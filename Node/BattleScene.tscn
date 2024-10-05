@@ -1,0 +1,115 @@
+[gd_scene load_steps=12 format=3 uid="uid://dnjjuoowbfuj"]
+
+[ext_resource type="Texture2D" uid="uid://dq737uhgbf5dw" path="res://Assets/Enemy/Bat/Bat01_01_T_R_Idle.png" id="1_fdg71"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_omsdp"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_53kvm"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tjfo3"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_omuad"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aoe1d"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_376r7"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kybx3"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ejrtx"]
+atlas = ExtResource("1_fdg71")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cu8p1"]
+animations = [{
+"frames": [{
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_omsdp")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_53kvm")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_tjfo3")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_omuad")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_aoe1d")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_376r7")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_kybx3")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_ejrtx")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 12.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_n0u52"]
+radius = 16.0312
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Player" type="Node" parent="."]
+
+[node name="Background" type="Node" parent="."]
+
+[node name="Enemy" type="Node" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Enemy"]
+position = Vector2(676, 250)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemy/StaticBody2D"]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_cu8p1")
+animation = &"Idle"
+frame_progress = 0.345321
+flip_h = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy/StaticBody2D"]
+scale = Vector2(1, 1.56)
+shape = SubResource("CircleShape2D_n0u52")
+
+[node name="UI" type="Node" parent="."]
+
+[node name="Attack_Strength" type="Button" parent="UI"]
+offset_left = 450.0
+offset_top = 202.0
+offset_right = 525.0
+offset_bottom = 233.0
+text = "Strength"
+
+[node name="Attack_Dexterity" type="Button" parent="UI"]
+offset_left = 451.0
+offset_top = 249.0
+offset_right = 512.0
+offset_bottom = 280.0
+text = "Dexter"
+
+[node name="Attack_Intellect" type="Button" parent="UI"]
+offset_left = 450.0
+offset_top = 298.0
+offset_right = 521.0
+offset_bottom = 329.0
+text = "Intellect"
