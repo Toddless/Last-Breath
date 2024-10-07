@@ -10,7 +10,6 @@ namespace Playground.Script.Items
 
         public override void ReduceDamageTaken()
         {
-
         }
     }
 }

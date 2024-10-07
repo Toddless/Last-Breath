@@ -78,8 +78,8 @@ namespace Playground.Script.LootGenerator
             factories =
             [
                 BowFactory.Instance,
-                DaggerFactory.Instance,
-                BodyArmorFactory.Instance,
+                SwordFactory.Instance,
+               // BodyArmorFactory.Instance,
             ];
         }
 
@@ -89,8 +89,8 @@ namespace Playground.Script.LootGenerator
             return factoryIndex switch
             {
                 0 => BowFactory.Instance,
-                1 => DaggerFactory.Instance,
-                2 => BodyArmorFactory.Instance,
+                1 => SwordFactory.Instance,
+             //   2 => BodyArmorFactory.Instance,
                 _ => throw new Exception(),
             };
         }

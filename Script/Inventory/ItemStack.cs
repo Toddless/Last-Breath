@@ -1,5 +1,4 @@
 ﻿using Godot;
-using Playground.Script.Items;
 using System;
 
 namespace Playground.Script.Inventory

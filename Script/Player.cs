@@ -4,106 +4,82 @@
     using Playground.Script;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using System;
 
     public partial class Player : CharacterBody2D
     {
         [Export]
-        private RestorePlayerMovement _button;
+        private RestorePlayerMovement _restoreMovementButton;
         [Export]
         private ProgressBar _progressBarMovement;
         [Export]
         private ResearchButton _researchButton;
         [Export]
-        private Weapon playerWeapon;
+        private Weapon _playerWeapon;
         [Export]
-        private BodyArmor playerArmor;
+        private BodyArmor _playerArmor;
         [Export]
-        private GridContainer inventory;
-        private AnimationTree animationTree;
-        private Inventory playerInventory;
-        private const int TileSize = 64;
-        private bool moving = false;
-        private Vector2 inputDirection = Vector2.Zero;
-        private double movementPoints;
-        private double MaxMovementPoints = 15;
+        private AnimationTree _animationTree;
+        [Export]
+        private Inventory _playerInventory;
+        private const int _tileSize = 64;
+        private bool _moving = false;
+        private Vector2 _inputDirection = Vector2.Zero;
+        private double _movementPoints;
+        private double _maxMovementPoints = 15;
         // здесь хранится зона в которой находится игрок
         private ZoneToResearch _currentZone;
-
-
-        public Inventory PlayerInventory
-        {
-            get => playerInventory;
-            private set => playerInventory = value;
-        }
-
         public Weapon PlayerWeapon
         {
-            get => playerWeapon;
-            set => playerWeapon = value;
+            get => _playerWeapon;
+            set => _playerWeapon = value;
         }
-
         public BodyArmor PlayerArmor
         {
-            get => playerArmor;
-            set => playerArmor = value;
-               
+            get => _playerArmor;
+            set => _playerArmor = value;
+
         }
 
         public override void _Ready()
         {
-            movementPoints = MaxMovementPoints;
-            _button.Pressed += RestoreMovementPoints;
-            playerInventory = new(30);
-            inventory = playerInventory;
-
-            // связываем зоны с сигналом
-            foreach (ZoneToResearch zone in GetTree().GetNodesInGroup("ZonesToResearch"))
-            {
-                zone.Connect(nameof(ZoneToResearch.OnPlayerEnteredZone), new Callable( this, nameof(OnPlayerEnteredZone)));
-            }
-            // подписываемся на эвент и вызываем метод
+            _movementPoints = _maxMovementPoints;
+            _restoreMovementButton.Pressed += RestoreMovementPoints;
             _researchButton.Pressed += ResearchCurrentZone;
         }
 
         public override void _Input(InputEvent @event)
         {
-            Movement(@event);
-        }
-
-        private void Movement(InputEvent @event)
-        {
             if (Input.IsActionJustPressed("ui_down"))
             {
-                inputDirection = Vector2.Down;
+                _inputDirection = Vector2.Down;
                 Move();
             }
             else if (Input.IsActionJustPressed("ui_up"))
             {
-                inputDirection = Vector2.Up;
+                _inputDirection = Vector2.Up;
                 Move();
             }
             else if (Input.IsActionJustPressed("ui_left"))
             {
-                inputDirection = Vector2.Left;
+                _inputDirection = Vector2.Left;
                 Move();
             }
             else if (Input.IsActionJustPressed("ui_right"))
             {
-                inputDirection = Vector2.Right;
+                _inputDirection = Vector2.Right;
                 Move();
             }
         }
 
         private async void Move()
         {
-            if (inputDirection != Vector2.Zero)
+            if (_inputDirection != Vector2.Zero)
             {
-                if (!moving && movementPoints != 0)
+                if (!_moving && _movementPoints != 0)
                 {
-                    moving = true;
+                    _moving = true;
                     var tween = CreateTween();
-                    tween.TweenProperty(this, "position", Position + inputDirection * TileSize, 0.25f);
+                    tween.TweenProperty(this, "position", Position + _inputDirection * _tileSize, 0.25f);
                     tween.TweenCallback(new Callable(this, nameof(MovingFalse)));
                     tween.TweenCallback(new Callable(this, nameof(ReduceMovementPoint)));
                     await ToSignal(tween, "finished");
@@ -113,43 +89,52 @@
 
         private void MovingFalse()
         {
-            moving = false;
+            _moving = false;
         }
 
         private void ReduceMovementPoint()
         {
-            movementPoints -= 1;
+            _movementPoints -= 1;
             UpdateMovementBar();
         }
 
         private void RestoreMovementPoints()
         {
-            movementPoints = MaxMovementPoints;
+            _movementPoints = _maxMovementPoints;
             UpdateMovementBar();
         }
 
         private void UpdateMovementBar()
         {
-            _progressBarMovement.MaxValue = MaxMovementPoints;
+            _progressBarMovement.MaxValue = _maxMovementPoints;
             var tween = CreateTween();
-            tween.TweenProperty(_progressBarMovement, "value", movementPoints, 0.5f);
+            tween.TweenProperty(_progressBarMovement, "value", _movementPoints, 0.5f);
         }
 
         private void OnPlayerEnteredZone(ZoneToResearch zone)
         {
             // если игрок в зоне, сохраняем ее
             _currentZone = zone;
-            GD.Print($"Player is in Zone: {zone}");
+            GD.Print($"Player is in area to research");
+        }
+
+        private void OnPlayerExitedZone()
+        {
+            // если игрок покинул зону, обнуляем
+            _currentZone = null;
+            GD.Print("Player left the area");
         }
 
         private void ResearchCurrentZone()
         {
             // при нажатии кнопки срабатывает ивент, который вызывает этот метод
-            // который вызывает метод зоны
-            var item = _currentZone.AddEvents();
-            if( item != null )
+            if (_currentZone == null)
+                return;
+            var item = _currentZone.ResearchArea();
+            if (item != null)
             {
-                playerInventory.AddItem(item);
+                item.Description();
+                _playerInventory.AddItem(item);
             }
         }
     }

@@ -6,7 +6,10 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Script\Chest\**" />
+    <EmbeddedResource Remove="Script\Chest\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Node\Components\" />
-    <Folder Include="Script\Chest\" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://cupef35moutgn"]
+
+[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_7rwgp"]
+[ext_resource type="Texture2D" uid="uid://6bjplofclo64" path="res://Assets/Weapon/fantasy_weapons_pack1_noglow.png" id="1_yeo7n"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0cndi"]
+atlas = ExtResource("1_yeo7n")
+region = Rect2(128, 96, 32, 32)
+
+[resource]
+script = ExtResource("1_7rwgp")
+ItemResourcePath = "res://Resource/BowMythic.tres"
+ItemName = "Bow Mythic"
+MaxStackSize = 1
+Icon = SubResource("AtlasTexture_0cndi")
+Rarity = 32
+Quantity = 1

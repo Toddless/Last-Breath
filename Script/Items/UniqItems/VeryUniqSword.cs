@@ -3,10 +3,10 @@ using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
 namespace Playground.Script.Items
 {
-    public partial class VeryUniqDagger : Dagger
+    public partial class VeryUniqSword : Sword
     {
-        private static VeryUniqDagger instance = null;
-        private VeryUniqDagger(
+        private static VeryUniqSword instance = null;
+        private VeryUniqSword(
             string weaponName,
             GlobalRarity rarity,
             float minDamage,
@@ -19,11 +19,11 @@ namespace Playground.Script.Items
         {
         }
 
-        public static VeryUniqDagger Instance
+        public static VeryUniqSword Instance
         {
             get
             {
-                instance ??= new VeryUniqDagger("Shadow Strike", GlobalRarity.Mythic, 600, 950, string.Empty, null, 1, 1);
+                instance ??= new VeryUniqSword("Shadow Strike", GlobalRarity.Mythic, 600, 950, "res://Resource/SwordMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Swords/SwordMythic.png"), 1, 1);
                 return instance;
             }
         }

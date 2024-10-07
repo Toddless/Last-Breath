@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://brq838p6sncer"]
+
+[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_gotee"]
+[ext_resource type="Texture2D" uid="uid://6bjplofclo64" path="res://Assets/Weapon/fantasy_weapons_pack1_noglow.png" id="1_ivhrx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lj1ab"]
+atlas = ExtResource("1_ivhrx")
+region = Rect2(128, 32, 32, 32)
+
+[resource]
+script = ExtResource("1_gotee")
+ItemResourcePath = "res://Resource/BowLegendary.tres"
+ItemName = "Bow Legendary"
+MaxStackSize = 1
+Icon = SubResource("AtlasTexture_lj1ab")
+Rarity = 16
+Quantity = 1

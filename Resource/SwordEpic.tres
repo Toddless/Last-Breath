@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://dd62i2bxacl1o"]
+
+[ext_resource type="Texture2D" uid="uid://6bjplofclo64" path="res://Assets/Weapon/fantasy_weapons_pack1_noglow.png" id="1_6mryn"]
+[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_wqtr5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_byp8j"]
+atlas = ExtResource("1_6mryn")
+region = Rect2(0, 128, 32, 32)
+
+[resource]
+script = ExtResource("1_wqtr5")
+ItemResourcePath = "res://Resource/SwordEpic.tres"
+ItemName = "Sword Epic"
+MaxStackSize = 1
+Icon = SubResource("AtlasTexture_byp8j")
+Rarity = 8
+Quantity = 1

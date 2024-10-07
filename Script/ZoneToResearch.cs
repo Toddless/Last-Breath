@@ -2,26 +2,24 @@
 {
     using Godot;
     using Playground.Script.Items;
-    using Playground.Script.Items.Factories;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class ZoneToResearch : Area2D
     {
-
-
-        // кастомный сигнал
+        // кастомный сигнал для входа игрока в зону
         [Signal]
         public delegate void OnPlayerEnteredZoneEventHandler(ZoneToResearch zone);
+        // кастомный сигнал для выхода игрока из зоны
+        [Signal]
+        public delegate void OnPlayerExitedZoneEventHandler(ZoneToResearch zone);
         public GlobalRarity globalRarity;
         private BasedOnRarityLootTable lootTable = new();
-        private Player player;
 
         public override void _Ready()
         {
             // поскольку зон может быть множество, добавляю их все в общую группу
             // в теории можно будет генерить события сразу для всех зон
             // на будущее: Найти информацию является ли это хорошей практикой
-            AddToGroup("ZonesToResearch");
             this.BodyEntered += OnPlayerEnter;
             this.BodyExited += OnPlayerExited;
             this.globalRarity = GlobalRarity.Epic;
@@ -46,10 +44,10 @@
                 return;
             }
             // при покидании зоны игроком обнуляем данный сигнал
-            EmitSignal(nameof(OnPlayerEnteredZone), null);
+            EmitSignal(nameof(OnPlayerExitedZone), null);
         }
 
-        public Item AddEvents()
+        public Item ResearchArea()
         {
             var item = lootTable.GetRandomItem();
             return item;

@@ -24,7 +24,7 @@ namespace Playground.Script.Items
         {
             get
             {
-                instance ??= new VeryUniqBow("Zeus`s Bow", GlobalRarity.Mythic, 600, 900, string.Empty, null, 1, 1);
+                instance ??= new VeryUniqBow("Zeus`s Bow", GlobalRarity.Mythic, 600, 900, "res://Resource/BowMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowMythic.png"), 1, 1);
                 return instance;
             }
         }
