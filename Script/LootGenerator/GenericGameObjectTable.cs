@@ -1,7 +1,7 @@
-﻿using Godot;
-
-namespace Playground.Script.LootGenerator
+﻿namespace Playground.Script.LootGenerator
 {
+    using Godot;
+
     public class GenericGameObjectTable : GenericObjectsTable<GenericGameObject, Node2D>
     {
     }

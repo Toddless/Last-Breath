@@ -1,8 +1,8 @@
-﻿using Playground.Script.Items.UniqItems;
-using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.Items.Factories
+﻿namespace Playground.Script.Items.Factories
 {
+    using Playground.Script.Items.UniqItems;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     public class BodyArmorFactory : ItemCreator
     {
         private static BodyArmorFactory instance = null;
@@ -20,8 +20,6 @@ namespace Playground.Script.Items.Factories
                 return instance;
             }
         }
-
-
 
         public override BodyArmor GenerateItem(GlobalRarity rarity)
         {

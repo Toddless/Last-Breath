@@ -1,11 +1,9 @@
-[gd_scene load_steps=61 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=59 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_4f7n1"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_fxid3"]
 [ext_resource type="Script" path="res://Script/Inventory/Inventory.cs" id="3_4mm32"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Font/Berry Rotunda.ttf" id="3_u30rm"]
-[ext_resource type="Resource" uid="uid://cupef35moutgn" path="res://Resource/BowMythic.tres" id="4_ustoj"]
-[ext_resource type="Resource" uid="uid://cbolwlym8jkpo" path="res://Resource/BowEpic.tres" id="5_xd7ti"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_fxid3")
@@ -458,7 +456,6 @@ shape = SubResource("CircleShape2D_1c8vr")
 
 [node name="Inventory" type="Node" parent="."]
 script = ExtResource("3_4mm32")
-_starterItems = Array[Object]([ExtResource("4_ustoj"), ExtResource("5_xd7ti")])
 
 [node name="InventoryWindow" type="Panel" parent="Inventory"]
 anchors_preset = 8

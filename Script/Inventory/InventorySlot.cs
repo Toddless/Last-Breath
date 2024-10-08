@@ -109,11 +109,5 @@ namespace Playground
                 RemoveItem(InventoryItem);
             }
         }
-
-
-        public void UpdateItem(Item item, int index)
-        {
-
-        }
     }
 }

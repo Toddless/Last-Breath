@@ -1,8 +1,9 @@
-﻿using Godot;
-using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.Items
+﻿namespace Playground.Script.Items
 {
+    using Godot;
+    using Playground.Script.Helpers;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     public partial class VeryUniqSword : Sword
     {
         private static VeryUniqSword instance = null;
@@ -23,7 +24,7 @@ namespace Playground.Script.Items
         {
             get
             {
-                instance ??= new VeryUniqSword("Shadow Strike", GlobalRarity.Mythic, 600, 950, "res://Resource/SwordMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Swords/SwordMythic.png"), 1, 1);
+                instance ??= new VeryUniqSword(StringHelper.SwordMythic, GlobalRarity.Mythic, 600, 950, "res://Resource/SwordMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Swords/SwordMythic.png"), 1, 1);
                 return instance;
             }
         }

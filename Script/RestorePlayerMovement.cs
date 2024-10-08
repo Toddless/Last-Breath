@@ -1,8 +1,8 @@
-using Godot;
-
 namespace Playground
 {
-	public partial class RestorePlayerMovement : Button
+    using Godot;
+
+    public partial class RestorePlayerMovement : Button
 	{
     }
 }

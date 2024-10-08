@@ -1,7 +1,7 @@
-﻿using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.LootGenerator
+﻿namespace Playground.Script.LootGenerator
 {
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     public abstract class GenericObject<T>
         where T : class
     {

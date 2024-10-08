@@ -1,8 +1,8 @@
-﻿using Godot;
-using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.Items.UniqItems
+﻿namespace Playground.Script.Items.UniqItems
 {
+    using Godot;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     partial class VeryUniqBodyArmor : BodyArmor
     {
         private static VeryUniqBodyArmor instance = null;

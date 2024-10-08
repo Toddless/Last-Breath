@@ -1,11 +1,11 @@
-﻿using Godot;
-using Playground.Script.Items;
-using Playground.Script.Items.Factories;
-using System;
-using System.Collections.Generic;
-
-namespace Playground.Script.LootGenerator
+﻿namespace Playground.Script.LootGenerator
 {
+    using Godot;
+    using Playground.Script.Items;
+    using Playground.Script.Items.Factories;
+    using System;
+    using System.Collections.Generic;
+
     public abstract class GenericObjectsTable<T, U>
         where T : GenericObject<U> where U : class
     {
@@ -94,19 +94,5 @@ namespace Playground.Script.LootGenerator
                 _ => throw new Exception(),
             };
         }
-
-        //private T PickLootDropItem()
-        //{
-        //    float pickedNumber = random.RandfRange(0, probabilityTotalWeight);
-        //    foreach (T lootDropItem in lootDropItems)
-        //    {
-        //        if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
-        //        {
-        //            return lootDropItem;
-        //        }
-        //    }
-        //    return null;
-        //}
-
     }
 }

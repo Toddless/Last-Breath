@@ -1,8 +1,9 @@
-﻿using Godot;
-using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.Items
+﻿namespace Playground.Script.Items
 {
+    using Godot;
+    using Playground.Script.Helpers;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     public partial class VeryUniqBow : Bow
     {
         private static VeryUniqBow instance = null;
@@ -24,7 +25,7 @@ namespace Playground.Script.Items
         {
             get
             {
-                instance ??= new VeryUniqBow("Zeus`s Bow", GlobalRarity.Mythic, 600, 900, "res://Resource/BowMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowMythic.png"), 1, 1);
+                instance ??= new VeryUniqBow(StringHelper.BowMythic, GlobalRarity.Mythic, 600, 900, "res://Resource/BowMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowMythic.png"), 1, 1);
                 return instance;
             }
         }

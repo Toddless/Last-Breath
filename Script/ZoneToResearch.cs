@@ -6,6 +6,7 @@
 
     public partial class ZoneToResearch : Area2D
     {
+        private BasedOnRarityLootTable _lootTable = new();
         // кастомный сигнал для входа игрока в зону
         [Signal]
         public delegate void OnPlayerEnteredZoneEventHandler(ZoneToResearch zone);
@@ -13,18 +14,17 @@
         [Signal]
         public delegate void OnPlayerExitedZoneEventHandler(ZoneToResearch zone);
         public GlobalRarity globalRarity;
-        private BasedOnRarityLootTable lootTable = new();
 
         public override void _Ready()
         {
             // поскольку зон может быть множество, добавляю их все в общую группу
             // в теории можно будет генерить события сразу для всех зон
             // на будущее: Найти информацию является ли это хорошей практикой
-            this.BodyEntered += OnPlayerEnter;
-            this.BodyExited += OnPlayerExited;
-            this.globalRarity = GlobalRarity.Epic;
-            lootTable.InitializeLootTable();
-            lootTable.ValidateTable();
+            BodyEntered += OnPlayerEnter;
+            BodyExited += OnPlayerExited;
+            globalRarity = GlobalRarity.Epic;
+            _lootTable.InitializeLootTable();
+            _lootTable.ValidateTable();
         }
 
         private void OnPlayerEnter(Node node)
@@ -49,7 +49,7 @@
 
         public Item ResearchArea()
         {
-            var item = lootTable.GetRandomItem();
+            var item = _lootTable.GetRandomItem();
             return item;
         }
     }

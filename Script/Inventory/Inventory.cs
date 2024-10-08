@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Inventory
 {
     using Godot;
-    using Godot.Collections;
+    using Playground.Script.Helpers;
     using Playground.Script.Items;
     using System.Collections.Generic;
     using System.Linq;
@@ -291,13 +291,11 @@
         //}
         #endregion
 
-        private string _itemSlotPath = "res://Node/InventorySlot.tscn";
+        private string _inventorySlotPath = SceneParh.InventorySlot;
         private GridContainer _inventoryContainer;
-        private static Inventory instance = null;
+        private static Inventory _instance = null;
         private List<InventorySlot> _slots = [];
         private PackedScene _inventorySlot;
-        [Export]
-        private Array<Item> _starterItems;
         private Panel _inventoryWindow;
         private int _capacity = 35;
         private Label _infoText;
@@ -311,8 +309,8 @@
         {
             get
             {
-                instance ??= new Inventory();
-                return instance;
+                _instance ??= new Inventory();
+                return _instance;
             }
         }
 
@@ -321,20 +319,15 @@
             _inventoryWindow = GetNode<Panel>("InventoryWindow");
             _inventoryContainer = GetNode<GridContainer>("InventoryWindow/InventoryContainer");
             _infoText = GetNode<Label>("InventoryWindow/InfoText");
-            _inventorySlot = ResourceLoader.Load<PackedScene>(_itemSlotPath);
+            _inventorySlot = ResourceLoader.Load<PackedScene>(_inventorySlotPath);
             Initialize();
             ToggleWindow(false);
 
-            foreach (InventorySlot child in _inventoryContainer.GetChildren())
+            foreach (InventorySlot child in _inventoryContainer.GetChildren().Cast<InventorySlot>())
             {
                 _slots.Append(child);
                 child.SetItem(null);
                 child._inventory = this;
-            }
-
-            foreach (Item item in _starterItems)
-            {
-                AddItem(item);
             }
         }
 

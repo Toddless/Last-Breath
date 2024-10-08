@@ -1,8 +1,8 @@
-﻿using Godot;
-using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-
-namespace Playground.Script.Items
+﻿namespace Playground.Script.Items
 {
+    using Godot;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+
     public partial class Bow(
         string weaponName,
         GlobalRarity rarity,

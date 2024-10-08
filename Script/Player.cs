@@ -28,11 +28,13 @@
         private double _maxMovementPoints = 15;
         // здесь хранится зона в которой находится игрок
         private ZoneToResearch _currentZone;
+
         public Weapon PlayerWeapon
         {
             get => _playerWeapon;
             set => _playerWeapon = value;
         }
+
         public BodyArmor PlayerArmor
         {
             get => _playerArmor;
