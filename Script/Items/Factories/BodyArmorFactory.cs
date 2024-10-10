@@ -23,6 +23,7 @@
 
         public override BodyArmor GenerateItem(GlobalRarity rarity)
         {
+            // потенциальный memory leak
             return rarity switch
             {
                 GlobalRarity.Common => new BodyArmor("Bronze BodyArmor", GlobalRarity.Common, RandomNumberGenerator.RandfRange(100, 150), RandomNumberGenerator.RandfRange(25, 50), string.Empty, null, 1, 1),

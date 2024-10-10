@@ -17,5 +17,4 @@
 
         public GlobalRarity Rarity;
     }
-
 }

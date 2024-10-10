@@ -1,0 +1,67 @@
+[gd_scene load_steps=13 format=3 uid="uid://pr1grqs702wc"]
+
+[ext_resource type="PackedScene" uid="uid://clhkconm7wvrw" path="res://Scenes/Player.tscn" id="1_6tao4"]
+[ext_resource type="Script" path="res://Script/BattleTurnManager.cs" id="1_yrqdj"]
+[ext_resource type="Script" path="res://Script/Character.cs" id="3_rr338"]
+[ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="4_5csh0"]
+[ext_resource type="Resource" uid="uid://clv2eqh430578" path="res://Resource/CombatActions/BaseAttack.tres" id="4_kfaox"]
+[ext_resource type="Texture2D" uid="uid://dq737uhgbf5dw" path="res://Assets/Enemy/Bat/Bat01_01_T_R_Idle.png" id="5_0cm3x"]
+[ext_resource type="Resource" uid="uid://c2itwwhpbxdr4" path="res://Resource/CombatActions/Heal.tres" id="5_fnqsk"]
+[ext_resource type="Resource" uid="uid://dipmso3c5vdpj" path="res://Resource/CombatActions/Stump.tres" id="6_mqkra"]
+[ext_resource type="Script" path="res://Scenes/CombatActionButton.cs" id="9_3fpqq"]
+[ext_resource type="Script" path="res://Scenes/CombatActionButtons.cs" id="9_owynk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vyokk"]
+atlas = ExtResource("4_5csh0")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kcf8k"]
+atlas = ExtResource("5_0cm3x")
+region = Rect2(0, 0, 32, 32)
+
+[node name="BattleScene" type="Node2D"]
+script = ExtResource("1_yrqdj")
+
+[node name="Player" parent="." node_paths=PackedStringArray("_opponent") instance=ExtResource("1_6tao4")]
+position = Vector2(102, 69)
+script = ExtResource("3_rr338")
+_isPlayer = true
+_combatActions = [ExtResource("4_kfaox"), ExtResource("5_fnqsk"), ExtResource("6_mqkra")]
+_opponent = NodePath("../Enemy")
+_visual = SubResource("AtlasTexture_vyokk")
+
+[node name="Enemy" parent="." node_paths=PackedStringArray("_opponent") instance=ExtResource("1_6tao4")]
+position = Vector2(278, 69)
+script = ExtResource("3_rr338")
+_combatActions = [ExtResource("4_kfaox"), ExtResource("5_fnqsk"), ExtResource("6_mqkra")]
+_opponent = NodePath("../Player")
+_visual = SubResource("AtlasTexture_kcf8k")
+_flipVisual = true
+
+[node name="CombarActionUI" type="VBoxContainer" parent="."]
+offset_left = 296.0
+offset_top = 258.0
+offset_right = 336.0
+offset_bottom = 298.0
+scale = Vector2(2.59058, 1.8351)
+theme_override_constants/separation = 1
+script = ExtResource("9_owynk")
+
+[node name="CombatActionAttack" type="Button" parent="CombarActionUI"]
+layout_mode = 2
+text = "Attack"
+script = ExtResource("9_3fpqq")
+
+[node name="CombatActionHeal" type="Button" parent="CombarActionUI"]
+layout_mode = 2
+text = "Attack"
+script = ExtResource("9_3fpqq")
+
+[node name="CombatActionStump" type="Button" parent="CombarActionUI"]
+layout_mode = 2
+text = "Attack"
+script = ExtResource("9_3fpqq")
+
+[connection signal="pressed" from="CombarActionUI/CombatActionAttack" to="CombarActionUI/CombatActionAttack" method="OnPressed"]
+[connection signal="pressed" from="CombarActionUI/CombatActionHeal" to="CombarActionUI/CombatActionHeal" method="OnPressed"]
+[connection signal="pressed" from="CombarActionUI/CombatActionStump" to="CombarActionUI/CombatActionStump" method="OnPressed"]

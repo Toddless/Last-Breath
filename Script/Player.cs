@@ -1,6 +1,7 @@
 ﻿namespace Playground
 {
     using Godot;
+    using Godot.Collections;
     using Playground.Script;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
@@ -9,10 +10,6 @@
     {
         [Export]
         private RestorePlayerMovement _restoreMovementButton;
-        [Export]
-        private ProgressBar _progressBarMovement;
-        [Export]
-        private ResearchButton _researchButton;
         [Export]
         private Weapon _playerWeapon;
         [Export]
@@ -28,6 +25,28 @@
         private double _maxMovementPoints = 15;
         // здесь хранится зона в которой находится игрок
         private ZoneToResearch _currentZone;
+
+        #region Combat
+        [Export]
+        private bool _isPlayer;
+        [Export]
+        private float _currentHealth;
+        [Export]
+        private float _maxHealth = 100;
+        [Export]
+        private Array _combatAction;
+        [Export]
+        private Node _opponent;
+        #endregion
+
+        #region UI
+        private ProgressBar _healthBar;
+        [Export]
+        private ProgressBar _progressBarMovement;
+        [Export]
+        private ResearchButton _researchButton;
+        private Label _healthBarText;
+        #endregion
 
         public Weapon PlayerWeapon
         {
@@ -73,6 +92,33 @@
             }
         }
 
+        private void UpdateHealthBar()
+        {
+            // обновляем значение healthBar
+            _healthBar.Value = _currentHealth;
+            // обновляем текст
+            _healthBarText.Text = _currentHealth.ToString();
+        }
+
+        private void TakeDamage(float damage)
+        {
+            _currentHealth -= damage;
+            // если здоровье меньше 0
+            if (_currentHealth < 0)
+                // вызываем метод GameOver
+                QueueFree();
+            UpdateHealthBar();
+        }
+
+        private void Heal(float amount)
+        {
+            _currentHealth += amount;
+            if (_currentHealth > _maxHealth)
+                // если здоровье больше максимального, присваиваем максимальное значение
+                _currentHealth = _maxHealth;
+            UpdateHealthBar();
+        }
+
         private async void Move()
         {
             if (_inputDirection != Vector2.Zero)
@@ -80,10 +126,13 @@
                 if (!_moving && _movementPoints != 0)
                 {
                     _moving = true;
+                    // создаем новый tween
                     var tween = CreateTween();
+                    // передаем в tween свойство, которое хотим изменить, направление и длину анимации
                     tween.TweenProperty(this, "position", Position + _inputDirection * _tileSize, 0.25f);
                     tween.TweenCallback(new Callable(this, nameof(MovingFalse)));
                     tween.TweenCallback(new Callable(this, nameof(ReduceMovementPoint)));
+                    // ожидаем завершения анимации
                     await ToSignal(tween, "finished");
                 }
             }

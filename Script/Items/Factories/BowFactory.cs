@@ -24,6 +24,7 @@
 
         public override Bow GenerateItem(GlobalRarity globalRarity)
         {
+            // потенциальный memory leak
             return globalRarity switch
             {
                 GlobalRarity.Common => new Bow(StringHelper.BowCommon, GlobalRarity.Common, RandomNumberGenerator.RandfRange(25, 50), RandomNumberGenerator.RandfRange(100, 150), string.Empty, null, 1, 1),

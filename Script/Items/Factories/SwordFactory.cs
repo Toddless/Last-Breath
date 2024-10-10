@@ -24,6 +24,7 @@
 
         public override Sword GenerateItem(GlobalRarity rarity)
         {
+            // потенциальный memory leak
             return rarity switch
             {
                 GlobalRarity.Common => new Sword(StringHelper.SwordCommon, GlobalRarity.Common, RandomNumberGenerator.RandfRange(30, 45), RandomNumberGenerator.RandfRange(140, 160), string.Empty, null, 1, 1),
