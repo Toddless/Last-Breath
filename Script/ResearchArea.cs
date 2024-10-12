@@ -4,16 +4,30 @@
     using Playground.Script.Items;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
-    public partial class ZoneToResearch : Area2D
+    public partial class ResearchArea : Area2D
     {
+        #region Private fields
         private BasedOnRarityLootTable _lootTable = new();
-        // кастомный сигнал для входа игрока в зону
+        #endregion
+
+        #region Signals
         [Signal]
-        public delegate void OnPlayerEnteredZoneEventHandler(ZoneToResearch zone);
-        // кастомный сигнал для выхода игрока из зоны
+        public delegate void OnPlayerEnteredZoneEventHandler(ResearchArea zone);
         [Signal]
-        public delegate void OnPlayerExitedZoneEventHandler(ZoneToResearch zone);
-        public GlobalRarity globalRarity;
+        public delegate void OnPlayerExitedZoneEventHandler(ResearchArea zone);
+        [Signal]
+        public delegate void PlayerTakeDamageOnAreaEnterEventHandler(float damage);
+        #endregion
+
+        private GlobalRarity _areaRarity;
+
+        #region Public properties
+        public GlobalRarity AreaRarity
+        {
+            get => _areaRarity;
+            set => _areaRarity = value;
+        }
+        #endregion
 
         public override void _Ready()
         {
@@ -22,7 +36,7 @@
             // на будущее: Найти информацию является ли это хорошей практикой
             BodyEntered += OnPlayerEnter;
             BodyExited += OnPlayerExited;
-            globalRarity = GlobalRarity.Epic;
+            AreaRarity = GlobalRarity.Epic;
             _lootTable.InitializeLootTable();
             _lootTable.ValidateTable();
         }
@@ -33,8 +47,9 @@
             {
                 return;
             }
+            EmitSignal(SignalName.PlayerTakeDamageOnAreaEnter, 250f);
             // когда игрок пересекает зону, отправляем сигнал
-            EmitSignal(nameof(OnPlayerEnteredZone), this);
+            EmitSignal(SignalName.OnPlayerEnteredZone, this);
         }
 
         private void OnPlayerExited(Node node)
@@ -44,10 +59,10 @@
                 return;
             }
             // при покидании зоны игроком обнуляем данный сигнал
-            EmitSignal(nameof(OnPlayerExitedZone), null);
+            EmitSignal(SignalName.OnPlayerExitedZone, null);
         }
 
-        public Item ResearchArea()
+        public Item GetRandomResearchEvent()
         {
             var item = _lootTable.GetRandomItem();
             return item;

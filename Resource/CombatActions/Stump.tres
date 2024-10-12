@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_v5vxt")
-_name = "Stump"
-_damage = 18.0
-_heal = 0.0
+Name = "Stump"
+Damage = 18.0
+Heal = 0.0

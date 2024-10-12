@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_dcpj7")
-_name = "Heal"
-_damage = 0.0
-_heal = 10.0
+Name = "Heal"
+Damage = 0.0
+Heal = 10.0

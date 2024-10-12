@@ -26,7 +26,6 @@
             // потенциальный memory leak
             return rarity switch
             {
-                GlobalRarity.Common => new BodyArmor("Bronze BodyArmor", GlobalRarity.Common, RandomNumberGenerator.RandfRange(100, 150), RandomNumberGenerator.RandfRange(25, 50), string.Empty, null, 1, 1),
                 GlobalRarity.Uncommon => new BodyArmor("Iron BodyArmor", GlobalRarity.Uncommon, RandomNumberGenerator.RandfRange(160, 220), RandomNumberGenerator.RandfRange(65, 80), string.Empty, null, 1, 1),
                 GlobalRarity.Rare => new BodyArmor("Silver BodyArmor", GlobalRarity.Rare, RandomNumberGenerator.RandfRange(200, 280), RandomNumberGenerator.RandfRange(70, 120), string.Empty, null, 1, 1),
                 GlobalRarity.Epic => new("Golden BodyArmor", GlobalRarity.Epic, RandomNumberGenerator.RandfRange(260, 320), RandomNumberGenerator.RandfRange(130, 160), string.Empty, null, 1, 1),

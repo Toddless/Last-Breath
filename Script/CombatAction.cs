@@ -4,9 +4,9 @@ using Godot;
 public partial class CombatAction : Resource
 {
     [Export]
-    private string _name;
+    public string Name;
     [Export]
-    private float _damage;
+    public float Damage;
     [Export]
-    private float _heal;
+    public float Heal;
 }

@@ -27,7 +27,6 @@
             // потенциальный memory leak
             return globalRarity switch
             {
-                GlobalRarity.Common => new Bow(StringHelper.BowCommon, GlobalRarity.Common, RandomNumberGenerator.RandfRange(25, 50), RandomNumberGenerator.RandfRange(100, 150), string.Empty, null, 1, 1),
                 GlobalRarity.Uncommon => new Bow(StringHelper.BowUncommon, GlobalRarity.Uncommon, RandomNumberGenerator.RandfRange(65, 80), RandomNumberGenerator.RandfRange(160, 220), ResourcePath.BowUncommon, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowUncommon.png"), 1, 1),
                 GlobalRarity.Rare => new Bow(StringHelper.BowRare, GlobalRarity.Rare, RandomNumberGenerator.RandfRange(70, 120), RandomNumberGenerator.RandfRange(200, 280), ResourcePath.BowRare, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowRare.png"), 1, 1),
                 GlobalRarity.Epic => new Bow(StringHelper.BowEpic, GlobalRarity.Epic, RandomNumberGenerator.RandfRange(130, 160), RandomNumberGenerator.RandfRange(260, 320), ResourcePath.BowEpic, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowEpic.png"), 1, 1),

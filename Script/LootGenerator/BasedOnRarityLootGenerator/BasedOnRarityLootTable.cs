@@ -4,15 +4,14 @@
     {
         public void InitializeLootTable()
         {
-            lootDropItems = new()
-            {
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Common),
+            lootDropItems =
+            [
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Uncommon),
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Rare),
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Epic),
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Legendary),
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Mythic),
-            };
+            ];
         }
     }
 }

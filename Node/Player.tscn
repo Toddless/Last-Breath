@@ -1,9 +1,13 @@
-[gd_scene load_steps=59 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=63 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_4f7n1"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_fxid3"]
-[ext_resource type="Script" path="res://Script/Inventory/Inventory.cs" id="3_4mm32"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Font/Berry Rotunda.ttf" id="3_u30rm"]
+[ext_resource type="Texture2D" uid="uid://bdcjbdp4ohog8" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Normal.png" id="5_58vpv"]
+[ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="6_w46fu"]
+[ext_resource type="Script" path="res://Components/HealthComponent.cs" id="7_2s6kv"]
+[ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="8_5dtdn"]
+[ext_resource type="Script" path="res://Components/AttackComponent.cs" id="8_nwamj"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_fxid3")
@@ -435,7 +439,7 @@ shadow_color = Color(0, 0, 0, 1)
 physics_interpolation_mode = 2
 position = Vector2(86, 154)
 script = ExtResource("1_4f7n1")
-_playerInventory = NodePath("Inventory")
+_playerInventory = NodePath("")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_uobba")
@@ -454,10 +458,14 @@ libraries = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1c8vr")
 
-[node name="Inventory" type="Node" parent="."]
-script = ExtResource("3_4mm32")
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("7_2s6kv")
+_maxHealth = 500.0
 
-[node name="InventoryWindow" type="Panel" parent="Inventory"]
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("8_5dtdn")
+
+[node name="InventoryWindow" type="Panel" parent="InventoryComponent"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -471,7 +479,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 
-[node name="InventoryContainer" type="GridContainer" parent="Inventory/InventoryWindow"]
+[node name="InventoryContainer" type="GridContainer" parent="InventoryComponent/InventoryWindow"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -488,7 +496,7 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 5
 
-[node name="InfoText" type="Label" parent="Inventory/InventoryWindow"]
+[node name="InfoText" type="Label" parent="InventoryComponent/InventoryWindow"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -502,31 +510,24 @@ grow_horizontal = 2
 grow_vertical = 0
 label_settings = SubResource("LabelSettings_5soym")
 
-[node name="Panel" type="Panel" parent="Inventory/InventoryWindow"]
-visible = false
-custom_minimum_size = Vector2(100, 130)
-layout_mode = 2
-offset_left = 221.0
-offset_top = 32.0
-offset_right = 321.0
-offset_bottom = 192.0
-
-[node name="GridContainer" type="GridContainer" parent="Inventory/InventoryWindow/Panel"]
+[node name="ClearButton" type="Button" parent="InventoryComponent/InventoryWindow"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 5.0
-offset_right = 90.0
-offset_bottom = 120.0
-scale = Vector2(1.009, 1.3)
-theme_override_constants/v_separation = 2
+offset_left = 23.0
+offset_top = 320.0
+offset_right = 226.0
+offset_bottom = 374.0
+scale = Vector2(0.213588, 0.514125)
+icon = ExtResource("5_58vpv")
 
-[node name="FullIcon" type="TextureRect" parent="Inventory/InventoryWindow/Panel/GridContainer"]
-custom_minimum_size = Vector2(80, 60)
-layout_mode = 2
+[node name="ClearButtonText" type="Label" parent="InventoryComponent/InventoryWindow/ClearButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(4.93912, 2.41147)
+text = "Clear"
+label_settings = ExtResource("6_w46fu")
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Descrip" type="Label" parent="Inventory/InventoryWindow/Panel/GridContainer"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-
-[node name="Stats" type="Label" parent="Inventory/InventoryWindow/Panel/GridContainer"]
-layout_mode = 2
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("8_nwamj")

@@ -7,8 +7,11 @@
     [GlobalClass]
     public partial class Item : Resource
     {
-        private readonly RandomNumberGenerator randomNumberGenerator = new();
+        #region Private fields
+        private readonly RandomNumberGenerator _randomNumberGenerator = new();
+        #endregion
 
+        #region Export fields
         [Export]
         public string ItemResourcePath;
         [Export]
@@ -23,13 +26,15 @@
         public GlobalRarity Rarity;
         [Export]
         public int Quantity;
+        #endregion
 
+        #region Properties
         protected RandomNumberGenerator RandomNumberGenerator
         {
-            get { return randomNumberGenerator; }
+            get { return _randomNumberGenerator; }
         }
-
         public Guid Guid { get; private set; } = Guid.NewGuid();
+        #endregion
 
 
         public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D icon, int stackSize, int quantity)

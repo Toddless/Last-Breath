@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_hwbxx")
-_name = "Hit"
-_damage = 10.0
-_heal = 0.0
+Name = "Attack"
+Damage = 10.0
+Heal = 0.0

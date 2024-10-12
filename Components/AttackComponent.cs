@@ -1,0 +1,83 @@
+namespace Playground
+{
+    using Godot;
+
+    [GlobalClass]
+    public partial class AttackComponent : Node
+    {
+        #region Export fields
+        private readonly RandomNumberGenerator _rng = new();
+        private float _finalDamage;
+        private float _baseMinDamage;
+        private float _baseMaxDamage;
+        private float _criticalStrikeChance;
+        private float _criticalStrikeDamage;
+        private float _damage;
+        #endregion
+
+        #region Properties
+
+        public float BaseMinDamage
+        {
+            get => _baseMinDamage;
+            set => _baseMinDamage = value;
+        }
+
+        public float BaseMaxDamage
+        {
+            get => _baseMaxDamage;
+            set => _baseMaxDamage = value;
+        }
+
+        public float FinalDamage
+        {
+            get
+            {
+                if (HitCritical())
+                {
+                    return (GetAvarageDamage() + _damage) * _criticalStrikeDamage;
+                }
+                return GetAvarageDamage() + _damage;
+            }
+        }
+
+        public float CriticalStrikeChance
+        {
+            get => _criticalStrikeChance;
+            set => _criticalStrikeChance = value;
+        }
+
+        public float CriticalStrikeDamage
+        {
+            get => _criticalStrikeDamage;
+            set => _criticalStrikeDamage = value;
+        }
+
+        #endregion
+
+        public override void _Ready()
+        {
+            _criticalStrikeDamage = 1.5f;
+            _criticalStrikeChance = 0.05f;
+            _baseMinDamage = 25f;
+            _baseMaxDamage = 100f;
+        }
+
+        public float DealDamage(float damage)
+        {
+            _damage = damage;
+            return FinalDamage;
+        }
+
+        private bool HitCritical()
+        {
+            var criticalStrike = _rng.RandfRange(0, 1);
+            return criticalStrike <= _criticalStrikeChance;
+        }
+
+        private float GetAvarageDamage()
+        {
+            return _rng.RandfRange(_baseMinDamage, _baseMaxDamage);
+        }
+    }
+}

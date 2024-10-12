@@ -6,17 +6,20 @@ namespace Playground
 
     public partial class InventorySlot : Node
     {
+        #region Private fields
         private Label _quantityLabel;
+        private InventoryComponent _inventory;
+        private Item _inventoryItem;
         private TextureRect _icon;
         private int _quantity;
         private int _index;
-        public Inventory _inventory;
-        public Item InventoryItem;
+        #endregion
 
-        public Inventory Inventory
+        #region Properties
+        public InventoryComponent Inventory
         {
             get => _inventory;
-            private set => _inventory = value;
+            set => _inventory = value;
         }
 
         public int Quantity
@@ -24,6 +27,14 @@ namespace Playground
             get => _quantity;
             private set => _quantity = value;
         }
+
+        public Item InventoryItem
+        {
+            get => _inventoryItem;
+            private set => _inventoryItem = value;
+        }
+
+        #endregion
 
         public override void _Ready()
         {
@@ -82,6 +93,14 @@ namespace Playground
             }
         }
 
+        public void RemoveItself()
+        {
+            _quantityLabel.Text = string.Empty;
+            _quantity = 0;
+            _icon.Texture = null;
+            InventoryItem = null;
+        }
+
         public void UpdateQuantity()
         {
             if (_quantity <= 1)
@@ -99,14 +118,6 @@ namespace Playground
             if (InventoryItem == null)
             {
                 return;
-            }
-
-            var removeAfterUse = InventoryItem.OnUse(_inventory.GetParent<Player>());
-
-            if (removeAfterUse)
-            {
-                InventoryItem.Free();
-                RemoveItem(InventoryItem);
             }
         }
     }

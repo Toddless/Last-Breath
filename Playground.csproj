@@ -6,11 +6,14 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Scenes\Components\**" />
     <Compile Remove="Script\Chest\**" />
+    <EmbeddedResource Remove="Scenes\Components\**" />
     <EmbeddedResource Remove="Script\Chest\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Node\Components\" />
+    <Folder Include="Node\" />
+    <Folder Include="Scenes\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".editorconfig" />

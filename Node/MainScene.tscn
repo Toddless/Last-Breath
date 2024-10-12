@@ -1,15 +1,15 @@
 [gd_scene load_steps=17 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/_PNG/MainLev.png" id="1_4jlib"]
-[ext_resource type="Script" path="res://Script/ZoneToResearch.cs" id="2_oipc7"]
+[ext_resource type="Script" path="res://Script/ResearchArea.cs" id="2_p52a2"]
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Node/Player.tscn" id="2_sxnxb"]
-[ext_resource type="Script" path="res://Script/RestorePlayerMovement.cs" id="5_ccrgj"]
+[ext_resource type="Script" path="res://Script/UI/RestorePlayerMovement.cs" id="5_ccrgj"]
 [ext_resource type="Texture2D" uid="uid://bxlecob3ygmmm" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BqBar.png" id="5_p8jfl"]
 [ext_resource type="Texture2D" uid="uid://swxnp7pvxjvd" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BarHealth.png" id="6_xogud"]
 [ext_resource type="Texture2D" uid="uid://b3m1yc8ttdfp6" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BarMana.png" id="7_kj832"]
 [ext_resource type="Texture2D" uid="uid://drkeixjqccjy0" path="res://Assets/UI MMORPG Dark Templar/Game Menu & Pause/Buttons/Button Normal.png" id="8_ijle3"]
 [ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="10_4khdd"]
-[ext_resource type="Script" path="res://Script/ResearchButton.cs" id="11_vpeqh"]
+[ext_resource type="Script" path="res://Script/UI/ResearchButton.cs" id="11_vpeqh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
 texture = ExtResource("1_4jlib")
@@ -595,7 +595,7 @@ bg_color = Color(0.13, 0.13, 0.13, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uegfl"]
 bg_color = Color(0.831276, 0.518108, 0.136693, 1)
 
-[node name="Node2D" type="Node2D"]
+[node name="MainScene" type="Node2D"]
 
 [node name="GlobalMap" type="Node" parent="."]
 
@@ -606,8 +606,8 @@ tile_set = SubResource("TileSet_jmesm")
 [node name="SpawnMap" type="TileMapLayer" parent="GlobalMap"]
 tile_set = SubResource("TileSet_jk2yw")
 
-[node name="Area2D" type="Area2D" parent="GlobalMap/SpawnMap" groups=["ZonesToResearch"]]
-script = ExtResource("2_oipc7")
+[node name="Area2D" type="Area2D" parent="GlobalMap/SpawnMap"]
+script = ExtResource("2_p52a2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GlobalMap/SpawnMap/Area2D"]
 position = Vector2(159, 159)
@@ -729,3 +729,4 @@ show_percentage = false
 
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]
+[connection signal="PlayerTakeDamageOnAreaEnter" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="TakeDamageOnAreaDamage"]
