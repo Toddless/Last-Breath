@@ -15,5 +15,8 @@
         public static readonly string BowEpic = "Bow Gold";
         public static readonly string BowLegendary = "Bow Phoenix Fire";
         public static readonly string BowMythic = "Zeus`s Bow";
+
+
+        public static readonly string BodyArmorMythic = "Heart of darkness";
     }
 }

@@ -10,6 +10,12 @@
     [GlobalClass]
     public partial class InventoryComponent : Node
     {
+        #region Path conts
+        private const string InventoryContainer = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/InventoryContainer";
+        private const string ClearButton = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/ClearButton";
+        private const string InventoryWindow = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow";
+        #endregion
+
         #region Private fields
         private string _inventorySlotPath = SceneParh.InventorySlot;
         private GridContainer _inventoryContainer;
@@ -17,27 +23,24 @@
         private PackedScene _inventorySlot;
         private Panel _inventoryWindow;
         private Button _clearButton;
-        private Label _infoText;
+        [Export]
         private int _capacity = 35;
         #endregion
 
-        #region Properties
-        public Label InfoText
-        {
-            get => _infoText;
-            private set => _infoText = value;
-        }
-
+        #region Signals
+        [Signal]
+        public delegate void OnPlayerEquipItemEventHandler(Item item);
         #endregion
 
         public override void _Ready()
         {
+
             _inventorySlot = ResourceLoader.Load<PackedScene>(_inventorySlotPath);
-            _inventoryContainer = GetNode<GridContainer>("/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/InventoryContainer");
-            _clearButton = GetNode<Button>("/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/ClearButton");
-            _infoText = GetNode<Label>("/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/InfoText");
-            _inventoryWindow = GetNode<Panel>("/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow");
+            _inventoryContainer = GetNode<GridContainer>(InventoryContainer);
+            _clearButton = GetNode<Button>(ClearButton);
+            _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _clearButton.Pressed += OnClearButtonPressed;
+
             Initialize();
             ToggleWindow(false);
 
@@ -51,9 +54,10 @@
 
         public override void _Input(InputEvent @event)
         {
-            if (Input.IsActionJustPressed("Inventory"))
+            if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
             {
                 ToggleWindow(!_inventoryWindow.Visible);
+                return;
             }
         }
 
@@ -65,6 +69,12 @@
                 _inventoryContainer.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
+        }
+
+        private void OnEquipItem(Item item)
+        {
+            EmitSignal(SignalName.OnPlayerEquipItem, item);
+            RemoveItem(item);
         }
 
         public bool ToggleWindow(bool isOpen)

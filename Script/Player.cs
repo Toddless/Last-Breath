@@ -2,11 +2,18 @@
 {
     using Godot;
     using Playground.Script;
+    using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
 
     public partial class Player : CharacterBody2D
     {
+
+        #region Const
+        private const string RestoreMovementPointsButton = "/root/MainScene/UI/Buttons/ChillButton";
+        private const string ResearchButton = "/root/MainScene/UI/Buttons/ResearchButton";
+        private const string StaminaProgressBar = "/root/MainScene/UI/PlayerBars/StaminaBar";
+        #endregion
 
         #region Private fields
         private Vector2 _inputDirection = Vector2.Zero;
@@ -14,21 +21,14 @@
         private ResearchArea _currentZone;
         private const int _tileSize = 64;
         private double _movementPoints;
+        private BodyArmor _playerArmor;
+        private Weapon _playerWeapon;
         private bool _moving = false;
-        // здесь хранится зона в которой находится игрок
         #endregion
 
         #region Export fields
-        [Export]
-        private RestorePlayerMovement _restoreMovementButton;
-        [Export]
-        private AnimationTree _animationTree;
-        [Export]
-        private InventoryComponent _playerInventory;
-        [Export]
-        private BodyArmor _playerArmor;
-        [Export]
-        private Weapon _playerWeapon;
+
+      
 
         #endregion
 
@@ -38,10 +38,11 @@
         #endregion
 
         #region UI
-        [Export]
+        private RestorePlayerMovement _restoreMovementButton;
+        private InventoryComponent _playerInventory;
         private ProgressBar _progressBarMovement;
-        [Export]
         private ResearchButton _researchButton;
+        private Button _doSomeDamageButton;
         private ProgressBar _healthBar;
         private Label _healthBarText;
         #endregion
@@ -66,43 +67,65 @@
 
         public override void _Ready()
         {
-            _movementPoints = _maxMovementPoints;
+            _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
+            _doSomeDamageButton = GetNode<Button>("/root/MainScene/UI/Buttons/DoSomeDamage");
             _playerInventory = GetNode<InventoryComponent>(nameof(InventoryComponent));
             _healthComponent = GetNode<HealthComponent>(nameof(HealthComponent));
             _attackComponent = GetNode<AttackComponent>(nameof(AttackComponent));
+            _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
+            _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
+            _researchButton = GetNode<ResearchButton>(ResearchButton);
             _restoreMovementButton.Pressed += RestoreMovementPoints;
+            _playerInventory.OnPlayerEquipItem += OnEquipItem;
             _researchButton.Pressed += ResearchCurrentZone;
             _healthComponent.OnCharacterDied += PlayerDied;
+            _movementPoints = _maxMovementPoints;
+        }
+
+        private void PlayerDidCriticalDamage()
+        {
+            GD.Print($"Critical hit!");
+        }
+
+        private void OnPressed()
+        {
+            GD.Print($"Current damage is: {_attackComponent.BaseMinDamage} - {_attackComponent.BaseMaxDamage}");
+            GD.Print($"Player did: {_attackComponent.DealDamage()}");
         }
 
         public override void _Input(InputEvent @event)
         {
-            if (Input.IsActionJustPressed("ui_down"))
+            if (Input.IsActionJustPressed(InputMaps.MoveDown))
             {
                 _inputDirection = Vector2.Down;
                 Move();
             }
-            else if (Input.IsActionJustPressed("ui_up"))
+            else if (Input.IsActionJustPressed(InputMaps.MoveUp))
             {
                 _inputDirection = Vector2.Up;
                 Move();
             }
-            else if (Input.IsActionJustPressed("ui_left"))
+            else if (Input.IsActionJustPressed(InputMaps.MoveLeft))
             {
                 _inputDirection = Vector2.Left;
                 Move();
             }
-            else if (Input.IsActionJustPressed("ui_right"))
+            else if (Input.IsActionJustPressed(InputMaps.MoveRight))
             {
                 _inputDirection = Vector2.Right;
                 Move();
             }
         }
 
-        private void OnEquipWeapon(Weapon weapon)
+        private void OnEquipItem(Item item)
         {
-            _attackComponent.BaseMinDamage += weapon.MinDamage;
-            _attackComponent.BaseMaxDamage += weapon.MaxDamage;
+            if (item is Weapon s)
+            {
+                _playerWeapon = s;
+                _attackComponent.BaseMinDamage += _playerWeapon.MinDamage;
+                _attackComponent.BaseMaxDamage += _playerWeapon.MaxDamage;
+                _attackComponent.CriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
+            }
         }
 
         private void PlayerDied()
@@ -157,6 +180,7 @@
         {
             // если игрок в зоне, сохраняем ее
             _currentZone = zone;
+            // GD.Print($" {_attackComponent.DealDamage()}");
         }
 
         private void OnPlayerExitedZone()

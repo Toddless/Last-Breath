@@ -12,7 +12,6 @@ namespace Playground
         private float _baseMaxDamage;
         private float _criticalStrikeChance;
         private float _criticalStrikeDamage;
-        private float _damage;
         #endregion
 
         #region Properties
@@ -35,9 +34,10 @@ namespace Playground
             {
                 if (HitCritical())
                 {
-                    return (GetAvarageDamage() + _damage) * _criticalStrikeDamage;
+                    EmitSignal(SignalName.OnPlayerCriticalHit);
+                    return GetAvarageDamage() * _criticalStrikeDamage;
                 }
-                return GetAvarageDamage() + _damage;
+                return GetAvarageDamage();
             }
         }
 
@@ -55,6 +55,11 @@ namespace Playground
 
         #endregion
 
+
+        #region Signal
+        [Signal]
+        public delegate void OnPlayerCriticalHitEventHandler();
+        #endregion
         public override void _Ready()
         {
             _criticalStrikeDamage = 1.5f;
@@ -63,9 +68,8 @@ namespace Playground
             _baseMaxDamage = 100f;
         }
 
-        public float DealDamage(float damage)
+        public float DealDamage()
         {
-            _damage = damage;
             return FinalDamage;
         }
 

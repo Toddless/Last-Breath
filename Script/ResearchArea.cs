@@ -8,6 +8,7 @@
     {
         #region Private fields
         private BasedOnRarityLootTable _lootTable = new();
+        private GlobalRarity _areaRarity;
         #endregion
 
         #region Signals
@@ -19,7 +20,6 @@
         public delegate void PlayerTakeDamageOnAreaEnterEventHandler(float damage);
         #endregion
 
-        private GlobalRarity _areaRarity;
 
         #region Public properties
         public GlobalRarity AreaRarity
@@ -31,9 +31,6 @@
 
         public override void _Ready()
         {
-            // поскольку зон может быть множество, добавляю их все в общую группу
-            // в теории можно будет генерить события сразу для всех зон
-            // на будущее: Найти информацию является ли это хорошей практикой
             BodyEntered += OnPlayerEnter;
             BodyExited += OnPlayerExited;
             AreaRarity = GlobalRarity.Epic;
@@ -47,8 +44,6 @@
             {
                 return;
             }
-            EmitSignal(SignalName.PlayerTakeDamageOnAreaEnter, 250f);
-            // когда игрок пересекает зону, отправляем сигнал
             EmitSignal(SignalName.OnPlayerEnteredZone, this);
         }
 
@@ -58,7 +53,6 @@
             {
                 return;
             }
-            // при покидании зоны игроком обнуляем данный сигнал
             EmitSignal(SignalName.OnPlayerExitedZone, null);
         }
 

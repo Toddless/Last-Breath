@@ -36,6 +36,9 @@
         public Guid Guid { get; private set; } = Guid.NewGuid();
         #endregion
 
+        #region Signals
+        #endregion
+
 
         public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D icon, int stackSize, int quantity)
         {

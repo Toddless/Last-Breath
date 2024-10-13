@@ -6,13 +6,22 @@ namespace Playground
 
     public partial class InventorySlot : Node
     {
+
+        #region Const
+        private const string InventoryComponent = "/root/MainScene/CharacterBody2D/InventoryComponent";
+        #endregion
+
         #region Private fields
-        private Label _quantityLabel;
         private InventoryComponent _inventory;
+        private RichTextLabel _fullItemDescription;
+        private Label _quantityLabel;
         private Item _inventoryItem;
         private TextureRect _icon;
         private int _quantity;
         private int _index;
+        #endregion
+
+        #region Signals
         #endregion
 
         #region Properties
@@ -38,33 +47,47 @@ namespace Playground
 
         public override void _Ready()
         {
+            _inventory = GetNode<InventoryComponent>(InventoryComponent);
+            _fullItemDescription = GetNode<RichTextLabel>("ItemDescription");
             _quantityLabel = GetNode<Label>("QuantityText");
             _icon = GetNode<TextureRect>("Icon");
+            _fullItemDescription.Hide();
         }
 
         public void OnMouseEntered()
         {
-            if (InventoryItem != null)
+            // action on mouse entered.
+            if (InventoryItem == null)
             {
-                _inventory.InfoText.Text = InventoryItem.ItemName;
+                return;
             }
-            else
+            // for example hier im show item description if under mouse cursor is an weapon
+            if (InventoryItem is Weapon s)
             {
-                _inventory.InfoText.Text = string.Empty;
+                _fullItemDescription.Text = $"" +
+                    $" {s.ItemName} \n" +
+                    $" Damage: {Mathf.RoundToInt(s.MinDamage)} - {Mathf.RoundToInt(s.MaxDamage)} \n" +
+                    $" Critical Strike Chande: {s.CriticalStrikeChance * 100}% \n";
+                _fullItemDescription.Show();
             }
         }
 
         public void OnMouseExited()
         {
-            _inventory.InfoText.Text = string.Empty;
+            _fullItemDescription?.Hide();
+            _fullItemDescription.Text = string.Empty;
         }
 
-        public void SetItem(Item newItem)
+        public void EquipItem(Item item)
         {
-            if (newItem != null)
+        }
+
+        public void SetItem(Item item)
+        {
+            if (item != null)
             {
-                InventoryItem = newItem;
-                _quantity += newItem.Quantity;
+                InventoryItem = item;
+                _quantity += item.Quantity;
                 _icon.Visible = true;
                 _icon.Texture = InventoryItem.Icon;
             }
@@ -115,10 +138,6 @@ namespace Playground
 
         public void OnPressed()
         {
-            if (InventoryItem == null)
-            {
-                return;
-            }
         }
     }
 }

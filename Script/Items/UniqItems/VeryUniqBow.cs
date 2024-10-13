@@ -8,16 +8,8 @@
     {
         private static VeryUniqBow instance = null;
 
-        private VeryUniqBow(
-            string name,
-            GlobalRarity rarity,
-            float mindamage,
-            float maxdamage,
-            string resourcePath,
-            Texture2D icon,
-            int stackSize,
-            int quantity)
-            : base(name, rarity, mindamage, maxdamage, resourcePath, icon, stackSize, quantity)
+        private VeryUniqBow( string name, GlobalRarity rarity, float mindamage, float maxdamage, float criticalStrikeChance, string resourcePath, Texture2D icon, int stackSize, int quantity)
+            : base(name, rarity, mindamage, maxdamage, criticalStrikeChance, resourcePath, icon, stackSize, quantity)
         {
         }
 
@@ -25,7 +17,7 @@
         {
             get
             {
-                instance ??= new VeryUniqBow(StringHelper.BowMythic, GlobalRarity.Mythic, 600, 900, "res://Resource/BowMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowMythic.png"), 1, 1);
+                instance ??= new VeryUniqBow(StringHelper.BowMythic, GlobalRarity.Mythic, 600, 900, 0.1f, "res://Resource/BowMythic.tres", GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowMythic.png"), 1, 1);
                 return instance;
             }
         }

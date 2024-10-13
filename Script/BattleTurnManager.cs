@@ -61,6 +61,6 @@ public partial class BattleTurnManager : Node
 
     public override void _Ready()
     {
-        _player = GetNode<CharacterBody2D>("CharacterBody2D");
+        _player = GetNode<CharacterBody2D>(nameof(CharacterBody2D));
     }
 }
