@@ -23,42 +23,20 @@
         private PackedScene _inventorySlot;
         private Panel _inventoryWindow;
         private Button _clearButton;
+        private Item _item;
         [Export]
-        private int _capacity = 35;
-        #endregion
-
-        #region Signals
-        [Signal]
-        public delegate void OnPlayerEquipItemEventHandler(Item item);
+        private int _capacity;
         #endregion
 
         public override void _Ready()
         {
-
             _inventorySlot = ResourceLoader.Load<PackedScene>(_inventorySlotPath);
             _inventoryContainer = GetNode<GridContainer>(InventoryContainer);
             _clearButton = GetNode<Button>(ClearButton);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _clearButton.Pressed += OnClearButtonPressed;
-
             Initialize();
             ToggleWindow(false);
-
-            foreach (InventorySlot child in _inventoryContainer.GetChildren().Cast<InventorySlot>())
-            {
-                _slots.Append(child);
-                child.SetItem(null);
-                child.Inventory = this;
-            }
-        }
-
-        public override void _Input(InputEvent @event)
-        {
-            if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
-            {
-                ToggleWindow(!_inventoryWindow.Visible);
-                return;
-            }
         }
 
         public void Initialize()
@@ -71,10 +49,13 @@
             }
         }
 
-        private void OnEquipItem(Item item)
+        public override void _Input(InputEvent @event)
         {
-            EmitSignal(SignalName.OnPlayerEquipItem, item);
-            RemoveItem(item);
+            if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
+            {
+                ToggleWindow(!_inventoryWindow.Visible);
+                return;
+            }
         }
 
         public bool ToggleWindow(bool isOpen)
@@ -118,7 +99,7 @@
         {
             foreach (var item in _slots)
             {
-                RemoveItem(item.InventoryItem);
+                 RemoveItem(item.InventoryItem);
             }
         }
 

@@ -611,10 +611,10 @@ tile_set = SubResource("TileSet_jmesm")
 tile_set = SubResource("TileSet_jk2yw")
 
 [node name="Area2D" type="Area2D" parent="GlobalMap/SpawnMap"]
+position = Vector2(158, 160)
 script = ExtResource("2_p52a2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GlobalMap/SpawnMap/Area2D"]
-position = Vector2(159, 159)
 shape = SubResource("RectangleShape2D_xbypx")
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("2_sxnxb")]
@@ -756,5 +756,4 @@ show_percentage = false
 
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]
-[connection signal="PlayerTakeDamageOnAreaEnter" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="TakeDamageOnAreaDamage"]
 [connection signal="pressed" from="UI/Buttons/DoSomeDamage" to="CharacterBody2D" method="OnPressed"]

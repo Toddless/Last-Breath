@@ -20,7 +20,6 @@
         public delegate void PlayerTakeDamageOnAreaEnterEventHandler(float damage);
         #endregion
 
-
         #region Public properties
         public GlobalRarity AreaRarity
         {

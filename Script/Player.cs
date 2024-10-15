@@ -39,7 +39,7 @@
 
         #region UI
         private RestorePlayerMovement _restoreMovementButton;
-        private InventoryComponent _playerInventory;
+        private InventoryComponent _inventoryComponent;
         private ProgressBar _progressBarMovement;
         private ResearchButton _researchButton;
         private Button _doSomeDamageButton;
@@ -69,14 +69,14 @@
         {
             _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
             _doSomeDamageButton = GetNode<Button>("/root/MainScene/UI/Buttons/DoSomeDamage");
-            _playerInventory = GetNode<InventoryComponent>(nameof(InventoryComponent));
+            _inventoryComponent = GetNode<InventoryComponent>(nameof(InventoryComponent));
             _healthComponent = GetNode<HealthComponent>(nameof(HealthComponent));
             _attackComponent = GetNode<AttackComponent>(nameof(AttackComponent));
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
             _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
             _researchButton = GetNode<ResearchButton>(ResearchButton);
             _restoreMovementButton.Pressed += RestoreMovementPoints;
-            _playerInventory.OnPlayerEquipItem += OnEquipItem;
+            //_globalSignals = GetNode("/root/GlobalSignal") as GlobalSignals;
             _researchButton.Pressed += ResearchCurrentZone;
             _healthComponent.OnCharacterDied += PlayerDied;
             _movementPoints = _maxMovementPoints;
@@ -203,7 +203,7 @@
             if (item != null)
             {
                 item.Description();
-                _playerInventory.AddItem(item);
+                _inventoryComponent.AddItem(item);
             }
         }
     }

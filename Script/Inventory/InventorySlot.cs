@@ -6,22 +6,19 @@ namespace Playground
 
     public partial class InventorySlot : Node
     {
-
         #region Const
         private const string InventoryComponent = "/root/MainScene/CharacterBody2D/InventoryComponent";
         #endregion
 
         #region Private fields
-        private InventoryComponent _inventory;
         private RichTextLabel _fullItemDescription;
+        private InventoryComponent _inventory;
         private Label _quantityLabel;
         private Item _inventoryItem;
         private TextureRect _icon;
+        private Area2D _area2D;
         private int _quantity;
         private int _index;
-        #endregion
-
-        #region Signals
         #endregion
 
         #region Properties
@@ -47,14 +44,19 @@ namespace Playground
 
         public override void _Ready()
         {
-            _inventory = GetNode<InventoryComponent>(InventoryComponent);
             _fullItemDescription = GetNode<RichTextLabel>("ItemDescription");
+            _inventory = GetNode<InventoryComponent>(InventoryComponent);
             _quantityLabel = GetNode<Label>("QuantityText");
+            // for mouseEntered and mouseExited events on each child control node mouse filter
+            // should be set to ignore
+            _area2D = GetNode<Area2D>(nameof(Area2D));
+            _area2D.MouseExited += MouseExited;
+            _area2D.MouseEntered += MouseEntered;
             _icon = GetNode<TextureRect>("Icon");
             _fullItemDescription.Hide();
         }
 
-        public void OnMouseEntered()
+        public void MouseEntered()
         {
             // action on mouse entered.
             if (InventoryItem == null)
@@ -64,22 +66,17 @@ namespace Playground
             // for example hier im show item description if under mouse cursor is an weapon
             if (InventoryItem is Weapon s)
             {
-                _fullItemDescription.Text = $"" +
-                    $" {s.ItemName} \n" +
+                _fullItemDescription.Text = $" {s.ItemName} \n" +
                     $" Damage: {Mathf.RoundToInt(s.MinDamage)} - {Mathf.RoundToInt(s.MaxDamage)} \n" +
                     $" Critical Strike Chande: {s.CriticalStrikeChance * 100}% \n";
                 _fullItemDescription.Show();
             }
         }
 
-        public void OnMouseExited()
+        public void MouseExited()
         {
             _fullItemDescription?.Hide();
             _fullItemDescription.Text = string.Empty;
-        }
-
-        public void EquipItem(Item item)
-        {
         }
 
         public void SetItem(Item item)
@@ -134,10 +131,6 @@ namespace Playground
             {
                 _quantityLabel.Text = _quantity.ToString();
             }
-        }
-
-        public void OnPressed()
-        {
         }
     }
 }

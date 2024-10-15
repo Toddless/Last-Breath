@@ -1,0 +1,11 @@
+namespace Playground
+{
+    using Godot;
+    using Playground.Script.Items;
+
+    public partial class GlobalSignals : Node
+    {
+        [Signal]
+        public delegate void OnEquipItemEventHandler(Item item);
+    }
+}
