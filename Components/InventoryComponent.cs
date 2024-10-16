@@ -99,7 +99,7 @@
         {
             foreach (var item in _slots)
             {
-                 RemoveItem(item.InventoryItem);
+                RemoveItem(item.InventoryItem);
             }
         }
 
@@ -138,7 +138,7 @@
         {
             foreach (InventorySlot slot in _slots)
             {
-                if (slot.InventoryItem == null || (slot.InventoryItem.Quantity < item.MaxStackSize && slot.InventoryItem.Guid == item.Guid))
+                if (slot.InventoryItem == null || (slot.InventoryItem.Guid == item.Guid && slot.InventoryItem.Quantity < item.MaxStackSize))
                 {
                     return slot;
                 }
@@ -149,14 +149,7 @@
 
         public InventorySlot GetSlotToRemove(Item item)
         {
-            try
-            {
-                return _slots.Find(x => x.InventoryItem.Guid == item.Guid);
-            }
-            catch (ArgumentNullException)
-            {
-                return null;
-            }
+            return _slots.Find(x => x.InventoryItem.Guid == item.Guid);
         }
 
         public int GetNumberOfItems(Item item)

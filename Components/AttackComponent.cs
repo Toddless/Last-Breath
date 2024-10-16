@@ -68,11 +68,6 @@ namespace Playground
             _baseMaxDamage = 100f;
         }
 
-        public float DealDamage()
-        {
-            return FinalDamage;
-        }
-
         private bool HitCritical()
         {
             var criticalStrike = _rng.RandfRange(0, 1);

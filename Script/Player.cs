@@ -18,18 +18,13 @@
         #region Private fields
         private Vector2 _inputDirection = Vector2.Zero;
         private double _maxMovementPoints = 15;
+        private GlobalSignals _globalSignals;
         private ResearchArea _currentZone;
         private const int _tileSize = 64;
         private double _movementPoints;
         private BodyArmor _playerArmor;
         private Weapon _playerWeapon;
         private bool _moving = false;
-        #endregion
-
-        #region Export fields
-
-      
-
         #endregion
 
         #region Components
@@ -67,18 +62,20 @@
 
         public override void _Ready()
         {
-            _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
             _doSomeDamageButton = GetNode<Button>("/root/MainScene/UI/Buttons/DoSomeDamage");
+
+            _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
             _inventoryComponent = GetNode<InventoryComponent>(nameof(InventoryComponent));
+            _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
             _healthComponent = GetNode<HealthComponent>(nameof(HealthComponent));
             _attackComponent = GetNode<AttackComponent>(nameof(AttackComponent));
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
             _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
             _researchButton = GetNode<ResearchButton>(ResearchButton);
             _restoreMovementButton.Pressed += RestoreMovementPoints;
-            //_globalSignals = GetNode("/root/GlobalSignal") as GlobalSignals;
             _researchButton.Pressed += ResearchCurrentZone;
             _healthComponent.OnCharacterDied += PlayerDied;
+            _globalSignals.OnEquipItem += OnEquipItem;
             _movementPoints = _maxMovementPoints;
         }
 
@@ -90,7 +87,7 @@
         private void OnPressed()
         {
             GD.Print($"Current damage is: {_attackComponent.BaseMinDamage} - {_attackComponent.BaseMaxDamage}");
-            GD.Print($"Player did: {_attackComponent.DealDamage()}");
+            GD.Print($"Player did: {_attackComponent.FinalDamage}");
         }
 
         public override void _Input(InputEvent @event)
@@ -125,6 +122,7 @@
                 _attackComponent.BaseMinDamage += _playerWeapon.MinDamage;
                 _attackComponent.BaseMaxDamage += _playerWeapon.MaxDamage;
                 _attackComponent.CriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
+                _inventoryComponent.RemoveItem(item);
             }
         }
 
@@ -187,11 +185,6 @@
         {
             // если игрок покинул зону, обнуляем
             _currentZone = null;
-        }
-
-        private void TakeDamageOnAreaDamage(float damage)
-        {
-            _healthComponent.TakeDamage(damage);
         }
 
         private void ResearchCurrentZone()

@@ -1,6 +1,7 @@
 namespace Playground
 {
     using Godot;
+    using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
 
@@ -13,6 +14,8 @@ namespace Playground
         #region Private fields
         private RichTextLabel _fullItemDescription;
         private InventoryComponent _inventory;
+        private GlobalSignals _globalSignals;
+        private Vector2 _mousePosition;
         private Label _quantityLabel;
         private Item _inventoryItem;
         private TextureRect _icon;
@@ -44,25 +47,26 @@ namespace Playground
 
         public override void _Ready()
         {
+            _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
             _fullItemDescription = GetNode<RichTextLabel>("ItemDescription");
             _inventory = GetNode<InventoryComponent>(InventoryComponent);
             _quantityLabel = GetNode<Label>("QuantityText");
             // for mouseEntered and mouseExited events on each child control node mouse filter
             // should be set to ignore
             _area2D = GetNode<Area2D>(nameof(Area2D));
-            _area2D.MouseExited += MouseExited;
-            _area2D.MouseEntered += MouseEntered;
             _icon = GetNode<TextureRect>("Icon");
             _fullItemDescription.Hide();
         }
 
-        public void MouseEntered()
+        public void OnMouseEntered()
         {
             // action on mouse entered.
-            if (InventoryItem == null)
+            if(InventoryItem == null)
             {
                 return;
             }
+
+            _mousePosition = _area2D.GetLocalMousePosition();
             // for example hier im show item description if under mouse cursor is an weapon
             if (InventoryItem is Weapon s)
             {
@@ -73,10 +77,19 @@ namespace Playground
             }
         }
 
-        public void MouseExited()
+        public void OnMouseExited()
         {
             _fullItemDescription?.Hide();
             _fullItemDescription.Text = string.Empty;
+            _mousePosition = Vector2.Zero;
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (_mousePosition != Vector2.Zero && @event.IsActionPressed(InputMaps.EquipOnRightClickButton))
+            {
+                _globalSignals.EmitSignal(GlobalSignals.SignalName.OnEquipItem, InventoryItem);
+            }
         }
 
         public void SetItem(Item item)

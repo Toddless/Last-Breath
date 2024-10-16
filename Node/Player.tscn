@@ -708,7 +708,6 @@ grow_vertical = 2
 scale = Vector2(1.38048, 1.21376)
 size_flags_horizontal = 4
 size_flags_vertical = 4
-mouse_filter = 2
 
 [node name="InventoryContainer" type="GridContainer" parent="InventoryComponent/InventoryWindow"]
 layout_mode = 0
@@ -717,7 +716,6 @@ offset_top = 193.613
 offset_right = 690.231
 offset_bottom = 513.613
 scale = Vector2(0.607049, 0.584461)
-mouse_filter = 2
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 15

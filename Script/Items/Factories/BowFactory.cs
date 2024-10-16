@@ -10,7 +10,7 @@
 
         private BowFactory()
         {
-
+            
         }
 
         public static BowFactory Instance
@@ -24,7 +24,6 @@
 
         public override Bow GenerateItem(GlobalRarity globalRarity)
         {
-            // потенциальный memory leak
             return globalRarity switch
             {
                 GlobalRarity.Uncommon => new Bow(StringHelper.BowUncommon, GlobalRarity.Uncommon, RandomNumberGenerator.RandfRange(65, 80), RandomNumberGenerator.RandfRange(160, 220), 0.05f, ResourcePath.BowUncommon, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowUncommon.png"), 1, 1),

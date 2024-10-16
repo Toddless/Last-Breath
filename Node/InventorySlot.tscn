@@ -12,7 +12,6 @@ shadow_color = Color(0, 0, 0, 1)
 
 [node name="InventorySlot" type="Button"]
 custom_minimum_size = Vector2(40, 40)
-mouse_filter = 2
 script = ExtResource("1_yg5o5")
 
 [node name="Area2D" type="Area2D" parent="."]
@@ -55,4 +54,6 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
+[connection signal="mouse_entered" from="." to="." method="OnMouseEntered"]
+[connection signal="mouse_exited" from="." to="." method="OnMouseExited"]
 [connection signal="pressed" from="." to="." method="OnPressed"]
