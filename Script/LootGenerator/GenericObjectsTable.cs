@@ -9,9 +9,9 @@
     public abstract class GenericObjectsTable<T, U>
         where T : GenericObject<U> where U : class
     {
-        public List<T> lootDropItems;
+        public List<T>? lootDropItems;
 
-        public  List<ItemCreator> factories;
+        public  List<ItemCreator>? factories;
 
         private readonly RandomNumberGenerator random = new();
 
@@ -46,8 +46,13 @@
             }
         }
 
-        public Item GetRandomItem()
+        public Item? GetRandomItem()
         {
+            if(lootDropItems == null || factories == null)
+            {
+                ArgumentNullException.ThrowIfNull(lootDropItems);
+                ArgumentNullException.ThrowIfNull(factories);
+            }
             var randomFactory = random.RandiRange(0, factories.Count-1);
 
             var factory = GetFactory(randomFactory);
@@ -57,19 +62,24 @@
             {
                 if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
                 {
-                   return factory.GenerateItem(lootDropItem.Rarity);
+                   return factory?.GenerateItem(lootDropItem.Rarity);
                 }
             }
             return null;
         }
 
-        public Item GetItemWithSelectedRarity(int index)
+        public Item? GetItemWithSelectedRarity(int index)
         {
+            if (lootDropItems == null || factories == null)
+            {
+                ArgumentNullException.ThrowIfNull(factories);
+                ArgumentNullException.ThrowIfNull(lootDropItems);
+            }
             var randomFactory = random.RandiRange(0, factories.Count - 1);
 
             var factory = GetFactory(randomFactory);
 
-            return factory.GenerateItem(lootDropItems[index].Rarity);
+            return factory?.GenerateItem(lootDropItems[index].Rarity);
         }
 
 
@@ -84,14 +94,14 @@
         }
 
 
-        private ItemCreator GetFactory(int factoryIndex)
+        private ItemCreator? GetFactory(int factoryIndex)
         {
             return factoryIndex switch
             {
                 0 => BowFactory.Instance,
                 1 => SwordFactory.Instance,
              //   2 => BodyArmorFactory.Instance,
-                _ => throw new Exception(),
+                _ => null,
             };
         }
     }

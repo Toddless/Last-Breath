@@ -5,7 +5,7 @@
     public abstract class GenericObject<T>
         where T : class
     {
-        public T Item;
+        public T? Item;
 
         public float probabilityWeight;
 

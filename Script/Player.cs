@@ -1,5 +1,6 @@
 ﻿namespace Playground
 {
+    using System;
     using Godot;
     using Playground.Script;
     using Playground.Script.Helpers;
@@ -18,42 +19,38 @@
         #region Private fields
         private Vector2 _inputDirection = Vector2.Zero;
         private double _maxMovementPoints = 15;
-        private GlobalSignals _globalSignals;
-        private ResearchArea _currentZone;
+        private GlobalSignals? _globalSignals;
+        private ResearchArea? _currentZone;
         private const int _tileSize = 64;
         private double _movementPoints;
-        private BodyArmor _playerArmor;
-        private Weapon _playerWeapon;
+        private BodyArmor? _playerArmor;
+        private Weapon? _playerWeapon;
         private bool _moving = false;
         #endregion
 
         #region Components
-        private HealthComponent _healthComponent;
-        private AttackComponent _attackComponent;
+        private HealthComponent? _healthComponent;
+        private AttackComponent? _attackComponent;
         #endregion
 
         #region UI
-        private RestorePlayerMovement _restoreMovementButton;
-        private InventoryComponent _inventoryComponent;
-        private ProgressBar _progressBarMovement;
-        private ResearchButton _researchButton;
-        private Button _doSomeDamageButton;
-        private ProgressBar _healthBar;
-        private Label _healthBarText;
-        #endregion
-
-        #region Signals
-
+        private RestorePlayerMovement? _restoreMovementButton;
+        private InventoryComponent? _inventoryComponent;
+        private ProgressBar? _progressBarMovement;
+        private ResearchButton? _researchButton;
+        private Button? _doSomeDamageButton;
+        private ProgressBar? _healthBar;
+        private Label? _healthBarText;
         #endregion
 
         #region Properties
-        public BodyArmor PlayerArmor
+        public BodyArmor? PlayerArmor
         {
             get => _playerArmor;
             set => _playerArmor = value;
         }
 
-        public Weapon PlayerWeapon
+        public Weapon? PlayerWeapon
         {
             get => _playerWeapon;
             set => _playerWeapon = value;
@@ -66,7 +63,7 @@
 
             _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
             _inventoryComponent = GetNode<InventoryComponent>(nameof(InventoryComponent));
-            _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
+            _globalSignals = GetNode< GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _healthComponent = GetNode<HealthComponent>(nameof(HealthComponent));
             _attackComponent = GetNode<AttackComponent>(nameof(AttackComponent));
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
@@ -77,6 +74,13 @@
             _healthComponent.OnCharacterDied += PlayerDied;
             _globalSignals.OnEquipItem += OnEquipItem;
             _movementPoints = _maxMovementPoints;
+
+            if (_attackComponent == null || _inventoryComponent == null || _progressBarMovement == null)
+            {
+                ArgumentNullException.ThrowIfNull(_attackComponent);
+                ArgumentNullException.ThrowIfNull(_inventoryComponent);
+                ArgumentNullException.ThrowIfNull(_progressBarMovement);
+            }
         }
 
         private void PlayerDidCriticalDamage()
@@ -86,7 +90,7 @@
 
         private void OnPressed()
         {
-            GD.Print($"Current damage is: {_attackComponent.BaseMinDamage} - {_attackComponent.BaseMaxDamage}");
+            GD.Print($"Current damage is: {_attackComponent!.BaseMinDamage} - {_attackComponent.BaseMaxDamage}");
             GD.Print($"Player did: {_attackComponent.FinalDamage}");
         }
 
@@ -116,13 +120,14 @@
 
         private void OnEquipItem(Item item)
         {
+           
             if (item is Weapon s)
             {
                 _playerWeapon = s;
-                _attackComponent.BaseMinDamage += _playerWeapon.MinDamage;
+                _attackComponent!.BaseMinDamage += _playerWeapon.MinDamage;
                 _attackComponent.BaseMaxDamage += _playerWeapon.MaxDamage;
                 _attackComponent.CriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
-                _inventoryComponent.RemoveItem(item);
+                _inventoryComponent!.RemoveItem(item);
             }
         }
 
@@ -169,7 +174,7 @@
 
         private void UpdateMovementBar()
         {
-            _progressBarMovement.MaxValue = _maxMovementPoints;
+            _progressBarMovement!.MaxValue = _maxMovementPoints;
             var tween = CreateTween();
             tween.TweenProperty(_progressBarMovement, "value", _movementPoints, 0.5f);
         }
@@ -196,7 +201,7 @@
             if (item != null)
             {
                 item.Description();
-                _inventoryComponent.AddItem(item);
+                _inventoryComponent!.AddItem(item);
             }
         }
     }

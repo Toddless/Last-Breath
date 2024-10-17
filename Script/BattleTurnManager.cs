@@ -57,7 +57,7 @@ public partial class BattleTurnManager : Node
     [Export]
     private float _nextTurnDelay = 1.0f;
     private bool _gameOver = false;
-    private CharacterBody2D _player;
+    private CharacterBody2D? _player;
 
     public override void _Ready()
     {

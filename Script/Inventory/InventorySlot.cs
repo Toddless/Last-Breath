@@ -1,5 +1,6 @@
 namespace Playground
 {
+    using System;
     using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
@@ -12,20 +13,20 @@ namespace Playground
         #endregion
 
         #region Private fields
-        private RichTextLabel _fullItemDescription;
-        private InventoryComponent _inventory;
-        private GlobalSignals _globalSignals;
+        private RichTextLabel? _fullItemDescription;
+        private InventoryComponent? _inventory;
+        private GlobalSignals? _globalSignals;
         private Vector2 _mousePosition;
-        private Label _quantityLabel;
-        private Item _inventoryItem;
-        private TextureRect _icon;
-        private Area2D _area2D;
+        private Label? _quantityLabel;
+        private Item? _inventoryItem;
+        private TextureRect? _icon;
+        private Area2D? _area2D;
         private int _quantity;
         private int _index;
         #endregion
 
         #region Properties
-        public InventoryComponent Inventory
+        public InventoryComponent? Inventory
         {
             get => _inventory;
             set => _inventory = value;
@@ -37,7 +38,7 @@ namespace Playground
             private set => _quantity = value;
         }
 
-        public Item InventoryItem
+        public Item? InventoryItem
         {
             get => _inventoryItem;
             private set => _inventoryItem = value;
@@ -56,12 +57,16 @@ namespace Playground
             _area2D = GetNode<Area2D>(nameof(Area2D));
             _icon = GetNode<TextureRect>("Icon");
             _fullItemDescription.Hide();
+            if(_quantityLabel == null)
+            {
+                ArgumentNullException.ThrowIfNull(_quantityLabel);
+            }
         }
 
         public void OnMouseEntered()
         {
             // action on mouse entered.
-            if(InventoryItem == null)
+            if (InventoryItem == null || _area2D == null)
             {
                 return;
             }
@@ -70,7 +75,7 @@ namespace Playground
             // for example hier im show item description if under mouse cursor is an weapon
             if (InventoryItem is Weapon s)
             {
-                _fullItemDescription.Text = $" {s.ItemName} \n" +
+                _fullItemDescription!.Text = $" {s.ItemName} \n" +
                     $" Damage: {Mathf.RoundToInt(s.MinDamage)} - {Mathf.RoundToInt(s.MaxDamage)} \n" +
                     $" Critical Strike Chande: {s.CriticalStrikeChance * 100}% \n";
                 _fullItemDescription.Show();
@@ -79,32 +84,36 @@ namespace Playground
 
         public void OnMouseExited()
         {
+            if (_fullItemDescription == null)
+            {
+                return;
+            }
             _fullItemDescription?.Hide();
-            _fullItemDescription.Text = string.Empty;
+            _fullItemDescription!.Text = string.Empty;
             _mousePosition = Vector2.Zero;
         }
 
         public override void _Input(InputEvent @event)
         {
-            if (_mousePosition != Vector2.Zero && @event.IsActionPressed(InputMaps.EquipOnRightClickButton))
+            if (_mousePosition != Vector2.Zero && @event.IsActionPressed(InputMaps.EquipOnRightClickButton) && InventoryItem != null)
             {
-                _globalSignals.EmitSignal(GlobalSignals.SignalName.OnEquipItem, InventoryItem);
+                _globalSignals?.EmitSignal(GlobalSignals.SignalName.OnEquipItem, InventoryItem);
             }
         }
 
-        public void SetItem(Item item)
+        public void SetItem(Item? item)
         {
             if (item != null)
             {
                 InventoryItem = item;
                 _quantity += item.Quantity;
-                _icon.Visible = true;
+                _icon!.Visible = true;
                 _icon.Texture = InventoryItem.Icon;
             }
             else
             {
                 InventoryItem = null;
-                _icon.Texture = null;
+                _icon!.Texture = null;
             }
             UpdateQuantity();
         }
@@ -115,8 +124,13 @@ namespace Playground
             UpdateQuantity();
         }
 
-        public void RemoveItem(Item item)
+        public void RemoveItem(Item? item)
         {
+            if(item == null)
+            {
+                return;
+            }
+
             _quantity -= item.Quantity;
             UpdateQuantity();
 
@@ -128,9 +142,9 @@ namespace Playground
 
         public void RemoveItself()
         {
-            _quantityLabel.Text = string.Empty;
+            _quantityLabel!.Text = string.Empty;
             _quantity = 0;
-            _icon.Texture = null;
+            _icon!.Texture = null;
             InventoryItem = null;
         }
 
@@ -138,11 +152,11 @@ namespace Playground
         {
             if (_quantity <= 1)
             {
-                _quantityLabel.Text = string.Empty;
+                _quantityLabel!.Text = string.Empty;
             }
             else
             {
-                _quantityLabel.Text = _quantity.ToString();
+                _quantityLabel!.Text = _quantity.ToString();
             }
         }
     }

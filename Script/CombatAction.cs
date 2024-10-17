@@ -4,7 +4,7 @@ using Godot;
 public partial class CombatAction : Resource
 {
     [Export]
-    public string Name;
+    public string? Name;
     [Export]
     public float Damage;
     [Export]

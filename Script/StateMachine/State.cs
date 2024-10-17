@@ -1,18 +1,26 @@
 ﻿namespace Playground.Script.StateMachine
 {
+    using System;
     using Godot;
 
     public partial class State : Node
     {
         [Export]
-        private AnimatedSprite2D _animatedSprite2D;
+        private AnimatedSprite2D? _animatedSprite2D;
 
         public AnimatedSprite2D AnimatedSprite2D
         {
-            get { return _animatedSprite2D; }
+            get
+            {
+                if (_animatedSprite2D == null)
+                {
+                    ArgumentNullException.ThrowIfNull(_animatedSprite2D);
+                }
+                return _animatedSprite2D;
+            }
         }
 
-        public StateMachine fsm;
+        public StateMachine? fsm;
 
         public virtual void Enter()
         {

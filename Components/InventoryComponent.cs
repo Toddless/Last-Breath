@@ -18,12 +18,12 @@
 
         #region Private fields
         private string _inventorySlotPath = SceneParh.InventorySlot;
-        private GridContainer _inventoryContainer;
+        private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
-        private PackedScene _inventorySlot;
-        private Panel _inventoryWindow;
-        private Button _clearButton;
-        private Item _item;
+        private PackedScene? _inventorySlot;
+        private Panel? _inventoryWindow;
+        private Button? _clearButton;
+        private Item? _item;
         [Export]
         private int _capacity;
         #endregion
@@ -35,6 +35,12 @@
             _clearButton = GetNode<Button>(ClearButton);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _clearButton.Pressed += OnClearButtonPressed;
+            if(_inventorySlot == null || _inventoryWindow == null || _inventoryContainer == null)
+            {
+                ArgumentNullException.ThrowIfNull(_inventorySlot);
+                ArgumentNullException.ThrowIfNull(_inventoryWindow);
+                ArgumentNullException.ThrowIfNull(_inventoryContainer);
+            }
             Initialize();
             ToggleWindow(false);
         }
@@ -43,8 +49,8 @@
         {
             for (int i = 0; i < _capacity; i++)
             {
-                InventorySlot inventorySlot = _inventorySlot.Instantiate<InventorySlot>();
-                _inventoryContainer.AddChild(inventorySlot);
+                InventorySlot inventorySlot = _inventorySlot!.Instantiate<InventorySlot>();
+                _inventoryContainer!.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
         }
@@ -53,7 +59,7 @@
         {
             if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
             {
-                ToggleWindow(!_inventoryWindow.Visible);
+                ToggleWindow(!_inventoryWindow!.Visible);
                 return;
             }
         }
@@ -71,7 +77,7 @@
             //}
 
             #endregion
-            return _inventoryWindow.Visible = isOpen;
+            return _inventoryWindow!.Visible = isOpen;
         }
 
         public void OnGivePlayerItem(Item item, int amount)
@@ -89,7 +95,7 @@
 
         private void RemoveAllItemsFromInventory()
         {
-            foreach (InventorySlot child in _inventoryContainer.GetChildren().Cast<InventorySlot>())
+            foreach (InventorySlot child in _inventoryContainer!.GetChildren().Cast<InventorySlot>())
             {
                 child.RemoveItself();
             }
@@ -122,19 +128,20 @@
             }
         }
 
-        public void RemoveItem(Item item)
+        public void RemoveItem(Item? item)
         {
             var slot = GetSlotToRemove(item);
 
             if (slot == null)
             {
+                GD.Print("not found. Returned null");
                 return;
             }
 
             slot.RemoveItem(item);
         }
 
-        public InventorySlot GetSlotToAdd(Item item)
+        public InventorySlot? GetSlotToAdd(Item item)
         {
             foreach (InventorySlot slot in _slots)
             {
@@ -147,14 +154,17 @@
             return null;
         }
 
-        public InventorySlot GetSlotToRemove(Item item)
+        public InventorySlot? GetSlotToRemove(Item? item)
         {
-            return _slots.Find(x => x.InventoryItem.Guid == item.Guid);
+            // this method work correctly without first condition only if i equip or remove an item from right to left
+            // cause if an item is removed from left to right, then after first cycle method return null
+            // and NullReferenceException is thrown
+            return _slots.FirstOrDefault(x => x.InventoryItem != null && x.InventoryItem.Guid == item?.Guid);
         }
 
         public int GetNumberOfItems(Item item)
         {
-            return _slots.FindAll(slot => slot.InventoryItem.Guid == item.Guid).Count;
+            return _slots.FindAll(slot => slot.InventoryItem != null && slot.InventoryItem.Guid == item.Guid).Count;
         }
     }
 }

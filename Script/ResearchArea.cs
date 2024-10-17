@@ -55,7 +55,7 @@
             EmitSignal(SignalName.OnPlayerExitedZone, null);
         }
 
-        public Item GetRandomResearchEvent()
+        public Item? GetRandomResearchEvent()
         {
             var item = _lootTable.GetRandomItem();
             return item;

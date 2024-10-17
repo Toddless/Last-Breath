@@ -6,7 +6,7 @@
 
     public class SwordFactory : ItemCreator
     {
-        private static SwordFactory instance = null;
+        private static SwordFactory? _instance = null;
 
         private SwordFactory()
         {
@@ -17,14 +17,13 @@
         {
             get
             {
-                instance ??= new SwordFactory();
-                return instance;
+                _instance ??= new SwordFactory();
+                return _instance;
             }
         }
 
-        public override Sword GenerateItem(GlobalRarity rarity)
+        public override Sword? GenerateItem(GlobalRarity rarity)
         {
-            // потенциальный memory leak
             return rarity switch
             {
                 GlobalRarity.Uncommon => new Sword(StringHelper.SwordUncommon, GlobalRarity.Uncommon, RandomNumberGenerator.RandfRange(75, 100), RandomNumberGenerator.RandfRange(170, 195), 0.08f ,ResourcePath.SwordUncommon, GD.Load<Texture2D>("res://Assets/Weapon/Swords/SwordUncommon.png"), 1, 1),

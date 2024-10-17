@@ -6,8 +6,8 @@
 
     partial class VeryUniqBodyArmor : BodyArmor
     {
-        private static VeryUniqBodyArmor instance = null;
-        private VeryUniqBodyArmor(string itemName, GlobalRarity rarity, float defence, float bonusHealth, string resourcePath, Texture2D icon, int stackSize, int quantity)
+        private static VeryUniqBodyArmor? _instance = null;
+        private VeryUniqBodyArmor(string itemName, GlobalRarity rarity, float defence, float bonusHealth, string resourcePath, Texture2D? icon, int stackSize, int quantity)
             : base(itemName, rarity, defence, bonusHealth, resourcePath, icon, stackSize, quantity)
         {
         }
@@ -15,8 +15,8 @@
         {
             get
             {
-                instance ??= new VeryUniqBodyArmor(StringHelper.BodyArmorMythic, GlobalRarity.Mythic, 900, 600, string.Empty, null, 1, 1);
-                return instance;
+                _instance ??= new VeryUniqBodyArmor(StringHelper.BodyArmorMythic, GlobalRarity.Mythic, 900, 600, string.Empty, null, 1, 1);
+                return _instance;
             }
         }
     }

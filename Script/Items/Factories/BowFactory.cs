@@ -6,7 +6,7 @@
 
     public class BowFactory : ItemCreator
     {
-        private static BowFactory instance;
+        private static BowFactory? _instance = null;
 
         private BowFactory()
         {
@@ -17,12 +17,12 @@
         {
             get
             {
-                instance ??= new BowFactory();
-                return instance;
+                _instance ??= new BowFactory();
+                return _instance;
             }
         }
 
-        public override Bow GenerateItem(GlobalRarity globalRarity)
+        public override Bow? GenerateItem(GlobalRarity globalRarity)
         {
             return globalRarity switch
             {

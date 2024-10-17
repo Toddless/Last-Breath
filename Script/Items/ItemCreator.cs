@@ -7,6 +7,6 @@
     {
         protected RandomNumberGenerator RandomNumberGenerator = new();
 
-        public abstract Item GenerateItem(GlobalRarity rarity);
+        public abstract Item? GenerateItem(GlobalRarity rarity);
     }
 }

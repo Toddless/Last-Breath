@@ -13,15 +13,15 @@
 
         #region Export fields
         [Export]
-        public string ItemResourcePath;
+        public string? ItemResourcePath;
         [Export]
-        public string ItemName;
+        public string? ItemName;
         [Export]
         public int MaxStackSize;
         [Export]
-        public Texture2D Icon;
+        public Texture2D? Icon;
         [Export]
-        public PackedScene ItemScene;
+        public PackedScene? ItemScene;
         [Export]
         public GlobalRarity Rarity;
         [Export]
@@ -36,11 +36,7 @@
         public Guid Guid { get; private set; } = Guid.NewGuid();
         #endregion
 
-        #region Signals
-        #endregion
-
-
-        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D icon, int stackSize, int quantity)
+        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity)
         {
             ItemResourcePath = resourcePath;
             ItemName = itemName;
@@ -80,14 +76,14 @@
 
         public bool Equals(Item other)
         {
-            if (other == null)
+            if (other == null || ItemName == null)
             {
                 return false;
             }
             return ItemName.Equals(other.ItemName) && Quantity == other.Quantity;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
             {
@@ -113,6 +109,6 @@
             return false;
         }
 
-        public Item Copy() => MemberwiseClone() as Item;
+        public Item? Copy() => MemberwiseClone() as Item;
     }
 }
