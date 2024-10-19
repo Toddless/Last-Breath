@@ -1,89 +1,28 @@
 ﻿namespace Playground.Script.Inventory
 {
     using Godot;
-    using Playground.Script.Helpers;
     using Playground.Script.Items;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     [GlobalClass]
     public partial class InventoryComponent : Node
     {
-        #region Path conts
-        private const string InventoryContainer = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/InventoryContainer";
-        private const string ClearButton = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow/ClearButton";
-        private const string InventoryWindow = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow";
-        #endregion
-
-        #region Inventory slots 
-        private string _inventorySlotPath = SceneParh.InventorySlot;
-        private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
-        private GlobalSignals? _globalSignals;
         private PackedScene? _inventorySlot;
-        private Panel? _inventoryWindow;
-        private Button? _clearButton;
-        private Panel? _equipWindow;
-        private Item? _item;
-        [Export]
         private int _capacity;
+        private Item? _item;
+        private int _gold;
 
-        #endregion
-
-        public override void _Ready()
+        public void Inititalize(int size, string path, GridContainer container)
         {
-            _globalSignals = GetNode< GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _inventorySlot = ResourceLoader.Load<PackedScene>(_inventorySlotPath);
-            _inventoryContainer = GetNode<GridContainer>(InventoryContainer);
-            _inventoryWindow = GetNode<Panel>(InventoryWindow);
-            _clearButton = GetNode<Button>(ClearButton);
-            _clearButton.Pressed += RemoveAllItemsFromInventory;
-            if(_inventorySlot == null || _inventoryWindow == null || _inventoryContainer == null || _clearButton == null)
-            {
-                ArgumentNullException.ThrowIfNull(_inventoryContainer);
-                ArgumentNullException.ThrowIfNull(_inventoryWindow);
-                ArgumentNullException.ThrowIfNull(_inventorySlot);
-                ArgumentNullException.ThrowIfNull(_clearButton);
-            }
-            Initialize(_capacity);
-            ToggleWindow(false);
-        }
-
-        public void Initialize(int size)
-        {
+            _inventorySlot = ResourceLoader.Load<PackedScene>(path);
             for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot!.Instantiate<InventorySlot>();
-                _inventoryContainer!.AddChild(inventorySlot);
+                container.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
-        }
-
-        public override void _Input(InputEvent @event)
-        {
-            if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
-            {
-                ToggleWindow(!_inventoryWindow!.Visible);
-                return;
-            }
-        }
-
-        public bool ToggleWindow(bool isOpen)
-        {
-            #region if you need to hide the mouse cursor
-            //if (isOpen)
-            //{
-            //    Input.MouseMode = Input.MouseModeEnum.Visible;
-            //}
-            //else
-            //{
-            //    Input.MouseMode = Input.MouseModeEnum.Captured;
-            //}
-
-            #endregion
-            _globalSignals!.EmitSignal(GlobalSignals.SignalName.InventoryVisible, isOpen);
-            return _inventoryWindow!.Visible = isOpen;
         }
 
         public void OnGivePlayerItem(Item item, int amount)
@@ -94,20 +33,22 @@
             }
         }
 
-        private void RemoveAllItemsFromInventory()
-        {
-            foreach (InventorySlot child in _inventoryContainer!.GetChildren().Cast<InventorySlot>())
-            {
-                child.RemoveItself();
-            }
-        }
-
         private void RemoveAllItemsFromSlot()
         {
             foreach (var item in _slots)
             {
                 RemoveItem(item.InventoryItem);
             }
+        }
+
+        public void AddGoldToInventory(int amount)
+        {
+            _gold += amount;
+        }
+
+        public void RemoveGoldFromInventory(int amount)
+        {
+            _gold -= amount;
         }
 
         public void AddItem(Item item)

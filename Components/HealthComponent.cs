@@ -10,6 +10,8 @@
         private float _currentHealth;
         [Export]
         private float _maxHealth = 100;
+        [Export]
+        private float _defence = 100;
         #endregion
 
         #region Signals
@@ -29,7 +31,7 @@
                 }
                 return _currentHealth;
             }
-            private set
+            set
             {
                 if (_currentHealth > _maxHealth)
                 {
@@ -41,7 +43,13 @@
         public float MaxHealth
         {
             get => _maxHealth;
-            private set => _maxHealth = value;
+            set => _maxHealth = Mathf.RoundToInt(value);
+        }
+
+        public float Defence
+        {
+            get => _defence;
+            set => _defence = Mathf.RoundToInt(value);
         }
         #endregion
 
@@ -52,7 +60,7 @@
 
         public void TakeDamage(float damage)
         {
-            _currentHealth -= damage;
+            _currentHealth -= damage - _defence;
         }
 
         public void Heal(float amount)

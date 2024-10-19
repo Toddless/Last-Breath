@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" load_steps=3 format=3 uid="uid://b00lk41nm8nhv"]
+
+[ext_resource type="Texture2D" uid="uid://j34nlrpprtnj" path="res://Assets/BodyArmor/Uniq.png" id="1_o6vvh"]
+[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_phj6v"]
+
+[resource]
+script = ExtResource("1_phj6v")
+ItemResourcePath = "res://Resource/BodyArmorUniq.tres"
+ItemName = "Very Uniq Body Armor"
+MaxStackSize = 1
+Icon = ExtResource("1_o6vvh")
+Rarity = 32
+Quantity = 1

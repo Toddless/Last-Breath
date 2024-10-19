@@ -15,7 +15,7 @@
         {
             get
             {
-                _instance ??= new VeryUniqBodyArmor(StringHelper.BodyArmorMythic, GlobalRarity.Mythic, 900, 600, string.Empty, null, 1, 1);
+                _instance ??= new VeryUniqBodyArmor(StringHelper.BodyArmorMythic, GlobalRarity.Mythic, 900, 600, "res://Resource/BodyArmorUniq.tres", GD.Load<Texture2D>("res://Assets/BodyArmor/Uniq.png"), 1, 1);
                 return _instance;
             }
         }

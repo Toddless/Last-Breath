@@ -1,20 +1,55 @@
-[gd_scene load_steps=8 format=3 uid="uid://bw2mbm6teo27u"]
+[gd_scene load_steps=15 format=3 uid="uid://bw2mbm6teo27u"]
 
-[ext_resource type="Texture2D" uid="uid://dgx1227bxaxgt" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Idle.png" id="1_7jcqe"]
 [ext_resource type="Script" path="res://EnemyAI.cs" id="1_jgl8u"]
 [ext_resource type="Script" path="res://Components/HealthComponent.cs" id="3_ftclj"]
 [ext_resource type="Script" path="res://Components/AttackComponent.cs" id="4_rr2j7"]
 [ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="5_v8wli"]
+[ext_resource type="Script" path="res://Script/StateMachine/StateMachine.cs" id="6_3d7c3"]
+[ext_resource type="Script" path="res://IdleEnemy.cs" id="7_paqu3"]
+[ext_resource type="Script" path="res://WalkEnemy.cs" id="8_6h7vw"]
+[ext_resource type="Texture2D" uid="uid://s6xwq4fsfyaw" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Move01.png" id="8_intd8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_280rj"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ybt8h"]
-atlas = ExtResource("1_7jcqe")
+[sub_resource type="AtlasTexture" id="AtlasTexture_0yv3g"]
+atlas = ExtResource("8_intd8")
 region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qdr2k"]
+atlas = ExtResource("8_intd8")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kclqd"]
+atlas = ExtResource("8_intd8")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ckbr"]
+atlas = ExtResource("8_intd8")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kv31i"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0yv3g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qdr2k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kclqd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ckbr")
+}],
+"loop": true,
+"name": &"Walk",
+"speed": 12.0
+}]
 
 [node name="Enemy" type="Node2D"]
 z_index = 1
-position = Vector2(242, 155)
+position = Vector2(33, 29)
 scale = Vector2(1.2, 1.2)
 script = ExtResource("1_jgl8u")
 
@@ -24,9 +59,6 @@ scale = Vector2(2.5, 2.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_280rj")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("AtlasTexture_ybt8h")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_ftclj")
@@ -43,10 +75,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -405.0
-offset_top = -237.0
-offset_right = 155.0
-offset_bottom = 143.0
+offset_left = -143.0
+offset_top = -332.0
+offset_right = 417.0
+offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.443953, 0.510209)
@@ -63,3 +95,33 @@ scale = Vector2(0.946495, 0.969961)
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 4
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("6_3d7c3")
+initialState = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="FSM"]
+script = ExtResource("7_paqu3")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="FSM/Idle"]
+position = Vector2(224, 71)
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_kv31i")
+animation = &"Walk"
+
+[node name="Timer" type="Timer" parent="FSM/Idle"]
+wait_time = 2.0
+one_shot = true
+
+[node name="Walk" type="Node" parent="FSM"]
+script = ExtResource("8_6h7vw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="FSM/Walk"]
+position = Vector2(119, 75)
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_kv31i")
+animation = &"Walk"
+
+[node name="Timer" type="Timer" parent="FSM/Walk"]
+wait_time = 2.0
+one_shot = true

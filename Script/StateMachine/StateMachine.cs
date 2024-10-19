@@ -52,10 +52,10 @@
 
         public void TransitionTo(string key)
         {
-            if (!_states.TryGetValue(key, out State? value) || value == _currentState)
+            if (!_states.ContainsKey(key) || _currentState == _states[key])
                 return;
             _currentState!.Exit();
-            _currentState = value;
+            _currentState = _states[key];
             _currentState.Enter();
         }
     }

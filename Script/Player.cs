@@ -2,7 +2,6 @@
 {
     using System;
     using Godot;
-    using Playground.Components;
     using Playground.Script;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
@@ -12,8 +11,10 @@
     {
 
         #region Const
-        private const string EquipedItemWeapon = "/root/MainScene/CharacterBody2D/InventoryComponent/EquipedItemInventoryComponent";
-        private const string InventoryComponent = "/root/MainScene/CharacterBody2D/InventoryComponent";
+        private const string InventoryComponent = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer/InventoryComponent";
+        private const string InventoryContainer = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer";
+        private const string InventoryWindow = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow";
+        private const string PlayerStats = "/root/MainScene/CharacterBody2D/PlayerStats/PlayerStats";
         private const string RestoreMovementPointsButton = "/root/MainScene/UI/Buttons/ChillButton";
         private const string AttackComponent = "/root/MainScene/CharacterBody2D/AttackComponent";
         private const string HealthComponent = "/root/MainScene/CharacterBody2D/HealthComponent";
@@ -40,15 +41,16 @@
         #endregion
 
         #region UI
-        private EquipedItemInventoryComponent? _equipedItemInventoryComponent;
         private RestorePlayerMovement? _restoreMovementButton;
         private InventoryComponent? _inventoryComponent;
+        private GridContainer? _inventoryContainder;
         private ProgressBar? _progressBarMovement;
         private ResearchButton? _researchButton;
         private TextureProgressBar? _healthBar;
         private Button? _doSomeDamageButton;
         private RichTextLabel? _playerStats;
         private ProgressBar? _progressBar;
+        private Panel? _inventoryWindow;
         private Label? _healthBarText;
         #endregion
 
@@ -68,25 +70,25 @@
 
         public override void _Ready()
         {
-            _equipedItemInventoryComponent = GetNode<EquipedItemInventoryComponent>(EquipedItemWeapon);
             _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
+            _inventoryContainder = GetNode<GridContainer>(InventoryContainer);
             _inventoryComponent = GetNode<InventoryComponent>(InventoryComponent);
-            _globalSignals = GetNode< GlobalSignals>(NodePathHelper.GlobalSignalPath);
+            _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _healthComponent = GetNode<HealthComponent>(HealthComponent);
             _attackComponent = GetNode<AttackComponent>(AttackComponent);
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
             _researchButton = GetNode<ResearchButton>(ResearchButton);
             _healthBar = GetNode<TextureProgressBar>(HealthBar);
-            _playerStats = GetNode<RichTextLabel>("/root/MainScene/CharacterBody2D/PlayerStats/PlayerStats");
+            _inventoryWindow = GetNode<Panel>(InventoryWindow);
+            _playerStats = GetNode<RichTextLabel>(PlayerStats);
             _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
             _restoreMovementButton.Pressed += RestoreMovementPoints;
             _researchButton.Pressed += ResearchCurrentZone;
             _healthComponent.OnCharacterDied += PlayerDied;
-            _globalSignals.InventoryVisible += InventoryVisible;
             _globalSignals.OnEquipItem += OnEquipItem;
             _movementPoints = _maxMovementPoints;
-            _playerStats.Visible = false;
-            GD.Print($"Plyer health: {_healthComponent.CurrentHealth}");
+            _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
+            ToggleWindow(false);
             UpdateHealthBar();
             UpdateStats();
 
@@ -99,17 +101,38 @@
             }
         }
 
-        private void InventoryVisible(bool visible)
-        {
-            _playerStats!.Visible = visible;
-        }
-
         private void PlayerDidCriticalDamage()
         {
             GD.Print($"Critical hit!");
         }
 
+        public bool ToggleWindow(bool isOpen)
+        {
+            #region if you need to hide the mouse cursor
+            //if (isOpen)
+            //{
+            //    Input.MouseMode = Input.MouseModeEnum.Visible;
+            //}
+            //else
+            //{
+            //    Input.MouseMode = Input.MouseModeEnum.Captured;
+            //}
+
+            #endregion
+            _playerStats!.Visible = isOpen;
+            return _inventoryWindow!.Visible = isOpen;
+        }
+
         public override void _Input(InputEvent @event)
+        {
+            if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
+            {
+                ToggleWindow(!_inventoryWindow!.Visible);
+                return;
+            }
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
         {
             if (Input.IsActionJustPressed(InputMaps.MoveDown))
             {
@@ -135,10 +158,9 @@
 
         private void OnEquipItem(Item item)
         {
-           
-            if (item is Weapon s)
+            if (item is Weapon weapon)
             {
-                if(_playerWeapon != null)
+                if (_playerWeapon != null)
                 {
                     _inventoryComponent!.AddItem(_playerWeapon);
                     _attackComponent!.BaseMinDamage -= _playerWeapon.MinDamage;
@@ -147,12 +169,27 @@
                     _playerWeapon = null;
                     UpdateStats();
                 }
-                _playerWeapon = s;
+                _playerWeapon = weapon;
                 _attackComponent!.BaseMinDamage += _playerWeapon.MinDamage;
                 _attackComponent.BaseMaxDamage += _playerWeapon.MaxDamage;
                 _attackComponent.CriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
-                _inventoryComponent!.RemoveItem(item);
-                _equipedItemInventoryComponent!.SetItemToSlot(item);
+                _inventoryComponent!.RemoveItem(weapon);
+                UpdateStats();
+            }
+            else if (item is BodyArmor armor)
+            {
+                if (_playerArmor != null)
+                {
+                    _inventoryComponent!.AddItem(_playerArmor);
+                    _healthComponent!.MaxHealth -= _playerArmor.BonusHealth;
+                    _healthComponent.Defence -= _playerArmor.Defence;
+                    _playerArmor = null;
+                    UpdateStats();
+                }
+                _playerArmor = armor;
+                _healthComponent!.MaxHealth += _playerArmor.BonusHealth;
+                _healthComponent.Defence += _playerArmor.Defence;
+                _inventoryComponent!.RemoveItem(armor);
                 UpdateStats();
             }
         }
@@ -167,7 +204,9 @@
             _playerStats!.Text = $"Damage: {_attackComponent!.BaseMinDamage} - {_attackComponent.BaseMaxDamage} \n" +
                 $"Critical Hit Chance: {_attackComponent.CriticalStrikeChance * 100}% \n" +
                 $"Critical Hit Damage: {_attackComponent.CriticalStrikeDamage * 100}% \n" +
-                $"Health: {_healthComponent!.CurrentHealth}\n";
+                $"Health: {_healthComponent!.CurrentHealth}\n" +
+                $"Defence: {_healthComponent.Defence}\n" +
+                $"Max. Health: {_healthComponent.MaxHealth}";
         }
 
         private async void Move()

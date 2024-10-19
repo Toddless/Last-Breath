@@ -5,7 +5,6 @@
 
     public partial class State : Node
     {
-        [Export]
         private AnimatedSprite2D? _animatedSprite2D;
 
         public AnimatedSprite2D AnimatedSprite2D

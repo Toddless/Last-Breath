@@ -12,5 +12,10 @@
         public static readonly string SwordRare = "res://Resource/SwordRare.tres";
         public static readonly string SwordEpic = "res://Resource/SwordEpic.tres";
         public static readonly string SwordLegendary = "res://Resource/SwordLegendary.tres";
+
+        public static readonly string BodyArmorUncommon = "res://Resource/BodyArmorUncommon.tres";
+        public static readonly string BodyArmorRare= "res://Resource/BodyArmorRare.tres";
+        public static readonly string BodyArmorEpic= "res://Resource/BodyArmorEpic.tres";
+        public static readonly string BodyArmorLegendary= "res://Resource/BodyArmorLegendary.tres";
     }
 }

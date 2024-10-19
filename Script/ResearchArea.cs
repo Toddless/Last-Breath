@@ -7,6 +7,8 @@
     public partial class ResearchArea : Area2D
     {
         #region Private fields
+
+        // Loot Table schould be injected insteat of copies for each class 
         private BasedOnRarityLootTable _lootTable = new();
         private GlobalRarity _areaRarity;
         #endregion

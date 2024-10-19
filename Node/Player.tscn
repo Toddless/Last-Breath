@@ -1,4 +1,4 @@
-[gd_scene load_steps=104 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=99 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_4f7n1"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_fxid3"]
@@ -8,9 +8,6 @@
 [ext_resource type="Script" path="res://Components/HealthComponent.cs" id="7_2s6kv"]
 [ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="8_5dtdn"]
 [ext_resource type="Script" path="res://Components/AttackComponent.cs" id="8_nwamj"]
-[ext_resource type="Script" path="res://Components/EquipedItemInventoryComponent.cs" id="8_pqu6y"]
-[ext_resource type="Script" path="res://Script/StateMachine/StateMachine.cs" id="10_dje16"]
-[ext_resource type="Script" path="res://Script/StateMachine/IdleDownState.cs" id="11_s1rom"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_fxid3")
@@ -673,10 +670,6 @@ animations = [{
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1c8vr"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pquaa"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_1a8d5"]
-
 [node name="CharacterBody2D" type="CharacterBody2D"]
 physics_interpolation_mode = 2
 position = Vector2(86, 154)
@@ -694,11 +687,9 @@ shape = SubResource("CircleShape2D_1c8vr")
 script = ExtResource("7_2s6kv")
 _maxHealth = 500.0
 
-[node name="InventoryComponent" type="Node" parent="."]
-script = ExtResource("8_5dtdn")
-_capacity = 105
+[node name="Inventory" type="Node" parent="."]
 
-[node name="InventoryWindow" type="Panel" parent="InventoryComponent"]
+[node name="InventoryWindow" type="Panel" parent="Inventory"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -714,7 +705,7 @@ scale = Vector2(1.38048, 1.21376)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="InventoryContainer" type="GridContainer" parent="InventoryComponent/InventoryWindow"]
+[node name="InventoryContainer" type="GridContainer" parent="Inventory/InventoryWindow"]
 layout_mode = 0
 offset_left = 178.924
 offset_top = 193.613
@@ -725,17 +716,20 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 15
 
-[node name="ClearButton" type="Button" parent="InventoryComponent/InventoryWindow"]
+[node name="InventoryComponent" type="Node" parent="Inventory/InventoryWindow/InventoryContainer"]
+script = ExtResource("8_5dtdn")
+
+[node name="ClearButton" type="Button" parent="Inventory/InventoryWindow"]
 layout_mode = 0
-offset_left = 177.474
-offset_top = 360.862
-offset_right = 380.474
-offset_bottom = 414.862
+offset_left = 55.7777
+offset_top = 539.645
+offset_right = 258.778
+offset_bottom = 593.645
 scale = Vector2(0.213588, 0.514125)
 icon = ExtResource("5_58vpv")
 flat = true
 
-[node name="ClearButtonText" type="Label" parent="InventoryComponent/InventoryWindow/ClearButton"]
+[node name="ClearButtonText" type="Label" parent="Inventory/InventoryWindow/ClearButton"]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
@@ -745,58 +739,8 @@ label_settings = ExtResource("6_w46fu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EquipedItemInventoryComponent" type="Node" parent="InventoryComponent"]
-script = ExtResource("8_pqu6y")
-
-[node name="WeaponWindow" type="Panel" parent="InventoryComponent/EquipedItemInventoryComponent"]
-offset_left = 244.0
-offset_top = 232.0
-offset_right = 284.0
-offset_bottom = 272.0
-theme_override_styles/panel = SubResource("StyleBoxTexture_pquaa")
-
-[node name="WeaponLeftIcon" type="TextureRect" parent="InventoryComponent/EquipedItemInventoryComponent/WeaponWindow"]
-layout_mode = 0
-offset_left = 11.0
-offset_top = 74.0
-offset_right = 51.0
-offset_bottom = 114.0
-
-[node name="Area2D" type="Area2D" parent="InventoryComponent/EquipedItemInventoryComponent/WeaponWindow/WeaponLeftIcon"]
-position = Vector2(20, 20)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="InventoryComponent/EquipedItemInventoryComponent/WeaponWindow/WeaponLeftIcon/Area2D"]
-scale = Vector2(1.9, 1.9)
-shape = SubResource("RectangleShape2D_1a8d5")
-
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("8_nwamj")
-
-[node name="FSM" type="Node" parent="."]
-script = ExtResource("10_dje16")
-initialState = NodePath("Idle/IdleDownState")
-
-[node name="Idle" type="Node" parent="FSM"]
-
-[node name="IdleDownState" type="Node" parent="FSM/Idle" node_paths=PackedStringArray("_animatedSprite2D")]
-script = ExtResource("11_s1rom")
-_animatedSprite2D = NodePath("../../../AnimatedSprite2D")
-
-[node name="IdleUpState" type="Node" parent="FSM/Idle"]
-
-[node name="IdleRightState" type="Node" parent="FSM/Idle"]
-
-[node name="IdleLeftState" type="Node" parent="FSM/Idle"]
-
-[node name="Run" type="Node" parent="FSM"]
-
-[node name="RunDownState" type="Node" parent="FSM/Run"]
-
-[node name="RunUpState" type="Node" parent="FSM/Run"]
-
-[node name="RunLeftState" type="Node" parent="FSM/Run"]
-
-[node name="RunRightState" type="Node" parent="FSM/Run"]
 
 [node name="PlayerStats" type="Node" parent="."]
 

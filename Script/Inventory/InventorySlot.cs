@@ -3,7 +3,6 @@ namespace Playground
     using System;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.Inventory;
     using Playground.Script.Items;
 
     public partial class InventorySlot : Node
@@ -14,7 +13,6 @@ namespace Playground
 
         #region Private fields
         private RichTextLabel? _fullItemDescription;
-        private InventoryComponent? _inventory;
         private GlobalSignals? _globalSignals;
         private Vector2 _mousePosition;
         private Label? _quantityLabel;
@@ -22,7 +20,6 @@ namespace Playground
         private TextureRect? _icon;
         private Area2D? _area2D;
         private int _quantity;
-        private int _index;
         #endregion
 
         #region Properties
@@ -38,7 +35,6 @@ namespace Playground
         {
             _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
             _fullItemDescription = GetNode<RichTextLabel>("ItemDescription");
-            _inventory = GetNode<InventoryComponent>(InventoryComponent);
             _quantityLabel = GetNode<Label>("QuantityText");
             // for mouseEntered and mouseExited events on each child control node mouse filter
             // should be set to ignore
@@ -63,9 +59,16 @@ namespace Playground
             // for example hier im show item description if under mouse cursor is an weapon
             if (InventoryItem is Weapon s)
             {
-                _fullItemDescription!.Text = $" {s.ItemName} \n" +
-                    $" Damage: {Mathf.RoundToInt(s.MinDamage)} - {Mathf.RoundToInt(s.MaxDamage)} \n" +
-                    $" Critical Strike Chande: {s.CriticalStrikeChance * 100}% \n";
+                _fullItemDescription!.Text = $"{s.ItemName} \n" +
+                    $"Damage: {Mathf.RoundToInt(s.MinDamage)} - {Mathf.RoundToInt(s.MaxDamage)} \n" +
+                    $"Critical Strike Chande: {s.CriticalStrikeChance * 100}% \n";
+                _fullItemDescription.Show();
+            }
+            else if (InventoryItem is BodyArmor c)
+            {
+                _fullItemDescription!.Text = $"{c.ItemName}\n" +
+                    $"Defence: {Mathf.RoundToInt(c.Defence)}\n" +
+                    $"Bonus Health: {Mathf.RoundToInt(c.BonusHealth)}";
                 _fullItemDescription.Show();
             }
         }
