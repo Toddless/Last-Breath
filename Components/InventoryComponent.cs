@@ -16,38 +16,43 @@
         private const string InventoryWindow = "/root/MainScene/CharacterBody2D/InventoryComponent/InventoryWindow";
         #endregion
 
-        #region Private fields
+        #region Inventory slots 
         private string _inventorySlotPath = SceneParh.InventorySlot;
         private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
+        private GlobalSignals? _globalSignals;
         private PackedScene? _inventorySlot;
         private Panel? _inventoryWindow;
         private Button? _clearButton;
+        private Panel? _equipWindow;
         private Item? _item;
         [Export]
         private int _capacity;
+
         #endregion
 
         public override void _Ready()
         {
+            _globalSignals = GetNode< GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _inventorySlot = ResourceLoader.Load<PackedScene>(_inventorySlotPath);
             _inventoryContainer = GetNode<GridContainer>(InventoryContainer);
-            _clearButton = GetNode<Button>(ClearButton);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
-            _clearButton.Pressed += OnClearButtonPressed;
-            if(_inventorySlot == null || _inventoryWindow == null || _inventoryContainer == null)
+            _clearButton = GetNode<Button>(ClearButton);
+            _clearButton.Pressed += RemoveAllItemsFromInventory;
+            if(_inventorySlot == null || _inventoryWindow == null || _inventoryContainer == null || _clearButton == null)
             {
-                ArgumentNullException.ThrowIfNull(_inventorySlot);
-                ArgumentNullException.ThrowIfNull(_inventoryWindow);
                 ArgumentNullException.ThrowIfNull(_inventoryContainer);
+                ArgumentNullException.ThrowIfNull(_inventoryWindow);
+                ArgumentNullException.ThrowIfNull(_inventorySlot);
+                ArgumentNullException.ThrowIfNull(_clearButton);
             }
-            Initialize();
+            Initialize(_capacity);
             ToggleWindow(false);
         }
 
-        public void Initialize()
+        public void Initialize(int size)
         {
-            for (int i = 0; i < _capacity; i++)
+            for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot!.Instantiate<InventorySlot>();
                 _inventoryContainer!.AddChild(inventorySlot);
@@ -77,6 +82,7 @@
             //}
 
             #endregion
+            _globalSignals!.EmitSignal(GlobalSignals.SignalName.InventoryVisible, isOpen);
             return _inventoryWindow!.Visible = isOpen;
         }
 
@@ -86,11 +92,6 @@
             {
                 AddItem(item);
             }
-        }
-
-        private void OnClearButtonPressed()
-        {
-            RemoveAllItemsFromInventory();
         }
 
         private void RemoveAllItemsFromInventory()
@@ -134,7 +135,6 @@
 
             if (slot == null)
             {
-                GD.Print("not found. Returned null");
                 return;
             }
 
@@ -143,15 +143,7 @@
 
         public InventorySlot? GetSlotToAdd(Item item)
         {
-            foreach (InventorySlot slot in _slots)
-            {
-                if (slot.InventoryItem == null || (slot.InventoryItem.Guid == item.Guid && slot.InventoryItem.Quantity < item.MaxStackSize))
-                {
-                    return slot;
-                }
-            }
-
-            return null;
+            return _slots.FirstOrDefault(x => x.InventoryItem == null || (x.InventoryItem.Guid == item.Guid && x.InventoryItem.Quantity < item.MaxStackSize));
         }
 
         public InventorySlot? GetSlotToRemove(Item? item)

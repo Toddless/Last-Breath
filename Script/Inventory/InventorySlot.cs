@@ -26,18 +26,6 @@ namespace Playground
         #endregion
 
         #region Properties
-        public InventoryComponent? Inventory
-        {
-            get => _inventory;
-            set => _inventory = value;
-        }
-
-        public int Quantity
-        {
-            get => _quantity;
-            private set => _quantity = value;
-        }
-
         public Item? InventoryItem
         {
             get => _inventoryItem;

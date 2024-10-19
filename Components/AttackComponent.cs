@@ -5,7 +5,7 @@ namespace Playground
     [GlobalClass]
     public partial class AttackComponent : Node
     {
-        #region Export fields
+        #region private fields
         private readonly RandomNumberGenerator _rng = new();
         private float _finalDamage;
         private float _baseMinDamage;
@@ -19,13 +19,13 @@ namespace Playground
         public float BaseMinDamage
         {
             get => _baseMinDamage;
-            set => _baseMinDamage = value;
+            set => _baseMinDamage = Mathf.RoundToInt(value);
         }
 
         public float BaseMaxDamage
         {
             get => _baseMaxDamage;
-            set => _baseMaxDamage = value;
+            set => _baseMaxDamage = Mathf.RoundToInt(value);
         }
 
         public float FinalDamage
@@ -60,6 +60,7 @@ namespace Playground
         [Signal]
         public delegate void OnPlayerCriticalHitEventHandler();
         #endregion
+
         public override void _Ready()
         {
             _criticalStrikeDamage = 1.5f;

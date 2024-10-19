@@ -1,0 +1,65 @@
+[gd_scene load_steps=8 format=3 uid="uid://bw2mbm6teo27u"]
+
+[ext_resource type="Texture2D" uid="uid://dgx1227bxaxgt" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Idle.png" id="1_7jcqe"]
+[ext_resource type="Script" path="res://EnemyAI.cs" id="1_jgl8u"]
+[ext_resource type="Script" path="res://Components/HealthComponent.cs" id="3_ftclj"]
+[ext_resource type="Script" path="res://Components/AttackComponent.cs" id="4_rr2j7"]
+[ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="5_v8wli"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_280rj"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ybt8h"]
+atlas = ExtResource("1_7jcqe")
+region = Rect2(0, 0, 32, 32)
+
+[node name="Enemy" type="Node2D"]
+z_index = 1
+position = Vector2(242, 155)
+scale = Vector2(1.2, 1.2)
+script = ExtResource("1_jgl8u")
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(0, 2.50002)
+scale = Vector2(2.5, 2.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_280rj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("AtlasTexture_ybt8h")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_ftclj")
+
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("4_rr2j7")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("5_v8wli")
+
+[node name="InventoryWindow" type="Panel" parent="InventoryComponent"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -405.0
+offset_top = -237.0
+offset_right = 155.0
+offset_bottom = 143.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.443953, 0.510209)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="InventoryContainer" type="GridContainer" parent="InventoryComponent/InventoryWindow"]
+layout_mode = 0
+offset_left = 34.3743
+offset_top = 30.7302
+offset_right = 554.374
+offset_bottom = 350.73
+scale = Vector2(0.946495, 0.969961)
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 4

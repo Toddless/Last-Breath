@@ -10,7 +10,6 @@
         private float _currentHealth;
         [Export]
         private float _maxHealth = 100;
-
         #endregion
 
         #region Signals
@@ -44,7 +43,6 @@
             get => _maxHealth;
             private set => _maxHealth = value;
         }
-
         #endregion
 
         public override void _Ready()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=17 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/_PNG/MainLev.png" id="1_4jlib"]
 [ext_resource type="Script" path="res://Script/ResearchArea.cs" id="2_p52a2"]
@@ -6,10 +6,9 @@
 [ext_resource type="Script" path="res://Script/UI/RestorePlayerMovement.cs" id="5_ccrgj"]
 [ext_resource type="Texture2D" uid="uid://bxlecob3ygmmm" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BqBar.png" id="5_p8jfl"]
 [ext_resource type="Texture2D" uid="uid://swxnp7pvxjvd" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BarHealth.png" id="6_xogud"]
-[ext_resource type="Texture2D" uid="uid://b3m1yc8ttdfp6" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BarMana.png" id="7_kj832"]
-[ext_resource type="Texture2D" uid="uid://bdcjbdp4ohog8" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Normal.png" id="8_14ynh"]
 [ext_resource type="Texture2D" uid="uid://drkeixjqccjy0" path="res://Assets/UI MMORPG Dark Templar/Game Menu & Pause/Buttons/Button Normal.png" id="8_ijle3"]
 [ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="10_4khdd"]
+[ext_resource type="PackedScene" uid="uid://bw2mbm6teo27u" path="res://Enemy.tscn" id="10_mdjwb"]
 [ext_resource type="Script" path="res://Script/UI/ResearchButton.cs" id="11_vpeqh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
@@ -590,9 +589,6 @@ tile_size = Vector2i(64, 64)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xbypx"]
 size = Vector2(64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_vl6t7"]
-atlas = ExtResource("8_14ynh")
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jimfu"]
 bg_color = Color(0.13, 0.13, 0.13, 1)
 
@@ -673,52 +669,6 @@ label_settings = ExtResource("10_4khdd")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GenerateSomeItem" type="Button" parent="UI/Buttons"]
-light_mask = 2
-visibility_layer = 2
-offset_left = 162.0
-offset_top = 603.0
-offset_right = 338.0
-offset_bottom = 658.0
-scale = Vector2(0.282656, 0.731837)
-action_mode = 0
-text = "
-"
-icon = ExtResource("8_ijle3")
-flat = true
-
-[node name="Label" type="Label" parent="UI/Buttons/GenerateSomeItem"]
-layout_mode = 0
-offset_left = -3.53785
-offset_top = 16.3971
-offset_right = 36.4622
-offset_bottom = 39.3971
-scale = Vector2(4.97137, 1.71949)
-text = "Item"
-label_settings = ExtResource("10_4khdd")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="DoSomeDamage" type="Button" parent="UI/Buttons"]
-offset_left = 225.0
-offset_top = 612.0
-offset_right = 428.0
-offset_bottom = 666.0
-scale = Vector2(0.39785, 0.475685)
-icon = SubResource("AtlasTexture_vl6t7")
-
-[node name="Label" type="Label" parent="UI/Buttons/DoSomeDamage"]
-layout_mode = 0
-offset_left = 5.02702
-offset_top = 4.20446
-offset_right = 109.027
-offset_bottom = 27.2045
-scale = Vector2(1.87236, 2.02477)
-text = "Do some damage"
-label_settings = ExtResource("10_4khdd")
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="PlayerBars" type="Node" parent="UI"]
 
 [node name="HealthProgressBar" type="TextureProgressBar" parent="UI/PlayerBars"]
@@ -727,26 +677,16 @@ offset_top = -1.52588e-05
 offset_right = 42.0
 offset_bottom = 40.0
 scale = Vector2(4.73265, 0.493778)
+rounded = true
 nine_patch_stretch = true
 texture_under = ExtResource("5_p8jfl")
 texture_progress = ExtResource("6_xogud")
 
-[node name="StaminaProgressBar" type="TextureProgressBar" parent="UI/PlayerBars"]
-offset_left = 2.0
-offset_top = 20.0
-offset_right = 42.0
-offset_bottom = 60.0
-scale = Vector2(4.73265, 0.493778)
-value = 90.0
-nine_patch_stretch = true
-texture_under = ExtResource("5_p8jfl")
-texture_progress = ExtResource("7_kj832")
-
 [node name="StaminaBar" type="ProgressBar" parent="UI/PlayerBars"]
 offset_left = 2.0
-offset_top = 40.0
+offset_top = 22.0
 offset_right = 6.0
-offset_bottom = 67.0
+offset_bottom = 49.0
 scale = Vector2(47.3132, 0.747516)
 theme_override_styles/background = SubResource("StyleBoxFlat_jimfu")
 theme_override_styles/fill = SubResource("StyleBoxFlat_uegfl")
@@ -754,6 +694,9 @@ max_value = 0.0
 step = 1.0
 show_percentage = false
 
+[node name="Enemy" parent="." instance=ExtResource("10_mdjwb")]
+position = Vector2(243, 158)
+scale = Vector2(1.20205, 1.2)
+
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]
-[connection signal="pressed" from="UI/Buttons/DoSomeDamage" to="CharacterBody2D" method="OnPressed"]

@@ -7,5 +7,7 @@ namespace Playground
     {
         [Signal]
         public delegate void OnEquipItemEventHandler(Item item);
+        [Signal]
+        public delegate void InventoryVisibleEventHandler(bool visible);
     }
 }

@@ -96,19 +96,6 @@
         {
             return HashCode.Combine(ItemName, Quantity);
         }
-
-        public void Description()
-        {
-            GD.Print($"I am {this.ItemName}. My Rarity is: {this.Rarity}");
-        }
-
-        // todo?: добавление второго метода для удаляемого после использования предмета
-        public bool OnUse(Player player) 
-        {
-            GD.Print($"Player used {ItemName}");
-            return false;
-        }
-
         public Item? Copy() => MemberwiseClone() as Item;
     }
 }
