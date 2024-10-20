@@ -15,7 +15,6 @@
         private const string InventoryWindow = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow";
         private const string PlayerAnimatedSprites = "/root/MainScene/CharacterBody2D/AnimatedSprite2D";
         private const string PlayerStats = "/root/MainScene/CharacterBody2D/PlayerStats/PlayerStats";
-        private const string RestoreMovementPointsButton = "/root/MainScene/UI/Buttons/ChillButton";
         private const string AttackComponent = "/root/MainScene/CharacterBody2D/AttackComponent";
         private const string HealthComponent = "/root/MainScene/CharacterBody2D/HealthComponent";
         private const string StaminaProgressBar = "/root/MainScene/UI/PlayerBars/StaminaBar";
@@ -37,6 +36,7 @@
         private bool _isMoving;
         private int _speed;
         private Vector2 _lastPosition;
+        private bool _canMove = true;
         #endregion
 
         #region Components
@@ -45,7 +45,6 @@
         #endregion
 
         #region UI
-        private RestorePlayerMovement? _restoreMovementButton;
         private InventoryComponent? _inventoryComponent;
         private GridContainer? _inventoryContainder;
         private ProgressBar? _progressBarMovement;
@@ -56,6 +55,8 @@
         private ProgressBar? _progressBar;
         private Panel? _inventoryWindow;
         private Label? _healthBarText;
+        private TextureRect? _goldIcon;
+        private Label? _goldAmount;
         #endregion
 
         #region Properties
@@ -89,13 +90,24 @@
             set => _lastPosition = value;
         }
 
+        public bool CanMove
+        {
+            get => _canMove;
+            set => _canMove = value;
+        }
+
+        public InventoryComponent? Inventory
+        {
+            get => _inventoryComponent;
+            set => _inventoryComponent = value;
+        }
+
         [Export]
         public int Speed { get; set; } = 200;
         #endregion
 
         public override void _Ready()
         {
-            _restoreMovementButton = GetNode<RestorePlayerMovement>(RestoreMovementPointsButton);
             _inventoryContainder = GetNode<GridContainer>(InventoryContainer);
             _inventoryComponent = GetNode<InventoryComponent>(InventoryComponent);
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
@@ -103,6 +115,8 @@
             _attackComponent = GetNode<AttackComponent>(AttackComponent);
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
             _researchButton = GetNode<ResearchButton>(ResearchButton);
+            _goldIcon = GetNode<TextureRect>("/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect");
+            _goldAmount = GetNode<Label>("/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect/Label");
             _healthBar = GetNode<TextureProgressBar>(HealthBar);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _playerStats = GetNode<RichTextLabel>(PlayerStats);
@@ -158,6 +172,11 @@
 
         public override void _PhysicsProcess(double delta)
         {
+            if (!_canMove)
+            {
+                return;
+            }
+
             Vector2 inputDirection = Input.GetVector(InputMaps.MoveLeft, InputMaps.MoveRight, InputMaps.MoveUp, InputMaps.MoveDown);
             Velocity = inputDirection * Speed;
             MoveAndSlide();

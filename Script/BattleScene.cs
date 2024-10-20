@@ -30,28 +30,48 @@ namespace Playground
             _damageButton = GetNode<Button>("/root/MainScene/BattleScene/UI/Button");
             _returnButton = GetNode<Button>("/root/MainScene/BattleScene/UI/ReturnButton");
             _timer = GetNode<Timer>("/root/MainScene/BattleScene/Timer");
+            _enemy!.PlayerTakedAllItems += _enemy_PlayerTakedAllItems;
             _returnButton.Pressed += _returnButton_Pressed;
             _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
             _enemy!.Health!.OnCharacterDied += EnemyDied;
             this.EnemyTurn += EnemyDealDamage;
             this.PlayerTurn += PlayersTurn;
             _damageButton.Pressed += PlayersDealDamage;
+            _enemy.EnemyInventoryClosed += EnemyInventoryClosed;
             SetHealthBars();
             UpdateHealthBar();
         }
 
+        private void _enemy_PlayerTakedAllItems()
+        {
+            _player.Inventory.AddItem(_enemy.Inventory.GivePlayerItem());
+            EnemyInventoryClosed();
+        }
+
+        private void EnemyInventoryClosed()
+        {
+            _enemy!.QueueFree();
+            SetPlayerStats();
+            QueueFree();
+        }
+
         private void _returnButton_Pressed()
         {
-            QueueFree();
+            SetPlayerStats();
             _enemy!.QueueFree();
+            QueueFree();
+        }
+
+        private void SetPlayerStats()
+        {
             _player!.Position = _player.PlayerLastPosition;
-            _player.Speed = 200;
+            _player.CanMove = true;
         }
 
         private void EnemyDied()
         {
             _enemy!.EnemiesDeath();
-            QueueFree();
+            _damageButton!.Visible = false;
         }
 
         private void PlayerHealth_OnCharacterDied()
@@ -64,10 +84,10 @@ namespace Playground
         {
             _player = player;
             _enemy = enemy;
+            _player.CanMove = false;
 
             _player.Position = new Vector2(250, 450);
             _enemy.Position = new Vector2(950, 450);
-            _player.Speed = 0;
         }
 
 
@@ -83,18 +103,20 @@ namespace Playground
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
 
-        public  void EnemyDealDamage()
+        public void EnemyDealDamage()
         {
-            _timer.WaitTime = 1.5;
-            var x = _enemy!.EnemyAttack!.FinalDamage;
-            _player!.PlayerHealth!.TakeDamage(x);
-            UpdateHealthBar();
-            GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
-            GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
-            GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
-            GD.Print("___________________________");
+            if (_enemy.Health.CurrentHealth > 0)
+            {
+                var x = _enemy!.EnemyAttack!.FinalDamage;
+                _player!.PlayerHealth!.TakeDamage(x);
+                UpdateHealthBar();
+                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
+                GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
+                GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
+                GD.Print("___________________________");
 
-            EmitSignal(SignalName.PlayerTurn);
+                EmitSignal(SignalName.PlayerTurn);
+            }
         }
 
         private void PlayersTurn()
@@ -104,6 +126,10 @@ namespace Playground
 
         private void PlayersDealDamage()
         {
+            if (_enemy!.Health!.CurrentHealth <= 0)
+            {
+                return;
+            }
             var x = _player!.PlayerAttack!.FinalDamage;
             _enemy!.Health!.TakeDamage(x);
             UpdateHealthBar();

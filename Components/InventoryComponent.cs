@@ -12,7 +12,6 @@
         private PackedScene? _inventorySlot;
         private int _capacity;
         private Item? _item;
-        private int _gold;
 
         public void Inititalize(int size, string path, GridContainer container)
         {
@@ -33,22 +32,25 @@
             }
         }
 
-        private void RemoveAllItemsFromSlot()
+        public Item? GivePlayerItem()
+        {
+            foreach (var item in _slots)
+            {
+                if (item.InventoryItem != null)
+                {
+                    return item.InventoryItem;
+                }
+                break;
+            }
+            return null;
+        }
+
+        public void RemoveAllItemsFromSlot()
         {
             foreach (var item in _slots)
             {
                 RemoveItem(item.InventoryItem);
             }
-        }
-
-        public void AddGoldToInventory(int amount)
-        {
-            _gold += amount;
-        }
-
-        public void RemoveGoldFromInventory(int amount)
-        {
-            _gold -= amount;
         }
 
         public void AddItem(Item item)
@@ -78,7 +80,6 @@
             {
                 return;
             }
-
             slot.RemoveItem(item);
         }
 

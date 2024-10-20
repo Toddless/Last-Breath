@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=19 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/_PNG/MainLev.png" id="1_4jlib"]
 [ext_resource type="Script" path="res://Script/MainScene.cs" id="1_8vjwq"]
@@ -11,6 +11,7 @@
 [ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="10_4khdd"]
 [ext_resource type="PackedScene" uid="uid://bw2mbm6teo27u" path="res://Node/Enemy.tscn" id="10_mdjwb"]
 [ext_resource type="Script" path="res://Script/UI/ResearchButton.cs" id="11_vpeqh"]
+[ext_resource type="Script" path="res://Node/EnemySpawner.cs" id="12_dqvs4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
 texture = ExtResource("1_4jlib")
@@ -700,6 +701,9 @@ show_percentage = false
 [node name="Enemy" parent="." instance=ExtResource("10_mdjwb")]
 position = Vector2(229, 156)
 scale = Vector2(1.20205, 1.2)
+
+[node name="EnemySpawner" type="Node" parent="."]
+script = ExtResource("12_dqvs4")
 
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]
