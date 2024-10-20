@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="CombatAction" load_steps=2 format=3 uid="uid://dipmso3c5vdpj"]
-
-[ext_resource type="Script" path="res://Script/CombatAction.cs" id="1_v5vxt"]
-
-[resource]
-script = ExtResource("1_v5vxt")
-Name = "Stump"
-Damage = 18.0
-Heal = 0.0

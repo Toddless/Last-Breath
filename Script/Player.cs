@@ -9,11 +9,11 @@
 
     public partial class Player : CharacterBody2D
     {
-
         #region Const
         private const string InventoryComponent = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer/InventoryComponent";
         private const string InventoryContainer = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer";
         private const string InventoryWindow = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow";
+        private const string PlayerAnimatedSprites = "/root/MainScene/CharacterBody2D/AnimatedSprite2D";
         private const string PlayerStats = "/root/MainScene/CharacterBody2D/PlayerStats/PlayerStats";
         private const string RestoreMovementPointsButton = "/root/MainScene/UI/Buttons/ChillButton";
         private const string AttackComponent = "/root/MainScene/CharacterBody2D/AttackComponent";
@@ -24,15 +24,19 @@
         #endregion
 
         #region Private fields
+        // for grid movement
+        //  private double _maxMovementPoints = 15;
+        //   private const int _tileSize = 64;
         private Vector2 _inputDirection = Vector2.Zero;
-        private double _maxMovementPoints = 15;
+        private AnimatedSprite2D? _sprite;
         private GlobalSignals? _globalSignals;
         private ResearchArea? _currentZone;
-        private const int _tileSize = 64;
         private double _movementPoints;
         private BodyArmor? _playerArmor;
         private Weapon? _playerWeapon;
-        private bool _moving = false;
+        private bool _isMoving;
+        private int _speed;
+        private Vector2 _lastPosition;
         #endregion
 
         #region Components
@@ -66,6 +70,27 @@
             get => _playerWeapon;
             set => _playerWeapon = value;
         }
+
+        public HealthComponent? PlayerHealth
+        {
+            get => _healthComponent;
+            set => _healthComponent = value;
+        }
+
+        public AttackComponent? PlayerAttack
+        {
+            get => _attackComponent;
+            set => _attackComponent = value;
+        }
+
+        public Vector2 PlayerLastPosition
+        {
+            get => _lastPosition;
+            set => _lastPosition = value;
+        }
+
+        [Export]
+        public int Speed { get; set; } = 200;
         #endregion
 
         public override void _Ready()
@@ -81,17 +106,17 @@
             _healthBar = GetNode<TextureProgressBar>(HealthBar);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _playerStats = GetNode<RichTextLabel>(PlayerStats);
+            _sprite = GetNode<AnimatedSprite2D>(PlayerAnimatedSprites);
             _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
-            _restoreMovementButton.Pressed += RestoreMovementPoints;
             _researchButton.Pressed += ResearchCurrentZone;
-            _healthComponent.OnCharacterDied += PlayerDied;
             _globalSignals.OnEquipItem += OnEquipItem;
-            _movementPoints = _maxMovementPoints;
             _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
+            _healthComponent.IncreasedMaximumHealth(500);
+            _healthComponent.RefreshHealth();
             ToggleWindow(false);
             UpdateHealthBar();
             UpdateStats();
-
+            _sprite.Play("Idle_down");
             if (_attackComponent == null || _inventoryComponent == null || _progressBarMovement == null || _healthBar == null)
             {
                 ArgumentNullException.ThrowIfNull(_healthBar);
@@ -128,31 +153,54 @@
             if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
             {
                 ToggleWindow(!_inventoryWindow!.Visible);
-                return;
             }
         }
 
-        public override void _UnhandledInput(InputEvent @event)
+        public override void _PhysicsProcess(double delta)
         {
-            if (Input.IsActionJustPressed(InputMaps.MoveDown))
+            Vector2 inputDirection = Input.GetVector(InputMaps.MoveLeft, InputMaps.MoveRight, InputMaps.MoveUp, InputMaps.MoveDown);
+            Velocity = inputDirection * Speed;
+            MoveAndSlide();
+        }
+
+
+        private void UpdateStats()
+        {
+            _playerStats!.Text = $"Damage: {_attackComponent!.BaseMinDamage} - {_attackComponent.BaseMaxDamage} \n" +
+                $"Critical Hit Chance: {_attackComponent.CriticalStrikeChance * 100}% \n" +
+                $"Critical Hit Damage: {_attackComponent.CriticalStrikeDamage * 100}% \n" +
+                $"Health: {_healthComponent!.CurrentHealth}\n" +
+                $"Defence: {_healthComponent.Defence}\n" +
+                $"Max. Health: {_healthComponent.MaxHealth}";
+        }
+
+       
+
+        private void UpdateHealthBar()
+        {
+            _healthBar!.MaxValue = _healthComponent!.MaxHealth;
+            var tween = CreateTween();
+            tween.TweenProperty(_healthBar, "value", _healthComponent.CurrentHealth, 0.2f);
+        }
+
+        private void OnPlayerEnteredZone(ResearchArea zone)
+        {
+            _currentZone = zone;
+        }
+
+        private void OnPlayerExitedZone()
+        {
+            _currentZone = null;
+        }
+
+        private void ResearchCurrentZone()
+        {
+            if (_currentZone == null)
+                return;
+            var item = _currentZone.GetRandomResearchEvent();
+            if (item != null)
             {
-                _inputDirection = Vector2.Down;
-                Move();
-            }
-            else if (Input.IsActionJustPressed(InputMaps.MoveUp))
-            {
-                _inputDirection = Vector2.Up;
-                Move();
-            }
-            else if (Input.IsActionJustPressed(InputMaps.MoveLeft))
-            {
-                _inputDirection = Vector2.Left;
-                Move();
-            }
-            else if (Input.IsActionJustPressed(InputMaps.MoveRight))
-            {
-                _inputDirection = Vector2.Right;
-                Move();
+                _inventoryComponent!.AddItem(item);
             }
         }
 
@@ -194,94 +242,47 @@
             }
         }
 
-        private void PlayerDied()
+        public override void _UnhandledInput(InputEvent @event)
         {
-            GD.Print("I am dead. Game over");
+            //if (Input.IsActionJustPressed(InputMaps.MoveDown))
+            //{
+            //    _inputDirection = Vector2.Down;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveUp))
+            //{
+            //    _inputDirection = Vector2.Up;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveLeft))
+            //{
+            //    _inputDirection = Vector2.Left;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveRight))
+            //{
+            //    _inputDirection = Vector2.Right;
+            //    MoveAndSlide();
+            //}
         }
 
-        private void UpdateStats()
+        private void MoveGrid()
         {
-            _playerStats!.Text = $"Damage: {_attackComponent!.BaseMinDamage} - {_attackComponent.BaseMaxDamage} \n" +
-                $"Critical Hit Chance: {_attackComponent.CriticalStrikeChance * 100}% \n" +
-                $"Critical Hit Damage: {_attackComponent.CriticalStrikeDamage * 100}% \n" +
-                $"Health: {_healthComponent!.CurrentHealth}\n" +
-                $"Defence: {_healthComponent.Defence}\n" +
-                $"Max. Health: {_healthComponent.MaxHealth}";
-        }
-
-        private async void Move()
-        {
-            if (_inputDirection != Vector2.Zero)
-            {
-                if (!_moving && _movementPoints != 0)
-                {
-                    _moving = true;
-                    // создаем новый tween
-                    var tween = CreateTween();
-                    // передаем в tween свойство, которое хотим изменить, направление и длину анимации
-                    tween.TweenProperty(this, "position", Position + _inputDirection * _tileSize, 0.1f);
-                    tween.TweenCallback(new Callable(this, nameof(MovingFalse)));
-                    tween.TweenCallback(new Callable(this, nameof(ReduceMovementPoint)));
-                    // ожидаем завершения анимации
-                    await ToSignal(tween, "finished");
-                }
-            }
-        }
-
-        private void MovingFalse()
-        {
-            _moving = false;
-        }
-
-        private void ReduceMovementPoint()
-        {
-            _movementPoints -= 1;
-            UpdateMovementBar();
-        }
-
-        private void RestoreMovementPoints()
-        {
-            _movementPoints = _maxMovementPoints;
-            UpdateMovementBar();
-        }
-
-        private void UpdateMovementBar()
-        {
-            _progressBarMovement!.MaxValue = _maxMovementPoints;
-            var tween = CreateTween();
-            tween.TweenProperty(_progressBarMovement, "value", _movementPoints, 0.1f);
-        }
-
-        private void UpdateHealthBar()
-        {
-            _healthBar!.MaxValue = _healthComponent!.MaxHealth;
-            var tween = CreateTween();
-            tween.TweenProperty(_healthBar, "value", _healthComponent.CurrentHealth, 0.2f);
-        }
-
-        private void OnPlayerEnteredZone(ResearchArea zone)
-        {
-            // если игрок в зоне, сохраняем ее
-            _currentZone = zone;
-            // GD.Print($" {_attackComponent.DealDamage()}");
-        }
-
-        private void OnPlayerExitedZone()
-        {
-            // если игрок покинул зону, обнуляем
-            _currentZone = null;
-        }
-
-        private void ResearchCurrentZone()
-        {
-            // при нажатии кнопки срабатывает ивент, который вызывает этот метод
-            if (_currentZone == null)
-                return;
-            var item = _currentZone.GetRandomResearchEvent();
-            if (item != null)
-            {
-                _inventoryComponent!.AddItem(item);
-            }
+            //if (_inputDirection != Vector2.Zero)
+            //{
+            //    if (!_moving && _movementPoints != 0)
+            //    {
+            //        _moving = true;
+            //        // создаем новый tween
+            //        var tween = CreateTween();
+            //        // передаем в tween свойство, которое хотим изменить, направление и длину анимации
+            //        tween.TweenProperty(this, "position", Position + _inputDirection * _tileSize, 0.1f);
+            //        tween.TweenCallback(new Callable(this, nameof(MovingFalse)));
+            //        tween.TweenCallback(new Callable(this, nameof(ReduceMovementPoint)));
+            //        // ожидаем завершения анимации
+            //        await ToSignal(tween, "finished");
+            //    }
+            //}
         }
     }
 }

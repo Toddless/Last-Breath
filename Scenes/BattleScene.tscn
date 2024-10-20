@@ -1,0 +1,87 @@
+[gd_scene load_steps=6 format=3 uid="uid://c0lun31icaoam"]
+
+[ext_resource type="Script" path="res://Script/BattleScene.cs" id="1_yicyd"]
+[ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="2_rmdsv"]
+[ext_resource type="Texture2D" uid="uid://bdcjbdp4ohog8" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Normal.png" id="3_jakpg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eo1t1"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh5o6"]
+bg_color = Color(0.781423, 0.123547, 0.135953, 1)
+
+[node name="BattleScene" type="Node2D"]
+process_mode = 3
+z_index = 1
+script = ExtResource("1_yicyd")
+
+[node name="BattleScene1" type="Sprite2D" parent="."]
+position = Vector2(635, 486)
+scale = Vector2(1.07987, 0.98093)
+texture = ExtResource("2_rmdsv")
+
+[node name="UI" type="Node" parent="."]
+
+[node name="Button" type="Button" parent="UI"]
+z_index = 1
+offset_left = 511.0
+offset_top = 359.0
+offset_right = 591.0
+offset_bottom = 384.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/Button"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+texture = ExtResource("3_jakpg")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="UI/Button"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+text = "Damage"
+
+[node name="ReturnButton" type="Button" parent="UI"]
+z_index = 1
+offset_left = 3.0
+offset_top = 73.0
+offset_right = 83.0
+offset_bottom = 98.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/ReturnButton"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+texture = ExtResource("3_jakpg")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="UI/ReturnButton"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+text = "Return"
+
+[node name="PlayerHpBar" type="ProgressBar" parent="UI"]
+z_index = 1
+offset_top = 1.0
+offset_right = 120.0
+offset_bottom = 26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_eo1t1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_lh5o6")
+show_percentage = false
+
+[node name="EnemyHpBar" type="ProgressBar" parent="UI"]
+z_index = 1
+offset_left = 1160.0
+offset_top = 1.0
+offset_right = 1280.0
+offset_bottom = 26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_eo1t1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_lh5o6")
+fill_mode = 1
+show_percentage = false
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.5
+one_shot = true

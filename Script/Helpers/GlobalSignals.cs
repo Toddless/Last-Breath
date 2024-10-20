@@ -9,5 +9,7 @@ namespace Playground
         public delegate void OnEquipItemEventHandler(Item item);
         [Signal]
         public delegate void InventoryVisibleEventHandler(bool visible);
+        [Signal]
+        public delegate void PlayerEncountedEventHandler();
     }
 }

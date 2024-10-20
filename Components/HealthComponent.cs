@@ -11,7 +11,7 @@
         [Export]
         private float _maxHealth = 100;
         [Export]
-        private float _defence = 100;
+        private float _defence = 30;
         #endregion
 
         #region Signals
@@ -43,7 +43,7 @@
         public float MaxHealth
         {
             get => _maxHealth;
-            set => _maxHealth = Mathf.RoundToInt(value);
+            set => _maxHealth = value;
         }
 
         public float Defence
@@ -60,7 +60,7 @@
 
         public void TakeDamage(float damage)
         {
-            _currentHealth -= damage - _defence;
+            _currentHealth -= damage;
         }
 
         public void Heal(float amount)
@@ -78,6 +78,11 @@
         public void ReduceMaximumHealth(float amount)
         {
             _maxHealth -= amount;
+        }
+
+        public void RefreshHealth()
+        {
+            _currentHealth = MaxHealth;
         }
     }
 }

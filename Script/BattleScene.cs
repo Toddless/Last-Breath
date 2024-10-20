@@ -1,0 +1,126 @@
+namespace Playground
+{
+    using Godot;
+    using Playground.Script.Helpers;
+
+    public partial class BattleScene : Node2D
+    {
+        private EnemyAI? _enemy;
+        private Player? _player;
+        private Sprite2D? _sprite;
+        private GlobalSignals? _signals;
+        private ProgressBar? _playerHpBar;
+        private ProgressBar? _enemyHpBar;
+        private Button? _damageButton;
+        private Button? _returnButton;
+        private Timer? _timer;
+        [Signal]
+        public delegate void EnemyTurnEventHandler();
+        [Signal]
+        public delegate void PlayerTurnEventHandler();
+
+
+        public override void _Ready()
+        {
+            StartFight();
+            _signals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
+            _playerHpBar = GetNode<ProgressBar>("/root/MainScene/BattleScene/UI/PlayerHpBar");
+            _enemyHpBar = GetNode<ProgressBar>("/root/MainScene/BattleScene/UI/EnemyHpBar");
+            _sprite = GetNode<Sprite2D>("/root/MainScene/BattleScene/BattleScene1");
+            _damageButton = GetNode<Button>("/root/MainScene/BattleScene/UI/Button");
+            _returnButton = GetNode<Button>("/root/MainScene/BattleScene/UI/ReturnButton");
+            _timer = GetNode<Timer>("/root/MainScene/BattleScene/Timer");
+            _returnButton.Pressed += _returnButton_Pressed;
+            _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
+            _enemy!.Health!.OnCharacterDied += EnemyDied;
+            this.EnemyTurn += EnemyDealDamage;
+            this.PlayerTurn += PlayersTurn;
+            _damageButton.Pressed += PlayersDealDamage;
+            SetHealthBars();
+            UpdateHealthBar();
+        }
+
+        private void _returnButton_Pressed()
+        {
+            QueueFree();
+            _enemy!.QueueFree();
+            _player!.Position = _player.PlayerLastPosition;
+            _player.Speed = 200;
+        }
+
+        private void EnemyDied()
+        {
+            _enemy!.EnemiesDeath();
+            QueueFree();
+        }
+
+        private void PlayerHealth_OnCharacterDied()
+        {
+            GD.Print("GameOver");
+            QueueFree();
+        }
+
+        public void Init(Player player, EnemyAI enemy)
+        {
+            _player = player;
+            _enemy = enemy;
+
+            _player.Position = new Vector2(250, 450);
+            _enemy.Position = new Vector2(950, 450);
+            _player.Speed = 0;
+        }
+
+
+        private void SetHealthBars()
+        {
+            _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
+            _enemyHpBar!.MaxValue = _enemy!.Health!.MaxHealth;
+        }
+
+        public void UpdateHealthBar()
+        {
+            _enemyHpBar!.Value = _enemy!.Health!.CurrentHealth;
+            _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
+        }
+
+        public  void EnemyDealDamage()
+        {
+            _timer.WaitTime = 1.5;
+            var x = _enemy!.EnemyAttack!.FinalDamage;
+            _player!.PlayerHealth!.TakeDamage(x);
+            UpdateHealthBar();
+            GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
+            GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
+            GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
+            GD.Print("___________________________");
+
+            EmitSignal(SignalName.PlayerTurn);
+        }
+
+        private void PlayersTurn()
+        {
+            _damageButton!.Visible = true;
+        }
+
+        private void PlayersDealDamage()
+        {
+            var x = _player!.PlayerAttack!.FinalDamage;
+            _enemy!.Health!.TakeDamage(x);
+            UpdateHealthBar();
+            GD.Print($"Player did damage: {Mathf.RoundToInt(x)}");
+            GD.Print($"Enemy current hp: {Mathf.RoundToInt(_enemy.Health.CurrentHealth)}");
+            GD.Print($"Current hp: {Mathf.RoundToInt(_player.PlayerHealth!.CurrentHealth)}");
+            GD.Print("___________________________");
+            _damageButton!.Visible = false;
+            EmitSignal(SignalName.EnemyTurn);
+        }
+
+        public void StartFight()
+        {
+            if (_player == null && _enemy == null)
+            {
+                GD.Print("Opponents not found");
+            }
+        }
+    }
+}

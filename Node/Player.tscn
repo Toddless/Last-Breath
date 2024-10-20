@@ -541,7 +541,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_3q2hw")
 }],
 "loop": true,
-"name": &"Move_down",
+"name": &"ui_down",
 "speed": 10.0
 }, {
 "frames": [{
@@ -582,7 +582,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_ir6mm")
 }],
 "loop": true,
-"name": &"Move_left",
+"name": &"ui_left",
 "speed": 10.0
 }, {
 "frames": [{
@@ -623,7 +623,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_brrxd")
 }],
 "loop": true,
-"name": &"Move_right",
+"name": &"ui_right",
 "speed": 10.0
 }, {
 "frames": [{
@@ -664,21 +664,20 @@ animations = [{
 "texture": SubResource("AtlasTexture_oflgr")
 }],
 "loop": true,
-"name": &"Move_up",
+"name": &"ui_up",
 "speed": 10.0
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1c8vr"]
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D"]
 physics_interpolation_mode = 2
 position = Vector2(86, 154)
 script = ExtResource("1_4f7n1")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_uobba")
-animation = &"Idle_down"
-frame_progress = 0.913562
+animation = &"ui_left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1c8vr")
