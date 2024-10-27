@@ -20,6 +20,8 @@
         private const string StaminaProgressBar = "/root/MainScene/UI/PlayerBars/StaminaBar";
         private const string HealthBar = "/root/MainScene/UI/PlayerBars/HealthProgressBar";
         private const string ResearchButton = "/root/MainScene/UI/Buttons/ResearchButton";
+        private const string GoldIcon = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect";
+        private const string GoldAmount = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect/Label";
         #endregion
 
         #region Private fields
@@ -43,6 +45,12 @@
         private HealthComponent? _healthComponent;
         private AttackComponent? _attackComponent;
         #endregion
+
+        [Signal]
+        public delegate void PlayerEnterTheBattleEventHandler();
+
+        [Signal]
+        public delegate void PlayerExitedTheBattleEventHandler();
 
         #region UI
         private InventoryComponent? _inventoryComponent;
@@ -102,6 +110,12 @@
             set => _inventoryComponent = value;
         }
 
+        public AnimatedSprite2D? PlayerAnimation
+        {
+            get => _sprite;
+            set => _sprite = value;
+        }
+
         [Export]
         public int Speed { get; set; } = 200;
         #endregion
@@ -115,8 +129,8 @@
             _attackComponent = GetNode<AttackComponent>(AttackComponent);
             _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
             _researchButton = GetNode<ResearchButton>(ResearchButton);
-            _goldIcon = GetNode<TextureRect>("/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect");
-            _goldAmount = GetNode<Label>("/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect/Label");
+            _goldIcon = GetNode<TextureRect>(GoldIcon);
+            _goldAmount = GetNode<Label>(GoldAmount);
             _healthBar = GetNode<TextureProgressBar>(HealthBar);
             _inventoryWindow = GetNode<Panel>(InventoryWindow);
             _playerStats = GetNode<RichTextLabel>(PlayerStats);

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=21 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/_PNG/MainLev.png" id="1_4jlib"]
 [ext_resource type="Script" path="res://Script/MainScene.cs" id="1_8vjwq"]
@@ -9,9 +9,10 @@
 [ext_resource type="Texture2D" uid="uid://swxnp7pvxjvd" path="res://Assets/UI MMORPG Dark Templar/CharacterPlayer/ProgressBar/BarHealth.png" id="6_xogud"]
 [ext_resource type="Texture2D" uid="uid://drkeixjqccjy0" path="res://Assets/UI MMORPG Dark Templar/Game Menu & Pause/Buttons/Button Normal.png" id="8_ijle3"]
 [ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="10_4khdd"]
-[ext_resource type="PackedScene" uid="uid://bw2mbm6teo27u" path="res://Node/Enemy.tscn" id="10_mdjwb"]
 [ext_resource type="Script" path="res://Script/UI/ResearchButton.cs" id="11_vpeqh"]
 [ext_resource type="Script" path="res://Node/EnemySpawner.cs" id="12_dqvs4"]
+[ext_resource type="Texture2D" uid="uid://dqlmbs82w33r6" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Close Normal.png" id="14_7nw50"]
+[ext_resource type="Texture2D" uid="uid://08ymwvj42jt8" path="res://Assets/UI MMORPG Dark Templar/Backpack inventory small/Icons/Money03.png" id="15_65t5n"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
 texture = ExtResource("1_4jlib")
@@ -597,6 +598,9 @@ bg_color = Color(0.13, 0.13, 0.13, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uegfl"]
 bg_color = Color(0.831276, 0.518108, 0.136693, 1)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ek282"]
+atlas = ExtResource("15_65t5n")
+
 [node name="MainScene" type="Node2D"]
 process_mode = 1
 script = ExtResource("1_8vjwq")
@@ -618,7 +622,7 @@ script = ExtResource("2_p52a2")
 shape = SubResource("RectangleShape2D_xbypx")
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("2_sxnxb")]
-z_index = 1
+z_index = 2
 
 [node name="UI" type="Node" parent="."]
 
@@ -698,12 +702,71 @@ max_value = 0.0
 step = 1.0
 show_percentage = false
 
-[node name="Enemy" parent="." instance=ExtResource("10_mdjwb")]
-position = Vector2(229, 156)
-scale = Vector2(1.20205, 1.2)
-
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("12_dqvs4")
+
+[node name="GlobalEnemyIntentory" type="Node" parent="."]
+
+[node name="InventoryWindow" type="Panel" parent="GlobalEnemyIntentory"]
+z_index = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -267.0
+offset_top = -227.0
+offset_right = 293.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.942217, 1.06497)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="InventoryContainer" type="GridContainer" parent="GlobalEnemyIntentory/InventoryWindow"]
+layout_mode = 0
+offset_left = 163.621
+offset_top = 59.4694
+offset_right = 683.621
+offset_bottom = 379.469
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 5
+
+[node name="CloseButton" type="Button" parent="GlobalEnemyIntentory/InventoryWindow"]
+layout_mode = 0
+offset_left = 519.172
+offset_top = 1.33846
+offset_right = 578.172
+offset_bottom = 65.3385
+scale = Vector2(0.676281, 0.473968)
+icon = ExtResource("14_7nw50")
+
+[node name="TakeAllButton" type="Button" parent="GlobalEnemyIntentory/InventoryWindow"]
+layout_mode = 0
+offset_left = 99.9416
+offset_top = 345.079
+offset_right = 167.942
+offset_bottom = 376.079
+text = "Take all"
+
+[node name="TextureRect" type="TextureRect" parent="GlobalEnemyIntentory/InventoryWindow"]
+layout_mode = 0
+offset_left = 7.07546
+offset_top = 14.8674
+offset_right = 23.0755
+offset_bottom = 30.8674
+texture = SubResource("AtlasTexture_ek282")
+
+[node name="Label" type="Label" parent="GlobalEnemyIntentory/InventoryWindow/TextureRect"]
+layout_mode = 0
+offset_left = 18.1097
+offset_top = -1.64777
+offset_right = 58.1097
+offset_bottom = 21.3522
+scale = Vector2(0.75819, 0.655748)
+text = "100"
 
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]

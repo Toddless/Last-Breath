@@ -13,6 +13,8 @@
         private int _capacity;
         private Item? _item;
 
+        public List<InventorySlot> Slots { get { return _slots; } }
+
         public void Inititalize(int size, string path, GridContainer container)
         {
             _inventorySlot = ResourceLoader.Load<PackedScene>(path);
@@ -55,6 +57,11 @@
 
         public void AddItem(Item item)
         {
+            if(item == null)
+            {
+                return;
+            }
+
             var slot = GetSlotToAdd(item);
             if (slot == null)
             {

@@ -1,6 +1,7 @@
 namespace Playground
 {
     using Godot;
+    using Playground.Script;
     using Playground.Script.Helpers;
 
     public partial class BattleScene : Node2D
@@ -14,6 +15,12 @@ namespace Playground
         private Button? _damageButton;
         private Button? _returnButton;
         private Timer? _timer;
+        private EnemyInventory? _enemyInventory;
+
+        [Signal]
+        public delegate void BattleSceneReadyEventHandler();
+        [Signal]
+        public delegate void BattleSceneFinishedEventHandler();
         [Signal]
         public delegate void EnemyTurnEventHandler();
         [Signal]
@@ -30,36 +37,38 @@ namespace Playground
             _damageButton = GetNode<Button>("/root/MainScene/BattleScene/UI/Button");
             _returnButton = GetNode<Button>("/root/MainScene/BattleScene/UI/ReturnButton");
             _timer = GetNode<Timer>("/root/MainScene/BattleScene/Timer");
-            _enemy!.PlayerTakedAllItems += _enemy_PlayerTakedAllItems;
-            _returnButton.Pressed += _returnButton_Pressed;
+            _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
+            _returnButton.Pressed += BattleFinished;
             _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
+            _enemyInventory!.TakeAllButton!.Pressed += PlayerTakedAllItems;
+            _enemyInventory!.CloseButton!.Pressed += PlayerClosedInventory;
             _enemy!.Health!.OnCharacterDied += EnemyDied;
             this.EnemyTurn += EnemyDealDamage;
             this.PlayerTurn += PlayersTurn;
             _damageButton.Pressed += PlayersDealDamage;
-            _enemy.EnemyInventoryClosed += EnemyInventoryClosed;
             SetHealthBars();
             UpdateHealthBar();
         }
 
-        private void _enemy_PlayerTakedAllItems()
+        private void PlayerClosedInventory()
         {
-            _player.Inventory.AddItem(_enemy.Inventory.GivePlayerItem());
-            EnemyInventoryClosed();
+            _enemyInventory!.ClearInventory();
+            BattleFinished();
         }
 
-        private void EnemyInventoryClosed()
+        private void PlayerTakedAllItems()
         {
-            _enemy!.QueueFree();
-            SetPlayerStats();
-            QueueFree();
+            _enemyInventory!.GivePlayerItems().ForEach(_player!.Inventory!.AddItem);
+            _enemyInventory.ClearInventory();
+            BattleFinished();
         }
 
-        private void _returnButton_Pressed()
+        private void BattleFinished()
         {
             SetPlayerStats();
             _enemy!.QueueFree();
             QueueFree();
+            EmitSignal(SignalName.BattleSceneFinished);
         }
 
         private void SetPlayerStats()
@@ -70,8 +79,9 @@ namespace Playground
 
         private void EnemyDied()
         {
-            _enemy!.EnemiesDeath();
             _damageButton!.Visible = false;
+            _enemyInventory!.InventoryVisible(true);
+
         }
 
         private void PlayerHealth_OnCharacterDied()
@@ -105,15 +115,15 @@ namespace Playground
 
         public void EnemyDealDamage()
         {
-            if (_enemy.Health.CurrentHealth > 0)
+            if (_enemy!.Health!.CurrentHealth > 0)
             {
                 var x = _enemy!.EnemyAttack!.FinalDamage;
                 _player!.PlayerHealth!.TakeDamage(x);
                 UpdateHealthBar();
-                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
-                GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
-                GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
-                GD.Print("___________________________");
+                //GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
+                //GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
+                //GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
+                //GD.Print("___________________________");
 
                 EmitSignal(SignalName.PlayerTurn);
             }
@@ -133,10 +143,10 @@ namespace Playground
             var x = _player!.PlayerAttack!.FinalDamage;
             _enemy!.Health!.TakeDamage(x);
             UpdateHealthBar();
-            GD.Print($"Player did damage: {Mathf.RoundToInt(x)}");
-            GD.Print($"Enemy current hp: {Mathf.RoundToInt(_enemy.Health.CurrentHealth)}");
-            GD.Print($"Current hp: {Mathf.RoundToInt(_player.PlayerHealth!.CurrentHealth)}");
-            GD.Print("___________________________");
+            //GD.Print($"Player did damage: {Mathf.RoundToInt(x)}");
+            //GD.Print($"Enemy current hp: {Mathf.RoundToInt(_enemy.Health.CurrentHealth)}");
+            //GD.Print($"Current hp: {Mathf.RoundToInt(_player.PlayerHealth!.CurrentHealth)}");
+            //GD.Print("___________________________");
             _damageButton!.Visible = false;
             EmitSignal(SignalName.EnemyTurn);
         }

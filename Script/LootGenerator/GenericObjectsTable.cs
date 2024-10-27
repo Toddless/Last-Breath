@@ -82,21 +82,6 @@
             return factory?.GenerateItem(lootDropItems[index].Rarity);
         }
 
-        public Item? GetItemAtRarity(int index)
-        {
-            if (lootDropItems == null || factories == null)
-            {
-                ArgumentNullException.ThrowIfNull(factories);
-                ArgumentNullException.ThrowIfNull(lootDropItems);
-            }
-            var randomFactory = random.RandiRange(0, factories.Count - 1);
-            var rarityFrom = random.RandiRange(index, lootDropItems.Count - 1);
-            var factory = GetFactory(randomFactory);
-
-            return factory?.GenerateItem(lootDropItems[rarityFrom].Rarity);
-        }
-
-
         private void SetFactories()
         {
             factories =

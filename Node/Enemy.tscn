@@ -1,21 +1,15 @@
-[gd_scene load_steps=11 format=3 uid="uid://bw2mbm6teo27u"]
+[gd_scene load_steps=7 format=3 uid="uid://bw2mbm6teo27u"]
 
 [ext_resource type="Script" path="res://Script/Enemy/EnemyAI.cs" id="1_g0i5v"]
 [ext_resource type="Texture2D" uid="uid://dgx1227bxaxgt" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Idle.png" id="2_8ewjt"]
 [ext_resource type="Script" path="res://Components/HealthComponent.cs" id="3_ftclj"]
 [ext_resource type="Script" path="res://Components/AttackComponent.cs" id="4_rr2j7"]
-[ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="5_v8wli"]
-[ext_resource type="Texture2D" uid="uid://dqlmbs82w33r6" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Close Normal.png" id="6_tu5tn"]
-[ext_resource type="Texture2D" uid="uid://08ymwvj42jt8" path="res://Assets/UI MMORPG Dark Templar/Backpack inventory small/Icons/Money03.png" id="7_004v7"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_m264x"]
 atlas = ExtResource("2_8ewjt")
 region = Rect2(192, 0, 32, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_280rj"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8k36v"]
-atlas = ExtResource("7_004v7")
 
 [node name="Enemy" type="Node2D"]
 z_index = 1
@@ -39,67 +33,3 @@ script = ExtResource("3_ftclj")
 
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("4_rr2j7")
-
-[node name="InventoryWindow" type="Panel" parent="."]
-visible = false
-z_index = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -497.5
-offset_top = -187.5
-offset_right = 62.5001
-offset_bottom = 192.5
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(0.942217, 1.06497)
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="InventoryContainer" type="GridContainer" parent="InventoryWindow"]
-layout_mode = 0
-offset_left = 163.621
-offset_top = 59.4694
-offset_right = 683.621
-offset_bottom = 379.469
-theme_override_constants/h_separation = 1
-theme_override_constants/v_separation = 1
-columns = 5
-
-[node name="InventoryComponent" type="Node" parent="InventoryWindow/InventoryContainer"]
-script = ExtResource("5_v8wli")
-
-[node name="CloseButton" type="Button" parent="InventoryWindow"]
-layout_mode = 0
-offset_left = 519.172
-offset_top = 1.33846
-offset_right = 578.172
-offset_bottom = 65.3385
-scale = Vector2(0.676281, 0.473968)
-icon = ExtResource("6_tu5tn")
-
-[node name="TakeAllButton" type="Button" parent="InventoryWindow"]
-layout_mode = 0
-offset_left = 99.9416
-offset_top = 345.079
-offset_right = 167.942
-offset_bottom = 376.079
-text = "Take all"
-
-[node name="TextureRect" type="TextureRect" parent="InventoryWindow"]
-offset_left = 7.07546
-offset_top = 14.8674
-offset_right = 23.0755
-offset_bottom = 30.8674
-texture = SubResource("AtlasTexture_8k36v")
-
-[node name="Label" type="Label" parent="InventoryWindow/TextureRect"]
-layout_mode = 0
-offset_left = 18.1097
-offset_top = -1.64777
-offset_right = 58.1097
-offset_bottom = 21.3522
-scale = Vector2(0.75819, 0.655748)
-text = "100"

@@ -26,7 +26,7 @@ namespace Playground
         public Item? InventoryItem
         {
             get => _inventoryItem;
-            private set => _inventoryItem = value;
+            set => _inventoryItem = value;
         }
 
         #endregion
@@ -56,7 +56,7 @@ namespace Playground
             }
 
             _mousePosition = _area2D.GetLocalMousePosition();
-            // for example hier im show item description if under mouse cursor is an weapon
+            // for example hier shown item description if under mouse cursor is an weapon
             if (InventoryItem is Weapon s)
             {
                 _fullItemDescription!.Text = $"{s.ItemName} \n" +

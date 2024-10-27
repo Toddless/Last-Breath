@@ -1,33 +1,39 @@
 namespace Playground
 {
-    using System.Collections.Generic;
     using Godot;
 
     public partial class EnemySpawner : Node
     {
+        private MainScene? _parentScene;
         private PackedScene? _scene;
-        private List<EnemyAI>? _enemies = [];
-        private Node? _parentScene;
+        private EnemyAI? _enemyAI;
 
-        public override void _PhysicsProcess(double delta)
+
+        public EnemyAI? EnemyAI
         {
-
+            get => _enemyAI;
+            set => _enemyAI = value;
         }
+
 
         public override void _Ready()
         {
-            _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             _parentScene = GetParent().GetNode<MainScene>("/root/MainScene");
-            CreateEnemies();
+            _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
+            GD.Print("Instantiate: EnemySpawner");
         }
 
-        private void CreateEnemies()
+        public void Initialize()
         {
-            for (int i = 0; i < 10; i++)
-            {
-                EnemyAI enemy = _scene!.Instantiate<EnemyAI>();
-                _enemies!.Add(enemy);
-            }
+            EnemyAI enemy = _scene!.Instantiate<EnemyAI>();
+            _enemyAI = enemy;
+            _parentScene!.CallDeferred("add_child", _enemyAI);
+        }
+
+        public async void CreateNewEnemy()
+        {
+            await ToSignal(_parentScene!, "EnemyCanSpawn");
+            Initialize();
         }
     }
 }
