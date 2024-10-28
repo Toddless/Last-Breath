@@ -35,9 +35,9 @@ namespace Playground
             _area = GetNode<Area2D>("/root/MainScene/Enemy/Area2D");
             _collisionShape = GetNode<CollisionShape2D>("/root/MainScene/Enemy/Area2D/CollisionShape2D");
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _rarity = GlobalRarity.Common;
-            _health.OnCharacterDied += IamDead;
             _area.BodyEntered += PlayerEntered;
+            _health.OnCharacterDied += IamDead;
+            _rarity = GlobalRarity.Common;
             _health.RefreshHealth();
         }
 
