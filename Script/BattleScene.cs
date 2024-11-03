@@ -117,13 +117,11 @@ namespace Playground
         {
             if (_enemy!.Health!.CurrentHealth > 0)
             {
-                var x = _enemy!.EnemyAttack!.FinalDamage;
+                var x = _enemy!.EnemyDealDamage();
                 _player!.PlayerHealth!.TakeDamage(x);
                 UpdateHealthBar();
-                //GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
-                //GD.Print($"Player current hp: {Mathf.RoundToInt(_player.PlayerHealth.CurrentHealth)}");
-                //GD.Print($"Current hp: {Mathf.RoundToInt(_enemy.Health!.CurrentHealth)}");
-                //GD.Print("___________________________");
+                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
+                GD.Print("___________________________");
 
                 EmitSignal(SignalName.PlayerTurn);
             }

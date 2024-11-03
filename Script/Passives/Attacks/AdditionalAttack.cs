@@ -1,8 +1,13 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    public class AdditionalAttack : AttackPassives
+    public partial class AdditionalAttack : Passive, IAttackPassives
     {
-        public override void OnActivated(AttackComponent attack)
+        public void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default, float amount = default)
+        {
+
+        }
+
+        public void ApplyBeforeAttack(AttackComponent attack)
         {
 
         }

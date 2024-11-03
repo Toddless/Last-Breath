@@ -15,11 +15,14 @@ namespace Playground
         public EnemyAI? EnemyAI
         {
             get => _enemy;
+            set => _enemy = value;
         }
 
 
         [Signal]
         public delegate void EnemyCanSpawnEventHandler();
+        [Signal]
+        public delegate void EnemyInitializedEventHandler();
 
         public override void _Ready()
         {
@@ -27,9 +30,9 @@ namespace Playground
             _globalSignals.PlayerEncounted += PlayerInteracted;
             _enemySpawner = GetNode<EnemySpawner>("/root/MainScene/EnemySpawner");
             _enemySpawner.Initialize();
-            _enemy = _enemySpawner.EnemyAI;
             _player = GetNode<Player>("CharacterBody2D");
             GD.Print("Instantiate: MainScene");
+            EmitSignal(SignalName.EnemyInitialized);
         }
 
         private void PlayerInteracted()

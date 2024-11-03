@@ -9,7 +9,7 @@
 
     public partial class EnemyInventory : Node
     {
-        private BasedOnRarityLootTable _lootTable = new();
+        private BasedOnRarityLootTable _lootTable = BasedOnRarityLootTable.Instance;
         private RandomNumberGenerator _rnd = new();
         private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
@@ -41,9 +41,10 @@
         }
 
 
-        public override void _Ready()
+        public override async void _Ready()
         {
             _mainScene = GetNode<MainScene>("/root/MainScene");
+            await ToSignal(_mainScene!, "EnemyInitialized");
             _inventoryContainer = GetNode<GridContainer>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/InventoryContainer");
             _takeAllButton = GetNode<Button>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/TakeAllButton");
             _goldAmount = GetNode<Label>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/TextureRect/Label");
@@ -54,7 +55,6 @@
             _enemyAI = _mainScene.EnemyAI;
             _lootTable.InitializeLootTable();
             _lootTable.ValidateTable();
-            _enemyAI!.EnemyDied += OnDeathSpawnItem;
 
             for (int i = 0; i < 25; i++)
             {
@@ -62,6 +62,8 @@
                 _inventoryContainer.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
+
+            _enemyAI!.EnemyDied += OnDeathSpawnItem;
             InventoryVisible(false);
             GD.Print("Instantiate: EnemyInventory");
         }

@@ -3,13 +3,18 @@ namespace Playground
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Helpers;
     using Godot;
+    using System.Collections.Generic;
+    using Playground.Script.Passives.Attacks;
+    using Playground.Script.Passives;
 
     public partial class EnemyAI : Node2D
     {
+        private readonly RandomNumberGenerator _rnd = new();
         private GlobalSignals? _globalSignals;
         private HealthComponent? _health;
         private AttackComponent? _attack;
         private CollisionShape2D? _collisionShape;
+        private List<IAttackPassives>? _attackPassives;
         private GlobalRarity _rarity;
         private Area2D? _area;
 
@@ -38,7 +43,28 @@ namespace Playground
             _area.BodyEntered += PlayerEntered;
             _health.OnCharacterDied += IamDead;
             _rarity = GlobalRarity.Common;
+            _health.IncreasedMaximumHealth(10);
             _health.RefreshHealth();
+            _attack.OnPlayerCriticalHit += EnemyDealCritical;
+            _attackPassives =
+            [
+                new BuffAttack(),
+            ];
+
+            PassivesPool.TotalWeight();
+        }
+
+        private void EnemyDealCritical()
+        {
+            GD.Print("Critical Strike!");
+        }
+
+        public float EnemyDealDamage()
+        {
+            _attackPassives![0].ApplyBeforeAttack(_attack!);
+            var finalDamage = _attack!.FinalDamage; ;
+            _attackPassives[0].ApplyAfterAttack(_attack!, _health!, finalDamage);
+            return finalDamage;
         }
 
         private void IamDead()
@@ -47,7 +73,7 @@ namespace Playground
             EmitSignal(SignalName.EnemyDied, (int)_rarity);
         }
 
-        private void PlayerEntered(Node body)
+        public void PlayerEntered(Node body)
         {
             if (body is Player)
             {

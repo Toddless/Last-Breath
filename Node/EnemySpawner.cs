@@ -4,35 +4,29 @@ namespace Playground
 
     public partial class EnemySpawner : Node
     {
+        private RandomNumberGenerator _rnd = new();
         private MainScene? _parentScene;
         private PackedScene? _scene;
-        private EnemyAI? _enemyAI;
-
-
-        public EnemyAI? EnemyAI
-        {
-            get => _enemyAI;
-            set => _enemyAI = value;
-        }
-
 
         public override void _Ready()
         {
-            _parentScene = GetParent().GetNode<MainScene>("/root/MainScene");
+            _parentScene = GetNode<MainScene>("/root/MainScene");
             _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             GD.Print("Instantiate: EnemySpawner");
+            _parentScene.EnemyCanSpawn += CreateNewEnemy;
         }
 
         public void Initialize()
         {
             EnemyAI enemy = _scene!.Instantiate<EnemyAI>();
-            _enemyAI = enemy;
-            _parentScene!.CallDeferred("add_child", _enemyAI);
+            _parentScene!.CallDeferred("add_child", enemy);
+            enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
+            enemy.Position = new Vector2(_rnd.RandfRange(50,900 ), _rnd.RandfRange(250, 700));
+            _parentScene.EnemyAI = enemy;
         }
 
-        public async void CreateNewEnemy()
+        public void CreateNewEnemy()
         {
-            await ToSignal(_parentScene!, "EnemyCanSpawn");
             Initialize();
         }
     }

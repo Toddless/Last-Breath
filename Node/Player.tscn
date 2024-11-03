@@ -676,6 +676,7 @@ atlas = ExtResource("8_njvwc")
 physics_interpolation_mode = 2
 position = Vector2(86, 154)
 script = ExtResource("1_4f7n1")
+Speed = 900
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_uobba")
@@ -686,7 +687,6 @@ shape = SubResource("CircleShape2D_1c8vr")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("7_2s6kv")
-_maxHealth = 500.0
 
 [node name="Inventory" type="Node" parent="."]
 

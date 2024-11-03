@@ -139,7 +139,7 @@
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
             _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
-            _healthComponent.IncreasedMaximumHealth(500);
+            _healthComponent.IncreasedMaximumHealth(10000);
             _healthComponent.RefreshHealth();
             ToggleWindow(false);
             UpdateHealthBar();

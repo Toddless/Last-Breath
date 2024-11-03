@@ -1,24 +1,18 @@
 namespace Playground
 {
-    using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Passives.Attacks;
 
     [GlobalClass]
     public partial class AttackComponent : Node
     {
         #region private fields
         private readonly RandomNumberGenerator _rng = new();
-        private List<AttackPassives>? _attackPassives;
         private float _criticalStrikeChance;
         private float _criticalStrikeDamage;
         private float _baseMinDamage;
         private float _baseMaxDamage;
         private float _finalDamage;
         #endregion
-
-        [Signal]
-        public delegate void VampireAttackEventHandler(float hpamount);
 
         public AttackComponent()
         {
@@ -77,11 +71,6 @@ namespace Playground
             _criticalStrikeChance = 0.05f;
             _baseMinDamage = 25f;
             _baseMaxDamage = 100f;
-        }
-
-        public void SetAttackPassives(List<AttackPassives> attacks)
-        {
-            _attackPassives = attacks;
         }
 
         private bool HitCritical()
