@@ -16,7 +16,7 @@ namespace Playground
 
         public AttackComponent()
         {
-            
+
         }
 
         #region Properties
@@ -31,19 +31,6 @@ namespace Playground
         {
             get => _baseMaxDamage;
             set => _baseMaxDamage = Mathf.RoundToInt(value);
-        }
-
-        public float FinalDamage
-        {
-            get
-            {
-                if (HitCritical())
-                {
-                    EmitSignal(SignalName.OnPlayerCriticalHit);
-                    return GetAvarageDamage() * _criticalStrikeDamage;
-                }
-                return GetAvarageDamage();
-            }
         }
 
         public float CriticalStrikeChance
@@ -73,15 +60,16 @@ namespace Playground
             _baseMaxDamage = 100f;
         }
 
-        private bool HitCritical()
+        public float CalculateDamage()
         {
-            var criticalStrike = _rng.RandfRange(0, 1);
-            return criticalStrike <= _criticalStrikeChance;
-        }
+            float damage = _rng.RandfRange(_baseMinDamage, _baseMaxDamage);
+            bool criticalStrike = _rng.RandfRange(0, 1) <= _criticalStrikeChance;
+            if (criticalStrike)
+            {
+                damage *= _criticalStrikeDamage;
+            }
 
-        private float GetAvarageDamage()
-        {
-            return _rng.RandfRange(_baseMinDamage, _baseMaxDamage);
+            return damage;
         }
     }
 }

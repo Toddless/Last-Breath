@@ -30,13 +30,14 @@ namespace Playground
         public override void _Ready()
         {
             StartFight();
-            _signals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _playerHpBar = GetNode<ProgressBar>("/root/MainScene/BattleScene/UI/PlayerHpBar");
-            _enemyHpBar = GetNode<ProgressBar>("/root/MainScene/BattleScene/UI/EnemyHpBar");
-            _sprite = GetNode<Sprite2D>("/root/MainScene/BattleScene/BattleScene1");
-            _damageButton = GetNode<Button>("/root/MainScene/BattleScene/UI/Button");
-            _returnButton = GetNode<Button>("/root/MainScene/BattleScene/UI/ReturnButton");
-            _timer = GetNode<Timer>("/root/MainScene/BattleScene/Timer");
+            var battelScene = GetParent().GetNode<BattleScene>("BattleScene");
+            _signals = battelScene.GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
+            _playerHpBar = battelScene.GetNode<ProgressBar>("UI/PlayerHpBar");
+            _enemyHpBar = battelScene.GetNode<ProgressBar>("UI/EnemyHpBar");
+            _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
+            _damageButton = battelScene.GetNode<Button>("UI/Button");
+            _returnButton = battelScene.GetNode<Button>("UI/ReturnButton");
+            _timer = battelScene.GetNode<Timer>("Timer");
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _returnButton.Pressed += BattleFinished;
             _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
@@ -48,6 +49,32 @@ namespace Playground
             _damageButton.Pressed += PlayersDealDamage;
             SetHealthBars();
             UpdateHealthBar();
+        }
+        private void PlayersDealDamage()
+        {
+            if (_enemy!.Health!.CurrentHealth <= 0)
+            {
+                return;
+            }
+            var x = _player!.PlayerAttack!.CalculateDamage();
+            _enemy!.Health!.TakeDamage(x);
+            UpdateHealthBar();
+            _damageButton!.Visible = false;
+            EmitSignal(SignalName.EnemyTurn);
+        }
+
+        public void EnemyDealDamage()
+        {
+            if (_enemy!.Health!.CurrentHealth > 0)
+            {
+                var x = _enemy!.EnemyDealDamage();
+                _player!.PlayerHealth!.TakeDamage(x);
+                UpdateHealthBar();
+                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
+                GD.Print("___________________________");
+
+                EmitSignal(SignalName.PlayerTurn);
+            }
         }
 
         private void PlayerClosedInventory()
@@ -100,7 +127,6 @@ namespace Playground
             _enemy.Position = new Vector2(950, 450);
         }
 
-
         private void SetHealthBars()
         {
             _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
@@ -113,40 +139,9 @@ namespace Playground
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
 
-        public void EnemyDealDamage()
-        {
-            if (_enemy!.Health!.CurrentHealth > 0)
-            {
-                var x = _enemy!.EnemyDealDamage();
-                _player!.PlayerHealth!.TakeDamage(x);
-                UpdateHealthBar();
-                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
-                GD.Print("___________________________");
-
-                EmitSignal(SignalName.PlayerTurn);
-            }
-        }
-
         private void PlayersTurn()
         {
             _damageButton!.Visible = true;
-        }
-
-        private void PlayersDealDamage()
-        {
-            if (_enemy!.Health!.CurrentHealth <= 0)
-            {
-                return;
-            }
-            var x = _player!.PlayerAttack!.FinalDamage;
-            _enemy!.Health!.TakeDamage(x);
-            UpdateHealthBar();
-            //GD.Print($"Player did damage: {Mathf.RoundToInt(x)}");
-            //GD.Print($"Enemy current hp: {Mathf.RoundToInt(_enemy.Health.CurrentHealth)}");
-            //GD.Print($"Current hp: {Mathf.RoundToInt(_player.PlayerHealth!.CurrentHealth)}");
-            //GD.Print("___________________________");
-            _damageButton!.Visible = false;
-            EmitSignal(SignalName.EnemyTurn);
         }
 
         public void StartFight()

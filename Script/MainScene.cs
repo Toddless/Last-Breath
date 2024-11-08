@@ -1,6 +1,7 @@
 namespace Playground
 {
     using Godot;
+    using Playground.Script;
     using Playground.Script.Helpers;
 
     public partial class MainScene : Node2D
@@ -11,6 +12,7 @@ namespace Playground
         private EnemySpawner? _enemySpawner;
         private Player? _player;
         private EnemyAI? _enemy;
+        private EnemyInventory? _enemyInventory;
 
         public EnemyAI? EnemyAI
         {
@@ -22,7 +24,7 @@ namespace Playground
         [Signal]
         public delegate void EnemyCanSpawnEventHandler();
         [Signal]
-        public delegate void EnemyInitializedEventHandler();
+        public delegate void MainSceneInitializedEventHandler();
 
         public override void _Ready()
         {
@@ -30,9 +32,12 @@ namespace Playground
             _globalSignals.PlayerEncounted += PlayerInteracted;
             _enemySpawner = GetNode<EnemySpawner>("/root/MainScene/EnemySpawner");
             _enemySpawner.Initialize();
+            _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _player = GetNode<Player>("CharacterBody2D");
             GD.Print("Instantiate: MainScene");
-            EmitSignal(SignalName.EnemyInitialized);
+            _enemyInventory.Initialize(_enemy!);
+
+            EmitSignal(SignalName.MainSceneInitialized);
         }
 
         private void PlayerInteracted()

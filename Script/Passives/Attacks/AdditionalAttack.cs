@@ -1,13 +1,19 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    public partial class AdditionalAttack : Passive, IAttackPassives
-    {
-        public void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default, float amount = default)
-        {
+    using Godot;
 
+    public partial class AdditionalAttack : Node, IPassivesAppliedAfterAttack
+    {
+
+        private int _cooldown = 4;
+
+        public int Cooldown
+        {
+            get => _cooldown;
+            set => _cooldown = value;
         }
 
-        public void ApplyBeforeAttack(AttackComponent attack)
+        public void ApplyAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
         {
 
         }

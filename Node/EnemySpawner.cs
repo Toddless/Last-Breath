@@ -8,12 +8,15 @@ namespace Playground
         private MainScene? _parentScene;
         private PackedScene? _scene;
 
+        [Signal]
+        public delegate void EnemySpawnedEventHandler();
+
         public override void _Ready()
         {
             _parentScene = GetNode<MainScene>("/root/MainScene");
             _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             GD.Print("Instantiate: EnemySpawner");
-            _parentScene.EnemyCanSpawn += CreateNewEnemy;
+            _parentScene.EnemyCanSpawn += Initialize;
         }
 
         public void Initialize()
@@ -23,11 +26,7 @@ namespace Playground
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
             enemy.Position = new Vector2(_rnd.RandfRange(50,900 ), _rnd.RandfRange(250, 700));
             _parentScene.EnemyAI = enemy;
-        }
-
-        public void CreateNewEnemy()
-        {
-            Initialize();
+            EmitSignal(SignalName.EnemySpawned);
         }
     }
 }

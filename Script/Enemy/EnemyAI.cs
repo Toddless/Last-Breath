@@ -5,7 +5,8 @@ namespace Playground
     using Godot;
     using System.Collections.Generic;
     using Playground.Script.Passives.Attacks;
-    using Playground.Script.Passives;
+    using System;
+    using System.Linq;
 
     public partial class EnemyAI : Node2D
     {
@@ -14,7 +15,8 @@ namespace Playground
         private HealthComponent? _health;
         private AttackComponent? _attack;
         private CollisionShape2D? _collisionShape;
-        private List<IAttackPassives>? _attackPassives;
+        private List<Node>? _attackPassives;
+        private Dictionary<Type, int> _passivesOnCooldown = [];
         private GlobalRarity _rarity;
         private Area2D? _area;
 
@@ -35,42 +37,32 @@ namespace Playground
 
         public override void _Ready()
         {
-            _attack = GetNode<AttackComponent>("/root/MainScene/Enemy/AttackComponent");
-            _health = GetNode<HealthComponent>("/root/MainScene/Enemy/HealthComponent");
-            _area = GetNode<Area2D>("/root/MainScene/Enemy/Area2D");
-            _collisionShape = GetNode<CollisionShape2D>("/root/MainScene/Enemy/Area2D/CollisionShape2D");
+            var parentNode = GetParent().GetNode<EnemyAI>("Enemy");
+            _attack = parentNode.GetNode<AttackComponent>("AttackComponent");
+            _health = parentNode.GetNode<HealthComponent>("HealthComponent");
+            _area = parentNode.GetNode<Area2D>("Area2D");
+            _collisionShape = parentNode.GetNode<CollisionShape2D>("Area2D/CollisionShape2D");
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _area.BodyEntered += PlayerEntered;
-            _health.OnCharacterDied += IamDead;
             _rarity = GlobalRarity.Common;
-            _health.IncreasedMaximumHealth(10);
+            _health.IncreasedMaximumHealth(500);
             _health.RefreshHealth();
-            _attack.OnPlayerCriticalHit += EnemyDealCritical;
             _attackPassives =
             [
                 new BuffAttack(),
+                new VampireStrike(),
+                new AdditionalAttack(),
             ];
-
-            PassivesPool.TotalWeight();
-        }
-
-        private void EnemyDealCritical()
-        {
-            GD.Print("Critical Strike!");
         }
 
         public float EnemyDealDamage()
         {
-            _attackPassives![0].ApplyBeforeAttack(_attack!);
-            var finalDamage = _attack!.FinalDamage; ;
-            _attackPassives[0].ApplyAfterAttack(_attack!, _health!, finalDamage);
-            return finalDamage;
-        }
+            var chosenPasive = _attackPassives![_rnd.RandiRange(0, _attackPassives!.Count - 1)];
 
-        private void IamDead()
-        {
-            // Godot didnt sent enum value via Signals. Use int cast instead
-            EmitSignal(SignalName.EnemyDied, (int)_rarity);
+
+            var finalDamage = _attack!.CalculateDamage();
+
+
+            return finalDamage;
         }
 
         public void PlayerEntered(Node body)

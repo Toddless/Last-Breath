@@ -9,25 +9,11 @@
 
     public partial class Player : CharacterBody2D
     {
-        #region Const
-        private const string InventoryComponent = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer/InventoryComponent";
-        private const string InventoryContainer = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/InventoryContainer";
-        private const string InventoryWindow = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow";
-        private const string PlayerAnimatedSprites = "/root/MainScene/CharacterBody2D/AnimatedSprite2D";
-        private const string PlayerStats = "/root/MainScene/CharacterBody2D/PlayerStats/PlayerStats";
-        private const string AttackComponent = "/root/MainScene/CharacterBody2D/AttackComponent";
-        private const string HealthComponent = "/root/MainScene/CharacterBody2D/HealthComponent";
-        private const string StaminaProgressBar = "/root/MainScene/UI/PlayerBars/StaminaBar";
-        private const string HealthBar = "/root/MainScene/UI/PlayerBars/HealthProgressBar";
-        private const string ResearchButton = "/root/MainScene/UI/Buttons/ResearchButton";
-        private const string GoldIcon = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect";
-        private const string GoldAmount = "/root/MainScene/CharacterBody2D/Inventory/InventoryWindow/TextureRect/Label";
-        #endregion
-
         #region Private fields
         // for grid movement
         //  private double _maxMovementPoints = 15;
         //   private const int _tileSize = 64;
+
         private Vector2 _inputDirection = Vector2.Zero;
         private AnimatedSprite2D? _sprite;
         private GlobalSignals? _globalSignals;
@@ -122,19 +108,22 @@
 
         public override void _Ready()
         {
-            _inventoryContainder = GetNode<GridContainer>(InventoryContainer);
-            _inventoryComponent = GetNode<InventoryComponent>(InventoryComponent);
+            var parentNode = GetParent();
+            var uiNodes = parentNode.GetNode("UI");
+            var playerNode = parentNode.GetNode<CharacterBody2D>("CharacterBody2D");
+            _inventoryWindow = playerNode.GetNode("Inventory").GetNode<Panel>("InventoryWindow");
+            _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
+            _inventoryComponent = _inventoryContainder.GetNode<InventoryComponent>("InventoryComponent");
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _healthComponent = GetNode<HealthComponent>(HealthComponent);
-            _attackComponent = GetNode<AttackComponent>(AttackComponent);
-            _progressBarMovement = GetNode<ProgressBar>(StaminaProgressBar);
-            _researchButton = GetNode<ResearchButton>(ResearchButton);
-            _goldIcon = GetNode<TextureRect>(GoldIcon);
-            _goldAmount = GetNode<Label>(GoldAmount);
-            _healthBar = GetNode<TextureProgressBar>(HealthBar);
-            _inventoryWindow = GetNode<Panel>(InventoryWindow);
-            _playerStats = GetNode<RichTextLabel>(PlayerStats);
-            _sprite = GetNode<AnimatedSprite2D>(PlayerAnimatedSprites);
+            _healthComponent = playerNode.GetNode<HealthComponent>("HealthComponent");
+            _attackComponent = playerNode.GetNode<AttackComponent>("AttackComponent");
+            _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
+            _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
+            _goldIcon = _inventoryWindow.GetNode<TextureRect>("TextureRect");
+            _goldAmount = _goldIcon.GetNode<Label>("Label");
+            _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
+            _playerStats = playerNode.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
+            _sprite = playerNode.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
             _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
@@ -207,7 +196,7 @@
                 $"Max. Health: {_healthComponent.MaxHealth}";
         }
 
-       
+
 
         private void UpdateHealthBar()
         {

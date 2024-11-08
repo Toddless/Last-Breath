@@ -13,7 +13,6 @@
         private RandomNumberGenerator _rnd = new();
         private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
-        private MainScene? _mainScene;
         private PackedScene? _inventorySlot;
         private Panel? _inventoryWindow;
         private Button? _takeAllButton;
@@ -40,19 +39,16 @@
             get => _slots;
         }
 
-
-        public override async void _Ready()
+        public void Initialize(EnemyAI enemy)
         {
-            _mainScene = GetNode<MainScene>("/root/MainScene");
-            await ToSignal(_mainScene!, "EnemyInitialized");
-            _inventoryContainer = GetNode<GridContainer>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/InventoryContainer");
-            _takeAllButton = GetNode<Button>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/TakeAllButton");
-            _goldAmount = GetNode<Label>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/TextureRect/Label");
-            _goldIcon = GetNode<TextureRect>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/TextureRect");
-            _closeButton = GetNode<Button>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow/CloseButton");
-            _inventoryWindow = GetNode<Panel>("/root/MainScene/GlobalEnemyIntentory/InventoryWindow");
+            _enemyAI = enemy;
+            _inventoryWindow = GetParent().GetNode<MainScene>("MainScene").GetNode("GlobalEnemyIntentory").GetNode<Panel>("InventoryWindow");
+            _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
+            _takeAllButton = _inventoryWindow.GetNode<Button>("TakeAllButton");
+            _goldAmount = _inventoryWindow.GetNode<Label>("TextureRect/Label");
+            _goldIcon = _inventoryWindow.GetNode<TextureRect>("TextureRect");
+            _closeButton = _inventoryWindow.GetNode<Button>("CloseButton");
             _inventorySlot = ResourceLoader.Load<PackedScene>(SceneParh.InventorySlot);
-            _enemyAI = _mainScene.EnemyAI;
             _lootTable.InitializeLootTable();
             _lootTable.ValidateTable();
 
@@ -62,8 +58,11 @@
                 _inventoryContainer.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
-
-            _enemyAI!.EnemyDied += OnDeathSpawnItem;
+            if (_enemyAI!.Health == null)
+            {
+                GD.Print("Health component is lost");
+            }
+            _enemyAI!.Health!.OnCharacterDied += OnDeathSpawnItem;
             InventoryVisible(false);
             GD.Print("Instantiate: EnemyInventory");
         }
@@ -73,21 +72,11 @@
             _inventoryWindow!.Visible = visible;
         }
 
-        public void OnDeathSpawnItem(int rarity)
+        public void OnDeathSpawnItem()
         {
-            Item? item;
-            do
-            {
-                item = _lootTable.GetRandomItem();
-            } while (((int)item!.Rarity) <= rarity);
+            Item? item = _lootTable.GetRandomItem();
 
-            if (item == null)
-            {
-                return;
-            }
-
-            this.AddItem(item);
-            _goldAmount!.Text = _rnd.RandiRange(0, rarity * 1000).ToString();
+            AddItem(item!);
             _inventoryWindow!.Visible = true;
         }
 
