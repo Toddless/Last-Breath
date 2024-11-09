@@ -14,11 +14,6 @@ namespace Playground
         private float _finalDamage;
         #endregion
 
-        public AttackComponent()
-        {
-
-        }
-
         #region Properties
 
         public float BaseMinDamage

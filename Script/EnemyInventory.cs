@@ -19,7 +19,6 @@
         private TextureRect? _goldIcon;
         private Button? _closeButton;
         private Label? _goldAmount;
-        private EnemyAI? _enemyAI;
         private Item? _item;
 
         public Button? TakeAllButton
@@ -39,9 +38,8 @@
             get => _slots;
         }
 
-        public void Initialize(EnemyAI enemy)
+        public override void _Ready()
         {
-            _enemyAI = enemy;
             _inventoryWindow = GetParent().GetNode<MainScene>("MainScene").GetNode("GlobalEnemyIntentory").GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _takeAllButton = _inventoryWindow.GetNode<Button>("TakeAllButton");
@@ -58,13 +56,8 @@
                 _inventoryContainer.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
-            if (_enemyAI!.Health == null)
-            {
-                GD.Print("Health component is lost");
-            }
-            _enemyAI!.Health!.OnCharacterDied += OnDeathSpawnItem;
+
             InventoryVisible(false);
-            GD.Print("Instantiate: EnemyInventory");
         }
 
         public void InventoryVisible(bool visible)
@@ -88,6 +81,14 @@
         public void ClearInventory()
         {
             InventoryVisible(false);
+            foreach (var item in _slots)
+            {
+                if (item.InventoryItem != null)
+                {
+                    item.InventoryItem.Quantity = 0;
+                    item.InventoryItem = null;
+                }
+            }
             _slots.ForEach(item => item.InventoryItem = null);
         }
 
@@ -121,9 +122,9 @@
             slot.RemoveItem(item);
         }
 
-        public InventorySlot? GetSlotToAdd(Item item)
+        public InventorySlot? GetSlotToAdd(Item newItem)
         {
-            return _slots.FirstOrDefault(x => x.InventoryItem == null || (x.InventoryItem.Guid == item.Guid && x.InventoryItem.Quantity < item.MaxStackSize));
+            return _slots.FirstOrDefault(itemInSlot => itemInSlot.InventoryItem == null || (itemInSlot.InventoryItem.Guid == newItem.Guid && itemInSlot.InventoryItem.Quantity < newItem.MaxStackSize));
         }
 
         public InventorySlot? GetSlotToRemove(Item? item)

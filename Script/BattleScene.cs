@@ -6,21 +6,19 @@ namespace Playground
 
     public partial class BattleScene : Node2D
     {
-        private EnemyAI? _enemy;
-        private Player? _player;
-        private Sprite2D? _sprite;
-        private GlobalSignals? _signals;
+        private EnemyInventory? _enemyInventory;
         private ProgressBar? _playerHpBar;
         private ProgressBar? _enemyHpBar;
+        private GlobalSignals? _signals;
         private Button? _damageButton;
         private Button? _returnButton;
+        private Sprite2D? _sprite;
+        private EnemyAI? _enemy;
+        private Player? _player;
         private Timer? _timer;
-        private EnemyInventory? _enemyInventory;
 
         [Signal]
-        public delegate void BattleSceneReadyEventHandler();
-        [Signal]
-        public delegate void BattleSceneFinishedEventHandler();
+        public delegate void BattleSceneFinishedEventHandler(EnemyAI enemy);
         [Signal]
         public delegate void EnemyTurnEventHandler();
         [Signal]
@@ -39,14 +37,14 @@ namespace Playground
             _returnButton = battelScene.GetNode<Button>("UI/ReturnButton");
             _timer = battelScene.GetNode<Timer>("Timer");
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
+            _enemyInventory.InventoryVisible(false);
             _returnButton.Pressed += BattleFinished;
             _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
             _enemyInventory!.TakeAllButton!.Pressed += PlayerTakedAllItems;
             _enemyInventory!.CloseButton!.Pressed += PlayerClosedInventory;
-            _enemy!.Health!.OnCharacterDied += EnemyDied;
-            this.EnemyTurn += EnemyDealDamage;
-            this.PlayerTurn += PlayersTurn;
             _damageButton.Pressed += PlayersDealDamage;
+            PlayerTurn += PlayersTurn;
+            EnemyTurn += EnemyDealDamage;
             SetHealthBars();
             UpdateHealthBar();
         }
@@ -54,6 +52,7 @@ namespace Playground
         {
             if (_enemy!.Health!.CurrentHealth <= 0)
             {
+                EnemyDied();
                 return;
             }
             var x = _player!.PlayerAttack!.CalculateDamage();
@@ -70,10 +69,11 @@ namespace Playground
                 var x = _enemy!.EnemyDealDamage();
                 _player!.PlayerHealth!.TakeDamage(x);
                 UpdateHealthBar();
-                GD.Print($"Enemy did damage: {Mathf.RoundToInt(x)}");
-                GD.Print("___________________________");
-
                 EmitSignal(SignalName.PlayerTurn);
+            }
+            else
+            {
+                EnemyDied();
             }
         }
 
@@ -95,7 +95,7 @@ namespace Playground
             SetPlayerStats();
             _enemy!.QueueFree();
             QueueFree();
-            EmitSignal(SignalName.BattleSceneFinished);
+            EmitSignal(SignalName.BattleSceneFinished, _enemy);
         }
 
         private void SetPlayerStats()
@@ -106,6 +106,7 @@ namespace Playground
 
         private void EnemyDied()
         {
+            _enemyInventory!.OnDeathSpawnItem();
             _damageButton!.Visible = false;
             _enemyInventory!.InventoryVisible(true);
 

@@ -1,46 +1,51 @@
 namespace Playground
 {
-    using Godot;
-    using Playground.Script;
+    using System.Collections.ObjectModel;
     using Playground.Script.Helpers;
+    using Playground.Script;
+    using Godot;
+    using System.ComponentModel;
 
-    public partial class MainScene : Node2D
+    public partial class MainScene : ObservableObject
     {
         private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>("res://Scenes/BattleScene.tscn");
-        private GlobalSignals? _globalSignals;
         private BattleScene? _currentBattleScene;
-        private EnemySpawner? _enemySpawner;
-        private Player? _player;
-        private EnemyAI? _enemy;
         private EnemyInventory? _enemyInventory;
+        private GlobalSignals? _globalSignals;
+        private EnemySpawner? _enemySpawner;
+        private ObservableCollection<EnemyAI>? _enemies = [];
+        private int _maxEnemiesAtScene = 5;
+        private Player? _player;
 
-        public EnemyAI? EnemyAI
+        public ObservableCollection<EnemyAI>? Enemies
         {
-            get => _enemy;
-            set => _enemy = value;
+            get => _enemies;
+            set
+            {
+                if(SetProperty(ref _enemies, value))
+                {
+                    GD.Print("Collection initialized");
+                }
+            }
         }
 
 
-        [Signal]
-        public delegate void EnemyCanSpawnEventHandler();
         [Signal]
         public delegate void MainSceneInitializedEventHandler();
 
         public override void _Ready()
         {
+            Enemies = [];
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _globalSignals.PlayerEncounted += PlayerInteracted;
-            _enemySpawner = GetNode<EnemySpawner>("/root/MainScene/EnemySpawner");
-            _enemySpawner.Initialize();
+            _enemySpawner = GetNode<EnemySpawner>("EnemySpawner");
+            _enemySpawner.Initialize(_maxEnemiesAtScene);
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _player = GetNode<Player>("CharacterBody2D");
             GD.Print("Instantiate: MainScene");
-            _enemyInventory.Initialize(_enemy!);
-
             EmitSignal(SignalName.MainSceneInitialized);
         }
 
-        private void PlayerInteracted()
+        public void PlayerInteracted(EnemyAI enemy)
         {
             if (_currentBattleScene != null)
             {
@@ -52,15 +57,30 @@ namespace Playground
             _currentBattleScene = (BattleScene)battleInstance;
             mainScene.CallDeferred("add_child", battleInstance);
             _player!.PlayerLastPosition = _player.Position;
-            _currentBattleScene.Init(_player!, _enemy!);
+            _currentBattleScene.Init(_player!, enemy);
             _currentBattleScene.BattleSceneFinished += OnBattleFinished;
             GD.Print("Battle ready");
         }
 
-        private void OnBattleFinished()
+        private void OnBattleFinished(EnemyAI enemyToDelete)
         {
             _currentBattleScene = null;
-            EmitSignal(SignalName.EnemyCanSpawn);
+            enemyToDelete.PropertyChanged -= EnemiePropertyChanged;
+            enemyToDelete.GetNode<Area2D>("Area2D").BodyEntered -= enemyToDelete.PlayerEntered;
+            enemyToDelete.GetNode<Area2D>("Area2D").BodyExited -= enemyToDelete.PlayerExited;
+            _enemies?.Remove(enemyToDelete);
+            _enemySpawner!.SpawnNewEnemy();
+        }
+
+        public void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            foreach (var item in _enemies!)
+            {
+                if (item.PlayerEncounted)
+                {
+                    PlayerInteracted(item);
+                }
+            }
         }
     }
 }

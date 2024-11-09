@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://drkeixjqccjy0" path="res://Assets/UI MMORPG Dark Templar/Game Menu & Pause/Buttons/Button Normal.png" id="8_ijle3"]
 [ext_resource type="LabelSettings" uid="uid://ioqkivttjvp1" path="res://Assets/UI MMORPG Dark Templar/Font/Text Settings/TextSettings.tres" id="10_4khdd"]
 [ext_resource type="Script" path="res://Script/UI/ResearchButton.cs" id="11_vpeqh"]
-[ext_resource type="Script" path="res://Node/EnemySpawner.cs" id="12_dqvs4"]
+[ext_resource type="Script" path="res://Script/Enemy/EnemySpawner.cs" id="12_dqvs4"]
 [ext_resource type="Texture2D" uid="uid://dqlmbs82w33r6" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Close Normal.png" id="14_7nw50"]
 [ext_resource type="Texture2D" uid="uid://08ymwvj42jt8" path="res://Assets/UI MMORPG Dark Templar/Backpack inventory small/Icons/Money03.png" id="15_65t5n"]
 

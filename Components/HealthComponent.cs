@@ -27,7 +27,7 @@
                 if (_currentHealth <= 0)
                 {
                     _currentHealth = 0;
-                    EmitSignal(SignalName.OnCharacterDied);
+                    return _currentHealth;
                 }
                 return _currentHealth;
             }
