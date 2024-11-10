@@ -691,6 +691,7 @@ script = ExtResource("7_2s6kv")
 [node name="Inventory" type="Node" parent="."]
 
 [node name="InventoryWindow" type="Panel" parent="Inventory"]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

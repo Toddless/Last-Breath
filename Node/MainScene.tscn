@@ -708,6 +708,7 @@ script = ExtResource("12_dqvs4")
 [node name="GlobalEnemyIntentory" type="Node" parent="."]
 
 [node name="InventoryWindow" type="Panel" parent="GlobalEnemyIntentory"]
+visible = false
 z_index = 1
 anchors_preset = 8
 anchor_left = 0.5

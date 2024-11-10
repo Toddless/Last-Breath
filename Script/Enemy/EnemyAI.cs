@@ -6,20 +6,23 @@ namespace Playground
     using Playground.Script.Passives.Attacks;
     using System;
     using Playground.Script.Helpers;
+    using Playground.Script.StateMachine;
 
     public partial class EnemyAI : ObservableObject
     {
+        private Dictionary<Type, int> _passivesOnCooldown = [];
         private readonly RandomNumberGenerator _rnd = new();
+        private CollisionShape2D? _collisionShape;
         private GlobalSignals? _globalSignals;
+        private bool _playerEncounted = false;
+        private List<Node>? _attackPassives;
+        private AnimatedSprite2D? _sprite;
         private HealthComponent? _health;
         private AttackComponent? _attack;
-        private CollisionShape2D? _collisionShape;
-        private List<Node>? _attackPassives;
-        private Dictionary<Type, int> _passivesOnCooldown = [];
+        private StateMachine? _machine;
         private GlobalRarity _rarity;
-        private Area2D? _area;
         private Player? _player;
-        private bool _playerEncounted = false;
+        private Area2D? _area;
 
         [Signal]
         public delegate void EnemyDiedEventHandler(int rarity);
@@ -55,6 +58,8 @@ namespace Playground
             var parentNode = GetParent().GetNode<EnemyAI>($"{Name}");
             _attack = parentNode.GetNode<AttackComponent>("AttackComponent");
             _health = parentNode.GetNode<HealthComponent>("HealthComponent");
+            _sprite = parentNode.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+            _machine = parentNode.GetNode<StateMachine>("StateMachine");
             _area = parentNode.GetNode<Area2D>("Area2D");
             _collisionShape = parentNode.GetNode<CollisionShape2D>("Area2D/CollisionShape2D");
             _player = GetParent().GetNode<Player>("CharacterBody2D");
@@ -67,6 +72,7 @@ namespace Playground
                 new VampireStrike(),
                 new AdditionalAttack(),
             ];
+            _sprite.Play();
             EmitSignal(SignalName.EnemyInitialized);
         }
 

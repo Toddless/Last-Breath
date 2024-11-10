@@ -123,7 +123,6 @@ namespace Playground
             _player = player;
             _enemy = enemy;
             _player.CanMove = false;
-
             _player.Position = new Vector2(250, 450);
             _enemy.Position = new Vector2(950, 450);
         }

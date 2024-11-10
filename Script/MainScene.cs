@@ -9,11 +9,11 @@ namespace Playground
     public partial class MainScene : ObservableObject
     {
         private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>("res://Scenes/BattleScene.tscn");
+        private ObservableCollection<EnemyAI>? _enemies = [];
         private BattleScene? _currentBattleScene;
         private EnemyInventory? _enemyInventory;
         private GlobalSignals? _globalSignals;
         private EnemySpawner? _enemySpawner;
-        private ObservableCollection<EnemyAI>? _enemies = [];
         private int _maxEnemiesAtScene = 5;
         private Player? _player;
 
@@ -22,7 +22,7 @@ namespace Playground
             get => _enemies;
             set
             {
-                if(SetProperty(ref _enemies, value))
+                if (SetProperty(ref _enemies, value))
                 {
                     GD.Print("Collection initialized");
                 }
@@ -58,6 +58,8 @@ namespace Playground
             mainScene.CallDeferred("add_child", battleInstance);
             _player!.PlayerLastPosition = _player.Position;
             _currentBattleScene.Init(_player!, enemy);
+            this.CallDeferred("remove_child", enemy);
+            _currentBattleScene.CallDeferred("add_child", enemy);
             _currentBattleScene.BattleSceneFinished += OnBattleFinished;
             GD.Print("Battle ready");
         }
