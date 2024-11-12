@@ -68,6 +68,19 @@
             return null;
         }
 
+        public T? GetRarity()
+        {
+            float pickedNumber = random.RandfRange(0, probabilityTotalWeight);
+            foreach (T lootDropItem in lootDropItems!)
+            {
+                if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
+                {
+                    return lootDropItem;
+                }
+            }
+            return null;
+        }
+
         public Item? GetItemWithSelectedRarity(int index)
         {
             if (lootDropItems == null || factories == null)
@@ -91,7 +104,6 @@
                 BodyArmorFactory.Instance,
             ];
         }
-
 
         private ItemCreator? GetFactory(int factoryIndex)
         {

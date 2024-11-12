@@ -12,6 +12,7 @@
         private float _maxHealth = 100;
         [Export]
         private float _defence = 30;
+
         #endregion
 
         #region Signals
@@ -29,7 +30,7 @@
                     _currentHealth = 0;
                     return _currentHealth;
                 }
-                return _currentHealth;
+                return Mathf.RoundToInt(_currentHealth);
             }
             set
             {
@@ -43,7 +44,7 @@
         public float MaxHealth
         {
             get => _maxHealth;
-            set => _maxHealth = value;
+            set => _maxHealth = Mathf.RoundToInt(value);
         }
 
         public float Defence

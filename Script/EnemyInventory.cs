@@ -83,13 +83,8 @@
             InventoryVisible(false);
             foreach (var item in _slots)
             {
-                if (item.InventoryItem != null)
-                {
-                    item.InventoryItem.Quantity = 0;
-                    item.InventoryItem = null;
-                }
+                item.RemoveItself();
             }
-            _slots.ForEach(item => item.InventoryItem = null);
         }
 
         public void AddItem(Item item)

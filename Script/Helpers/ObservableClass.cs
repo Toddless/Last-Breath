@@ -4,13 +4,13 @@
     using System.Runtime.CompilerServices;
     using Godot;
 
-    public partial class ObservableObject : CharacterBody2D, INotifyPropertyChanged
+    public partial class ObservableClass : Node2D, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
-            if(Equals(field, value))
+            if (Equals(field, value))
             {
                 return false;
             }

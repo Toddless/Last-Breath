@@ -1,11 +1,10 @@
-namespace Playground
+﻿namespace Playground.Script.Enemy
 {
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.StateMachine;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
-    public partial class EnemyAI : ObservableObject
+    public abstract partial class EnemyGeneric : ObservableObject
     {
         private readonly RandomNumberGenerator _rnd = new();
         private CollisionShape2D? _collisionShape;
@@ -14,21 +13,15 @@ namespace Playground
         private AnimatedSprite2D? _sprite;
         private HealthComponent? _health;
         private AttackComponent? _attack;
-        private StateMachine? _machine;
         private GlobalRarity _rarity;
-        private RayCast2D? _rayCast;
-        private Vector2 _newPos;
         private Player? _player;
         private Area2D? _area;
-        private int _speed = 200;
         private int _level;
 
         [Signal]
         public delegate void EnemyDiedEventHandler(int rarity);
         [Signal]
         public delegate void EnemyInitializedEventHandler();
-        [Signal]
-        public delegate void EnemyReachedNewPositionEventHandler();
 
         public AttackComponent? EnemyAttack
         {
@@ -54,12 +47,6 @@ namespace Playground
             set => _health = value;
         }
 
-        public RayCast2D? RayCast
-        {
-            get => _rayCast;
-            set => _rayCast = value;
-        }
-
         public bool PlayerEncounted
         {
             get => _playerEncounted;
@@ -68,40 +55,35 @@ namespace Playground
 
         public override void _Ready()
         {
-            var parentNode = GetParent().GetNode<EnemyAI>($"{Name}");
-            _attack = parentNode.GetNode<AttackComponent>(nameof(AttackComponent));
-            _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
-            _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
-            _rayCast = parentNode.GetNode<RayCast2D>(nameof(RayCast2D));
-            _area = parentNode.GetNode<Area2D>(nameof(Area2D));
+            var parentNode = GetParent().GetNode<EnemyGeneric>($"{Name}");
+            _attack = parentNode.GetNode<AttackComponent>("AttackComponent");
+            _health = parentNode.GetNode<HealthComponent>("HealthComponent");
+            _sprite = parentNode.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+            _area = parentNode.GetNode<Area2D>("Area2D");
             _collisionShape = parentNode.GetNode<CollisionShape2D>("Area2D/CollisionShape2D");
             _player = GetParent().GetNode<Player>("CharacterBody2D");
             Rarity = EnemyRarity();
             _health.RefreshHealth();
-            _newPos = new Vector2(_rnd.RandfRange(120, 150), _rnd.RandfRange(50, 100)).Normalized() * _speed;
+            _sprite.Play();
+            Position = new Vector2(300, 300);
+            GD.Print($"My health: {_health.CurrentHealth}, damage: {_attack.BaseMinDamage} - {_attack.BaseMaxDamage}");
             EmitSignal(SignalName.EnemyInitialized);
         }
 
-        public override void _PhysicsProcess(double delta)
-        {
-           
-        }
-
-        public GlobalRarity EnemyRarity()
+        public virtual GlobalRarity EnemyRarity()
         {
             var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
             return rarity.Rarity;
         }
 
-        public void SetStatsBasedOnRarity()
+        private void SetStatsBasedOnRarity()
         {
             _level = _rnd.RandiRange(1, 50);
-            SetAnimation();
-            SetStats();
+            //SetAnimation();
+            //SetStats();
         }
 
-        public void SetAnimation()
+        private void SetAnimation()
         {
             switch (Rarity)
             {
@@ -123,7 +105,7 @@ namespace Playground
             }
         }
 
-        public void SetStats()
+        private void SetStats()
         {
             switch (Rarity)
             {
@@ -155,12 +137,12 @@ namespace Playground
             }
         }
 
-        public float EnemyDealDamage()
+        public virtual float EnemyDealDamage()
         {
             return _attack!.CalculateDamage();
         }
 
-        public void PlayerExited(Node2D body)
+        public virtual void PlayerExited(Node2D body)
         {
             if (body is Player s && !_area!.OverlapsBody(s))
             {
@@ -168,7 +150,7 @@ namespace Playground
             }
         }
 
-        public void PlayerEntered(Node2D body)
+        public virtual void PlayerEntered(Node2D body)
         {
             if (body is Player s && _area!.OverlapsBody(s))
             {

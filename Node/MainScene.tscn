@@ -705,6 +705,8 @@ show_percentage = false
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("12_dqvs4")
 
+[node name="Timer" type="Timer" parent="EnemySpawner"]
+
 [node name="GlobalEnemyIntentory" type="Node" parent="."]
 
 [node name="InventoryWindow" type="Panel" parent="GlobalEnemyIntentory"]

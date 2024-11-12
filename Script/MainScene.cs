@@ -5,8 +5,9 @@ namespace Playground
     using Playground.Script;
     using Godot;
     using System.ComponentModel;
+    using System.Linq;
 
-    public partial class MainScene : ObservableObject
+    public partial class MainScene : ObservableClass
     {
         private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>("res://Scenes/BattleScene.tscn");
         private ObservableCollection<EnemyAI>? _enemies = [];
@@ -16,17 +17,12 @@ namespace Playground
         private EnemySpawner? _enemySpawner;
         private int _maxEnemiesAtScene = 5;
         private Player? _player;
+        private int _level;
 
         public ObservableCollection<EnemyAI>? Enemies
         {
             get => _enemies;
-            set
-            {
-                if (SetProperty(ref _enemies, value))
-                {
-                    GD.Print("Collection initialized");
-                }
-            }
+            set => SetProperty(ref _enemies, value);
         }
 
 
@@ -45,9 +41,9 @@ namespace Playground
             EmitSignal(SignalName.MainSceneInitialized);
         }
 
-        public void PlayerInteracted(EnemyAI enemy)
+        public void PlayerInteracted(EnemyAI? enemy)
         {
-            if (_currentBattleScene != null)
+            if (_currentBattleScene != null || enemy == null)
             {
                 return;
             }
@@ -76,13 +72,7 @@ namespace Playground
 
         public void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            foreach (var item in _enemies!)
-            {
-                if (item.PlayerEncounted)
-                {
-                    PlayerInteracted(item);
-                }
-            }
+            PlayerInteracted(_enemies!.FirstOrDefault(x => x.PlayerEncounted == true && x != null));
         }
     }
 }

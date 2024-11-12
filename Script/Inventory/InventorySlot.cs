@@ -133,6 +133,11 @@ namespace Playground
 
         public void RemoveItself()
         {
+            if(InventoryItem == null)
+            {
+                return;
+            }
+
             _quantityLabel!.Text = string.Empty;
             _quantity = 0;
             _icon!.Texture = null;

@@ -10,6 +10,7 @@ namespace Playground
         private ProgressBar? _playerHpBar;
         private ProgressBar? _enemyHpBar;
         private GlobalSignals? _signals;
+        private Label? _enemyHpBarText;
         private Button? _damageButton;
         private Button? _returnButton;
         private Sprite2D? _sprite;
@@ -29,12 +30,14 @@ namespace Playground
         {
             StartFight();
             var battelScene = GetParent().GetNode<BattleScene>("BattleScene");
+            var battleSceneUi = battelScene.GetNode("UI");
             _signals = battelScene.GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _playerHpBar = battelScene.GetNode<ProgressBar>("UI/PlayerHpBar");
-            _enemyHpBar = battelScene.GetNode<ProgressBar>("UI/EnemyHpBar");
+            _playerHpBar = battleSceneUi.GetNode<ProgressBar>("PlayerHpBar");
+            _enemyHpBar = battleSceneUi.GetNode<ProgressBar>("EnemyHpBar");
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
-            _damageButton = battelScene.GetNode<Button>("UI/Button");
-            _returnButton = battelScene.GetNode<Button>("UI/ReturnButton");
+            _damageButton = battleSceneUi.GetNode<Button>("Button");
+            _returnButton = battleSceneUi.GetNode<Button>("ReturnButton");
+            _enemyHpBarText = battleSceneUi.GetNode<Label>("EnemyHpBar/EnemyHpBarValue");
             _timer = battelScene.GetNode<Timer>("Timer");
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _enemyInventory.InventoryVisible(false);
@@ -109,7 +112,6 @@ namespace Playground
             _enemyInventory!.OnDeathSpawnItem();
             _damageButton!.Visible = false;
             _enemyInventory!.InventoryVisible(true);
-
         }
 
         private void PlayerHealth_OnCharacterDied()
@@ -137,6 +139,7 @@ namespace Playground
         {
             _enemyHpBar!.Value = _enemy!.Health!.CurrentHealth;
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
+            _enemyHpBarText!.Text = _enemy.Health.CurrentHealth.ToString();
         }
 
         private void PlayersTurn()

@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public static class GlobalRarityToWeight
+    public static class ConvertGlobalRarity
     {
         public static readonly Dictionary<GlobalRarity, float> rarityWeights = new()
         {
@@ -10,6 +10,15 @@
             {GlobalRarity.Rare, 250 },
             {GlobalRarity.Epic, 125 },
             {GlobalRarity.Legendary, 25 },
+            {GlobalRarity.Mythic, 5 },
+        };
+
+        public static readonly Dictionary<GlobalRarity, int> multiplier = new()
+        {
+            {GlobalRarity.Uncommon, 1 },
+            {GlobalRarity.Rare, 2 },
+            {GlobalRarity.Epic, 3 },
+            {GlobalRarity.Legendary, 4 },
             {GlobalRarity.Mythic, 5 },
         };
     }

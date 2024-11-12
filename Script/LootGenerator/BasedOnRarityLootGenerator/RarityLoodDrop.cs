@@ -5,7 +5,7 @@
         public RarityLoodDrop(Rarity rarity, GlobalRarity globalRarity)
         {
             Item = rarity;
-            probabilityWeight = GlobalRarityToWeight.rarityWeights[globalRarity];
+            probabilityWeight = ConvertGlobalRarity.rarityWeights[globalRarity];
             Rarity = globalRarity;
         }
     }

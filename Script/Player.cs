@@ -131,7 +131,7 @@
             _healthComponent.IncreasedMaximumHealth(10000);
             _healthComponent.RefreshHealth();
             ToggleWindow(false);
-            UpdateHealthBar();
+            SetHealthBar();
             UpdateStats();
             _sprite.Play("Idle_down");
             if (_attackComponent == null || _inventoryComponent == null || _progressBarMovement == null || _healthBar == null)
@@ -141,6 +141,11 @@
                 ArgumentNullException.ThrowIfNull(_inventoryComponent);
                 ArgumentNullException.ThrowIfNull(_progressBarMovement);
             }
+        }
+
+        private void UpdateHealthBar()
+        {
+            _healthBar!.Value = _healthComponent!.CurrentHealth;
         }
 
         private void PlayerDidCriticalDamage()
@@ -198,9 +203,10 @@
 
 
 
-        private void UpdateHealthBar()
+        private void SetHealthBar()
         {
             _healthBar!.MaxValue = _healthComponent!.MaxHealth;
+            _healthBar.Value = _healthComponent.CurrentHealth;
             var tween = CreateTween();
             tween.TweenProperty(_healthBar, "value", _healthComponent.CurrentHealth, 0.2f);
         }

@@ -5,7 +5,7 @@
     public partial class State : Node
     {
         public StateMachine? fsm;
-
+        public RandomNumberGenerator rnd = new();
         public virtual void Enter()
         {
         }
