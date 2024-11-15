@@ -622,7 +622,7 @@ script = ExtResource("2_p52a2")
 shape = SubResource("RectangleShape2D_xbypx")
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("2_sxnxb")]
-z_index = 2
+z_index = 1
 
 [node name="UI" type="Node" parent="."]
 

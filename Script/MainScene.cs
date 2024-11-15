@@ -10,6 +10,7 @@ namespace Playground
     public partial class MainScene : ObservableClass
     {
         private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>("res://Scenes/BattleScene.tscn");
+        private RandomNumberGenerator _rnd = new();
         private ObservableCollection<EnemyAI>? _enemies = [];
         private BattleScene? _currentBattleScene;
         private EnemyInventory? _enemyInventory;
@@ -22,24 +23,23 @@ namespace Playground
         public ObservableCollection<EnemyAI>? Enemies
         {
             get => _enemies;
-            set => SetProperty(ref _enemies, value);
+            set => _enemies = value;
         }
 
-
-        [Signal]
-        public delegate void MainSceneInitializedEventHandler();
 
         public override void _Ready()
         {
-            Enemies = [];
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _enemySpawner = GetNode<EnemySpawner>("EnemySpawner");
-            _enemySpawner.Initialize(_maxEnemiesAtScene);
+            _enemySpawner = GetNode<EnemySpawner>(nameof(EnemySpawner));
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
-            _player = GetNode<Player>("CharacterBody2D");
-            GD.Print("Instantiate: MainScene");
-            EmitSignal(SignalName.MainSceneInitialized);
+            _player = GetNode<Player>(nameof(CharacterBody2D));
+
+            for (int i = 0; i < _maxEnemiesAtScene; i++)
+            {
+                _enemySpawner.SpawnNewEnemy();
+            }
         }
+
 
         public void PlayerInteracted(EnemyAI? enemy)
         {
@@ -54,25 +54,26 @@ namespace Playground
             mainScene.CallDeferred("add_child", battleInstance);
             _player!.PlayerLastPosition = _player.Position;
             _currentBattleScene.Init(_player!, enemy);
+            this.CallDeferred("remove_child", _player);
+            _currentBattleScene.CallDeferred("add_child", _player);
             this.CallDeferred("remove_child", enemy);
             _currentBattleScene.CallDeferred("add_child", enemy);
             _currentBattleScene.BattleSceneFinished += OnBattleFinished;
-            GD.Print("Battle ready");
         }
 
         private void OnBattleFinished(EnemyAI enemyToDelete)
         {
+            CallDeferred("remove_child", _currentBattleScene!);
             _currentBattleScene = null;
             enemyToDelete.PropertyChanged -= EnemiePropertyChanged;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyEntered -= enemyToDelete.PlayerEntered;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyExited -= enemyToDelete.PlayerExited;
             _enemies?.Remove(enemyToDelete);
-            _enemySpawner!.SpawnNewEnemy();
         }
 
         public void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            PlayerInteracted(_enemies!.FirstOrDefault(x => x.PlayerEncounted == true && x != null));
+            PlayerInteracted(_enemies!.FirstOrDefault(x => x.PlayerEncounted == true));
         }
     }
 }

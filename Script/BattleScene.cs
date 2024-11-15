@@ -96,9 +96,9 @@ namespace Playground
         private void BattleFinished()
         {
             SetPlayerStats();
-            _enemy!.QueueFree();
-            QueueFree();
-            EmitSignal(SignalName.BattleSceneFinished, _enemy);
+            this.CallDeferred("remove_child", _player!);
+            GetParent().CallDeferred("add_child", _player!);
+            EmitSignal(SignalName.BattleSceneFinished, _enemy!);
         }
 
         private void SetPlayerStats()
@@ -116,7 +116,6 @@ namespace Playground
 
         private void PlayerHealth_OnCharacterDied()
         {
-            GD.Print("GameOver");
             QueueFree();
         }
 

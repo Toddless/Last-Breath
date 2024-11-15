@@ -55,7 +55,6 @@
         {
             if (!_states.ContainsKey(key) || _currentState == _states[key])
                 return;
-            GD.Print($"Machine invoke: {key}");
             _currentState!.Exit();
             _currentState = _states[key];
             _currentState.Enter();

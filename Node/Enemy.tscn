@@ -331,6 +331,7 @@ scale = Vector2(1.2, 1.2)
 script = ExtResource("1_g0i5v")
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
+collide_with_areas = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_up6k3")

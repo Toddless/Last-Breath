@@ -18,7 +18,6 @@ namespace Playground
         private GlobalRarity _rarity;
         private RayCast2D? _rayCast;
         private Vector2 _newPos;
-        private Player? _player;
         private Area2D? _area;
         private int _speed = 200;
         private int _level;
@@ -76,16 +75,9 @@ namespace Playground
             _rayCast = parentNode.GetNode<RayCast2D>(nameof(RayCast2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _collisionShape = parentNode.GetNode<CollisionShape2D>("Area2D/CollisionShape2D");
-            _player = GetParent().GetNode<Player>("CharacterBody2D");
             Rarity = EnemyRarity();
             _health.RefreshHealth();
-            _newPos = new Vector2(_rnd.RandfRange(120, 150), _rnd.RandfRange(50, 100)).Normalized() * _speed;
             EmitSignal(SignalName.EnemyInitialized);
-        }
-
-        public override void _PhysicsProcess(double delta)
-        {
-           
         }
 
         public GlobalRarity EnemyRarity()
