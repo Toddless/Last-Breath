@@ -16,7 +16,7 @@
 
         public override void _Ready()
         {
-            foreach (Node node in GetChildren())
+            foreach (Node2D node in GetChildren())
             {
                 if (node is State state)
                 {

@@ -6,6 +6,7 @@ namespace Playground
     using Godot;
     using System.ComponentModel;
     using System.Linq;
+    using Godot.Collections;
 
     public partial class MainScene : ObservableClass
     {
@@ -16,7 +17,6 @@ namespace Playground
         private EnemyInventory? _enemyInventory;
         private GlobalSignals? _globalSignals;
         private EnemySpawner? _enemySpawner;
-        private int _maxEnemiesAtScene = 5;
         private Player? _player;
         private int _level;
 
@@ -26,6 +26,14 @@ namespace Playground
             set => _enemies = value;
         }
 
+        public Array<Vector2> EnemiesRespawnPosition { get; } =
+            [
+            new Vector2(259, 566),
+            new Vector2(728, 624),
+            new Vector2(878, 306),
+            new Vector2(515, 172),
+            new Vector2(290, 210),
+            ];
 
         public override void _Ready()
         {
@@ -34,7 +42,7 @@ namespace Playground
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _player = GetNode<Player>(nameof(CharacterBody2D));
 
-            for (int i = 0; i < _maxEnemiesAtScene; i++)
+            for (int i = 0; i < EnemiesRespawnPosition.Count; i++)
             {
                 _enemySpawner.SpawnNewEnemy();
             }
@@ -68,7 +76,8 @@ namespace Playground
             enemyToDelete.PropertyChanged -= EnemiePropertyChanged;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyEntered -= enemyToDelete.PlayerEntered;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyExited -= enemyToDelete.PlayerExited;
-            _enemies?.Remove(enemyToDelete);
+            _enemySpawner!.DeleteEnemy(enemyToDelete);
+            _enemies!.Remove(enemyToDelete);
         }
 
         public void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)

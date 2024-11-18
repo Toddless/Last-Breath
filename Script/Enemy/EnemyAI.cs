@@ -8,18 +8,18 @@ namespace Playground
     public partial class EnemyAI : ObservableObject
     {
         private readonly RandomNumberGenerator _rnd = new();
-        private CollisionShape2D? _collisionShape;
+        private NavigationAgent2D? _navigationAgent2D;
+        private CollisionShape2D? _areaCollisionShape;
+        private CollisionShape2D? _enemiesCollisionShape;
         private GlobalSignals? _globalSignals;
         private bool _playerEncounted = false;
         private AnimatedSprite2D? _sprite;
         private HealthComponent? _health;
+        private Vector2 _respawnPosition;
         private AttackComponent? _attack;
         private StateMachine? _machine;
         private GlobalRarity _rarity;
-        private RayCast2D? _rayCast;
-        private Vector2 _newPos;
         private Area2D? _area;
-        private int _speed = 200;
         private int _level;
 
         [Signal]
@@ -53,10 +53,15 @@ namespace Playground
             set => _health = value;
         }
 
-        public RayCast2D? RayCast
+        public NavigationAgent2D? NavigationAgent2D
         {
-            get => _rayCast;
-            set => _rayCast = value;
+            get => _navigationAgent2D;
+            set => _navigationAgent2D = value;
+        }
+
+        public Vector2 RespawnPosition
+        {
+            get => _respawnPosition;
         }
 
         public bool PlayerEncounted
@@ -72,11 +77,14 @@ namespace Playground
             _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
-            _rayCast = parentNode.GetNode<RayCast2D>(nameof(RayCast2D));
+            _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
-            _collisionShape = parentNode.GetNode<CollisionShape2D>("Area2D/CollisionShape2D");
+            _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
+            _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
+            _respawnPosition = Position;
             Rarity = EnemyRarity();
             _health.RefreshHealth();
+            AddToGroup("MovingObstacles");
             EmitSignal(SignalName.EnemyInitialized);
         }
 

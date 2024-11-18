@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=22 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/_PNG/MainLev.png" id="1_4jlib"]
 [ext_resource type="Script" path="res://Script/MainScene.cs" id="1_8vjwq"]
@@ -601,6 +601,8 @@ bg_color = Color(0.831276, 0.518108, 0.136693, 1)
 [sub_resource type="AtlasTexture" id="AtlasTexture_ek282"]
 atlas = ExtResource("15_65t5n")
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1h4aj"]
+
 [node name="MainScene" type="Node2D"]
 process_mode = 1
 script = ExtResource("1_8vjwq")
@@ -770,6 +772,72 @@ offset_right = 58.1097
 offset_bottom = 21.3522
 scale = Vector2(0.75819, 0.655748)
 text = "100"
+
+[node name="StaticObjects" type="Node" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(308, 140)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(261, 629)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D2"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(373, 563)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D3"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(130, 579)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D4"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D5" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(308, 459)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D5"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D6" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(166, 464)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D6"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D7" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(491, 433)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D7"]
+shape = SubResource("RectangleShape2D_1h4aj")
+
+[node name="StaticBody2D8" type="StaticBody2D" parent="StaticObjects"]
+z_index = 1
+position = Vector2(683, 483)
+scale = Vector2(2.22, 2.22)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticObjects/StaticBody2D8"]
+shape = SubResource("RectangleShape2D_1h4aj")
 
 [connection signal="OnPlayerEnteredZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerEnteredZone"]
 [connection signal="OnPlayerExitedZone" from="GlobalMap/SpawnMap/Area2D" to="CharacterBody2D" method="OnPlayerExitedZone"]

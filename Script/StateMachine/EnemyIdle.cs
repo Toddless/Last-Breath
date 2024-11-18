@@ -6,7 +6,7 @@
     {
         public override void Enter()
         {
-            GetNode<Timer>(nameof(Timer)).Start(rnd.RandiRange(3, 10));
+            GetNode<Timer>(nameof(Timer)).Start(rnd.RandiRange(1, 2));
             GetOwner().GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D)).Play("Bat_Myth");
         }
 

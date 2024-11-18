@@ -3,16 +3,18 @@ namespace Playground
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.Linq;
     using Godot;
 
     public partial class EnemySpawner : Node
     {
+        private Dictionary<Vector2, EnemyAI?>? _enemyPosition = new();
         private RandomNumberGenerator _rnd = new();
+        private Queue<Action> _spawnQueue = new();
+        private bool _isProcessing = false;
         private MainScene? _parentScene;
         private PackedScene? _scene;
-        private Queue<Action> _spawnQueue = new();
         private Timer? _timer;
-        private bool _isProcessing = false;
 
         public override void _Ready()
         {
@@ -20,6 +22,11 @@ namespace Playground
             _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             _timer = _parentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
             _parentScene.Enemies!.CollectionChanged += OnCollectionChanged;
+
+            foreach (var respawnPosition in _parentScene.EnemiesRespawnPosition)
+            {
+                _enemyPosition![respawnPosition] = null;
+            }
         }
 
         /// <summary>
@@ -36,6 +43,12 @@ namespace Playground
             }
 
             EnqueueSpawnEnemyEvent();
+        }
+
+        public void DeleteEnemy(EnemyAI enemyToDelete)
+        {
+            var positionToFree = _enemyPosition!.FirstOrDefault(x => x.Value == enemyToDelete);
+            _enemyPosition![positionToFree.Key] = null;
         }
 
         private void EnqueueSpawnEnemyEvent()
@@ -71,13 +84,15 @@ namespace Playground
 
         public void SpawnNewEnemy()
         {
+            var freePosition = _enemyPosition!.FirstOrDefault(x => x.Value == null);
             EnemyAI enemy = _scene!.Instantiate<EnemyAI>();
             _parentScene!.CallDeferred("add_child", enemy);
             _parentScene.Enemies!.Add(enemy);
-            enemy.Position = new Vector2(_rnd.RandfRange(50, 900), _rnd.RandfRange(250, 700));
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
             enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
             enemy.PropertyChanged += _parentScene.EnemiePropertyChanged;
+            enemy.Position = freePosition.Key;
+            _enemyPosition![freePosition.Key] = enemy;
         }
     }
 }

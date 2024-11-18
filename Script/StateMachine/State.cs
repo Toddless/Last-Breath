@@ -2,7 +2,7 @@
 {
     using Godot;
 
-    public partial class State : Node
+    public partial class State : Node2D
     {
         public StateMachine? fsm;
         public RandomNumberGenerator rnd = new();

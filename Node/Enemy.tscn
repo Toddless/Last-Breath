@@ -324,16 +324,15 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_280rj"]
 
-[node name="Enemy" type="CharacterBody2D"]
+[node name="Enemy" type="CharacterBody2D" groups=["MovingObstacles"]]
 z_index = 1
-position = Vector2(267, 216)
 scale = Vector2(1.2, 1.2)
 script = ExtResource("1_g0i5v")
 
-[node name="RayCast2D" type="RayCast2D" parent="."]
-collide_with_areas = true
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(1.725, 1.725)
 shape = SubResource("RectangleShape2D_up6k3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -341,7 +340,6 @@ sprite_frames = SubResource("SpriteFrames_2uv7i")
 animation = &"Bat_Epic"
 
 [node name="Area2D" type="Area2D" parent="."]
-position = Vector2(0, 2.50002)
 scale = Vector2(2.5, 2.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
@@ -357,13 +355,13 @@ script = ExtResource("4_rr2j7")
 script = ExtResource("5_xnkjp")
 initialState = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateMachine"]
+[node name="Idle" type="Node2D" parent="StateMachine"]
 script = ExtResource("10_wjrrt")
 
 [node name="Timer" type="Timer" parent="StateMachine/Idle"]
 wait_time = 5.0
 
-[node name="Move" type="Node" parent="StateMachine"]
+[node name="Move" type="Node2D" parent="StateMachine"]
 script = ExtResource("11_k2edv")
 
 [connection signal="timeout" from="StateMachine/Idle/Timer" to="StateMachine/Idle" method="OnTimerTimeOut"]
