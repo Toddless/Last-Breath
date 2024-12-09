@@ -1,48 +1,47 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    using Godot;
-
-    public partial class BuffAttack() : Node, IPassivesAppliedBeforAttack, IPassivesAppliedAfterAttack
+    public partial class BuffAttack : Ability
     {
-        private readonly float _additionalCriticalStrikeChance = 1.05f;
-        private readonly float _additionalCritStrikeDamage = 1.1f;
-        private readonly float _additionalMinDamage = 1.3f;
-        private readonly float _additionalMaxDamage = 1.3f;
+        private readonly float _additionalDamage = 1.3f;
+
+        private float _baseMinDamageBeforBuff;
+        private float _baseMaxDamageBeforBuff;
 
 
-        private float _minDamageBeforBuff;
-        private float _maxDamageBeforBuff;
-        private float _criticalStrikeDamageBeforeBuff;
-        private float _criticalChanceBeforBuff;
-
-
-        private int _cooldown = 4;
-
-        public int Cooldown
+        public BuffAttack()
         {
-            get => _cooldown;
-            set => _cooldown = value;
         }
 
-        public void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default)
+        public override void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default)
         {
-            attack!.CriticalStrikeChance = _criticalStrikeDamageBeforeBuff;
-            attack.CriticalStrikeDamage = _criticalChanceBeforBuff;
-            attack.BaseMinDamage = _minDamageBeforBuff;
-            attack.BaseMaxDamage = _maxDamageBeforBuff;
+            
+          
         }
 
-        public void ApplyBeforeAttack(AttackComponent? attack)
+        public override void ApplyAfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
         {
-            _criticalStrikeDamageBeforeBuff = attack!.CriticalStrikeDamage;
-            _criticalChanceBeforBuff = attack.CriticalStrikeChance;
-            _minDamageBeforBuff = attack.BaseMinDamage;
-            _maxDamageBeforBuff = attack.BaseMaxDamage;
+            if (attack == null)
+            {
+                return;
+            }
+            attack.BaseMinDamage = _baseMinDamageBeforBuff;
+            attack.BaseMaxDamage = _baseMaxDamageBeforBuff;
 
-            attack.CriticalStrikeChance *= _additionalCriticalStrikeChance;
-            attack.CriticalStrikeDamage *= _additionalCritStrikeDamage;
-            attack.BaseMinDamage *= _additionalMinDamage;
-            attack.BaseMaxDamage *= _additionalMaxDamage;
+            _baseMinDamageBeforBuff = default;
+            _baseMaxDamageBeforBuff = default;
+        }
+
+        public override void ApplyBeforAttack(AttackComponent? attack, HealthComponent? health)
+        {
+            if(attack == null)
+            {
+                return;
+            }
+            _baseMinDamageBeforBuff = attack.BaseMinDamage;
+            _baseMaxDamageBeforBuff = attack.BaseMaxDamage;
+
+            attack.BaseMinDamage *= _additionalDamage;
+            attack.BaseMaxDamage *= _additionalDamage;
         }
     }
 }

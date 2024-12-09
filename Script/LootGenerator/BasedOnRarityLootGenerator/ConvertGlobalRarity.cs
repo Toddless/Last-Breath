@@ -21,5 +21,14 @@
             {GlobalRarity.Legendary, 4 },
             {GlobalRarity.Mythic, 5 },
         };
+
+        public static readonly Dictionary<GlobalRarity, int>  abilityQuantity= new()
+        {
+            {GlobalRarity.Uncommon, 1 },
+            {GlobalRarity.Rare, 2 },
+            {GlobalRarity.Epic, 4 },
+            {GlobalRarity.Legendary, 6 },
+            {GlobalRarity.Mythic, 8 },
+        };
     }
 }

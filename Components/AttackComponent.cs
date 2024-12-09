@@ -55,16 +55,16 @@ namespace Playground
             _baseMaxDamage = 100f;
         }
 
-        public float CalculateDamage()
+        public (float, bool) CalculateDamage()
         {
             float damage = _rng.RandfRange(_baseMinDamage, _baseMaxDamage);
             bool criticalStrike = _rng.RandfRange(0, 1) <= _criticalStrikeChance;
             if (criticalStrike)
             {
-                damage *= _criticalStrikeDamage;
+                return (damage *= _criticalStrikeDamage, true);
             }
 
-            return damage;
+            return (damage, false);
         }
     }
 }

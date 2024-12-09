@@ -1,16 +1,12 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    using Godot;
-
-    public partial class VampireStrike : Node, IPassivesAppliedAfterAttack
+    public partial class VampireStrike : Ability
     {
         private float _leachPercentage = 0.1f;
-        private int _cooldown = 4;
 
-        public int Cooldown
+        public VampireStrike()
         {
-            get => _cooldown;
-            set => _cooldown = value;
+            HaveISomethinToApplyAfterAttack = true;
         }
 
         public float LeechPercentage
@@ -19,13 +15,21 @@
             set => _leachPercentage = value;
         }
 
-        public void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default)
+
+        public override void ApplyAfterAttack(AttackComponent? attack, HealthComponent? health)
         {
 
-            if (health != null)
-            {
+        }
 
-            }
+        public override void ApplyAfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        {
+
+        }
+
+
+        public override void ApplyBeforAttack(AttackComponent? attack, HealthComponent? health)
+        {
+
         }
     }
 }

@@ -137,7 +137,7 @@
             }
         }
 
-        public virtual float EnemyDealDamage()
+        public virtual (float, bool) EnemyDealDamage()
         {
             return _attack!.CalculateDamage();
         }

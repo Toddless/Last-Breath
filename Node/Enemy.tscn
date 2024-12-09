@@ -332,7 +332,7 @@ script = ExtResource("1_g0i5v")
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-scale = Vector2(1.725, 1.725)
+scale = Vector2(1.24, 1.24)
 shape = SubResource("RectangleShape2D_up6k3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -343,6 +343,7 @@ animation = &"Bat_Epic"
 scale = Vector2(2.5, 2.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+scale = Vector2(0.565, 0.565)
 shape = SubResource("RectangleShape2D_280rj")
 
 [node name="HealthComponent" type="Node" parent="."]
