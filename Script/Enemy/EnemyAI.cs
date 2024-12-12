@@ -6,6 +6,7 @@ namespace Playground
     using Playground.Script.StateMachine;
     using System.Collections.Generic;
     using Playground.Script.Passives.Attacks;
+    using Playground.Script.Passives;
 
     public partial class EnemyAI : ObservableObject
     {
@@ -22,7 +23,7 @@ namespace Playground
         private StateMachine? _machine;
         private GlobalRarity _rarity;
         private Area2D? _area;
-        private List<Ability>? _skills = [];
+        private List<Ability>? _skills;
         private int _level;
 
         [Signal]
@@ -88,6 +89,7 @@ namespace Playground
             Rarity = EnemyRarity();
             _health.RefreshHealth();
             AddToGroup("MovingObstacles");
+            SetRandomSkills();
             EmitSignal(SignalName.EnemyInitialized);
         }
 
@@ -166,10 +168,8 @@ namespace Playground
         public void SetRandomSkills()
         {
             var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + CalculateExtraAbilityFromLevel();
-            for (int i = 0; i < amountAbilities; i++)
-            {
-               _skills!.Add(AbilityPool);
-            }
+            _skills = new AbilityPool().SelectAbilities()
+           
         }
 
         public void PlayerExited(Node2D body)
@@ -190,7 +190,7 @@ namespace Playground
 
         private int CalculateExtraAbilityFromLevel()
         {
-            return  Mathf.Max(1, _level / 10);
+            return Mathf.Max(1, _level / 10);
         }
     }
 }

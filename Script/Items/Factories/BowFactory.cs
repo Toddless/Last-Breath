@@ -6,6 +6,11 @@
 
     public class BowFactory : ItemCreator
     {
+        private readonly string _uncommonBowTexturePath = "res://Assets/Weapon/Bows/BowUncommon.png";
+        private readonly string _rareBowTexturePath = "res://Assets/Weapon/Bows/BowRare.png";
+        private readonly string _epicBowTexturePath = "res://Assets/Weapon/Bows/BowEpic.png";
+        private readonly string _legendaryBowTexturePath = "res://Assets/Weapon/Bows/BowLegendary.png";
+
         private static BowFactory? _instance = null;
 
         private BowFactory()
@@ -26,10 +31,10 @@
         {
             return globalRarity switch
             {
-                GlobalRarity.Uncommon => new Bow(StringHelper.BowUncommon, GlobalRarity.Uncommon, RandomNumberGenerator.RandfRange(65, 80), RandomNumberGenerator.RandfRange(160, 220), 0.05f, ResourcePath.BowUncommon, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowUncommon.png"), 1, 1),
-                GlobalRarity.Rare => new Bow(StringHelper.BowRare, GlobalRarity.Rare, RandomNumberGenerator.RandfRange(70, 120), RandomNumberGenerator.RandfRange(200, 280), 0.05f, ResourcePath.BowRare, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowRare.png"), 1, 1),
-                GlobalRarity.Epic => new Bow(StringHelper.BowEpic, GlobalRarity.Epic, RandomNumberGenerator.RandfRange(130, 160), RandomNumberGenerator.RandfRange(260, 320), 0.05f,  ResourcePath.BowEpic, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowEpic.png"), 1, 1),
-                GlobalRarity.Legendary => new Bow(StringHelper.BowLegendary, GlobalRarity.Legendary, RandomNumberGenerator.RandfRange(180, 300), RandomNumberGenerator.RandfRange(450, 600), 0.05f, ResourcePath.BowLegendary, GD.Load<Texture2D>("res://Assets/Weapon/Bows/BowLegendary.png"), 1, 1),
+                GlobalRarity.Uncommon => new Bow(StringHelper.BowUncommon, GlobalRarity.Uncommon, 90, 180, 0.05f, ResourcePath.BowUncommon, GD.Load<Texture2D>(_uncommonBowTexturePath), 1, 1),
+                GlobalRarity.Rare => new Bow(StringHelper.BowRare, GlobalRarity.Rare, 90, 180, 0.05f, ResourcePath.BowRare, GD.Load<Texture2D>(_rareBowTexturePath), 1, 1),
+                GlobalRarity.Epic => new Bow(StringHelper.BowEpic, GlobalRarity.Epic, 90, 180, 0.05f, ResourcePath.BowEpic, GD.Load<Texture2D>(_epicBowTexturePath), 1, 1),
+                GlobalRarity.Legendary => new Bow(StringHelper.BowLegendary, GlobalRarity.Legendary, 90, 180, 0.05f, ResourcePath.BowLegendary, GD.Load<Texture2D>(_legendaryBowTexturePath), 1, 1),
                 GlobalRarity.Mythic => VeryUniqBow.Instance,
                 _ => null,
             };

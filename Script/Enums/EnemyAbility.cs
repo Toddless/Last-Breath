@@ -6,5 +6,7 @@
         VampireStrike = 1,
         DoubleStrike,
         BuffAttack,
+        BuffCriticalStrikeChance,
+        BuffCriticalStrikeDamage,
     }
 }

@@ -1,24 +1,36 @@
 ﻿namespace Playground.Script.Passives
 {
+    using System;
     using System.Collections.Generic;
     using Godot;
     using Playground.Script.Passives.Attacks;
 
-    public abstract class AbilityPool
+    public class AbilityPool
     {
-        private readonly List<Ability> _abilities = [
-            new DoubleStrike(),
-            new VampireStrike(),
-            new BuffAttack(),
-            new BuffCriticalStrikeChance(),
-            new BuffCriticalStrikeDamage(),
-            ];
-
-        public Ability GetRandomAbility()
+        public AbilityPool()
         {
+        }
+
+        public List<Ability> SelectAbilities(List<Ability> abilities, int count)
+        {
+            if(count > abilities.Count)
+            {
+                throw new ArgumentException("");
+            }
             using (var rnd = new RandomNumberGenerator())
             {
-                return _abilities[rnd.RandiRange(0, _abilities.Count - 1)];
+                var randomNumber = rnd.RandiRange(0, abilities.Count - 1);
+                List<Ability> result = [];
+                while (result.Count != count)
+                {
+                    var chosenAbility = abilities[randomNumber];
+                    if (!result.Contains(chosenAbility))
+                    {
+                        result.Add(chosenAbility);
+                    }
+                }
+                
+                return result;
             }
         }
     }
