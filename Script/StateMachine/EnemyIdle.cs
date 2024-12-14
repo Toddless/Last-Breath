@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.StateMachine
 {
     using Godot;
+    using Playground.Script.Enums;
 
     public partial class EnemyIdle : State
     {
@@ -18,7 +19,7 @@
 
         private void OnTimerTimeOut()
         {
-            fsm!.TransitionTo("Move");
+            fsm!.TransitionTo(States.Move.ToString());
         }
     }
 }

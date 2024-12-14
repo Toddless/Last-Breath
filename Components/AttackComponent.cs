@@ -12,6 +12,8 @@ namespace Playground
         private float _baseMinDamage;
         private float _baseMaxDamage;
         private float _finalDamage;
+        private float _leech = 0f;
+        private float _leechedHealth = 0;
         #endregion
 
         #region Properties
@@ -40,11 +42,27 @@ namespace Playground
             set => _criticalStrikeDamage = value;
         }
 
-        #endregion
+        public float Leech
+        {
+            get => _leech;
+            set
+            {
+                if (value > 1f || value < 0f)
+                {
+                    _leech = 0;
+                }
+                else
+                {
+                    _leech = value;
+                }
+            }
+        }
 
-        #region Signal
-        [Signal]
-        public delegate void OnPlayerCriticalHitEventHandler();
+        public float LeechedHealth
+        {
+            get => _leechedHealth;
+        }
+
         #endregion
 
         public override void _Ready()
@@ -61,9 +79,11 @@ namespace Playground
             bool criticalStrike = _rng.RandfRange(0, 1) <= _criticalStrikeChance;
             if (criticalStrike)
             {
-                return (damage *= _criticalStrikeDamage, true);
+                var finalDamage = damage * _criticalStrikeDamage;
+                _leechedHealth = _leech * finalDamage;
+                return (finalDamage, true);
             }
-
+            _leechedHealth = _leech * damage;
             return (damage, false);
         }
     }

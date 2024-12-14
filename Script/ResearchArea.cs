@@ -8,7 +8,6 @@
     {
         #region Private fields
 
-        // Loot Table schould be injected insteat of copies for each class 
         private BasedOnRarityLootTable _lootTable = BasedOnRarityLootTable.Instance;
         private GlobalRarity _areaRarity;
         #endregion

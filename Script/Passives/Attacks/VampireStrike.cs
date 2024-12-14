@@ -1,6 +1,8 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    public partial class VampireStrike : Ability
+    using Playground.Script.Passives.Interfaces;
+
+    public partial class VampireStrike : Ability, ICanLeech, ICanBuffAttack
     {
         private float _leachPercentage = 0.1f;
 
@@ -9,27 +11,38 @@
             HaveISomethinToApplyAfterAttack = true;
         }
 
-        public float LeechPercentage
+        //public override void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default)
+        //{
+
+        //}
+        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
         {
-            get => _leachPercentage;
-            set => _leachPercentage = value;
+            if(attack == null)
+            {
+                return;
+            }
+
+            attack.Leech = 0;
         }
 
-
-        public override void ApplyAfterAttack(AttackComponent? attack, HealthComponent? health)
+        public override void BuffAttacks(AttackComponent? attack = null)
         {
+            if (attack == null)
+            {
+                return;
+            }
 
+            attack.Leech = _leachPercentage;
         }
 
-        public override void ApplyAfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        public void Leech(AttackComponent? attack = null, HealthComponent? health = null)
         {
+            if(attack == null || health == null)
+            {
+                return;
+            }
 
-        }
-
-
-        public override void ApplyBeforAttack(AttackComponent? attack, HealthComponent? health)
-        {
-
+            health.Heal(attack.LeechedHealth);
         }
     }
 }

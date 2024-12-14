@@ -124,7 +124,6 @@
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
             _playerStats = playerNode.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-            _attackComponent.OnPlayerCriticalHit += PlayerDidCriticalDamage;
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
             _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
@@ -146,11 +145,6 @@
         private void UpdateHealthBar()
         {
             _healthBar!.Value = _healthComponent!.CurrentHealth;
-        }
-
-        private void PlayerDidCriticalDamage()
-        {
-            GD.Print($"Critical hit!");
         }
 
         public bool ToggleWindow(bool isOpen)
@@ -190,6 +184,29 @@
             MoveAndSlide();
         }
 
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            //if (Input.IsActionJustPressed(InputMaps.MoveDown))
+            //{
+            //    _inputDirection = Vector2.Down;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveUp))
+            //{
+            //    _inputDirection = Vector2.Up;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveLeft))
+            //{
+            //    _inputDirection = Vector2.Left;
+            //    MoveAndSlide();
+            //}
+            //else if (Input.IsActionJustPressed(InputMaps.MoveRight))
+            //{
+            //    _inputDirection = Vector2.Right;
+            //    MoveAndSlide();
+            //}
+        }
 
         private void UpdateStats()
         {
@@ -200,8 +217,6 @@
                 $"Defence: {_healthComponent.Defence}\n" +
                 $"Max. Health: {_healthComponent.MaxHealth}";
         }
-
-
 
         private void SetHealthBar()
         {
@@ -268,30 +283,6 @@
                 _inventoryComponent!.RemoveItem(armor);
                 UpdateStats();
             }
-        }
-
-        public override void _UnhandledInput(InputEvent @event)
-        {
-            //if (Input.IsActionJustPressed(InputMaps.MoveDown))
-            //{
-            //    _inputDirection = Vector2.Down;
-            //    MoveAndSlide();
-            //}
-            //else if (Input.IsActionJustPressed(InputMaps.MoveUp))
-            //{
-            //    _inputDirection = Vector2.Up;
-            //    MoveAndSlide();
-            //}
-            //else if (Input.IsActionJustPressed(InputMaps.MoveLeft))
-            //{
-            //    _inputDirection = Vector2.Left;
-            //    MoveAndSlide();
-            //}
-            //else if (Input.IsActionJustPressed(InputMaps.MoveRight))
-            //{
-            //    _inputDirection = Vector2.Right;
-            //    MoveAndSlide();
-            //}
         }
 
         private void MoveGrid()

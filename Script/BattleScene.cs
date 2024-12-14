@@ -58,8 +58,8 @@ namespace Playground
                 EnemyDied();
                 return;
             }
-            var x = _player!.PlayerAttack!.CalculateDamage();
-            _enemy!.Health!.TakeDamage(x.Item1);
+            var dealedDamage = _player!.PlayerAttack!.CalculateDamage();
+            _enemy!.Health!.TakeDamage(dealedDamage.Item1);
             UpdateHealthBar();
             _damageButton!.Visible = false;
             EmitSignal(SignalName.EnemyTurn);
@@ -69,8 +69,8 @@ namespace Playground
         {
             if (_enemy!.Health!.CurrentHealth > 0)
             {
-                var x = _enemy!.EnemyDealDamage();
-                _player!.PlayerHealth!.TakeDamage(x.Item1);
+                var dealedDamage = _enemy!.EnemyDealDamage();
+                _player!.PlayerHealth!.TakeDamage(dealedDamage.Item1);
                 UpdateHealthBar();
                 EmitSignal(SignalName.PlayerTurn);
             }

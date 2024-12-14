@@ -11,6 +11,7 @@
     {
         public static List<Ability> LoadAbility(string filePath)
         {
+            // WIP still not sure if i want this.
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException();

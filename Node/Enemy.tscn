@@ -365,4 +365,6 @@ wait_time = 5.0
 [node name="Move" type="Node2D" parent="StateMachine"]
 script = ExtResource("11_k2edv")
 
+[node name="Battle" type="Node2D" parent="StateMachine"]
+
 [connection signal="timeout" from="StateMachine/Idle/Timer" to="StateMachine/Idle" method="OnTimerTimeOut"]

@@ -7,6 +7,8 @@ namespace Playground
     using System.Collections.Generic;
     using Playground.Script.Passives.Attacks;
     using Playground.Script.Passives;
+    using Playground.Components;
+    using Playground.Script.Enums;
 
     public partial class EnemyAI : ObservableObject
     {
@@ -14,8 +16,10 @@ namespace Playground
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
         private CollisionShape2D? _enemiesCollisionShape;
+        private BattleBehavior? _battleBehavior;
         private GlobalSignals? _globalSignals;
         private bool _playerEncounted = false;
+        private bool _enemyFight = false;
         private AnimatedSprite2D? _sprite;
         private HealthComponent? _health;
         private Vector2 _respawnPosition;
@@ -42,14 +46,28 @@ namespace Playground
         public GlobalRarity Rarity
         {
             get => _rarity;
+            set => _rarity = value;
+
+        }
+
+        public RandomNumberGenerator Rnd
+        {
+            get => _rnd;
+        }
+
+        public bool EnemyFigth
+        {
+            get => _enemyFight;
             set
             {
-                if (SetProperty(ref _rarity, value))
+                if(SetProperty(ref _enemyFight, value))
                 {
-                    SetStatsBasedOnRarity();
+                    IAmInBattle();
                 }
             }
         }
+
+        private void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
 
         public HealthComponent? Health
         {
@@ -87,23 +105,19 @@ namespace Playground
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _respawnPosition = Position;
             Rarity = EnemyRarity();
+            _level = _rnd.RandiRange(1, 50);
             _health.RefreshHealth();
             AddToGroup("MovingObstacles");
             SetRandomSkills();
             EmitSignal(SignalName.EnemyInitialized);
+            SetAnimation();
+            SetStats();
         }
 
         public GlobalRarity EnemyRarity()
         {
             var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
             return rarity.Rarity;
-        }
-
-        public void SetStatsBasedOnRarity()
-        {
-            _level = _rnd.RandiRange(1, 50);
-            SetAnimation();
-            SetStats();
         }
 
         public void SetAnimation()
@@ -167,9 +181,8 @@ namespace Playground
 
         public void SetRandomSkills()
         {
-            var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + CalculateExtraAbilityFromLevel();
-            _skills = new AbilityPool().SelectAbilities()
-           
+            // var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + CalculateExtraAbilityFromLevel();
+            _skills = new AbilityPool().SelectAbilities(2);
         }
 
         public void PlayerExited(Node2D body)

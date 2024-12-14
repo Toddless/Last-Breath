@@ -1,17 +1,13 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using Playground.Script.Passives.Interfaces;
 
-    public partial class BuffCriticalStrikeDamage : Ability
+    public partial class BuffCriticalStrikeDamage : Ability, ICanBuffAttack
     {
         private readonly float _criticalStrikeDamageBonus = 0.2f;
 
-        public override void ApplyAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
-        {
-        }
+        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null) => attack.CriticalStrikeDamage -= _criticalStrikeDamageBonus;
 
-        public override void ApplyAfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null) => attack.CriticalStrikeDamage -= _criticalStrikeDamageBonus;
-
-        public override void ApplyBeforAttack(AttackComponent? attack, HealthComponent? health) => attack.CriticalStrikeDamage += _criticalStrikeDamageBonus;
-
+        public override void BuffAttacks(AttackComponent? attack = null) => attack.CriticalStrikeDamage += _criticalStrikeDamageBonus;
     }
 }

@@ -9,10 +9,11 @@
 
         public int Cooldown { get; set; } = 4;
 
-        public abstract void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default);
+      //  public abstract void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default);
 
-        public abstract void ApplyBeforAttack(AttackComponent? attack, HealthComponent? health);
+        public abstract void AfterBuffEnds(AttackComponent? attack = default, HealthComponent? health = default);
 
-        public abstract void ApplyAfterBuffEnds(AttackComponent? attack = default, HealthComponent? health = default);
+        public abstract void BuffAttacks(AttackComponent? attack = default);
+
     }
 }

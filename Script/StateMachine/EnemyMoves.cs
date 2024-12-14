@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Godot;
     using Godot.Collections;
+    using Playground.Script.Enums;
 
     public partial class EnemyMoves : State
     {
@@ -181,7 +182,7 @@
 
         private void EnemyReachedDestination()
         {
-            fsm!.TransitionTo("Idle");
+            fsm!.TransitionTo(States.Idle.ToString());
         }
     }
 }
