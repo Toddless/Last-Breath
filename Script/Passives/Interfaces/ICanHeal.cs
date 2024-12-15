@@ -2,6 +2,5 @@
 {
     public interface ICanHeal
     {
-        void Heal(HealthComponent? health = default);
     }
 }

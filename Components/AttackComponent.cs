@@ -61,6 +61,7 @@ namespace Playground
         public float LeechedHealth
         {
             get => _leechedHealth;
+            set => _leechedHealth = value;
         }
 
         #endregion

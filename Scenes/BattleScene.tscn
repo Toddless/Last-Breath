@@ -79,14 +79,6 @@ offset_bottom = 26.0
 theme_override_styles/background = SubResource("StyleBoxFlat_eo1t1")
 theme_override_styles/fill = SubResource("StyleBoxFlat_lh5o6")
 fill_mode = 1
-show_percentage = false
-
-[node name="EnemyHpBarValue" type="Label" parent="UI/EnemyHpBar"]
-layout_mode = 0
-offset_left = 36.0
-offset_top = -1.0
-offset_right = 76.0
-offset_bottom = 22.0
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 1.5

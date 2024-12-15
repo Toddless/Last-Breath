@@ -8,19 +8,21 @@
     public class AbilityPool
     {
         private readonly List<Ability> _abilities = [
-            new DoubleStrike(),
+           // new DoubleStrike(),
             new VampireStrike(),
             new BuffAttack(),
             new BuffCriticalStrikeChance(),
             new BuffCriticalStrikeChance()
             ];
+
         public AbilityPool()
         {
+
         }
 
         public List<Ability> SelectAbilities(int count)
         {
-            if(count > _abilities.Count)
+            if (count > _abilities.Count)
             {
                 throw new ArgumentException("");
             }
@@ -36,9 +38,19 @@
                         result.Add(chosenAbility);
                     }
                 }
-                
+
                 return result;
             }
+        }
+
+        public List<Ability> GetAllAbilities()
+        {
+            List<Ability> x = [];
+            foreach (var ability in _abilities)
+            {
+                x.Add(ability);
+            }
+            return x;
         }
     }
 }

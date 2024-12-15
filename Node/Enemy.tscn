@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://bw2mbm6teo27u"]
+[gd_scene load_steps=56 format=3 uid="uid://bw2mbm6teo27u"]
 
 [ext_resource type="Script" path="res://Script/Enemy/EnemyAI.cs" id="1_g0i5v"]
 [ext_resource type="Texture2D" uid="uid://dgx1227bxaxgt" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Idle.png" id="2_8ewjt"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://Script/StateMachine/StateMachine.cs" id="5_xnkjp"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyIdle.cs" id="10_wjrrt"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyMoves.cs" id="11_k2edv"]
+[ext_resource type="Script" path="res://Script/StateMachine/EnemyBattle.cs" id="12_qqak5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_up6k3"]
 
@@ -366,5 +367,6 @@ wait_time = 5.0
 script = ExtResource("11_k2edv")
 
 [node name="Battle" type="Node2D" parent="StateMachine"]
+script = ExtResource("12_qqak5")
 
 [connection signal="timeout" from="StateMachine/Idle/Timer" to="StateMachine/Idle" method="OnTimerTimeOut"]

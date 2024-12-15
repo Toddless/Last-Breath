@@ -94,7 +94,6 @@
 
             if (_enemy.Position.DistanceTo(_targetPosition) <= 10.0f)
             {
-                GD.Print("Point reached");
                 EmitSignal(SignalName.EnemyReached);
             }
         }

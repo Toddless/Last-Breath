@@ -11,10 +11,6 @@
             HaveISomethinToApplyAfterAttack = true;
         }
 
-        //public override void ApplyAfterAttack(AttackComponent? attack = default, HealthComponent? health = default)
-        //{
-
-        //}
         public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
         {
             if(attack == null)
@@ -25,7 +21,7 @@
             attack.Leech = 0;
         }
 
-        public override void BuffAttacks(AttackComponent? attack = null)
+        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = null)
         {
             if (attack == null)
             {
@@ -35,14 +31,10 @@
             attack.Leech = _leachPercentage;
         }
 
-        public void Leech(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
         {
-            if(attack == null || health == null)
-            {
-                return;
-            }
-
             health.Heal(attack.LeechedHealth);
+            attack.LeechedHealth = 0;
         }
     }
 }

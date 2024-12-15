@@ -8,6 +8,10 @@
 
         public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null) => attack.CriticalStrikeDamage -= _criticalStrikeDamageBonus;
 
-        public override void BuffAttacks(AttackComponent? attack = null) => attack.CriticalStrikeDamage += _criticalStrikeDamageBonus;
+        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = default)
+        {
+            attack.CriticalStrikeDamage += _criticalStrikeDamageBonus;
+        }
+        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null) => throw new System.NotImplementedException();
     }
 }

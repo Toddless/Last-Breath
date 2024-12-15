@@ -13,21 +13,21 @@ namespace Playground
     public partial class EnemyAI : ObservableObject
     {
         private readonly RandomNumberGenerator _rnd = new();
+        private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
-        private CollisionShape2D? _enemiesCollisionShape;
         private BattleBehavior? _battleBehavior;
         private GlobalSignals? _globalSignals;
         private bool _playerEncounted = false;
-        private bool _enemyFight = false;
         private AnimatedSprite2D? _sprite;
+        private bool _enemyFight = false;
         private HealthComponent? _health;
         private Vector2 _respawnPosition;
         private AttackComponent? _attack;
         private StateMachine? _machine;
+        private List<Ability>? _abilities;
         private GlobalRarity _rarity;
         private Area2D? _area;
-        private List<Ability>? _skills;
         private int _level;
 
         [Signal]
@@ -50,9 +50,20 @@ namespace Playground
 
         }
 
+        public BattleBehavior? BattleBehavior
+        {
+            get => _battleBehavior;
+            set => _battleBehavior = value;
+        }
+
         public RandomNumberGenerator Rnd
         {
             get => _rnd;
+        }
+
+        public List<Ability>? Abilities
+        {
+            get => _abilities;
         }
 
         public bool EnemyFigth
@@ -60,7 +71,7 @@ namespace Playground
             get => _enemyFight;
             set
             {
-                if(SetProperty(ref _enemyFight, value))
+                if (SetProperty(ref _enemyFight, value))
                 {
                     IAmInBattle();
                 }
@@ -69,7 +80,7 @@ namespace Playground
 
         private void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
 
-        public HealthComponent? Health
+        public HealthComponent? HealthComponent
         {
             get => _health;
             set => _health = value;
@@ -96,22 +107,23 @@ namespace Playground
         {
             var parentNode = GetParent().GetNode<EnemyAI>($"{Name}");
             _attack = parentNode.GetNode<AttackComponent>(nameof(AttackComponent));
-            _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
+            _health = parentNode.GetNode<HealthComponent>(nameof(Playground.HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
+            SetRandomAbilities();
+            _battleBehavior = new BattleBehavior(this);
             _respawnPosition = Position;
             Rarity = EnemyRarity();
             _level = _rnd.RandiRange(1, 50);
+            _health.IncreasedMaximumHealth(1000);
             _health.RefreshHealth();
             AddToGroup("MovingObstacles");
-            SetRandomSkills();
             EmitSignal(SignalName.EnemyInitialized);
             SetAnimation();
-            SetStats();
         }
 
         public GlobalRarity EnemyRarity()
@@ -174,15 +186,23 @@ namespace Playground
             }
         }
 
-        public (float, bool) EnemyDealDamage()
+        public (float, bool) ActivateAbilityBeforDealDamage()
         {
+            var chosenAbility = _battleBehavior!.MakeDecision();
+            if (chosenAbility == null)
+            {
+                return _attack!.CalculateDamage();
+            }
+
+            chosenAbility.ActivateAbility(_attack, _health);
+            GD.Print($"Activated ability {chosenAbility.GetType().ToString()}. Cooldown {chosenAbility.Cooldown}");
             return _attack!.CalculateDamage();
         }
 
-        public void SetRandomSkills()
+        public void SetRandomAbilities()
         {
             // var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + CalculateExtraAbilityFromLevel();
-            _skills = new AbilityPool().SelectAbilities(2);
+            _abilities = new AbilityPool().GetAllAbilities();
         }
 
         public void PlayerExited(Node2D body)

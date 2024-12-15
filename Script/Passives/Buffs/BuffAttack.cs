@@ -13,7 +13,7 @@
         {
         }
 
-        public override void BuffAttacks(AttackComponent? attack = null)
+        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = default)
         {
 
             if (attack == null)
@@ -35,9 +35,8 @@
             }
             attack.BaseMinDamage = _baseMinDamageBeforBuff;
             attack.BaseMaxDamage = _baseMaxDamageBeforBuff;
-
-            _baseMinDamageBeforBuff = default;
-            _baseMaxDamageBeforBuff = default;
         }
+
+        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null) => throw new System.NotImplementedException();
     }
 }

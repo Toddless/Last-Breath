@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Passives.Interfaces
 {
-    public interface IDealDamage
+    public interface ICanDealDamage
     {
     }
 }

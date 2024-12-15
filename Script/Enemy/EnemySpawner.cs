@@ -18,6 +18,8 @@ namespace Playground
 
         public override void _Ready()
         {
+
+            // TODO: Enemy spawn on main scene too if i am in battle
             _parentScene = (MainScene)GetParent();
             _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             _timer = _parentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
@@ -93,6 +95,8 @@ namespace Playground
             enemy.PropertyChanged += _parentScene.EnemiePropertyChanged;
             enemy.Position = freePosition.Key;
             _enemyPosition![freePosition.Key] = enemy;
+
+            GD.Print($"{enemy.VisibilityLayer}, {enemy.CollisionLayer}");
         }
     }
 }

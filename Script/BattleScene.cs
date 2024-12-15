@@ -10,7 +10,6 @@ namespace Playground
         private ProgressBar? _playerHpBar;
         private ProgressBar? _enemyHpBar;
         private GlobalSignals? _signals;
-        private Label? _enemyHpBarText;
         private Button? _damageButton;
         private Button? _returnButton;
         private Sprite2D? _sprite;
@@ -37,7 +36,6 @@ namespace Playground
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
             _damageButton = battleSceneUi.GetNode<Button>("Button");
             _returnButton = battleSceneUi.GetNode<Button>("ReturnButton");
-            _enemyHpBarText = battleSceneUi.GetNode<Label>("EnemyHpBar/EnemyHpBarValue");
             _timer = battelScene.GetNode<Timer>("Timer");
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _enemyInventory.InventoryVisible(false);
@@ -45,38 +43,44 @@ namespace Playground
             _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
             _enemyInventory!.TakeAllButton!.Pressed += PlayerTakedAllItems;
             _enemyInventory!.CloseButton!.Pressed += PlayerClosedInventory;
-            _damageButton.Pressed += PlayersDealDamage;
+            _damageButton.Pressed += PlayerMakeTurn;
             PlayerTurn += PlayersTurn;
-            EnemyTurn += EnemyDealDamage;
+            EnemyTurn += EnemyMakeTurn;
             SetHealthBars();
             UpdateHealthBar();
         }
-        private void PlayersDealDamage()
+        private void PlayerMakeTurn()
         {
-            if (_enemy!.Health!.CurrentHealth <= 0)
+            if (_enemy!.HealthComponent!.CurrentHealth <= 0)
             {
-                EnemyDied();
+                EnemyDead();
                 return;
             }
             var dealedDamage = _player!.PlayerAttack!.CalculateDamage();
-            _enemy!.Health!.TakeDamage(dealedDamage.Item1);
+            _enemy!.HealthComponent!.TakeDamage(dealedDamage.Item1);
             UpdateHealthBar();
             _damageButton!.Visible = false;
             EmitSignal(SignalName.EnemyTurn);
         }
 
-        public void EnemyDealDamage()
+        public void EnemyMakeTurn()
         {
-            if (_enemy!.Health!.CurrentHealth > 0)
+            if (_enemy!.HealthComponent!.CurrentHealth > 0)
             {
-                var dealedDamage = _enemy!.EnemyDealDamage();
+                _enemy!.BattleBehavior?.GatherInfo(_player!);
+                var dealedDamage = _enemy.ActivateAbilityBeforDealDamage();
                 _player!.PlayerHealth!.TakeDamage(dealedDamage.Item1);
+                if(_enemy.BattleBehavior!.AbilityWithEffectAfterAttack != null)
+                {
+                    _enemy.BattleBehavior.AbilityWithEffectAfterAttack.EffectAfterAttack(_enemy.EnemyAttack, _enemy.HealthComponent);
+                }
                 UpdateHealthBar();
+                GD.Print($"dealed damage {dealedDamage.Item1}");
                 EmitSignal(SignalName.PlayerTurn);
             }
             else
             {
-                EnemyDied();
+                EnemyDead();
             }
         }
 
@@ -107,9 +111,10 @@ namespace Playground
             _player.CanMove = true;
         }
 
-        private void EnemyDied()
+        private void EnemyDead()
         {
             _enemyInventory!.OnDeathSpawnItem();
+            _enemy!.BattleBehavior!.BattleEnds();
             _damageButton!.Visible = false;
             _enemyInventory!.InventoryVisible(true);
         }
@@ -124,6 +129,7 @@ namespace Playground
             _player = player;
             _enemy = enemy;
             _player.CanMove = false;
+            _enemy.EnemyFigth = true;
             _player.Position = new Vector2(250, 450);
             _enemy.Position = new Vector2(950, 450);
         }
@@ -131,14 +137,13 @@ namespace Playground
         private void SetHealthBars()
         {
             _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
-            _enemyHpBar!.MaxValue = _enemy!.Health!.MaxHealth;
+            _enemyHpBar!.MaxValue = _enemy!.HealthComponent!.MaxHealth;
         }
 
         public void UpdateHealthBar()
         {
-            _enemyHpBar!.Value = _enemy!.Health!.CurrentHealth;
+            _enemyHpBar!.Value = _enemy!.HealthComponent!.CurrentHealth;
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
-            _enemyHpBarText!.Text = _enemy.Health.CurrentHealth.ToString();
         }
 
         private void PlayersTurn()

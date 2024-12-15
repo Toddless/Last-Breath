@@ -46,6 +46,7 @@ namespace Playground
             {
                 _enemySpawner.SpawnNewEnemy();
             }
+            GD.Print($"{this.VisibilityLayer}");
         }
 
 
