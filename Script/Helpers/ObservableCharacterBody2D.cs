@@ -4,7 +4,7 @@
     using System.Runtime.CompilerServices;
     using Godot;
 
-    public partial class ObservableObject : CharacterBody2D, INotifyPropertyChanged
+    public partial class ObservableCharacterBody2D : CharacterBody2D, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 

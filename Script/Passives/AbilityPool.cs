@@ -12,7 +12,10 @@
             new VampireStrike(),
             new BuffAttack(),
             new BuffCriticalStrikeChance(),
-            new BuffCriticalStrikeChance()
+            new BuffCriticalStrikeDamage(),
+            new Regeneration(),
+            new OneShotHeal(),
+            new Badabooom()
             ];
 
         public AbilityPool()

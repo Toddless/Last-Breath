@@ -3,7 +3,7 @@
     enum EnemyAbility
     {
         None = 0,
-        VampireStrike = 1,
+        VampireStrike,
         DoubleStrike,
         BuffAttack,
         BuffCriticalStrikeChance,

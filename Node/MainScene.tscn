@@ -679,6 +679,27 @@ label_settings = ExtResource("10_4khdd")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ReduceEnemiesAttribute" type="Button" parent="UI/Buttons"]
+offset_left = 208.0
+offset_top = 5.0
+offset_right = 287.0
+offset_bottom = 36.0
+text = "ReduceAttribute"
+
+[node name="AddEnemiesAttribute" type="Button" parent="UI/Buttons"]
+offset_left = 360.0
+offset_top = 3.0
+offset_right = 469.0
+offset_bottom = 34.0
+text = "AddAttribute"
+
+[node name="DealDamage" type="Button" parent="UI/Buttons"]
+offset_left = 481.0
+offset_top = 2.0
+offset_right = 588.0
+offset_bottom = 33.0
+text = "DealDamage"
+
 [node name="PlayerBars" type="Node" parent="UI"]
 
 [node name="HealthProgressBar" type="TextureProgressBar" parent="UI/PlayerBars"]

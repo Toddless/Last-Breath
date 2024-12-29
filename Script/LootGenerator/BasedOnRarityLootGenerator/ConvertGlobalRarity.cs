@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
 {
     using System.Collections.Generic;
+    using Playground.Script.Enums;
 
     public static class ConvertGlobalRarity
     {

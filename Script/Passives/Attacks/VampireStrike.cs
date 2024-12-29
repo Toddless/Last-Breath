@@ -33,7 +33,7 @@
 
         public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
         {
-            health.Heal(attack.LeechedHealth);
+            health.CurrentHealth += attack.LeechedHealth;
             attack.LeechedHealth = 0;
         }
     }

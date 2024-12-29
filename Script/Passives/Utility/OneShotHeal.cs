@@ -12,7 +12,7 @@
 
         public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = null)
         {
-            health.Heal(_healAmoint);
+            health.CurrentHealth += _healAmoint;
         }
         public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null) => throw new NotImplementedException();
 

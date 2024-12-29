@@ -1,8 +1,8 @@
 ﻿namespace Playground.Script.Items
 {
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class VeryUniqSword : Sword
     {

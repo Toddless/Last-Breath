@@ -1,11 +1,12 @@
 ﻿namespace Playground.Script
 {
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Inventory;
+    using System.Collections.Generic;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using System.Linq;
     using Godot;
-    using System.Collections.Generic;
 
     public partial class EnemyInventory : Node
     {
@@ -40,6 +41,7 @@
 
         public override void _Ready()
         {
+
             _inventoryWindow = GetParent().GetNode<MainScene>("MainScene").GetNode("GlobalEnemyIntentory").GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _takeAllButton = _inventoryWindow.GetNode<Button>("TakeAllButton");

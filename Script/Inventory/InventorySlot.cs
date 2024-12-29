@@ -1,4 +1,4 @@
-namespace Playground
+namespace Playground.Script.Inventory
 {
     using System;
     using Godot;
@@ -41,7 +41,7 @@ namespace Playground
             _area2D = GetNode<Area2D>(nameof(Area2D));
             _icon = GetNode<TextureRect>("Icon");
             _fullItemDescription.Hide();
-            if(_quantityLabel == null)
+            if (_quantityLabel == null)
             {
                 ArgumentNullException.ThrowIfNull(_quantityLabel);
             }
@@ -117,7 +117,7 @@ namespace Playground
 
         public void RemoveItem(Item? item)
         {
-            if(item == null)
+            if (item == null)
             {
                 return;
             }
@@ -133,7 +133,7 @@ namespace Playground
 
         public void RemoveItself()
         {
-            if(InventoryItem == null)
+            if (InventoryItem == null)
             {
                 return;
             }

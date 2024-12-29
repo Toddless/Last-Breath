@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Items
 {
     using Godot;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Enums;
 
     public partial class Bow : Weapon
     {

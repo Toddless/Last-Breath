@@ -1,7 +1,7 @@
 ﻿namespace Playground
 {
-    using System;
     using Godot;
+    using Playground.Components;
     using Playground.Script;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
@@ -28,8 +28,9 @@
         #endregion
 
         #region Components
-        private HealthComponent? _healthComponent;
-        private AttackComponent? _attackComponent;
+        private HealthComponent? _playerHealth;
+        private AttackComponent? _playerAttack;
+        private AttributeComponent? _playerAttribute;
         #endregion
 
         [Signal]
@@ -68,14 +69,14 @@
 
         public HealthComponent? PlayerHealth
         {
-            get => _healthComponent;
-            set => _healthComponent = value;
+            get => _playerHealth;
+            set => _playerHealth = value;
         }
 
         public AttackComponent? PlayerAttack
         {
-            get => _attackComponent;
-            set => _attackComponent = value;
+            get => _playerAttack;
+            set => _playerAttack = value;
         }
 
         public Vector2 PlayerLastPosition
@@ -102,6 +103,12 @@
             set => _sprite = value;
         }
 
+        public AttributeComponent? PlayerAttribute
+        {
+            get => _playerAttribute;
+            set => _playerAttribute = value;
+        }
+
         [Export]
         public int Speed { get; set; } = 200;
         #endregion
@@ -110,41 +117,34 @@
         {
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
-            var playerNode = parentNode.GetNode<CharacterBody2D>("CharacterBody2D");
+            var playerNode = parentNode.GetNode<CharacterBody2D>(nameof(CharacterBody2D));
             _inventoryWindow = playerNode.GetNode("Inventory").GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _inventoryComponent = _inventoryContainder.GetNode<InventoryComponent>("InventoryComponent");
+            _inventoryComponent = _inventoryContainder.GetNode<InventoryComponent>(nameof(InventoryComponent));
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _healthComponent = playerNode.GetNode<HealthComponent>("HealthComponent");
-            _attackComponent = playerNode.GetNode<AttackComponent>("AttackComponent");
+            _playerHealth = playerNode.GetNode<HealthComponent>(nameof(HealthComponent));
+            _playerAttack = playerNode.GetNode<AttackComponent>(nameof(AttackComponent));
+            _playerAttribute = playerNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
-            _goldIcon = _inventoryWindow.GetNode<TextureRect>("TextureRect");
+            _goldIcon = _inventoryWindow.GetNode<TextureRect>(nameof(TextureRect));
             _goldAmount = _goldIcon.GetNode<Label>("Label");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
             _playerStats = playerNode.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
-            _sprite = playerNode.GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+            _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
             _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
-            _healthComponent.IncreasedMaximumHealth(10000);
-            _healthComponent.RefreshHealth();
+            _playerHealth.RefreshHealth();
             ToggleWindow(false);
             SetHealthBar();
             UpdateStats();
             _sprite.Play("Idle_down");
-            if (_attackComponent == null || _inventoryComponent == null || _progressBarMovement == null || _healthBar == null)
-            {
-                ArgumentNullException.ThrowIfNull(_healthBar);
-                ArgumentNullException.ThrowIfNull(_attackComponent);
-                ArgumentNullException.ThrowIfNull(_inventoryComponent);
-                ArgumentNullException.ThrowIfNull(_progressBarMovement);
-            }
         }
 
         private void UpdateHealthBar()
         {
-            _healthBar!.Value = _healthComponent!.CurrentHealth;
+            _healthBar!.Value = _playerHealth!.CurrentHealth;
         }
 
         public bool ToggleWindow(bool isOpen)
@@ -210,20 +210,23 @@
 
         private void UpdateStats()
         {
-            _playerStats!.Text = $"Damage: {_attackComponent!.BaseMinDamage} - {_attackComponent.BaseMaxDamage} \n" +
-                $"Critical Hit Chance: {_attackComponent.CriticalStrikeChance * 100}% \n" +
-                $"Critical Hit Damage: {_attackComponent.CriticalStrikeDamage * 100}% \n" +
-                $"Health: {_healthComponent!.CurrentHealth}\n" +
-                $"Defence: {_healthComponent.Defence}\n" +
-                $"Max. Health: {_healthComponent.MaxHealth}";
+            _playerStats!.Text = $"Damage: {_playerAttack!.BaseMinDamage} - {_playerAttack.BaseMaxDamage} \n" +
+                $"Critical Hit Chance: {_playerAttack.BaseCriticalStrikeChance * 100}% \n" +
+                $"Critical Hit Damage: {_playerAttack.BaseCriticalStrikeDamage * 100}% \n" +
+                $"Health: {_playerHealth!.CurrentHealth}\n" +
+              //  $"Defence: {_playerHealth.Defence}\n" +
+                $"Max. Health: {_playerHealth.MaxHealth}\n" +
+                $"Strength: {PlayerAttribute!.Strength!.Total}\n" +
+                $"Dexterity: {PlayerAttribute.Dexterity!.Total}\n" +
+                $"Intelligence: {PlayerAttribute.Intelligence!.Total}";
         }
 
         private void SetHealthBar()
         {
-            _healthBar!.MaxValue = _healthComponent!.MaxHealth;
-            _healthBar.Value = _healthComponent.CurrentHealth;
+            _healthBar!.MaxValue = _playerHealth!.MaxHealth;
+            _healthBar.Value = _playerHealth.CurrentHealth;
             var tween = CreateTween();
-            tween.TweenProperty(_healthBar, "value", _healthComponent.CurrentHealth, 0.2f);
+            tween.TweenProperty(_healthBar, "value", _playerHealth.CurrentHealth, 0.2f);
         }
 
         private void OnPlayerEnteredZone(ResearchArea zone)
@@ -254,16 +257,16 @@
                 if (_playerWeapon != null)
                 {
                     _inventoryComponent!.AddItem(_playerWeapon);
-                    _attackComponent!.BaseMinDamage -= _playerWeapon.MinDamage;
-                    _attackComponent.BaseMaxDamage -= _playerWeapon.MaxDamage;
-                    _attackComponent.CriticalStrikeChance = 0.05f;
+                    _playerAttack!.BaseMinDamage -= _playerWeapon.MinDamage;
+                    _playerAttack.BaseMaxDamage -= _playerWeapon.MaxDamage;
+                    _playerAttack.BaseCriticalStrikeChance = 0.05f;
                     _playerWeapon = null;
                     UpdateStats();
                 }
                 _playerWeapon = weapon;
-                _attackComponent!.BaseMinDamage += _playerWeapon.MinDamage;
-                _attackComponent.BaseMaxDamage += _playerWeapon.MaxDamage;
-                _attackComponent.CriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
+                _playerAttack!.BaseMinDamage += _playerWeapon.MinDamage;
+                _playerAttack.BaseMaxDamage += _playerWeapon.MaxDamage;
+                _playerAttack.BaseCriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
                 _inventoryComponent!.RemoveItem(weapon);
                 UpdateStats();
             }
@@ -272,14 +275,12 @@
                 if (_playerArmor != null)
                 {
                     _inventoryComponent!.AddItem(_playerArmor);
-                    _healthComponent!.MaxHealth -= _playerArmor.BonusHealth;
-                    _healthComponent.Defence -= _playerArmor.Defence;
+                  //  _playerHealth!.MaxHealth -= _playerArmor.BonusHealth;
                     _playerArmor = null;
                     UpdateStats();
                 }
                 _playerArmor = armor;
-                _healthComponent!.MaxHealth += _playerArmor.BonusHealth;
-                _healthComponent.Defence += _playerArmor.Defence;
+              //  _playerHealth!.MaxHealth += _playerArmor.BonusHealth;
                 _inventoryComponent!.RemoveItem(armor);
                 UpdateStats();
             }

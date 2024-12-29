@@ -1,26 +1,17 @@
 ﻿namespace Playground
 {
     using Godot;
+    using Playground.Script.Helpers;
 
     [GlobalClass]
-    public partial class HealthComponent : Node
+    public partial class HealthComponent : ObservableNode
     {
-        #region Export fields
-        [Export]
+        private readonly float _baseHealth = 100;
+        private float _totalPercentHealthIncreases = 1;
+        private float _additionalHealth;
         private float _currentHealth;
-        [Export]
-        private float _maxHealth = 100;
-        [Export]
-        private float _defence = 30;
+        private float _maxHealth;
 
-        #endregion
-
-        #region Signals
-        [Signal]
-        public delegate void OnCharacterDiedEventHandler();
-        #endregion
-
-        #region Properties
         public float CurrentHealth
         {
             get
@@ -34,56 +25,77 @@
             }
             set
             {
-                if (_currentHealth > _maxHealth)
+                if (SetProperty(ref _currentHealth, value))
                 {
-                    _currentHealth = _maxHealth;
+                    if (_currentHealth > _maxHealth)
+                    {
+                        _currentHealth = _maxHealth;
+                        RefreshHealth();
+                    }
                 }
             }
         }
 
-        public float MaxHealth
+        /// <summary>
+        /// All percent increases for health (strength bonuses, passives, etc.)
+        /// </summary>
+        public float TotalPercentHealthIncreases
         {
-            get => _maxHealth;
-            set => _maxHealth = Mathf.RoundToInt(value);
+            get => _totalPercentHealthIncreases;
+            set
+            {
+                if (SetProperty(ref _totalPercentHealthIncreases, value))
+                    RefreshMaxHealth();
+            }
         }
 
-        public float Defence
+
+        /// <summary>
+        /// Flat bonus health (passives, items, etc.)
+        /// </summary>
+        public float AdditionalHealth
         {
-            get => _defence;
-            set => _defence = Mathf.RoundToInt(value);
+            get => _additionalHealth;
+            set
+            {
+                if (SetProperty(ref _additionalHealth, value))
+                    RefreshMaxHealth();
+            }
         }
-        #endregion
+
+        /// <summary>
+        /// Sum of all bonuses ((Base health + additional health) * total percent)
+        /// </summary>
+        public float MaxHealth
+        {
+            get => Mathf.RoundToInt(_maxHealth);
+            set
+            {
+               if( SetProperty(ref _maxHealth, value))
+                {
+                    if(_maxHealth < _currentHealth)
+                    {
+                        _currentHealth = _maxHealth;
+                        RefreshHealth();
+                    }
+                }
+            }
+        }
 
         public override void _Ready()
         {
-            _currentHealth = _maxHealth;
-        }
-
-        public void TakeDamage(float damage)
-        {
-            _currentHealth -= damage;
-        }
-
-        public void Heal(float amount)
-        {
-            _currentHealth += amount;
-            if (_currentHealth > _maxHealth)
-                _currentHealth = _maxHealth;
-        }
-
-        public void IncreasedMaximumHealth(float amount)
-        {
-            _maxHealth += amount;
-        }
-
-        public void ReduceMaximumHealth(float amount)
-        {
-            _maxHealth -= amount;
+            RefreshMaxHealth();
+            RefreshHealth();
         }
 
         public void RefreshHealth()
         {
-            _currentHealth = MaxHealth;
+            _currentHealth = _maxHealth;
+        }
+
+        private void RefreshMaxHealth()
+        {
+            _maxHealth = (_baseHealth + _additionalHealth) * _totalPercentHealthIncreases;
         }
     }
 }

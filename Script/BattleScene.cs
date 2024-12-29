@@ -7,6 +7,7 @@ namespace Playground
     public partial class BattleScene : Node2D
     {
         private EnemyInventory? _enemyInventory;
+        private RandomNumberGenerator? _rnd;
         private ProgressBar? _playerHpBar;
         private ProgressBar? _enemyHpBar;
         private GlobalSignals? _signals;
@@ -36,11 +37,11 @@ namespace Playground
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
             _damageButton = battleSceneUi.GetNode<Button>("Button");
             _returnButton = battleSceneUi.GetNode<Button>("ReturnButton");
+            _rnd = new RandomNumberGenerator();
             _timer = battelScene.GetNode<Timer>("Timer");
             _enemyInventory = GetNode<EnemyInventory>(NodePathHelper.EnemyInventory);
             _enemyInventory.InventoryVisible(false);
             _returnButton.Pressed += BattleFinished;
-            _player!.PlayerHealth!.OnCharacterDied += PlayerHealth_OnCharacterDied;
             _enemyInventory!.TakeAllButton!.Pressed += PlayerTakedAllItems;
             _enemyInventory!.CloseButton!.Pressed += PlayerClosedInventory;
             _damageButton.Pressed += PlayerMakeTurn;
@@ -49,38 +50,92 @@ namespace Playground
             SetHealthBars();
             UpdateHealthBar();
         }
-        private void PlayerMakeTurn()
+
+        public void Init(Player player, EnemyAI enemy)
         {
-            if (_enemy!.HealthComponent!.CurrentHealth <= 0)
-            {
-                EnemyDead();
-                return;
-            }
-            var dealedDamage = _player!.PlayerAttack!.CalculateDamage();
-            _enemy!.HealthComponent!.TakeDamage(dealedDamage.Item1);
-            UpdateHealthBar();
-            _damageButton!.Visible = false;
-            EmitSignal(SignalName.EnemyTurn);
+            _player = player;
+            _enemy = enemy;
+            _player.CanMove = false;
+            _enemy.EnemyFigth = true;
+            _player.Position = new Vector2(250, 450);
+            _enemy.Position = new Vector2(950, 450);
         }
 
-        public void EnemyMakeTurn()
+        private void StartFight()
         {
-            if (_enemy!.HealthComponent!.CurrentHealth > 0)
+            if (_enemy == null)
             {
-                _enemy!.BattleBehavior?.GatherInfo(_player!);
-                var dealedDamage = _enemy.ActivateAbilityBeforDealDamage();
-                _player!.PlayerHealth!.TakeDamage(dealedDamage.Item1);
-                if(_enemy.BattleBehavior!.AbilityWithEffectAfterAttack != null)
-                {
-                    _enemy.BattleBehavior.AbilityWithEffectAfterAttack.EffectAfterAttack(_enemy.EnemyAttack, _enemy.HealthComponent);
-                }
-                UpdateHealthBar();
-                GD.Print($"dealed damage {dealedDamage.Item1}");
+                GD.Print("Opponents not found");
+                SetPlayerStats();
+                this.CallDeferred("remove_child", _player!);
+                GetParent().CallDeferred("add_child", _player!);
+                this.QueueFree();
+            }
+        }
+
+        private void EnemyMakeTurn()
+        {
+            if (_enemy!.EnemyHealth!.CurrentHealth > 0)
+            {
+                EnemyTurnHandler();
                 EmitSignal(SignalName.PlayerTurn);
             }
             else
             {
                 EnemyDead();
+            }
+        }
+
+        private void PlayerMakeTurn()
+        {
+            if (_enemy!.EnemyHealth!.CurrentHealth <= 0)
+            {
+                EnemyDead();
+                return;
+            }
+            var (damage, crit) = _player!.PlayerAttack!.CalculateDamage();
+            // TODO: Player attack animation
+            _enemy!.EnemyHealth!.CurrentHealth -= damage;
+
+            if (crit)
+            {
+                // TODO: Crit animation or some nice text 
+                GD.Print("Crit!");
+            }
+            UpdateHealthBar();
+            _damageButton!.Visible = false;
+            EmitSignal(SignalName.EnemyTurn);
+        }
+
+
+        private void EnemyTurnHandler()
+        {
+            _rnd ??= new();
+            _enemy!.BattleBehavior?.GatherInfo(_player!);
+            float additionalAttackChance = _rnd.RandfRange(0, 1);
+            var (damage, crit) = _enemy.ActivateAbilityBeforDealDamage();
+
+            // TODO: Ability animation
+
+            _player!.PlayerHealth!.CurrentHealth -= damage;
+            if (crit)
+            {
+                // TODO: Crit animation or some nice text 
+                GD.Print("Crit!");
+            }
+            if (_enemy.BattleBehavior!.AbilityWithEffectAfterAttack != null)
+            {
+                _enemy.BattleBehavior.AbilityWithEffectAfterAttack.EffectAfterAttack(_enemy.EnemyAttack, _enemy.EnemyHealth);
+                // TODO: Animation
+                UpdateHealthBar();
+            }
+            UpdateHealthBar();
+            _enemy.BattleBehavior.RemoveBuffEffectAfterTurnsEnd();
+
+            GD.Print($"dealed damage {damage}");
+            if (additionalAttackChance <= _enemy.EnemyAttack!.BaseAdditionalAttackChance)
+            {
+                EnemyTurnHandler();
             }
         }
 
@@ -119,44 +174,22 @@ namespace Playground
             _enemyInventory!.InventoryVisible(true);
         }
 
-        private void PlayerHealth_OnCharacterDied()
-        {
-            QueueFree();
-        }
-
-        public void Init(Player player, EnemyAI enemy)
-        {
-            _player = player;
-            _enemy = enemy;
-            _player.CanMove = false;
-            _enemy.EnemyFigth = true;
-            _player.Position = new Vector2(250, 450);
-            _enemy.Position = new Vector2(950, 450);
-        }
-
         private void SetHealthBars()
         {
             _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
-            _enemyHpBar!.MaxValue = _enemy!.HealthComponent!.MaxHealth;
+            _enemyHpBar!.MaxValue = _enemy!.EnemyHealth!.MaxHealth;
         }
 
-        public void UpdateHealthBar()
+        private void UpdateHealthBar()
         {
-            _enemyHpBar!.Value = _enemy!.HealthComponent!.CurrentHealth;
+            _enemyHpBar!.Value = _enemy!.EnemyHealth!.CurrentHealth;
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
+
 
         private void PlayersTurn()
         {
             _damageButton!.Visible = true;
-        }
-
-        public void StartFight()
-        {
-            if (_player == null && _enemy == null)
-            {
-                GD.Print("Opponents not found");
-            }
         }
     }
 }

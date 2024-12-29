@@ -1,5 +1,7 @@
 ﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
 {
+    using Playground.Script.Enums;
+
     public class BasedOnRarityLootTable : GenericObjectsTable<RarityLoodDrop, Rarity>
     {
         private static BasedOnRarityLootTable? instance = null;

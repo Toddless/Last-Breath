@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.LootGenerator
 {
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Enums;
 
     public abstract class GenericObject<T>
         where T : class

@@ -1,8 +1,9 @@
-[gd_scene load_steps=99 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=100 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_4f7n1"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_fxid3"]
 [ext_resource type="Texture2D" uid="uid://cdvyvrevjhnqq" path="res://Assets/Player/Warrior_walk_run.png" id="3_q7x46"]
+[ext_resource type="Script" path="res://Components/AttributeComponent.cs" id="6_ha1o2"]
 [ext_resource type="Script" path="res://Components/HealthComponent.cs" id="7_2s6kv"]
 [ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="8_5dtdn"]
 [ext_resource type="Texture2D" uid="uid://08ymwvj42jt8" path="res://Assets/UI MMORPG Dark Templar/Backpack inventory small/Icons/Money03.png" id="8_njvwc"]
@@ -688,6 +689,12 @@ shape = SubResource("CircleShape2D_1c8vr")
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("7_2s6kv")
 
+[node name="AttackComponent" type="Node" parent="."]
+script = ExtResource("8_nwamj")
+
+[node name="AttributeComponent" type="Node" parent="."]
+script = ExtResource("6_ha1o2")
+
 [node name="Inventory" type="Node" parent="."]
 
 [node name="InventoryWindow" type="Panel" parent="Inventory"]
@@ -737,9 +744,6 @@ offset_right = 58.1097
 offset_bottom = 21.3522
 scale = Vector2(0.75819, 0.655748)
 text = "100"
-
-[node name="AttackComponent" type="Node" parent="."]
-script = ExtResource("8_nwamj")
 
 [node name="PlayerStats" type="Node" parent="."]
 

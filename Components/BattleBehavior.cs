@@ -13,8 +13,10 @@
         private bool _iCanBuffAttack;
         private bool _iCanLeech;
         private bool _iCanDealDamage;
+        private bool _iCanBuffDefence;
         private HealthComponent? _playerHealth;
         private EnemyAI? _enemyAI;
+        private Ability? _activatedAbility;
         private List<Ability>? _activatedAbilities = [];
         private Ability? _abitilyWithEffectAfterAttack;
 
@@ -49,26 +51,27 @@
         public Ability? MakeDecision()
         {
             UpdateUsedAbilitiesCooldown();
+            ReduceBuffDuration();
             RemoveBuffFromLastTurn();
             _abitilyWithEffectAfterAttack = null;
-            var enemyHealthPercent = _enemyAI!.HealthComponent!.CurrentHealth / _enemyAI.HealthComponent.MaxHealth * 100;
+            var enemyHealthPercent = _enemyAI!.EnemyHealth!.CurrentHealth / _enemyAI.EnemyHealth.MaxHealth * 100;
             var playerHealthPercent = _playerHealth!.CurrentHealth / _playerHealth.MaxHealth * 100;
             var diff = playerHealthPercent - enemyHealthPercent;
 
-            if(diff > 20)
+            if (diff > 10)
             {
-                if(_iCanDealDamage && enemyHealthPercent > playerHealthPercent)
+                if (_iCanDealDamage && enemyHealthPercent > playerHealthPercent)
                 {
                     return TryToKillHimHard();
                 }
-                if(_iCanHeal && enemyHealthPercent < playerHealthPercent)
+                if (_iCanHeal && enemyHealthPercent < playerHealthPercent)
                 {
                     return TryToHillYourself();
                 }
             }
-            if(diff < 20)
+            if (diff < 10)
             {
-                if(_iCanDealDamage && enemyHealthPercent > playerHealthPercent)
+                if (_iCanBuffAttack && enemyHealthPercent > playerHealthPercent)
                 {
                     return BuffYourSelf();
                 }
@@ -115,24 +118,25 @@
 
         private Ability? ActivateAbility(List<Ability>? abilities)
         {
-            if(abilities == null)
+            if (abilities == null)
             {
                 return null;
             }
-            var amountAbilities = abilities.Where(x=> x.Cooldown == 4).Count();
+            var amountAbilities = abilities.Where(x => x.Cooldown == 4).Count();
             GD.Print($"Abilities to activate {amountAbilities}");
-            if(amountAbilities == 0)
+            if (amountAbilities == 0)
             {
                 return null;
             }
 
-            var ability = abilities[_enemyAI!.Rnd.RandiRange(0, amountAbilities -1)];
+            var ability = abilities[_enemyAI!.Rnd.RandiRange(0, amountAbilities - 1)];
             _activatedAbilities!.Add(ability);
 
             if (ability.HaveISomethinToApplyAfterAttack)
             {
                 _abitilyWithEffectAfterAttack = ability;
             }
+            _activatedAbility = ability;
             return ability;
         }
 
@@ -140,30 +144,59 @@
         {
             if (_activatedAbilities!.Count == 0)
                 return;
-            var itemsToRemove = new List<Ability>();
-            foreach (var item in _activatedAbilities)
+            var buffToDelete = new List<Ability>();
+            foreach (var ability in _activatedAbilities)
             {
-                item.Cooldown--;
-                GD.Print($"Activated ability {item.GetType()} cooldown left {item.Cooldown}");
-                if(item.Cooldown == 0)
+                ability.Cooldown--;
+                if (ability.Cooldown == 0)
                 {
-                    item.Cooldown = 4;
-                    itemsToRemove.Add(item);
+                    ability.Cooldown = 4;
+                    buffToDelete.Add(ability);
                 }
             }
+            DeleteBuffsFromList(buffToDelete);
+        }
 
-            foreach (var item in itemsToRemove)
+
+        private void ReduceBuffDuration()
+        {
+            var buffToDelete = new List<Ability>();
+            foreach (var ability in _activatedAbilities!)
             {
-               _activatedAbilities.Remove(item);
+                ability.BuffLasts--;
+                if (ability.BuffLasts == 0)
+                {
+                    buffToDelete.Add(ability);
+                }
+            }
+            DeleteBuffsFromList(buffToDelete);
+        }
+
+
+        private void DeleteBuffsFromList(List<Ability>? abilities)
+        {
+            if ( abilities == null || abilities.Count == 0 ) { return; }
+            foreach (var ability in abilities)
+            {
+                _activatedAbilities!.Remove(ability);
             }
         }
 
         private void RemoveBuffFromLastTurn()
         {
-            foreach (var item in _activatedAbilities)
+            foreach (var item in _activatedAbilities!)
             {
-                item.AfterBuffEnds(_enemyAI.EnemyAttack);
+                item.AfterBuffEnds(_enemyAI!.EnemyAttack);
             }
+        }
+
+        public void RemoveBuffEffectAfterTurnsEnd()
+        {
+            if (_activatedAbility!.BuffLasts != 0)
+            {
+                return;
+            }
+            _activatedAbility.AfterBuffEnds(_enemyAI!.EnemyAttack, _enemyAI.EnemyHealth);
         }
 
 

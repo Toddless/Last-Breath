@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Items
 {
     using Godot;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Enums;
     using System;
 
     [GlobalClass]

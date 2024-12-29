@@ -1,4 +1,4 @@
-namespace Playground
+namespace Playground.Script.Enemy
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace Playground
         public override void _Ready()
         {
 
-            // TODO: Enemy spawn on main scene too if i am in battle
+            // TODO: Enemy spawn on battle scene to if i am in battle
             _parentScene = (MainScene)GetParent();
             _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
             _timer = _parentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
@@ -32,8 +32,7 @@ namespace Playground
         }
 
         /// <summary>
-        /// first: we need to spawn an enemy only if enemy was killed and removed from list
-        /// second: if some timer is running, we await until timeout and then spawn new enemy
+        /// i need to spawn an enemy only if enemy was killed and removed from list, thats why i have here if-statement
         /// </summary>
         /// <param name="sender">To be added</param>
         /// <param name="e">To be added</param>

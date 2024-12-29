@@ -1,9 +1,9 @@
 ﻿namespace Playground.Script.Items.Factories
 {
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Items.UniqItems;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public class BodyArmorFactory : ItemCreator
     {

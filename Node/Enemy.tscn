@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3 uid="uid://bw2mbm6teo27u"]
+[gd_scene load_steps=57 format=3 uid="uid://bw2mbm6teo27u"]
 
 [ext_resource type="Script" path="res://Script/Enemy/EnemyAI.cs" id="1_g0i5v"]
 [ext_resource type="Texture2D" uid="uid://dgx1227bxaxgt" path="res://Assets/Enemy/Bat/Bat01_01_T_F_Idle.png" id="2_8ewjt"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://Components/AttackComponent.cs" id="4_rr2j7"]
 [ext_resource type="Texture2D" uid="uid://dulo1msu5uqjm" path="res://Assets/Enemy/Bat/Batt_Myth.png" id="4_w3nwg"]
 [ext_resource type="Script" path="res://Script/StateMachine/StateMachine.cs" id="5_xnkjp"]
+[ext_resource type="Script" path="res://Components/AttributeComponent.cs" id="9_pmtkc"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyIdle.cs" id="10_wjrrt"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyMoves.cs" id="11_k2edv"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyBattle.cs" id="12_qqak5"]
@@ -352,6 +353,9 @@ script = ExtResource("3_ftclj")
 
 [node name="AttackComponent" type="Node" parent="."]
 script = ExtResource("4_rr2j7")
+
+[node name="AttributeComponent" type="Node" parent="."]
+script = ExtResource("9_pmtkc")
 
 [node name="StateMachine" type="Node" parent="."]
 script = ExtResource("5_xnkjp")

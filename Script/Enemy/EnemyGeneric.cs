@@ -1,10 +1,11 @@
 ﻿namespace Playground.Script.Enemy
 {
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
-    public abstract partial class EnemyGeneric : ObservableObject
+    public abstract partial class EnemyGeneric : ObservableCharacterBody2D
     {
         private readonly RandomNumberGenerator _rnd = new();
         private CollisionShape2D? _collisionShape;
@@ -101,38 +102,6 @@
                     break;
                 default:
                     _sprite!.Play("Bat_Uncomm");
-                    break;
-            }
-        }
-
-        private void SetStats()
-        {
-            switch (Rarity)
-            {
-                case GlobalRarity.Rare:
-                    _attack!.BaseMinDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Rare];
-                    _attack.BaseMaxDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Rare];
-                    _health!.MaxHealth *= (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Rare];
-                    break;
-                case GlobalRarity.Epic:
-                    _attack!.BaseMinDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Epic];
-                    _attack.BaseMaxDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Epic];
-                    _health!.MaxHealth *= (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Epic];
-                    break;
-                case GlobalRarity.Legendary:
-                    _attack!.BaseMinDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Legendary];
-                    _attack.BaseMaxDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Legendary];
-                    _health!.MaxHealth *= (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Legendary];
-                    break;
-                case GlobalRarity.Mythic:
-                    _attack!.BaseMinDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Mythic];
-                    _attack.BaseMaxDamage += (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Mythic];
-                    _health!.MaxHealth *= (_level + 3 * 6) * ConvertGlobalRarity.multiplier[GlobalRarity.Mythic];
-                    break;
-                default:
-                    _attack!.BaseMinDamage += (_level + 3 * 6) * 1.5f;
-                    _attack.BaseMaxDamage += (_level + 3 * 6) * 1.5f;
-                    _health!.MaxHealth *= (_level + 3 * 6) * 1.5f;
                     break;
             }
         }

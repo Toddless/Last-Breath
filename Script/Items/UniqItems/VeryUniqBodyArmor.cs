@@ -1,8 +1,8 @@
 ﻿namespace Playground.Script.Items.UniqItems
 {
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     partial class VeryUniqBodyArmor : BodyArmor
     {

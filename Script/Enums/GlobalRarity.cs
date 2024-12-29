@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
+﻿namespace Playground.Script.Enums
 {
     public enum GlobalRarity
     {
