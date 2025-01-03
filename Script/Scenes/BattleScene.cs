@@ -125,7 +125,6 @@ namespace Playground
             }
             if (_enemy.BattleBehavior!.AbilityWithEffectAfterAttack != null)
             {
-                _enemy.BattleBehavior.AbilityWithEffectAfterAttack.EffectAfterAttack(_enemy.EnemyAttack, _enemy.EnemyHealth);
                 // TODO: Animation
                 UpdateHealthBar();
             }

@@ -1,23 +1,13 @@
 ﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
 {
     using Playground.Script.Enums;
+    using Playground.Script.Items;
 
-    public class BasedOnRarityLootTable : GenericObjectsTable<RarityLoodDrop, Rarity>
+    public class BasedOnRarityLootTable : GenericObjectsTable<RarityLoodDrop, Rarity>, IBasedOnRarityLootTable
     {
-        private static BasedOnRarityLootTable? instance = null;
-
-        private BasedOnRarityLootTable()
+        public BasedOnRarityLootTable()
         {
 
-        }
-
-        public static BasedOnRarityLootTable Instance
-        {
-            get
-            {
-                instance ??= new BasedOnRarityLootTable();
-                return instance;
-            }
         }
 
         public void InitializeLootTable()
@@ -31,5 +21,13 @@
                 new RarityLoodDrop(new Rarity(),GlobalRarity.Mythic),
             ];
         }
+
+        public override void ValidateTable() => base.ValidateTable();
+
+        public override RarityLoodDrop? GetRarity() => base.GetRarity();
+
+        public override Item? GetRandomItem() => base.GetRandomItem();
+
+        public override Item? GetItemWithSelectedRarity(int index) => base.GetItemWithSelectedRarity(index);
     }
 }

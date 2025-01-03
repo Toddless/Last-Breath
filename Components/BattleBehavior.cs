@@ -196,7 +196,6 @@
             {
                 return;
             }
-            _activatedAbility.AfterBuffEnds(_enemyAI!.EnemyAttack, _enemyAI.EnemyHealth);
         }
 
 

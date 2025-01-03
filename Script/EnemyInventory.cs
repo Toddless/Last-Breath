@@ -7,10 +7,11 @@
     using Playground.Script.Items;
     using System.Linq;
     using Godot;
+    using Microsoft.Extensions.DependencyInjection;
 
     public partial class EnemyInventory : Node
     {
-        private BasedOnRarityLootTable _lootTable = BasedOnRarityLootTable.Instance;
+        private IBasedOnRarityLootTable? _lootTable;
         private RandomNumberGenerator _rnd = new();
         private GridContainer? _inventoryContainer;
         private List<InventorySlot> _slots = [];
@@ -41,7 +42,6 @@
 
         public override void _Ready()
         {
-
             _inventoryWindow = GetParent().GetNode<MainScene>("MainScene").GetNode("GlobalEnemyIntentory").GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _takeAllButton = _inventoryWindow.GetNode<Button>("TakeAllButton");
@@ -49,8 +49,9 @@
             _goldIcon = _inventoryWindow.GetNode<TextureRect>("TextureRect");
             _closeButton = _inventoryWindow.GetNode<Button>("CloseButton");
             _inventorySlot = ResourceLoader.Load<PackedScene>(SceneParh.InventorySlot);
-            _lootTable.InitializeLootTable();
-            _lootTable.ValidateTable();
+            _lootTable = DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>();
+            _lootTable?.InitializeLootTable();
+            _lootTable?.ValidateTable();
 
             for (int i = 0; i < 25; i++)
             {

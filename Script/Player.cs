@@ -140,6 +140,7 @@
             SetHealthBar();
             UpdateStats();
             _sprite.Play("Idle_down");
+            GD.Print($"Scene initialized: {this.Name}");
         }
 
         private void UpdateHealthBar()

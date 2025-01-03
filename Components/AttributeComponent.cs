@@ -4,7 +4,7 @@
     using Godot;
 
     [GlobalClass]
-    public partial class AttributeComponent : Node
+    public partial class AttributeComponent : Node, IGameComponent
     {
         private Dexterity? _dexterity;
         private Strength? _strength;

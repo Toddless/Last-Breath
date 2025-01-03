@@ -1,30 +1,39 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using System;
+    using Playground.Components;
     using Playground.Script.Passives.Interfaces;
 
     public partial class Regeneration : Ability, ICanHeal
     {
         private float _regenerationAmount = 15;
+
         public Regeneration()
         {
             BuffLasts = 3;
         }
 
-        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = null)
+        public override Type TargetTypeComponent => typeof(HealthComponent);
+
+        public override void ActivateAbility(IGameComponent? component)
         {
-            if(health == null)
+            if (component == null || component is not HealthComponent health)
             {
                 return;
             }
             health.CurrentHealth += _regenerationAmount;
         }
 
-        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void AfterBuffEnds(IGameComponent? component)
         {
+            if (component == null || component is not AttackComponent attack)
+            {
+                return;
+            }
             BuffLasts = 3;
         }
 
-        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void EffectAfterAttack(IGameComponent? component)
         {
             return;
         }

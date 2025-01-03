@@ -11,20 +11,9 @@
         private readonly string _epicBowTexturePath = "res://Assets/Weapon/Bows/BowEpic.png";
         private readonly string _legendaryBowTexturePath = "res://Assets/Weapon/Bows/BowLegendary.png";
 
-        private static BowFactory? _instance = null;
-
-        private BowFactory()
+        public BowFactory()
         {
             
-        }
-
-        public static BowFactory Instance
-        {
-            get
-            {
-                _instance ??= new BowFactory();
-                return _instance;
-            }
         }
 
         public override Bow? GenerateItem(GlobalRarity globalRarity)

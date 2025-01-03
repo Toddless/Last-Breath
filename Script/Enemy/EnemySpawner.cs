@@ -5,30 +5,29 @@ namespace Playground.Script.Enemy
     using System.Collections.Specialized;
     using System.Linq;
     using Godot;
+    using Playground.Script.Scenes;
 
     public partial class EnemySpawner : Node
     {
-        private Dictionary<Vector2, EnemyAI?>? _enemyPosition = new();
+        private Dictionary<Vector2, EnemyAI?> _enemyPosition = new();
         private RandomNumberGenerator _rnd = new();
         private Queue<Action> _spawnQueue = new();
         private bool _isProcessing = false;
-        private MainScene? _parentScene;
-        private PackedScene? _scene;
+        private BaseSpawnableScene? _parentScene;
+        private PackedScene? _enemyToSpawn;
         private Timer? _timer;
 
         public override void _Ready()
         {
 
             // TODO: Enemy spawn on battle scene to if i am in battle
-            _parentScene = (MainScene)GetParent();
-            _scene = ResourceLoader.Load<PackedScene>("res://Node/Enemy.tscn");
+            _parentScene = (BaseSpawnableScene)GetParent();
             _timer = _parentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
             _parentScene.Enemies!.CollectionChanged += OnCollectionChanged;
+            _enemyToSpawn =ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn");
 
-            foreach (var respawnPosition in _parentScene.EnemiesRespawnPosition)
-            {
-                _enemyPosition![respawnPosition] = null;
-            }
+            GD.Print($"Scene initialized: {this.Name}");
+
         }
 
         /// <summary>
@@ -44,6 +43,14 @@ namespace Playground.Script.Enemy
             }
 
             EnqueueSpawnEnemyEvent();
+        }
+
+        public void InitializeEnemiesPositions(List<Vector2> positions)
+        {
+            foreach (Vector2 position in positions)
+            {
+                _enemyPosition[position] = null;
+            }
         }
 
         public void DeleteEnemy(EnemyAI enemyToDelete)
@@ -68,17 +75,13 @@ namespace Playground.Script.Enemy
             {
                 return;
             }
-            while (_spawnQueue.Count > 0)
+            _isProcessing = true;
+            _timer!.Start(_rnd.RandiRange(5, 15));
+            if (_timer!.TimeLeft != 0)
             {
-                _isProcessing = true;
-                var nextEvent = _spawnQueue.Dequeue();
-                if (_timer!.TimeLeft != 0)
-                {
-                    await ToSignal(_timer, "timeout");
-                }
-                nextEvent.Invoke();
-                _timer!.Start(_rnd.RandiRange(1, 15));
+                await ToSignal(_timer, "timeout");
             }
+            _spawnQueue.Dequeue();
 
             _isProcessing = false;
         }
@@ -86,7 +89,7 @@ namespace Playground.Script.Enemy
         public void SpawnNewEnemy()
         {
             var freePosition = _enemyPosition!.FirstOrDefault(x => x.Value == null);
-            EnemyAI enemy = _scene!.Instantiate<EnemyAI>();
+            EnemyAI enemy = _enemyToSpawn!.Instantiate<EnemyAI>();
             _parentScene!.CallDeferred("add_child", enemy);
             _parentScene.Enemies!.Add(enemy);
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;

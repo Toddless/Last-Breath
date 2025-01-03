@@ -1,5 +1,7 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using System;
+    using Playground.Components;
     using Playground.Script.Passives.Interfaces;
 
     public partial class Badabooom : Ability, ICanDealDamage
@@ -14,8 +16,14 @@
             Cooldown = 4;
         }
 
-        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = null)
+        public override Type TargetTypeComponent =>typeof(AttackComponent);
+
+        public override void ActivateAbility(IGameComponent? component)
         {
+            if(component == null || component is not AttackComponent attack)
+            {
+                return;
+            }
             _minBeforBuff = attack.BaseMinDamage;
             _maxBeforBuff = attack.BaseMaxDamage;
 
@@ -23,13 +31,17 @@
             attack.BaseMaxDamage *= _damageMultiplier;
         }
 
-        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void AfterBuffEnds(IGameComponent? component)
         {
+            if (component == null || component is not AttackComponent attack)
+            {
+                return;
+            }
             attack.BaseMinDamage = _minBeforBuff;
             attack.BaseMaxDamage = _maxBeforBuff;
         }
 
-        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void EffectAfterAttack(IGameComponent? component)
         {
            
         }

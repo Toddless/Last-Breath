@@ -6,20 +6,9 @@
 
     public class SwordFactory : ItemCreator
     {
-        private static SwordFactory? _instance = null;
-
-        private SwordFactory()
+        public SwordFactory()
         {
-
-        }
-
-        public static SwordFactory Instance
-        {
-            get
-            {
-                _instance ??= new SwordFactory();
-                return _instance;
-            }
+            
         }
 
         public override Sword? GenerateItem(GlobalRarity rarity)

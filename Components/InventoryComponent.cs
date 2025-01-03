@@ -1,12 +1,13 @@
 ﻿namespace Playground.Script.Inventory
 {
     using Godot;
+    using Playground.Components;
     using Playground.Script.Items;
     using System.Collections.Generic;
     using System.Linq;
 
     [GlobalClass]
-    public partial class InventoryComponent : Node
+    public partial class InventoryComponent : Node, IGameComponent
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;

@@ -73,8 +73,9 @@
 
         public virtual GlobalRarity EnemyRarity()
         {
-            var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
-            return rarity.Rarity;
+            //var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
+            //return rarity.Rarity;
+            return GlobalRarity.Uncommon;
         }
 
         private void SetStatsBasedOnRarity()

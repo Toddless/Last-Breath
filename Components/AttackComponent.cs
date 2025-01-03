@@ -1,10 +1,10 @@
 namespace Playground
 {
-    using System;
     using Godot;
+    using Playground.Components;
 
     [GlobalClass]
-    public partial class AttackComponent : Node
+    public partial class AttackComponent : Node, IGameComponent
     {
         #region private fields
         private readonly RandomNumberGenerator _rng = new();

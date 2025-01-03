@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.Enums;
     using Playground.Script.Items;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
@@ -9,7 +10,7 @@
     {
         #region Private fields
 
-        private BasedOnRarityLootTable _lootTable = BasedOnRarityLootTable.Instance;
+        private IBasedOnRarityLootTable? _lootTable;
         private GlobalRarity _areaRarity;
         #endregion
 
@@ -35,8 +36,8 @@
             BodyEntered += OnPlayerEnter;
             BodyExited += OnPlayerExited;
             AreaRarity = GlobalRarity.Epic;
-            _lootTable.InitializeLootTable();
-            _lootTable.ValidateTable();
+            _lootTable = DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>();
+            GD.Print($"Scene initialized: {this.Name}");
         }
 
         private void OnPlayerEnter(Node node)

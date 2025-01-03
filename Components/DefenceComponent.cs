@@ -3,7 +3,7 @@
     using Godot;
 
     [GlobalClass]
-    public partial class DefenceComponent : Node
+    public partial class DefenceComponent : Node, IGameComponent
     {
         private float _defence;
         private float _chanceToEvade;

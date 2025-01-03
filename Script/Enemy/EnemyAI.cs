@@ -17,6 +17,7 @@ namespace Playground
         private AttributeComponent? _attribute;
         private HealthComponent? _health;
         private AttackComponent? _attack;
+        private DefenceComponent? _defence;
         #endregion
 
         private readonly RandomNumberGenerator _rnd = new();
@@ -37,7 +38,7 @@ namespace Playground
         private int _level;
 
         [Signal]
-        public delegate void EnemyDiedEventHandler(int rarity);
+        public delegate void EnemyDiedEventHandler(EnemyAI enemy);
         [Signal]
         public delegate void EnemyInitializedEventHandler();
         [Signal]
@@ -139,6 +140,7 @@ namespace Playground
             EmitSignal(SignalName.EnemyInitialized);
             SetAnimation();
             _health.RefreshHealth();
+            GD.Print($"Scene initialized: {this.Name}");
         }
 
         private void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
@@ -186,8 +188,9 @@ namespace Playground
 
         public GlobalRarity EnemyRarity()
         {
-            var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
-            return rarity.Rarity;
+            //var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
+            //return rarity.Rarity;
+            return GlobalRarity.Common;
         }
 
         public void SetAnimation()
@@ -220,10 +223,21 @@ namespace Playground
                 return _attack!.CalculateDamage();
             }
 
-            chosenAbility.ActivateAbility(_attack, _health);
-            GD.Print($"Activated ability {chosenAbility.GetType().ToString()}. Cooldown {chosenAbility.Cooldown}");
+            IGameComponent? targetComponent = FindComponentToBeInvolved(chosenAbility);
+
+            chosenAbility.ActivateAbility(targetComponent);
+
+            GD.Print($"Activated ability {chosenAbility.GetType()}. Cooldown {chosenAbility.Cooldown}");
             return _attack!.CalculateDamage();
         }
+
+        public IGameComponent? FindComponentToBeInvolved(Ability? chosenAbility) => chosenAbility?.TargetTypeComponent switch
+        {
+            var t when t == typeof(AttackComponent) => _attack,
+            var t when t == typeof(HealthComponent) => _health,
+            var t when t == typeof(AttackComponent) => _attribute,
+            _ => null
+        };
 
         public void SetRandomAbilities()
         {

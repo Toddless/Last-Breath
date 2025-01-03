@@ -1,29 +1,32 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using System;
+    using Playground.Components;
     using Playground.Script.Passives.Interfaces;
 
     public partial class VampireStrike : Ability, ICanLeech, ICanBuffAttack
     {
         private float _leachPercentage = 0.1f;
 
+        public override Type TargetTypeComponent => typeof(AttackComponent);
+
         public VampireStrike()
         {
             HaveISomethinToApplyAfterAttack = true;
         }
 
-        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void AfterBuffEnds(IGameComponent? component)
         {
-            if(attack == null)
+            if (component == null || component is not AttackComponent attack)
             {
                 return;
             }
-
             attack.Leech = 0;
         }
 
-        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void ActivateAbility(IGameComponent? component)
         {
-            if (attack == null)
+            if (component == null || component is not AttackComponent attack)
             {
                 return;
             }
@@ -31,10 +34,12 @@
             attack.Leech = _leachPercentage;
         }
 
-        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void EffectAfterAttack(IGameComponent? component)
         {
-            health.CurrentHealth += attack.LeechedHealth;
-            attack.LeechedHealth = 0;
+            if (component == null || component is not HealthComponent health)
+            {
+                return;
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c0lun31icaoam"]
 
-[ext_resource type="Script" path="res://Script/BattleScene.cs" id="1_yicyd"]
+[ext_resource type="Script" path="res://Script/Scenes/BattleScene.cs" id="1_yicyd"]
 [ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="2_rmdsv"]
 [ext_resource type="Texture2D" uid="uid://bdcjbdp4ohog8" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Normal.png" id="3_jakpg"]
 

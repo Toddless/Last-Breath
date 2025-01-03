@@ -7,20 +7,9 @@
 
     public class BodyArmorFactory : ItemCreator
     {
-        private static BodyArmorFactory? instance = null;
-
-        private BodyArmorFactory()
+        public BodyArmorFactory()
         {
-
-        }
-
-        public static BodyArmorFactory Instance
-        {
-            get
-            {
-                instance ??= new BodyArmorFactory();
-                return instance;
-            }
+            
         }
 
         public override BodyArmor? GenerateItem(GlobalRarity rarity)

@@ -1,10 +1,11 @@
 ﻿namespace Playground
 {
     using Godot;
+    using Playground.Components;
     using Playground.Script.Helpers;
 
     [GlobalClass]
-    public partial class HealthComponent : ObservableNode
+    public partial class HealthComponent : ObservableNode, IGameComponent
     {
         private readonly float _baseHealth = 100;
         private float _totalPercentHealthIncreases = 1;

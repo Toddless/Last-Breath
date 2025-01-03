@@ -11,13 +11,13 @@
     {
         public List<T>? lootDropItems;
 
-        public  List<ItemCreator>? factories;
+        public List<ItemCreator>? factories;
 
         private readonly RandomNumberGenerator random = new();
 
         private float probabilityTotalWeight;
 
-        public void ValidateTable()
+        public virtual void ValidateTable()
         {
             SetFactories();
             if (lootDropItems != null && lootDropItems.Count > 0)
@@ -46,14 +46,14 @@
             }
         }
 
-        public Item? GetRandomItem()
+        public virtual Item? GetRandomItem()
         {
-            if(lootDropItems == null || factories == null)
+            if (lootDropItems == null || factories == null)
             {
                 ArgumentNullException.ThrowIfNull(lootDropItems);
                 ArgumentNullException.ThrowIfNull(factories);
             }
-            var randomFactory = random.RandiRange(0, factories.Count-1);
+            var randomFactory = random.RandiRange(0, factories.Count - 1);
 
             var factory = GetFactory(randomFactory);
 
@@ -62,13 +62,13 @@
             {
                 if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
                 {
-                   return factory?.GenerateItem(lootDropItem.Rarity);
+                    return factory?.GenerateItem(lootDropItem.Rarity);
                 }
             }
             return null;
         }
 
-        public T? GetRarity()
+        public virtual T? GetRarity()
         {
             float pickedNumber = random.RandfRange(0, probabilityTotalWeight);
             foreach (T lootDropItem in lootDropItems!)
@@ -81,7 +81,7 @@
             return null;
         }
 
-        public Item? GetItemWithSelectedRarity(int index)
+        public virtual Item? GetItemWithSelectedRarity(int index)
         {
             if (lootDropItems == null || factories == null)
             {
@@ -99,9 +99,9 @@
         {
             factories =
             [
-                BowFactory.Instance,
-                SwordFactory.Instance,
-                BodyArmorFactory.Instance,
+                new BowFactory(),
+                new SwordFactory(),
+                new BodyArmorFactory(),
             ];
         }
 
@@ -109,9 +109,9 @@
         {
             return factoryIndex switch
             {
-                0 => BowFactory.Instance,
-                1 => SwordFactory.Instance,
-                2 => BodyArmorFactory.Instance,
+                0 => new BowFactory(),
+                1 => new SwordFactory(),
+                2 => new BodyArmorFactory(),
                 _ => null,
             };
         }

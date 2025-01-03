@@ -1,5 +1,7 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using System;
+    using Playground.Components;
     using Playground.Script.Passives.Interfaces;
 
     public partial class BuffAttack : Ability, ICanBuffAttack
@@ -13,10 +15,11 @@
         {
         }
 
-        public override void ActivateAbility(AttackComponent? attack = null, HealthComponent? health = default)
-        {
+        public override Type TargetTypeComponent => typeof(AttackComponent);
 
-            if (attack == null)
+        public override void ActivateAbility(IGameComponent? component)
+        {
+            if (component == null || component is not AttackComponent attack)
             {
                 return;
             }
@@ -27,9 +30,9 @@
             attack.BaseMaxDamage *= _additionalDamage;
         }
 
-        public override void AfterBuffEnds(AttackComponent? attack = null, HealthComponent? health = null)
+        public override void AfterBuffEnds(IGameComponent? component)
         {
-            if (attack == null)
+            if (component == null || component is not AttackComponent attack)
             {
                 return;
             }
@@ -37,6 +40,6 @@
             attack.BaseMaxDamage = _baseMaxDamageBeforBuff;
         }
 
-        public override void EffectAfterAttack(AttackComponent? attack = null, HealthComponent? health = null) => throw new System.NotImplementedException();
+        public override void EffectAfterAttack(IGameComponent? component) => throw new System.NotImplementedException();
     }
 }
