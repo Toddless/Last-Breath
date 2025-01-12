@@ -3,7 +3,6 @@
     using Godot;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public abstract partial class EnemyGeneric : ObservableCharacterBody2D
     {

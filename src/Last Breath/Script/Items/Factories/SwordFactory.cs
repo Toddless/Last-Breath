@@ -6,9 +6,9 @@
 
     public class SwordFactory : ItemCreator
     {
-        public SwordFactory()
+        public SwordFactory(RandomNumberGenerator random)
         {
-        
+            RandomNumberGenerator =random;
         }
 
         public override Sword? GenerateItem(GlobalRarity rarity)

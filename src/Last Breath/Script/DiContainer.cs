@@ -1,5 +1,6 @@
 ﻿namespace Playground.Script
 {
+    using Godot;
     using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
@@ -15,6 +16,7 @@
             var provider = new ServiceCollection();
 
             provider.AddSingleton<IBasedOnRarityLootTable, BasedOnRarityLootTable>();
+            provider.AddTransient<RandomNumberGenerator>();
 
             ServiceProvider = provider.BuildServiceProvider();
         }

@@ -1,6 +1,5 @@
 namespace Playground
 {
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Passives.Attacks;
     using Playground.Script.StateMachine;
     using Playground.Script.Passives;
@@ -54,6 +53,11 @@ namespace Playground
         {
             get => _battleBehavior;
             set => _battleBehavior = value;
+        }
+
+        public Area2D? Area
+        {
+            get => _area;
         }
 
         public AttackComponent? EnemyAttack
@@ -134,8 +138,8 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = _rnd.RandiRange(1, 50);
             var points = SetAttributesDependsOnType(_enemyType);
-            _attribute.Dexterity.PropertyChanged += OnDexterityChange;
-            _attribute.Strength.PropertyChanged += OnStrengthChange;
+            _attribute!.Dexterity!.PropertyChanged += OnDexterityChange;
+            _attribute.Strength!.PropertyChanged += OnStrengthChange;
             _attribute!.Strength.Total += points.Strength;
             EmitSignal(SignalName.EnemyInitialized);
             SetAnimation();

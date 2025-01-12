@@ -5,11 +5,6 @@
 
     public class BasedOnRarityLootTable : GenericObjectsTable<RarityLoodDrop, Rarity>, IBasedOnRarityLootTable
     {
-        public BasedOnRarityLootTable()
-        {
-
-        }
-
         public void InitializeLootTable()
         {
             lootDropItems =

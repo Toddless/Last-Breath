@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.LootGenerator
 {
     using Godot;
+    using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.Items;
     using Playground.Script.Items.Factories;
     using System;
@@ -13,12 +14,13 @@
 
         public List<ItemCreator>? factories;
 
-        private readonly RandomNumberGenerator random = new();
+        private RandomNumberGenerator? random;
 
         private float probabilityTotalWeight;
 
         public virtual void ValidateTable()
         {
+            random = DiContainer.ServiceProvider?.GetService<RandomNumberGenerator>();
             SetFactories();
             if (lootDropItems != null && lootDropItems.Count > 0)
             {
@@ -99,9 +101,9 @@
         {
             factories =
             [
-                new BowFactory(),
-                new SwordFactory(),
-                new BodyArmorFactory(),
+                new BowFactory(random),
+                new SwordFactory(random),
+                new BodyArmorFactory(random),
             ];
         }
     }

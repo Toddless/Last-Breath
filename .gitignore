@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+.vs
 /.vs/ProjectEvaluation
 /Assets
 /Properties
@@ -12,3 +13,5 @@
 /.vs/Playground
 /addons
 /src/Last Breath/.vs
+/Testing/bin
+/Testing/obj
