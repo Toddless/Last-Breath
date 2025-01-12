@@ -1,0 +1,214 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Testing\\PlaygroundTest.csproj": {}
+  },
+  "projects": {
+    "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\Playground.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\Playground.csproj",
+        "projectName": "Playground",
+        "projectPath": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\Playground.csproj",
+        "packagesPath": "C:\\Users\\faust\\.nuget\\packages\\",
+        "outputPath": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\.godot\\mono\\temp\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\faust\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Godot.SourceGenerators": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "GodotSharp": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "GodotSharpEditor": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "Microsoft.CodeAnalysis.CSharp": {
+              "target": "Package",
+              "version": "[4.12.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Settings.Configuration": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "YamlDotNet": {
+              "target": "Package",
+              "version": "[16.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Testing\\PlaygroundTest.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Testing\\PlaygroundTest.csproj",
+        "projectName": "PlaygroundTest",
+        "projectPath": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Testing\\PlaygroundTest.csproj",
+        "packagesPath": "C:\\Users\\faust\\.nuget\\packages\\",
+        "outputPath": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Testing\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\faust\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\Playground.csproj": {
+                "projectPath": "D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground\\src\\Last Breath\\Playground.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "MSTest.Analyzers": {
+              "target": "Package",
+              "version": "[3.6.1, )",
+              "versionOverride": "[3.6.1, )"
+            },
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[3.6.1, )",
+              "versionOverride": "[3.6.1, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[3.6.1, )",
+              "versionOverride": "[3.6.1, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.11.1, )",
+              "versionOverride": "[17.11.1, )"
+            },
+            "Microsoft.Testing.Extensions.CodeCoverage": {
+              "target": "Package",
+              "version": "[17.12.5, )",
+              "versionOverride": "[17.12.5, )"
+            },
+            "Microsoft.Testing.Extensions.TrxReport": {
+              "target": "Package",
+              "version": "[1.4.1, )",
+              "versionOverride": "[1.4.1, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.72, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

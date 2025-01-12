@@ -1,0 +1,200 @@
+[gd_scene load_steps=10 format=3 uid="uid://c0lun31icaoam"]
+
+[ext_resource type="Script" path="res://Script/Scenes/BattleScene.cs" id="1_yicyd"]
+[ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="2_rmdsv"]
+[ext_resource type="Texture2D" uid="uid://bdcjbdp4ohog8" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Normal.png" id="3_jakpg"]
+[ext_resource type="Texture2D" uid="uid://dpfytb6fpg1ue" path="res://Assets/Weapon/fantasy_epicweapons_pack1_nobg.png" id="4_qu74n"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eo1t1"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh5o6"]
+bg_color = Color(0.781423, 0.123547, 0.135953, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qr4ab"]
+atlas = ExtResource("4_qu74n")
+region = Rect2(234, 14, 2, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pd86h"]
+atlas = ExtResource("4_qu74n")
+region = Rect2(130, 94, 1, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ln6nm"]
+atlas = ExtResource("4_qu74n")
+region = Rect2(76, 47, 1, 1)
+
+[node name="BattleScene" type="Node2D"]
+process_mode = 3
+z_index = 1
+script = ExtResource("1_yicyd")
+
+[node name="BattleScene1" type="Sprite2D" parent="."]
+position = Vector2(635, 486)
+scale = Vector2(1.07987, 0.98093)
+texture = ExtResource("2_rmdsv")
+
+[node name="UI" type="Node" parent="."]
+
+[node name="ReturnButton" type="Button" parent="UI"]
+z_index = 1
+offset_left = 3.0
+offset_top = 73.0
+offset_right = 83.0
+offset_bottom = 98.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/ReturnButton"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+scale = Vector2(1.3531, 0.993749)
+texture = ExtResource("3_jakpg")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="UI/ReturnButton"]
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 25.0
+text = "Escape battle"
+
+[node name="PlayerHpBar" type="ProgressBar" parent="UI"]
+z_index = 1
+offset_top = 1.0
+offset_right = 120.0
+offset_bottom = 26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_eo1t1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_lh5o6")
+
+[node name="EnemyHpBar" type="ProgressBar" parent="UI"]
+z_index = 1
+offset_left = 1160.0
+offset_top = 1.0
+offset_right = 1280.0
+offset_bottom = 26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_eo1t1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_lh5o6")
+fill_mode = 1
+
+[node name="AttackButtons" type="Node2D" parent="UI"]
+
+[node name="Stance" type="Node2D" parent="UI/AttackButtons"]
+
+[node name="StrengthStance" type="Button" parent="UI/AttackButtons/Stance"]
+z_index = 1
+offset_left = 519.0
+offset_top = 293.0
+offset_right = 599.0
+offset_bottom = 324.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/Stance/StrengthStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(2.03694, 0.774048)
+texture = SubResource("AtlasTexture_qr4ab")
+
+[node name="Label" type="Label" parent="UI/AttackButtons/Stance/StrengthStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Strength"
+
+[node name="DexterityStance" type="Button" parent="UI/AttackButtons/Stance"]
+z_index = 1
+offset_left = 518.0
+offset_top = 345.0
+offset_right = 598.0
+offset_bottom = 376.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/Stance/DexterityStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(2, 0.799996)
+texture = SubResource("AtlasTexture_pd86h")
+
+[node name="Label" type="Label" parent="UI/AttackButtons/Stance/DexterityStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Dexterity"
+
+[node name="IntelligenceStance" type="Button" parent="UI/AttackButtons/Stance"]
+z_index = 1
+offset_left = 517.0
+offset_top = 400.0
+offset_right = 597.0
+offset_bottom = 431.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/Stance/IntelligenceStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(2.0358, 0.776634)
+texture = SubResource("AtlasTexture_ln6nm")
+
+[node name="Label" type="Label" parent="UI/AttackButtons/Stance/IntelligenceStance"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Intelligence"
+
+[node name="BodyPart" type="Node2D" parent="UI/AttackButtons"]
+
+[node name="Head" type="Button" parent="UI/AttackButtons/BodyPart"]
+z_index = 1
+offset_left = 638.0
+offset_top = 307.0
+offset_right = 646.0
+offset_bottom = 315.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/BodyPart/Head"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(1.11521, 0.634063)
+
+[node name="Label" type="Label" parent="UI/AttackButtons/BodyPart/Head"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Head"
+
+[node name="Body" type="Button" parent="UI/AttackButtons/BodyPart"]
+z_index = 1
+offset_left = 643.0
+offset_top = 364.0
+offset_right = 651.0
+offset_bottom = 372.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/BodyPart/Body"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(1.11521, 0.634063)
+
+[node name="Label" type="Label" parent="UI/AttackButtons/BodyPart/Body"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Body"
+
+[node name="Legs" type="Button" parent="UI/AttackButtons/BodyPart"]
+z_index = 1
+offset_left = 642.0
+offset_top = 416.0
+offset_right = 650.0
+offset_bottom = 424.0
+
+[node name="TextureRect" type="TextureRect" parent="UI/AttackButtons/BodyPart/Legs"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="UI/AttackButtons/BodyPart/Legs"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Legs"
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.5
+one_shot = true
