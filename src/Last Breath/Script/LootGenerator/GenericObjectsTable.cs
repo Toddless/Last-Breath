@@ -1,7 +1,6 @@
 ﻿namespace Playground.Script.LootGenerator
 {
     using Godot;
-    using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.Items;
     using Playground.Script.Items.Factories;
     using System;
@@ -14,13 +13,12 @@
 
         public List<ItemCreator>? factories;
 
-        private RandomNumberGenerator? random;
+        private RandomNumberGenerator? _random = new();
 
         private float probabilityTotalWeight;
 
         public virtual void ValidateTable()
         {
-            random = DiContainer.ServiceProvider?.GetService<RandomNumberGenerator>();
             SetFactories();
             if (lootDropItems != null && lootDropItems.Count > 0)
             {
@@ -55,11 +53,11 @@
                 ArgumentNullException.ThrowIfNull(lootDropItems);
                 ArgumentNullException.ThrowIfNull(factories);
             }
-            var randomFactory = random.RandiRange(0, factories.Count - 1);
+            var randomFactory = _random!.RandiRange(0, factories.Count - 1);
 
             var factory = factories[randomFactory];
 
-            float pickedNumber = random.RandfRange(0, probabilityTotalWeight);
+            float pickedNumber = _random.RandfRange(0, probabilityTotalWeight);
             foreach (T lootDropItem in lootDropItems)
             {
                 if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
@@ -72,7 +70,7 @@
 
         public virtual T? GetRarity()
         {
-            float pickedNumber = random.RandfRange(0, probabilityTotalWeight);
+            float pickedNumber = _random!.RandfRange(0, probabilityTotalWeight);
             foreach (T lootDropItem in lootDropItems!)
             {
                 if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
@@ -90,7 +88,7 @@
                 ArgumentNullException.ThrowIfNull(factories);
                 ArgumentNullException.ThrowIfNull(lootDropItems);
             }
-            var randomFactory = random.RandiRange(0, factories.Count - 1);
+            var randomFactory = _random!.RandiRange(0, factories.Count - 1);
 
             var factory = factories[randomFactory];
 
@@ -101,9 +99,9 @@
         {
             factories =
             [
-                new BowFactory(random),
-                new SwordFactory(random),
-                new BodyArmorFactory(random),
+                new BowFactory(_random!),
+                new SwordFactory(_random!),
+                new BodyArmorFactory(_random!),
             ];
         }
     }

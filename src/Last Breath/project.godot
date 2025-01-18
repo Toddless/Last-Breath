@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalSignal="*res://Script/Helpers/GlobalSignals.cs"
-EnemyInventory="*res://Script/EnemyInventory.cs"
+DiContainer="*res://Script/DiContainer.cs"
 
 [display]
 

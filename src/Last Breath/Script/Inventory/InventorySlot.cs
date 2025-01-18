@@ -7,10 +7,7 @@ namespace Playground.Script.Inventory
 
     public partial class InventorySlot : Node
     {
-        #region Const
-        private const string InventoryComponent = "/root/MainScene/CharacterBody2D/InventoryComponent";
-        #endregion
-
+     
         #region Private fields
         private RichTextLabel? _fullItemDescription;
         private GlobalSignals? _globalSignals;

@@ -1,0 +1,111 @@
+﻿namespace Playground.Script
+{
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Inventory;
+    using System.Collections.Generic;
+    using Playground.Script.Items;
+    using System.Linq;
+    using Godot;
+    using System;
+    using Playground.Components.Interfaces;
+
+    [Inject]
+    [GlobalClass]
+    public partial class EnemyInventoryComponent : Node, IInventory
+    {
+        [Inject] private IBasedOnRarityLootTable? _lootTable;
+        private List<InventorySlot> _slots = [];
+        private PackedScene? _inventorySlot;
+        private Item? _item;
+        private Action? _showInventory;
+        private Action? _hideInventory;
+
+        public Action? ShowInventory
+        {
+            get => _showInventory;
+            set => _showInventory = value;
+        }
+        public Action? HideInventory
+        {
+            get => _hideInventory;
+            set => _hideInventory = value;
+        }
+
+        public void Initialize(int size, string parth, GridContainer container, Action? hideInventory, Action? showInventory)
+        {
+            _inventorySlot = ResourceLoader.Load<PackedScene>(parth);
+            for (int i = 0; i < size; i++)
+            {
+                InventorySlot inventorySlot = _inventorySlot.Instantiate<InventorySlot>();
+                container.AddChild(inventorySlot);
+                _slots.Add(inventorySlot);
+            }
+            _hideInventory = hideInventory;
+            _showInventory = showInventory;
+            ResolveServices();
+        }
+
+        public List<Item> GivePlayerItems() => _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem!).ToList();
+
+
+        public void AddItem(Item? item)
+        {
+            if (item == null)
+                return;
+            var slot = GetSlotToAdd(item);
+            if (slot == null)
+            {
+                GD.Print("No slot available.");
+                return;
+            }
+
+            if (slot.InventoryItem == null)
+            {
+                slot.SetItem(item);
+            }
+            else if (slot.InventoryItem.Guid == item.Guid)
+            {
+                slot.AddItem(item);
+            }
+        }
+
+        public List<Item?> GiveAllItems()
+        {
+            var itemsToGive = _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem).ToList();
+            _slots.ForEach(x => RemoveItem(x.InventoryItem));
+            return itemsToGive;
+        }
+
+        public void TakeAllItems(List<Item?> items)
+        {
+            if (items.Count > 0)
+                items.ForEach(AddItem!);
+        }
+
+        private void ResolveServices() => DiContainer.InjectDependencies(this);
+
+        private void RemoveItem(Item? item)
+        {
+            var slot = GetSlotToRemove(item);
+
+            if (slot == null)
+            {
+                return;
+            }
+            slot.RemoveItem(item);
+        }
+
+        private InventorySlot? GetSlotToAdd(Item newItem)
+        {
+            return _slots.FirstOrDefault(itemInSlot => itemInSlot.InventoryItem == null || (itemInSlot.InventoryItem.Guid == newItem.Guid && itemInSlot.InventoryItem.Quantity < newItem.MaxStackSize));
+        }
+
+        private InventorySlot? GetSlotToRemove(Item? item)
+        {
+            // this method work correctly without first condition only if i equip or remove an item from right to left
+            // cause if an item is removed from left to right, then after first cycle method return null
+            // and NullReferenceException is thrown
+            return _slots.FirstOrDefault(x => x.InventoryItem != null && x.InventoryItem.Guid == item?.Guid);
+        }
+    }
+}

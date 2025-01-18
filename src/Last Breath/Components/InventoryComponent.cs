@@ -1,22 +1,35 @@
 ﻿namespace Playground.Script.Inventory
 {
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script.Items;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     [GlobalClass]
-    public partial class InventoryComponent : Node, IGameComponent
+    public partial class InventoryComponent : Node, IGameComponent, IInventory
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
         private int _capacity;
         private Item? _item;
+        private Action? _showInventory;
+        private Action? _hideInventory;
 
-        public List<InventorySlot> Slots { get { return _slots; } }
+        public Action? ShowInventory
+        {
+            get => _showInventory;
+            set => _showInventory = value;
+        }
 
-        public void Inititalize(int size, string path, GridContainer container)
+        public Action? HideInventory
+        {
+            get => _hideInventory;
+            set => _hideInventory = value;
+        }
+
+        public void Inititalize(int size, string path, GridContainer container, Action? hideInventory, Action? showInventory)
         {
             _inventorySlot = ResourceLoader.Load<PackedScene>(path);
             for (int i = 0; i < size; i++)
@@ -25,6 +38,8 @@
                 container.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
+            _showInventory = showInventory;
+            _hideInventory = hideInventory;
         }
 
         public void OnGivePlayerItem(Item item, int amount)
@@ -58,7 +73,7 @@
 
         public void AddItem(Item item)
         {
-            if(item == null)
+            if (item == null)
             {
                 return;
             }
@@ -107,6 +122,14 @@
         public int GetNumberOfItems(Item item)
         {
             return _slots.FindAll(slot => slot.InventoryItem != null && slot.InventoryItem.Guid == item.Guid).Count;
+        }
+
+        public List<Item?> GiveAllItems() => _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem).ToList();
+
+        public void TakeAllItems(List<Item?> items)
+        {
+            if (items.Count > 0)
+                items.ForEach(AddItem!);
         }
     }
 }

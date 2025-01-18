@@ -2,7 +2,7 @@
 {
     using System;
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
 
     public abstract partial class Ability : Node
     {

@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://bw2mbm6teo27u"]
+[gd_scene load_steps=58 format=3 uid="uid://bw2mbm6teo27u"]
 
 [ext_resource type="Script" path="res://Script/Enemy/EnemyAI.cs" id="1_t2uow"]
 [ext_resource type="Texture2D" uid="uid://dohome0v4lwm4" path="res://Assets/Enemy/Bat/Batt_Epic.png" id="2_5yepq"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyIdle.cs" id="11_dg8qf"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyMoves.cs" id="12_23m8q"]
 [ext_resource type="Script" path="res://Script/StateMachine/EnemyBattle.cs" id="13_j51yl"]
+[ext_resource type="Script" path="res://Components/EnemyInventoryComponent.cs" id="14_rxtry"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_up6k3"]
 
@@ -372,5 +373,37 @@ script = ExtResource("12_23m8q")
 
 [node name="Battle" type="Node2D" parent="StateMachine"]
 script = ExtResource("13_j51yl")
+
+[node name="Inventory" type="Node2D" parent="."]
+
+[node name="InventoryWindow" type="Panel" parent="Inventory"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -399.0
+offset_top = -229.0
+offset_right = 161.0
+offset_bottom = 151.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.795567, 0.81376)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="InventoryContainer" type="GridContainer" parent="Inventory/InventoryWindow"]
+layout_mode = 0
+offset_left = 2.89757
+offset_top = 1.92244
+offset_right = 522.898
+offset_bottom = 321.922
+scale = Vector2(1.06583, 1.18864)
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 5
+
+[node name="EnemyInventoryComponent" type="Node" parent="Inventory/InventoryWindow/InventoryContainer"]
+script = ExtResource("14_rxtry")
 
 [connection signal="timeout" from="StateMachine/Idle/Timer" to="StateMachine/Idle" method="OnTimerTimeOut"]

@@ -1,5 +1,6 @@
 ﻿namespace Playground
 {
+    using System;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -40,7 +41,7 @@
         public delegate void PlayerExitedTheBattleEventHandler();
 
         #region UI
-        private InventoryComponent? _inventoryComponent;
+        private InventoryComponent? _inventory;
         private GridContainer? _inventoryContainder;
         private ProgressBar? _progressBarMovement;
         private ResearchButton? _researchButton;
@@ -50,8 +51,8 @@
         private ProgressBar? _progressBar;
         private Panel? _inventoryWindow;
         private Label? _healthBarText;
-        private TextureRect? _goldIcon;
-        private Label? _goldAmount;
+        private Node2D? _inventoryNode;
+        private Node2D? _uIElements;
         #endregion
 
         #region Properties
@@ -93,8 +94,8 @@
 
         public InventoryComponent? Inventory
         {
-            get => _inventoryComponent;
-            set => _inventoryComponent = value;
+            get => _inventory;
+            set => _inventory = value;
         }
 
         public AnimatedSprite2D? PlayerAnimation
@@ -118,29 +119,28 @@
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
             var playerNode = parentNode.GetNode<CharacterBody2D>(nameof(CharacterBody2D));
-            _inventoryWindow = playerNode.GetNode("Inventory").GetNode<Panel>("InventoryWindow");
+            _uIElements = playerNode.GetNode<Node2D>("UI");
+            _inventoryNode = _uIElements.GetNode<Node2D>("Inventory");
+            _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _inventoryComponent = _inventoryContainder.GetNode<InventoryComponent>(nameof(InventoryComponent));
+            _inventory = _inventoryContainder.GetNode<InventoryComponent>(nameof(InventoryComponent));
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _playerHealth = playerNode.GetNode<HealthComponent>(nameof(HealthComponent));
             _playerAttack = playerNode.GetNode<AttackComponent>(nameof(AttackComponent));
             _playerAttribute = playerNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
-            _goldIcon = _inventoryWindow.GetNode<TextureRect>(nameof(TextureRect));
-            _goldAmount = _goldIcon.GetNode<Label>("Label");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
-            _playerStats = playerNode.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
+            _playerStats = _uIElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
-            _inventoryComponent.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!);
+            _inventory.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
-            ToggleWindow(false);
             SetHealthBar();
             UpdateStats();
+            _uIElements.Hide();
             _sprite.Play("Idle_down");
-            GD.Print($"Scene initialized: {this.Name}");
         }
 
         private void UpdateHealthBar()
@@ -148,28 +148,19 @@
             _healthBar!.Value = _playerHealth!.CurrentHealth;
         }
 
-        public bool ToggleWindow(bool isOpen)
-        {
-            #region if you need to hide the mouse cursor
-            //if (isOpen)
-            //{
-            //    Input.MouseMode = Input.MouseModeEnum.Visible;
-            //}
-            //else
-            //{
-            //    Input.MouseMode = Input.MouseModeEnum.Captured;
-            //}
-
-            #endregion
-            _playerStats!.Visible = isOpen;
-            return _inventoryWindow!.Visible = isOpen;
-        }
-
         public override void _Input(InputEvent @event)
         {
             if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
             {
-                ToggleWindow(!_inventoryWindow!.Visible);
+                if (_uIElements!.Visible)
+                {
+                    _uIElements?.Hide();
+                }
+                else
+                {
+                    _uIElements?.Show();
+
+                }
             }
         }
 
@@ -215,7 +206,7 @@
                 $"Critical Hit Chance: {_playerAttack.BaseCriticalStrikeChance * 100}% \n" +
                 $"Critical Hit Damage: {_playerAttack.BaseCriticalStrikeDamage * 100}% \n" +
                 $"Health: {_playerHealth!.CurrentHealth}\n" +
-              //  $"Defence: {_playerHealth.Defence}\n" +
+                //  $"Defence: {_playerHealth.Defence}\n" +
                 $"Max. Health: {_playerHealth.MaxHealth}\n" +
                 $"Strength: {PlayerAttribute!.Strength!.Total}\n" +
                 $"Dexterity: {PlayerAttribute.Dexterity!.Total}\n" +
@@ -247,7 +238,7 @@
             var item = _currentZone.GetRandomResearchEvent();
             if (item != null)
             {
-                _inventoryComponent!.AddItem(item);
+                _inventory!.AddItem(item);
             }
         }
 
@@ -257,7 +248,7 @@
             {
                 if (_playerWeapon != null)
                 {
-                    _inventoryComponent!.AddItem(_playerWeapon);
+                    _inventory!.AddItem(_playerWeapon);
                     _playerAttack!.BaseMinDamage -= _playerWeapon.MinDamage;
                     _playerAttack.BaseMaxDamage -= _playerWeapon.MaxDamage;
                     _playerAttack.BaseCriticalStrikeChance = 0.05f;
@@ -268,21 +259,19 @@
                 _playerAttack!.BaseMinDamage += _playerWeapon.MinDamage;
                 _playerAttack.BaseMaxDamage += _playerWeapon.MaxDamage;
                 _playerAttack.BaseCriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
-                _inventoryComponent!.RemoveItem(weapon);
+                _inventory!.RemoveItem(weapon);
                 UpdateStats();
             }
             else if (item is BodyArmor armor)
             {
                 if (_playerArmor != null)
                 {
-                    _inventoryComponent!.AddItem(_playerArmor);
-                  //  _playerHealth!.MaxHealth -= _playerArmor.BonusHealth;
+                    _inventory!.AddItem(_playerArmor);
                     _playerArmor = null;
                     UpdateStats();
                 }
                 _playerArmor = armor;
-              //  _playerHealth!.MaxHealth += _playerArmor.BonusHealth;
-                _inventoryComponent!.RemoveItem(armor);
+                _inventory!.RemoveItem(armor);
                 UpdateStats();
             }
         }

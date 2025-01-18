@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using System;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script.Passives.Interfaces;
 
     public partial class VampireStrike : Ability, ICanLeech, ICanBuffAttack

@@ -1,7 +1,7 @@
 ﻿namespace Playground
 {
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script.Helpers;
 
     [GlobalClass]

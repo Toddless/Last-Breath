@@ -43,7 +43,6 @@
             var newRank = _reputationRanks.First(pair => pair.Key(_currentReputationPoints)).Value;
             if (_currentRank != newRank)
                 _currentRank = newRank;
-
         }
     }
 }

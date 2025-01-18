@@ -37,6 +37,8 @@
             set => _enemiesRespawnPosition = value;
         }
 
+        protected abstract void ResolveDependencies();
+
         public abstract void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e);
     }
 }

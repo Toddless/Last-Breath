@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=98 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_nuf03"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_mu4dn"]
@@ -7,7 +7,6 @@
 [ext_resource type="Script" path="res://Components/AttackComponent.cs" id="5_5evlb"]
 [ext_resource type="Script" path="res://Components/AttributeComponent.cs" id="6_ff2yq"]
 [ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="7_adkn2"]
-[ext_resource type="Texture2D" uid="uid://08ymwvj42jt8" path="res://Assets/UI MMORPG Dark Templar/Backpack inventory small/Icons/Money03.png" id="8_joqa4"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_mu4dn")
@@ -670,9 +669,6 @@ animations = [{
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1c8vr"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_u7pl4"]
-atlas = ExtResource("8_joqa4")
-
 [node name="Player" type="CharacterBody2D"]
 physics_interpolation_mode = 2
 position = Vector2(86, 154)
@@ -695,10 +691,26 @@ script = ExtResource("5_5evlb")
 [node name="AttributeComponent" type="Node" parent="."]
 script = ExtResource("6_ff2yq")
 
-[node name="Inventory" type="Node" parent="."]
+[node name="UI" type="Node2D" parent="."]
+position = Vector2(793, 246)
 
-[node name="InventoryWindow" type="Panel" parent="Inventory"]
-visible = false
+[node name="PlayerStats" type="Node2D" parent="UI"]
+z_index = 11
+position = Vector2(-151, -196)
+
+[node name="PlayerStats" type="RichTextLabel" parent="UI/PlayerStats"]
+offset_right = 1.0
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+tab_size = 1
+threaded = true
+
+[node name="Inventory" type="Node2D" parent="UI"]
+z_index = 10
+
+[node name="InventoryWindow" type="Panel" parent="UI/Inventory"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -714,7 +726,7 @@ scale = Vector2(1.38048, 1.21376)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="InventoryContainer" type="GridContainer" parent="Inventory/InventoryWindow"]
+[node name="InventoryContainer" type="GridContainer" parent="UI/Inventory/InventoryWindow"]
 layout_mode = 0
 offset_left = 178.924
 offset_top = 193.613
@@ -725,36 +737,5 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 15
 
-[node name="InventoryComponent" type="Node" parent="Inventory/InventoryWindow/InventoryContainer"]
+[node name="InventoryComponent" type="Node" parent="UI/Inventory/InventoryWindow/InventoryContainer"]
 script = ExtResource("7_adkn2")
-
-[node name="TextureRect" type="TextureRect" parent="Inventory/InventoryWindow"]
-layout_mode = 0
-offset_left = 483.89
-offset_top = 1.64777
-offset_right = 499.89
-offset_bottom = 17.6478
-texture = SubResource("AtlasTexture_u7pl4")
-
-[node name="Label" type="Label" parent="Inventory/InventoryWindow/TextureRect"]
-layout_mode = 0
-offset_left = 18.1097
-offset_top = -1.64777
-offset_right = 58.1097
-offset_bottom = 21.3522
-scale = Vector2(0.75819, 0.655748)
-text = "100"
-
-[node name="PlayerStats" type="Node" parent="."]
-
-[node name="PlayerStats" type="RichTextLabel" parent="PlayerStats"]
-offset_left = 488.0
-offset_top = 234.0
-offset_right = 489.0
-offset_bottom = 234.0
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-tab_size = 1
-threaded = true

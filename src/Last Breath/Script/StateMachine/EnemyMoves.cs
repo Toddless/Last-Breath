@@ -75,9 +75,6 @@
         {
             SetInterests();
             SetDanger();
-
-
-
             ChoseDirection();
             QueueRedraw();
             var desiredVelocity = _chosenDirection * _speed;
@@ -167,16 +164,16 @@
             }
         }
 
-        public override void _Draw()
-        {
-            DrawCircle(_enemy!.Position, _maxRadius, new Color(0.2f, 0.8f, 0.2f, 0.5f));
+        //public override void _Draw()
+        //{
+        //    DrawCircle(_enemy!.Position, _maxRadius, new Color(0.2f, 0.8f, 0.2f, 0.5f));
 
-            for (int i = 0; i < _danger.Count; i++)
-            {
-                var color = _danger[i] == 1 ? new Color(0.545098f, 0, 0, 1) : new Color(0.133333f, 0.545098f, 0.133333f, 1);
-                DrawLine(_enemy!.Position, _enemy.Position + _rayDirection[i] * _lookAhead, color);
-            }
-        }
+        //    for (int i = 0; i < _danger.Count; i++)
+        //    {
+        //        var color = _danger[i] == 1 ? new Color(0.545098f, 0, 0, 1) : new Color(0.133333f, 0.545098f, 0.133333f, 1);
+        //        DrawLine(_enemy!.Position, _enemy.Position + _rayDirection[i] * _lookAhead, color);
+        //    }
+        //}
 
 
         private void EnemyReachedDestination()

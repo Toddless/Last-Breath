@@ -2,6 +2,7 @@
 {
     using Playground.Script.Attribute;
     using Godot;
+    using Playground.Components.Interfaces;
 
     [GlobalClass]
     public partial class AttributeComponent : Node, IGameComponent

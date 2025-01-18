@@ -198,7 +198,6 @@
             }
         }
 
-
         public void BattleEnds()
         {
             _playerHealth = null;

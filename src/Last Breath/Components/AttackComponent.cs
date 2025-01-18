@@ -1,7 +1,7 @@
 namespace Playground
 {
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
 
     [GlobalClass]
     public partial class AttackComponent : Node, IGameComponent

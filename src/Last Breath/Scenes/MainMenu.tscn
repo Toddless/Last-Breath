@@ -5,7 +5,7 @@
 [node name="MainMenu" type="Node2D"]
 
 [node name="UIElemente" type="Node2D" parent="."]
-position = Vector2(-677, 241)
+position = Vector2(-733, 163)
 
 [node name="Continue" type="Button" parent="UIElemente"]
 offset_left = 800.0

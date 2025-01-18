@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using System;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
 
     public partial class OneShotHeal : Ability
     {

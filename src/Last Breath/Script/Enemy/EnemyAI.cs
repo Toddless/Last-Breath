@@ -1,15 +1,20 @@
 namespace Playground
 {
-    using Playground.Script.Passives.Attacks;
-    using Playground.Script.StateMachine;
-    using Playground.Script.Passives;
     using System.Collections.Generic;
-    using Playground.Script.Helpers;
-    using Playground.Script.Enums;
-    using Playground.Components;
     using System.ComponentModel;
     using Godot;
+    using Microsoft.Extensions.DependencyInjection;
+    using Playground.Components;
+    using Playground.Components.Interfaces;
+    using Playground.Script;
+    using Playground.Script.Enums;
+    using Playground.Script.Helpers;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Playground.Script.Passives;
+    using Playground.Script.Passives.Attacks;
+    using Playground.Script.StateMachine;
 
+    [Inject]
     public partial class EnemyAI : ObservableCharacterBody2D
     {
         #region Components
@@ -19,21 +24,19 @@ namespace Playground
         private DefenceComponent? _defence;
         #endregion
 
-        private readonly RandomNumberGenerator _rnd = new();
+        private bool _enemyFight = false, _playerEncounted = false;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
-        private BattleBehavior? _battleBehavior;
-        private GlobalSignals? _globalSignals;
-        private bool _playerEncounted = false;
-        private List<Ability>? _abilities;
+        [Inject] private RandomNumberGenerator? _rnd;
         private AnimatedSprite2D? _sprite;
-        private bool _enemyFight = false;
         private Vector2 _respawnPosition;
+        private Area2D? _area;
+        [Inject] private BattleBehavior? _battleBehavior;
+        private List<Ability>? _abilities;
         private StateMachine? _machine;
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
-        private Area2D? _area;
         private int _level;
 
         [Signal]
@@ -42,6 +45,16 @@ namespace Playground
         public delegate void EnemyInitializedEventHandler();
         [Signal]
         public delegate void EnemyReachedNewPositionEventHandler();
+
+        #region UI
+        private Node2D? _inventoryNode;
+        private Panel? _inventoryWindow;
+        private GridContainer? _inventoryContainer;
+        private EnemyInventoryComponent? _inventory;
+        #endregion
+
+
+        #region Properties
 
         public NavigationAgent2D? NavigationAgent2D
         {
@@ -78,7 +91,7 @@ namespace Playground
             set => _attribute = value;
         }
 
-        public RandomNumberGenerator Rnd
+        public RandomNumberGenerator? Rnd
         {
             get => _rnd;
         }
@@ -118,10 +131,21 @@ namespace Playground
             }
         }
 
+        public EnemyInventoryComponent? Inventory
+        {
+            get => _inventory;
+            set => _inventory = value;
+        }
+        #endregion
+
         public override void _Ready()
         {
-            var randomTypeNumber = Rnd.RandiRange(1, 2);
             var parentNode = GetParent().GetNode<EnemyAI>($"{Name}");
+            _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
+            _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
+            _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
+            Inventory = _inventoryContainer.GetNode<EnemyInventoryComponent>(nameof(EnemyInventoryComponent));
+            Inventory.Initialize(25, SceneParh.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _attack = parentNode.GetNode<AttackComponent>(nameof(AttackComponent));
             _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
@@ -131,9 +155,22 @@ namespace Playground
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _attribute = parentNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
-            _enemyType = SetRandomEnemyType(randomTypeNumber);
-            SetRandomAbilities();
             _battleBehavior = new BattleBehavior(this);
+            _inventoryNode.Hide();
+            ResolveDependencies();
+            SetStats();
+            SpawnItems();
+        }
+
+        private void SpawnItems()
+        {
+            _inventory?.AddItem(DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>()?.GetRandomItem());
+        }
+
+        private void SetStats()
+        {
+            _enemyType = SetRandomEnemyType(_rnd!.RandiRange(1, 2));
+            SetRandomAbilities();
             _respawnPosition = Position;
             Rarity = EnemyRarity();
             _level = _rnd.RandiRange(1, 50);
@@ -141,11 +178,13 @@ namespace Playground
             _attribute!.Dexterity!.PropertyChanged += OnDexterityChange;
             _attribute.Strength!.PropertyChanged += OnStrengthChange;
             _attribute!.Strength.Total += points.Strength;
-            EmitSignal(SignalName.EnemyInitialized);
+            _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
-            _health.RefreshHealth();
-            GD.Print($"Scene initialized: {this.Name}");
+            _health!.RefreshHealth();
+            EmitSignal(SignalName.EnemyInitialized);
         }
+
+        private void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         private void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
         {
