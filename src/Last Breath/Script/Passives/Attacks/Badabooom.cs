@@ -1,49 +1,32 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    using System;
-    using Playground.Components.Interfaces;
     using Playground.Script.Passives.Interfaces;
 
-    public partial class Badabooom : Ability, ICanDealDamage
+    public partial class Badabooom : Ability<AttackComponent>, ICanDealDamage
     {
         private float _damageMultiplier = 2;
 
         private float _minBeforBuff;
         private float _maxBeforBuff;
 
-        public Badabooom()
+        public Badabooom(AttackComponent component) : base(component)
         {
-            Cooldown = 4;
         }
 
-        public override Type TargetTypeComponent =>typeof(AttackComponent);
-
-        public override void ActivateAbility(IGameComponent? component)
+        public override void ActivateAbility(AttackComponent? component)
         {
-            if(component == null || component is not AttackComponent attack)
-            {
-                return;
-            }
-            _minBeforBuff = attack.BaseMinDamage;
-            _maxBeforBuff = attack.BaseMaxDamage;
+            _minBeforBuff = component!.BaseMinDamage;
+            _maxBeforBuff = component.BaseMaxDamage;
 
-            attack.BaseMinDamage *= _damageMultiplier;
-            attack.BaseMaxDamage *= _damageMultiplier;
+            component.BaseMinDamage *= _damageMultiplier;
+            component.BaseMaxDamage *= _damageMultiplier;
         }
 
-        public override void AfterBuffEnds(IGameComponent? component)
+        public override void AfterBuffEnds(AttackComponent? component)
         {
-            if (component == null || component is not AttackComponent attack)
-            {
-                return;
-            }
-            attack.BaseMinDamage = _minBeforBuff;
-            attack.BaseMaxDamage = _maxBeforBuff;
+            component!.BaseMinDamage = _minBeforBuff;
+            component.BaseMaxDamage = _maxBeforBuff;
         }
-
-        public override void EffectAfterAttack(IGameComponent? component)
-        {
-       
-        }
+        public override void EffectAfterAttack(AttackComponent? component) => throw new System.NotImplementedException();
     }
 }

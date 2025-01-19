@@ -111,7 +111,7 @@ namespace Playground
 
         public override void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            PlayerInteracted(Enemies!.FirstOrDefault(x => x.PlayerEncounted == true));
+            PlayerInteracted(Enemies!.FirstOrDefault(x => x.PlayerEncounter == true));
         }
 
         protected override void ResolveDependencies() => DiContainer.InjectDependencies(this);

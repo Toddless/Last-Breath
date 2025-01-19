@@ -2,40 +2,54 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Passives.Attacks;
 
-    public class AbilityPool
+    public class AbilityPool : IDisposable
     {
-        private readonly List<Ability> _abilities = [
-           // new DoubleStrike(),
-            new VampireStrike(),
-            new BuffAttack(),
-            new BuffCriticalStrikeChance(),
-            new BuffCriticalStrikeDamage(),
-            new Regeneration(),
-            new OneShotHeal(),
-            new Badabooom()
-            ];
+        private List<IAbility> _abilities = new();
 
-        public AbilityPool()
+        protected List<IAbility> Abilities
         {
-
+            get => _abilities;
+            set => _abilities = value;
         }
 
-        public List<Ability> SelectAbilities(int count)
+        public AbilityPool(EnemyAI enemy)
         {
-            if (count > _abilities.Count)
+            SetTargetComponents(enemy);
+        }
+
+        private void SetTargetComponents(EnemyAI enemy)
+        {
+            Abilities.Add(new OneShotHeal(enemy.EnemyHealth!));
+            Abilities.Add(new Regeneration(enemy.EnemyHealth!));
+            Abilities.Add(new BuffAttack(enemy.EnemyAttack!));
+            Abilities.Add(new BuffCriticalStrikeChance(enemy.EnemyAttack!));
+            Abilities.Add(new BuffCriticalStrikeDamage(enemy.EnemyAttack!));
+            Abilities.Add(new VampireStrike(enemy.EnemyHealth!));
+        }
+
+        public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity)
+        {
+            return Abilities.FirstOrDefault(x => x.Rarity == rarity);
+        }
+
+        public List<IAbility> SelectAbilities(int count)
+        {
+            if (count > Abilities.Count)
             {
                 throw new ArgumentException("");
             }
             using (var rnd = new RandomNumberGenerator())
             {
-                List<Ability> result = [];
+                List<IAbility> result = [];
                 while (result.Count != count)
                 {
-                    var randomNumber = rnd.RandiRange(0, _abilities.Count - 1);
-                    var chosenAbility = _abilities[randomNumber];
+                    var randomNumber = rnd.RandiRange(0, Abilities.Count - 1);
+                    var chosenAbility = Abilities[randomNumber];
                     if (!result.Contains(chosenAbility))
                     {
                         result.Add(chosenAbility);
@@ -46,14 +60,20 @@
             }
         }
 
-        public List<Ability> GetAllAbilities()
+        public List<IAbility> GetAllAbilities()
         {
-            List<Ability> x = [];
-            foreach (var ability in _abilities)
+            List<IAbility> x = [];
+            foreach (var ability in Abilities)
             {
                 x.Add(ability);
             }
             return x;
+        }
+
+        public void Dispose()
+        {
+            Abilities.Clear();
+            GC.SuppressFinalize(this);
         }
     }
 }

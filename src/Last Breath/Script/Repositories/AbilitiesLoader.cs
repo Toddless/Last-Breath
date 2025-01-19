@@ -3,13 +3,13 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Playground.Script.Passives.Attacks;
+    using Playground.Script.Passives;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
 
     public static class AbilitiesLoader
     {
-        public static List<Ability> LoadAbility(string filePath)
+        public static List<IAbility> LoadAbility(string filePath)
         {
             // WIP still not sure if i want this.
             if (!File.Exists(filePath))
@@ -20,7 +20,7 @@
             var yaml = File.ReadAllText(filePath);
             var deserealizer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
 
-            var rawAbilities = deserealizer.Deserialize<List<Ability>>(yaml);
+            var rawAbilities = deserealizer.Deserialize<List<IAbility>>(yaml);
 
             return rawAbilities.Select(AbilityFactory.CreateAbilities).ToList();
         }

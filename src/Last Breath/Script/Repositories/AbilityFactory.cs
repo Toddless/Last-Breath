@@ -3,17 +3,17 @@
     using System;
     using System.Linq;
     using System.Reflection;
-    using Playground.Script.Passives.Attacks;
+    using Playground.Script.Passives;
 
     public class AbilityFactory 
     {
-        public static Ability CreateAbilities(dynamic abilityData)
+        public static IAbility CreateAbilities(dynamic abilityData)
         {
             var typeName = abilityData.GetType();
 
-            var abilityType = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(o=>o.Name == typeName && typeof(Ability).IsAssignableFrom(o));
+            var abilityType = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(o=>o.Name == typeName && typeof(IAbility).IsAssignableFrom(o));
 
-            return abilityType == null ? throw new Exception() : (Ability)Activator.CreateInstance(abilityType)!;
+            return abilityType == null ? throw new Exception() : (IAbility)Activator.CreateInstance(abilityType)!;
         }
     }
 }

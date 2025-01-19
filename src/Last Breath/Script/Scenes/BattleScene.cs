@@ -58,7 +58,7 @@ namespace Playground
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
             _returnButton = battleSceneUi.GetNode<Button>("ReturnButton");
 
-            _takeAll.Pressed += PlayerTakedAllItems;
+            _takeAll.Pressed += PlayerTakesAllItems;
             _timer = battelScene.GetNode<Timer>("Timer");
             _returnButton.Pressed += BattleFinished;
             PlayerTurn += PlayerMakeTurn;
@@ -66,16 +66,15 @@ namespace Playground
             _head.Pressed += PlayerMakeTurn;
             SetHealthBars();
             UpdateHealthBar();
+            DiContainer.InjectDependencies(this);
         }
-
-        public void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         public void Init(Player player, EnemyAI enemy)
         {
             _player = player;
             _enemy = enemy;
             _player.CanMove = false;
-            _enemy.EnemyFigth = true;
+            _enemy.EnemyFight = true;
             _player.Position = new Vector2(250, 450);
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
@@ -114,7 +113,7 @@ namespace Playground
                 return;
             }
             _attackButtonsUI?.Show();
-            var (damage, crit) = _player!.PlayerAttack!.CalculateDamage();
+            var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
             // TODO: Player attack animation
             _enemy!.EnemyHealth!.CurrentHealth -= damage;
 
@@ -134,7 +133,7 @@ namespace Playground
         {
             _enemy!.BattleBehavior?.GatherInfo(_player!);
             float additionalAttackChance = Rnd!.RandfRange(0, 1);
-            var (damage, crit) = _enemy.ActivateAbilityBeforDealDamage();
+            var (damage, crit, leeched) = _enemy.ActivateAbilityBeforeDealDamage();
 
             // TODO: Ability animation
 
@@ -164,7 +163,7 @@ namespace Playground
             BattleFinished();
         }
 
-        private void PlayerTakedAllItems()
+        private void PlayerTakesAllItems()
         {
             var enemyItems = _enemyInventory?.GiveAllItems();
             if (enemyItems?.Count > 0)

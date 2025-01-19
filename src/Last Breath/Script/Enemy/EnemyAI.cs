@@ -5,13 +5,11 @@ namespace Playground
     using Godot;
     using Microsoft.Extensions.DependencyInjection;
     using Playground.Components;
-    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Passives;
-    using Playground.Script.Passives.Attacks;
     using Playground.Script.StateMachine;
 
     [Inject]
@@ -21,10 +19,10 @@ namespace Playground
         private AttributeComponent? _attribute;
         private HealthComponent? _health;
         private AttackComponent? _attack;
-        private DefenceComponent? _defence;
+        private DefenceComponent? _defense;
         #endregion
 
-        private bool _enemyFight = false, _playerEncounted = false;
+        private bool _enemyFight = false, _playerEncounter = false;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
@@ -33,7 +31,7 @@ namespace Playground
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private BattleBehavior? _battleBehavior;
-        private List<Ability>? _abilities;
+        private List<IAbility>? _abilities = new();
         private StateMachine? _machine;
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
@@ -99,7 +97,7 @@ namespace Playground
             set => _rnd = value;
         }
 
-        public List<Ability>? Abilities
+        public List<IAbility>? Abilities
         {
             get => _abilities;
         }
@@ -109,10 +107,10 @@ namespace Playground
             get => _respawnPosition;
         }
 
-        public bool PlayerEncounted
+        public bool PlayerEncounter
         {
-            get => _playerEncounted;
-            set => SetProperty(ref _playerEncounted, value);
+            get => _playerEncounter;
+            set => SetProperty(ref _playerEncounter, value);
         }
 
         public GlobalRarity Rarity
@@ -122,7 +120,7 @@ namespace Playground
 
         }
 
-        public bool EnemyFigth
+        public bool EnemyFight
         {
             get => _enemyFight;
             set
@@ -160,7 +158,7 @@ namespace Playground
             _attribute = parentNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
             _battleBehavior = new BattleBehavior(this);
             _inventoryNode.Hide();
-            ResolveDependencies();
+            DiContainer.InjectDependencies(this);
             SetStats();
             SpawnItems();
         }
@@ -173,7 +171,6 @@ namespace Playground
         protected void SetStats()
         {
             _enemyType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
-            SetRandomAbilities();
             _respawnPosition = Position;
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
@@ -183,11 +180,9 @@ namespace Playground
             _attribute!.Strength.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
-            _health!.RefreshHealth();
+            SetRandomAbilities();
             EmitSignal(SignalName.EnemyInitialized);
         }
-
-        protected void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         protected void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
         {
@@ -257,40 +252,28 @@ namespace Playground
             }
         }
 
-        public (float damage, bool crit) ActivateAbilityBeforDealDamage()
+        public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
-            var chosenAbility = _battleBehavior!.MakeDecision();
-            if (chosenAbility == null)
-            {
-                return _attack!.CalculateDamage();
-            }
-
-            IGameComponent? targetComponent = FindComponentToBeInvolved(chosenAbility);
-
-            chosenAbility.ActivateAbility(targetComponent);
-
+            var ability = BattleBehavior?.MakeDecision();
+            ability?.ActivateAbility();
             return _attack!.CalculateDamage();
         }
-
-        public IGameComponent? FindComponentToBeInvolved(Ability? chosenAbility) => chosenAbility?.TargetTypeComponent switch
-        {
-            var t when t == typeof(AttackComponent) => _attack,
-            var t when t == typeof(HealthComponent) => _health,
-            var t when t == typeof(AttackComponent) => _attribute,
-            _ => null
-        };
 
         protected void SetRandomAbilities()
         {
             //var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + Mathf.Max(1, _level / 10);
-            _abilities = new AbilityPool().GetAllAbilities();
+            using (var abilities = new AbilityPool(this))
+            {
+                _abilities = abilities.SelectAbilities(3);
+            }
+            var x = true;
         }
 
         public void PlayerExited(Node2D body)
         {
             if (body is Player s && !_area!.OverlapsBody(s))
             {
-                PlayerEncounted = false;
+                PlayerEncounter = false;
             }
         }
 
@@ -298,7 +281,7 @@ namespace Playground
         {
             if (body is Player s && _area!.OverlapsBody(s))
             {
-                PlayerEncounted = true;
+                PlayerEncounter = true;
             }
         }
 

@@ -1,13 +1,15 @@
 namespace Playground
 {
     using Godot;
-    using Playground.Components.Interfaces;
+    using Playground.Components;
+    using Playground.Script;
 
+    [Inject]
     [GlobalClass]
-    public partial class AttackComponent : Node, IGameComponent
+    public partial class AttackComponent : ComponentBase, IAttackComponent
     {
         #region private fields
-        private readonly RandomNumberGenerator _rng = new();
+        private RandomNumberGenerator? _rnd;
         private float _additionalAdditionlaAttackChance;
         private float _currentAdditionalAttackChance;
         private float _baseAdditionalAttackChance;
@@ -34,6 +36,13 @@ namespace Playground
         #endregion
 
         #region Properties
+
+        [Inject]
+        protected RandomNumberGenerator? Rnd
+        {
+            get => _rnd;
+            set => _rnd = value;
+        }
 
         public float BaseMinDamage
         {
@@ -131,20 +140,20 @@ namespace Playground
             _currentCriticalStrikeChance = _additionalCriticalStrikeChance + _baseCriticalStrikeChance;
             _currentCriticalStrikeDamage = _additionalCriticalStrikeDamage + _baseCriticalStrikeDamage;
             _currentAdditionalAttackChance = _additionalAdditionlaAttackChance + _baseAdditionalAttackChance;
+            DiContainer.InjectDependencies(this);
         }
 
-        public (float damage, bool crit) CalculateDamage()
+
+        public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
-            float damage = _rng.RandfRange(_currentMinDamage, _currentMaxDamage);
-            bool criticalStrike = _rng.RandfRange(0, 1) <= _currentCriticalStrikeChance;
+            float damage = Rnd!.RandfRange(_currentMinDamage, _currentMaxDamage);
+            bool criticalStrike = Rnd.RandfRange(0, 1) <= _currentCriticalStrikeChance;
             if (criticalStrike)
             {
                 var finalDamage = damage * _currentCriticalStrikeDamage;
-                _leechedHealth = _leech * finalDamage;
-                return (finalDamage, true);
+                return (finalDamage, true, _leech * finalDamage);
             }
-            _leechedHealth = _leech * damage;
-            return (damage, false);
+            return (damage, false, _leech * damage);
         }
     }
 }

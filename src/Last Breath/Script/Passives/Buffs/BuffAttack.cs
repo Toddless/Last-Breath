@@ -1,45 +1,35 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using System;
-    using Playground.Components.Interfaces;
     using Playground.Script.Passives.Interfaces;
 
-    public partial class BuffAttack : Ability, ICanBuffAttack
+    public partial class BuffAttack : Ability<AttackComponent>, ICanBuffAttack
     {
         private readonly float _additionalDamage = 1.3f;
 
         private float _baseMinDamageBeforBuff;
         private float _baseMaxDamageBeforBuff;
 
-        public BuffAttack()
+        public BuffAttack(AttackComponent component) : base(component)
         {
         }
 
-        public override Type TargetTypeComponent => typeof(AttackComponent);
-
-        public override void ActivateAbility(IGameComponent? component)
+        public override void ActivateAbility(AttackComponent? component)
         {
-            if (component == null || component is not AttackComponent attack)
-            {
-                return;
-            }
-            _baseMinDamageBeforBuff = attack.BaseMinDamage;
-            _baseMaxDamageBeforBuff = attack.BaseMaxDamage;
+            _baseMinDamageBeforBuff = component.BaseMinDamage;
+            _baseMaxDamageBeforBuff = component.BaseMaxDamage;
 
-            attack.BaseMinDamage *= _additionalDamage;
-            attack.BaseMaxDamage *= _additionalDamage;
+            component.BaseMinDamage *= _additionalDamage;
+            component.BaseMaxDamage *= _additionalDamage;
         }
 
-        public override void AfterBuffEnds(IGameComponent? component)
+
+        public override void AfterBuffEnds(AttackComponent? component)
         {
-            if (component == null || component is not AttackComponent attack)
-            {
-                return;
-            }
-            attack.BaseMinDamage = _baseMinDamageBeforBuff;
-            attack.BaseMaxDamage = _baseMaxDamageBeforBuff;
+            component.BaseMinDamage = _baseMinDamageBeforBuff;
+            component.BaseMaxDamage = _baseMaxDamageBeforBuff;
         }
 
-        public override void EffectAfterAttack(IGameComponent? component) => throw new System.NotImplementedException();
+        public override void EffectAfterAttack(AttackComponent? component) => throw new NotImplementedException();
     }
 }

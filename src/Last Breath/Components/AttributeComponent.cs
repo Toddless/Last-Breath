@@ -2,10 +2,9 @@
 {
     using Playground.Script.Attribute;
     using Godot;
-    using Playground.Components.Interfaces;
 
     [GlobalClass]
-    public partial class AttributeComponent : Node, IGameComponent
+    public partial class AttributeComponent : ComponentBase, IAttributeComponent
     {
         private Dexterity? _dexterity;
         private Strength? _strength;

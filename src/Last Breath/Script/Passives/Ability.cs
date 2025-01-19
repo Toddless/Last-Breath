@@ -1,26 +1,38 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    using System;
     using Godot;
     using Playground.Components.Interfaces;
+    using Playground.Script.Enums;
 
-    public abstract partial class Ability : Node
+    public abstract partial class Ability<T> : Node, IAbility where T : IGameComponent
     {
-        public bool HaveISomethinToApplyAfterAttack { get; set; } = false;
-
-        public abstract Type TargetTypeComponent
-        {
-            get;
-        }
+        private T? _target;
+        private GlobalRarity _rarity;
 
         public int BuffLasts { get; set; } = 1;
 
         public int Cooldown { get; set; } = 4;
 
-        public abstract void AfterBuffEnds(IGameComponent? component);
+        protected Ability(T component)
+        {
+            _target = component;
+        }
+        public IGameComponent? TargetComponent => _target;
 
-        public abstract void ActivateAbility(IGameComponent? component);
+        public GlobalRarity Rarity
+        {
+            get => _rarity;
+            set => _rarity = value;
+        }
 
-        public abstract void EffectAfterAttack(IGameComponent? component);
+        public void AfterBuffEnds() => AfterBuffEnds(_target);
+        public void ActivateAbility() => ActivateAbility(_target);
+        public void EffectAfterAttack() => EffectAfterAttack(_target);
+
+        public abstract void AfterBuffEnds(T? component);
+
+        public abstract void ActivateAbility(T? component);
+
+        public abstract void EffectAfterAttack(T? component);
     }
 }

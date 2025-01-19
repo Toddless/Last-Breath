@@ -4,7 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script.Passives.Attacks;
+    using Playground.Script;
+    using Playground.Script.Passives;
     using Playground.Script.Passives.Interfaces;
 
     [Inject]
@@ -18,17 +19,18 @@
         private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
         private EnemyAI? _enemyAI;
-        private Ability? _activatedAbility;
-        private List<Ability>? _activatedAbilities = [];
-        private Ability? _abitilyWithEffectAfterAttack;
+        private IAbility? _activatedAbility;
+        private List<IAbility>? _activatedAbilities = [];
+        private IAbility? _abitilyWithEffectAfterAttack;
 
         public BattleBehavior(EnemyAI enemy)
         {
             _enemyAI = enemy;
             FindOutWhatICan(_enemyAI.Abilities);
+            DiContainer.InjectDependencies(this);
         }
 
-        public Ability? AbilityWithEffectAfterAttack
+        public IAbility? AbilityWithEffectAfterAttack
         {
             get => _abitilyWithEffectAfterAttack;
         }
@@ -45,7 +47,7 @@
             _playerHealth = player.PlayerHealth;
         }
 
-        private void FindOutWhatICan(List<Ability>? abilities)
+        private void FindOutWhatICan(List<IAbility>? abilities)
         {
             if (abilities == null)
             {
@@ -57,7 +59,7 @@
             _iCanDealDamage = abilities.Any(x => x is ICanDealDamage);
         }
 
-        public Ability? MakeDecision()
+        public IAbility? MakeDecision()
         {
             UpdateUsedAbilitiesCooldown();
             ReduceBuffDuration();
@@ -93,39 +95,38 @@
             return ChoseRandomAbilityNotOnCooldown();
         }
 
-
-        private Ability? UseAbility(Func<Ability, bool> filter)
+        private IAbility? UseAbility(Func<IAbility, bool> filter)
         {
             var abilities = _enemyAI!.Abilities!.Where(filter).ToList();
             return ActivateAbility(abilities);
         }
 
-        private Ability? BuffYourSelf()
+        private IAbility? BuffYourSelf()
         {
-            return UseAbility(x => x is ICanBuffAttack);
+            return UseAbility(x => x is AttackComponent && x is ICanBuffAttack);
         }
 
-        private Ability? TryToKillHimHard()
+        private IAbility? TryToKillHimHard()
         {
             return UseAbility(x => x is ICanDealDamage);
         }
 
-        private Ability? TryDealDamageAndHeal()
+        private IAbility? TryDealDamageAndHeal()
         {
             return UseAbility(x => x is ICanLeech);
         }
 
-        private Ability? TryToHillYourself()
+        private IAbility? TryToHillYourself()
         {
             return UseAbility(x => x is ICanHeal);
         }
 
-        private Ability? ChoseRandomAbilityNotOnCooldown()
+        private IAbility? ChoseRandomAbilityNotOnCooldown()
         {
             return UseAbility(x => x.Cooldown == 4);
         }
 
-        private Ability? ActivateAbility(List<Ability>? abilities)
+        private IAbility? ActivateAbility(List<IAbility>? abilities)
         {
             if (abilities == null)
             {
@@ -139,11 +140,6 @@
 
             var ability = abilities[Rnd!.RandiRange(0, amountAbilities - 1)];
             _activatedAbilities!.Add(ability);
-
-            if (ability.HaveISomethinToApplyAfterAttack)
-            {
-                _abitilyWithEffectAfterAttack = ability;
-            }
             _activatedAbility = ability;
             return ability;
         }
@@ -152,7 +148,7 @@
         {
             if (_activatedAbilities!.Count == 0)
                 return;
-            var buffToDelete = new List<Ability>();
+            var buffToDelete = new List<IAbility>();
             foreach (var ability in _activatedAbilities)
             {
                 ability.Cooldown--;
@@ -168,7 +164,7 @@
 
         private void ReduceBuffDuration()
         {
-            var buffToDelete = new List<Ability>();
+            var buffToDelete = new List<IAbility>();
             foreach (var ability in _activatedAbilities!)
             {
                 ability.BuffLasts--;
@@ -181,7 +177,7 @@
         }
 
 
-        private void DeleteBuffsFromList(List<Ability>? abilities)
+        private void DeleteBuffsFromList(List<IAbility>? abilities)
         {
             if ( abilities == null || abilities.Count == 0 ) { return; }
             foreach (var ability in abilities)
@@ -194,7 +190,7 @@
         {
             foreach (var item in _activatedAbilities!)
             {
-                item.AfterBuffEnds(_enemyAI!.EnemyAttack);
+                item.AfterBuffEnds();
             }
         }
 

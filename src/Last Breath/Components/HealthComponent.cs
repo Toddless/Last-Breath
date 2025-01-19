@@ -1,11 +1,10 @@
 ﻿namespace Playground
 {
     using Godot;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Helpers;
+    using Playground.Components;
 
     [GlobalClass]
-    public partial class HealthComponent : ObservableNode, IGameComponent
+    public partial class HealthComponent : ComponentBase, IHealthComponent
     {
         private readonly float _baseHealth = 100;
         private float _totalPercentHealthIncreases = 1;
@@ -31,7 +30,6 @@
                     if (_currentHealth > _maxHealth)
                     {
                         _currentHealth = _maxHealth;
-                        RefreshHealth();
                     }
                 }
             }
@@ -45,8 +43,7 @@
             get => _totalPercentHealthIncreases;
             set
             {
-                if (SetProperty(ref _totalPercentHealthIncreases, value))
-                    RefreshMaxHealth();
+                SetProperty(ref _totalPercentHealthIncreases, value);
             }
         }
 
@@ -59,8 +56,7 @@
             get => _additionalHealth;
             set
             {
-                if (SetProperty(ref _additionalHealth, value))
-                    RefreshMaxHealth();
+                SetProperty(ref _additionalHealth, value);
             }
         }
 
@@ -77,10 +73,14 @@
                     if(_maxHealth < _currentHealth)
                     {
                         _currentHealth = _maxHealth;
-                        RefreshHealth();
                     }
                 }
             }
+        }
+
+        protected float BaseHealth
+        {
+            get => _baseHealth;
         }
 
         public override void _Ready()
@@ -91,12 +91,16 @@
 
         public void RefreshHealth()
         {
-            _currentHealth = _maxHealth;
+            CurrentHealth = MaxHealth;
         }
 
         private void RefreshMaxHealth()
         {
-            _maxHealth = (_baseHealth + _additionalHealth) * _totalPercentHealthIncreases;
+            MaxHealth = (BaseHealth + AdditionalHealth) * TotalPercentHealthIncreases;
         }
+
+        public void TakeDamage(float damage) => CurrentHealth -= damage;
+        public void Heal(float amount) =>  CurrentHealth += amount;
+        public void ReducePercentageHealth(float percentage) => MaxHealth *= percentage;
     }
 }

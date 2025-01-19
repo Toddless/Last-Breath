@@ -1,29 +1,26 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
-    using System;
-    using Playground.Components.Interfaces;
-
-    public partial class OneShotHeal : Ability
+    public partial class OneShotHeal : Ability<HealthComponent>
     {
         private float _healAmoint = 50;
 
-        public OneShotHeal()
+        public OneShotHeal(HealthComponent component) : base(component)
         {
-        
         }
 
-        public override Type TargetTypeComponent => typeof(HealthComponent);
-
-        public override void ActivateAbility(IGameComponent? component)
+        public override void ActivateAbility(HealthComponent? component)
         {
-            if (component == null || component is not HealthComponent health)
-            {
-                return;
-            }
-            health.CurrentHealth += _healAmoint;
+            component?.Heal(_healAmoint);
         }
-        public override void AfterBuffEnds(IGameComponent? component) => throw new NotImplementedException();
 
-        public override void EffectAfterAttack(IGameComponent? component) => throw new NotImplementedException();
+        public override void AfterBuffEnds(HealthComponent? component)
+        {
+
+        }
+
+        public override void EffectAfterAttack(HealthComponent? component)
+        {
+
+        }
     }
 }
