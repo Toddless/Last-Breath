@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+DiContainer="*res://DIComponents/DiContainer.cs"
 GlobalSignal="*res://Script/Helpers/GlobalSignals.cs"
-DiContainer="*res://Script/DiContainer.cs"
 
 [display]
 

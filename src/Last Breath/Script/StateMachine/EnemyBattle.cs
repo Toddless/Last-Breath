@@ -14,8 +14,8 @@
         }
 
 
-        public override void Enter() => _enemy.Velocity = Godot.Vector2.Zero;
+        public override void Enter() => _enemy!.Velocity = Vector2.Zero;
 
-        public override void Exit() => _enemy.Velocity = _vector2;
+        public override void Exit() => _enemy!.Velocity = _vector2;
     }
 }

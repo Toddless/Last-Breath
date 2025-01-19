@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Script\Helpers\Extensions\" />
     <Folder Include="Script\Items\ItemsAbilities\" />
+    <Folder Include="Script\Items\UniqItems\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".editorconfig" />

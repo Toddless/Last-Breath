@@ -1,6 +1,6 @@
 ﻿using System;
 
-[AttributeUsage(AttributeTargets.All, AllowMultiple = true, Inherited = true)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Constructor | AttributeTargets.Method)]
 public class Inject : Attribute
 {
 }

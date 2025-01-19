@@ -4,25 +4,23 @@
     using Godot;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Script.Items.UniqItems;
 
     public class BodyArmorFactory : ItemCreator
     {
         public BodyArmorFactory(RandomNumberGenerator random)
         {
             ArgumentNullException.ThrowIfNull(random);
-            RandomNumberGenerator = random;
+            Rnd = random;
         }
 
         public override BodyArmor? GenerateItem(GlobalRarity rarity)
         {
             return rarity switch
             {
-                GlobalRarity.Uncommon => new BodyArmor("Iron BodyArmor", GlobalRarity.Uncommon, RandomNumberGenerator!.RandfRange(160, 220), RandomNumberGenerator.RandfRange(150, 300), ResourcePath.BodyArmorUncommon, GD.Load<Texture2D>("res://Assets/BodyArmor/Uncommon.png"), 1, 1),
-                GlobalRarity.Rare => new BodyArmor("Silver BodyArmor", GlobalRarity.Rare, RandomNumberGenerator!.RandfRange(200, 280), RandomNumberGenerator.RandfRange(250, 450), ResourcePath.BodyArmorRare, GD.Load<Texture2D>("res://Assets/BodyArmor/Rare.png"), 1, 1),
-                GlobalRarity.Epic => new("Golden BodyArmor", GlobalRarity.Epic, RandomNumberGenerator!.RandfRange(260, 320), RandomNumberGenerator.RandfRange(500, 750), ResourcePath.BodyArmorEpic, GD.Load<Texture2D>("res://Assets/BodyArmor/Epic.png"), 1, 1),
-                GlobalRarity.Legendary => new BodyArmor("Phoenix BodyArmor", GlobalRarity.Legendary, RandomNumberGenerator!.RandfRange(450, 600), RandomNumberGenerator.RandfRange(600, 900), ResourcePath.BodyArmorLegendary, GD.Load<Texture2D>("res://Assets/BodyArmor/Legendary.png"), 1, 1),
-                GlobalRarity.Mythic => VeryUniqBodyArmor.Instance,
+                GlobalRarity.Uncommon => new BodyArmor(StringHelper.BodyArmorUncommon, GlobalRarity.Uncommon, Rnd!.RandfRange(160, 220), Rnd.RandfRange(150, 300), ResourcePath.BodyArmorUncommon, GD.Load<Texture2D>(TexturePaths.BodyArmorUncommon), 1, 1),
+                GlobalRarity.Rare => new BodyArmor(StringHelper.BodyArmorRare, GlobalRarity.Rare, Rnd!.RandfRange(200, 280), Rnd.RandfRange(250, 450), ResourcePath.BodyArmorRare, GD.Load<Texture2D>(TexturePaths.BodyArmorRare), 1, 1),
+                GlobalRarity.Epic => new(StringHelper.BodyArmorEpic, GlobalRarity.Epic, Rnd!.RandfRange(260, 320), Rnd.RandfRange(500, 750), ResourcePath.BodyArmorEpic, GD.Load<Texture2D>(TexturePaths.BodyArmorEpic), 1, 1),
+                GlobalRarity.Legendary => new BodyArmor(StringHelper.BodyArmorLegendary, GlobalRarity.Legendary, Rnd!.RandfRange(450, 600), Rnd.RandfRange(600, 900), ResourcePath.BodyArmorLegendary, GD.Load<Texture2D>(TexturePaths.BodyArmorLegendary), 1, 1),
                 _ => null,
             };
         }

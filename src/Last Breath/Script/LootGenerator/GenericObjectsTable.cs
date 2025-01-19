@@ -6,61 +6,61 @@
     using System;
     using System.Collections.Generic;
 
-    public abstract class GenericObjectsTable<T, U>
-        where T : GenericObject<U> where U : class
+    public abstract class GenericObjectsTable<T>
+        where T : GenericObject
     {
-        public List<T>? lootDropItems;
+        public List<T>? LootDropItems;
 
-        public List<ItemCreator>? factories;
+        public List<ItemCreator>? Factories;
 
         private RandomNumberGenerator? _random = new();
 
-        private float probabilityTotalWeight;
+        private float _probabilityTotalWeight;
 
         public virtual void ValidateTable()
         {
             SetFactories();
-            if (lootDropItems != null && lootDropItems.Count > 0)
+            if (LootDropItems != null && LootDropItems.Count > 0)
             {
                 float currentProbabilityWeithMaximum = 0f;
 
-                foreach (T lootDropItem in lootDropItems)
+                foreach (T lootDropItem in LootDropItems)
                 {
-                    if (lootDropItem.probabilityWeight < 0f)
+                    if (lootDropItem.ProbabilityWeight < 0f)
                     {
-                        lootDropItem.probabilityWeight = 0f;
+                        lootDropItem.ProbabilityWeight = 0f;
                     }
                     else
                     {
-                        lootDropItem.probabilityRangeFrom = currentProbabilityWeithMaximum;
-                        currentProbabilityWeithMaximum += lootDropItem.probabilityWeight;
-                        lootDropItem.probabilityRangeTo = currentProbabilityWeithMaximum;
+                        lootDropItem.ProbabilityRangeFrom = currentProbabilityWeithMaximum;
+                        currentProbabilityWeithMaximum += lootDropItem.ProbabilityWeight;
+                        lootDropItem.ProbabilityRangeTo = currentProbabilityWeithMaximum;
                     }
                 }
-                probabilityTotalWeight = currentProbabilityWeithMaximum;
+                _probabilityTotalWeight = currentProbabilityWeithMaximum;
 
-                foreach (T lootDropItem in lootDropItems)
+                foreach (T lootDropItem in LootDropItems)
                 {
-                    lootDropItem.probabilityPercent = lootDropItem.probabilityWeight / probabilityTotalWeight * 100;
+                    lootDropItem.ProbabilityPercent = MathF.Round(lootDropItem.ProbabilityWeight / _probabilityTotalWeight * 100, 1);
                 }
             }
         }
 
         public virtual Item? GetRandomItem()
         {
-            if (lootDropItems == null || factories == null)
+            if (LootDropItems == null || Factories == null)
             {
-                ArgumentNullException.ThrowIfNull(lootDropItems);
-                ArgumentNullException.ThrowIfNull(factories);
+                ArgumentNullException.ThrowIfNull(LootDropItems);
+                ArgumentNullException.ThrowIfNull(Factories);
             }
-            var randomFactory = _random!.RandiRange(0, factories.Count - 1);
+            var randomFactory = _random!.RandiRange(0, Factories.Count - 1);
 
-            var factory = factories[randomFactory];
+            var factory = Factories[randomFactory];
 
-            float pickedNumber = _random.RandfRange(0, probabilityTotalWeight);
-            foreach (T lootDropItem in lootDropItems)
+            float pickedNumber = _random.RandfRange(0, _probabilityTotalWeight);
+            foreach (T lootDropItem in LootDropItems)
             {
-                if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
+                if (pickedNumber >= lootDropItem.ProbabilityRangeFrom && pickedNumber <= lootDropItem.ProbabilityRangeTo)
                 {
                     return factory?.GenerateItem(lootDropItem.Rarity);
                 }
@@ -70,10 +70,10 @@
 
         public virtual T? GetRarity()
         {
-            float pickedNumber = _random!.RandfRange(0, probabilityTotalWeight);
-            foreach (T lootDropItem in lootDropItems!)
+            float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
+            foreach (T lootDropItem in LootDropItems!)
             {
-                if (pickedNumber >= lootDropItem.probabilityRangeFrom && pickedNumber <= lootDropItem.probabilityRangeTo)
+                if (pickedNumber >= lootDropItem.ProbabilityRangeFrom && pickedNumber <= lootDropItem.ProbabilityRangeTo)
                 {
                     return lootDropItem;
                 }
@@ -83,21 +83,21 @@
 
         public virtual Item? GetItemWithSelectedRarity(int index)
         {
-            if (lootDropItems == null || factories == null)
+            if (LootDropItems == null || Factories == null)
             {
-                ArgumentNullException.ThrowIfNull(factories);
-                ArgumentNullException.ThrowIfNull(lootDropItems);
+                ArgumentNullException.ThrowIfNull(Factories);
+                ArgumentNullException.ThrowIfNull(LootDropItems);
             }
-            var randomFactory = _random!.RandiRange(0, factories.Count - 1);
+            var randomFactory = _random!.RandiRange(0, Factories.Count - 1);
 
-            var factory = factories[randomFactory];
+            var factory = Factories[randomFactory];
 
-            return factory?.GenerateItem(lootDropItems[index].Rarity);
+            return factory?.GenerateItem(LootDropItems[index].Rarity);
         }
 
         private void SetFactories()
         {
-            factories =
+            Factories =
             [
                 new BowFactory(_random!),
                 new SwordFactory(_random!),

@@ -5,7 +5,7 @@
 
     public abstract class ItemCreator
     {
-        protected RandomNumberGenerator? RandomNumberGenerator;
+        protected RandomNumberGenerator? Rnd;
 
         public abstract Item? GenerateItem(GlobalRarity rarity);
     }

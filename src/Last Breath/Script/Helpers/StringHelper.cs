@@ -16,6 +16,10 @@
         public static readonly string BowLegendary = "Bow Phoenix Fire";
         public static readonly string BowMythic = "Zeus`s Bow";
 
+        public static readonly string BodyArmorUncommon = "Iron Heart";
+        public static readonly string BodyArmorRare = "Silver Heart";
+        public static readonly string BodyArmorEpic = "Golden Heart";
+        public static readonly string BodyArmorLegendary = "Phoenix Plumage";
 
         public static readonly string BodyArmorMythic = "Heart of darkness";
     }

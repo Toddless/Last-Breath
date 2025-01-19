@@ -1,6 +1,13 @@
 ﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    public class Rarity()
+    using Playground.Script.Enums;
+
+    public class Rarity : GenericObject
     {
+        public Rarity(GlobalRarity rarity)
+        {
+            Rarity = rarity;
+            ProbabilityWeight = ConvertGlobalRarity.rarityWeights[rarity];
+        }
     }
 }

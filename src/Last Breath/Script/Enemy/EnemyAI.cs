@@ -28,11 +28,11 @@ namespace Playground
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
-        [Inject] private RandomNumberGenerator? _rnd;
+        private RandomNumberGenerator? _rnd;
         private AnimatedSprite2D? _sprite;
         private Vector2 _respawnPosition;
         private Area2D? _area;
-        [Inject] private BattleBehavior? _battleBehavior;
+        private BattleBehavior? _battleBehavior;
         private List<Ability>? _abilities;
         private StateMachine? _machine;
         private EnemyType? _enemyType;
@@ -62,6 +62,7 @@ namespace Playground
             set => _navigationAgent2D = value;
         }
 
+        [Inject]
         public BattleBehavior? BattleBehavior
         {
             get => _battleBehavior;
@@ -91,9 +92,11 @@ namespace Playground
             set => _attribute = value;
         }
 
+        [Inject]
         public RandomNumberGenerator? Rnd
         {
             get => _rnd;
+            set => _rnd = value;
         }
 
         public List<Ability>? Abilities
@@ -145,7 +148,7 @@ namespace Playground
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = _inventoryContainer.GetNode<EnemyInventoryComponent>(nameof(EnemyInventoryComponent));
-            Inventory.Initialize(25, SceneParh.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
+            Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _attack = parentNode.GetNode<AttackComponent>(nameof(AttackComponent));
             _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
@@ -162,18 +165,18 @@ namespace Playground
             SpawnItems();
         }
 
-        private void SpawnItems()
+        protected void SpawnItems()
         {
             _inventory?.AddItem(DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>()?.GetRandomItem());
         }
 
-        private void SetStats()
+        protected void SetStats()
         {
-            _enemyType = SetRandomEnemyType(_rnd!.RandiRange(1, 2));
+            _enemyType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
             SetRandomAbilities();
             _respawnPosition = Position;
             Rarity = EnemyRarity();
-            _level = _rnd.RandiRange(1, 50);
+            _level = Rnd.RandiRange(1, 50);
             var points = SetAttributesDependsOnType(_enemyType);
             _attribute!.Dexterity!.PropertyChanged += OnDexterityChange;
             _attribute.Strength!.PropertyChanged += OnStrengthChange;
@@ -184,9 +187,9 @@ namespace Playground
             EmitSignal(SignalName.EnemyInitialized);
         }
 
-        private void ResolveDependencies() => DiContainer.InjectDependencies(this);
+        protected void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
-        private void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
+        protected void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
         {
             if (e is PropertyChangedWithValuesEventArgs<int> args)
             {
@@ -197,26 +200,22 @@ namespace Playground
                     _attack.CurrentCriticalStrikeChance = _attack.BaseCriticalStrikeChance * _attribute.Dexterity.TotalCriticalStrikeChance();
                     GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalStrikeChance}, CritDamage: {_attack.CurrentCriticalStrikeDamage}");
                 }
-                else
-                {
-
-                }
             }
         }
 
-        private void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
+        protected void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
         {
             if (e is PropertyChangedWithValuesEventArgs<int> args)
             {
                 if (args.NewValue < args.OldValue)
                 {
                     var diff = args.OldValue - args.NewValue;
-                    _health.TotalPercentHealthIncreases -= _attribute.Strength.HealthIncrease * diff;
+                    _health!.TotalPercentHealthIncreases -= _attribute!.Strength!.HealthIncrease * diff;
 
                 }
                 else
                 {
-                    _health.TotalPercentHealthIncreases = _attribute.Strength.TotalHealthIncrese();
+                    _health!.TotalPercentHealthIncreases = _attribute!.Strength!.TotalHealthIncrese();
                 }
                 GD.Print($"Current hp after strength increased: {_health.CurrentHealth}, Max Health: {_health.MaxHealth}\n" +
                     $"Strength: {_attribute.Strength.Total}");
@@ -227,16 +226,16 @@ namespace Playground
             }
         }
 
-        private void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
+        protected void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
 
-        public GlobalRarity EnemyRarity()
+        protected GlobalRarity EnemyRarity()
         {
             //var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
             //return rarity.Rarity;
             return GlobalRarity.Common;
         }
 
-        public void SetAnimation()
+        protected void SetAnimation()
         {
             switch (Rarity)
             {
@@ -270,7 +269,6 @@ namespace Playground
 
             chosenAbility.ActivateAbility(targetComponent);
 
-            GD.Print($"Activated ability {chosenAbility.GetType()}. Cooldown {chosenAbility.Cooldown}");
             return _attack!.CalculateDamage();
         }
 
@@ -282,7 +280,7 @@ namespace Playground
             _ => null
         };
 
-        public void SetRandomAbilities()
+        protected void SetRandomAbilities()
         {
             //var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + Mathf.Max(1, _level / 10);
             _abilities = new AbilityPool().GetAllAbilities();
@@ -304,7 +302,7 @@ namespace Playground
             }
         }
 
-        private (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyType? enemyType)
+        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyType? enemyType)
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
@@ -321,7 +319,7 @@ namespace Playground
         }
 
 
-        private EnemyType SetRandomEnemyType(int index)
+        protected EnemyType SetRandomEnemyType(int index)
         {
             return index switch
             {

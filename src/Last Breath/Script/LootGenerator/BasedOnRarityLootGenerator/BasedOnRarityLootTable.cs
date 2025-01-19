@@ -3,23 +3,22 @@
     using Playground.Script.Enums;
     using Playground.Script.Items;
 
-    public class BasedOnRarityLootTable : GenericObjectsTable<RarityLoodDrop, Rarity>, IBasedOnRarityLootTable
+    public class BasedOnRarityLootTable : GenericObjectsTable<Rarity>, IBasedOnRarityLootTable
     {
         public void InitializeLootTable()
         {
-            lootDropItems =
+            LootDropItems =
             [
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Uncommon),
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Rare),
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Epic),
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Legendary),
-                new RarityLoodDrop(new Rarity(),GlobalRarity.Mythic),
+                new Rarity(GlobalRarity.Uncommon),
+                new Rarity(GlobalRarity.Rare),
+                new Rarity(GlobalRarity.Epic),
+                new Rarity(GlobalRarity.Legendary),
             ];
         }
 
         public override void ValidateTable() => base.ValidateTable();
 
-        public override RarityLoodDrop? GetRarity() => base.GetRarity();
+        public override Rarity? GetRarity() => base.GetRarity();
 
         public override Item? GetRandomItem() => base.GetRandomItem();
 

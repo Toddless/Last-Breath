@@ -1,6 +1,5 @@
 ﻿namespace Playground
 {
-    using System;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -51,8 +50,7 @@
         private ProgressBar? _progressBar;
         private Panel? _inventoryWindow;
         private Label? _healthBarText;
-        private Node2D? _inventoryNode;
-        private Node2D? _uIElements;
+        private Node2D? _playersInventoryElements, _inventoryNode;
         #endregion
 
         #region Properties
@@ -119,8 +117,8 @@
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
             var playerNode = parentNode.GetNode<CharacterBody2D>(nameof(CharacterBody2D));
-            _uIElements = playerNode.GetNode<Node2D>("UI");
-            _inventoryNode = _uIElements.GetNode<Node2D>("Inventory");
+            _playersInventoryElements = playerNode.GetNode<Node2D>("UI");
+            _inventoryNode = _playersInventoryElements.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _inventory = _inventoryContainder.GetNode<InventoryComponent>(nameof(InventoryComponent));
@@ -131,15 +129,15 @@
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
-            _playerStats = _uIElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
+            _playerStats = _playersInventoryElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
-            _inventory.Inititalize(105, SceneParh.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
+            _inventory.Inititalize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             SetHealthBar();
             UpdateStats();
-            _uIElements.Hide();
+            _playersInventoryElements.Hide();
             _sprite.Play("Idle_down");
         }
 
@@ -152,14 +150,13 @@
         {
             if (Input.IsActionJustPressed(InputMaps.OpenInventoryOnI))
             {
-                if (_uIElements!.Visible)
+                if (_playersInventoryElements!.Visible)
                 {
-                    _uIElements?.Hide();
+                    _playersInventoryElements?.Hide();
                 }
                 else
                 {
-                    _uIElements?.Show();
-
+                    _playersInventoryElements?.Show();
                 }
             }
         }

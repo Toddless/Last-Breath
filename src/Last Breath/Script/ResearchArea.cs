@@ -10,8 +10,7 @@
     {
         #region Private fields
 
-        [Inject]
-        public IBasedOnRarityLootTable? _lootTable;
+        private IBasedOnRarityLootTable? _lootTable;
         private GlobalRarity _areaRarity;
         #endregion
 
@@ -24,7 +23,14 @@
         public delegate void PlayerTakeDamageOnAreaEnterEventHandler(float damage);
         #endregion
 
-        #region Public properties
+        #region Properties
+        [Inject]
+        protected IBasedOnRarityLootTable? LootTable
+        {
+            get => _lootTable;
+            set => _lootTable = value;
+        }
+
         public GlobalRarity AreaRarity
         {
             get => _areaRarity;
@@ -37,8 +43,6 @@
             BodyEntered += OnPlayerEnter;
             BodyExited += OnPlayerExited;
             AreaRarity = GlobalRarity.Epic;
-            // _lootTable = DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>();
-            GD.Print($"Scene initialized: {this.Name}");
             Initialize();
         }
 
@@ -64,7 +68,7 @@
 
         public Item? GetRandomResearchEvent()
         {
-            var item = _lootTable?.GetRandomItem();
+            var item = LootTable?.GetRandomItem();
             return item;
         }
     }

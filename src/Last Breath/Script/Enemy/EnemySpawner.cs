@@ -5,29 +5,88 @@ namespace Playground.Script.Enemy
     using System.Collections.Specialized;
     using System.Linq;
     using Godot;
+    using Playground.Script.Helpers;
     using Playground.Script.Scenes;
 
-    public partial class EnemySpawner : Node
+    [Inject]
+    public partial class EnemySpawner : Node, IEnemySpawner
     {
         private Dictionary<Vector2, EnemyAI?> _enemyPosition = new();
-        private RandomNumberGenerator _rnd = new();
-        private Queue<Action> _spawnQueue = new();
-        private bool _isProcessing = false;
         private BaseSpawnableScene? _parentScene;
+        private Queue<Action> _spawnQueue = new();
+        private RandomNumberGenerator? _rnd;
+        private bool _isProcessing = false;
         private PackedScene? _enemyToSpawn;
         private Timer? _timer;
 
+        [Inject]
+        protected RandomNumberGenerator? Rnd
+        {
+            get => _rnd;
+            set => _rnd = value;
+        }
+
+        protected Queue<Action> SpawnQueue
+        {
+            get => _spawnQueue;
+            set => _spawnQueue = value;
+        }
+
+        protected PackedScene? EnemyToSpawn
+        {
+            get => _enemyToSpawn;
+            set => _enemyToSpawn = value;
+        }
+
+        protected BaseSpawnableScene? ParentScene
+        {
+            get => _parentScene;
+            set => _parentScene = value;
+        }
+
+        protected Dictionary<Vector2, EnemyAI?> EnemyPositions
+        {
+            get => _enemyPosition;
+            set => _enemyPosition = value;
+        }
+
         public override void _Ready()
         {
+            // TODO: When I am in a battle, enemies spawn in the battle scene
+            ParentScene = (BaseSpawnableScene)GetParent();
+            _timer = ParentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
+            EnemyToSpawn = ResourceLoader.Load<PackedScene>(ScenePath.EnemyToSpawn);
+            ParentScene.Enemies!.CollectionChanged += OnCollectionChanged;
+            ResolveDependencies();
+        }
 
-            // TODO: Enemy spawn on battle scene to if i am in battle
-            _parentScene = (BaseSpawnableScene)GetParent();
-            _timer = _parentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
-            _enemyToSpawn = ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn");
-            _parentScene.Enemies!.CollectionChanged += OnCollectionChanged;
+        private void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
-            GD.Print($"Scene initialized: {this.Name}");
+        public void InitializeEnemiesPositions(List<Vector2> positions)
+        {
+            foreach (Vector2 position in positions)
+            {
+                EnemyPositions[position] = null;
+            }
+        }
 
+        public void DeleteEnemy(EnemyAI enemyToDelete)
+        {
+            var positionToFree = EnemyPositions!.FirstOrDefault(x => x.Value == enemyToDelete);
+            EnemyPositions![positionToFree.Key] = null;
+        }
+
+        public void SpawnNewEnemy()
+        {
+            var freePosition = EnemyPositions!.FirstOrDefault(x => x.Value == null);
+            EnemyAI enemy = EnemyToSpawn!.Instantiate<EnemyAI>();
+            ParentScene!.CallDeferred("add_child", enemy);
+            ParentScene.Enemies!.Add(enemy);
+            enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
+            enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
+            enemy.PropertyChanged += ParentScene.EnemiePropertyChanged;
+            enemy.Position = freePosition.Key;
+            EnemyPositions![freePosition.Key] = enemy;
         }
 
         /// <summary>
@@ -45,23 +104,9 @@ namespace Playground.Script.Enemy
             EnqueueSpawnEnemyEvent();
         }
 
-        public void InitializeEnemiesPositions(List<Vector2> positions)
-        {
-            foreach (Vector2 position in positions)
-            {
-                _enemyPosition[position] = null;
-            }
-        }
-
-        public void DeleteEnemy(EnemyAI enemyToDelete)
-        {
-            var positionToFree = _enemyPosition!.FirstOrDefault(x => x.Value == enemyToDelete);
-            _enemyPosition![positionToFree.Key] = null;
-        }
-
         private void EnqueueSpawnEnemyEvent()
         {
-            _spawnQueue.Enqueue(SpawnNewEnemy);
+            SpawnQueue.Enqueue(SpawnNewEnemy);
 
             ProcessingQueue();
         }
@@ -71,33 +116,19 @@ namespace Playground.Script.Enemy
         /// </summary>
         private async void ProcessingQueue()
         {
-            if (_isProcessing || _spawnQueue.Count == 0)
+            if (_isProcessing || SpawnQueue.Count == 0)
             {
                 return;
             }
             _isProcessing = true;
-            _timer!.Start(_rnd.RandiRange(5, 15));
+            _timer!.Start(Rnd!.RandiRange(5, 15));
             if (_timer!.TimeLeft != 0)
             {
                 await ToSignal(_timer, "timeout");
             }
-            _spawnQueue.Dequeue().Invoke();
+            SpawnQueue.Dequeue().Invoke();
 
             _isProcessing = false;
-        }
-
-        public void SpawnNewEnemy()
-        {
-            var freePosition = _enemyPosition!.FirstOrDefault(x => x.Value == null);
-            EnemyAI enemy = _enemyToSpawn!.Instantiate<EnemyAI>();
-            _parentScene!.CallDeferred("add_child", enemy);
-            _parentScene.Enemies!.Add(enemy);
-            enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
-            enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
-            enemy.PropertyChanged += _parentScene.EnemiePropertyChanged;
-            enemy.Position = freePosition.Key;
-            _enemyPosition![freePosition.Key] = enemy;
-            GD.Print($"{enemy.VisibilityLayer}, {enemy.CollisionLayer}");
         }
     }
 }

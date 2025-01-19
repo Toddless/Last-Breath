@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script
 {
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Inventory;
     using System.Collections.Generic;
     using Playground.Script.Items;
@@ -9,17 +8,15 @@
     using System;
     using Playground.Components.Interfaces;
 
-    [Inject]
     [GlobalClass]
     public partial class EnemyInventoryComponent : Node, IInventory
     {
-        [Inject] private IBasedOnRarityLootTable? _lootTable;
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
         private Item? _item;
         private Action? _showInventory;
         private Action? _hideInventory;
-
+      
         public Action? ShowInventory
         {
             get => _showInventory;
@@ -42,7 +39,6 @@
             }
             _hideInventory = hideInventory;
             _showInventory = showInventory;
-            ResolveServices();
         }
 
         public List<Item> GivePlayerItems() => _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem!).ToList();
@@ -55,7 +51,6 @@
             var slot = GetSlotToAdd(item);
             if (slot == null)
             {
-                GD.Print("No slot available.");
                 return;
             }
 
@@ -81,8 +76,6 @@
             if (items.Count > 0)
                 items.ForEach(AddItem!);
         }
-
-        private void ResolveServices() => DiContainer.InjectDependencies(this);
 
         private void RemoveItem(Item? item)
         {

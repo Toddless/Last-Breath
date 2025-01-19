@@ -1,24 +1,24 @@
 ﻿namespace Playground.Script
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Godot;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Microsoft.Extensions.DependencyInjection;
+    using System.Collections.Generic;
+    using Microsoft.CodeAnalysis;
+    using System.Reflection;
+    using System.Linq;
+    using System;
+    using Godot;
 
     public partial class DiContainer : Node
     {
-        public static List<ClassMetadata>? ClassMetadataCollection
+        private static List<ClassMetadata>? ClassMetadataCollection
         {
-            get; private set;
+            get; set;
         }
 
         public static IServiceProvider? ServiceProvider
         {
-            get; set;
+            get; private set;
         }
 
         public override void _Ready()
@@ -27,7 +27,22 @@
             CollectClassesToInject();
         }
 
-        public static void Configure()
+        public static void InjectDependencies(object instance)
+        {
+            var getClassToInject = ClassMetadataCollection?.FirstOrDefault(type => type.Type == instance.GetType());
+            if (getClassToInject == null) { return; }
+
+            foreach (var property in getClassToInject.Properties)
+            {
+                var dependency = ServiceProvider?.GetService(property.PropertyType);
+                if (dependency != null)
+                {
+                    property.SetValue(instance, dependency);
+                }
+            }
+        }
+
+        private void Configure()
         {
             var provider = new ServiceCollection();
 
@@ -38,32 +53,17 @@
                 instance.ValidateTable();
                 return instance;
             });
-            provider.AddTransient<RandomNumberGenerator>();
+            provider.AddSingleton<RandomNumberGenerator>();
 
             ServiceProvider = provider.BuildServiceProvider();
         }
 
-        public static void CollectClassesToInject()
+        private void CollectClassesToInject()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             ClassMetadataCollection = assembly.GetTypes()
                 .Where(type => type.GetCustomAttribute<Inject>() != null)
-                .Select(type => new ClassMetadata(type, type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).Where(field => field.GetCustomAttribute<Inject>() != null).ToList())).ToList();
-        }
-
-        public static void InjectDependencies(object instance)
-        {
-            var getClassToInject = ClassMetadataCollection?.FirstOrDefault(type => type.Type == instance.GetType());
-            if (getClassToInject == null) { return; }
-
-            foreach (var field in getClassToInject.Fields)
-            {
-                var dependency = ServiceProvider?.GetService(field.FieldType);
-                if (dependency != null)
-                {
-                    field.SetValue(instance, dependency);
-                }
-            }
+                .Select(type => new ClassMetadata(type, type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).Where(property => property.GetCustomAttribute<Inject>() != null).ToList())).ToList();
         }
     }
 }

@@ -14,8 +14,7 @@
         private PackedScene? _inventorySlot;
         private int _capacity;
         private Item? _item;
-        private Action? _showInventory;
-        private Action? _hideInventory;
+        private Action? _showInventory, _hideInventory;
 
         public Action? ShowInventory
         {
@@ -81,7 +80,6 @@
             var slot = GetSlotToAdd(item);
             if (slot == null)
             {
-                GD.Print("No slot available.");
                 return;
             }
 

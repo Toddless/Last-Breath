@@ -2,18 +2,15 @@
 {
     using Playground.Script.Enums;
 
-    public abstract class GenericObject<T>
-        where T : class
+    public abstract class GenericObject
     {
-        public T? Item;
+        public float ProbabilityWeight;
 
-        public float probabilityWeight;
+        public float ProbabilityPercent;
 
-        public float probabilityPercent;
+        public float ProbabilityRangeFrom;
 
-        public float probabilityRangeFrom;
-
-        public float probabilityRangeTo;
+        public float ProbabilityRangeTo;
 
         public GlobalRarity Rarity;
     }

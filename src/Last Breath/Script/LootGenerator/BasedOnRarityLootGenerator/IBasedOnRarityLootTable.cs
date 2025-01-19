@@ -6,7 +6,7 @@
     {
         Item? GetItemWithSelectedRarity(int index);
         Item? GetRandomItem();
-        RarityLoodDrop? GetRarity();
+        Rarity? GetRarity();
         void InitializeLootTable();
         void ValidateTable();
     }

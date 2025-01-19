@@ -1,6 +1,5 @@
 namespace Playground
 {
-    using System;
     using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script;
@@ -12,7 +11,7 @@ namespace Playground
         private Button? _intelligenceStance, _dexterityStance, _strengthStance;
         private ProgressBar? _playerHpBar, _enemyHpBar;
         private Button? _head, _body, _legs;
-        [Inject] private RandomNumberGenerator? _rnd;
+        private RandomNumberGenerator? _rnd;
         private GlobalSignals? _signals;
         private Button? _returnButton, _takeAll;
         private Sprite2D? _sprite;
@@ -30,6 +29,12 @@ namespace Playground
         [Signal]
         public delegate void PlayerTurnEventHandler();
 
+        [Inject]
+        protected RandomNumberGenerator? Rnd
+        {
+            get => _rnd;
+            set => _rnd = value;
+        }
 
         public override void _Ready()
         {
@@ -81,7 +86,6 @@ namespace Playground
         {
             if (_enemy == null)
             {
-                GD.Print("Opponents not found");
                 SetPlayerStats();
                 this.CallDeferred("remove_child", _player!);
                 GetParent().CallDeferred("add_child", _player!);
@@ -129,7 +133,7 @@ namespace Playground
         private void EnemyTurnHandler()
         {
             _enemy!.BattleBehavior?.GatherInfo(_player!);
-            float additionalAttackChance = _rnd!.RandfRange(0, 1);
+            float additionalAttackChance = Rnd!.RandfRange(0, 1);
             var (damage, crit) = _enemy.ActivateAbilityBeforDealDamage();
 
             // TODO: Ability animation

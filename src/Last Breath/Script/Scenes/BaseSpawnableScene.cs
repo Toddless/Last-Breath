@@ -7,11 +7,12 @@
     using System.ComponentModel;
     using System.Collections.Generic;
 
+    [Inject]
     public abstract partial class BaseSpawnableScene : ObservableNode2D
     {
         private ObservableCollection<EnemyAI>? _enemies = [];
-        private RandomNumberGenerator _rnd = new();
-        private EnemySpawner? _enemySpawner;
+        private RandomNumberGenerator? _rnd;
+        private IEnemySpawner? _enemySpawner;
         private List<Vector2>? _enemiesRespawnPosition;
 
         public ObservableCollection<EnemyAI>? Enemies
@@ -20,15 +21,17 @@
             set => SetProperty(ref _enemies, value);
         }
 
-        public EnemySpawner? EnemySpawner
+        public IEnemySpawner? EnemySpawner
         {
             get => _enemySpawner;
             set => _enemySpawner = value;
         }
 
-        public RandomNumberGenerator Rnd
+        [Inject]
+        protected RandomNumberGenerator? Rnd
         {
             get => _rnd;
+            set => _rnd = value;
         }
 
         public List<Vector2>? EnemiesRespawnPosition

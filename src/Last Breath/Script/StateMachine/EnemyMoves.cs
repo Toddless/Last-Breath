@@ -82,13 +82,6 @@
             _enemy!.Rotation = _velocity.Angle();
             var collide = _enemy.MoveAndCollide(_enemy.Velocity * delta);
 
-
-            //if (collide != null)
-            //{
-            //    GD.Print("Collide set new path");
-            //    SetRandomTarget();
-            //}
-
             if (_enemy.Position.DistanceTo(_targetPosition) <= 10.0f)
             {
                 EmitSignal(SignalName.EnemyReached);

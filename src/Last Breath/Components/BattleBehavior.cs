@@ -7,6 +7,7 @@
     using Playground.Script.Passives.Attacks;
     using Playground.Script.Passives.Interfaces;
 
+    [Inject]
     public class BattleBehavior
     {
         private bool _iCanHeal;
@@ -14,6 +15,7 @@
         private bool _iCanLeech;
         private bool _iCanDealDamage;
         private bool _iCanBuffDefence;
+        private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
         private EnemyAI? _enemyAI;
         private Ability? _activatedAbility;
@@ -29,6 +31,13 @@
         public Ability? AbilityWithEffectAfterAttack
         {
             get => _abitilyWithEffectAfterAttack;
+        }
+
+        [Inject]
+        protected RandomNumberGenerator? Rnd
+        {
+            get => _rnd;
+            set => _rnd = value;
         }
 
         public void GatherInfo(Player player)
@@ -123,13 +132,12 @@
                 return null;
             }
             var amountAbilities = abilities.Where(x => x.Cooldown == 4).Count();
-            GD.Print($"Abilities to activate {amountAbilities}");
             if (amountAbilities == 0)
             {
                 return null;
             }
 
-            var ability = abilities[_enemyAI!.Rnd.RandiRange(0, amountAbilities - 1)];
+            var ability = abilities[Rnd!.RandiRange(0, amountAbilities - 1)];
             _activatedAbilities!.Add(ability);
 
             if (ability.HaveISomethinToApplyAfterAttack)

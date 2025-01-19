@@ -7,30 +7,36 @@ namespace Playground
     using Playground.Script.Scenes;
     using System;
     using System.Collections.Generic;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script;
+    using Playground.Script.Helpers;
 
-    [Inject]
     public partial class MainScene : BaseSpawnableScene
     {
-        private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>("res://Scenes/BattleScene.tscn");
+        private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>(ScenePath.BattleScene);
         private BattleScene? _currentBattleScene;
         private Queue<Action> _actionQueue = new();
         private Button? _addAttribute, _dealDamage, _reduceAttribute;
         private Player? _player;
-        [Inject] private IBasedOnRarityLootTable? _basedOnRarityLootTable;
-
+      
         public override void _Ready()
         {
-            EnemySpawner = GetNode<EnemySpawner>(nameof(EnemySpawner));
+            EnemySpawner = GetNode<IEnemySpawner>(nameof(EnemySpawner));
             _player = GetNode<Player>(nameof(CharacterBody2D));
+            // for testing purposes 
             _reduceAttribute = GetNode<Button>("/root/MainScene/UI/Buttons/ReduceEnemiesAttribute");
             _addAttribute = GetNode<Button>("/root/MainScene/UI/Buttons/AddEnemiesAttribute");
             _dealDamage = GetNode<Button>("/root/MainScene/UI/Buttons/DealDamage");
             _dealDamage.Pressed += DealDamage;
             _addAttribute.Pressed += AddEnemiesAttribute;
             _reduceAttribute.Pressed += ReduceEnemiesAttributePressed;
+            // ... 
+            
+            ResolveDependencies();
+            InitializeEnemies();
+        }
 
+        private void InitializeEnemies()
+        {
             EnemiesRespawnPosition = new List<Vector2>()
                 {
                     new(259, 566),
@@ -39,34 +45,38 @@ namespace Playground
                     new(515, 172),
                     new(290, 210),
                 };
-            EnemySpawner.InitializeEnemiesPositions(EnemiesRespawnPosition);
+            EnemySpawner?.InitializeEnemiesPositions(EnemiesRespawnPosition);
 
             for (int i = 0; i < EnemiesRespawnPosition.Count; i++)
             {
-                EnemySpawner.SpawnNewEnemy();
+                EnemySpawner?.SpawnNewEnemy();
             }
         }
 
-
+        // Test
         private void DealDamage()
         {
             var enemy = Enemies?[0];
-            enemy.EnemyHealth.MaxHealth *= 0.9f;
+            enemy!.EnemyHealth!.MaxHealth *= 0.9f;
             GD.Print($"Current health: {enemy.EnemyHealth.CurrentHealth}\n" +
                 $"Max health: {enemy.EnemyHealth.MaxHealth}");
         }
 
+        // Test
         private void AddEnemiesAttribute()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference. Since this is testing methods, i dont realy care about this warnings
             Enemies[0].EnemyAttribute.Dexterity.Total += 5;
             Enemies[0].EnemyAttribute.Strength.Total += 5;
         }
 
+        // Test
         private void ReduceEnemiesAttributePressed()
         {
             Enemies[0].EnemyAttribute.Dexterity.Total -= 5;
             Enemies[0].EnemyAttribute.Strength.Total -= 5;
         }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
         public void PlayerInteracted(EnemyAI? enemy)
         {
