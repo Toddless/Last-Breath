@@ -3,7 +3,6 @@ namespace Playground
     using System.Collections.Generic;
     using System.ComponentModel;
     using Godot;
-    using Microsoft.Extensions.DependencyInjection;
     using Playground.Components;
     using Playground.NewFolder;
     using Playground.Script;
@@ -24,6 +23,7 @@ namespace Playground
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false;
+        private IBasedOnRarityLootTable? _lootTable;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
@@ -138,6 +138,13 @@ namespace Playground
             get => _inventory;
             set => _inventory = value;
         }
+
+        [Inject]
+        protected IBasedOnRarityLootTable? LootTable
+        {
+            get => _lootTable;
+            set => _lootTable = value;
+        }
         #endregion
 
         public override void _Ready()
@@ -166,7 +173,7 @@ namespace Playground
 
         protected void SpawnItems()
         {
-            _inventory?.AddItem(DiContainer.ServiceProvider?.GetService<IBasedOnRarityLootTable>()?.GetRandomItem());
+            _inventory?.AddItem(LootTable?.GetRandomItem());
         }
 
         protected void SetStats()
@@ -256,9 +263,6 @@ namespace Playground
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
             BattleBehavior?.MakeDecision()?.ActivateAbility();
-            var testStrategyAbility = new TestAbility();
-            testStrategyAbility.Execute(this.EnemyAttack!);
-
             return _attack!.CalculateDamage();
         }
 

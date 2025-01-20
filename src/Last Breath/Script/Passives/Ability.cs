@@ -4,7 +4,7 @@
     using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
-    public abstract partial class Ability<T> : Node, IAbility where T : IGameComponent
+    public abstract partial class Ability<T> : RefCounted, IAbility where T : IGameComponent
     {
         private T? _target;
         private GlobalRarity _rarity;

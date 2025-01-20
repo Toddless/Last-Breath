@@ -149,6 +149,7 @@ namespace Playground
                 UpdateHealthBar();
             }
             UpdateHealthBar();
+            _enemy.EnemyHealth.Heal(leeched);
             _enemy.BattleBehavior.RemoveBuffEffectAfterTurnsEnd();
 
             GD.Print($"dealed damage {damage}");

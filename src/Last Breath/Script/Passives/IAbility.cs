@@ -13,13 +13,11 @@
         {
             get; set;
         }
-
         public EffectType EffectType
         {
             get;
             set;
         }
-
         GlobalRarity Rarity
         {
             get; set;

@@ -2,7 +2,7 @@
 {
     public partial class OneShotHeal : Ability<HealthComponent>
     {
-        private float _healAmoint = 50;
+        private readonly float _healAmount = 50;
 
         public OneShotHeal(HealthComponent component) : base(component)
         {
@@ -10,7 +10,7 @@
 
         public override void ActivateAbility(HealthComponent? component)
         {
-            component?.Heal(_healAmoint);
+            component?.Heal(_healAmount);
         }
 
         public override void AfterBuffEnds(HealthComponent? component)

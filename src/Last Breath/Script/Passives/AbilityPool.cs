@@ -6,17 +6,10 @@
     using Godot;
     using Playground.Script.Enums;
     using Playground.Script.Passives.Attacks;
-    using Playground.Script.Passives.Buffs;
 
     public class AbilityPool : IDisposable
     {
         private List<IAbility>? _abilities = new();
-
-        protected List<IAbility>? Abilities
-        {
-            get => _abilities;
-            set => _abilities = value;
-        }
 
         public AbilityPool(BaseEnemy enemy)
         {
@@ -27,34 +20,30 @@
         {
             if (enemy.EnemyAttack == null || enemy.EnemyHealth == null || enemy.EnemyAttribute == null)
                 return;
-            Abilities?.Add(new OneShotHeal(enemy.EnemyHealth));
-            Abilities?.Add(new Regeneration(enemy.EnemyHealth));
-            Abilities?.Add(new BuffAttack(enemy.EnemyAttack));
-            Abilities?.Add(new BuffCriticalStrikeChance(enemy.EnemyAttack));
-            Abilities?.Add(new BuffCriticalStrikeDamage(enemy.EnemyAttack));
-            Abilities?.Add(new VampireStrike(enemy.EnemyAttack));
-            Abilities?.Add(new DoubleStrike(enemy.EnemyAttack));
-            Abilities?.Add(new JustCreatingNewAbility(enemy.EnemyAttribute));
+            _abilities?.Add(new OneShotHeal(enemy.EnemyHealth));
+            _abilities?.Add(new Regeneration(enemy.EnemyHealth));
+            _abilities?.Add(new BuffAttack(enemy.EnemyAttack));
+            _abilities?.Add(new BuffCriticalStrikeChance(enemy.EnemyAttack));
+            _abilities?.Add(new BuffCriticalStrikeDamage(enemy.EnemyAttack));
+            _abilities?.Add(new VampireStrike(enemy.EnemyAttack));
+            _abilities?.Add(new DoubleStrike(enemy.EnemyAttack));
         }
 
-        public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity)
-        {
-            return Abilities?.FirstOrDefault(x => x.Rarity == rarity);
-        }
+        public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
 
-        public List<IAbility>? SelectAbilities(int count)
+        public List<IAbility>? SelectAbilities(int amount)
         {
-            if (count > Abilities?.Count || Abilities == null)
+            if (amount > _abilities?.Count || _abilities == null)
             {
                 throw new ArgumentException("");
             }
             using (var rnd = new RandomNumberGenerator())
             {
                 List<IAbility> result = [];
-                while (result.Count != count)
+                while (result.Count != amount)
                 {
-                    var randomNumber = rnd.RandiRange(0, Abilities.Count - 1);
-                    var chosenAbility = Abilities[randomNumber];
+                    // If we do not have a lot of skills, and amount is only a little bit lower than count, this part can take too long.
+                    var chosenAbility = _abilities[rnd.RandiRange(0, _abilities.Count - 1)];
                     if (!result.Contains(chosenAbility))
                     {
                         result.Add(chosenAbility);
@@ -65,20 +54,10 @@
             }
         }
 
-        public List<IAbility> GetAllAbilities()
-        {
-            List<IAbility> x = [];
-            foreach (var ability in Abilities!)
-            {
-                x.Add(ability);
-            }
-            return x;
-        }
-
         public void Dispose()
         {
-            Abilities?.Clear();
-            Abilities = null;
+            _abilities?.Clear();
+            _abilities = null;
             GC.SuppressFinalize(this);
         }
     }
