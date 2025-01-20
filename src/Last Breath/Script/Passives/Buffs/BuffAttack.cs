@@ -26,6 +26,8 @@
 
         public override void AfterBuffEnds(AttackComponent? component)
         {
+            // bad idea. If this buff lasts for another turn and the target gets a debuff, that lasts for 3 turns and reduces e.g. damage, 
+            // ffter this buff ends, it is reset to the value it had before the debuff.
             component.BaseMinDamage = _baseMinDamageBeforBuff;
             component.BaseMaxDamage = _baseMaxDamageBeforBuff;
         }
