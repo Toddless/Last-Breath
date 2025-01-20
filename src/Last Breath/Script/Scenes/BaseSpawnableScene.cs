@@ -10,12 +10,12 @@
     [Inject]
     public abstract partial class BaseSpawnableScene : ObservableNode2D
     {
-        private ObservableCollection<EnemyAI>? _enemies = [];
+        private ObservableCollection<BaseEnemy>? _enemies = [];
         private RandomNumberGenerator? _rnd;
         private IEnemySpawner? _enemySpawner;
         private List<Vector2>? _enemiesRespawnPosition;
 
-        public ObservableCollection<EnemyAI>? Enemies
+        public ObservableCollection<BaseEnemy>? Enemies
         {
             get => _enemies;
             set => SetProperty(ref _enemies, value);

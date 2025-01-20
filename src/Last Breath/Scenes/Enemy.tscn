@@ -1,6 +1,6 @@
 [gd_scene load_steps=58 format=3 uid="uid://bw2mbm6teo27u"]
 
-[ext_resource type="Script" path="res://Script/Enemy/EnemyAI.cs" id="1_t2uow"]
+[ext_resource type="Script" path="res://Script/Enemy/Enemy.cs" id="1_8th1w"]
 [ext_resource type="Texture2D" uid="uid://dohome0v4lwm4" path="res://Assets/Enemy/Bat/Batt_Epic.png" id="2_5yepq"]
 [ext_resource type="Texture2D" uid="uid://dia3xbc6ijxae" path="res://Assets/Enemy/Bat/Batt_Legend.png" id="3_nyrj8"]
 [ext_resource type="Texture2D" uid="uid://dulo1msu5uqjm" path="res://Assets/Enemy/Bat/Batt_Myth.png" id="4_xmjx6"]
@@ -329,8 +329,7 @@ animations = [{
 
 [node name="Enemy" type="CharacterBody2D" groups=["MovingObstacles"]]
 z_index = 1
-scale = Vector2(1.2, 1.2)
-script = ExtResource("1_t2uow")
+script = ExtResource("1_8th1w")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 

@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using Playground.Script.Passives.Interfaces;
+    using Playground.Script.Enums;
 
     public partial class Badabooom : Ability<AttackComponent>, ICanDealDamage
     {
@@ -11,6 +12,7 @@
 
         public Badabooom(AttackComponent component) : base(component)
         {
+            EffectType = EffectType.Buff;
         }
 
         public override void ActivateAbility(AttackComponent? component)

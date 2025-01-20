@@ -15,7 +15,7 @@ namespace Playground
         private GlobalSignals? _signals;
         private Button? _returnButton, _takeAll;
         private Sprite2D? _sprite;
-        private EnemyAI? _enemy;
+        private BaseEnemy? _enemy;
         private Player? _player;
         private Timer? _timer;
         private Node2D? _attackButtonsUI;
@@ -23,7 +23,7 @@ namespace Playground
         private IInventory? _enemyInventory;
 
         [Signal]
-        public delegate void BattleSceneFinishedEventHandler(EnemyAI enemy);
+        public delegate void BattleSceneFinishedEventHandler(BaseEnemy enemy);
         [Signal]
         public delegate void EnemyTurnEventHandler();
         [Signal]
@@ -69,7 +69,7 @@ namespace Playground
             DiContainer.InjectDependencies(this);
         }
 
-        public void Init(Player player, EnemyAI enemy)
+        public void Init(Player player, BaseEnemy enemy)
         {
             _player = player;
             _enemy = enemy;

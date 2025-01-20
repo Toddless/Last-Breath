@@ -5,7 +5,7 @@
 
     public interface IEnemySpawner
     {
-        void DeleteEnemy(EnemyAI enemyToDelete);
+        void DeleteEnemy(BaseEnemy enemyToDelete);
         void InitializeEnemiesPositions(List<Vector2> positions);
         void SpawnNewEnemy();
     }

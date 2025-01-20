@@ -5,6 +5,7 @@ namespace Playground
     using Godot;
     using Microsoft.Extensions.DependencyInjection;
     using Playground.Components;
+    using Playground.NewFolder;
     using Playground.Script;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
@@ -13,7 +14,7 @@ namespace Playground
     using Playground.Script.StateMachine;
 
     [Inject]
-    public partial class EnemyAI : ObservableCharacterBody2D
+    public partial class BaseEnemy : ObservableCharacterBody2D
     {
         #region Components
         private AttributeComponent? _attribute;
@@ -38,7 +39,7 @@ namespace Playground
         private int _level;
 
         [Signal]
-        public delegate void EnemyDiedEventHandler(EnemyAI enemy);
+        public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
         [Signal]
         public delegate void EnemyInitializedEventHandler();
         [Signal]
@@ -141,7 +142,7 @@ namespace Playground
 
         public override void _Ready()
         {
-            var parentNode = GetParent().GetNode<EnemyAI>($"{Name}");
+            var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
@@ -254,8 +255,10 @@ namespace Playground
 
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
-            var ability = BattleBehavior?.MakeDecision();
-            ability?.ActivateAbility();
+            BattleBehavior?.MakeDecision()?.ActivateAbility();
+            var testStrategyAbility = new TestAbility();
+            testStrategyAbility.Execute(this.EnemyAttack!);
+
             return _attack!.CalculateDamage();
         }
 
@@ -266,7 +269,6 @@ namespace Playground
             {
                 _abilities = abilities.SelectAbilities(3);
             }
-            var x = true;
         }
 
         public void PlayerExited(Node2D body)

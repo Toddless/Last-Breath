@@ -8,7 +8,7 @@
     {
         private T? _target;
         private GlobalRarity _rarity;
-
+        private EffectType _effectType;
         public int BuffLasts { get; set; } = 1;
 
         public int Cooldown { get; set; } = 4;
@@ -23,6 +23,12 @@
         {
             get => _rarity;
             set => _rarity = value;
+        }
+
+        public EffectType EffectType
+        {
+            get =>_effectType;
+            set => _effectType = value;
         }
 
         public void AfterBuffEnds() => AfterBuffEnds(_target);

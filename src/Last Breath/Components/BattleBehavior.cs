@@ -18,12 +18,12 @@
         private bool _iCanBuffDefence;
         private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
-        private EnemyAI? _enemyAI;
+        private BaseEnemy? _enemyAI;
         private IAbility? _activatedAbility;
         private List<IAbility>? _activatedAbilities = [];
         private IAbility? _abitilyWithEffectAfterAttack;
 
-        public BattleBehavior(EnemyAI enemy)
+        public BattleBehavior(BaseEnemy enemy)
         {
             _enemyAI = enemy;
             FindOutWhatICan(_enemyAI.Abilities);

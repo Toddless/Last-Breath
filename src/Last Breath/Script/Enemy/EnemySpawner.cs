@@ -11,7 +11,7 @@ namespace Playground.Script.Enemy
     [Inject]
     public partial class EnemySpawner : Node, IEnemySpawner
     {
-        private Dictionary<Vector2, EnemyAI?> _enemyPosition = new();
+        private Dictionary<Vector2, BaseEnemy?> _enemyPosition = new();
         private BaseSpawnableScene? _parentScene;
         private Queue<Action> _spawnQueue = new();
         private RandomNumberGenerator? _rnd;
@@ -44,7 +44,7 @@ namespace Playground.Script.Enemy
             set => _parentScene = value;
         }
 
-        protected Dictionary<Vector2, EnemyAI?> EnemyPositions
+        protected Dictionary<Vector2, BaseEnemy?> EnemyPositions
         {
             get => _enemyPosition;
             set => _enemyPosition = value;
@@ -70,7 +70,7 @@ namespace Playground.Script.Enemy
             }
         }
 
-        public void DeleteEnemy(EnemyAI enemyToDelete)
+        public void DeleteEnemy(BaseEnemy enemyToDelete)
         {
             var positionToFree = EnemyPositions!.FirstOrDefault(x => x.Value == enemyToDelete);
             EnemyPositions![positionToFree.Key] = null;
@@ -79,7 +79,7 @@ namespace Playground.Script.Enemy
         public void SpawnNewEnemy()
         {
             var freePosition = EnemyPositions!.FirstOrDefault(x => x.Value == null);
-            EnemyAI enemy = EnemyToSpawn!.Instantiate<EnemyAI>();
+            BaseEnemy enemy = EnemyToSpawn!.Instantiate<BaseEnemy>();
             ParentScene!.CallDeferred("add_child", enemy);
             ParentScene.Enemies!.Add(enemy);
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;

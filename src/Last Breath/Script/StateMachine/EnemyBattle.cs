@@ -4,11 +4,11 @@
 
     public partial class EnemyBattle : State
     {
-        private EnemyAI? _enemy;
+        private BaseEnemy? _enemy;
         private Vector2 _vector2;
         public override void StateReady()
         {
-            _enemy = GetOwner<EnemyAI>();
+            _enemy = GetOwner<BaseEnemy>();
 
             _vector2 = _enemy.Velocity;
         }

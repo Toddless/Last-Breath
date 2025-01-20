@@ -10,7 +10,7 @@
         private NavigationAgent2D? _navigationAgent;
         private Vector2 _targetPosition;
 
-        private EnemyAI? _enemy;
+        private BaseEnemy? _enemy;
 
         private int _arrayLenght = 32;
         private float _steerForce = 0.4f;
@@ -34,7 +34,7 @@
 
         public override void StateReady()
         {
-            _enemy = GetOwner<EnemyAI>();
+            _enemy = GetOwner<BaseEnemy>();
             _navigationAgent = _enemy.NavigationAgent2D;
             EnemyReached += EnemyReachedDestination;
         }

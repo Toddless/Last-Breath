@@ -78,7 +78,7 @@ namespace Playground
         }
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-        public void PlayerInteracted(EnemyAI? enemy)
+        public void PlayerInteracted(BaseEnemy? enemy)
         {
             if (_currentBattleScene != null || enemy == null)
             {
@@ -98,7 +98,7 @@ namespace Playground
             _currentBattleScene.BattleSceneFinished += OnBattleFinished;
         }
 
-        private void OnBattleFinished(EnemyAI enemyToDelete)
+        private void OnBattleFinished(BaseEnemy enemyToDelete)
         {
             CallDeferred("remove_child", _currentBattleScene!);
             _currentBattleScene = null;
