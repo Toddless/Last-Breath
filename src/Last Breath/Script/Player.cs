@@ -6,8 +6,9 @@
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
+    using Playground.Script.Passives.Attacks;
 
-    public partial class Player : CharacterBody2D
+    public partial class Player : CharacterBody2D, ICharacter
     {
         #region Private fields
         // for grid movement
@@ -110,6 +111,16 @@
 
         [Export]
         public int Speed { get; set; } = 200;
+        public HealthComponent HealthComponent
+        {
+            get => throw new System.NotImplementedException();
+            set => throw new System.NotImplementedException();
+        }
+        public AttackComponent AttackComponent
+        {
+            get => throw new System.NotImplementedException();
+            set => throw new System.NotImplementedException();
+        }
         #endregion
 
         public override void _Ready()

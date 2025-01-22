@@ -4,16 +4,16 @@ namespace Playground
     using System.ComponentModel;
     using Godot;
     using Playground.Components;
-    using Playground.NewFolder;
     using Playground.Script;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Passives;
+    using Playground.Script.Passives.Attacks;
     using Playground.Script.StateMachine;
 
     [Inject]
-    public partial class BaseEnemy : ObservableCharacterBody2D
+    public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
     {
         #region Components
         private AttributeComponent? _attribute;
@@ -145,6 +145,16 @@ namespace Playground
             get => _lootTable;
             set => _lootTable = value;
         }
+        public HealthComponent HealthComponent
+        {
+            get => throw new System.NotImplementedException();
+            set => throw new System.NotImplementedException();
+        }
+        public AttackComponent AttackComponent
+        {
+            get => throw new System.NotImplementedException();
+            set => throw new System.NotImplementedException();
+        }
         #endregion
 
         public override void _Ready()
@@ -155,8 +165,8 @@ namespace Playground
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = _inventoryContainer.GetNode<EnemyInventoryComponent>(nameof(EnemyInventoryComponent));
             Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
-            _attack = parentNode.GetNode<AttackComponent>(nameof(AttackComponent));
-            _health = parentNode.GetNode<HealthComponent>(nameof(HealthComponent));
+            _attack = parentNode.GetNode<AttackComponent>(nameof(Playground.AttackComponent));
+            _health = parentNode.GetNode<HealthComponent>(nameof(Playground.HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
@@ -169,6 +179,9 @@ namespace Playground
             DiContainer.InjectDependencies(this);
             SetStats();
             SpawnItems();
+
+
+            
         }
 
         protected void SpawnItems()
@@ -262,6 +275,7 @@ namespace Playground
 
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
+            // working fine for buff, but what should i do to debuff someone?
             BattleBehavior?.MakeDecision()?.ActivateAbility();
             return _attack!.CalculateDamage();
         }

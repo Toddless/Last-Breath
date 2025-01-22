@@ -2,9 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Godot;
-    using Playground.Script.Enums;
     using Playground.Script.Passives.Attacks;
 
     public class AbilityPool : IDisposable
@@ -20,16 +18,16 @@
         {
             if (enemy.EnemyAttack == null || enemy.EnemyHealth == null || enemy.EnemyAttribute == null)
                 return;
-            _abilities?.Add(new OneShotHeal(enemy.EnemyHealth));
-            _abilities?.Add(new Regeneration(enemy.EnemyHealth));
-            _abilities?.Add(new BuffAttack(enemy.EnemyAttack));
-            _abilities?.Add(new BuffCriticalStrikeChance(enemy.EnemyAttack));
-            _abilities?.Add(new BuffCriticalStrikeDamage(enemy.EnemyAttack));
-            _abilities?.Add(new VampireStrike(enemy.EnemyAttack));
-            _abilities?.Add(new DoubleStrike(enemy.EnemyAttack));
+            _abilities?.Add(new OneShotHeal());
+            _abilities?.Add(new Regeneration());
+            _abilities?.Add(new BuffAttack());
+            _abilities?.Add(new BuffCriticalStrikeChance());
+            _abilities?.Add(new BuffCriticalStrikeDamage());
+            _abilities?.Add(new VampireStrike());
+            _abilities?.Add(new DoubleStrike());
         }
 
-        public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
+       // public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
 
         public List<IAbility>? SelectAbilities(int amount)
         {

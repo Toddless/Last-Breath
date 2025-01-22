@@ -3,14 +3,9 @@
     using System;
     using Playground.Script.Passives.Interfaces;
 
-    public partial class DoubleStrike : Ability<AttackComponent>, ICanDealDamage
+    public partial class DoubleStrike : Ability<AttackComponent, BaseEnemy>, ICanDealDamage
     {
-        public DoubleStrike(AttackComponent component) : base(component)
-        {
-        }
-
-        public override void AfterBuffEnds(AttackComponent? component) => throw new NotImplementedException();
         public override void ActivateAbility(AttackComponent? component) => throw new NotImplementedException();
-        public override void EffectAfterAttack(AttackComponent? component) => throw new NotImplementedException();
+        public override void SetTargetCharacter(BaseEnemy? target) => throw new NotImplementedException();
     }
 }

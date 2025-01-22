@@ -3,14 +3,14 @@
     using System;
     using Playground.Script.Passives.Interfaces;
 
-    public partial class BuffAttack : Ability<AttackComponent>, ICanBuffAttack
+    public partial class BuffAttack : Ability<AttackComponent, BaseEnemy>, ICanBuffAttack
     {
         private readonly float _additionalDamage = 1.3f;
 
         private float _baseMinDamageBeforBuff;
         private float _baseMaxDamageBeforBuff;
 
-        public BuffAttack(AttackComponent component) : base(component)
+        public BuffAttack() : base()
         {
         }
 
@@ -23,15 +23,15 @@
             component.BaseMaxDamage *= _additionalDamage;
         }
 
+        public override void SetTargetCharacter(BaseEnemy? target) => throw new NotImplementedException();
 
-        public override void AfterBuffEnds(AttackComponent? component)
-        {
-            // bad idea. If this buff lasts for another turn and the target gets a debuff, that lasts for 3 turns and reduces e.g. damage, 
-            // ffter this buff ends, it is reset to the value it had before the debuff.
-            component.BaseMinDamage = _baseMinDamageBeforBuff;
-            component.BaseMaxDamage = _baseMaxDamageBeforBuff;
-        }
 
-        public override void EffectAfterAttack(AttackComponent? component) => throw new NotImplementedException();
+        //public override void AfterBuffEnds(AttackComponent? component)
+        //{
+        //    // bad idea. If this buff lasts for another turn and the target gets a debuff, that lasts for 3 turns and reduces e.g. damage, 
+        //    // ffter this buff ends, it is reset to the value it had before the debuff.
+        //    component.BaseMinDamage = _baseMinDamageBeforBuff;
+        //    component.BaseMaxDamage = _baseMaxDamageBeforBuff;
+        //}
     }
 }

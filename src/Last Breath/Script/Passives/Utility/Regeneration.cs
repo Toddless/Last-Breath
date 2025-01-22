@@ -2,14 +2,10 @@
 {
     using Playground.Script.Passives.Interfaces;
 
-    public partial class Regeneration : Ability<HealthComponent>, ICanHeal
+    public partial class Regeneration : Ability<HealthComponent, BaseEnemy>, ICanHeal
     {
         private float _regenerationAmount = 15;
 
-        public Regeneration(HealthComponent component) : base(component)
-        {
-            BuffLasts = 3;
-        }
 
         public override void ActivateAbility(HealthComponent? component)
         {
@@ -17,14 +13,7 @@
                 return;
             component.CurrentHealth += _regenerationAmount;
         }
-        public override void AfterBuffEnds(HealthComponent? component)
-        {
-            BuffLasts = 3;
-        }
 
-        public override void EffectAfterAttack(HealthComponent? component)
-        {
-
-        }
+        public override void SetTargetCharacter(BaseEnemy? target) => throw new System.NotImplementedException();
     }
 }

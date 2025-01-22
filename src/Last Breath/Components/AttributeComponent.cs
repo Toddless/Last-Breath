@@ -10,7 +10,6 @@
         private Strength? _strength;
         private Intelligence? _intelligence;
 
-
         public Dexterity? Dexterity
         {
             get => _dexterity;

@@ -1,7 +1,8 @@
 ﻿namespace Playground.Script.Passives
 {
+    using System;
     using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
+    using Playground.Script.Passives.Attacks;
 
     public interface IAbility
     {
@@ -13,21 +14,17 @@
         {
             get; set;
         }
-        public EffectType EffectType
-        {
-            get;
-            set;
-        }
-        GlobalRarity Rarity
-        {
-            get; set;
-        }
+        Type TargetType { get; }
+
         IGameComponent? TargetComponent
         {
             get;
         }
-        public void AfterBuffEnds();
+        ICharacter? TargetCharacter
+        {
+            get;
+        }
+        public void SetTargetCharacter(ICharacter? character);
         public void ActivateAbility();
-        public void EffectAfterAttack();
     }
 }

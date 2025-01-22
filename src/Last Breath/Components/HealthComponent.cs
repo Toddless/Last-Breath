@@ -66,16 +66,7 @@
         public float MaxHealth
         {
             get => Mathf.RoundToInt(_maxHealth);
-            set
-            {
-               if( SetProperty(ref _maxHealth, value))
-                {
-                    if(_maxHealth < _currentHealth)
-                    {
-                        _currentHealth = _maxHealth;
-                    }
-                }
-            }
+            set => SetProperty(ref _maxHealth, value);
         }
 
         protected float BaseHealth

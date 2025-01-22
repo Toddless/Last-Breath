@@ -11,28 +11,19 @@
         public float CriticalStrikeChance
         {
             get => _criticalStrikeChance;
-            set
-            {
-                _criticalStrikeChance = value;
-            }
+            set => _criticalStrikeChance = value;
         }
 
         public float AdditionalAttackChance
         {
             get => _additionalAttackChance;
-            set
-            {
-                _additionalAttackChance = value;
-            }
+            set => _additionalAttackChance = value;
         }
 
         public float DodgeChance
         {
             get => _dodgeChance;
-            set
-            {
-                _dodgeChance = value;
-            }
+            set => _dodgeChance = value;
         }
 
         public float TotalCriticalStrikeChance() => _criticalStrikeChance * Total;

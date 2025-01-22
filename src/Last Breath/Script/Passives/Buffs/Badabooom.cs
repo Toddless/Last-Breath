@@ -1,19 +1,13 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using Playground.Script.Passives.Interfaces;
-    using Playground.Script.Enums;
 
-    public partial class Badabooom : Ability<AttackComponent>, ICanDealDamage
+    public partial class Badabooom : Ability<AttackComponent, BaseEnemy>, ICanDealDamage
     {
         private float _damageMultiplier = 2;
 
         private float _minBeforBuff;
         private float _maxBeforBuff;
-
-        public Badabooom(AttackComponent component) : base(component)
-        {
-            EffectType = EffectType.Buff;
-        }
 
         public override void ActivateAbility(AttackComponent? component)
         {
@@ -24,11 +18,6 @@
             component.BaseMaxDamage *= _damageMultiplier;
         }
 
-        public override void AfterBuffEnds(AttackComponent? component)
-        {
-            component!.BaseMinDamage = _minBeforBuff;
-            component.BaseMaxDamage = _maxBeforBuff;
-        }
-        public override void EffectAfterAttack(AttackComponent? component) => throw new System.NotImplementedException();
+        public override void SetTargetCharacter(BaseEnemy? target) => throw new System.NotImplementedException();
     }
 }

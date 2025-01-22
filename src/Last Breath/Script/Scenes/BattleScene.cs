@@ -133,6 +133,16 @@ namespace Playground
         {
             _enemy!.BattleBehavior?.GatherInfo(_player!);
             float additionalAttackChance = Rnd!.RandfRange(0, 1);
+
+            
+
+            var damage2 = Rnd.RandfRange(_enemy!.EnemyAttack!.CurrentMinDamage, _enemy.EnemyAttack.CurrentMaxDamage);
+            if(_enemy.EnemyAttack.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
+            {
+                damage2 *= _enemy.EnemyAttack.CurrentCriticalStrikeDamage;
+            }
+
+
             var (damage, crit, leeched) = _enemy.ActivateAbilityBeforeDealDamage();
 
             // TODO: Ability animation

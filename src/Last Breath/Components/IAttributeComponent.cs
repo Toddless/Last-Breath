@@ -1,6 +1,6 @@
 ﻿namespace Playground.Components
 {
-    internal interface IAttributeComponent
+    public interface IAttributeComponent
     {
     }
 }

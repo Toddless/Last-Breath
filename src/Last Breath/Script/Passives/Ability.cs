@@ -1,44 +1,50 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
+    using System;
     using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
-    public abstract partial class Ability<T> : RefCounted, IAbility where T : IGameComponent
+    public abstract partial class Ability<T, U> : RefCounted, IAbility
+        where T : IGameComponent
+        where U : ICharacter
     {
         private T? _target;
-        private GlobalRarity _rarity;
         private EffectType _effectType;
+        protected U? Character;
         public int BuffLasts { get; set; } = 1;
-
         public int Cooldown { get; set; } = 4;
 
-        protected Ability(T component)
+        protected Ability()
         {
-            _target = component;
-        }
-        public IGameComponent? TargetComponent => _target;
-
-        public GlobalRarity Rarity
-        {
-            get => _rarity;
-            set => _rarity = value;
+            TargetType = typeof(U);
         }
 
-        public EffectType EffectType
+        public ICharacter? TargetCharacter
         {
-            get =>_effectType;
-            set => _effectType = value;
+            get => Character;
         }
 
-        public void AfterBuffEnds() => AfterBuffEnds(_target);
+        public IGameComponent? TargetComponent
+        {
+            get; set;
+        }
+
+        public Type TargetType
+        {
+            get;
+            private set;
+        }
+
+        // Methods from IAbility
         public void ActivateAbility() => ActivateAbility(_target);
-        public void EffectAfterAttack() => EffectAfterAttack(_target);
+        public void SetTargetCharacter(ICharacter? character) => SetTargetCharacter(character);
 
-        public abstract void AfterBuffEnds(T? component);
 
+        // Methods from this class
         public abstract void ActivateAbility(T? component);
 
-        public abstract void EffectAfterAttack(T? component);
+
+        public abstract void SetTargetCharacter(U? target);
     }
 }

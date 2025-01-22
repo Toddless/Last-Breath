@@ -1,6 +1,5 @@
 ﻿namespace Playground.Components
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
@@ -18,15 +17,17 @@
         private bool _iCanBuffDefence;
         private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
-        private BaseEnemy? _enemyAI;
+        private BaseEnemy? _enemyBase;
+        private Player? _player;
         private IAbility? _activatedAbility;
         private List<IAbility>? _activatedAbilities = [];
         private IAbility? _abitilyWithEffectAfterAttack;
 
+
         public BattleBehavior(BaseEnemy enemy)
         {
-            _enemyAI = enemy;
-            FindOutWhatICan(_enemyAI.Abilities);
+            _enemyBase = enemy;
+            FindOutWhatICan(_enemyBase.Abilities);
             DiContainer.InjectDependencies(this);
         }
 
@@ -44,20 +45,21 @@
 
         public void GatherInfo(Player player)
         {
-            _playerHealth = player.PlayerHealth;
+            _player = player;
+            foreach (var item in _enemyBase.Abilities)
+            {
+                if (item.TargetType == typeof(BaseEnemy))
+                {
+                    item.SetTargetCharacter(_enemyBase);
+                }
+                else if (item.TargetType == typeof(Player))
+                {
+                    item.SetTargetCharacter(_player);
+                }
+            }
         }
 
-        private void FindOutWhatICan(List<IAbility>? abilities)
-        {
-            if (abilities == null)
-            {
-                return;
-            }
-            _iCanHeal = abilities.Any(x => x is ICanHeal);
-            _iCanBuffAttack = abilities.Any(x => x is ICanBuffAttack);
-            _iCanLeech = abilities.Any(x => x is ICanLeech);
-            _iCanDealDamage = abilities.Any(x => x is ICanDealDamage);
-        }
+
 
         public IAbility? MakeDecision()
         {
@@ -65,7 +67,7 @@
             ReduceBuffDuration();
             RemoveBuffFromLastTurn();
             _abitilyWithEffectAfterAttack = null;
-            var enemyHealthPercent = _enemyAI!.EnemyHealth!.CurrentHealth / _enemyAI.EnemyHealth.MaxHealth * 100;
+            var enemyHealthPercent = _enemyBase!.EnemyHealth!.CurrentHealth / _enemyBase.EnemyHealth.MaxHealth * 100;
             var playerHealthPercent = _playerHealth!.CurrentHealth / _playerHealth.MaxHealth * 100;
             var diff = playerHealthPercent - enemyHealthPercent;
 
@@ -73,76 +75,74 @@
             {
                 if (_iCanDealDamage && enemyHealthPercent > playerHealthPercent)
                 {
-                    return TryToKillHimHard();
                 }
                 if (_iCanHeal && enemyHealthPercent < playerHealthPercent)
                 {
-                    return TryToHillYourself();
                 }
             }
             if (diff < 10)
             {
                 if (_iCanBuffAttack && enemyHealthPercent > playerHealthPercent)
                 {
-                    return BuffYourSelf();
                 }
                 if (_iCanLeech && enemyHealthPercent < playerHealthPercent)
                 {
-                    return TryDealDamageAndHeal();
                 }
             }
-
-            return ChoseRandomAbilityNotOnCooldown();
+            return null;
         }
 
-        private IAbility? UseAbility(Func<IAbility, bool> filter)
-        {
-            var abilities = _enemyAI!.Abilities!.Where(filter).ToList();
-            return ActivateAbility(abilities);
-        }
+        #region X
+        //private IAbility? UseAbility(Func<IAbility, bool> filter)
+        //{
+        //    var abilities = _enemyBase!.Abilities!.Where(filter).ToList();
+        //    return ActivateAbility(abilities);
+        //}
 
-        private IAbility? BuffYourSelf()
-        {
-            return UseAbility(x => x is AttackComponent && x is ICanBuffAttack);
-        }
+        //private IAbility? BuffYourSelf()
+        //{
+        //    return UseAbility(x => x is AttackComponent && x is ICanBuffAttack);
+        //}
 
-        private IAbility? TryToKillHimHard()
-        {
-            return UseAbility(x => x is ICanDealDamage);
-        }
+        //private IAbility? TryToKillHimHard()
+        //{
+        //    return UseAbility(x => x is ICanDealDamage);
+        //}
 
-        private IAbility? TryDealDamageAndHeal()
-        {
-            return UseAbility(x => x is ICanLeech);
-        }
+        //private IAbility? TryDealDamageAndHeal()
+        //{
+        //    return UseAbility(x => x is ICanLeech);
+        //}
 
-        private IAbility? TryToHillYourself()
-        {
-            return UseAbility(x => x is ICanHeal);
-        }
+        //private IAbility? TryToHillYourself()
+        //{
+        //    return UseAbility(x => x is ICanHeal);
+        //}
 
-        private IAbility? ChoseRandomAbilityNotOnCooldown()
-        {
-            return UseAbility(x => x.Cooldown == 4);
-        }
+        //private IAbility? ChoseRandomAbilityNotOnCooldown()
+        //{
+        //    return UseAbility(x => x.Cooldown == 4);
+        //}
 
-        private IAbility? ActivateAbility(List<IAbility>? abilities)
-        {
-            if (abilities == null)
-            {
-                return null;
-            }
-            var amountAbilities = abilities.Where(x => x.Cooldown == 4).Count();
-            if (amountAbilities == 0)
-            {
-                return null;
-            }
+        //private IAbility? ActivateAbility(List<IAbility>? abilities)
+        //{
+        //    if (abilities == null)
+        //    {
+        //        return null;
+        //    }
+        //    var amountAbilities = abilities.Where(x => x.Cooldown == 4).Count();
+        //    if (amountAbilities == 0)
+        //    {
+        //        return null;
+        //    }
 
-            var ability = abilities[Rnd!.RandiRange(0, amountAbilities - 1)];
-            _activatedAbilities!.Add(ability);
-            _activatedAbility = ability;
-            return ability;
-        }
+        //    var ability = abilities[Rnd!.RandiRange(0, amountAbilities - 1)];
+        //    _activatedAbilities!.Add(ability);
+        //    _activatedAbility = ability;
+        //    return ability;
+        //}
+
+        #endregion
 
         private void UpdateUsedAbilitiesCooldown()
         {
@@ -179,10 +179,9 @@
 
         private void DeleteBuffsFromList(List<IAbility>? abilities)
         {
-            if ( abilities == null || abilities.Count == 0 ) { return; }
             foreach (var ability in abilities)
             {
-                _activatedAbilities!.Remove(ability);
+                _activatedAbilities?.Remove(ability);
             }
         }
 
@@ -190,7 +189,7 @@
         {
             foreach (var item in _activatedAbilities!)
             {
-                item.AfterBuffEnds();
+               // item.AfterBuffEnds();
             }
         }
 
@@ -206,7 +205,19 @@
         {
             _playerHealth = null;
             _activatedAbilities = null;
-            _enemyAI = null;
+            _enemyBase = null;
+        }
+
+        private void FindOutWhatICan(List<IAbility>? abilities)
+        {
+            if (abilities == null)
+            {
+                return;
+            }
+            _iCanHeal = abilities.Any(x => x is ICanHeal);
+            _iCanBuffAttack = abilities.Any(x => x is ICanBuffAttack);
+            _iCanLeech = abilities.Any(x => x is ICanLeech);
+            _iCanDealDamage = abilities.Any(x => x is ICanDealDamage);
         }
     }
 }
