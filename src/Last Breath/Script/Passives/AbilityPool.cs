@@ -47,7 +47,10 @@
                     if (!result.Contains(chosenAbility))
                     {
                         result.Add(chosenAbility);
+                        _abilities.Remove(chosenAbility);
                     }
+                    if(_abilities.Count <= 0)
+                        break;
                 }
 
                 return result;
