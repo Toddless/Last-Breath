@@ -3,8 +3,7 @@
     using Godot;
     using Playground.Components;
 
-    [GlobalClass]
-    public partial class HealthComponent : ComponentBase, IHealthComponent
+    public class HealthComponent : ComponentBase, IHealthComponent
     {
         private readonly float _baseHealth = 100;
         private float _totalPercentHealthIncreases = 1;
@@ -25,19 +24,17 @@
             }
             set
             {
-                if (SetProperty(ref _currentHealth, value))
+                if (value > _maxHealth)
                 {
-                    if (_currentHealth > _maxHealth)
-                    {
-                        _currentHealth = _maxHealth;
-                    }
+                    _currentHealth = _maxHealth;
+                }
+                else
+                {
+                    _currentHealth = value;
                 }
             }
         }
 
-        /// <summary>
-        /// All percent increases for health (strength bonuses, passives, etc.)
-        /// </summary>
         public float TotalPercentHealthIncreases
         {
             get => _totalPercentHealthIncreases;
@@ -47,10 +44,6 @@
             }
         }
 
-
-        /// <summary>
-        /// Flat bonus health (passives, items, etc.)
-        /// </summary>
         public float AdditionalHealth
         {
             get => _additionalHealth;
@@ -60,13 +53,10 @@
             }
         }
 
-        /// <summary>
-        /// Sum of all bonuses ((Base health + additional health) * total percent)
-        /// </summary>
         public float MaxHealth
         {
             get => Mathf.RoundToInt(_maxHealth);
-            set => SetProperty(ref _maxHealth, value);
+            private set => _maxHealth = value;
         }
 
         protected float BaseHealth
@@ -74,9 +64,9 @@
             get => _baseHealth;
         }
 
-        public override void _Ready()
+        public HealthComponent()
         {
-            RefreshMaxHealth();
+            _maxHealth = (BaseHealth + AdditionalHealth) * TotalPercentHealthIncreases;
             RefreshHealth();
         }
 
@@ -85,13 +75,8 @@
             CurrentHealth = MaxHealth;
         }
 
-        private void RefreshMaxHealth()
-        {
-            MaxHealth = (BaseHealth + AdditionalHealth) * TotalPercentHealthIncreases;
-        }
-
         public void TakeDamage(float damage) => CurrentHealth -= damage;
-        public void Heal(float amount) =>  CurrentHealth += amount;
+        public void Heal(float amount) => CurrentHealth += amount;
         public void ReducePercentageHealth(float percentage) => MaxHealth *= percentage;
     }
 }

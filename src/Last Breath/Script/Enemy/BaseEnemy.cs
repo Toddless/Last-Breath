@@ -73,13 +73,13 @@ namespace Playground
             get => _area;
         }
 
-        public AttackComponent? EnemyAttack
+        public AttackComponent? AttackComponent
         {
             get => _attack;
             set => _attack = value;
         }
 
-        public HealthComponent? EnemyHealth
+        public HealthComponent? HealthComponent
         {
             get => _health;
             set => _health = value;
@@ -145,43 +145,30 @@ namespace Playground
             get => _lootTable;
             set => _lootTable = value;
         }
-        public HealthComponent HealthComponent
-        {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
-        }
-        public AttackComponent AttackComponent
-        {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
-        }
         #endregion
 
         public override void _Ready()
         {
+            _attack = new AttackComponent();
+            _health = new HealthComponent();
+            _attribute = new AttributeComponent();
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            Inventory = _inventoryContainer.GetNode<EnemyInventoryComponent>(nameof(EnemyInventoryComponent));
+            Inventory = new EnemyInventoryComponent();
             Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
-            _attack = parentNode.GetNode<AttackComponent>(nameof(Playground.AttackComponent));
-            _health = parentNode.GetNode<HealthComponent>(nameof(Playground.HealthComponent));
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _attribute = parentNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
             _battleBehavior = new BattleBehavior(this);
             _inventoryNode.Hide();
             DiContainer.InjectDependencies(this);
             SetStats();
             SpawnItems();
-
-
-            
         }
 
         protected void SpawnItems()
@@ -320,7 +307,6 @@ namespace Playground
                 _ => (1, 1, 1)
             };
         }
-
 
         protected EnemyType SetRandomEnemyType(int index)
         {

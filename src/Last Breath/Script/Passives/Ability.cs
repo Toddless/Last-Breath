@@ -11,18 +11,13 @@
     {
         private T? _target;
         private EffectType _effectType;
-        protected U? Character;
+        protected U? TargetCharacter;
         public int BuffLasts { get; set; } = 1;
         public int Cooldown { get; set; } = 4;
 
         protected Ability()
         {
             TargetType = typeof(U);
-        }
-
-        public ICharacter? TargetCharacter
-        {
-            get => Character;
         }
 
         public IGameComponent? TargetComponent
@@ -40,11 +35,8 @@
         public void ActivateAbility() => ActivateAbility(_target);
         public void SetTargetCharacter(ICharacter? character) => SetTargetCharacter(character);
 
-
         // Methods from this class
         public abstract void ActivateAbility(T? component);
-
-
         public abstract void SetTargetCharacter(U? target);
     }
 }

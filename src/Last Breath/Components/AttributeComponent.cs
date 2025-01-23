@@ -1,10 +1,8 @@
 ﻿namespace Playground.Components
 {
     using Playground.Script.Attribute;
-    using Godot;
 
-    [GlobalClass]
-    public partial class AttributeComponent : ComponentBase, IAttributeComponent
+    public class AttributeComponent : ComponentBase, IAttributeComponent
     {
         private Dexterity? _dexterity;
         private Strength? _strength;
@@ -25,7 +23,7 @@
             get => _intelligence;
         }
 
-        public override void _Ready()
+        public AttributeComponent()
         {
             _dexterity = new Dexterity();
             _strength = new Strength();

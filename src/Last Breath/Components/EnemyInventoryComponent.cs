@@ -7,9 +7,9 @@
     using Godot;
     using System;
     using Playground.Components.Interfaces;
+    using Playground.Components;
 
-    [GlobalClass]
-    public partial class EnemyInventoryComponent : Node, IInventory
+    public class EnemyInventoryComponent : ComponentBase, IInventory
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;

@@ -1,12 +1,8 @@
-[gd_scene load_steps=98 format=3 uid="uid://dt02wd1ss75rn"]
+[gd_scene load_steps=94 format=3 uid="uid://dt02wd1ss75rn"]
 
 [ext_resource type="Script" path="res://Script/Player.cs" id="1_nuf03"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_mu4dn"]
 [ext_resource type="Texture2D" uid="uid://cdvyvrevjhnqq" path="res://Assets/Player/Warrior_walk_run.png" id="3_ajmxy"]
-[ext_resource type="Script" path="res://Components/HealthComponent.cs" id="4_0xg02"]
-[ext_resource type="Script" path="res://Components/AttackComponent.cs" id="5_5evlb"]
-[ext_resource type="Script" path="res://Components/AttributeComponent.cs" id="6_ff2yq"]
-[ext_resource type="Script" path="res://Components/InventoryComponent.cs" id="7_adkn2"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_mu4dn")
@@ -682,15 +678,6 @@ animation = &"ui_left"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1c8vr")
 
-[node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("4_0xg02")
-
-[node name="AttackComponent" type="Node" parent="."]
-script = ExtResource("5_5evlb")
-
-[node name="AttributeComponent" type="Node" parent="."]
-script = ExtResource("6_ff2yq")
-
 [node name="UI" type="Node2D" parent="."]
 position = Vector2(793, 246)
 
@@ -736,6 +723,3 @@ scale = Vector2(0.607049, 0.584461)
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 15
-
-[node name="InventoryComponent" type="Node" parent="UI/Inventory/InventoryWindow/InventoryContainer"]
-script = ExtResource("7_adkn2")

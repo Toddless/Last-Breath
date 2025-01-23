@@ -14,13 +14,11 @@
         {
             get; set;
         }
-        Type TargetType { get; }
-
-        IGameComponent? TargetComponent
+        Type TargetType
         {
             get;
         }
-        ICharacter? TargetCharacter
+        IGameComponent? TargetComponent
         {
             get;
         }

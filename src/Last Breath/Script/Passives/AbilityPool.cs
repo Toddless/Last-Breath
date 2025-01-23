@@ -16,7 +16,7 @@
 
         private void SetTargetComponents(BaseEnemy enemy)
         {
-            if (enemy.EnemyAttack == null || enemy.EnemyHealth == null || enemy.EnemyAttribute == null)
+            if (enemy.AttackComponent == null || enemy.HealthComponent == null || enemy.EnemyAttribute == null)
                 return;
             _abilities?.Add(new OneShotHeal());
             _abilities?.Add(new Regeneration());

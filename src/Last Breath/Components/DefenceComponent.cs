@@ -1,10 +1,6 @@
 ﻿namespace Playground.Components
 {
-    using Godot;
-    using Playground.Components.Interfaces;
-
-    [GlobalClass]
-    public partial class DefenceComponent : Node, IGameComponent
+    public class DefenceComponent : ComponentBase
     {
         private float _defence;
         private float _chanceToEvade;

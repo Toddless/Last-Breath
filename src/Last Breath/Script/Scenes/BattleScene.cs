@@ -94,7 +94,7 @@ namespace Playground
 
         private void EnemyMakeTurn()
         {
-            if (_enemy!.EnemyHealth!.CurrentHealth > 0)
+            if (_enemy!.HealthComponent!.CurrentHealth > 0)
             {
                 EnemyTurnHandler();
                 EmitSignal(SignalName.PlayerTurn);
@@ -107,7 +107,7 @@ namespace Playground
 
         private void PlayerMakeTurn()
         {
-            if (_enemy!.EnemyHealth!.CurrentHealth <= 0)
+            if (_enemy!.HealthComponent!.CurrentHealth <= 0)
             {
                 EnemyDead();
                 return;
@@ -115,7 +115,7 @@ namespace Playground
             _attackButtonsUI?.Show();
             var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
             // TODO: Player attack animation
-            _enemy!.EnemyHealth!.CurrentHealth -= damage;
+            _enemy!.HealthComponent!.CurrentHealth -= damage;
 
             if (crit)
             {
@@ -136,10 +136,10 @@ namespace Playground
 
             
 
-            var damage2 = Rnd.RandfRange(_enemy!.EnemyAttack!.CurrentMinDamage, _enemy.EnemyAttack.CurrentMaxDamage);
-            if(_enemy.EnemyAttack.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
+            var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinDamage, _enemy.AttackComponent.CurrentMaxDamage);
+            if(_enemy.AttackComponent.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
             {
-                damage2 *= _enemy.EnemyAttack.CurrentCriticalStrikeDamage;
+                damage2 *= _enemy.AttackComponent.CurrentCriticalStrikeDamage;
             }
 
 
@@ -159,11 +159,11 @@ namespace Playground
                 UpdateHealthBar();
             }
             UpdateHealthBar();
-            _enemy.EnemyHealth.Heal(leeched);
+            _enemy.HealthComponent.Heal(leeched);
             _enemy.BattleBehavior.RemoveBuffEffectAfterTurnsEnd();
 
             GD.Print($"dealed damage {damage}");
-            if (additionalAttackChance <= _enemy.EnemyAttack!.BaseAdditionalAttackChance)
+            if (additionalAttackChance <= _enemy.AttackComponent!.BaseAdditionalAttackChance)
             {
                 EnemyTurnHandler();
             }
@@ -206,12 +206,12 @@ namespace Playground
         private void SetHealthBars()
         {
             _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
-            _enemyHpBar!.MaxValue = _enemy!.EnemyHealth!.MaxHealth;
+            _enemyHpBar!.MaxValue = _enemy!.HealthComponent!.MaxHealth;
         }
 
         private void UpdateHealthBar()
         {
-            _enemyHpBar!.Value = _enemy!.EnemyHealth!.CurrentHealth;
+            _enemyHpBar!.Value = _enemy!.HealthComponent!.CurrentHealth;
             _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
     }

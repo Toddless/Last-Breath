@@ -5,8 +5,7 @@ namespace Playground
     using Playground.Script;
 
     [Inject]
-    [GlobalClass]
-    public partial class AttackComponent : ComponentBase, IAttackComponent
+    public class AttackComponent : ComponentBase, IAttackComponent
     {
         #region private fields
         private RandomNumberGenerator? _rnd;
@@ -127,7 +126,7 @@ namespace Playground
         }
         #endregion
 
-        public override void _Ready()
+        public AttackComponent()
         {
             _baseAdditionalAttackChance = 0.05f;
             _baseCriticalStrikeChance = 0.05f;
@@ -142,7 +141,6 @@ namespace Playground
             _currentAdditionalAttackChance = _additionalAdditionlaAttackChance + _baseAdditionalAttackChance;
             DiContainer.InjectDependencies(this);
         }
-
 
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {

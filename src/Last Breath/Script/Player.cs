@@ -125,6 +125,9 @@
 
         public override void _Ready()
         {
+            _playerHealth = new HealthComponent();
+            _playerAttack = new AttackComponent();
+            _playerAttribute = new AttributeComponent();
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
             var playerNode = parentNode.GetNode<CharacterBody2D>(nameof(CharacterBody2D));
@@ -132,11 +135,8 @@
             _inventoryNode = _playersInventoryElements.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _inventory = _inventoryContainder.GetNode<InventoryComponent>(nameof(InventoryComponent));
+            _inventory = new InventoryComponent();
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
-            _playerHealth = playerNode.GetNode<HealthComponent>(nameof(HealthComponent));
-            _playerAttack = playerNode.GetNode<AttackComponent>(nameof(AttackComponent));
-            _playerAttribute = playerNode.GetNode<AttributeComponent>(nameof(AttributeComponent));
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");

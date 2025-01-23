@@ -57,9 +57,9 @@ namespace Playground
         private void DealDamage()
         {
             var enemy = Enemies?[0];
-            enemy!.EnemyHealth!.MaxHealth *= 0.9f;
-            GD.Print($"Current health: {enemy.EnemyHealth.CurrentHealth}\n" +
-                $"Max health: {enemy.EnemyHealth.MaxHealth}");
+           // enemy!.HealthComponent!.MaxHealth *= 0.9f;
+            GD.Print($"Current health: {enemy.HealthComponent.CurrentHealth}\n" +
+                $"Max health: {enemy.HealthComponent.MaxHealth}");
         }
 
         // Test

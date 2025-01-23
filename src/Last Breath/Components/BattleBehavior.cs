@@ -14,7 +14,6 @@
         private bool _iCanBuffAttack;
         private bool _iCanLeech;
         private bool _iCanDealDamage;
-        private bool _iCanBuffDefence;
         private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
         private BaseEnemy? _enemyBase;
@@ -52,7 +51,7 @@
                 {
                     item.SetTargetCharacter(_enemyBase);
                 }
-                else if (item.TargetType == typeof(Player))
+                if (item.TargetType == typeof(Player))
                 {
                     item.SetTargetCharacter(_player);
                 }
@@ -67,7 +66,7 @@
             ReduceBuffDuration();
             RemoveBuffFromLastTurn();
             _abitilyWithEffectAfterAttack = null;
-            var enemyHealthPercent = _enemyBase!.EnemyHealth!.CurrentHealth / _enemyBase.EnemyHealth.MaxHealth * 100;
+            var enemyHealthPercent = _enemyBase!.HealthComponent!.CurrentHealth / _enemyBase.HealthComponent.MaxHealth * 100;
             var playerHealthPercent = _playerHealth!.CurrentHealth / _playerHealth.MaxHealth * 100;
             var diff = playerHealthPercent - enemyHealthPercent;
 
@@ -189,7 +188,7 @@
         {
             foreach (var item in _activatedAbilities!)
             {
-               // item.AfterBuffEnds();
+                // item.AfterBuffEnds();
             }
         }
 

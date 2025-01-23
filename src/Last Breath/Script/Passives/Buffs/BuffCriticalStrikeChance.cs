@@ -8,6 +8,10 @@
 
 
         public override void ActivateAbility(AttackComponent? component) => component.BaseCriticalStrikeChance += _criticalStrikeChanceBonus;
-        public override void SetTargetCharacter(BaseEnemy? target) => throw new System.NotImplementedException();
+        public override void SetTargetCharacter(BaseEnemy? target)
+        {
+            TargetCharacter = target;
+            TargetComponent = target.AttackComponent;
+        }
     }
 }
