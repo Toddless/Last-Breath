@@ -210,9 +210,9 @@
 
         private void UpdateStats()
         {
-            _playerStats!.Text = $"Damage: {_playerAttack!.BaseMinDamage} - {_playerAttack.BaseMaxDamage} \n" +
-                $"Critical Hit Chance: {_playerAttack.BaseCriticalStrikeChance * 100}% \n" +
-                $"Critical Hit Damage: {_playerAttack.BaseCriticalStrikeDamage * 100}% \n" +
+            _playerStats!.Text = $"Damage: {_playerAttack!.CurrentMinStrikeDamage} - {_playerAttack.CurrentMaxStrikeDamage} \n" +
+                $"Critical Hit Chance: {_playerAttack.CurrentCriticalStrikeChance * 100}% \n" +
+                $"Critical Hit Damage: {_playerAttack.CurrentCriticalStrikeDamage * 100}% \n" +
                 $"Health: {_playerHealth!.CurrentHealth}\n" +
                 //  $"Defence: {_playerHealth.Defence}\n" +
                 $"Max. Health: {_playerHealth.MaxHealth}\n" +
@@ -257,16 +257,16 @@
                 if (_playerWeapon != null)
                 {
                     _inventory!.AddItem(_playerWeapon);
-                    _playerAttack!.BaseMinDamage -= _playerWeapon.MinDamage;
-                    _playerAttack.BaseMaxDamage -= _playerWeapon.MaxDamage;
-                    _playerAttack.BaseCriticalStrikeChance = 0.05f;
+                    //_playerAttack!.BaseMinDamage -= _playerWeapon.MinDamage;
+                    //_playerAttack.BaseMaxDamage -= _playerWeapon.MaxDamage;
+                    //_playerAttack.BaseCriticalStrikeChance = 0.05f;
                     _playerWeapon = null;
                     UpdateStats();
                 }
                 _playerWeapon = weapon;
-                _playerAttack!.BaseMinDamage += _playerWeapon.MinDamage;
-                _playerAttack.BaseMaxDamage += _playerWeapon.MaxDamage;
-                _playerAttack.BaseCriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
+                //_playerAttack!.BaseMinDamage += _playerWeapon.MinDamage;
+                //_playerAttack.BaseMaxDamage += _playerWeapon.MaxDamage;
+                //_playerAttack.BaseCriticalStrikeChance = _playerWeapon.CriticalStrikeChance;
                 _inventory!.RemoveItem(weapon);
                 UpdateStats();
             }

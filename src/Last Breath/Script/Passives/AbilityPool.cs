@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Passives.Attacks;
 
     public class AbilityPool : IDisposable
     {
@@ -18,13 +17,6 @@
         {
             if (enemy.AttackComponent == null || enemy.HealthComponent == null || enemy.EnemyAttribute == null)
                 return;
-            _abilities?.Add(new OneShotHeal());
-            _abilities?.Add(new Regeneration());
-            _abilities?.Add(new BuffAttack());
-            _abilities?.Add(new BuffCriticalStrikeChance());
-            _abilities?.Add(new BuffCriticalStrikeDamage());
-            _abilities?.Add(new VampireStrike());
-            _abilities?.Add(new DoubleStrike());
         }
 
        // public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);

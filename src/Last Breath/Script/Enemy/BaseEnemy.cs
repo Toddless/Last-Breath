@@ -198,9 +198,6 @@ namespace Playground
             {
                 if (args.NewValue < args.OldValue)
                 {
-
-                    _attack!.CurrentCriticalStrikeDamage = _attack.BaseCriticalStrikeDamage * _attribute!.Dexterity!.TotalAdditionalAttackChance();
-                    _attack.CurrentCriticalStrikeChance = _attack.BaseCriticalStrikeChance * _attribute.Dexterity.TotalCriticalStrikeChance();
                     GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalStrikeChance}, CritDamage: {_attack.CurrentCriticalStrikeDamage}");
                 }
             }
@@ -213,12 +210,12 @@ namespace Playground
                 if (args.NewValue < args.OldValue)
                 {
                     var diff = args.OldValue - args.NewValue;
-                    _health!.TotalPercentHealthIncreases -= _attribute!.Strength!.HealthIncrease * diff;
+                    _health!.IncreaseHealth -= _attribute!.Strength!.HealthIncrease * diff;
 
                 }
                 else
                 {
-                    _health!.TotalPercentHealthIncreases = _attribute!.Strength!.TotalHealthIncrese();
+                    _health!.IncreaseHealth = _attribute!.Strength!.TotalHealthIncrese();
                 }
                 GD.Print($"Current hp after strength increased: {_health.CurrentHealth}, Max Health: {_health.MaxHealth}\n" +
                     $"Strength: {_attribute.Strength.Total}");

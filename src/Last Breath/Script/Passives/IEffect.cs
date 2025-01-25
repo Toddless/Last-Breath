@@ -1,19 +1,32 @@
 ﻿namespace Playground.Script.Passives
 {
-    using System.Collections.Generic;
+    using Playground.Script.Enums;
 
     public interface IEffect
     {
-        List<string>? Properties
+        string Name
         {
             get;
-            set;
         }
-
-        float? Modifier
+        string Description
         {
             get;
-            set;
+        }
+        float Modifier
+        {
+            get;
+        }
+        Stats Stat
+        {
+            get;
+        }
+        EffectType EffectType
+        {
+            get;
+        }
+        int Duration
+        {
+            get;
         }
     }
 }

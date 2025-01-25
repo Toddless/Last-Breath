@@ -3,33 +3,37 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Enums;
 
     [Inject]
     public class AttackComponent : ComponentBase, IAttackComponent
     {
         #region private fields
         private RandomNumberGenerator? _rnd;
-        private float _additionalAdditionlaAttackChance;
-        private float _currentAdditionalAttackChance;
-        private float _baseAdditionalAttackChance;
+        private readonly float _baseAdditionalStrikeChance = 0.05f;
+        private readonly float _baseCriticalStrikeChance = 0.05f;
+        private readonly float _baseCriticalStrikeDamage = 1.5f;
+        private readonly float _baseMinStrikeDamage = 40;
+        private readonly float _baseMaxStrikeDamage = 100;
+
+        private float _additionalAdditionalStrikeChance;
+        private float _increaseAdditionalStrikeChance = 1;
+        private float _currentAdditionalStrikeChance;
 
         private float _additionalCriticalStrikeChance;
+        private float _increaseCriticalStrikeChance = 1;
         private float _currentCriticalStrikeChance;
-        private float _baseCriticalStrikeChance;
 
         private float _additionalCriticalStrikeDamage;
         private float _currentCriticalStrikeDamage;
-        private float _baseCriticalStrikeDamage;
 
-        private float _leechedHealth;
+        private float _additionalMinStrikeDamage;
+        private float _currentMinStrikeDamage;
 
-        private float _additionalMinDamage;
-        private float _currentMinDamage;
-        private float _baseMinDamage;
+        private float _additionalMaxStrikeDamage;
+        private float _currentMaxStrikeDamage;
 
-        private float _additionalMaxDamage;
-        private float _currentMaxDamage;
-        private float _baseMaxDamage;
+        private float _increaseDamage = 1;
 
         private float _leech;
         #endregion
@@ -42,54 +46,122 @@ namespace Playground
             get => _rnd;
             set => _rnd = value;
         }
+        #region Additional Values
 
-        public float BaseMinDamage
+        public float AdditionalMinStrikeDamage
         {
-            get => _baseMinDamage;
-            set => _baseMinDamage = value;
+            get => _additionalMinStrikeDamage;
+            set
+            {
+                if (SetProperty(ref _additionalMinStrikeDamage, value))
+                    UpdateValues();
+            }
         }
 
-        public float CurrentMinDamage
+        public float AdditionalMaxStrikeDamage
         {
-            get => Mathf.RoundToInt(_currentMinDamage);
-            set => _currentMinDamage = value;
+            get => _additionalMaxStrikeDamage;
+            set
+            {
+                if (SetProperty(ref _additionalMaxStrikeDamage, value))
+                    UpdateValues();
+            }
         }
 
-        public float BaseMaxDamage
+        public float AdditionalCriticalStrikeDamage
         {
-            get => _baseMaxDamage;
-            set => _baseMaxDamage = value;
+            get => _additionalCriticalStrikeDamage;
+            set
+            {
+                if (SetProperty(ref _additionalCriticalStrikeDamage, value))
+                    UpdateValues();
+            }
         }
 
-        public float CurrentMaxDamage
+        public float AdditionalCriticalStrikeChance
         {
-            get => Mathf.RoundToInt(_currentMaxDamage);
-            set => _currentMaxDamage = value;
+            get => _additionalCriticalStrikeChance;
+            set
+            {
+                if (SetProperty(ref _additionalCriticalStrikeChance, value))
+                    UpdateValues();
+            }
         }
 
-        public float BaseCriticalStrikeChance
+        public float AdditionalAdditionalStrikeChance
         {
-            get => _baseCriticalStrikeChance;
-            set => _baseCriticalStrikeChance = value;
+            get => _additionalAdditionalStrikeChance;
+            set
+            {
+                if (SetProperty(ref _additionalAdditionalStrikeChance, value))
+                    UpdateValues();
+            }
+        }
+
+        public float IncreaseDamage
+        {
+            get => _increaseDamage;
+            set
+            {
+                if (SetProperty(ref _increaseDamage, value))
+                    UpdateValues();
+            }
+        }
+
+        public float IncreaseCriticalStrikeChance
+        {
+            get => _increaseCriticalStrikeChance;
+            set
+            {
+                if (SetProperty(ref _increaseCriticalStrikeChance, value))
+                    UpdateValues();
+            }
+        }
+
+        public float IncreaseAdditionalStrikeChance
+        {
+            get => _increaseAdditionalStrikeChance;
+            set
+            {
+                if (SetProperty(ref _increaseAdditionalStrikeChance, value))
+                    UpdateValues();
+            }
+        }
+
+        #endregion
+
+        #region Current Values
+        public float CurrentMinStrikeDamage
+        {
+            get => Mathf.RoundToInt(_currentMinStrikeDamage);
+            private set => _currentMinStrikeDamage = value;
+        }
+
+        public float CurrentMaxStrikeDamage
+        {
+            get => Mathf.RoundToInt(_currentMaxStrikeDamage);
+            private set => _currentMaxStrikeDamage = value;
         }
 
         public float CurrentCriticalStrikeChance
         {
             get => _currentCriticalStrikeChance;
-            set => _currentCriticalStrikeChance = value;
-        }
-
-        public float BaseCriticalStrikeDamage
-        {
-            get => _baseCriticalStrikeDamage;
-            set => _baseCriticalStrikeDamage = value;
+            private set => _currentCriticalStrikeChance = value;
         }
 
         public float CurrentCriticalStrikeDamage
         {
             get => _currentCriticalStrikeDamage;
-            set => _currentCriticalStrikeDamage = value;
+            private set => _currentCriticalStrikeDamage = value;
         }
+
+        public float CurrentAdditionalStrikeChance
+        {
+            get => _currentAdditionalStrikeChance;
+            private set => _currentAdditionalStrikeChance = value;
+        }
+
+        #endregion
 
         public float Leech
         {
@@ -107,51 +179,42 @@ namespace Playground
             }
         }
 
-        public float LeechedHealth
-        {
-            get => _leechedHealth;
-            set => _leechedHealth = value;
-        }
-
-        public float BaseAdditionalAttackChance
-        {
-            get => _baseAdditionalAttackChance;
-            set => _baseAdditionalAttackChance = value;
-        }
-
-        public float CurrentAdditionalAttackChance
-        {
-            get => _currentAdditionalAttackChance;
-            set => _currentAdditionalAttackChance = value;
-        }
         #endregion
 
         public AttackComponent()
         {
-            _baseAdditionalAttackChance = 0.05f;
-            _baseCriticalStrikeChance = 0.05f;
-            _baseCriticalStrikeDamage = 1.5f;
-            _baseMaxDamage = 100f;
-            _baseMinDamage = 25f;
-
-            _currentMinDamage = _additionalMinDamage + _baseMinDamage;
-            _currentMaxDamage = _additionalMaxDamage + _baseMaxDamage;
-            _currentCriticalStrikeChance = _additionalCriticalStrikeChance + _baseCriticalStrikeChance;
-            _currentCriticalStrikeDamage = _additionalCriticalStrikeDamage + _baseCriticalStrikeDamage;
-            _currentAdditionalAttackChance = _additionalAdditionlaAttackChance + _baseAdditionalAttackChance;
+            CurrentMinStrikeDamage = (AdditionalMinStrikeDamage + _baseMinStrikeDamage) * IncreaseDamage;
+            CurrentMaxStrikeDamage = (AdditionalMaxStrikeDamage + _baseMaxStrikeDamage) * IncreaseDamage;
+            CurrentCriticalStrikeChance = (AdditionalCriticalStrikeChance + _baseCriticalStrikeChance) * IncreaseCriticalStrikeChance;
+            CurrentAdditionalStrikeChance = (AdditionalAdditionalStrikeChance + _baseAdditionalStrikeChance) * IncreaseAdditionalStrikeChance;
+            CurrentCriticalStrikeDamage = AdditionalCriticalStrikeDamage + _baseCriticalStrikeDamage;
             DiContainer.InjectDependencies(this);
+        }
+
+        protected override void UpdateValues()
+        {
+            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+            CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
+            CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Stats.CriticalStrikeDamage);
+            CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
         }
 
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
-            float damage = Rnd!.RandfRange(_currentMinDamage, _currentMaxDamage);
-            bool criticalStrike = Rnd.RandfRange(0, 1) <= _currentCriticalStrikeChance;
+            float damage = Rnd!.RandfRange(CurrentMinStrikeDamage, CurrentMaxStrikeDamage);
+            bool criticalStrike = Rnd.RandfRange(0, 1) <= CurrentCriticalStrikeChance;
             if (criticalStrike)
             {
-                var finalDamage = damage * _currentCriticalStrikeDamage;
-                return (finalDamage, true, _leech * finalDamage);
+                var finalDamage = damage * CurrentCriticalStrikeDamage;
+                return (finalDamage, true, Leech * finalDamage);
             }
-            return (damage, false, _leech * damage);
+            return (damage, false, Leech * damage);
+        }
+
+        protected bool IsChanceSuccessful(float chance)
+        {
+            return Rnd!.Randf() <= chance;
         }
     }
 }

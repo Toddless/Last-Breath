@@ -136,7 +136,7 @@ namespace Playground
 
             
 
-            var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinDamage, _enemy.AttackComponent.CurrentMaxDamage);
+            var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinStrikeDamage, _enemy.AttackComponent.CurrentMaxStrikeDamage);
             if(_enemy.AttackComponent.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
             {
                 damage2 *= _enemy.AttackComponent.CurrentCriticalStrikeDamage;
@@ -163,10 +163,10 @@ namespace Playground
             _enemy.BattleBehavior.RemoveBuffEffectAfterTurnsEnd();
 
             GD.Print($"dealed damage {damage}");
-            if (additionalAttackChance <= _enemy.AttackComponent!.BaseAdditionalAttackChance)
-            {
-                EnemyTurnHandler();
-            }
+            //if (additionalAttackChance <= _enemy.AttackComponent!.BaseAdditionalAttackChance)
+            //{
+            //    EnemyTurnHandler();
+            //}
         }
 
         private void PlayerClosedInventory()
