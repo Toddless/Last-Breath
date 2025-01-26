@@ -6,9 +6,9 @@
         private string _name = name;
         private string _description = desc;
         private float _modifier = modifier;
+        private int _duration = duration;
         private EffectType _effectType;
         private Stats _stat;
-        private int _duration = duration;
 
         public Stats Stat
         {
@@ -19,7 +19,11 @@
         public string Name => _name;
         public string Description => _description;
         public float Modifier => _modifier;
-        public int Duration => _duration;
+        public int Duration
+        {
+            get => _duration;
+            set => _duration = value;
+        }
 
         public EffectType EffectType
         {

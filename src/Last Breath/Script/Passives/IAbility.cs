@@ -1,28 +1,20 @@
 ﻿namespace Playground.Script.Passives
 {
     using System;
-    using Playground.Components.Interfaces;
+    using System.Collections.Generic;
     using Playground.Script.Passives.Attacks;
 
     public interface IAbility
     {
-        int BuffLasts
-        {
-            get; set;
-        }
         int Cooldown
         {
             get; set;
         }
-        Type TargetType
-        {
-            get;
-        }
-        IGameComponent? TargetComponent
-        {
-            get;
-        }
-        public void SetTargetCharacter(ICharacter? character);
-        public void ActivateAbility();
+
+        Action<ICharacter, IAbility> OnReceiveAbilityHandler { get; set; }
+
+        List<IEffect> Effects { get; set; }
+
+        void ActivateAbility(ICharacter character);
     }
 }

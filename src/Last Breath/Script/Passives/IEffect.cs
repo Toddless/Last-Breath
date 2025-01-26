@@ -27,6 +27,7 @@
         int Duration
         {
             get;
+            set;
         }
     }
 }

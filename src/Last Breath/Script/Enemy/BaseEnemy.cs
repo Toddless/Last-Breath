@@ -1,10 +1,12 @@
 namespace Playground
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
@@ -23,6 +25,8 @@ namespace Playground
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false;
+        private ObservableCollection<IEffect>? _effects;
+        private ObservableCollection<IAbility>? _appliedAbilities = [];
         private IBasedOnRarityLootTable? _lootTable;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
@@ -49,7 +53,7 @@ namespace Playground
         private Node2D? _inventoryNode;
         private Panel? _inventoryWindow;
         private GridContainer? _inventoryContainer;
-        private EnemyInventoryComponent? _inventory;
+        private EnemyInventory? _inventory;
         #endregion
 
 
@@ -133,7 +137,7 @@ namespace Playground
             }
         }
 
-        public EnemyInventoryComponent? Inventory
+        public EnemyInventory? Inventory
         {
             get => _inventory;
             set => _inventory = value;
@@ -145,18 +149,25 @@ namespace Playground
             get => _lootTable;
             set => _lootTable = value;
         }
+
+        public ObservableCollection<IAbility>? AppliedAbilities
+        {
+            get => _appliedAbilities;
+            set => _appliedAbilities = value;
+        }
         #endregion
 
         public override void _Ready()
         {
-            _attack = new AttackComponent();
-            _health = new HealthComponent();
+            _effects = [];
+            _attack = new AttackComponent(_effects);
+            _health = new HealthComponent(_effects);
             _attribute = new AttributeComponent();
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            Inventory = new EnemyInventoryComponent();
+            Inventory = new EnemyInventory();
             Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
@@ -260,7 +271,7 @@ namespace Playground
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
             // working fine for buff, but what should i do to debuff someone?
-            BattleBehavior?.MakeDecision()?.ActivateAbility();
+            //BattleBehavior?.MakeDecision()?.ActivateAbility();
             return _attack!.CalculateDamage();
         }
 

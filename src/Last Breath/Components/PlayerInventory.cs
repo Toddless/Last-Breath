@@ -7,13 +7,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    [GlobalClass]
-    public partial class InventoryComponent : Node, IGameComponent, IInventory
+    public class PlayerInventory : IInventory
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
-        private int _capacity;
-        private Item? _item;
         private Action? _showInventory, _hideInventory;
 
         public Action? ShowInventory
@@ -28,7 +25,7 @@
             set => _hideInventory = value;
         }
 
-        public void Inititalize(int size, string path, GridContainer container, Action? hideInventory, Action? showInventory)
+        public void Initialize(int size, string path, GridContainer container, Action? hideInventory, Action? showInventory)
         {
             _inventorySlot = ResourceLoader.Load<PackedScene>(path);
             for (int i = 0; i < size; i++)

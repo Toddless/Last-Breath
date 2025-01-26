@@ -53,5 +53,30 @@
             Assert.IsTrue(criticalStrikeDamageBevorDebuff > _attackComponent.CurrentCriticalStrikeDamage);
             Assert.IsTrue(additionalStrikeChanceBevorDebuff > _attackComponent.CurrentAdditionalStrikeChance);
         }
+
+        [TestMethod]
+        public void TwoSimilarDebuffsAppliedTest()
+        {
+            Assert.IsNotNull( _attackComponent );
+
+            var criticalStrikeDebuffFromFristAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.05f, 3);
+            var criticalStrikeDebuffFromSecondAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.01f, 3);
+            _attackComponent.Effects?.Add(criticalStrikeDebuffFromFristAbility);
+            var criticalStrikeChanceBevorSecondDebuff = _attackComponent.CurrentCriticalStrikeChance;
+            _attackComponent.Effects?.Add(criticalStrikeDebuffFromSecondAbility);
+
+            Assert.IsTrue(criticalStrikeChanceBevorSecondDebuff > _attackComponent.CurrentCriticalStrikeChance);
+        }
+
+        [TestMethod]
+        public void GettingDebuffedPropertyHaveCorrectValue()
+        {
+            Assert.IsNotNull(_attackComponent);
+            var criticalStrikeDebuffFromFristAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.05f, 3);
+            var firstGet = _attackComponent.CurrentCriticalStrikeChance;
+            var secondGet = _attackComponent.CurrentCriticalStrikeChance;
+            var thirdGet = _attackComponent.CurrentCriticalStrikeChance;
+            Assert.IsTrue(firstGet == thirdGet);
+        }
     }
 }

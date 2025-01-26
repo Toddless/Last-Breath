@@ -1,22 +1,20 @@
-﻿namespace Playground.Script
+﻿namespace Playground.Script.Enemy
 {
-    using Playground.Script.Inventory;
+    using System;
     using System.Collections.Generic;
-    using Playground.Script.Items;
     using System.Linq;
     using Godot;
-    using System;
     using Playground.Components.Interfaces;
-    using Playground.Components;
+    using Playground.Script.Inventory;
+    using Playground.Script.Items;
 
-    public class EnemyInventoryComponent : ComponentBase, IInventory
+    public class EnemyInventory : IInventory
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
-        private Item? _item;
         private Action? _showInventory;
         private Action? _hideInventory;
-      
+
         public Action? ShowInventory
         {
             get => _showInventory;
@@ -28,9 +26,9 @@
             set => _hideInventory = value;
         }
 
-        public void Initialize(int size, string parth, GridContainer container, Action? hideInventory, Action? showInventory)
+        public void Initialize(int size, string path, GridContainer container, Action? hideInventory, Action? showInventory)
         {
-            _inventorySlot = ResourceLoader.Load<PackedScene>(parth);
+            _inventorySlot = ResourceLoader.Load<PackedScene>(path);
             for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot.Instantiate<InventorySlot>();
@@ -42,7 +40,6 @@
         }
 
         public List<Item> GivePlayerItems() => _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem!).ToList();
-
 
         public void AddItem(Item? item)
         {
@@ -90,7 +87,7 @@
 
         private InventorySlot? GetSlotToAdd(Item newItem)
         {
-            return _slots.FirstOrDefault(itemInSlot => itemInSlot.InventoryItem == null || (itemInSlot.InventoryItem.Guid == newItem.Guid && itemInSlot.InventoryItem.Quantity < newItem.MaxStackSize));
+            return _slots.FirstOrDefault(itemInSlot => itemInSlot.InventoryItem == null || itemInSlot.InventoryItem.Guid == newItem.Guid && itemInSlot.InventoryItem.Quantity < newItem.MaxStackSize);
         }
 
         private InventorySlot? GetSlotToRemove(Item? item)

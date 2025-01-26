@@ -28,7 +28,6 @@ window/size/viewport_height=920
 [dotnet]
 
 project/assembly_name="Playground"
-project/solution_directory="D:\\Programms\\Godot_v4.3-stable_mono_win64\\Projects\\playground"
 
 [file_customization]
 

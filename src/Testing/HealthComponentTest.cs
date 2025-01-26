@@ -1,6 +1,8 @@
 ﻿namespace PlaygroundTest
 {
+    using System.Collections.ObjectModel;
     using Playground;
+    using Playground.Script.Passives;
     using Playground.Script.Passives.Buffs;
     using Playground.Script.Passives.Debuffs;
 
@@ -12,7 +14,8 @@
         [TestInitialize]
         public void Initialize()
         {
-            _healthComponent = new HealthComponent();
+            var effects = new ObservableCollection<IEffect>();
+            _healthComponent = new HealthComponent(effects);
         }
 
         [TestCleanup]
@@ -245,7 +248,5 @@
 
             Assert.IsFalse(weakReference?.IsAlive ?? true, "HealthComponent was not collected");
         }
-
-        
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Playground.Components
 {
-    public class DefenceComponent : ComponentBase
+    public class DefenceComponent
     {
         private float _defence;
         private float _chanceToEvade;

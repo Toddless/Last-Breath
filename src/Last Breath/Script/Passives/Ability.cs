@@ -1,42 +1,27 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using System;
-    using Godot;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
+    using System.Collections.Generic;
 
-    public abstract partial class Ability<T, U> : RefCounted, IAbility
-        where T : IGameComponent
-        where U : ICharacter
+    public abstract class Ability : IAbility
     {
-        private T? _target;
-        private EffectType _effectType;
-        protected U? TargetCharacter;
-        public int BuffLasts { get; set; } = 1;
+        private List<IEffect> _effects;
+        public Action<ICharacter, IAbility> OnReceiveAbilityHandler { get; set; } = DoNothing;
         public int Cooldown { get; set; } = 4;
-
         protected Ability()
         {
-            TargetType = typeof(U);
+            _effects ??= [];
         }
-
-        public IGameComponent? TargetComponent
+        public List<IEffect> Effects
         {
-            get; set;
+            get => _effects;
+            set => _effects = value;
         }
 
-        public Type TargetType
+        public virtual void ActivateAbility(ICharacter character) => OnReceiveAbilityHandler.Invoke(character, this);
+
+        private static void DoNothing(ICharacter character, IAbility ability)
         {
-            get;
-            private set;
         }
-
-        // Methods from IAbility
-        public void ActivateAbility() => ActivateAbility(_target);
-        public void SetTargetCharacter(ICharacter? character) => SetTargetCharacter(character);
-
-        // Methods from this class
-        public abstract void ActivateAbility(T? component);
-        public abstract void SetTargetCharacter(U? target);
     }
 }

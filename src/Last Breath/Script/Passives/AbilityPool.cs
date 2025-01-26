@@ -19,7 +19,7 @@
                 return;
         }
 
-       // public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
+        // public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
 
         public List<IAbility>? SelectAbilities(int amount)
         {
@@ -30,16 +30,16 @@
             using (var rnd = new RandomNumberGenerator())
             {
                 List<IAbility> result = [];
+                // If we do not have a lot of skills and amount is only a little bit lower than count, this part can take too long.
                 while (result.Count != amount)
                 {
-                    // If we do not have a lot of skills, and amount is only a little bit lower than count, this part can take too long.
                     var chosenAbility = _abilities[rnd.RandiRange(0, _abilities.Count - 1)];
                     if (!result.Contains(chosenAbility))
                     {
                         result.Add(chosenAbility);
                         _abilities.Remove(chosenAbility);
                     }
-                    if(_abilities.Count <= 0)
+                    if (_abilities.Count <= 0)
                         break;
                 }
 

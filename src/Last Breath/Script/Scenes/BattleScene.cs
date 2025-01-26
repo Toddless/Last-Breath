@@ -1,5 +1,6 @@
 namespace Playground
 {
+    using System;
     using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script;
@@ -57,13 +58,11 @@ namespace Playground
             _enemyHpBar = battleSceneUi.GetNode<ProgressBar>("EnemyHpBar");
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
             _returnButton = battleSceneUi.GetNode<Button>("ReturnButton");
-
-            _takeAll.Pressed += PlayerTakesAllItems;
             _timer = battelScene.GetNode<Timer>("Timer");
-            _returnButton.Pressed += BattleFinished;
-            PlayerTurn += PlayerMakeTurn;
-            EnemyTurn += EnemyMakeTurn;
-            _head.Pressed += PlayerMakeTurn;
+
+            _takeAll!.Pressed += PlayerTakesAllItems;
+            _returnButton!.Pressed += BattleFinished;
+            _head!.Pressed += PlayerMakeTurn;
             SetHealthBars();
             UpdateHealthBar();
             DiContainer.InjectDependencies(this);
@@ -79,6 +78,10 @@ namespace Playground
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
             _playerInventory = _player.Inventory;
+            this.EnemyTurn += _enemy.AttackComponent!.HandleEffectsDuration;
+            this.EnemyTurn += _enemy.HealthComponent!.HandleEffectsDuration;
+            PlayerTurn += PlayerMakeTurn;
+            EnemyTurn += EnemyMakeTurn;
         }
 
         private void StartFight()
@@ -113,15 +116,15 @@ namespace Playground
                 return;
             }
             _attackButtonsUI?.Show();
-            var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
+           // var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
             // TODO: Player attack animation
-            _enemy!.HealthComponent!.CurrentHealth -= damage;
+           // _enemy!.HealthComponent!.CurrentHealth -= damage;
 
-            if (crit)
-            {
-                // TODO: Crit animation or some nice text 
-                GD.Print("Crit!");
-            }
+            //if (crit)
+            //{
+            //    // TODO: Crit animation or some nice text 
+            //    GD.Print("Crit!");
+            //}
             UpdateHealthBar();
             //_damageButton!.Visible = false;
             _attackButtonsUI?.Hide();
@@ -134,10 +137,10 @@ namespace Playground
             _enemy!.BattleBehavior?.GatherInfo(_player!);
             float additionalAttackChance = Rnd!.RandfRange(0, 1);
 
-            
+
 
             var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinStrikeDamage, _enemy.AttackComponent.CurrentMaxStrikeDamage);
-            if(_enemy.AttackComponent.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
+            if (_enemy.AttackComponent.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
             {
                 damage2 *= _enemy.AttackComponent.CurrentCriticalStrikeDamage;
             }
@@ -147,7 +150,7 @@ namespace Playground
 
             // TODO: Ability animation
 
-            _player!.PlayerHealth!.CurrentHealth -= damage;
+           // _player!.PlayerHealth!.CurrentHealth -= damage;
             if (crit)
             {
                 // TODO: Crit animation or some nice text 
@@ -185,9 +188,22 @@ namespace Playground
         private void BattleFinished()
         {
             SetPlayerStats();
+            UnsubscribeEvents();
             this.CallDeferred("remove_child", _player!);
             GetParent().CallDeferred("add_child", _player!);
             EmitSignal(SignalName.BattleSceneFinished, _enemy!);
+        }
+
+        private void UnsubscribeEvents()
+        {
+            if (_enemy == null)
+                return;
+            this.EnemyTurn -= _enemy.HealthComponent!.HandleEffectsDuration;
+            this.EnemyTurn -= _enemy.AttackComponent!.HandleEffectsDuration;
+            _returnButton!.Pressed -= BattleFinished;
+            PlayerTurn -= PlayerMakeTurn;
+            EnemyTurn -= EnemyMakeTurn;
+            _takeAll!.Pressed -= PlayerTakesAllItems;
         }
 
         private void SetPlayerStats()
@@ -205,14 +221,14 @@ namespace Playground
 
         private void SetHealthBars()
         {
-            _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
+          //  _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
             _enemyHpBar!.MaxValue = _enemy!.HealthComponent!.MaxHealth;
         }
 
         private void UpdateHealthBar()
         {
             _enemyHpBar!.Value = _enemy!.HealthComponent!.CurrentHealth;
-            _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
+          //  _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
     }
 }

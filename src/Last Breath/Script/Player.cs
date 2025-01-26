@@ -1,11 +1,14 @@
 ﻿namespace Playground
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
     using Playground.Script;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
+    using Playground.Script.Passives;
     using Playground.Script.Passives.Attacks;
 
     public partial class Player : CharacterBody2D, ICharacter
@@ -26,6 +29,7 @@
         private int _speed;
         private Vector2 _lastPosition;
         private bool _canMove = true;
+        private ObservableCollection<IEffect>? _effects;
         #endregion
 
         #region Components
@@ -41,7 +45,7 @@
         public delegate void PlayerExitedTheBattleEventHandler();
 
         #region UI
-        private InventoryComponent? _inventory;
+        private PlayerInventory? _inventory;
         private GridContainer? _inventoryContainder;
         private ProgressBar? _progressBarMovement;
         private ResearchButton? _researchButton;
@@ -67,18 +71,6 @@
             set => _playerWeapon = value;
         }
 
-        public HealthComponent? PlayerHealth
-        {
-            get => _playerHealth;
-            set => _playerHealth = value;
-        }
-
-        public AttackComponent? PlayerAttack
-        {
-            get => _playerAttack;
-            set => _playerAttack = value;
-        }
-
         public Vector2 PlayerLastPosition
         {
             get => _lastPosition;
@@ -91,7 +83,7 @@
             set => _canMove = value;
         }
 
-        public InventoryComponent? Inventory
+        public PlayerInventory? Inventory
         {
             get => _inventory;
             set => _inventory = value;
@@ -113,20 +105,22 @@
         public int Speed { get; set; } = 200;
         public HealthComponent HealthComponent
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => _playerHealth;
+            set => _playerHealth = value;
         }
         public AttackComponent AttackComponent
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => _playerAttack;
+            set => _playerAttack = value;
         }
+        public ObservableCollection<IAbility>? AppliedAbilities { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
         #endregion
 
         public override void _Ready()
         {
-            _playerHealth = new HealthComponent();
-            _playerAttack = new AttackComponent();
+            _effects = [];
+            _playerHealth = new HealthComponent(_effects);
+            _playerAttack = new AttackComponent(_effects);
             _playerAttribute = new AttributeComponent();
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
@@ -135,7 +129,7 @@
             _inventoryNode = _playersInventoryElements.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _inventory = new InventoryComponent();
+            _inventory = new PlayerInventory();
             _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
@@ -144,7 +138,7 @@
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _researchButton.Pressed += ResearchCurrentZone;
             _globalSignals.OnEquipItem += OnEquipItem;
-            _inventory.Inititalize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
+            _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             SetHealthBar();
             UpdateStats();

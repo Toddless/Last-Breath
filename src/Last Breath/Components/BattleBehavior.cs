@@ -5,6 +5,7 @@
     using Godot;
     using Playground.Script;
     using Playground.Script.Passives;
+    using Playground.Script.Passives.Attacks;
     using Playground.Script.Passives.Interfaces;
 
     [Inject]
@@ -17,6 +18,8 @@
         private RandomNumberGenerator? _rnd;
         private HealthComponent? _playerHealth;
         private BaseEnemy? _enemyBase;
+        private ICharacter? _selfTarget;
+        private ICharacter? _opponentTarget;
         private Player? _player;
         private IAbility? _activatedAbility;
         private List<IAbility>? _activatedAbilities = [];
@@ -26,6 +29,7 @@
         public BattleBehavior(BaseEnemy enemy)
         {
             _enemyBase = enemy;
+            _selfTarget = enemy;
             FindOutWhatICan(_enemyBase.Abilities);
             DiContainer.InjectDependencies(this);
         }
@@ -45,17 +49,7 @@
         public void GatherInfo(Player player)
         {
             _player = player;
-            foreach (var item in _enemyBase.Abilities)
-            {
-                if (item.TargetType == typeof(BaseEnemy))
-                {
-                    item.SetTargetCharacter(_enemyBase);
-                }
-                if (item.TargetType == typeof(Player))
-                {
-                    item.SetTargetCharacter(_player);
-                }
-            }
+            _opponentTarget = player;
         }
 
 
@@ -166,11 +160,7 @@
             var buffToDelete = new List<IAbility>();
             foreach (var ability in _activatedAbilities!)
             {
-                ability.BuffLasts--;
-                if (ability.BuffLasts == 0)
-                {
-                    buffToDelete.Add(ability);
-                }
+                buffToDelete.Add(ability);
             }
             DeleteBuffsFromList(buffToDelete);
         }
@@ -194,10 +184,6 @@
 
         public void RemoveBuffEffectAfterTurnsEnd()
         {
-            if (_activatedAbility!.BuffLasts != 0)
-            {
-                return;
-            }
         }
 
         public void BattleEnds()

@@ -378,6 +378,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="InventoryContainer" type="GridContainer" parent="Inventory/InventoryWindow"]
+layout_mode = 0
 offset_left = 76.5624
 offset_top = 34.5238
 offset_right = 376.562

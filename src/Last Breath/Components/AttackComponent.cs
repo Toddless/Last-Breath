@@ -1,40 +1,48 @@
 namespace Playground
 {
+    using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
     using Playground.Script;
     using Playground.Script.Enums;
+    using Playground.Script.Passives;
 
     [Inject]
     public class AttackComponent : ComponentBase, IAttackComponent
     {
         #region private fields
-        private RandomNumberGenerator? _rnd;
+
+        #region Base values
         private readonly float _baseAdditionalStrikeChance = 0.05f;
         private readonly float _baseCriticalStrikeChance = 0.05f;
         private readonly float _baseCriticalStrikeDamage = 1.5f;
         private readonly float _baseMinStrikeDamage = 40;
         private readonly float _baseMaxStrikeDamage = 100;
+        #endregion
 
-        private float _additionalAdditionalStrikeChance;
-        private float _increaseAdditionalStrikeChance = 1;
-        private float _currentAdditionalStrikeChance;
-
-        private float _additionalCriticalStrikeChance;
+        #region Increases
         private float _increaseCriticalStrikeChance = 1;
-        private float _currentCriticalStrikeChance;
+        private float _increaseAdditionalStrikeChance = 1;
+        #endregion
 
+        #region Additionals
+        private float _additionalAdditionalStrikeChance;
+        private float _additionalCriticalStrikeChance;
         private float _additionalCriticalStrikeDamage;
-        private float _currentCriticalStrikeDamage;
-
         private float _additionalMinStrikeDamage;
-        private float _currentMinStrikeDamage;
-
         private float _additionalMaxStrikeDamage;
+        #endregion
+
+        #region Currents
+        private float _currentAdditionalStrikeChance;
+        private float _currentCriticalStrikeDamage;
+        private float _currentCriticalStrikeChance;
+        private float _currentMinStrikeDamage;
         private float _currentMaxStrikeDamage;
+        #endregion
 
+        private RandomNumberGenerator? _rnd;
         private float _increaseDamage = 1;
-
         private float _leech;
         #endregion
 
@@ -54,7 +62,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _additionalMinStrikeDamage, value))
-                    UpdateValues();
+                    UpdateAdditionalMinDamageValue();
             }
         }
 
@@ -64,7 +72,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _additionalMaxStrikeDamage, value))
-                    UpdateValues();
+                    UpdateAdditionalMaxDamageValue();
             }
         }
 
@@ -74,7 +82,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _additionalCriticalStrikeDamage, value))
-                    UpdateValues();
+                    UpdateAdditionalCriticalStrikeDamageValue();
             }
         }
 
@@ -84,7 +92,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _additionalCriticalStrikeChance, value))
-                    UpdateValues();
+                    UpdateAdditionalCriticalStrikeChanceValue();
             }
         }
 
@@ -94,7 +102,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _additionalAdditionalStrikeChance, value))
-                    UpdateValues();
+                    UpdateAdditionalStrikeChanceValue();
             }
         }
 
@@ -104,7 +112,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _increaseDamage, value))
-                    UpdateValues();
+                    UpdateIncreaseDamageValues();
             }
         }
 
@@ -114,7 +122,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _increaseCriticalStrikeChance, value))
-                    UpdateValues();
+                    UpdateIncreaseCriticalStrikeChanceValue();
             }
         }
 
@@ -124,10 +132,9 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _increaseAdditionalStrikeChance, value))
-                    UpdateValues();
+                    UpdateIncreaseAdditionalStrikeChanceValue();
             }
         }
-
         #endregion
 
         #region Current Values
@@ -160,7 +167,6 @@ namespace Playground
             get => _currentAdditionalStrikeChance;
             private set => _currentAdditionalStrikeChance = value;
         }
-
         #endregion
 
         public float Leech
@@ -180,14 +186,10 @@ namespace Playground
         }
 
         #endregion
-
-        public AttackComponent()
+        public AttackComponent(ObservableCollection<IEffect>? appliedEffects = default) : base(appliedEffects)
         {
-            CurrentMinStrikeDamage = (AdditionalMinStrikeDamage + _baseMinStrikeDamage) * IncreaseDamage;
-            CurrentMaxStrikeDamage = (AdditionalMaxStrikeDamage + _baseMaxStrikeDamage) * IncreaseDamage;
-            CurrentCriticalStrikeChance = (AdditionalCriticalStrikeChance + _baseCriticalStrikeChance) * IncreaseCriticalStrikeChance;
-            CurrentAdditionalStrikeChance = (AdditionalAdditionalStrikeChance + _baseAdditionalStrikeChance) * IncreaseAdditionalStrikeChance;
-            CurrentCriticalStrikeDamage = AdditionalCriticalStrikeDamage + _baseCriticalStrikeDamage;
+            UpdateValues();
+            // since a lot of code was changed, i need better solution for this
             DiContainer.InjectDependencies(this);
         }
 
@@ -200,6 +202,27 @@ namespace Playground
             CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
         }
 
+        // Not very pretty, but I don't want to recalculate all properties via the UpdateValues method when only one thing has been changed
+        // Switch statement not helping if more than one property was changed simultaneously
+        // Maybe I'll find a better solution later
+        #region Pain for the eyes
+
+        private void UpdateAdditionalMinDamageValue() => CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+        private void UpdateAdditionalMaxDamageValue() => CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+        private void UpdateAdditionalCriticalStrikeDamageValue() => CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Stats.CriticalStrikeDamage);
+        private void UpdateAdditionalCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
+        private void UpdateIncreaseAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
+        private void UpdateIncreaseCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
+        private void UpdateAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
+        private void UpdateIncreaseDamageValues()
+        {
+            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+        }
+        #endregion
+
+
+        // i don´t really like it, refactoring is needed
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
             float damage = Rnd!.RandfRange(CurrentMinStrikeDamage, CurrentMaxStrikeDamage);
@@ -212,6 +235,7 @@ namespace Playground
             return (damage, false, Leech * damage);
         }
 
+        // looks useful, but im not sure
         protected bool IsChanceSuccessful(float chance)
         {
             return Rnd!.Randf() <= chance;

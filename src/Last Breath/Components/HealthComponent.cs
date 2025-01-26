@@ -1,9 +1,11 @@
 ﻿namespace Playground
 {
     using System;
+    using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
     using Playground.Script.Enums;
+    using Playground.Script.Passives;
 
     public class HealthComponent : ComponentBase, IHealthComponent
     {
@@ -63,7 +65,7 @@
             private set => _maxHealth = value;
         }
 
-        public HealthComponent()
+        public HealthComponent(ObservableCollection<IEffect>? appliedEffects = default) : base(appliedEffects)
         {
             _maxHealth = (_baseHealth + AdditionalHealth) * IncreaseHealth;
             RefreshHealth();
@@ -77,11 +79,11 @@
 
         protected override void UpdateValues()
         {
-            var oldMaxHealth = _maxHealth;
-            _maxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Stats.Health);
-            _currentHealth = (_currentHealth / oldMaxHealth) * _maxHealth;
-            if (CurrentHealth > _maxHealth)
-                CurrentHealth = _maxHealth;
+            var oldMaxHealth = MaxHealth;
+            MaxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Stats.Health);
+            CurrentHealth = (CurrentHealth / oldMaxHealth) * MaxHealth;
+            if (CurrentHealth > MaxHealth)
+                CurrentHealth = MaxHealth;
         }
     }
 }
