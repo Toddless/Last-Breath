@@ -1,9 +1,9 @@
 ﻿namespace PlaygroundTest
 {
-    using Playground.Script.Passives;
     using Playground;
     using Playground.Script.Passives.Attacks;
     using System.Collections.ObjectModel;
+    using Playground.Script.Effects.Interfaces;
 
     public class BaseEnemyTest : ICharacter
     {

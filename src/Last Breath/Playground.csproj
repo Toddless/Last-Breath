@@ -20,7 +20,7 @@
     <Folder Include="Script\Helpers\Extensions\" />
     <Folder Include="Script\Items\ItemsAbilities\" />
     <Folder Include="Script\Items\UniqItems\" />
-    <Folder Include="Script\Passives\Utility\" />
+    <Folder Include="Script\Effects\Utility\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".editorconfig" />

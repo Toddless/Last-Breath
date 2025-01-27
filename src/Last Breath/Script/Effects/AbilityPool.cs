@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Godot;
+    using Playground.Script.Effects.Interfaces;
 
     public class AbilityPool : IDisposable
     {

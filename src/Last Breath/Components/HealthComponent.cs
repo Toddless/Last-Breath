@@ -1,11 +1,13 @@
 ﻿namespace Playground
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using Godot;
     using Playground.Components;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
-    using Playground.Script.Passives;
 
     public class HealthComponent : ComponentBase, IHealthComponent
     {
@@ -76,6 +78,39 @@
         public void TakeDamage(float damage) => CurrentHealth = Math.Max(0, CurrentHealth - damage);
 
         public void Heal(float amount) => CurrentHealth = Math.Min(MaxHealth, CurrentHealth + amount);
+
+        public override void HandleAppliedEffects()
+        {
+            if (Effects == null)
+                return;
+
+            var groupedEffects = Effects.GroupBy(effect => effect.EffectType);
+
+            foreach (var group in groupedEffects)
+            {
+                switch (group.Key)
+                {
+                    case EffectType.Regeneration:
+                        HandleRegenerationEffects(group);
+                        break;
+
+                    case EffectType.Poison:
+                        HandlePoisonEffect(group);
+                        break;
+
+                    case EffectType.Bleeding:
+                        HandleBleedEffect(group);
+                        break;
+                }
+            }
+            base.HandleAppliedEffects();
+        }
+
+        private void HandleBleedEffect(IEnumerable<IEffect> bleed) => TakeDamage(bleed.Sum(bleed => bleed.Modifier));
+
+        private void HandlePoisonEffect(IEnumerable<IEffect> poison) => TakeDamage(poison.Sum(poison => poison.Modifier));
+
+        private void HandleRegenerationEffects(IEnumerable<IEffect> regen) => Heal(regen.Sum(effect => effect.Modifier));
 
         protected override void UpdateValues()
         {

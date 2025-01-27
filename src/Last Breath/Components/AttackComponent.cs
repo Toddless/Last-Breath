@@ -4,8 +4,8 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
-    using Playground.Script.Passives;
 
     [Inject]
     public class AttackComponent : ComponentBase, IAttackComponent

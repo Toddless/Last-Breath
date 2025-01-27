@@ -3,11 +3,12 @@
     using Playground.Script.Enums;
     using Playground.Script.Passives;
 
-    public class StrikeDamageDebuff : AbstractDebuff
+    public class StrikeDamageDebuff : AbstractEffect
     {
         public StrikeDamageDebuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
             Stat = Stats.StrikeDamage;
+            EffectType = EffectType.Debuff;
         }
     }
 }

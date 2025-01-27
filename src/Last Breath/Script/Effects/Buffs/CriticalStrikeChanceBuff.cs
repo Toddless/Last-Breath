@@ -2,11 +2,12 @@
 {
     using Playground.Script.Enums;
     using Playground.Script.Passives;
-    public class CriticalStrikeChanceBuff : AbstractBuff
+    public class CriticalStrikeChanceBuff : AbstractEffect
     {
         public CriticalStrikeChanceBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
             Stat = Stats.CriticalStrikeChance;
+            EffectType = EffectType.Buff
         }
     }
 }

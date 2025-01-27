@@ -4,6 +4,9 @@
     {
         None = 0,
         Buff,
-        Debuff
+        Debuff,
+        Regeneration,
+        Poison,
+        Bleeding
     }
 }

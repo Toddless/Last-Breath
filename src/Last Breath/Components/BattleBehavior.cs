@@ -4,7 +4,7 @@
     using System.Linq;
     using Godot;
     using Playground.Script;
-    using Playground.Script.Passives;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives.Attacks;
     using Playground.Script.Passives.Interfaces;
 

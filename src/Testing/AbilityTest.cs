@@ -1,5 +1,6 @@
 ﻿namespace PlaygroundTest
 {
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives;
     using Playground.Script.Passives.Buffs;
     using Playground.Script.Passives.Debuffs;

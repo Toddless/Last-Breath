@@ -1,5 +1,6 @@
 ﻿namespace Playground.Script.Passives
 {
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives.Attacks;
     public static class AbilityHandler
     {

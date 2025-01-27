@@ -1,6 +1,8 @@
 ﻿namespace Playground.Script.Passives.Attacks
 {
     using System.Collections.ObjectModel;
+    using Playground.Script.Effects.Interfaces;
+
     public interface ICharacter
     {
 

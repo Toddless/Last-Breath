@@ -6,6 +6,7 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;

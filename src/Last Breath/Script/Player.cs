@@ -1,14 +1,13 @@
 ﻿namespace Playground
 {
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using Playground.Script.Passives;
     using Playground.Script.Passives.Attacks;
 
     public partial class Player : CharacterBody2D, ICharacter

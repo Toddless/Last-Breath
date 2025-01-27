@@ -5,7 +5,7 @@
     using System.Collections.Specialized;
     using System.Linq;
     using Playground;
-    using Playground.Script.Passives;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives.Attacks;
 
     public class PlayerTest : ICharacter

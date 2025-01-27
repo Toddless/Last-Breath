@@ -5,9 +5,9 @@
     using System.Collections.Specialized;
     using System.Linq;
     using Playground.Components.Interfaces;
+    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Script.Passives;
 
     public abstract class ComponentBase : ObservableObject, IGameComponent, IDisposable
     {
@@ -25,15 +25,16 @@
             // here i need reference to all effects on character
             _effects = appliedEffects;
             Effects ??= [];
-            Effects.CollectionChanged += ApplyEffect;
+            Effects.CollectionChanged += ModifyStatsWithEffect;
         }
 
-        public void HandleEffectsDuration()
+        public virtual void HandleAppliedEffects()
         {
             if (Effects == null || Effects.Count <= 0)
                 return;
-            var expiredEffects = Effects.Where(effect => --effect.Duration == 0).ToList();
-            expiredEffects.ForEach(effect => Effects.Remove(effect));
+
+            var effectsToRemove = Effects.Where(effect => --effect.Duration == 0).ToList();
+            effectsToRemove.ForEach(effect => Effects.Remove(effect));
         }
 
         protected virtual void Dispose(bool disposing)
@@ -55,7 +56,7 @@
         {
             if (Effects != null)
             {
-                Effects.CollectionChanged -= ApplyEffect;
+                Effects.CollectionChanged -= ModifyStatsWithEffect;
                 Effects = null;
             }
         }
@@ -64,7 +65,7 @@
         {
         }
 
-        protected void ApplyEffect(object? sender, NotifyCollectionChangedEventArgs e)
+        protected void ModifyStatsWithEffect(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // i don´t really know what should be updated, so i update just all properties
             if (e.Action is NotifyCollectionChangedAction.Add || e.Action is NotifyCollectionChangedAction.Remove)

@@ -2,11 +2,12 @@
 {
     using Playground.Script.Enums;
     using Playground.Script.Passives;
-    public class StrikeDamageBuff : AbstractBuff
+    public class StrikeDamageBuff : AbstractEffect
     {
         public StrikeDamageBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
             Stat = Stats.StrikeDamage;
+            EffectType = EffectType.Buff;
         }
     }
 }

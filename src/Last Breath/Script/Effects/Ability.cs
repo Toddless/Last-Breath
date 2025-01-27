@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Playground.Script.Effects.Interfaces;
 
     public abstract class Ability : IAbility
     {

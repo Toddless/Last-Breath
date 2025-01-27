@@ -1,6 +1,5 @@
 namespace Playground
 {
-    using System;
     using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script;
@@ -78,8 +77,8 @@ namespace Playground
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
             _playerInventory = _player.Inventory;
-            this.EnemyTurn += _enemy.AttackComponent!.HandleEffectsDuration;
-            this.EnemyTurn += _enemy.HealthComponent!.HandleEffectsDuration;
+            this.EnemyTurn += _enemy.AttackComponent!.HandleAppliedEffects;
+            this.EnemyTurn += _enemy.HealthComponent!.HandleAppliedEffects;
             PlayerTurn += PlayerMakeTurn;
             EnemyTurn += EnemyMakeTurn;
         }
@@ -198,8 +197,8 @@ namespace Playground
         {
             if (_enemy == null)
                 return;
-            this.EnemyTurn -= _enemy.HealthComponent!.HandleEffectsDuration;
-            this.EnemyTurn -= _enemy.AttackComponent!.HandleEffectsDuration;
+            this.EnemyTurn -= _enemy.HealthComponent!.HandleAppliedEffects;
+            this.EnemyTurn -= _enemy.AttackComponent!.HandleAppliedEffects;
             _returnButton!.Pressed -= BattleFinished;
             PlayerTurn -= PlayerMakeTurn;
             EnemyTurn -= EnemyMakeTurn;
