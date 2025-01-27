@@ -188,7 +188,7 @@ namespace Playground
 
         #endregion
 
-        public AttackComponent(ObservableCollection<IEffect>? appliedEffects = default) : base(appliedEffects)
+        public AttackComponent(ObservableCollection<IEffect> appliedEffects) : base(appliedEffects)
         {
             UpdateValues();
             // since a lot of code was changed, i need better solution for this
@@ -237,8 +237,8 @@ namespace Playground
             return (damage, false, Leech * damage);
         }
 
-        // looks useful, but im not sure
-        protected bool IsChanceSuccessful(float chance)
+        // looks useful
+        public bool IsChanceSuccessful(float chance)
         {
             return Rnd!.Randf() <= chance;
         }

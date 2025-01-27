@@ -4,6 +4,7 @@
     using Playground;
     using Playground.Script.Effects.Debuffs;
     using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Enums;
     using Playground.Script.Passives.Buffs;
     using Playground.Script.Passives.Debuffs;
 
@@ -140,7 +141,7 @@
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
             Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
         }
 
@@ -149,8 +150,8 @@
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthBuff("Some f", "Empty", 0.3f, 3));
+            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.3f, 3));
             Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
         }
 
@@ -159,8 +160,8 @@
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf("Some Debuff", "Empty", -0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
             Assert.IsTrue(healthBevorBuff > _healthComponent.MaxHealth);
         }
 
@@ -170,7 +171,7 @@
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorDebuffs = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
             Assert.IsTrue(_healthComponent.MaxHealth < healthBevorDebuffs);
         }
 
@@ -178,9 +179,9 @@
         public void TwoDebuffsAppliedTest()
         {
             Assert.IsNotNull(_healthComponent);
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
             var healthAfterDebuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
             Assert.IsTrue(healthAfterDebuff == 90 && _healthComponent.MaxHealth == 70);
         }
 
@@ -188,8 +189,8 @@
         public void OneDebuffRemovedTest()
         {
             Assert.IsNotNull(_healthComponent);
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
             var healthBevorRemove = _healthComponent.MaxHealth;
             _healthComponent.Effects?.RemoveAt(1);
             Assert.IsTrue(healthBevorRemove < _healthComponent.MaxHealth);
@@ -200,8 +201,8 @@
         {
             Assert.IsNotNull(_healthComponent);
             var currentHealthBevorDebuff = _healthComponent.CurrentHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
+            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
             Assert.IsTrue(currentHealthBevorDebuff > _healthComponent.CurrentHealth);
         }
 
@@ -250,6 +251,7 @@
         {
             Assert.IsNotNull(_healthComponent);
             var buff = new StrikeDamageBuff(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(buff);
             for (int i = 0; i < 2; i++)
                 _healthComponent.HandleAppliedEffects();
             Assert.IsTrue(_healthComponent.Effects?.Count == 0);
@@ -269,7 +271,7 @@
         }
 
         [TestMethod]
-        public void TwoSimilarEffectsDealDamageAndRemovedTest()
+        public void TwoSimilarEffectsDealDamageAndRemovingTest()
         {
             Assert.IsNotNull(_healthComponent);
             var firstPoison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
@@ -281,7 +283,17 @@
 
             Assert.IsTrue(_healthComponent.CurrentHealth == 40);
             Assert.IsTrue(_healthComponent.Effects?.Count == 0);
+        }
 
+        [TestMethod]
+        public void PoisonEffectAppliedButDidNoDamageTest()
+        {
+            // This test does not make much sense, but just in case
+            Assert.IsNotNull(_healthComponent);
+            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(poison);
+            Assert.IsNotNull(_healthComponent.Effects?.FirstOrDefault(x => x.EffectType == EffectType.Poison));
+            Assert.IsTrue(_healthComponent.CurrentHealth == 100);
         }
 
         [TestMethod]
@@ -291,7 +303,7 @@
 
             void CreateAndDispose()
             {
-                var health = new HealthComponent();
+                var health = new HealthComponent([]);
                 weakReference = new WeakReference(health);
                 health.Dispose();
             }

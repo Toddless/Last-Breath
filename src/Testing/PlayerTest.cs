@@ -13,7 +13,7 @@
         private HealthComponent? _healthComponent;
         private AttackComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
-        private ObservableCollection<IEffect>? _effects;
+        private ObservableCollection<IEffect> _effects;
 
         public HealthComponent? HealthComponent
         {
@@ -31,15 +31,17 @@
             set => _appliedAbilities = value;
         }
 
-        public ObservableCollection<IEffect>? Effects
+        public ObservableCollection<IEffect> Effects
         {
             get => _effects;
             private set => _effects = value;
         }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. Only for test class
         public PlayerTest()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
-            Effects ??= [];
+            Effects = [];
             HealthComponent = new(Effects);
             AttackComponent = new(Effects);
             AppliedAbilities ??= [];

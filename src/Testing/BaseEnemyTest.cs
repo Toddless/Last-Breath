@@ -20,6 +20,7 @@
         public BaseEnemyTest()
         {
             _appliedAbilities = [];
+            _appliedEffects = [];
             HealthComponent = new(_appliedEffects);
             AttackComponent = new(_appliedEffects);
             AppliedAbilities = [];

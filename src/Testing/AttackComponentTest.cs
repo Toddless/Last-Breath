@@ -11,7 +11,7 @@
         [TestInitialize]
         public void Initialize()
         {
-            _attackComponent = new AttackComponent();
+            _attackComponent = new AttackComponent([]);
         }
 
         [TestCleanup]

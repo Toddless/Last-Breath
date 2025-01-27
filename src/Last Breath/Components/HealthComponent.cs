@@ -67,7 +67,7 @@
             private set => _maxHealth = value;
         }
 
-        public HealthComponent(ObservableCollection<IEffect>? appliedEffects = default) : base(appliedEffects)
+        public HealthComponent(ObservableCollection<IEffect> appliedEffects) : base(appliedEffects)
         {
             _maxHealth = (_baseHealth + AdditionalHealth) * IncreaseHealth;
             RefreshHealth();

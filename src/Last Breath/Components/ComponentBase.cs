@@ -11,20 +11,19 @@
 
     public abstract class ComponentBase : ObservableObject, IGameComponent, IDisposable
     {
-        private ObservableCollection<IEffect>? _effects;
+        private ObservableCollection<IEffect> _effects;
         private bool _disposed;
 
-        public ObservableCollection<IEffect>? Effects
+        public ObservableCollection<IEffect> Effects
         {
             get => _effects;
             set => SetProperty(ref _effects, value);
         }
 
-        protected ComponentBase(ObservableCollection<IEffect>? appliedEffects = default)
+        protected ComponentBase(ObservableCollection<IEffect> appliedEffects)
         {
-            // here i need reference to all effects on character
+            //i need reference to all effects on character
             _effects = appliedEffects;
-            Effects ??= [];
             Effects.CollectionChanged += ModifyStatsWithEffect;
         }
 
@@ -54,11 +53,7 @@
 
         protected virtual void OnDisposeManagedResources()
         {
-            if (Effects != null)
-            {
-                Effects.CollectionChanged -= ModifyStatsWithEffect;
-                Effects = null;
-            }
+            Effects.CollectionChanged -= ModifyStatsWithEffect;
         }
 
         protected virtual void OnDisposeUnmanagedResources()
