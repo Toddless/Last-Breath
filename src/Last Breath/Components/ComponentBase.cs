@@ -29,9 +29,8 @@
 
         public virtual void HandleAppliedEffects()
         {
-            if (Effects == null || Effects.Count <= 0)
+            if (Effects.Count <= 0)
                 return;
-
             var effectsToRemove = Effects.Where(effect => --effect.Duration == 0).ToList();
             effectsToRemove.ForEach(effect => Effects.Remove(effect));
         }

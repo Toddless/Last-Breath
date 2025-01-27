@@ -84,9 +84,7 @@
             if (Effects == null)
                 return;
 
-            var groupedEffects = Effects.GroupBy(effect => effect.EffectType);
-
-            foreach (var group in groupedEffects)
+            foreach (var group in Effects.GroupBy(effect => effect.EffectType))
             {
                 switch (group.Key)
                 {
