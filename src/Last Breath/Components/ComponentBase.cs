@@ -11,7 +11,7 @@
 
     public abstract class ComponentBase : ObservableObject, IGameComponent, IDisposable
     {
-        private ObservableCollection<IEffect>? _effects = [];
+        private ObservableCollection<IEffect>? _effects;
         private bool _disposed;
 
         public ObservableCollection<IEffect>? Effects
