@@ -68,7 +68,6 @@
             var healthWithAdditionalPercent = _healthComponent.MaxHealth;
             var currentHealth = _healthComponent.CurrentHealth;
             _healthComponent.IncreaseHealth -= 0.1f;
-            var currentHealthAfter = _healthComponent.CurrentHealth;
             Assert.IsTrue(healthWithAdditionalPercent > _healthComponent.MaxHealth);
         }
 
@@ -141,8 +140,7 @@
             Assert.IsNotNull(_healthComponent);
             var healthBevorBuff = _healthComponent.MaxHealth;
             _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
-            var healthAfterBuff = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthBevorBuff < healthAfterBuff);
+            Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
         }
 
         [TestMethod]
@@ -152,8 +150,7 @@
             var healthBevorBuff = _healthComponent.MaxHealth;
             _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
             _healthComponent.Effects?.Add(new HealthBuff("Some f", "Empty", 0.3f, 3));
-            var healthAfterBuff = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthBevorBuff < healthAfterBuff);
+            Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
         }
 
         [TestMethod]
@@ -163,8 +160,7 @@
             var healthBevorBuff = _healthComponent.MaxHealth;
             _healthComponent.Effects?.Add(new HealthBuff("Some Buff", "Empty", 0.1f, 3));
             _healthComponent.Effects?.Add(new HealthDebuf("Some Debuff", "Empty", -0.1f, 3));
-            var healthAfterBuff = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthBevorBuff > healthAfterBuff);
+            Assert.IsTrue(healthBevorBuff > _healthComponent.MaxHealth);
         }
 
 
@@ -174,8 +170,7 @@
             Assert.IsNotNull(_healthComponent);
             var healthBevorDebuffs = _healthComponent.MaxHealth;
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
-            var healthAfterDebuff = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthAfterDebuff < healthBevorDebuffs);
+            Assert.IsTrue(_healthComponent.MaxHealth < healthBevorDebuffs);
         }
 
         [TestMethod]
@@ -185,8 +180,7 @@
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
             var healthAfterDebuff = _healthComponent.MaxHealth;
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
-            var healthAfterSecondDebuff = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthAfterDebuff == 90 && healthAfterSecondDebuff == 70);
+            Assert.IsTrue(healthAfterDebuff == 90 && _healthComponent.MaxHealth == 70);
         }
 
         [TestMethod]
@@ -197,8 +191,7 @@
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
             var healthBevorRemove = _healthComponent.MaxHealth;
             _healthComponent.Effects?.RemoveAt(1);
-            var healthAfterRemove = _healthComponent.MaxHealth;
-            Assert.IsTrue(healthBevorRemove < healthAfterRemove);
+            Assert.IsTrue(healthBevorRemove < _healthComponent.MaxHealth);
         }
 
         [TestMethod]
@@ -208,8 +201,7 @@
             var currentHealthBevorDebuff = _healthComponent.CurrentHealth;
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.1f, 3));
             _healthComponent.Effects?.Add(new HealthDebuf("Crushed Bones", "Empty", -0.2f, 3));
-            var currentHealthAfterDebuff = _healthComponent.CurrentHealth;
-            Assert.IsTrue(currentHealthBevorDebuff > currentHealthAfterDebuff);
+            Assert.IsTrue(currentHealthBevorDebuff > _healthComponent.CurrentHealth);
         }
 
         [TestMethod]

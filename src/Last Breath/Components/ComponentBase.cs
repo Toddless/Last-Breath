@@ -11,7 +11,7 @@
 
     public abstract class ComponentBase : ObservableObject, IGameComponent, IDisposable
     {
-        private ObservableCollection<IEffect>? _effects = [];
+        private ObservableCollection<IEffect>? _effects;
         private bool _disposed;
 
         public ObservableCollection<IEffect>? Effects
@@ -32,14 +32,8 @@
         {
             if (Effects == null || Effects.Count <= 0)
                 return;
-            foreach (var effect in Effects)
-            {
-                effect.Duration--;
-                if (effect.Duration == 0)
-                {
-                    Effects?.Remove(effect);
-                }
-            }
+            var expiredEffects = Effects.Where(effect => --effect.Duration == 0).ToList();
+            expiredEffects.ForEach(effect => Effects.Remove(effect));
         }
 
         protected virtual void Dispose(bool disposing)

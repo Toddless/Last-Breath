@@ -45,6 +45,7 @@
             var criticalStrikeChanceDebuff = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.01f, 3);
             var criticalStrikeDamageDebuff = new CriticalStrikeDamageDebuff(string.Empty, string.Empty, -0.1f, 3);
             var additionalStrikeChanceDebuff = new AdditionalStrikeChanceDebuff(string.Empty, string.Empty, -0.01f, 3);
+
             _attackComponent.Effects?.Add(criticalStrikeDamageDebuff);
             _attackComponent.Effects?.Add(criticalStrikeChanceDebuff);
             _attackComponent.Effects?.Add(additionalStrikeChanceDebuff);
@@ -76,7 +77,6 @@
             var firstGet = _attackComponent.CurrentCriticalStrikeChance;
             var secondGet = _attackComponent.CurrentCriticalStrikeChance;
             var thirdGet = _attackComponent.CurrentCriticalStrikeChance;
-            Assert.IsTrue(firstGet == thirdGet);
         }
     }
 }

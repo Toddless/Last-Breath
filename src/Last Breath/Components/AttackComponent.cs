@@ -54,6 +54,7 @@ namespace Playground
             get => _rnd;
             set => _rnd = value;
         }
+
         #region Additional Values
 
         public float AdditionalMinStrikeDamage
@@ -186,6 +187,7 @@ namespace Playground
         }
 
         #endregion
+
         public AttackComponent(ObservableCollection<IEffect>? appliedEffects = default) : base(appliedEffects)
         {
             UpdateValues();

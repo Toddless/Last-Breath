@@ -43,6 +43,7 @@
             HealthComponent = new(Effects);
             AttackComponent = new(Effects);
             AppliedAbilities ??= [];
+            // Player class will be never deleted or disposed so i don`t care about unsubscribe here
             AppliedAbilities.CollectionChanged += OnAddAbility;
         }
 
