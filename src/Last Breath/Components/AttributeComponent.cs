@@ -2,6 +2,7 @@
 {
     using Playground.Script.Attribute;
 
+    // TODO: Rework
     public class AttributeComponent : IAttributeComponent
     {
         private Dexterity? _dexterity;

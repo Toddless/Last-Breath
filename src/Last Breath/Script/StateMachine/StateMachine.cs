@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Godot;
 
+    // Find Stateless package, not sure if i still need this
     [GlobalClass]
     public partial class StateMachine : Node
     {

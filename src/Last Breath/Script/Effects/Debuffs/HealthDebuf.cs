@@ -6,7 +6,7 @@
     {
         public HealthDebuf(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Stats.Health;
+            Stat = Parameter.Health;
             EffectType = EffectType.Debuff;
         }
     }

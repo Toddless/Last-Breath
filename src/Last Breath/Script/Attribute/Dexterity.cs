@@ -2,7 +2,7 @@
 {
     using Playground.Components;
 
-    public partial class Dexterity : Attribute
+    public class Dexterity : Attribute
     {
         private float _criticalStrikeChance = 0.01f;
         private float _additionalAttackChance = 0.01f;

@@ -3,6 +3,5 @@
     public static class NodePathHelper
     {
         public static readonly string GlobalSignalPath = "/root/GlobalSignal";
-        public static readonly string EnemyInventory = "/root/EnemyInventory";
     }
 }

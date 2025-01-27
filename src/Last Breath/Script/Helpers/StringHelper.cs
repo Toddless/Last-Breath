@@ -3,7 +3,7 @@
     public static class StringHelper
     {
         public static readonly string SwordCommon = "Sword Bronze";
-        public static readonly string SwordUncommon = "Sword Kooper";
+        public static readonly string SwordUncommon = "Sword Cooper";
         public static readonly string SwordRare = "Sword Silver";
         public static readonly string SwordEpic = "Sword Gold";
         public static readonly string SwordLegendary = "Sword Phoenix Fire";
@@ -21,6 +21,6 @@
         public static readonly string BodyArmorEpic = "Golden Heart";
         public static readonly string BodyArmorLegendary = "Phoenix Plumage";
 
-        public static readonly string BodyArmorMythic = "Heart of darkness";
+        public static readonly string BodyArmorMythic = "Heart of Darkness";
     }
 }

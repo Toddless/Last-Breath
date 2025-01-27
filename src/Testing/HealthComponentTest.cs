@@ -2,6 +2,7 @@
 {
     using System.Collections.ObjectModel;
     using Playground;
+    using Playground.Script.Effects.Debuffs;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives.Buffs;
     using Playground.Script.Passives.Debuffs;
@@ -220,6 +221,67 @@
             _healthComponent.TakeDamage(60);
             _healthComponent.Heal(-50);
             Assert.IsTrue(_healthComponent.CurrentHealth >= 0);
+        }
+
+        [TestMethod]
+        public void PoisonEffectTest()
+        {
+            Assert.IsNotNull(_healthComponent);
+            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(poison);
+            for (int i = 0; i < 2; i++)
+                _healthComponent.HandleAppliedEffects();
+            Assert.IsTrue(_healthComponent.CurrentHealth == 70);
+        }
+
+        [TestMethod]
+        public void BleedEffectTest()
+        {
+            Assert.IsNotNull(_healthComponent);
+            var bleed = new BleedEffect(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(bleed);
+            for (int i = 0; i < 2; i++)
+                _healthComponent.HandleAppliedEffects();
+            Assert.IsTrue(_healthComponent.CurrentHealth == 70);
+        }
+
+        [TestMethod]
+        public void EffectDeletedAfterNoDurationLeftTest()
+        {
+            Assert.IsNotNull(_healthComponent);
+            var buff = new StrikeDamageBuff(string.Empty, string.Empty, 15, 2);
+            for (int i = 0; i < 2; i++)
+                _healthComponent.HandleAppliedEffects();
+            Assert.IsTrue(_healthComponent.Effects?.Count == 0);
+        }
+
+        [TestMethod]
+        public void TwoDifferentEffectsDealDamageTest()
+        {
+            Assert.IsNotNull(_healthComponent);
+            var bleed = new BleedEffect(string.Empty, string.Empty, 15, 2);
+            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(bleed);
+            _healthComponent.Effects?.Add(poison);
+            for (int i = 0; i < 2; i++)
+                _healthComponent.HandleAppliedEffects();
+            Assert.IsTrue(_healthComponent.CurrentHealth == 40);
+        }
+
+        [TestMethod]
+        public void TwoSimilarEffectsDealDamageAndRemovedTest()
+        {
+            Assert.IsNotNull(_healthComponent);
+            var firstPoison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
+            var secondPoison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
+            _healthComponent.Effects?.Add(firstPoison);
+            _healthComponent.Effects?.Add(secondPoison);
+            for(int i = 0;i < 2;i++)
+                _healthComponent.HandleAppliedEffects();
+
+            Assert.IsTrue(_healthComponent.CurrentHealth == 40);
+            Assert.IsTrue(_healthComponent.Effects?.Count == 0);
+
         }
 
         [TestMethod]

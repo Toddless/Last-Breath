@@ -22,7 +22,6 @@ namespace Playground
         private AttributeComponent? _attribute;
         private HealthComponent? _health;
         private AttackComponent? _attack;
-        private DefenceComponent? _defense;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false;

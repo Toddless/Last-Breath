@@ -24,7 +24,7 @@
                 if (_currentHealth <= 0)
                 {
                     _currentHealth = 0;
-                    return _currentHealth;
+                    return Mathf.RoundToInt(_currentHealth);
                 }
                 return Mathf.RoundToInt(_currentHealth);
             }
@@ -115,7 +115,7 @@
         protected override void UpdateValues()
         {
             var oldMaxHealth = MaxHealth;
-            MaxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Stats.Health);
+            MaxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);
             CurrentHealth = (CurrentHealth / oldMaxHealth) * MaxHealth;
             if (CurrentHealth > MaxHealth)
                 CurrentHealth = MaxHealth;

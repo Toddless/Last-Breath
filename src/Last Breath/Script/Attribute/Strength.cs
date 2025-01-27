@@ -2,7 +2,7 @@
 {
     using Playground.Components;
 
-    public partial class Strength : Attribute
+    public class Strength : Attribute
     {
         private float _damageIncrease = 0.01f;
         private float _healthIncrease = 0.1f;

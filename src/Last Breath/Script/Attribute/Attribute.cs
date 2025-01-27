@@ -2,7 +2,7 @@
 {
     using Playground.Script.Helpers;
 
-    public abstract partial class Attribute : ObservableNode
+    public abstract class Attribute : ObservableObject
     {
         private int _total;
 

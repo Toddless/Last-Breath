@@ -8,6 +8,7 @@
     using Playground.Script.Passives.Attacks;
     using Playground.Script.Passives.Interfaces;
 
+    // TODO: Need to rework completely
     [Inject]
     public class BattleBehavior
     {
@@ -64,78 +65,8 @@
             var playerHealthPercent = _playerHealth!.CurrentHealth / _playerHealth.MaxHealth * 100;
             var diff = playerHealthPercent - enemyHealthPercent;
 
-            if (diff > 10)
-            {
-                if (_iCanDealDamage && enemyHealthPercent > playerHealthPercent)
-                {
-                }
-                if (_iCanHeal && enemyHealthPercent < playerHealthPercent)
-                {
-                }
-            }
-            if (diff < 10)
-            {
-                if (_iCanBuffAttack && enemyHealthPercent > playerHealthPercent)
-                {
-                }
-                if (_iCanLeech && enemyHealthPercent < playerHealthPercent)
-                {
-                }
-            }
             return null;
         }
-
-        #region X
-        //private IAbility? UseAbility(Func<IAbility, bool> filter)
-        //{
-        //    var abilities = _enemyBase!.Abilities!.Where(filter).ToList();
-        //    return ActivateAbility(abilities);
-        //}
-
-        //private IAbility? BuffYourSelf()
-        //{
-        //    return UseAbility(x => x is AttackComponent && x is ICanBuffAttack);
-        //}
-
-        //private IAbility? TryToKillHimHard()
-        //{
-        //    return UseAbility(x => x is ICanDealDamage);
-        //}
-
-        //private IAbility? TryDealDamageAndHeal()
-        //{
-        //    return UseAbility(x => x is ICanLeech);
-        //}
-
-        //private IAbility? TryToHillYourself()
-        //{
-        //    return UseAbility(x => x is ICanHeal);
-        //}
-
-        //private IAbility? ChoseRandomAbilityNotOnCooldown()
-        //{
-        //    return UseAbility(x => x.Cooldown == 4);
-        //}
-
-        //private IAbility? ActivateAbility(List<IAbility>? abilities)
-        //{
-        //    if (abilities == null)
-        //    {
-        //        return null;
-        //    }
-        //    var amountAbilities = abilities.Where(x => x.Cooldown == 4).Count();
-        //    if (amountAbilities == 0)
-        //    {
-        //        return null;
-        //    }
-
-        //    var ability = abilities[Rnd!.RandiRange(0, amountAbilities - 1)];
-        //    _activatedAbilities!.Add(ability);
-        //    _activatedAbility = ability;
-        //    return ability;
-        //}
-
-        #endregion
 
         private void UpdateUsedAbilitiesCooldown()
         {

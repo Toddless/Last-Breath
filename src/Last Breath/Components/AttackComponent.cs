@@ -197,11 +197,11 @@ namespace Playground
 
         protected override void UpdateValues()
         {
-            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
-            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
-            CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
-            CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Stats.CriticalStrikeDamage);
-            CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
+            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
+            CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Parameter.CriticalStrikeDamage);
+            CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
         }
 
         // Not very pretty, but I don't want to recalculate all properties via the UpdateValues method when only one thing has been changed
@@ -209,17 +209,17 @@ namespace Playground
         // Maybe I'll find a better solution later
         #region Pain for the eyes
 
-        private void UpdateAdditionalMinDamageValue() => CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
-        private void UpdateAdditionalMaxDamageValue() => CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
-        private void UpdateAdditionalCriticalStrikeDamageValue() => CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Stats.CriticalStrikeDamage);
-        private void UpdateAdditionalCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
-        private void UpdateIncreaseAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
-        private void UpdateIncreaseCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Stats.CriticalStrikeChance);
-        private void UpdateAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Stats.AdditionalStrikeChance);
+        private void UpdateAdditionalMinDamageValue() => CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+        private void UpdateAdditionalMaxDamageValue() => CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+        private void UpdateAdditionalCriticalStrikeDamageValue() => CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Parameter.CriticalStrikeDamage);
+        private void UpdateAdditionalCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
+        private void UpdateIncreaseAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
+        private void UpdateIncreaseCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
+        private void UpdateAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
         private void UpdateIncreaseDamageValues()
         {
-            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
-            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Stats.StrikeDamage);
+            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
         }
         #endregion
 

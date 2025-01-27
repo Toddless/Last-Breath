@@ -73,12 +73,12 @@
         }
 
         // this will be called each time some of "Current-" property is needed
-        protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Stats stat)
+        protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter stat)
         {
             return GetEffectModifier(stat, EffectType.Buff) * GetEffectModifier(stat, EffectType.Debuff) * ((baseValue + AdditionalValue) * increaseModifier);
         }
 
-        protected float GetEffectModifier(Stats stat, EffectType type)
+        protected float GetEffectModifier(Parameter stat, EffectType type)
         {
             if (Effects?.Count <= 0)
                 return 1;

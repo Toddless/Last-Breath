@@ -6,7 +6,7 @@
     {
         public StrikeDamageBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Stats.StrikeDamage;
+            Stat = Parameter.StrikeDamage;
             EffectType = EffectType.Buff;
         }
     }

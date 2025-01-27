@@ -4,7 +4,7 @@
     {
         public AdditionalStrikeChanceDebuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Enums.Stats.AdditionalStrikeChance;
+            Stat = Enums.Parameter.AdditionalStrikeChance;
             EffectType = Enums.EffectType.Debuff;
         }
     }

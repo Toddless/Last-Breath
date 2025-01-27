@@ -9,9 +9,9 @@
         private float _modifier = modifier;
         private int _duration = duration;
         private EffectType _effectType;
-        private Stats _stat;
+        private Parameter _stat;
 
-        public Stats Stat
+        public Parameter Stat
         {
             get => _stat;
             protected set => _stat = value;

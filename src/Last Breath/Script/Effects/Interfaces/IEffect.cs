@@ -16,7 +16,7 @@
         {
             get;
         }
-        Stats Stat
+        Parameter Stat
         {
             get;
         }

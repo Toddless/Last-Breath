@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Enums
 {
-    public enum Stats
+    public enum Parameter
     {
         None = 0,
         StrikeDamage,

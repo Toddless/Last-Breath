@@ -2,7 +2,7 @@
 {
     using Playground.Components;
 
-    public partial class Intelligence : Attribute
+    public class Intelligence : Attribute
     {
     }
 }
