@@ -2,6 +2,8 @@
 {
     using System.Collections.ObjectModel;
     using Playground;
+    using Playground.Components.EffectTypeHandlers;
+    using Playground.Script;
     using Playground.Script.Effects.Debuffs;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
@@ -17,7 +19,7 @@
         public void Initialize()
         {
             var effects = new ObservableCollection<IEffect>();
-            _healthComponent = new HealthComponent(effects);
+            _healthComponent = new HealthComponent(effects, new EffectHandlerFactory());
         }
 
         [TestCleanup]
@@ -302,7 +304,7 @@
 
             void CreateAndDispose()
             {
-                var health = new HealthComponent([]);
+                var health = new HealthComponent([], DiContainer.GetService<IEffectHandlerFactory>());
                 weakReference = new WeakReference(health);
                 health.Dispose();
             }

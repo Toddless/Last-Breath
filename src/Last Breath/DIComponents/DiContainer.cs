@@ -8,6 +8,7 @@
     using System.Linq;
     using System;
     using Godot;
+    using Playground.Components.EffectTypeHandlers;
 
     public partial class DiContainer : Node
     {
@@ -42,7 +43,12 @@
             }
         }
 
-        private void Configure()
+        public static T? GetService<T> () where T : class
+        {
+            return ServiceProvider?.GetService<T>();
+        }
+
+        private static void Configure()
         {
             var provider = new ServiceCollection();
 
@@ -54,11 +60,12 @@
                 return instance;
             });
             provider.AddSingleton<RandomNumberGenerator>();
+            provider.AddSingleton<IEffectHandlerFactory, EffectHandlerFactory>();
 
             ServiceProvider = provider.BuildServiceProvider();
         }
 
-        private void CollectClassesToInject()
+        private static void CollectClassesToInject()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             ClassMetadataCollection = assembly.GetTypes()

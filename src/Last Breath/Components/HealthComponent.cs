@@ -6,6 +6,7 @@
     using System.Linq;
     using Godot;
     using Playground.Components;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
 
@@ -67,7 +68,7 @@
             private set => _maxHealth = value;
         }
 
-        public HealthComponent(ObservableCollection<IEffect> appliedEffects) : base(appliedEffects)
+        public HealthComponent(ObservableCollection<IEffect> appliedEffects, IEffectHandlerFactory? effectHandlerFactory) : base(appliedEffects, effectHandlerFactory)
         {
             _maxHealth = (_baseHealth + AdditionalHealth) * IncreaseHealth;
             RefreshHealth();
@@ -81,34 +82,40 @@
 
         public override void HandleAppliedEffects()
         {
-            if (Effects == null)
-                return;
-
             foreach (var group in Effects.GroupBy(effect => effect.EffectType))
             {
                 switch (group.Key)
                 {
                     case EffectType.Regeneration:
-                        HandleRegenerationEffects(group);
+                        HandleRegeneration(group);
                         break;
 
                     case EffectType.Poison:
-                        HandlePoisonEffect(group);
+                        HandlePoison(group);
                         break;
 
                     case EffectType.Bleeding:
-                        HandleBleedEffect(group);
+                        HandleBleeding(group);
                         break;
                 }
             }
             base.HandleAppliedEffects();
         }
 
-        private void HandleBleedEffect(IEnumerable<IEffect> bleed) => TakeDamage(bleed.Sum(bleed => bleed.Modifier));
+        private void HandleRegeneration(IEnumerable<IEffect> effects)
+        {
+            Heal(EffectHandlerFactory!.GetHandler(EffectType.Regeneration).HandleEffectType(effects));
+        }
 
-        private void HandlePoisonEffect(IEnumerable<IEffect> poison) => TakeDamage(poison.Sum(poison => poison.Modifier));
+        private void HandlePoison(IEnumerable<IEffect> effects)
+        {
+            TakeDamage(EffectHandlerFactory!.GetHandler(EffectType.Poison).HandleEffectType(effects));
+        }
 
-        private void HandleRegenerationEffects(IEnumerable<IEffect> regen) => Heal(regen.Sum(effect => effect.Modifier));
+        private void HandleBleeding(IEnumerable<IEffect> effects)
+        {
+            TakeDamage(EffectHandlerFactory!.GetHandler(EffectType.Bleeding).HandleEffectType(effects));
+        }
 
         protected override void UpdateValues()
         {

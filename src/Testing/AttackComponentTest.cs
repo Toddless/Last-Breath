@@ -1,6 +1,7 @@
 ﻿namespace PlaygroundTest
 {
     using Playground;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Script.Passives.Debuffs;
 
     [TestClass]
@@ -11,7 +12,7 @@
         [TestInitialize]
         public void Initialize()
         {
-            _attackComponent = new AttackComponent([]);
+            _attackComponent = new AttackComponent([], new EffectHandlerFactory());
         }
 
         [TestCleanup]
@@ -26,21 +27,21 @@
         public void OneDebuffAppliedTest()
         {
             Assert.IsNotNull(_attackComponent);
-            var maxAttackBevorDebuff = _attackComponent.CurrentMaxStrikeDamage;
-            var minAttackBevorDebuff = _attackComponent.CurrentMinStrikeDamage;
+            var maxAttackBevorDebuff = _attackComponent.CurrentMaxDamage;
+            var minAttackBevorDebuff = _attackComponent.CurrentMinDamage;
             var debuff = new StrikeDamageDebuff(string.Empty, string.Empty, -0.1f, 3);
             _attackComponent.Effects?.Add(debuff);
-            Assert.IsTrue(maxAttackBevorDebuff > _attackComponent.CurrentMaxStrikeDamage);
-            Assert.IsTrue(minAttackBevorDebuff > _attackComponent.CurrentMinStrikeDamage);
+            Assert.IsTrue(maxAttackBevorDebuff > _attackComponent.CurrentMaxDamage);
+            Assert.IsTrue(minAttackBevorDebuff > _attackComponent.CurrentMinDamage);
         }
 
         [TestMethod]
         public void TwoDifferentDebuffsAppliedTest()
         {
             Assert.IsNotNull(_attackComponent);
-            var criticalStrikeChanceBevorDebuff = _attackComponent.CurrentCriticalStrikeChance;
-            var criticalStrikeDamageBevorDebuff = _attackComponent.CurrentCriticalStrikeDamage;
-            var additionalStrikeChanceBevorDebuff = _attackComponent.CurrentAdditionalStrikeChance;
+            var criticalStrikeChanceBevorDebuff = _attackComponent.CurrentCriticalChance;
+            var criticalStrikeDamageBevorDebuff = _attackComponent.CurrentCriticalDamage;
+            var additionalStrikeChanceBevorDebuff = _attackComponent.CurrentExtraHitChance;
 
             var criticalStrikeChanceDebuff = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.01f, 3);
             var criticalStrikeDamageDebuff = new CriticalStrikeDamageDebuff(string.Empty, string.Empty, -0.1f, 3);
@@ -50,9 +51,9 @@
             _attackComponent.Effects?.Add(criticalStrikeChanceDebuff);
             _attackComponent.Effects?.Add(additionalStrikeChanceDebuff);
 
-            Assert.IsTrue(criticalStrikeChanceBevorDebuff > _attackComponent.CurrentCriticalStrikeChance);
-            Assert.IsTrue(criticalStrikeDamageBevorDebuff > _attackComponent.CurrentCriticalStrikeDamage);
-            Assert.IsTrue(additionalStrikeChanceBevorDebuff > _attackComponent.CurrentAdditionalStrikeChance);
+            Assert.IsTrue(criticalStrikeChanceBevorDebuff > _attackComponent.CurrentCriticalChance);
+            Assert.IsTrue(criticalStrikeDamageBevorDebuff > _attackComponent.CurrentCriticalDamage);
+            Assert.IsTrue(additionalStrikeChanceBevorDebuff > _attackComponent.CurrentExtraHitChance);
         }
 
         [TestMethod]
@@ -63,10 +64,10 @@
             var criticalStrikeDebuffFromFristAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.05f, 3);
             var criticalStrikeDebuffFromSecondAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.01f, 3);
             _attackComponent.Effects?.Add(criticalStrikeDebuffFromFristAbility);
-            var criticalStrikeChanceBevorSecondDebuff = _attackComponent.CurrentCriticalStrikeChance;
+            var criticalStrikeChanceBevorSecondDebuff = _attackComponent.CurrentCriticalChance;
             _attackComponent.Effects?.Add(criticalStrikeDebuffFromSecondAbility);
 
-            Assert.IsTrue(criticalStrikeChanceBevorSecondDebuff > _attackComponent.CurrentCriticalStrikeChance);
+            Assert.IsTrue(criticalStrikeChanceBevorSecondDebuff > _attackComponent.CurrentCriticalChance);
         }
 
         [TestMethod]
@@ -74,9 +75,9 @@
         {
             Assert.IsNotNull(_attackComponent);
             var criticalStrikeDebuffFromFristAbility = new CriticalStrikeChanceDebuff(string.Empty, string.Empty, -0.05f, 3);
-            var firstGet = _attackComponent.CurrentCriticalStrikeChance;
-            var secondGet = _attackComponent.CurrentCriticalStrikeChance;
-            var thirdGet = _attackComponent.CurrentCriticalStrikeChance;
+            var firstGet = _attackComponent.CurrentCriticalChance;
+            var secondGet = _attackComponent.CurrentCriticalChance;
+            var thirdGet = _attackComponent.CurrentCriticalChance;
         }
     }
 }

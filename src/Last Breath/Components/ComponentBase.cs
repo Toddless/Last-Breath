@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Linq;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Components.Interfaces;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
@@ -12,7 +13,12 @@
     public abstract class ComponentBase : ObservableObject, IGameComponent, IDisposable
     {
         private ObservableCollection<IEffect> _effects;
+        private readonly IEffectHandlerFactory? _effectHandlerFactory;
+
         private bool _disposed;
+
+
+        public IEffectHandlerFactory? EffectHandlerFactory => _effectHandlerFactory;
 
         public ObservableCollection<IEffect> Effects
         {
@@ -20,9 +26,11 @@
             set => SetProperty(ref _effects, value);
         }
 
-        protected ComponentBase(ObservableCollection<IEffect> appliedEffects)
+        protected ComponentBase(ObservableCollection<IEffect> appliedEffects, IEffectHandlerFactory? effectHandlerFactory)
         {
             //i need reference to all effects on character
+            _effectHandlerFactory = effectHandlerFactory;
+            _effectHandlerFactory ??= new EffectHandlerFactory();
             _effects = appliedEffects;
             Effects.CollectionChanged += ModifyStatsWithEffect;
         }
@@ -59,6 +67,15 @@
         {
         }
 
+        protected virtual void UpdateProperty(ref float field, float newValue, Action<float> setter)
+        {
+            if (field != newValue)
+            {
+                field = newValue;
+                setter(field);
+            }
+        }
+
         protected void ModifyStatsWithEffect(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // i don´t really know what should be updated, so i update just all properties
@@ -69,21 +86,18 @@
         // this will be called each time some of "Current-" property is needed
         protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter stat)
         {
-            return GetEffectModifier(stat, EffectType.Buff) * GetEffectModifier(stat, EffectType.Debuff) * ((baseValue + AdditionalValue) * increaseModifier);
-        }
-
-        protected float GetEffectModifier(Parameter stat, EffectType type)
-        {
-            if (Effects?.Count <= 0)
-                return 1;
-            float effectSum = 1;
+            float debufSum = 1;
+            float bufSum = 1;
             // This loop is faster than the linq expression.
             // Perhaps the linq expression was poorly defined by me.
-            foreach (var debuff in Effects!.Where(x => x.EffectType == type && x.Stat == stat))
+            foreach (var effect in Effects!.Where(x => x.Stat == stat))
             {
-                effectSum += debuff.Modifier;
+                if (effect.EffectType == EffectType.Debuff)
+                    debufSum += effect.Modifier;
+                if (effect.EffectType == EffectType.Buff)
+                    bufSum += effect.Modifier;
             }
-            return effectSum;
+            return bufSum * debufSum * ((baseValue + AdditionalValue) * increaseModifier);
         }
 
         protected virtual void UpdateValues()

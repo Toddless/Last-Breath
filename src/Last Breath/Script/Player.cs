@@ -3,6 +3,7 @@
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
@@ -118,8 +119,8 @@
         public override void _Ready()
         {
             _effects = [];
-            _playerHealth = new HealthComponent(_effects);
-            _playerAttack = new AttackComponent(_effects);
+            _playerHealth = new HealthComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
+            _playerAttack = new AttackComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
             _playerAttribute = new AttributeComponent();
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");
@@ -129,14 +130,12 @@
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _inventory = new PlayerInventory();
-            _globalSignals = GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
             _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
             _playerStats = _playersInventoryElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _researchButton.Pressed += ResearchCurrentZone;
-            _globalSignals.OnEquipItem += OnEquipItem;
             _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             SetHealthBar();
@@ -203,9 +202,9 @@
 
         private void UpdateStats()
         {
-            _playerStats!.Text = $"Damage: {_playerAttack!.CurrentMinStrikeDamage} - {_playerAttack.CurrentMaxStrikeDamage} \n" +
-                $"Critical Hit Chance: {_playerAttack.CurrentCriticalStrikeChance * 100}% \n" +
-                $"Critical Hit Damage: {_playerAttack.CurrentCriticalStrikeDamage * 100}% \n" +
+            _playerStats!.Text = $"Damage: {_playerAttack!.CurrentMinDamage} - {_playerAttack.CurrentMaxDamage} \n" +
+                $"Critical Hit Chance: {_playerAttack.CurrentCriticalChance * 100}% \n" +
+                $"Critical Hit Damage: {_playerAttack.CurrentCriticalDamage * 100}% \n" +
                 $"Health: {_playerHealth!.CurrentHealth}\n" +
                 //  $"Defence: {_playerHealth.Defence}\n" +
                 $"Max. Health: {_playerHealth.MaxHealth}\n" +

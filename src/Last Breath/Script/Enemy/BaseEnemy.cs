@@ -5,6 +5,7 @@ namespace Playground
     using System.ComponentModel;
     using Godot;
     using Playground.Components;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enemy;
@@ -160,8 +161,8 @@ namespace Playground
         public override void _Ready()
         {
             _effects = [];
-            _attack = new AttackComponent(_effects);
-            _health = new HealthComponent(_effects);
+            _attack = new AttackComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
+            _health = new HealthComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
             _attribute = new AttributeComponent();
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
@@ -209,7 +210,7 @@ namespace Playground
             {
                 if (args.NewValue < args.OldValue)
                 {
-                    GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalStrikeChance}, CritDamage: {_attack.CurrentCriticalStrikeDamage}");
+                    GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalChance}, CritDamage: {_attack.CurrentCriticalDamage}");
                 }
             }
         }

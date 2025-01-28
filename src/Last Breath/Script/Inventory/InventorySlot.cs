@@ -30,7 +30,7 @@ namespace Playground.Script.Inventory
 
         public override void _Ready()
         {
-            _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
+           // _globalSignals = GetNode(NodePathHelper.GlobalSignalPath) as GlobalSignals;
             _fullItemDescription = GetNode<RichTextLabel>("ItemDescription");
             _quantityLabel = GetNode<Label>("QuantityText");
             // for mouseEntered and mouseExited events on each child control node mouse filter
@@ -85,7 +85,7 @@ namespace Playground.Script.Inventory
         {
             if (_mousePosition != Vector2.Zero && @event.IsActionPressed(InputMaps.EquipOnRightClickButton) && InventoryItem != null)
             {
-                _globalSignals?.EmitSignal(GlobalSignals.SignalName.OnEquipItem, InventoryItem);
+               // _globalSignals?.EmitSignal(GlobalSignals.SignalName.OnEquipItem, InventoryItem);
             }
         }
 

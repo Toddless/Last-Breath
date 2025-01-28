@@ -138,10 +138,10 @@ namespace Playground
 
 
 
-            var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinStrikeDamage, _enemy.AttackComponent.CurrentMaxStrikeDamage);
-            if (_enemy.AttackComponent.CurrentCriticalStrikeChance <= Rnd.RandfRange(0, 1))
+            var damage2 = Rnd.RandfRange(_enemy!.AttackComponent!.CurrentMinDamage, _enemy.AttackComponent.CurrentMaxDamage);
+            if (_enemy.AttackComponent.CurrentCriticalChance <= Rnd.RandfRange(0, 1))
             {
-                damage2 *= _enemy.AttackComponent.CurrentCriticalStrikeDamage;
+                damage2 *= _enemy.AttackComponent.CurrentCriticalDamage;
             }
 
 

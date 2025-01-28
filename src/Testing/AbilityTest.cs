@@ -45,12 +45,12 @@
         {
             Assert.IsNotNull(_player);
             var health = _player.HealthComponent?.CurrentHealth;
-            var damage = _player.AttackComponent?.CurrentMinStrikeDamage;
+            var damage = _player.AttackComponent?.CurrentMinDamage;
 
             _debuff?.ActivateAbility(_player);
 
             Assert.IsTrue(_player.HealthComponent?.CurrentHealth < health);
-            Assert.IsTrue(_player.AttackComponent?.CurrentMinStrikeDamage < damage);
+            Assert.IsTrue(_player.AttackComponent?.CurrentMinDamage < damage);
         }
 
 

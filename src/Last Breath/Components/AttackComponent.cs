@@ -3,6 +3,7 @@ namespace Playground
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
+    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
@@ -13,32 +14,32 @@ namespace Playground
         #region private fields
 
         #region Base values
-        private readonly float _baseAdditionalStrikeChance = 0.05f;
-        private readonly float _baseCriticalStrikeChance = 0.05f;
-        private readonly float _baseCriticalStrikeDamage = 1.5f;
-        private readonly float _baseMinStrikeDamage = 40;
-        private readonly float _baseMaxStrikeDamage = 100;
+        private readonly float _baseExtraHitChance = 0.05f;
+        private readonly float _baseCriticalChance = 0.05f;
+        private readonly float _baseCriticalDamage = 1.5f;
+        private readonly float _baseMinDamage = 40;
+        private readonly float _baseMaxDamage = 100;
         #endregion
 
         #region Increases
-        private float _increaseCriticalStrikeChance = 1;
-        private float _increaseAdditionalStrikeChance = 1;
+        private float _increaseCriticalChance = 1;
+        private float _increaseExtraHitChance = 1;
         #endregion
 
         #region Additionals
-        private float _additionalAdditionalStrikeChance;
-        private float _additionalCriticalStrikeChance;
-        private float _additionalCriticalStrikeDamage;
-        private float _additionalMinStrikeDamage;
-        private float _additionalMaxStrikeDamage;
+        private float _additionalExtraHitChance;
+        private float _additionalCriticalChance;
+        private float _additionalCriticalDamage;
+        private float _additionalMinDamage;
+        private float _additionalMaxDamage;
         #endregion
 
         #region Currents
-        private float _currentAdditionalStrikeChance;
-        private float _currentCriticalStrikeDamage;
-        private float _currentCriticalStrikeChance;
-        private float _currentMinStrikeDamage;
-        private float _currentMaxStrikeDamage;
+        private float _currentExtraHitChance;
+        private float _currentCriticalDamage;
+        private float _currentCriticalChance;
+        private float _currentMinDamage;
+        private float _currentMaxDamage;
         #endregion
 
         private RandomNumberGenerator? _rnd;
@@ -57,54 +58,47 @@ namespace Playground
 
         #region Additional Values
 
-        public float AdditionalMinStrikeDamage
+        public float AdditionalMinDamage
         {
-            get => _additionalMinStrikeDamage;
-            set
-            {
-                if (SetProperty(ref _additionalMinStrikeDamage, value))
-                    UpdateAdditionalMinDamageValue();
-            }
+            get => _additionalMinDamage;
+            set => UpdateProperty(ref _additionalMinDamage, CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMinDamage = value);
         }
 
-        public float AdditionalMaxStrikeDamage
+        public float AdditionalMaxDamage
         {
-            get => _additionalMaxStrikeDamage;
-            set
-            {
-                if (SetProperty(ref _additionalMaxStrikeDamage, value))
-                    UpdateAdditionalMaxDamageValue();
-            }
+            get => _additionalMaxDamage;
+            set => UpdateProperty(ref _additionalMaxDamage, CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMaxDamage = value);
         }
 
-        public float AdditionalCriticalStrikeDamage
+        public float AdditionalCriticalDamage
         {
-            get => _additionalCriticalStrikeDamage;
-            set
-            {
-                if (SetProperty(ref _additionalCriticalStrikeDamage, value))
-                    UpdateAdditionalCriticalStrikeDamageValue();
-            }
+            get => _additionalCriticalDamage;
+            set => UpdateProperty(ref _additionalCriticalDamage, CalculateValues(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage), value => CurrentCriticalDamage = value);
         }
 
-        public float AdditionalCriticalStrikeChance
+        public float AdditionalCriticalChance
         {
-            get => _additionalCriticalStrikeChance;
-            set
-            {
-                if (SetProperty(ref _additionalCriticalStrikeChance, value))
-                    UpdateAdditionalCriticalStrikeChanceValue();
-            }
+            get => _additionalCriticalChance;
+            set => UpdateProperty(ref _additionalCriticalChance, CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
         }
 
-        public float AdditionalAdditionalStrikeChance
+        public float AdditionalExtraHitChance
         {
-            get => _additionalAdditionalStrikeChance;
-            set
-            {
-                if (SetProperty(ref _additionalAdditionalStrikeChance, value))
-                    UpdateAdditionalStrikeChanceValue();
-            }
+            get => _additionalExtraHitChance;
+            set => UpdateProperty(ref _additionalExtraHitChance, CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+        }
+
+        public float IncreaseCriticalChance
+        {
+            get => _increaseCriticalChance;
+            set => UpdateProperty(ref _increaseCriticalChance, CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
+        }
+
+        public float IncreaseExtraHitChance
+        {
+            get => _increaseExtraHitChance;
+            set => UpdateProperty(ref _increaseExtraHitChance, CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+
         }
 
         public float IncreaseDamage
@@ -116,57 +110,37 @@ namespace Playground
                     UpdateIncreaseDamageValues();
             }
         }
-
-        public float IncreaseCriticalStrikeChance
-        {
-            get => _increaseCriticalStrikeChance;
-            set
-            {
-                if (SetProperty(ref _increaseCriticalStrikeChance, value))
-                    UpdateIncreaseCriticalStrikeChanceValue();
-            }
-        }
-
-        public float IncreaseAdditionalStrikeChance
-        {
-            get => _increaseAdditionalStrikeChance;
-            set
-            {
-                if (SetProperty(ref _increaseAdditionalStrikeChance, value))
-                    UpdateIncreaseAdditionalStrikeChanceValue();
-            }
-        }
         #endregion
 
         #region Current Values
-        public float CurrentMinStrikeDamage
+        public float CurrentMinDamage
         {
-            get => Mathf.RoundToInt(_currentMinStrikeDamage);
-            private set => _currentMinStrikeDamage = value;
+            get => Mathf.RoundToInt(_currentMinDamage);
+            private set => _currentMinDamage = value;
         }
 
-        public float CurrentMaxStrikeDamage
+        public float CurrentMaxDamage
         {
-            get => Mathf.RoundToInt(_currentMaxStrikeDamage);
-            private set => _currentMaxStrikeDamage = value;
+            get => Mathf.RoundToInt(_currentMaxDamage);
+            private set => _currentMaxDamage = value;
         }
 
-        public float CurrentCriticalStrikeChance
+        public float CurrentCriticalChance
         {
-            get => _currentCriticalStrikeChance;
-            private set => _currentCriticalStrikeChance = value;
+            get => _currentCriticalChance;
+            private set => _currentCriticalChance = value;
         }
 
-        public float CurrentCriticalStrikeDamage
+        public float CurrentCriticalDamage
         {
-            get => _currentCriticalStrikeDamage;
-            private set => _currentCriticalStrikeDamage = value;
+            get => _currentCriticalDamage;
+            private set => _currentCriticalDamage = value;
         }
 
-        public float CurrentAdditionalStrikeChance
+        public float CurrentExtraHitChance
         {
-            get => _currentAdditionalStrikeChance;
-            private set => _currentAdditionalStrikeChance = value;
+            get => _currentExtraHitChance;
+            private set => _currentExtraHitChance = value;
         }
         #endregion
 
@@ -188,7 +162,7 @@ namespace Playground
 
         #endregion
 
-        public AttackComponent(ObservableCollection<IEffect> appliedEffects) : base(appliedEffects)
+        public AttackComponent(ObservableCollection<IEffect> appliedEffects, IEffectHandlerFactory? effectHandlerFactory) : base(appliedEffects, effectHandlerFactory)
         {
             UpdateValues();
             // since a lot of code was changed, i need better solution for this
@@ -197,41 +171,27 @@ namespace Playground
 
         protected override void UpdateValues()
         {
-            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
-            CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Parameter.CriticalStrikeDamage);
-            CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
+            CurrentMaxDamage = CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinDamage = CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentCriticalChance = CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance);
+            CurrentCriticalDamage = CalculateValues(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage);
+            CurrentExtraHitChance = CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
         }
 
-        // Not very pretty, but I don't want to recalculate all properties via the UpdateValues method when only one thing has been changed
-        // Switch statement not helping if more than one property was changed simultaneously
-        // Maybe I'll find a better solution later
-        #region Pain for the eyes
-
-        private void UpdateAdditionalMinDamageValue() => CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
-        private void UpdateAdditionalMaxDamageValue() => CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
-        private void UpdateAdditionalCriticalStrikeDamageValue() => CurrentCriticalStrikeDamage = CalculateValues(_baseCriticalStrikeDamage, AdditionalCriticalStrikeDamage, 1f, Parameter.CriticalStrikeDamage);
-        private void UpdateAdditionalCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
-        private void UpdateIncreaseAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
-        private void UpdateIncreaseCriticalStrikeChanceValue() => CurrentCriticalStrikeChance = CalculateValues(_baseCriticalStrikeChance, AdditionalCriticalStrikeChance, IncreaseCriticalStrikeChance, Parameter.CriticalStrikeChance);
-        private void UpdateAdditionalStrikeChanceValue() => CurrentAdditionalStrikeChance = CalculateValues(_baseAdditionalStrikeChance, AdditionalAdditionalStrikeChance, IncreaseAdditionalStrikeChance, Parameter.AdditionalStrikeChance);
         private void UpdateIncreaseDamageValues()
         {
-            CurrentMaxStrikeDamage = CalculateValues(_baseMaxStrikeDamage, AdditionalMaxStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentMinStrikeDamage = CalculateValues(_baseMinStrikeDamage, AdditionalMinStrikeDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMaxDamage = CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinDamage = CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
         }
-        #endregion
-
 
         // i don´t really like it, refactoring is needed
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
-            float damage = Rnd!.RandfRange(CurrentMinStrikeDamage, CurrentMaxStrikeDamage);
-            bool criticalStrike = Rnd.RandfRange(0, 1) <= CurrentCriticalStrikeChance;
+            float damage = Rnd!.RandfRange(CurrentMinDamage, CurrentMaxDamage);
+            bool criticalStrike = Rnd.RandfRange(0, 1) <= CurrentCriticalChance;
             if (criticalStrike)
             {
-                var finalDamage = damage * CurrentCriticalStrikeDamage;
+                var finalDamage = damage * CurrentCriticalDamage;
                 return (finalDamage, true, Leech * finalDamage);
             }
             return (damage, false, Leech * damage);
