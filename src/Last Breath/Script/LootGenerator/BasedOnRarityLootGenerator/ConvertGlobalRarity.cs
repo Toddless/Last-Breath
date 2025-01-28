@@ -11,7 +11,6 @@
             {GlobalRarity.Rare, 250 },
             {GlobalRarity.Epic, 125 },
             {GlobalRarity.Legendary, 25 },
-            {GlobalRarity.Mythic, 5 },
         };
 
         public static readonly Dictionary<GlobalRarity, int> multiplier = new()
