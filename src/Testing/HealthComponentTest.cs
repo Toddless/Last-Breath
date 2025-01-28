@@ -68,7 +68,6 @@
             Assert.IsNotNull(_healthComponent);
             _healthComponent.IncreaseHealth += 0.1f;
             var healthWithAdditionalPercent = _healthComponent.MaxHealth;
-            var currentHealth = _healthComponent.CurrentHealth;
             _healthComponent.IncreaseHealth -= 0.1f;
             Assert.IsTrue(healthWithAdditionalPercent > _healthComponent.MaxHealth);
         }
