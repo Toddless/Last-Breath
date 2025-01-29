@@ -25,7 +25,7 @@
                 if (_currentHealth <= 0)
                 {
                     _currentHealth = 0;
-                    return Mathf.RoundToInt(_currentHealth);
+                    return _currentHealth;
                 }
                 return Mathf.RoundToInt(_currentHealth);
             }

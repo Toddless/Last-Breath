@@ -84,20 +84,21 @@
         }
 
         // this will be called each time some of "Current-" property is needed
-        protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter stat)
+        protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter parameter)
         {
             float debufSum = 1;
             float bufSum = 1;
             // This loop is faster than the linq expression.
             // Perhaps the linq expression was poorly defined by me.
-            foreach (var effect in Effects!.Where(x => x.Stat == stat))
+            foreach (var effect in Effects!.Where(x => x.Stat == parameter))
             {
                 if (effect.EffectType == EffectType.Debuff)
                     debufSum += effect.Modifier;
                 if (effect.EffectType == EffectType.Buff)
                     bufSum += effect.Modifier;
             }
-            return bufSum * debufSum * ((baseValue + AdditionalValue) * increaseModifier);
+
+            return bufSum * Math.Max(0, debufSum) * ((baseValue + AdditionalValue) * increaseModifier);
         }
 
         protected virtual void UpdateValues()
@@ -105,7 +106,6 @@
 
         }
 
-        // DONT FORGET TO CALL THIS, OTHERWISE MAY CAUSE MEMORY LEAK
         public void Dispose()
         {
             Dispose(true);
