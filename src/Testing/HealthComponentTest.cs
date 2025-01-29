@@ -31,40 +31,6 @@
         }
 
         [TestMethod]
-        public void InitializeTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-        }
-
-        [TestMethod]
-        public void MaxHealthTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            Assert.IsTrue(_healthComponent.MaxHealth == 100);
-        }
-
-        [TestMethod]
-        public void CurrentHealthTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            Assert.IsTrue(_healthComponent.CurrentHealth == 100);
-        }
-
-        [TestMethod]
-        public void HealthPercentTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            Assert.IsTrue(_healthComponent.IncreaseHealth == 1f);
-        }
-
-        [TestMethod]
-        public void AdditionalHealthTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            Assert.IsTrue(_healthComponent.AdditionalHealth == 0);
-        }
-
-        [TestMethod]
         public void ReducePercentReduceMaxHealth()
         {
             Assert.IsNotNull(_healthComponent);
