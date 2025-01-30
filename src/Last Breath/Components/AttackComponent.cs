@@ -1,9 +1,9 @@
 namespace Playground
 {
+    using System;
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
-    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
@@ -162,14 +162,14 @@ namespace Playground
 
         #endregion
 
-        public AttackComponent(ObservableCollection<IEffect> appliedEffects, IEffectHandlerFactory? effectHandlerFactory) : base(appliedEffects, effectHandlerFactory)
+        public AttackComponent(Func<Parameter, (float, float)> getModifiers) : base(getModifiers)
         {
-            UpdateValues();
+            UpdateProperties();
             // since a lot of code was changed, i need better solution for this
             DiContainer.InjectDependencies(this);
         }
 
-        protected override void UpdateValues()
+        public override void UpdateProperties()
         {
             CurrentMaxDamage = CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
             CurrentMinDamage = CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);

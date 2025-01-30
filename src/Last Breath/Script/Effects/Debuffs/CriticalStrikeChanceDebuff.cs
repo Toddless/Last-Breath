@@ -5,7 +5,7 @@
     {
         public CriticalStrikeChanceDebuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Parameter.CriticalStrikeChance;
+            Parameter = Parameter.CriticalStrikeChance;
             EffectType = EffectType.Debuff;
         }
     }

@@ -4,7 +4,7 @@
     using Playground.Script.Passives.Attacks;
     using System.Collections.ObjectModel;
     using Playground.Script.Effects.Interfaces;
-    using Playground.Components.EffectTypeHandlers;
+    using Playground.Components;
 
     public class BaseEnemyTest : ICharacter
     {
@@ -12,6 +12,7 @@
         private AttackComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _appliedEffects;
+        private EffectManager _effectManager;
 
 
         public HealthComponent? HealthComponent { get => _healthComponent; set => _healthComponent = value; }
@@ -20,10 +21,10 @@
 
         public BaseEnemyTest()
         {
+            _effectManager = new([]);
             _appliedAbilities = [];
             _appliedEffects = [];
-            HealthComponent = new(_appliedEffects, new EffectHandlerFactory());
-            AttackComponent = new(_appliedEffects, new EffectHandlerFactory());
+            HealthComponent = new(_effectManager.ModifierSum);
             AppliedAbilities = [];
         }
     }

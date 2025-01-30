@@ -5,7 +5,7 @@
     using System.Collections.Specialized;
     using System.Linq;
     using Playground;
-    using Playground.Components.EffectTypeHandlers;
+    using Playground.Components;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Passives.Attacks;
 
@@ -15,6 +15,7 @@
         private AttackComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _effects;
+        private EffectManager? _effectManager;
 
         public HealthComponent? HealthComponent
         {
@@ -43,11 +44,16 @@
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
             Effects = [];
-            HealthComponent = new(Effects, new EffectHandlerFactory());
-            AttackComponent = new(Effects, new EffectHandlerFactory());
+            _effectManager = new(Effects);
+            HealthComponent = new(_effectManager.ModifierSum);
+            AttackComponent = new(_effectManager.ModifierSum);
             AppliedAbilities ??= [];
+            AppliedAbilities.CollectionChanged += _effectManager.OnAddAbility;
+            _effectManager.TakeDamage += HealthComponent.TakeDamage;
+            _effectManager.Heal += HealthComponent.Heal;
             // Player class will be never deleted or disposed so i don`t care about unsubscribe here
             AppliedAbilities.CollectionChanged += OnAddAbility;
+
         }
 
         private void OnAddAbility(object? sender, NotifyCollectionChangedEventArgs e)

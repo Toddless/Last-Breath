@@ -5,7 +5,7 @@
     {
         public CriticalStrikeDamageDebuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Parameter.CriticalStrikeDamage;
+            Parameter = Parameter.CriticalStrikeDamage;
             EffectType = EffectType.Debuff;
         }
     }

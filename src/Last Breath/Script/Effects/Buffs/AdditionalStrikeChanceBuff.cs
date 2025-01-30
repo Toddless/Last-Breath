@@ -6,7 +6,7 @@ namespace Playground.Script.Passives.Buffs
     {
         public AdditionalStrikeChanceBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Stat = Parameter.AdditionalStrikeChance;
+            Parameter = Parameter.AdditionalStrikeChance;
             EffectType = EffectType.Buff;
         }
     }

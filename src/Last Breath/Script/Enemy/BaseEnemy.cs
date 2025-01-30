@@ -5,7 +5,6 @@ namespace Playground
     using System.ComponentModel;
     using Godot;
     using Playground.Components;
-    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enemy;
@@ -28,6 +27,7 @@ namespace Playground
         private bool _enemyFight = false, _playerEncounter = false;
         private ObservableCollection<IEffect>? _effects;
         private ObservableCollection<IAbility>? _appliedAbilities = [];
+        private EffectManager? _effectManager;
         private IBasedOnRarityLootTable? _lootTable;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
@@ -161,8 +161,9 @@ namespace Playground
         public override void _Ready()
         {
             _effects = [];
-            _attack = new AttackComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
-            _health = new HealthComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
+            _effectManager = new(_effects);
+            _attack = new AttackComponent(_effectManager.ModifierSum);
+            _health = new HealthComponent(_effectManager.ModifierSum);
             _attribute = new AttributeComponent();
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");

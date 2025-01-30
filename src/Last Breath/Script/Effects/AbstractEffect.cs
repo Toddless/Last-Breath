@@ -11,7 +11,7 @@
         private EffectType _effectType;
         private Parameter _stat;
 
-        public Parameter Stat
+        public Parameter Parameter
         {
             get => _stat;
             protected set => _stat = value;

@@ -1,13 +1,8 @@
 ﻿namespace Playground
 {
     using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
     using Godot;
     using Playground.Components;
-    using Playground.Components.EffectTypeHandlers;
-    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
 
     public class HealthComponent : ComponentBase, IHealthComponent
@@ -48,7 +43,7 @@
             set
             {
                 if (SetProperty(ref _increaseHealth, value))
-                    UpdateValues();
+                    UpdateProperties();
             }
         }
 
@@ -58,7 +53,7 @@
             set
             {
                 if (SetProperty(ref _additionalHealth, value))
-                    UpdateValues();
+                    UpdateProperties();
             }
         }
 
@@ -68,9 +63,9 @@
             private set => _maxHealth = value;
         }
 
-        public HealthComponent(ObservableCollection<IEffect> appliedEffects, IEffectHandlerFactory? effectHandlerFactory) : base(appliedEffects, effectHandlerFactory)
+        public HealthComponent(Func<Parameter, (float, float)> getModifiers) : base(getModifiers)
         {
-            _maxHealth = (_baseHealth + AdditionalHealth) * IncreaseHealth;
+            UpdateProperties();
             RefreshHealth();
         }
 
@@ -80,44 +75,7 @@
 
         public void Heal(float amount) => CurrentHealth = Math.Min(MaxHealth, CurrentHealth + amount);
 
-        public override void HandleAppliedEffects()
-        {
-            foreach (var group in Effects.GroupBy(effect => effect.EffectType))
-            {
-                switch (group.Key)
-                {
-                    case EffectType.Regeneration:
-                        HandleRegeneration(group);
-                        break;
-
-                    case EffectType.Poison:
-                        HandlePoison(group);
-                        break;
-
-                    case EffectType.Bleeding:
-                        HandleBleeding(group);
-                        break;
-                }
-            }
-            base.HandleAppliedEffects();
-        }
-
-        private void HandleRegeneration(IEnumerable<IEffect> effects)
-        {
-            Heal(EffectHandlerFactory!.GetHandler(EffectType.Regeneration).HandleEffectType(effects));
-        }
-
-        private void HandlePoison(IEnumerable<IEffect> effects)
-        {
-            TakeDamage(EffectHandlerFactory!.GetHandler(EffectType.Poison).HandleEffectType(effects));
-        }
-
-        private void HandleBleeding(IEnumerable<IEffect> effects)
-        {
-            TakeDamage(EffectHandlerFactory!.GetHandler(EffectType.Bleeding).HandleEffectType(effects));
-        }
-
-        protected override void UpdateValues()
+        public override void UpdateProperties()
         {
             var oldMaxHealth = MaxHealth;
             MaxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);

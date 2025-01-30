@@ -3,7 +3,6 @@
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
-    using Playground.Components.EffectTypeHandlers;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
@@ -30,6 +29,7 @@
         private Vector2 _lastPosition;
         private bool _canMove = true;
         private ObservableCollection<IEffect>? _effects;
+        private EffectManager? _effectManager;
         #endregion
 
         #region Components
@@ -119,8 +119,9 @@
         public override void _Ready()
         {
             _effects = [];
-            _playerHealth = new HealthComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
-            _playerAttack = new AttackComponent(_effects, DiContainer.GetService<IEffectHandlerFactory>());
+            _effectManager = new(_effects);
+            _playerHealth = new(_effectManager.ModifierSum);
+            _playerAttack = new(_effectManager.ModifierSum);
             _playerAttribute = new AttributeComponent();
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");

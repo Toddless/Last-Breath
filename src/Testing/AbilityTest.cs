@@ -23,15 +23,6 @@
             _debuff = new TestDebuffAbility();
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            _player?.AttackComponent?.Dispose();
-            _player?.HealthComponent?.Dispose();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
-
         [TestMethod]
         public void AddingAbilityInCollectionTest()
         {

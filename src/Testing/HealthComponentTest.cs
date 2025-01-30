@@ -1,14 +1,8 @@
 ﻿namespace PlaygroundTest
 {
-    using System.Collections.ObjectModel;
+    using Moq;
     using Playground;
-    using Playground.Components.EffectTypeHandlers;
-    using Playground.Script;
-    using Playground.Script.Effects.Debuffs;
-    using Playground.Script.Effects.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Passives.Buffs;
-    using Playground.Script.Passives.Debuffs;
+    using Playground.Components;
 
     [TestClass]
     public class HealthComponentTest
@@ -18,16 +12,7 @@
         [TestInitialize]
         public void Initialize()
         {
-            var effects = new ObservableCollection<IEffect>();
-            _healthComponent = new HealthComponent(effects, new EffectHandlerFactory());
-        }
-
-        [TestCleanup]
-        public void CleanUp()
-        {
-            _healthComponent?.Dispose();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            _healthComponent = new HealthComponent(new EffectManager([]).ModifierSum);
         }
 
         [TestMethod]
@@ -102,77 +87,6 @@
             Assert.IsTrue(_healthComponent.MaxHealth > healthBevorIncrease);
         }
 
-
-        [TestMethod]
-        public void OneBuffAppliedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
-            Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
-        }
-
-        [TestMethod]
-        public void TwoBuffsAppliedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.3f, 3));
-            Assert.IsTrue(healthBevorBuff < _healthComponent.MaxHealth);
-        }
-
-        [TestMethod]
-        public void OneBuffAndOneDebuffAppliedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var healthBevorBuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthBuff(string.Empty, string.Empty, 0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
-            Assert.IsTrue(healthBevorBuff > _healthComponent.MaxHealth);
-        }
-
-
-        [TestMethod]
-        public void OneDebuffAppliedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var healthBevorDebuffs = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
-            Assert.IsTrue(_healthComponent.MaxHealth < healthBevorDebuffs);
-        }
-
-        [TestMethod]
-        public void TwoDebuffsAppliedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
-            var healthAfterDebuff = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
-            Assert.IsTrue(healthAfterDebuff == 90 && _healthComponent.MaxHealth == 70);
-        }
-
-        [TestMethod]
-        public void OneDebuffRemovedTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
-            var healthBevorRemove = _healthComponent.MaxHealth;
-            _healthComponent.Effects?.RemoveAt(1);
-            Assert.IsTrue(healthBevorRemove < _healthComponent.MaxHealth);
-        }
-
-        [TestMethod]
-        public void CurrentHealthChangedAfterDebuffApplied()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var currentHealthBevorDebuff = _healthComponent.CurrentHealth;
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.1f, 3));
-            _healthComponent.Effects?.Add(new HealthDebuf(string.Empty, string.Empty, -0.2f, 3));
-            Assert.IsTrue(currentHealthBevorDebuff > _healthComponent.CurrentHealth);
-        }
-
         [TestMethod]
         public void HealCorrectAppliedTest()
         {
@@ -189,97 +103,6 @@
             _healthComponent.TakeDamage(60);
             _healthComponent.Heal(-50);
             Assert.IsTrue(_healthComponent.CurrentHealth >= 0);
-        }
-
-        [TestMethod]
-        public void PoisonEffectTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(poison);
-            for (int i = 0; i < 2; i++)
-                _healthComponent.HandleAppliedEffects();
-            Assert.IsTrue(_healthComponent.CurrentHealth == 70);
-        }
-
-        [TestMethod]
-        public void BleedEffectTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var bleed = new BleedEffect(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(bleed);
-            for (int i = 0; i < 2; i++)
-                _healthComponent.HandleAppliedEffects();
-            Assert.IsTrue(_healthComponent.CurrentHealth == 70);
-        }
-
-        [TestMethod]
-        public void EffectDeletedAfterNoDurationLeftTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var buff = new StrikeDamageBuff(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(buff);
-            for (int i = 0; i < 2; i++)
-                _healthComponent.HandleAppliedEffects();
-            Assert.IsTrue(_healthComponent.Effects?.Count == 0);
-        }
-
-        [TestMethod]
-        public void TwoDifferentEffectsDealDamageTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var bleed = new BleedEffect(string.Empty, string.Empty, 15, 2);
-            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(bleed);
-            _healthComponent.Effects?.Add(poison);
-            for (int i = 0; i < 2; i++)
-                _healthComponent.HandleAppliedEffects();
-            Assert.IsTrue(_healthComponent.CurrentHealth == 40);
-        }
-
-        [TestMethod]
-        public void TwoSimilarEffectsDealDamageAndRemovingTest()
-        {
-            Assert.IsNotNull(_healthComponent);
-            var firstPoison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
-            var secondPoison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(firstPoison);
-            _healthComponent.Effects?.Add(secondPoison);
-            for(int i = 0;i < 2;i++)
-                _healthComponent.HandleAppliedEffects();
-
-            Assert.IsTrue(_healthComponent.CurrentHealth == 40);
-            Assert.IsTrue(_healthComponent.Effects?.Count == 0);
-        }
-
-        [TestMethod]
-        public void PoisonEffectAppliedButDidNoDamageTest()
-        {
-            // This test does not make much sense, but just in case
-            Assert.IsNotNull(_healthComponent);
-            var poison = new PoisonEffect(string.Empty, string.Empty, 15, 2);
-            _healthComponent.Effects?.Add(poison);
-            Assert.IsNotNull(_healthComponent.Effects?.FirstOrDefault(x => x.EffectType == EffectType.Poison));
-            Assert.IsTrue(_healthComponent.CurrentHealth == 100);
-        }
-
-        [TestMethod]
-        public void HealthComponentIsCollectedAfterDispose()
-        {
-            WeakReference? weakReference = null;
-
-            void CreateAndDispose()
-            {
-                var health = new HealthComponent([], DiContainer.GetService<IEffectHandlerFactory>());
-                weakReference = new WeakReference(health);
-                health.Dispose();
-            }
-
-            CreateAndDispose();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            Assert.IsFalse(weakReference?.IsAlive ?? true, "HealthComponent was not collected");
         }
     }
 }
