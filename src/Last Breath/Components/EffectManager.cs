@@ -34,7 +34,8 @@
             if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
                 UpdateProperties?.Invoke();
         }
-        public (float buff, float debuff) ModifierSum(Parameter parameter)
+
+        public float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter parameter)
         {
             float debufSum = 1;
             float bufSum = 1;
@@ -47,9 +48,8 @@
                 if (effect.EffectType == EffectType.Buff)
                     bufSum += effect.Modifier;
             }
-            return (bufSum, debufSum);
+            return bufSum * Math.Max(0, debufSum) * ((baseValue + AdditionalValue) * increaseModifier);
         }
-
 
         // I need to call this method each enemy`s turn, so don`t forget to subscribe
         public void HandleAppliedEffects()

@@ -24,7 +24,7 @@
             _effectManager = new([]);
             _appliedAbilities = [];
             _appliedEffects = [];
-            HealthComponent = new(_effectManager.ModifierSum);
+            HealthComponent = new(_effectManager.CalculateValues);
             AppliedAbilities = [];
         }
     }

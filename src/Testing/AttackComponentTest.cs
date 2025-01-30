@@ -13,7 +13,7 @@
         [TestInitialize]
         public void Initialize()
         {
-            _attackComponent = new AttackComponent(new EffectManager([]).ModifierSum);
+            _attackComponent = new AttackComponent(new EffectManager([]).CalculateValues);
         }
     }
 }

@@ -7,11 +7,12 @@
 
     public abstract class ComponentBase : ObservableObject, IGameComponent
     {
-        private Func<Parameter, (float, float)> _getModifiers;
+        private Func<float, float, float, Parameter, float> _calculateValue;
+        protected Func<float, float, float, Parameter, float> CalculateValues => _calculateValue;
 
-        protected ComponentBase(Func<Parameter, (float, float)> getModifiers)
+        protected ComponentBase(Func<float, float, float, Parameter, float> calculateValue)
         {
-            _getModifiers = getModifiers;
+            _calculateValue = calculateValue;
         }
 
         public virtual void UpdateProperties()
@@ -26,13 +27,6 @@
                 field = newValue;
                 setter(field);
             }
-        }
-
-        //  this will be called each time some of "Current-" property is needed
-        protected float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter parameter)
-        {
-            var (buff, debuff) = _getModifiers.Invoke(parameter);
-            return buff * Math.Max(0, debuff) * ((baseValue + AdditionalValue) * increaseModifier);
         }
     }
 }

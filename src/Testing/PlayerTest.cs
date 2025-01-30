@@ -44,14 +44,15 @@
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
             Effects = [];
-            _effectManager = new(Effects);
-            HealthComponent = new(_effectManager.ModifierSum);
-            AttackComponent = new(_effectManager.ModifierSum);
             AppliedAbilities ??= [];
+            _effectManager = new(Effects);
+            HealthComponent = new(_effectManager.CalculateValues);
+            AttackComponent = new(_effectManager.CalculateValues);
             AppliedAbilities.CollectionChanged += _effectManager.OnAddAbility;
             _effectManager.TakeDamage += HealthComponent.TakeDamage;
             _effectManager.Heal += HealthComponent.Heal;
-            // Player class will be never deleted or disposed so i don`t care about unsubscribe here
+            _effectManager.UpdateProperties += HealthComponent.UpdateProperties;
+            _effectManager.UpdateProperties += AttackComponent.UpdateProperties;
             AppliedAbilities.CollectionChanged += OnAddAbility;
 
         }

@@ -120,8 +120,8 @@
         {
             _effects = [];
             _effectManager = new(_effects);
-            _playerHealth = new(_effectManager.ModifierSum);
-            _playerAttack = new(_effectManager.ModifierSum);
+            _playerHealth = new(_effectManager.CalculateValues);
+            _playerAttack = new(_effectManager.CalculateValues);
             _playerAttribute = new AttributeComponent();
             var parentNode = GetParent();
             var uiNodes = parentNode.GetNode("UI");

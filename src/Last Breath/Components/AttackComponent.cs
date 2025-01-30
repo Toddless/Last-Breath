@@ -61,43 +61,43 @@ namespace Playground
         public float AdditionalMinDamage
         {
             get => _additionalMinDamage;
-            set => UpdateProperty(ref _additionalMinDamage, CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMinDamage = value);
+            set => UpdateProperty(ref _additionalMinDamage, CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMinDamage = value);
         }
 
         public float AdditionalMaxDamage
         {
             get => _additionalMaxDamage;
-            set => UpdateProperty(ref _additionalMaxDamage, CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMaxDamage = value);
+            set => UpdateProperty(ref _additionalMaxDamage, CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMaxDamage = value);
         }
 
         public float AdditionalCriticalDamage
         {
             get => _additionalCriticalDamage;
-            set => UpdateProperty(ref _additionalCriticalDamage, CalculateValues(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage), value => CurrentCriticalDamage = value);
+            set => UpdateProperty(ref _additionalCriticalDamage, CalculateValues.Invoke(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage), value => CurrentCriticalDamage = value);
         }
 
         public float AdditionalCriticalChance
         {
             get => _additionalCriticalChance;
-            set => UpdateProperty(ref _additionalCriticalChance, CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
+            set => UpdateProperty(ref _additionalCriticalChance, CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
         }
 
         public float AdditionalExtraHitChance
         {
             get => _additionalExtraHitChance;
-            set => UpdateProperty(ref _additionalExtraHitChance, CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+            set => UpdateProperty(ref _additionalExtraHitChance, CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
         }
 
         public float IncreaseCriticalChance
         {
             get => _increaseCriticalChance;
-            set => UpdateProperty(ref _increaseCriticalChance, CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
+            set => UpdateProperty(ref _increaseCriticalChance, CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
         }
 
         public float IncreaseExtraHitChance
         {
             get => _increaseExtraHitChance;
-            set => UpdateProperty(ref _increaseExtraHitChance, CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+            set => UpdateProperty(ref _increaseExtraHitChance, CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
 
         }
 
@@ -162,7 +162,7 @@ namespace Playground
 
         #endregion
 
-        public AttackComponent(Func<Parameter, (float, float)> getModifiers) : base(getModifiers)
+        public AttackComponent(Func<float, float, float, Parameter, float> calculateValue) : base(calculateValue)
         {
             UpdateProperties();
             // since a lot of code was changed, i need better solution for this
@@ -171,17 +171,17 @@ namespace Playground
 
         public override void UpdateProperties()
         {
-            CurrentMaxDamage = CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentMinDamage = CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentCriticalChance = CalculateValues(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance);
-            CurrentCriticalDamage = CalculateValues(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage);
-            CurrentExtraHitChance = CalculateValues(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
+            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentCriticalChance = CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance);
+            CurrentCriticalDamage = CalculateValues.Invoke(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage);
+            CurrentExtraHitChance = CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
         }
 
         private void UpdateIncreaseDamageValues()
         {
-            CurrentMaxDamage = CalculateValues(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentMinDamage = CalculateValues(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
         }
 
         // i don´t really like it, refactoring is needed

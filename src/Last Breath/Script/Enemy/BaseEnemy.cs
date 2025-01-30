@@ -162,8 +162,8 @@ namespace Playground
         {
             _effects = [];
             _effectManager = new(_effects);
-            _attack = new AttackComponent(_effectManager.ModifierSum);
-            _health = new HealthComponent(_effectManager.ModifierSum);
+            _attack = new AttackComponent(_effectManager.CalculateValues);
+            _health = new HealthComponent(_effectManager.CalculateValues);
             _attribute = new AttributeComponent();
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");

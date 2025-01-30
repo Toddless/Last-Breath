@@ -1,6 +1,5 @@
 ﻿namespace PlaygroundTest
 {
-    using Moq;
     using Playground;
     using Playground.Components;
 
@@ -12,7 +11,7 @@
         [TestInitialize]
         public void Initialize()
         {
-            _healthComponent = new HealthComponent(new EffectManager([]).ModifierSum);
+            _healthComponent = new HealthComponent(new EffectManager([]).CalculateValues);
         }
 
         [TestMethod]

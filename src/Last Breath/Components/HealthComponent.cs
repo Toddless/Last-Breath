@@ -63,7 +63,7 @@
             private set => _maxHealth = value;
         }
 
-        public HealthComponent(Func<Parameter, (float, float)> getModifiers) : base(getModifiers)
+        public HealthComponent(Func<float, float, float, Parameter, float> calculateValue) : base(calculateValue)
         {
             UpdateProperties();
             RefreshHealth();
@@ -78,7 +78,7 @@
         public override void UpdateProperties()
         {
             var oldMaxHealth = MaxHealth;
-            MaxHealth = CalculateValues(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);
+            MaxHealth = CalculateValues.Invoke(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);
             CurrentHealth = (CurrentHealth / oldMaxHealth) * MaxHealth;
             if (CurrentHealth > MaxHealth)
                 CurrentHealth = MaxHealth;
