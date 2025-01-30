@@ -1,17 +1,18 @@
-     Last Breath 
+# Last Breath 
+
 2D Top-Down RGP where the player acts as a special undead whose main goal is to survive and seek out information about what happened.
 
-    Fractions
+## Fractions
 The game features four unique factions: Undead, Elves, Dwarves, and Humans, each with their own characteristics and privileges that open up as relationships improve. However, by deepening ties with one faction, you risk antagonising the others, creating a delicate balance between alliances and rivalries.
 
-    World Simulation.
+ ## World Simulation.
 The heart and soul of the game lie in its living, breathing world—a dynamic ecosystem where every NPC and monster is more than just a static entity. They are driven by purpose, ambition, and survival instincts. Each character, whether friend or foe, has their own goals—sometimes singular, sometimes multifaceted—that they tirelessly pursue. These goals shape their actions, creating a world that feels alive and unpredictable.
 
 But the world doesn’t stop there. NPCs and monsters don’t exist in isolation; they interact, clash, and evolve. They engage in battles with one another, not just for dominance but for growth. Through these conflicts, they grow stronger, adapt, and even unlock new abilities, becoming more formidable over time. This constant evolution ensures that the world is never stagnant—it’s a place where every encounter feels unique, and every decision you make ripples through the fabric of this ever-changing reality.
 
 In this world, you’re not just a player; you’re a part of an intricate, living tapestry where every thread has its own story, and every story intertwines with yours.
 
-    Combat System
+## Combat System
 Turn-based combat system with three types of stance. Each stance offers different gameplay from the others. 
 
 **Agility Stance:**
