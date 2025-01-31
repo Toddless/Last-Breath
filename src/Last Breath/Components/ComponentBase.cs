@@ -8,6 +8,7 @@
     public abstract class ComponentBase : ObservableObject, IGameComponent
     {
         private Func<float, float, float, Parameter, float> _calculateValue;
+        // maybe later can i find another way to update values
         protected Func<float, float, float, Parameter, float> CalculateValues => _calculateValue;
 
         protected ComponentBase(Func<float, float, float, Parameter, float> calculateValue)
@@ -24,8 +25,8 @@
         {
             if (field != newValue)
             {
-                field = newValue;
                 setter(field);
+                field = newValue;
             }
         }
     }

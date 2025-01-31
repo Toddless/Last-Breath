@@ -38,8 +38,8 @@
             get => _effects;
             private set => _effects = value;
         }
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. Only for test class
+        // Only for test class
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. 
         public PlayerTest()
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
@@ -53,39 +53,6 @@
             _effectManager.Heal += HealthComponent.Heal;
             _effectManager.UpdateProperties += HealthComponent.UpdateProperties;
             _effectManager.UpdateProperties += AttackComponent.UpdateProperties;
-            AppliedAbilities.CollectionChanged += OnAddAbility;
-
-        }
-
-        private void OnAddAbility(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action != NotifyCollectionChangedAction.Add && e.Action != NotifyCollectionChangedAction.Remove)
-                return;
-            if (e.OldItems != null)
-            {
-                RemoveOldAbilitiesEffects(e.OldItems.OfType<IAbility>());
-            }
-            if (e.NewItems != null)
-            {
-                AddNewAbilitiesEffects(e.NewItems.OfType<IAbility>());
-            }
-
-        }
-
-        private void AddNewAbilitiesEffects(IEnumerable<IAbility> abilities)
-        {
-            foreach (var effect in abilities.SelectMany(ability => ability.Effects))
-            {
-                Effects?.Add(effect);
-            }
-        }
-
-        private void RemoveOldAbilitiesEffects(IEnumerable<IAbility> abilities)
-        {
-            foreach (var effect in abilities.SelectMany(ability => ability.Effects))
-            {
-                Effects?.Remove(effect);
-            }
         }
     }
 }

@@ -12,6 +12,7 @@
     public class EffectManager : ObservableObject
     {
         private ObservableCollection<IEffect> _effects;
+        // for now this is the best what i came up with
         public Action<float>? TakeDamage { get; set; }
         public Action<float>? Heal { get; set; }
         public Action? UpdateProperties { get; set; }

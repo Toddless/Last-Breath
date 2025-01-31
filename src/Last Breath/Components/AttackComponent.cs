@@ -56,6 +56,7 @@ namespace Playground
             set => _rnd = value;
         }
 
+        // properties updating need more time, its work but hard to read
         #region Additional Values
 
         public float AdditionalMinDamage
@@ -169,6 +170,7 @@ namespace Playground
             DiContainer.InjectDependencies(this);
         }
 
+        // need to find out how i wanna update single property
         public override void UpdateProperties()
         {
             CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
@@ -180,11 +182,11 @@ namespace Playground
 
         private void UpdateIncreaseDamageValues()
         {
-            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
-            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage) ;
+            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage) ;
         }
 
-        // i don´t really like it, refactoring is needed
+        // i dont really like it, refactoring is needed
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
             float damage = Rnd!.RandfRange(CurrentMinDamage, CurrentMaxDamage);
