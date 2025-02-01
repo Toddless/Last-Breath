@@ -5,16 +5,11 @@
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
 
-    public abstract class ComponentBase : ObservableObject, IGameComponent
+    public abstract class ComponentBase(Func<float, float, float, Parameter, float> calculateValue) : ObservableObject, IGameComponent
     {
-        private Func<float, float, float, Parameter, float> _calculateValue;
+        private Func<float, float, float, Parameter, float> _calculateValue = calculateValue;
         // maybe later can i find another way to update values
         protected Func<float, float, float, Parameter, float> CalculateValues => _calculateValue;
-
-        protected ComponentBase(Func<float, float, float, Parameter, float> calculateValue)
-        {
-            _calculateValue = calculateValue;
-        }
 
         public abstract void UpdateProperties();
     }
