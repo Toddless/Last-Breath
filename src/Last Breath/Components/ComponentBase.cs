@@ -16,18 +16,6 @@
             _calculateValue = calculateValue;
         }
 
-        public virtual void UpdateProperties()
-        {
-
-        }
-
-        protected virtual void UpdateProperty(ref float field, float newValue, Action<float> setter)
-        {
-            if (field != newValue)
-            {
-                setter(field);
-                field = newValue;
-            }
-        }
+        public abstract void UpdateProperties();
     }
 }

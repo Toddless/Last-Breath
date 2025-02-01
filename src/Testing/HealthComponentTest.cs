@@ -1,7 +1,10 @@
 ﻿namespace PlaygroundTest
 {
+    using System.Collections.ObjectModel;
+    using Moq;
     using Playground;
     using Playground.Components;
+    using Playground.Script.Effects.Interfaces;
 
     [TestClass]
     public class HealthComponentTest
@@ -11,11 +14,12 @@
         [TestInitialize]
         public void Initialize()
         {
-            _healthComponent = new HealthComponent(new EffectManager([]).CalculateValues);
+            var mock = new Mock<EffectManager>(new Mock<ObservableCollection<IEffect>>().Object).Object;
+            _healthComponent = new HealthComponent(mock.CalculateValues);
         }
 
         [TestMethod]
-        public void ReducePercentReduceMaxHealth()
+        public void ReducePercent_ReduceMaxHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.IncreaseHealth += 0.1f;
@@ -25,7 +29,7 @@
         }
 
         [TestMethod]
-        public void CurrentHealthBiggerThanMaxHealthTest()
+        public void CurrentHealth_BiggerThanMaxHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.CurrentHealth += 100;
@@ -33,7 +37,7 @@
         }
 
         [TestMethod]
-        public void ReduceAdditionalHealthReducesCurrentHealthTest()
+        public void ReduceAdditionalHealth_ReducesCurrentHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.AdditionalHealth += 100;
@@ -43,7 +47,7 @@
         }
 
         [TestMethod]
-        public void DifferenceAfterTakingDamage()
+        public void Difference_AfterTakingDamage_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.AdditionalHealth += 100;
@@ -53,7 +57,7 @@
         }
 
         [TestMethod]
-        public void IncreaseAdditionalHealthIncreasesCurrentHealth()
+        public void IncreaseAdditionalHealth_IncreasesCurrentHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.AdditionalHealth += 100;
@@ -61,7 +65,7 @@
         }
 
         [TestMethod]
-        public void ReducingCurrentHealthLowerZeroTest()
+        public void ReducingCurrentHealth_LowerZero_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.CurrentHealth -= 200;
@@ -69,7 +73,7 @@
         }
 
         [TestMethod]
-        public void IncreaseTotalPercentIncreasesMaxHealthTest()
+        public void IncreaseTotalPercent_IncreasesMaxHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorIncrease = _healthComponent.MaxHealth;
@@ -78,7 +82,7 @@
         }
 
         [TestMethod]
-        public void IncreaseAdditionalHealthIncreasesMaxHealthTest()
+        public void IncreaseAdditionalHealth_IncreasesMaxHealth_Test()
         {
             Assert.IsNotNull(_healthComponent);
             var healthBevorIncrease = _healthComponent.MaxHealth;
@@ -87,7 +91,7 @@
         }
 
         [TestMethod]
-        public void HealCorrectAppliedTest()
+        public void Heal_CorrectApplied_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.TakeDamage(60);
@@ -96,7 +100,7 @@
         }
 
         [TestMethod]
-        public void HealthHealNegativeValueTest()
+        public void Heal_NegativeValue_Test()
         {
             Assert.IsNotNull(_healthComponent);
             _healthComponent.TakeDamage(60);

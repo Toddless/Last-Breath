@@ -1,11 +1,9 @@
 namespace Playground
 {
     using System;
-    using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
     using Playground.Script;
-    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
 
     [Inject]
@@ -24,6 +22,7 @@ namespace Playground
         #region Increases
         private float _increaseCriticalChance = 1;
         private float _increaseExtraHitChance = 1;
+        private float _increaseDamage = 1;
         #endregion
 
         #region Additionals
@@ -43,7 +42,6 @@ namespace Playground
         #endregion
 
         private RandomNumberGenerator? _rnd;
-        private float _increaseDamage = 1;
         private float _leech;
         #endregion
 
@@ -56,49 +54,83 @@ namespace Playground
             set => _rnd = value;
         }
 
-        // properties updating need more time, its work but hard to read
         #region Additional Values
 
         public float AdditionalMinDamage
         {
             get => _additionalMinDamage;
-            set => UpdateProperty(ref _additionalMinDamage, CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMinDamage = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _additionalMinDamage, value))
+                    CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
+            }
         }
 
         public float AdditionalMaxDamage
         {
             get => _additionalMaxDamage;
-            set => UpdateProperty(ref _additionalMaxDamage, CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage), value => CurrentMaxDamage = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _additionalMaxDamage, value))
+                    CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            }
         }
 
         public float AdditionalCriticalDamage
         {
             get => _additionalCriticalDamage;
-            set => UpdateProperty(ref _additionalCriticalDamage, CalculateValues.Invoke(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage), value => CurrentCriticalDamage = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _additionalCriticalDamage, value))
+                    CurrentCriticalDamage = CalculateValues.Invoke(_baseCriticalDamage, AdditionalCriticalDamage, 1f, Parameter.CriticalStrikeDamage);
+            }
         }
 
         public float AdditionalCriticalChance
         {
             get => _additionalCriticalChance;
-            set => UpdateProperty(ref _additionalCriticalChance, CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _additionalCriticalChance, value))
+                    CurrentCriticalChance = CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance);
+            }
         }
 
         public float AdditionalExtraHitChance
         {
             get => _additionalExtraHitChance;
-            set => UpdateProperty(ref _additionalExtraHitChance, CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _additionalExtraHitChance, value))
+                    CurrentExtraHitChance = CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
+            }
         }
 
         public float IncreaseCriticalChance
         {
             get => _increaseCriticalChance;
-            set => UpdateProperty(ref _increaseCriticalChance, CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance), value => CurrentCriticalChance = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _increaseCriticalChance, value))
+                    CurrentCriticalChance = CalculateValues.Invoke(_baseCriticalChance, AdditionalCriticalChance, IncreaseCriticalChance, Parameter.CriticalStrikeChance);
+            }
         }
 
         public float IncreaseExtraHitChance
         {
             get => _increaseExtraHitChance;
-            set => UpdateProperty(ref _increaseExtraHitChance, CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance), value => CurrentExtraHitChance = value);
+            set
+            {
+                value = ClampValue(value, 0);
+                if (SetProperty(ref _increaseExtraHitChance, value))
+                    CurrentExtraHitChance = CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
+            }
 
         }
 
@@ -107,6 +139,7 @@ namespace Playground
             get => _increaseDamage;
             set
             {
+                value = ClampValue(value, 0);
                 if (SetProperty(ref _increaseDamage, value))
                     UpdateIncreaseDamageValues();
             }
@@ -170,7 +203,6 @@ namespace Playground
             DiContainer.InjectDependencies(this);
         }
 
-        // need to find out how i wanna update single property
         public override void UpdateProperties()
         {
             CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
@@ -182,11 +214,11 @@ namespace Playground
 
         private void UpdateIncreaseDamageValues()
         {
-            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage) ;
-            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage) ;
+            CurrentMaxDamage = CalculateValues.Invoke(_baseMaxDamage, AdditionalMaxDamage, IncreaseDamage, Parameter.StrikeDamage);
+            CurrentMinDamage = CalculateValues.Invoke(_baseMinDamage, AdditionalMinDamage, IncreaseDamage, Parameter.StrikeDamage);
         }
 
-        // i dont really like it, refactoring is needed
+        // i don´t really like it, refactoring is needed
         public (float damage, bool crit, float leechedDamage) CalculateDamage()
         {
             float damage = Rnd!.RandfRange(CurrentMinDamage, CurrentMaxDamage);
@@ -204,5 +236,7 @@ namespace Playground
         {
             return Rnd!.Randf() <= chance;
         }
+
+        private float ClampValue(float value, float minValue) => value < minValue ? minValue : value;
     }
 }

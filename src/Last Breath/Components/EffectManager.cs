@@ -30,12 +30,6 @@
         }
 
 
-        protected void ModifyStatsWithEffect(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
-                UpdateProperties?.Invoke();
-        }
-
         public float CalculateValues(float baseValue, float AdditionalValue, float increaseModifier, Parameter parameter)
         {
             float debufSum = 1;
@@ -52,6 +46,16 @@
             return bufSum * Math.Max(0, debufSum) * ((baseValue + AdditionalValue) * increaseModifier);
         }
 
+        public void OnAddAbility(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action != NotifyCollectionChangedAction.Add && e.Action != NotifyCollectionChangedAction.Remove)
+                return;
+            if (e.NewItems != null)
+                AddNewAbilitiesEffects(e.NewItems.OfType<IAbility>());
+            if (e.OldItems != null)
+                RemoveOldAbilitiesEffects(e.OldItems.OfType<IAbility>());
+        }
+
         // I need to call this method each enemy`s turn, so don`t forget to subscribe
         public void HandleAppliedEffects()
         {
@@ -65,6 +69,12 @@
             RemoveExpiredEffects();
         }
 
+        protected void ModifyStatsWithEffect(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
+                UpdateProperties?.Invoke();
+        }
+
         private void RemoveExpiredEffects()
         {
             for (int i = Effects.Count - 1; i >= 0; i--)
@@ -72,16 +82,6 @@
                 if (--Effects[i].Duration <= 0)
                     Effects.RemoveAt(i);
             }
-        }
-
-        public void OnAddAbility(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action != NotifyCollectionChangedAction.Add && e.Action != NotifyCollectionChangedAction.Remove)
-                return;
-            if (e.NewItems != null)
-                AddNewAbilitiesEffects(e.NewItems.OfType<IAbility>());
-            if (e.OldItems != null)
-                RemoveOldAbilitiesEffects(e.OldItems.OfType<IAbility>());
         }
 
         private void AddNewAbilitiesEffects(IEnumerable<IAbility> abilities)
