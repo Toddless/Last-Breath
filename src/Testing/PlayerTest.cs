@@ -45,7 +45,7 @@
             _effectManager = new(Effects);
             HealthComponent = new(_effectManager.CalculateValues);
             AttackComponent = new(_effectManager.CalculateValues);
-            AppliedAbilities.CollectionChanged += _effectManager.OnAddAbility;
+            AppliedAbilities.CollectionChanged += _effectManager.OnChangeAbility;
             _effectManager.TakeDamage += HealthComponent.TakeDamage;
             _effectManager.Heal += HealthComponent.Heal;
             _effectManager.UpdateProperties += HealthComponent.UpdateProperties;

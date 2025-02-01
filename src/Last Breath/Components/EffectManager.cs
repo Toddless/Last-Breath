@@ -43,10 +43,11 @@
                 if (effect.EffectType == EffectType.Buff)
                     bufSum += effect.Modifier;
             }
-            return bufSum * Math.Max(0, debufSum) * ((baseValue + AdditionalValue) * increaseModifier);
+            // this works not very well for critical damage, need to think more.
+            return bufSum * Math.Max(0.01f, debufSum) * ((baseValue + AdditionalValue) * increaseModifier);
         }
 
-        public void OnAddAbility(object? sender, NotifyCollectionChangedEventArgs e)
+        public void OnChangeAbility(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action != NotifyCollectionChangedAction.Add && e.Action != NotifyCollectionChangedAction.Remove)
                 return;
