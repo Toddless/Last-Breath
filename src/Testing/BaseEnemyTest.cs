@@ -1,7 +1,6 @@
 ﻿namespace PlaygroundTest
 {
     using Playground;
-    using Playground.Script.Passives.Attacks;
     using System.Collections.ObjectModel;
     using Playground.Script.Effects.Interfaces;
     using Playground.Components;

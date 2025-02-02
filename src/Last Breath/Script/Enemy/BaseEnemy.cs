@@ -12,7 +12,7 @@ namespace Playground
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Passives;
-    using Playground.Script.Passives.Attacks;
+    using Playground.Script.Scenes;
     using Playground.Script.StateMachine;
 
     [Inject]
@@ -273,7 +273,7 @@ namespace Playground
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
             // working fine for buff, but what should i do to debuff someone?
-            //BattleBehavior?.MakeDecision()?.ActivateAbility();
+            BattleBehavior?.MakeDecision()?.ActivateAbility(BattleContext);
             return _attack!.CalculateDamage();
         }
 

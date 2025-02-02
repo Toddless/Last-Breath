@@ -8,7 +8,7 @@
         public TestDebuffAbility()
         {
             Effects = [new HealthDebuf(string.Empty, string.Empty, -0.1f, 3), new StrikeDamageDebuff(string.Empty, string.Empty, -0.1f, 3)];
-            OnReceiveAbilityHandler = AbilityHandler.ApplyAbility;
+            OnApplyAbilityHandler = AbilityHandler.ApplyAbility;
         }
     }
 }

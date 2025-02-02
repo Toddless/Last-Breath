@@ -4,7 +4,6 @@
     using Playground;
     using Playground.Components;
     using Playground.Script.Effects.Interfaces;
-    using Playground.Script.Passives.Attacks;
 
     public class PlayerTest : ICharacter
     {

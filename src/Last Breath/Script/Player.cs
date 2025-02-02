@@ -8,7 +8,6 @@
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using Playground.Script.Passives.Attacks;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

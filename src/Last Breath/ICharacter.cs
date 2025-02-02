@@ -1,5 +1,6 @@
-﻿namespace Playground.Script.Passives.Attacks
+﻿namespace Playground
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Playground.Script.Effects.Interfaces;
 
@@ -17,5 +18,7 @@
         }
 
         ObservableCollection<IAbility>? AppliedAbilities { get; set; }
+
+        List<IAbility>? Abilities { get; }
     }
 }

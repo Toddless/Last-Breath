@@ -4,6 +4,7 @@ namespace Playground
     using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Helpers;
+    using Playground.Script.Scenes;
 
     [Inject]
     public partial class BattleScene : Node2D
@@ -21,6 +22,7 @@ namespace Playground
         private Node2D? _attackButtonsUI;
         private IInventory? _playerInventory;
         private IInventory? _enemyInventory;
+        private IBattleContext? _battleContext;
 
         [Signal]
         public delegate void BattleSceneFinishedEventHandler(BaseEnemy enemy);
@@ -69,6 +71,7 @@ namespace Playground
 
         public void Init(Player player, BaseEnemy enemy)
         {
+            _battleContext = new BattleContext(player, enemy);
             _player = player;
             _enemy = enemy;
             _player.CanMove = false;
@@ -77,6 +80,7 @@ namespace Playground
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
             _playerInventory = _player.Inventory;
+            _enemy.BattleContext = _battleContext;
             PlayerTurn += PlayerMakeTurn;
             EnemyTurn += EnemyMakeTurn;
         }
@@ -113,9 +117,9 @@ namespace Playground
                 return;
             }
             _attackButtonsUI?.Show();
-           // var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
+            // var (damage, crit, leeched) = _player!.PlayerAttack!.CalculateDamage();
             // TODO: Player attack animation
-           // _enemy!.HealthComponent!.CurrentHealth -= damage;
+            // _enemy!.HealthComponent!.CurrentHealth -= damage;
 
             //if (crit)
             //{
@@ -147,20 +151,15 @@ namespace Playground
 
             // TODO: Ability animation
 
-           // _player!.PlayerHealth!.CurrentHealth -= damage;
+            // _player!.PlayerHealth!.CurrentHealth -= damage;
             if (crit)
             {
                 // TODO: Crit animation or some nice text 
                 GD.Print("Crit!");
             }
-            if (_enemy.BattleBehavior!.AbilityWithEffectAfterAttack != null)
-            {
-                // TODO: Animation
-                UpdateHealthBar();
-            }
+
             UpdateHealthBar();
             _enemy.HealthComponent.Heal(leeched);
-            _enemy.BattleBehavior.RemoveBuffEffectAfterTurnsEnd();
 
             GD.Print($"dealed damage {damage}");
             //if (additionalAttackChance <= _enemy.AttackComponent!.BaseAdditionalAttackChance)
@@ -216,14 +215,14 @@ namespace Playground
 
         private void SetHealthBars()
         {
-          //  _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
+            //  _playerHpBar!.MaxValue = _player!.PlayerHealth!.MaxHealth;
             _enemyHpBar!.MaxValue = _enemy!.HealthComponent!.MaxHealth;
         }
 
         private void UpdateHealthBar()
         {
             _enemyHpBar!.Value = _enemy!.HealthComponent!.CurrentHealth;
-          //  _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
+            //  _playerHpBar!.Value = _player!.PlayerHealth!.CurrentHealth;
         }
     }
 }

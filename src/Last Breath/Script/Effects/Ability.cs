@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using Playground;
     using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Scenes;
 
     public abstract class Ability : IAbility
     {
         private List<IEffect> _effects;
-        public Action<ICharacter, IAbility> OnReceiveAbilityHandler { get; set; } = DoNothing;
+        public Action<ICharacter, IAbility> OnApplyAbilityHandler { get; set; } = DoNothing;
         public int Cooldown { get; set; } = 4;
         protected Ability()
         {
@@ -19,7 +21,9 @@
             set => _effects = value;
         }
 
-        public virtual void ActivateAbility(ICharacter character) => OnReceiveAbilityHandler.Invoke(character, this);
+        public virtual void ActivateAbility(IBattleContext context) => OnApplyAbilityHandler.Invoke(SetTarget(context), this);
+
+        protected virtual ICharacter SetTarget(IBattleContext context) => context.Opponent; 
 
         private static void DoNothing(ICharacter character, IAbility ability)
         {
