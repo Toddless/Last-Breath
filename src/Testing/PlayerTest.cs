@@ -11,7 +11,8 @@
         private AttackComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _effects;
-        private EffectManager? _effectManager;
+        private List<IAbility> _abilities;
+        private EffectManager _effectManager;
 
         public HealthComponent? HealthComponent
         {
@@ -33,6 +34,16 @@
         {
             get => _effects;
             private set => _effects = value;
+        }
+
+        public List<IAbility> Abilities
+        {
+            get => _abilities;
+        }
+
+        public EffectManager EffectManager
+        {
+            get => _effectManager;
         }
         // Only for test class
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. 

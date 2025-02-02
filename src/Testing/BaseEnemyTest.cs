@@ -12,11 +12,16 @@
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _appliedEffects;
         private EffectManager _effectManager;
+        private List<IAbility> _abilities;
 
 
         public HealthComponent? HealthComponent { get => _healthComponent; set => _healthComponent = value; }
         public AttackComponent? AttackComponent { get => _attackComponent; set => _attackComponent = value; }
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
+
+        public List<IAbility> Abilities { get => _abilities; }
+
+        public EffectManager EffectManager { get => _effectManager; }
 
         public BaseEnemyTest()
         {

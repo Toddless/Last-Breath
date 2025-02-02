@@ -1,9 +1,10 @@
 ﻿namespace Playground.Components
 {
     using System;
+    using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
-    public class Condition
+    public class Condition : ICondition
     {
         public Func<bool> CheckCondition { get; set; }
 

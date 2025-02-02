@@ -39,6 +39,7 @@ namespace Playground
         private BattleBehavior? _battleBehavior;
         private List<IAbility>? _abilities = new();
         private StateMachine? _machine;
+        private IBattleContext? _battleContext;
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
         private int _level;
@@ -132,9 +133,7 @@ namespace Playground
             set
             {
                 if (SetProperty(ref _enemyFight, value))
-                {
                     IAmInBattle();
-                }
             }
         }
 
@@ -156,6 +155,8 @@ namespace Playground
             get => _appliedAbilities;
             set => _appliedAbilities = value;
         }
+
+        public EffectManager EffectManager => throw new System.NotImplementedException();
         #endregion
 
         public override void _Ready()
@@ -177,7 +178,7 @@ namespace Playground
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _battleBehavior = new BattleBehavior(this);
+            _battleBehavior = new BattleBehavior();
             _inventoryNode.Hide();
             DiContainer.InjectDependencies(this);
             SetStats();
@@ -273,7 +274,7 @@ namespace Playground
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
             // working fine for buff, but what should i do to debuff someone?
-            BattleBehavior?.MakeDecision()?.ActivateAbility(BattleContext);
+            BattleBehavior?.MakeDecision()?.ActivateAbility(_battleContext);
             return _attack!.CalculateDamage();
         }
 

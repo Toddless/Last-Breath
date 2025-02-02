@@ -80,7 +80,6 @@ namespace Playground
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
             _playerInventory = _player.Inventory;
-            _enemy.BattleContext = _battleContext;
             PlayerTurn += PlayerMakeTurn;
             EnemyTurn += EnemyMakeTurn;
         }
@@ -135,7 +134,6 @@ namespace Playground
 
         private void EnemyTurnHandler()
         {
-            _enemy!.BattleBehavior?.GatherInfo(_player!);
             float additionalAttackChance = Rnd!.RandfRange(0, 1);
 
 

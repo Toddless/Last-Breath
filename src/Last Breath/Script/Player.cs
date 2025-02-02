@@ -1,5 +1,6 @@
 ﻿namespace Playground
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
@@ -113,6 +114,10 @@
             set => _playerAttack = value;
         }
         public ObservableCollection<IAbility>? AppliedAbilities { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+        public EffectManager EffectManager => throw new System.NotImplementedException();
+
+        public List<IAbility>? Abilities => throw new System.NotImplementedException();
         #endregion
 
         public override void _Ready()

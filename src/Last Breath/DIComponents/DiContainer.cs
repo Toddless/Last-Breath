@@ -8,6 +8,8 @@
     using System.Linq;
     using System;
     using Godot;
+    using Playground.Components;
+    using Playground.Components.Interfaces;
 
     public partial class DiContainer : Node
     {
@@ -61,6 +63,7 @@
                 return instance;
             });
             provider.AddSingleton<RandomNumberGenerator>();
+            provider.AddTransient<IConditionsFactory, ConditionsFactory>();
             ServiceProvider = provider.BuildServiceProvider();
         }
 

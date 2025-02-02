@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using Playground.Components;
     using Playground.Script.Effects.Interfaces;
 
     public interface ICharacter
@@ -16,6 +17,8 @@
         {
             get; set;
         }
+
+        EffectManager EffectManager { get; }
 
         ObservableCollection<IAbility>? AppliedAbilities { get; set; }
 

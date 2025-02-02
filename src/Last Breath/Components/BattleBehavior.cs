@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Playground.Components.Interfaces;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Scenes;
 
@@ -10,20 +11,21 @@
     /// </summary>
     public class BattleBehavior
     {
-        private List<AbilityDecision>? _abilitiesDecisions;
-        private List<Condition>? _conditions;
+        private List<IAbilityDecision>? _abilitiesDecisions;
+        private List<ICondition>? _conditions;
         private IBattleContext? _battleContext;
 
         public BattleBehavior()
         {
-            _abilitiesDecisions = [];
             // i need to define somewhere set of conditions.
             // conditions have different priorities depends on battle behavior (defense behavior, aggressive behavior etc.)
         }
 
-        public void SetDependencies()
+        public void SetDependencies(IBattleContext context, IConditionsFactory conditions)
         {
-            _conditions = ConditionsFactory.SetNewConditions();
+            _battleContext = context;
+            _conditions = conditions.SetNewConditions(_battleContext);
+            SetAbilitiesDecisions(_battleContext.Self.Abilities!, _conditions!);
         }
 
         public IAbility? MakeDecision()
@@ -32,22 +34,19 @@
             return _abilitiesDecisions?.OrderByDescending(x => x.Priority).FirstOrDefault(x => x.Ability.Cooldown == 4)?.Ability;
         }
 
-        public void GatherInfo(Player player, IBattleContext context)
-        {
-            _battleContext = context;
-            SetAbilitiesDecisions(_battleContext.Self.Abilities!, _conditions!);
-        }
-
         public void BattleEnds()
         {
+            // i need to clear all that, because each fight we have new battle context
             _battleContext = null;
+            _abilitiesDecisions = null;
+            _conditions = null;
         }
 
-        private float EvaluateAbility(IAbility ability, List<Condition> conditions)
+        private float EvaluateAbility(IAbility ability, List<ICondition> conditions)
         {
             float priority = 0;
 
-            foreach (Condition condition in conditions)
+            foreach (var condition in conditions)
             {
                 if (condition.CheckCondition.Invoke())
                 {
@@ -57,7 +56,7 @@
             return priority;
         }
 
-        private float AbilityMatchConditionNeeds(IAbility ability, Condition condition)
+        private float AbilityMatchConditionNeeds(IAbility ability, ICondition condition)
         {
             float priorityModifier = 1;
             foreach (IEffect effect in ability.Effects)
@@ -70,11 +69,12 @@
             return priorityModifier;
         }
 
-        private void SetAbilitiesDecisions(List<IAbility> abilities, List<Condition> conditions)
+        private void SetAbilitiesDecisions(List<IAbility> abilities, List<ICondition> conditions)
         {
+            _abilitiesDecisions = [];
             foreach (var ability in abilities)
             {
-                _abilitiesDecisions?.Add(new(ability, EvaluateAbility(ability, conditions)));
+                _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability, conditions)));
             }
         }
 
