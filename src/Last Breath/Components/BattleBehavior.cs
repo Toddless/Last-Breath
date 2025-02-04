@@ -45,15 +45,14 @@
         private float EvaluateAbility(IAbility ability, List<ICondition> conditions)
         {
             float priority = 0;
-
+            float biggestPriority = 0;
             foreach (var condition in conditions)
             {
-                if (condition.CheckCondition.Invoke())
-                {
-                    priority += condition.Weight * AbilityMatchConditionNeeds(ability, condition);
-                }
+                if (priority > biggestPriority)
+                    biggestPriority = priority;
+                priority = condition.Weight * AbilityMatchConditionNeeds(ability, condition);
             }
-            return priority;
+            return biggestPriority;
         }
 
         private float AbilityMatchConditionNeeds(IAbility ability, ICondition condition)
@@ -61,9 +60,11 @@
             float priorityModifier = 1;
             foreach (IEffect effect in ability.Effects)
             {
-                // Only effect modifier count, i need some other info too (damage, heal amount, defense etc.)
                 if (effect.EffectType == condition.EffectNeeded)
-                    priorityModifier += effect.Modifier;
+                    // Only effect modifier count, i need some other info too (damage, heal amount, defense etc.)
+                    priorityModifier += effect.Modifier; // Modifiers are not always the same, need to be classified (e.g 0.1f or 50 or)
+                if (condition.CheckCondition.Invoke())
+                    priorityModifier += 0.5f;
             }
 
             return priorityModifier;

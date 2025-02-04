@@ -13,16 +13,16 @@
         public List<ICondition> SetNewConditions(IBattleContext context)
         {
             battleContext = context;
-            return [new Condition(HealthCondition, 15, EffectType.Regeneration),
+            return [new Condition(HealthCondition, 15, EffectType.Regeneration | EffectType.Buff),
                     // for example purify effect remove all debuffs
-                    new Condition(DebuffCondition, 5, EffectType.Buff),
-                    new Condition(PoisonAppliedCondition,5, EffectType.Poison)];
+                    new Condition(DebuffCondition, 5, EffectType.Buff | EffectType.Cleans),
+                    new Condition(PoisonAppliedCondition,5, EffectType.Poison | EffectType.Regeneration)];
         }
 
         private bool HealthCondition() => battleContext?.Self?.HealthComponent?.CurrentHealth < battleContext?.Opponent?.HealthComponent?.CurrentHealth;
 
         private bool DebuffCondition() => battleContext?.Self.EffectManager.Effects.Any(x => x.EffectType == EffectType.Debuff) != null;
 
-        private bool PoisonAppliedCondition() => battleContext?.Self.EffectManager.Effects.Any(x=>x.EffectType == EffectType.Poison) != null;
+        private bool PoisonAppliedCondition() => battleContext?.Self.EffectManager.Effects.Any(x => x.EffectType == EffectType.Poison) != null;
     }
 }

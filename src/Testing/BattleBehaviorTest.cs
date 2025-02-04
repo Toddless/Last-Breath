@@ -59,10 +59,10 @@
             mockDebuf.Setup(x => x.EffectType).Returns(EffectType.Debuff);
             mockDebuf.Setup(x => x.Modifier).Returns(0.3f);
 
-            mockBattleContext.SetupGet(x => x.Self.HealthComponent).Returns(new HealthComponent(mockFunc.Object));
+            mockBattleContext.Setup(x => x.Self.HealthComponent).Returns(new HealthComponent(mockFunc.Object));
             mockBattleContext.Setup(x => x.Self.Abilities).Returns([mockAbilityRegen.Object, mockAbilityDebuf.Object]);
-            mockBattleContext.SetupGet(x => x.Opponent.HealthComponent).Returns(new HealthComponent(mockFunc.Object));
-            mockBattleContext.SetupGet(x => x.Self.EffectManager).Returns(new EffectManager([mockPoison.Object, mockDebuf.Object, mockRegeneration.Object]));
+            mockBattleContext.Setup(x => x.Opponent.HealthComponent).Returns(new HealthComponent(mockFunc.Object));
+            mockBattleContext.Setup(x => x.Self.EffectManager).Returns(new EffectManager([mockPoison.Object, mockDebuf.Object, mockRegeneration.Object]));
             _battleContext = mockBattleContext.Object;
 
             var mockFactory = new Mock<IConditionsFactory>();
