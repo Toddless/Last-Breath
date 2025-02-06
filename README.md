@@ -24,3 +24,16 @@ This is the choice for those who believe that the best defence is attack, and vi
 
 **Intelligence Stance:**
 In the Intelligence stance, your character becomes a master of the magical arts: his intelligence attribute increases, and with it the magic damage, capable of scorching enemies with a single spell. But intelligence isn't just about attacking, it's also about defence: the energy barrier surrounding your character becomes stronger, deflecting blows and keeping him safe. This is the path for those who prefer to win with their mind rather than their sword, and who believe that knowledge is power.
+
+
+
+
+
+
+
+
+##  START UP
+1. Copy source code from github, open solution. 
+2. After restoring build app first time. 
+3. Then to start the game you need to copy Assets form zip file and paste in Last Breath folder.
+4. After that start Godot editor and build game. For Debug in Visual Studio just set right path to Godot exe.
