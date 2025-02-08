@@ -7,7 +7,6 @@
     {
         private OptionButton? _windowModeOptions, _resolutionOptions;
         private TabBar? _videoTabBar, _soundTabBar, _graphicsTabBar, _keybindingTabBar;
-        private Button? _saveButton;
 
         private readonly string[] _windowMods =
         {
@@ -17,7 +16,7 @@
             "Borderless Full-Screen"
         };
 
-        // array to show in UI
+        // values to show in UI
         private readonly string[] _resolutions =
         {
              "1280 x 720",
@@ -36,15 +35,15 @@
         {
             Configuration = GetNode<ConfigFileHandler>(NodePathHelper.ConfigFileHandler);
             var root = GetNode<TabContainer>(nameof(TabContainer));
+            var optionsMenu = GetOwner() as OptionsMenu;
             _soundTabBar = root.GetNode<TabBar>("Sound");
             _videoTabBar = root.GetNode<TabBar>("Video");
             _graphicsTabBar = root.GetNode<TabBar>("Graphics");
             _keybindingTabBar = root.GetNode<TabBar>("Keybindings");
-            _saveButton = GetNode<Button>(nameof(Button));
 
             _windowModeOptions = GetPathToNode(_videoTabBar)?.GetNode<HBoxContainer>("HBoxContainerWindowMode").GetNode<OptionButton>(nameof(OptionButton));
             _resolutionOptions = GetPathToNode(_videoTabBar)?.GetNode<HBoxContainer>("HBoxContainerResolution").GetNode<OptionButton?>(nameof(OptionButton));
-
+            optionsMenu!.SavePressed += SaveSettings;
             AddResolutions();
             AddWindowModes();
             SetEvents();
@@ -66,7 +65,6 @@
         {
             _windowModeOptions!.ItemSelected += WindowModeItemSelected;
             _resolutionOptions!.ItemSelected += ResolutionItemSelected;
-            _saveButton!.Pressed += SaveSettings;
         }
 
         private VBoxContainer? GetPathToNode(TabBar parent)

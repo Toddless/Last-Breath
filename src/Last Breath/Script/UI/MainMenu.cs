@@ -26,20 +26,15 @@
             _optionsMenu.ExitPressed += ExitPressed;
         }
 
-        private void SetSettings()
-        {
-
-        }
-
         private void ExitPressed()
         {
             _optionsMenu?.Hide();
+            _optionsMenu?.SetProcess(false);
             _marginContainer?.Show();
         }
         private void OptionsButtonPressed()
         {
             _marginContainer?.Hide();
-            // TODO: why?
             _optionsMenu?.SetProcess(true);
             _optionsMenu?.Show();
         }
