@@ -20,8 +20,8 @@
                 _config?.SetValue(SettingsSection.Keybinging, "Inventory", "I");
                 _config?.SetValue(SettingsSection.Keybinging, "Equip", "mouse_2");
 
-                _config?.SetValue(SettingsSection.Video, SettingsParameter.Resolution, new Vector2I(1280, 720));
-                _config?.SetValue(SettingsSection.Video, SettingsParameter.WindowMode, "Full-Screen");
+                _config?.SetValue(SettingsSection.Video, SettingsParameter.Resolution, 0);
+                _config?.SetValue(SettingsSection.Video, SettingsParameter.WindowMode, 1);
 
                 _config?.Save(ConfigFilePath);
             }
@@ -40,7 +40,6 @@
         public Dictionary<string, Variant> LoadSettings(string section)
         {
             Dictionary<string, Variant> settings = [];
-            // config cannot be null, because we create a new config when this class is initialized for the first time.
             foreach (var item in _config!.GetSectionKeys(section))
             {
                 settings[item] = _config.GetValue(section, item);
@@ -48,5 +47,7 @@
 
             return settings;
         }
+
+        public Variant LoadSetting(string section, string key) => _config!.GetValue(section, key);
     }
 }

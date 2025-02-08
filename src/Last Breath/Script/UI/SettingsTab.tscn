@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cb1hvr35v8ujh"]
+[gd_scene load_steps=2 format=3 uid="uid://cb1hvr35v8ujh"]
 
-[ext_resource type="PackedScene" uid="uid://dxr4golq6sbtx" path="res://Script/UI/WindowMode.tscn" id="1_d7ojw"]
-[ext_resource type="PackedScene" uid="uid://88xbo04batfd" path="res://Script/UI/ResolutionMode.tscn" id="2_lj0pm"]
+[ext_resource type="Script" path="res://Script/UI/SettingsTab.cs" id="1_46baa"]
 
 [node name="SettingsTab" type="Control"]
 layout_mode = 3
@@ -10,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_46baa")
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 1
@@ -23,7 +23,7 @@ offset_bottom = -150.0
 grow_horizontal = 2
 grow_vertical = 2
 tab_alignment = 1
-current_tab = 2
+current_tab = 1
 
 [node name="Sound" type="TabBar" parent="TabContainer"]
 visible = false
@@ -42,17 +42,19 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Sound/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Sound/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Sound/MarginContainer/ScrollContainer"]
 layout_mode = 2
 theme_override_constants/separation = 64
 alignment = 1
 
-[node name="Label" type="Label" parent="TabContainer/Sound/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Option 1"
 
 [node name="Video" type="TabBar" parent="TabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -61,23 +63,57 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
+theme_override_constants/margin_left = 160
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 160
+theme_override_constants/margin_bottom = 40
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Video/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Video/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 64
-alignment = 1
 
-[node name="Label" type="Label" parent="TabContainer/Video/MarginContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="HBoxContainerResolution" type="HBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerResolution"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Resolution"
 
+[node name="OptionButton" type="OptionButton" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerResolution"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+
+[node name="HBoxContainerWindowMode" type="HBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerWindowMode"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Window Mode"
+
+[node name="OptionButton" type="OptionButton" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerWindowMode"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+
 [node name="Graphics" type="TabBar" parent="TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -88,20 +124,54 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
+theme_override_constants/margin_left = 160
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 160
+theme_override_constants/margin_bottom = 40
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Graphics/MarginContainer"]
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Graphics/MarginContainer/ScrollContainer"]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_constants/separation = 128
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="WindowMode" parent="TabContainer/Graphics/MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_d7ojw")]
+[node name="Keybindings" type="TabBar" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="TabContainer/Keybindings"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 160
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 160
+theme_override_constants/margin_bottom = 40
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Keybindings/MarginContainer"]
 layout_mode = 2
 
-[node name="ResolutionMode" parent="TabContainer/Graphics/MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_lj0pm")]
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Keybindings/MarginContainer/ScrollContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 700.0
+offset_right = 234.0
+offset_bottom = 731.0
+text = "Save"
