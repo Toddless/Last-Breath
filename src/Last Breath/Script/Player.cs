@@ -48,7 +48,6 @@
         private PlayerInventory? _inventory;
         private GridContainer? _inventoryContainder;
         private ProgressBar? _progressBarMovement;
-        private ResearchButton? _researchButton;
         private TextureProgressBar? _healthBar;
         private Button? _doSomeDamageButton;
         private RichTextLabel? _playerStats;
@@ -136,11 +135,9 @@
             _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _inventory = new PlayerInventory();
             _progressBarMovement = uiNodes.GetNode<ProgressBar>("PlayerBars/StaminaBar");
-            _researchButton = uiNodes.GetNode<ResearchButton>("Buttons/ResearchButton");
             _healthBar = uiNodes.GetNode<TextureProgressBar>("PlayerBars/HealthProgressBar");
             _playerStats = _playersInventoryElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _researchButton.Pressed += ResearchCurrentZone;
             _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             SetHealthBar();

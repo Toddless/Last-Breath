@@ -7,18 +7,7 @@
 
     public class AbilityPool : IDisposable
     {
-        private List<IAbility>? _abilities = new();
-
-        public AbilityPool(BaseEnemy enemy)
-        {
-            SetTargetComponents(enemy);
-        }
-
-        private void SetTargetComponents(BaseEnemy enemy)
-        {
-            if (enemy.AttackComponent == null || enemy.HealthComponent == null || enemy.EnemyAttribute == null)
-                return;
-        }
+        private List<IAbility>? _abilities = [];
 
         // public IAbility? GetNewAbilityWithSpecificRarity(GlobalRarity rarity) => _abilities?.FirstOrDefault(x => x.Rarity == rarity);
 

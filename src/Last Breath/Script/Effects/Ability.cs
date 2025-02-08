@@ -9,11 +9,11 @@
     public abstract class Ability : IAbility
     {
         private List<IEffect> _effects;
-        public Action<ICharacter, IAbility> OnApplyAbilityHandler { get; set; } = DoNothing;
+        public Action<ICharacter, IAbility> AbilityHandler { get; set; } = DoNothing;
         public int Cooldown { get; set; } = 4;
-        protected Ability()
+        protected Ability(List<IEffect> effects)
         {
-            _effects ??= [];
+            _effects = effects;
         }
         public List<IEffect> Effects
         {
@@ -21,9 +21,9 @@
             set => _effects = value;
         }
 
-        public virtual void ActivateAbility(IBattleContext context) => OnApplyAbilityHandler.Invoke(SetTarget(context), this);
+        public virtual void ActivateAbility(IBattleContext context) => AbilityHandler.Invoke(SetTarget(context), this);
 
-        protected virtual ICharacter SetTarget(IBattleContext context) => context.Opponent; 
+        protected virtual ICharacter SetTarget(IBattleContext context) => context.Opponent;
 
         private static void DoNothing(ICharacter character, IAbility ability)
         {

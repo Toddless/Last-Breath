@@ -54,7 +54,7 @@
                     {
                         new TestBuffAbility
                         {
-                            OnApplyAbilityHandler = AbilityHandler.ApplyAbility,
+                            AbilityHandler = AbilityHandler.ApplyAbility,
                             Effects = new List<IEffect>
                             {
                                 new CriticalStrikeChanceBuff(string.Empty, string.Empty, 0.1f, 3),
@@ -63,7 +63,7 @@
                         },
                         new TestDebuffAbility
                         {
-                            OnApplyAbilityHandler = AbilityHandler.ApplyAbility,
+                            AbilityHandler = AbilityHandler.ApplyAbility,
                             Effects = new List<IEffect>
                             {
                                 new HealthDebuf(string.Empty, string.Empty, -0.1f, 3),

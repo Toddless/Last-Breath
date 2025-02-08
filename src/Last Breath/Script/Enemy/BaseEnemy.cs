@@ -281,7 +281,7 @@ namespace Playground
         protected void SetRandomAbilities()
         {
             //var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + Mathf.Max(1, _level / 10);
-            using (var abilities = new AbilityPool(this))
+            using (var abilities = new AbilityPool())
             {
                 _abilities = abilities.SelectAbilities(3);
             }

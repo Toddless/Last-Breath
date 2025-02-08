@@ -17,8 +17,6 @@
 
         public BattleBehavior()
         {
-            // i need to define somewhere set of conditions.
-            // conditions have different priorities depends on battle behavior (defense behavior, aggressive behavior etc.)
         }
 
         public void SetDependencies(IBattleContext context, IConditionsFactory conditions)
@@ -30,13 +28,13 @@
 
         public IAbility? MakeDecision()
         {
+            // update decisions bevor taking an ability
             UpdateAbilitiesDecisions();
             return _abilitiesDecisions?.OrderByDescending(x => x.Priority).FirstOrDefault(x => x.Ability.Cooldown == 4)?.Ability;
         }
 
         public void BattleEnds()
         {
-            // i need to clear all that, because each fight we have new battle context
             _battleContext = null;
             _abilitiesDecisions = null;
             _conditions = null;
@@ -44,13 +42,12 @@
 
         private float EvaluateAbility(IAbility ability, List<ICondition> conditions)
         {
-            float priority = 0;
             float biggestPriority = 0;
             foreach (var condition in conditions)
             {
+                float priority = condition.Weight * AbilityMatchConditionNeeds(ability, condition);
                 if (priority > biggestPriority)
                     biggestPriority = priority;
-                priority = condition.Weight * AbilityMatchConditionNeeds(ability, condition);
             }
             return biggestPriority;
         }
@@ -61,8 +58,7 @@
             foreach (IEffect effect in ability.Effects)
             {
                 if (effect.EffectType == condition.EffectNeeded)
-                    // Only effect modifier count, i need some other info too (damage, heal amount, defense etc.)
-                    priorityModifier += effect.Modifier; // Modifiers are not always the same, need to be classified (e.g 0.1f or 50 or)
+                    priorityModifier += 0.1f;
                 if (condition.CheckCondition.Invoke())
                     priorityModifier += 0.5f;
             }
