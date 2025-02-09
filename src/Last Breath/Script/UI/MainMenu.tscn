@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bd5wylwyowomd"]
+[gd_scene load_steps=7 format=3 uid="uid://bd5wylwyowomd"]
 
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="1_hrn6o"]
 [ext_resource type="Texture2D" uid="uid://d3s62mu2qu0f1" path="res://Assets/MainMenuBackground.png" id="1_kk64l"]
 [ext_resource type="Script" path="res://Script/UI/MainMenu.cs" id="1_ogonq"]
 [ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/Options.tscn" id="4_7ktkb"]
 [ext_resource type="AudioStream" uid="uid://c41u82tba0tul" path="res://Assets/Sounds/mainTheme.mp3" id="5_gnfau"]
+[ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="5_ki6sx"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -67,24 +68,35 @@ alignment = 1
 custom_minimum_size = Vector2(120, 30)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_hrn6o")
-theme_override_font_sizes/font_size = 24
-text = "New game"
+theme_override_font_sizes/font_size = 26
+text = "New Game"
+
+[node name="LoadGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_hrn6o")
+theme_override_font_sizes/font_size = 26
+text = "Load Game"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_hrn6o")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 text = "Options"
 
 [node name="QuitBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_hrn6o")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 26
 text = "Quit"
 
 [node name="Options" parent="." instance=ExtResource("4_7ktkb")]
+visible = false
+layout_mode = 1
+
+[node name="SaveLoadMenu" parent="." instance=ExtResource("5_ki6sx")]
 visible = false
 layout_mode = 1
 

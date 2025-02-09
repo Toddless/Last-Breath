@@ -25,9 +25,9 @@
                 GetUIElement<OptionButton>(_videoTabBar, "HBoxContainerResolution", nameof(OptionButton)));
 
             _soundSettings = new(
-                GetUIElement<HSlider>(_soundTabBar, "HBoxContainerMaster", nameof(HSlider)),
                 GetUIElement<HSlider>(_soundTabBar, "HBoxContainerMusic", nameof(HSlider)),
-                GetUIElement<HSlider>(_soundTabBar, "HBoxContainerSfx", nameof(HSlider)));
+                GetUIElement<HSlider>(_soundTabBar, "HBoxContainerSfx", nameof(HSlider)),
+                GetUIElement<HSlider>(_soundTabBar, "HBoxContainerMaster", nameof(HSlider)));
 
 
             optionsMenu!.SavePressed += SaveSettings;

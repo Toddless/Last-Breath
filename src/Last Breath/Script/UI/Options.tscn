@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://crpiglshqam38"]
+[gd_scene load_steps=5 format=3 uid="uid://crpiglshqam38"]
 
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="1_jy0md"]
 [ext_resource type="Script" path="res://Script/UI/OptionsMenu.cs" id="1_s22oy"]
 [ext_resource type="PackedScene" uid="uid://cb1hvr35v8ujh" path="res://Script/UI/SettingsTab.tscn" id="3_o136d"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="4_xehp7"]
 
 [node name="Options" type="Control"]
 layout_mode = 3
@@ -27,7 +28,7 @@ theme_override_constants/margin_bottom = 12
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = -48
+theme_override_constants/separation = -90
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -41,17 +42,21 @@ size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
 
 [node name="ExitBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
-theme_override_font_sizes/font_size = 25
+theme_override_fonts/font = ExtResource("4_xehp7")
+theme_override_font_sizes/font_size = 26
 text = "Return"
 
 [node name="SaveBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_font_sizes/font_size = 25
+theme_override_fonts/font = ExtResource("4_xehp7")
+theme_override_font_sizes/font_size = 26
 text = "Save"

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cb1hvr35v8ujh"]
+[gd_scene load_steps=4 format=3 uid="uid://cb1hvr35v8ujh"]
 
 [ext_resource type="Script" path="res://Script/UI/SettingsTab.cs" id="1_46baa"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_iywr4"]
+[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="3_nwe1g"]
 
 [node name="SettingsTab" type="Control"]
 layout_mode = 3
@@ -22,8 +24,10 @@ offset_right = -150.0
 offset_bottom = -150.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_iywr4")
+theme_override_font_sizes/font_size = 22
 tab_alignment = 1
-current_tab = 2
+current_tab = 1
 
 [node name="Video" type="TabBar" parent="TabContainer"]
 visible = false
@@ -47,31 +51,27 @@ theme_override_constants/margin_bottom = 40
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer"]
-clip_contents = true
-custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 theme_override_constants/separation = 16
 
+[node name="Control" type="Control" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="HBoxContainerResolution" type="HBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer"]
-clip_contents = true
-custom_minimum_size = Vector2(100, 20)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerResolution"]
-custom_minimum_size = Vector2(256, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Resolution"
+label_settings = ExtResource("3_nwe1g")
 
 [node name="OptionButton" type="OptionButton" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerResolution"]
 custom_minimum_size = Vector2(256, 0)
 layout_mode = 2
 
 [node name="HBoxContainerWindowMode" type="HBoxContainer" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer"]
-clip_contents = true
-custom_minimum_size = Vector2(100, 20)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerWindowMode"]
@@ -79,13 +79,13 @@ custom_minimum_size = Vector2(256, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Window Mode"
+label_settings = ExtResource("3_nwe1g")
 
 [node name="OptionButton" type="OptionButton" parent="TabContainer/Video/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerWindowMode"]
 custom_minimum_size = Vector2(256, 0)
 layout_mode = 2
 
 [node name="Sound" type="TabBar" parent="TabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -110,6 +110,9 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 16
 alignment = 1
 
+[node name="Control" type="Control" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="HBoxContainerMaster" type="HBoxContainer" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 20)
 layout_mode = 2
@@ -120,6 +123,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Master Volume"
+label_settings = ExtResource("3_nwe1g")
 
 [node name="HSlider" type="HSlider" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerMaster"]
 custom_minimum_size = Vector2(300, 32)
@@ -138,6 +142,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Music Volume"
+label_settings = ExtResource("3_nwe1g")
 
 [node name="HSlider" type="HSlider" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerMusic"]
 custom_minimum_size = Vector2(300, 32)
@@ -156,6 +161,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SFX Volume"
+label_settings = ExtResource("3_nwe1g")
 
 [node name="HSlider" type="HSlider" parent="TabContainer/Sound/MarginContainer/ScrollContainer/VBoxContainer/HBoxContainerSfx"]
 custom_minimum_size = Vector2(300, 32)
@@ -165,6 +171,7 @@ max_value = 1.0
 step = 0.001
 
 [node name="UI" type="TabBar" parent="TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -184,8 +191,9 @@ theme_override_constants/margin_bottom = 40
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/UI/MarginContainer/ScrollContainer"]
-custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 theme_override_constants/separation = 16
+
+[node name="Control" type="Control" parent="TabContainer/UI/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2

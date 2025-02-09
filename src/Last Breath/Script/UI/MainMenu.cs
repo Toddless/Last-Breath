@@ -1,11 +1,14 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Playground.Script.UI;
+
     public partial class MainMenu : Control
     {
-        private Button? _newGameButton, _optionsButton, _quitButton;
+        private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
         private PackedScene? _mainScene;
         private OptionsMenu? _optionsMenu;
+        private SaveLoadMenu? _saveLoadMenu;
         private MarginContainer? _marginContainer;
         private const string MainScenePath = "res://Scenes/MainScene.tscn";
 
@@ -17,13 +20,31 @@
             _newGameButton = root.GetNode<Button>("NewGameBtn");
             _optionsButton = root.GetNode<Button>("OptionsBtn");
             _quitButton = root.GetNode<Button>("QuitBtn");
+            _loadGameButton = root.GetNode<Button>("LoadGameBtn");
+
             _optionsMenu = GetNode<OptionsMenu>("Options");
+            _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
+
             _mainScene = ResourceLoader.Load<PackedScene>(MainScenePath);
 
+            _saveLoadMenu.ReturnPressed += ReturnButtonPressed;
+            _loadGameButton.Pressed += LoadGamePressed;
             _newGameButton.Pressed += NewGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += QuitButtonPressed;
             _optionsMenu.ExitPressed += ExitPressed;
+        }
+
+        private void ReturnButtonPressed()
+        {
+            _saveLoadMenu?.Hide();
+            _marginContainer?.Show();
+        }
+
+        private void LoadGamePressed()
+        {
+            _marginContainer?.Hide();
+            _saveLoadMenu?.Show();
         }
 
         private void ExitPressed()
