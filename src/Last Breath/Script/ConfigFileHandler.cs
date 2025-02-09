@@ -13,15 +13,18 @@
         {
             if (!FileAccess.FileExists(ConfigFilePath))
             {
-                _config?.SetValue(SettingsSection.Keybinging, "ui_left", "A");
-                _config?.SetValue(SettingsSection.Keybinging, "ui_right", "D");
-                _config?.SetValue(SettingsSection.Keybinging, "ui_up", "W");
-                _config?.SetValue(SettingsSection.Keybinging, "ui_down", "S");
-                _config?.SetValue(SettingsSection.Keybinging, "Inventory", "I");
                 _config?.SetValue(SettingsSection.Keybinging, "Equip", "mouse_2");
+                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveLeft, "A");
+                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveRight, "D");
+                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveUp, "W");
+                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveDown, "S");
+                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.Inventory, "I");
 
                 _config?.SetValue(SettingsSection.Video, SettingsParameter.Resolution, 0);
                 _config?.SetValue(SettingsSection.Video, SettingsParameter.WindowMode, 1);
+                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Master, 0.1);
+                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Music, 0.1);
+                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Sfx, 0.1);
 
                 _config?.Save(ConfigFilePath);
             }
