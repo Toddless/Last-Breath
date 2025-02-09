@@ -18,7 +18,7 @@
             get; set;
         }
 
-        EffectManager EffectManager { get; }
+        EffectManager? EffectManager { get; }
 
         ObservableCollection<IAbility>? AppliedAbilities { get; set; }
 
