@@ -11,7 +11,6 @@ namespace Playground
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.Passives;
     using Playground.Script.Scenes;
     using Playground.Script.StateMachine;
 
@@ -156,7 +155,7 @@ namespace Playground
             set => _appliedAbilities = value;
         }
 
-        public EffectManager EffectManager => throw new System.NotImplementedException();
+        public EffectManager? EffectManager => _effectManager;
         #endregion
 
         public override void _Ready()
@@ -202,7 +201,6 @@ namespace Playground
             _attribute!.Strength.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
-            SetRandomAbilities();
             EmitSignal(SignalName.EnemyInitialized);
         }
 
@@ -244,8 +242,6 @@ namespace Playground
 
         protected GlobalRarity EnemyRarity()
         {
-            //var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
-            //return rarity.Rarity;
             return GlobalRarity.Common;
         }
 
@@ -276,15 +272,6 @@ namespace Playground
             // working fine for buff, but what should i do to debuff someone?
             BattleBehavior?.MakeDecision()?.ActivateAbility(_battleContext);
             return _attack!.CalculateDamage();
-        }
-
-        protected void SetRandomAbilities()
-        {
-            //var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + Mathf.Max(1, _level / 10);
-            using (var abilities = new AbilityPool())
-            {
-                _abilities = abilities.SelectAbilities(3);
-            }
         }
 
         public void PlayerExited(Node2D body)

@@ -15,21 +15,12 @@ namespace Playground
         private PackedScene? _battleScene = ResourceLoader.Load<PackedScene>(ScenePath.BattleScene);
         private BattleScene? _currentBattleScene;
         private Queue<Action> _actionQueue = new();
-        private Button? _addAttribute, _dealDamage, _reduceAttribute;
         private Player? _player;
       
         public override void _Ready()
         {
             EnemySpawner = GetNode<IEnemySpawner>(nameof(EnemySpawner));
             _player = GetNode<Player>(nameof(CharacterBody2D));
-            // for testing purposes 
-            _reduceAttribute = GetNode<Button>("/root/MainScene/UI/Buttons/ReduceEnemiesAttribute");
-            _addAttribute = GetNode<Button>("/root/MainScene/UI/Buttons/AddEnemiesAttribute");
-            _dealDamage = GetNode<Button>("/root/MainScene/UI/Buttons/DealDamage");
-            _dealDamage.Pressed += DealDamage;
-            _addAttribute.Pressed += AddEnemiesAttribute;
-            _reduceAttribute.Pressed += ReduceEnemiesAttributePressed;
-            // ... 
             
             ResolveDependencies();
             InitializeEnemies();
@@ -52,31 +43,6 @@ namespace Playground
                 EnemySpawner?.SpawnNewEnemy();
             }
         }
-
-        // Test
-        private void DealDamage()
-        {
-            var enemy = Enemies?[0];
-           // enemy!.HealthComponent!.MaxHealth *= 0.9f;
-            GD.Print($"Current health: {enemy.HealthComponent.CurrentHealth}\n" +
-                $"Max health: {enemy.HealthComponent.MaxHealth}");
-        }
-
-        // Test
-        private void AddEnemiesAttribute()
-        {
-#pragma warning disable CS8602 // Dereference of a possibly null reference. Since this is testing methods, i dont realy care about this warnings
-            Enemies[0].EnemyAttribute.Dexterity.Total += 5;
-            Enemies[0].EnemyAttribute.Strength.Total += 5;
-        }
-
-        // Test
-        private void ReduceEnemiesAttributePressed()
-        {
-            Enemies[0].EnemyAttribute.Dexterity.Total -= 5;
-            Enemies[0].EnemyAttribute.Strength.Total -= 5;
-        }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
         public void PlayerInteracted(BaseEnemy? enemy)
         {
@@ -102,14 +68,14 @@ namespace Playground
         {
             CallDeferred("remove_child", _currentBattleScene!);
             _currentBattleScene = null;
-            enemyToDelete.PropertyChanged -= EnemiePropertyChanged;
+            enemyToDelete.PropertyChanged -= EnemyPropertyChanged;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyEntered -= enemyToDelete.PlayerEntered;
             enemyToDelete.GetNode<Area2D>("Area2D").BodyExited -= enemyToDelete.PlayerExited;
             EnemySpawner!.DeleteEnemy(enemyToDelete);
             Enemies!.Remove(enemyToDelete);
         }
 
-        public override void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public override void EnemyPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PlayerInteracted(Enemies!.FirstOrDefault(x => x.PlayerEncounter == true));
         }

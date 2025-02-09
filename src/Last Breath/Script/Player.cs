@@ -33,7 +33,7 @@
 
         #region UI
         private PlayerInventory? _inventory;
-        private GridContainer? _inventoryContainder;
+        private GridContainer? _inventoryContainer;
         private ProgressBar? _progressBarMovement;
         private RichTextLabel? _playerStats;
         private ProgressBar? _progressBar;
@@ -59,12 +59,6 @@
         {
             get => _inventory;
             set => _inventory = value;
-        }
-
-        public AnimatedSprite2D? PlayerAnimation
-        {
-            get => _sprite;
-            set => _sprite = value;
         }
 
         [Export]
@@ -96,16 +90,15 @@
             _playerHealth = new(_effectManager.CalculateValues);
             _playerAttack = new(_effectManager.CalculateValues);
             var parentNode = GetParent();
-            var uiNodes = parentNode.GetNode("UI");
             var playerNode = parentNode.GetNode<CharacterBody2D>(nameof(CharacterBody2D));
             _playersInventoryElements = playerNode.GetNode<Node2D>("UI");
             _inventoryNode = _playersInventoryElements.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
-            _inventoryContainder = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
+            _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             _inventory = new PlayerInventory();
             _playerStats = _playersInventoryElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainder!, _inventoryNode.Hide, _inventoryNode.Show);
+            _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainer!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             _playersInventoryElements.Hide();
             _sprite.Play("Idle_down");

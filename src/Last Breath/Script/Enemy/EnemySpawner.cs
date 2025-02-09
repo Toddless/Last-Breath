@@ -84,7 +84,7 @@ namespace Playground.Script.Enemy
             ParentScene.Enemies!.Add(enemy);
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
             enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
-            enemy.PropertyChanged += ParentScene.EnemiePropertyChanged;
+            enemy.PropertyChanged += ParentScene.EnemyPropertyChanged;
             enemy.Position = freePosition.Key;
             EnemyPositions![freePosition.Key] = enemy;
         }

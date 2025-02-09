@@ -695,6 +695,7 @@ tab_size = 1
 threaded = true
 
 [node name="Inventory" type="Node2D" parent="UI"]
+visible = false
 z_index = 10
 
 [node name="InventoryWindow" type="Panel" parent="UI/Inventory"]

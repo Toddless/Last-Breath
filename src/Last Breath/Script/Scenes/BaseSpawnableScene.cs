@@ -42,6 +42,6 @@
 
         protected abstract void ResolveDependencies();
 
-        public abstract void EnemiePropertyChanged(object? sender, PropertyChangedEventArgs e);
+        public abstract void EnemyPropertyChanged(object? sender, PropertyChangedEventArgs e);
     }
 }

@@ -3,7 +3,6 @@ namespace Playground
     using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script;
-    using Playground.Script.Helpers;
     using Playground.Script.Scenes;
 
     [Inject]
@@ -13,7 +12,6 @@ namespace Playground
         private ProgressBar? _playerHpBar, _enemyHpBar;
         private Button? _head, _body, _legs;
         private RandomNumberGenerator? _rnd;
-        private GlobalSignals? _signals;
         private Button? _returnButton, _takeAll;
         private Sprite2D? _sprite;
         private BaseEnemy? _enemy;
@@ -54,7 +52,6 @@ namespace Playground
             _head = bodyPartButtons.GetNode<Button>("Head");
             _body = bodyPartButtons.GetNode<Button>("Body");
             _legs = bodyPartButtons.GetNode<Button>("Legs");
-            _signals = battelScene.GetNode<GlobalSignals>(NodePathHelper.GlobalSignalPath);
             _playerHpBar = battleSceneUi.GetNode<ProgressBar>("PlayerHpBar");
             _enemyHpBar = battleSceneUi.GetNode<ProgressBar>("EnemyHpBar");
             _sprite = battelScene.GetNode<Sprite2D>("BattleScene1");
