@@ -361,6 +361,7 @@ script = ExtResource("12_23m8q")
 script = ExtResource("13_j51yl")
 
 [node name="Inventory" type="Node2D" parent="."]
+visible = false
 position = Vector2(-151, -115)
 
 [node name="InventoryWindow" type="Panel" parent="Inventory"]

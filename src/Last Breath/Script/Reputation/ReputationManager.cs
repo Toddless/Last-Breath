@@ -5,21 +5,21 @@
 
     public class ReputationManager
     {
-        private ElfsReputation? _elfsReputation = new(0);
+        private ElfsReputation? _elfReputation = new(0);
         private DwarfsReputation? _dwarfsReputation = new(0);
-        private HumansReputation? _hamansReputation = new(0);
+        private HumansReputation? _humansReputation = new(0);
 
-        public ReputationManager(int elfstRep, int dwarfsRep, int humanReps)
+        public ReputationManager(int elfRep, int dwarfsRep, int humanReps)
         {
-            _elfsReputation.ChangeReputationPoints(elfstRep);
+            _elfReputation.ChangeReputationPoints(elfRep);
             _dwarfsReputation.ChangeReputationPoints(dwarfsRep);
-            _hamansReputation.ChangeReputationPoints(humanReps);
+            _humansReputation.ChangeReputationPoints(humanReps);
         }
 
-        public ElfsReputation? ElfsReputation
+        public ElfsReputation? ElfReputation
         {
-            get => _elfsReputation;
-            private set => _elfsReputation = value;
+            get => _elfReputation;
+            private set => _elfReputation = value;
         }
 
         public DwarfsReputation? DwarfsReputation
@@ -30,8 +30,8 @@
 
         public HumansReputation? HumansReputation
         {
-            get => _hamansReputation;
-            private set => _hamansReputation = value;
+            get => _humansReputation;
+            private set => _humansReputation = value;
         }
 
         public void ChangeReputationForMultipleFractions(List<Fractions> fraction, int amount)
@@ -47,7 +47,7 @@
 
         private BaseReputation? GetReputationByFraction(Fractions fractions) => fractions switch
         {
-            Fractions.Elf => ElfsReputation,
+            Fractions.Elf => ElfReputation,
             Fractions.Dwarf => DwarfsReputation,
             Fractions.Human => HumansReputation,
             _ => null

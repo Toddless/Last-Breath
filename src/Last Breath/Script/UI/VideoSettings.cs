@@ -17,7 +17,7 @@
 
         private readonly string[] _windowMods =
         [
-          "Full-Screen",
+            "Full-Screen",
             "Window",
             "Borderless Window",
         ];
@@ -75,6 +75,8 @@
 
         private void WindowModeItemSelected(long index)
         {
+            // The game does not work correctly in the windowed mode.
+            // Buttons such as Close or Minimize are not displayed.
             switch (index)
             {
                 case 0:
