@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Playground.Script.Helpers.Extensions;
     using Playground.Script.UI;
 
     public partial class MainMenu : Control
@@ -14,6 +15,7 @@
 
         public override void _Ready()
         {
+            DisplayServer.WindowSetCurrentScreen(0);
             // don`t need to call GetParent here.
             _marginContainer = GetNode<MarginContainer>(nameof(MarginContainer));
             var root = _marginContainer.GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
@@ -33,6 +35,14 @@
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += QuitButtonPressed;
             _optionsMenu.ExitPressed += ExitPressed;
+            CallDeferred(nameof(ScreenResizeExtension.CenterWindow));
+            GetViewport().SizeChanged += OnWindowSizeChanged;
+        }
+
+        private void OnWindowSizeChanged()
+        {
+            if (DisplayServer.WindowGetMode() != DisplayServer.WindowMode.Fullscreen)
+                CallDeferred(nameof(ScreenResizeExtension.CenterWindow));
         }
 
         private void ReturnButtonPressed()
