@@ -20,7 +20,7 @@
 
         public override Rarity? GetRarity() => base.GetRarity();
 
-        public override Item? GetRandomItem() => base.GetRandomItem();
+        public override Item GetRandomItem() => base.GetRandomItem();
 
         public override Item? GetItemWithSelectedRarity(int index) => base.GetItemWithSelectedRarity(index);
     }

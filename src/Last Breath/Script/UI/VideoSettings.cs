@@ -7,27 +7,18 @@
     public class VideoSettings : ISettings
     {
         private OptionButton _windowModeOptions, _resolutionOptions;
+        private const string InitialResolution = "1366 x 768";
+        private const string FullHD = "1920 x 1080";
+        private const string QuadHD = "2560 x 1440";
+        private const string FullScreen = "Full-Screen";
+        private const string Window = "Window";
+        private const string BorderlessWindow = "Borderless Window";
 
         private readonly Vector2I[] _resolution =
         [
-            new(1280, 720),
+            new(1366, 768),
             new(1920, 1080),
             new(2560, 1440)
-        ];
-
-        private readonly string[] _windowMods =
-        [
-            "Full-Screen",
-            "Window",
-            "Borderless Window",
-        ];
-
-        // values to show in UI
-        private readonly string[] _resolutions =
-        [
-             "1280 x 720",
-             "1920 x 1080",
-             "2560 x 1440"
         ];
 
         public VideoSettings(OptionButton windowMode, OptionButton resolution)
@@ -40,18 +31,17 @@
 
         public void AddResolutions()
         {
-            foreach (var resolution in _resolutions)
-            {
-                _resolutionOptions?.AddItem(resolution);
-            }
+            _resolutionOptions?.AddItem(InitialResolution);
+            _resolutionOptions?.AddItem(FullHD);
+            _resolutionOptions?.AddItem(QuadHD);
+
         }
 
-        public void AddWindowModes()
+        public void AddWindowMods()
         {
-            foreach (var mode in _windowMods)
-            {
-                _windowModeOptions?.AddItem(mode);
-            }
+            _windowModeOptions?.AddItem(FullScreen);
+            _windowModeOptions?.AddItem(Window);
+            _windowModeOptions?.AddItem(BorderlessWindow);
         }
 
         public void LoadSettings(ConfigFileHandler config)
@@ -68,6 +58,8 @@
 
         private void ResolutionItemSelected(long index)
         {
+            // changing resolution in Full screen mode does nothing, for now.
+            // need more info about scaling.
             if (DisplayServer.WindowGetMode() != DisplayServer.WindowMode.Fullscreen)
                 DisplayServer.WindowSetSize(_resolution[index]);
             ScreenResizeExtension.CenterWindow();

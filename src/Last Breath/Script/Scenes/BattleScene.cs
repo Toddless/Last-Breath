@@ -76,7 +76,7 @@ namespace Playground
             _player.Position = new Vector2(250, 450);
             _enemy.Position = new Vector2(950, 450);
             _enemyInventory = _enemy.Inventory;
-            _playerInventory = _player.Inventory;
+           // _playerInventory = _player.Inventory;
             PlayerTurn += PlayerMakeTurn;
             EnemyTurn += EnemyMakeTurn;
         }

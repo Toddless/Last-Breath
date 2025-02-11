@@ -170,7 +170,7 @@ namespace Playground
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = new EnemyInventory();
-            Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
+            Inventory.Initialize(25,ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
@@ -210,7 +210,6 @@ namespace Playground
             {
                 if (args.NewValue < args.OldValue)
                 {
-                    GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalChance}, CritDamage: {_attack.CurrentCriticalDamage}");
                 }
             }
         }
@@ -229,8 +228,6 @@ namespace Playground
                 {
                     _health!.IncreaseHealth = _attribute!.Strength!.TotalHealthIncrese();
                 }
-                GD.Print($"Current hp after strength increased: {_health.CurrentHealth}, Max Health: {_health.MaxHealth}\n" +
-                    $"Strength: {_attribute.Strength.Total}");
                 if (!_enemyFight)
                 {
                     _health.RefreshHealth();

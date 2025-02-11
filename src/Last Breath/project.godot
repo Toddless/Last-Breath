@@ -28,6 +28,8 @@ ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
 
 window/size/viewport_width=1680
 window/size/viewport_height=920
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [dotnet]
 

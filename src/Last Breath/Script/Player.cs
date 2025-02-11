@@ -4,9 +4,10 @@
     using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
+    using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
-    using Playground.Script.Inventory;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class Player : CharacterBody2D, ICharacter
     {
@@ -32,10 +33,9 @@
         public delegate void PlayerExitedTheBattleEventHandler();
 
         #region UI
-        private PlayerInventory? _inventory;
+        private Inventory? _inventory;
         private GridContainer? _inventoryContainer;
         private ProgressBar? _progressBarMovement;
-        private RichTextLabel? _playerStats;
         private ProgressBar? _progressBar;
         private Panel? _inventoryWindow;
         private Label? _healthBarText;
@@ -48,22 +48,18 @@
             get => _lastPosition;
             set => _lastPosition = value;
         }
-
         public bool CanMove
         {
             get => _canMove;
             set => _canMove = value;
         }
-
-        public PlayerInventory? Inventory
+        public Inventory? Inventory
         {
             get => _inventory;
             set => _inventory = value;
         }
-
         [Export]
         public int Speed { get; set; } = 200;
-
         public HealthComponent? HealthComponent
         {
             get => _playerHealth;
@@ -74,13 +70,9 @@
             get => _playerAttack;
             set => _playerAttack = value;
         }
-
-        public EffectManager? EffectManager =>_effectManager;
-
+        public EffectManager? EffectManager => _effectManager;
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
-
         public List<IAbility>? Abilities => _abilities;
-
         #endregion
 
         public override void _Ready()
@@ -95,13 +87,22 @@
             _inventoryNode = _playersInventoryElements.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _inventory = new PlayerInventory();
-            _playerStats = _playersInventoryElements.GetNode<RichTextLabel>("PlayerStats/PlayerStats");
             _sprite = playerNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainer!, _inventoryNode.Hide, _inventoryNode.Show);
+            _inventory = new Inventory();
+           // _inventory.Initialize(105, ScenePath.InventorySlot, _inventoryContainer!, _inventoryNode.Hide, _inventoryNode.Show);
             _playerHealth.RefreshHealth();
             _playersInventoryElements.Hide();
             _sprite.Play("Idle_down");
+            SpawnItems(5);
+        }
+
+        private void SpawnItems(int amount)
+        {
+            var loot = DiContainer.GetService<IBasedOnRarityLootTable>();
+            for (int i = 0; i < amount; i++)
+            {
+                _inventory?.AddItem(loot.GetRandomItem());
+            }
         }
 
         public override void _Input(InputEvent @event)

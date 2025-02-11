@@ -31,7 +31,7 @@
 
 
             optionsMenu!.SavePressed += SaveSettings;
-            _videoSettings.AddWindowModes();
+            _videoSettings.AddWindowMods();
             _videoSettings.AddResolutions();
             LoadSettings();
         }

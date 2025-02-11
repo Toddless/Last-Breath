@@ -3,15 +3,21 @@
     using Godot;
     using Playground.Script.Helpers.Extensions;
     using Playground.Script.UI;
+    using Stateless;
 
     public partial class MainMenu : Control
     {
+        private const string MainScenePath = "res://Scenes/MainScene.tscn";
+        private enum UIState { Main, Options, SaveLoad }
+        private enum Trigger { ShowOptions, ShowSaveLoad, Return }
+
+        private StateMachine<UIState, Trigger>? _stateMachine;
+
         private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
         private PackedScene? _mainScene;
         private OptionsMenu? _optionsMenu;
         private SaveLoadMenu? _saveLoadMenu;
         private MarginContainer? _marginContainer;
-        private const string MainScenePath = "res://Scenes/MainScene.tscn";
 
         public override void _Ready()
         {
@@ -25,17 +31,54 @@
 
             _optionsMenu = GetNode<OptionsMenu>("Options");
             _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
-
             _mainScene = ResourceLoader.Load<PackedScene>(MainScenePath);
 
+            SetEvents();
+            ScreenResizeExtension.CenterWindow();
+            ConfigureStateMachine();
+        }
+
+        private void SetEvents()
+        {
+            GetViewport().SizeChanged += OnWindowSizeChanged;
             _saveLoadMenu.ReturnPressed += ReturnButtonPressed;
             _loadGameButton.Pressed += LoadGamePressed;
             _newGameButton.Pressed += NewGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += QuitButtonPressed;
             _optionsMenu.ExitPressed += ExitPressed;
-            ScreenResizeExtension.CenterWindow();
-            GetViewport().SizeChanged += OnWindowSizeChanged;
+        }
+
+        private void ConfigureStateMachine()
+        {
+            _stateMachine = new StateMachine<UIState, Trigger>(UIState.Main);
+            _stateMachine.Configure(UIState.Main)
+                .OnEntry(() =>
+                {
+                    _marginContainer?.Show();
+                    _optionsMenu?.Hide();
+                    _saveLoadMenu?.Hide();
+                })
+                .Permit(Trigger.ShowOptions, UIState.Options)
+                .Permit(Trigger.ShowSaveLoad, UIState.SaveLoad);
+
+            _stateMachine.Configure(UIState.Options)
+                .OnEntry(() =>
+                {
+                    _marginContainer?.Hide();
+                    _optionsMenu?.Show();
+                    _optionsMenu?.SetProcess(true);
+                })
+                .Permit(Trigger.Return, UIState.Main)
+                .OnExit(() => _optionsMenu?.SetProcess(false));
+
+            _stateMachine.Configure(UIState.SaveLoad)
+                .OnEntry(() =>
+                {
+                    _marginContainer?.Hide();
+                    _saveLoadMenu?.Show();
+                })
+                .Permit(Trigger.Return, UIState.Main);
         }
 
         private void OnWindowSizeChanged()
@@ -44,30 +87,10 @@
                 ScreenResizeExtension.CenterWindow();
         }
 
-        private void ReturnButtonPressed()
-        {
-            _saveLoadMenu?.Hide();
-            _marginContainer?.Show();
-        }
-
-        private void LoadGamePressed()
-        {
-            _marginContainer?.Hide();
-            _saveLoadMenu?.Show();
-        }
-
-        private void ExitPressed()
-        {
-            _optionsMenu?.Hide();
-            _optionsMenu?.SetProcess(false);
-            _marginContainer?.Show();
-        }
-        private void OptionsButtonPressed()
-        {
-            _marginContainer?.Hide();
-            _optionsMenu?.SetProcess(true);
-            _optionsMenu?.Show();
-        }
+        private void ReturnButtonPressed() => _stateMachine?.Fire(Trigger.Return);
+        private void LoadGamePressed() => _stateMachine?.Fire(Trigger.ShowSaveLoad);
+        private void ExitPressed() => _stateMachine?.Fire(Trigger.Return);
+        private void OptionsButtonPressed() => _stateMachine?.Fire(Trigger.ShowOptions);
         private void QuitButtonPressed() => GetTree().Quit();
         private void NewGamePressed() => GetTree().ChangeSceneToPacked(_mainScene);
     }

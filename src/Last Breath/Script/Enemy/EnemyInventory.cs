@@ -39,7 +39,7 @@
             _showInventory = showInventory;
         }
 
-        public List<Item> GivePlayerItems() => _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem!).ToList();
+        public List<Item> GivePlayerItems() => _slots.Where(x => x.Item != null).Select(x => x.Item!).ToList();
 
         public void AddItem(Item? item)
         {
@@ -51,11 +51,11 @@
                 return;
             }
 
-            if (slot.InventoryItem == null)
+            if (slot.Item == null)
             {
                 slot.SetItem(item);
             }
-            else if (slot.InventoryItem.Guid == item.Guid)
+            else if (slot.Item.Guid == item.Guid)
             {
                 slot.AddItem(item);
             }
@@ -63,8 +63,8 @@
 
         public List<Item?> GiveAllItems()
         {
-            var itemsToGive = _slots.Where(x => x.InventoryItem != null).Select(x => x.InventoryItem).ToList();
-            _slots.ForEach(x => RemoveItem(x.InventoryItem));
+            var itemsToGive = _slots.Where(x => x.Item != null).Select(x => x.Item).ToList();
+            _slots.ForEach(x => RemoveItem(x.Item));
             return itemsToGive;
         }
 
@@ -87,7 +87,7 @@
 
         private InventorySlot? GetSlotToAdd(Item newItem)
         {
-            return _slots.FirstOrDefault(itemInSlot => itemInSlot.InventoryItem == null || itemInSlot.InventoryItem.Guid == newItem.Guid && itemInSlot.InventoryItem.Quantity < newItem.MaxStackSize);
+            return _slots.FirstOrDefault(itemInSlot => itemInSlot.Item == null || itemInSlot.Item.Guid == newItem.Guid && itemInSlot.Item.Quantity < newItem.MaxStackSize);
         }
 
         private InventorySlot? GetSlotToRemove(Item? item)
@@ -95,7 +95,7 @@
             // this method work correctly without first condition only if i equip or remove an item from right to left
             // cause if an item is removed from left to right, then after first cycle method return null
             // and NullReferenceException is thrown
-            return _slots.FirstOrDefault(x => x.InventoryItem != null && x.InventoryItem.Guid == item?.Guid);
+            return _slots.FirstOrDefault(x => x.Item != null && x.Item.Guid == item?.Guid);
         }
     }
 }
