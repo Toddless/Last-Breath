@@ -1,0 +1,29 @@
+[gd_scene load_steps=7 format=3 uid="uid://drgs10sgp405d"]
+
+[ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
+[ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
+[ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
+[ext_resource type="PackedScene" uid="uid://boqqyrt0sfpve" path="res://Script/UI/MainUI.tscn" id="2_heqcp"]
+[ext_resource type="PackedScene" uid="uid://j6cqo6u0s83x" path="res://Script/UI/BattleUI.tscn" id="4_vfafg"]
+[ext_resource type="PackedScene" uid="uid://b5ardl26n1bo7" path="res://Scenes/BattleScene.tscn" id="4_wn8ry"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_dp7k8")
+
+[node name="MainWorld" parent="." instance=ExtResource("1_l3ktu")]
+
+[node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
+z_index = 1
+
+[node name="MainUILayer" type="CanvasLayer" parent="."]
+
+[node name="MainUI" parent="MainUILayer" instance=ExtResource("2_heqcp")]
+metadata/_edit_use_anchors_ = true
+
+[node name="BattleLayer" type="CanvasLayer" parent="."]
+layer = 10
+visible = false
+
+[node name="BattleScene" parent="BattleLayer" instance=ExtResource("4_wn8ry")]
+
+[node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]

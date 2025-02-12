@@ -7,14 +7,14 @@
 
     public partial class MainMenu : Control
     {
-        private const string MainScenePath = "res://Scenes/MainScene.tscn";
+        private const string Main = "res://Scenes/Main.tscn";
         private enum UIState { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }
 
         private StateMachine<UIState, Trigger>? _stateMachine;
 
         private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
-        private PackedScene? _mainScene;
+        private PackedScene? _main;
         private OptionsMenu? _optionsMenu;
         private SaveLoadMenu? _saveLoadMenu;
         private MarginContainer? _marginContainer;
@@ -31,7 +31,7 @@
 
             _optionsMenu = GetNode<OptionsMenu>("Options");
             _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
-            _mainScene = ResourceLoader.Load<PackedScene>(MainScenePath);
+            _main = ResourceLoader.Load<PackedScene>(Main);
 
             SetEvents();
             ScreenResizeExtension.CenterWindow();
@@ -92,6 +92,6 @@
         private void ExitPressed() => _stateMachine?.Fire(Trigger.Return);
         private void OptionsButtonPressed() => _stateMachine?.Fire(Trigger.ShowOptions);
         private void QuitButtonPressed() => GetTree().Quit();
-        private void NewGamePressed() => GetTree().ChangeSceneToPacked(_mainScene);
+        private void NewGamePressed() => GetTree().ChangeSceneToPacked(_main);
     }
 }

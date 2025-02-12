@@ -19,6 +19,7 @@ namespace Playground.Script.Enemy
         private PackedScene? _enemyToSpawn;
         private Timer? _timer;
 
+        #region Properties
         [Inject]
         protected RandomNumberGenerator? Rnd
         {
@@ -49,6 +50,7 @@ namespace Playground.Script.Enemy
             get => _enemyPosition;
             set => _enemyPosition = value;
         }
+        #endregion
 
         public override void _Ready()
         {

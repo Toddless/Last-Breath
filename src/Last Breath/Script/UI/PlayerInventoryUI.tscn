@@ -1,16 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://boa2lmvm2an46"]
+[gd_scene load_steps=4 format=3 uid="uid://boa2lmvm2an46"]
 
-[ext_resource type="Script" path="res://Script/UI/PlayerInventory.cs" id="1_0c3gf"]
-[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="1_2lx43"]
+[ext_resource type="Script" path="res://Script/UI/PlayerInventoryUI.cs" id="1_4n4hh"]
+[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="2_yfe3o"]
 
-[node name="PlayerInventory" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0gy2x"]
+bg_color = Color(0.13, 0.13, 0.13, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.8, 0.016, 0.016, 1)
+border_blend = true
+
+[node name="PlayerInventoryUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_0c3gf")
+script = ExtResource("1_4n4hh")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -24,6 +33,10 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0gy2x")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -56,7 +69,7 @@ offset_top = 42.0
 offset_right = 105.0
 offset_bottom = 67.0
 text = "Helmet"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer"]
@@ -79,12 +92,13 @@ layout_mode = 2
 size_flags_vertical = 0
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/Panel"]
+layout_mode = 0
 offset_left = 7.0
 offset_top = 52.0
 offset_right = 121.0
 offset_bottom = 77.0
 text = "Weapon"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="Panel2" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer"]
@@ -93,12 +107,13 @@ layout_mode = 2
 size_flags_vertical = 10
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/Panel2"]
+layout_mode = 0
 offset_left = 6.0
 offset_top = 42.0
 offset_right = 105.0
 offset_bottom = 67.0
 text = "Gloves"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
@@ -114,12 +129,13 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/Panel"]
+layout_mode = 0
 offset_left = -10.0
 offset_top = 19.0
 offset_right = 89.0
 offset_bottom = 44.0
 text = "Ring"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
@@ -129,12 +145,13 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/Panel3"]
+layout_mode = 0
 offset_left = 15.0
 offset_top = 63.0
 offset_right = 114.0
 offset_bottom = 88.0
 text = "Body"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
@@ -147,12 +164,13 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2/Panel2"]
+layout_mode = 0
 offset_left = -11.0
 offset_top = 8.0
 offset_right = 92.0
 offset_bottom = 33.0
 text = "Amulet"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2"]
@@ -162,12 +180,13 @@ size_flags_horizontal = 4
 size_flags_vertical = 10
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2/Panel3"]
+layout_mode = 0
 offset_left = -15.0
 offset_top = 16.0
 offset_right = 84.0
 offset_bottom = 41.0
 text = "Ring"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
@@ -187,12 +206,13 @@ size_flags_horizontal = 10
 size_flags_vertical = 0
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/Panel2"]
+layout_mode = 0
 offset_left = 17.0
 offset_top = 43.0
 offset_right = 116.0
 offset_bottom = 68.0
 text = "Cloak"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer"]
@@ -202,12 +222,13 @@ size_flags_horizontal = 10
 size_flags_vertical = 10
 
 [node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/Panel3"]
+layout_mode = 0
 offset_left = 14.0
 offset_top = 38.0
 offset_right = 113.0
 offset_bottom = 63.0
 text = "Boots"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="Panel2" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer"]
@@ -217,12 +238,13 @@ size_flags_horizontal = 4
 size_flags_vertical = 8
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/Panel2"]
+layout_mode = 0
 offset_left = 20.0
 offset_top = 32.0
 offset_right = 119.0
 offset_bottom = 57.0
 text = "Belt"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
@@ -242,7 +264,7 @@ size_flags_horizontal = 3
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/Panel"]
 layout_mode = 2
 text = "Other things"
-label_settings = ExtResource("1_2lx43")
+label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
 [node name="TabContainer" type="TabContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory"]

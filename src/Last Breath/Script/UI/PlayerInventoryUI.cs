@@ -4,7 +4,7 @@
     using Playground.Components;
     using Playground.Script.Helpers;
 
-    public partial class PlayerInventory : Control
+    public partial class PlayerInventoryUI : Control
     {
         private GridContainer? _equipInventory, _craftInventory;
         private Inventory? _inventoryEquip, _inventoryCrafting;

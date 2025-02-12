@@ -23,7 +23,6 @@ namespace Playground.Script.Inventory
         public override void _Ready()
         {
             _quantityLabel = GetNode<Label>("QuantityText");
-            // for mouseEntered and mouseExited events on each child control node mouse filter should be set to ignore
         }
 
         private void OnMouseEntered()

@@ -3,24 +3,26 @@
     using Godot;
     using Stateless;
 
-    public partial class PlayerUI : Control
+    public partial class MainUI : Control
     {
         private enum UIState { Main, Inventory, Quests, Map, Debug }
         private enum Trigger { ShowMain, ShowInventory, ShowQuests, ShowMap, ShowDebug }
 
         private StateMachine<UIState, Trigger>? _stateMachine;
         private Button? _characterBtn, _inventoryBtn, _questsBtn, _mapBtn, _debugBtn;
-        private PlayerInventory? _inventory;
+        private PlayerInventoryUI? _inventory;
         private MarginContainer? _uiBackground;
 
         public override void _Ready()
         {
             _stateMachine = new StateMachine<UIState, Trigger>(UIState.Main);
+            var parent = GetParent();
+            var owneer = GetOwner();
             var root = GetNode<MarginContainer>(nameof(MarginContainer));
             var buttons = root.GetNode<HBoxContainer>("HBoxContainerButtons");
             _inventoryBtn = buttons.GetNode<Button>("Inventory");
             _uiBackground = GetNode<MarginContainer>(nameof(MarginContainer));
-            _inventory = GetNode<PlayerInventory>(nameof(PlayerInventory));
+            _inventory = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
             SetEvents();
             ConfigureStateMachine();
             SetProcessUnhandledInput(true);
@@ -38,6 +40,23 @@
             }
         }
 
+        public override void _Input(InputEvent @event)
+        {
+            if (@event.IsActionPressed("Inventory"))
+            {
+                if (_stateMachine?.State != UIState.Inventory)
+                {
+                    _stateMachine?.Fire(Trigger.ShowInventory);
+                    GetViewport().SetInputAsHandled();
+                }
+                else
+                {
+                    _stateMachine?.Fire(Trigger.ShowMain);
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+        
         private void ConfigureStateMachine()
         {
             _stateMachine?.Configure(UIState.Main)
@@ -65,7 +84,9 @@
 
         private void SetEvents()
         {
-            _inventoryBtn!.Pressed += () => _stateMachine?.Fire(Trigger.ShowInventory);
+            _inventoryBtn!.Pressed += InventoryButtonPressed;
         }
+
+        private void InventoryButtonPressed() => _stateMachine?.Fire(Trigger.ShowInventory);
     }
 }

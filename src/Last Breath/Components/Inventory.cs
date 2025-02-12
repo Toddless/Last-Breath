@@ -3,7 +3,6 @@
     using Godot;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -11,21 +10,8 @@
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
-        private Action? _showInventory, _hideInventory;
 
-        //public Action? ShowInventory
-        //{
-        //    get => _showInventory;
-        //    set => _showInventory = value;
-        //}
-
-        //public Action? HideInventory
-        //{
-        //    get => _hideInventory;
-        //    set => _hideInventory = value;
-        //}
-
-        public void Initialize(int size, string path, GridContainer container/*, Action? hideInventory, Action? showInventory*/)
+        public void Initialize(int size, string path, GridContainer container)
         {
             _inventorySlot = ResourceLoader.Load<PackedScene>(path);
             for (int i = 0; i < size; i++)
@@ -34,8 +20,6 @@
                 container.AddChild(inventorySlot);
                 _slots.Add(inventorySlot);
             }
-            //_showInventory = showInventory;
-            //_hideInventory = hideInventory;
         }
 
         public void AddItem(Item item)
@@ -56,17 +40,6 @@
             }
         }
 
-        public void RemoveItem(Item item)
-        {
-            var slot = GetSlotToRemove(item);
-
-            if (slot == null)
-            {
-                return;
-            }
-            slot.RemoveItem(item);
-        }
-
         public InventorySlot? GetSlotToAdd(Item item)
         {
             return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Guid == item.Guid && itemSlot.Item.MaxStackSize >= item.Quantity));
@@ -76,8 +49,18 @@
         {
             // this method work correctly without first condition only if i equip or remove an item from right to left
             // cause if an item is removed from left to right, then after first cycle method return null
-            // and NullReferenceException is thrown
             return _slots.FirstOrDefault(x => x.Item != null && x.Item.Guid == item?.Guid);
+        }
+
+        public void RemoveItem(Item item)
+        {
+            var slot = GetSlotToRemove(item);
+
+            if (slot == null)
+            {
+                return;
+            }
+            slot.RemoveItem(item);
         }
 
         public int GetNumberOfItems(Item item)

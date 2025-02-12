@@ -1,35 +1,35 @@
 [gd_scene load_steps=8 format=3 uid="uid://boqqyrt0sfpve"]
 
-[ext_resource type="Script" path="res://Script/UI/PlayerUI.cs" id="1_e2js3"]
-[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_np2kp"]
-[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_5t0qn"]
-[ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/PlayerInventory.tscn" id="4_b8ogb"]
+[ext_resource type="Script" path="res://Script/UI/MainUI.cs" id="1_8jnuc"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
+[ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/UI/PlayerInventoryUI.tscn" id="3_pe3tt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hnvv8"]
-atlas = ExtResource("1_np2kp")
+atlas = ExtResource("1_v8awq")
 region = Rect2(0, 16, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pksnw"]
-atlas = ExtResource("2_5t0qn")
+atlas = ExtResource("2_ptkne")
 region = Rect2(0, 32, 64, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7mivm"]
-atlas = ExtResource("2_5t0qn")
+atlas = ExtResource("2_ptkne")
 region = Rect2(0, 32, 16, 16)
 
-[node name="PlayerUI" type="Control"]
-z_index = 2
+[node name="MainUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-script = ExtResource("1_e2js3")
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_8jnuc")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -102,6 +102,7 @@ size_flags_vertical = 0
 custom_minimum_size = Vector2(200, 180)
 layout_mode = 2
 
-[node name="PlayerInventory" parent="." instance=ExtResource("4_b8ogb")]
+[node name="PlayerInventoryUI" parent="." instance=ExtResource("3_pe3tt")]
 visible = false
-layout_mode = 1
+layout_mode = 2
+anchors_preset = 0
