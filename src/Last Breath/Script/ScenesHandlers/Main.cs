@@ -11,9 +11,9 @@
         private enum Trigger { StartBattle, EndBattle, Pause, Resume }
 
         private StateMachine<State, Trigger>? _machine;
-
         private MainWorld? _mainWorld;
         private CanvasLayer? _mainUI;
+        private CanvasLayer? _pauseMenu;
         private BattleLayer? _battleLayer;
         private BattleSceneHandler? _battleScene;
 
@@ -22,6 +22,7 @@
             _machine = new StateMachine<State, Trigger>(State.World);
             _mainWorld = GetNode<MainWorld>("MainWorld");
             _mainUI = GetNode<CanvasLayer>("MainUILayer");
+            _pauseMenu = GetNode<CanvasLayer>("PauseLayer");
             _battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
             _battleScene = _battleLayer.GetNode<BattleSceneHandler>("BattleScene");
             _mainWorld.PropertyChanged += NewBattleContextCreated;
@@ -53,10 +54,32 @@
               .OnEntry(() =>
               {
                   _mainWorld!.GetTree().Paused = true;
+                  _pauseMenu?.Show();
               })
-              .OnExit(() => _mainWorld!.GetTree().Paused = false)
+              .OnExit(() =>
+              {
+                  _mainWorld!.GetTree().Paused = false;
+                  _pauseMenu?.Hide();
+              })
               .Permit(Trigger.Resume, State.World);
         }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (@event.IsActionPressed("ui_cancel"))
+            {
+                if (_machine?.State == State.Paused)
+                {
+                    _machine?.Fire(Trigger.Resume);
+                }
+                else if (_machine?.State == State.World)
+                {
+                    _machine.Fire(Trigger.Pause);
+                }
+            }
+        }
+
+        public void FireResume()  => _machine?.Fire(Trigger.Resume);
 
         private void NewBattleContextCreated(object? sender, PropertyChangedEventArgs e)
         {

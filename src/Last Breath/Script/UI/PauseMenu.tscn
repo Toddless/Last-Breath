@@ -1,0 +1,91 @@
+[gd_scene load_steps=7 format=3 uid="uid://b03h1pcqbp3iw"]
+
+[ext_resource type="Texture2D" uid="uid://birlnsko8jyj4" path="res://Assets/PauseMenu_Placeholder.webp" id="1_253hr"]
+[ext_resource type="Script" path="res://Script/UI/PauseMenu.cs" id="1_dbrtl"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ivxo3"]
+[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/Options.tscn" id="3_u1gts"]
+[ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="5_cxf4b"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vf40p"]
+texture = ExtResource("1_253hr")
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_dbrtl")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+offset_right = 1680.0
+offset_bottom = 920.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_vf40p")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+offset_left = 1266.0
+offset_top = 408.0
+offset_right = 1680.0
+offset_bottom = 920.0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 150
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="ContinueBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "Continue"
+
+[node name="NewGameBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "New Game"
+
+[node name="SaveLoadBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "Save / Load"
+
+[node name="OptionsBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "Options"
+
+[node name="MainMenuBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "Main Menu"
+
+[node name="ExitBtn" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ivxo3")
+theme_override_font_sizes/font_size = 36
+text = "Exit"
+
+[node name="Options" parent="." instance=ExtResource("3_u1gts")]
+visible = false
+layout_mode = 2
+anchors_preset = 0
+
+[node name="SaveLoadMenu" parent="." instance=ExtResource("5_cxf4b")]
+visible = false
+layout_mode = 1
+focus_mode = 0

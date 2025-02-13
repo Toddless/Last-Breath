@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=9 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
@@ -6,9 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://boqqyrt0sfpve" path="res://Script/UI/MainUI.tscn" id="2_heqcp"]
 [ext_resource type="PackedScene" uid="uid://j6cqo6u0s83x" path="res://Script/UI/BattleUI.tscn" id="4_vfafg"]
 [ext_resource type="PackedScene" uid="uid://b5ardl26n1bo7" path="res://Scenes/BattleScene.tscn" id="4_wn8ry"]
+[ext_resource type="PackedScene" uid="uid://b03h1pcqbp3iw" path="res://Script/UI/PauseMenu.tscn" id="5_17akd"]
 [ext_resource type="Script" path="res://Script/UI/BattleLayer.cs" id="5_bee3c"]
 
 [node name="Main" type="Node2D"]
+process_mode = 3
 script = ExtResource("1_dp7k8")
 
 [node name="MainWorld" parent="." instance=ExtResource("1_l3ktu")]
@@ -20,6 +22,12 @@ z_index = 1
 
 [node name="MainUI" parent="MainUILayer" instance=ExtResource("2_heqcp")]
 metadata/_edit_use_anchors_ = true
+
+[node name="PauseLayer" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+
+[node name="PauseMenu" parent="PauseLayer" instance=ExtResource("5_17akd")]
 
 [node name="BattleLayer" type="CanvasLayer" parent="."]
 layer = 10

@@ -8,10 +8,10 @@
     public partial class MainMenu : Control
     {
         private const string Main = "res://Scenes/Main.tscn";
-        private enum UIState { Main, Options, SaveLoad }
+        private enum State { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }
 
-        private StateMachine<UIState, Trigger>? _stateMachine;
+        private StateMachine<State, Trigger>? _machine;
 
         private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
         private PackedScene? _main;
@@ -22,6 +22,7 @@
         public override void _Ready()
         {
             // don`t need to call GetParent here.
+            _machine = new StateMachine<State, Trigger>(State.Main);
             _marginContainer = GetNode<MarginContainer>(nameof(MarginContainer));
             var root = _marginContainer.GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
             _newGameButton = root.GetNode<Button>("NewGameBtn");
@@ -38,47 +39,59 @@
             ConfigureStateMachine();
         }
 
+        public override void _UnhandledKeyInput(InputEvent @event)
+        {
+            if (@event.IsActionPressed("ui_cancel"))
+            {
+                if (_machine!.State == State.Options || _machine.State == State.SaveLoad)
+                {
+                    _machine.Fire(Trigger.Return);
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+
         private void SetEvents()
         {
             GetViewport().SizeChanged += OnWindowSizeChanged;
-            _saveLoadMenu.ReturnPressed += ReturnButtonPressed;
             _loadGameButton.Pressed += LoadGamePressed;
             _newGameButton.Pressed += NewGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += QuitButtonPressed;
-            _optionsMenu.ExitPressed += ExitPressed;
+
+            _saveLoadMenu.ReturnPressed += ReturnPressed;
+            _optionsMenu.ReturnPressed += ReturnPressed;
         }
 
         private void ConfigureStateMachine()
         {
-            _stateMachine = new StateMachine<UIState, Trigger>(UIState.Main);
-            _stateMachine.Configure(UIState.Main)
+            _machine!.Configure(State.Main)
                 .OnEntry(() =>
                 {
                     _marginContainer?.Show();
                     _optionsMenu?.Hide();
                     _saveLoadMenu?.Hide();
                 })
-                .Permit(Trigger.ShowOptions, UIState.Options)
-                .Permit(Trigger.ShowSaveLoad, UIState.SaveLoad);
+                .Permit(Trigger.ShowOptions, State.Options)
+                .Permit(Trigger.ShowSaveLoad, State.SaveLoad);
 
-            _stateMachine.Configure(UIState.Options)
+            _machine.Configure(State.Options)
                 .OnEntry(() =>
                 {
                     _marginContainer?.Hide();
                     _optionsMenu?.Show();
                     _optionsMenu?.SetProcess(true);
                 })
-                .Permit(Trigger.Return, UIState.Main)
+                .Permit(Trigger.Return, State.Main)
                 .OnExit(() => _optionsMenu?.SetProcess(false));
 
-            _stateMachine.Configure(UIState.SaveLoad)
+            _machine.Configure(State.SaveLoad)
                 .OnEntry(() =>
                 {
                     _marginContainer?.Hide();
                     _saveLoadMenu?.Show();
                 })
-                .Permit(Trigger.Return, UIState.Main);
+                .Permit(Trigger.Return, State.Main);
         }
 
         private void OnWindowSizeChanged()
@@ -86,11 +99,9 @@
             if (DisplayServer.WindowGetMode() != DisplayServer.WindowMode.Fullscreen)
                 ScreenResizeExtension.CenterWindow();
         }
-
-        private void ReturnButtonPressed() => _stateMachine?.Fire(Trigger.Return);
-        private void LoadGamePressed() => _stateMachine?.Fire(Trigger.ShowSaveLoad);
-        private void ExitPressed() => _stateMachine?.Fire(Trigger.Return);
-        private void OptionsButtonPressed() => _stateMachine?.Fire(Trigger.ShowOptions);
+        private void LoadGamePressed() => _machine?.Fire(Trigger.ShowSaveLoad);
+        private void ReturnPressed() => _machine?.Fire(Trigger.Return);
+        private void OptionsButtonPressed() => _machine?.Fire(Trigger.ShowOptions);
         private void QuitButtonPressed() => GetTree().Quit();
         private void NewGamePressed() => GetTree().ChangeSceneToPacked(_main);
     }
