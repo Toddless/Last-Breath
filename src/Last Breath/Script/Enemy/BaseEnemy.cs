@@ -12,7 +12,6 @@ namespace Playground
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.Scenes;
-    using Playground.Script.StateMachine;
 
     [Inject]
     public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
@@ -37,7 +36,6 @@ namespace Playground
         private Area2D? _area;
         private BattleBehavior? _battleBehavior;
         private List<IAbility>? _abilities = new();
-        private StateMachine? _machine;
         private IBattleContext? _battleContext;
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
@@ -131,8 +129,7 @@ namespace Playground
             get => _enemyFight;
             set
             {
-                if (SetProperty(ref _enemyFight, value))
-                    IAmInBattle();
+                SetProperty(ref _enemyFight, value);
             }
         }
 
@@ -172,7 +169,6 @@ namespace Playground
             Inventory = new EnemyInventory();
             Inventory.Initialize(25,ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
@@ -234,8 +230,6 @@ namespace Playground
                 }
             }
         }
-
-        protected void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
 
         protected GlobalRarity EnemyRarity()
         {

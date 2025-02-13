@@ -4,8 +4,8 @@
     using Playground.Script.Helpers;
     using Playground.Script.Enemy;
     using Godot;
-    using System.ComponentModel;
     using System.Collections.Generic;
+    using System.ComponentModel;
 
     [Inject]
     public abstract partial class BaseSpawnableScene : ObservableNode2D
@@ -42,6 +42,6 @@
 
         protected abstract void ResolveDependencies();
 
-        public abstract void EnemyPropertyChanged(object? sender, PropertyChangedEventArgs e);
+        public abstract void EnemyReadyToFight(object? sender, PropertyChangedEventArgs e);
     }
 }

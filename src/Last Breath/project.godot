@@ -23,6 +23,7 @@ buses/default_bus_layout="res://Resource/default_bus_layout.tres"
 
 DiContainer="*res://DIComponents/DiContainer.cs"
 ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
+GameManager="*res://Script/GameManager.cs"
 
 [display]
 

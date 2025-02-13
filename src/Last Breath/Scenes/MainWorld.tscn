@@ -588,5 +588,3 @@ tile_set = SubResource("TileSet_jmesm")
 
 [node name="EnemySpawner" type="Node" parent="."]
 script = ExtResource("4_yvpx8")
-
-[node name="Timer" type="Timer" parent="EnemySpawner"]

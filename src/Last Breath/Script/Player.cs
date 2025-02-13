@@ -6,8 +6,9 @@
     using Playground.Components;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
+    using Playground.Script;
 
-    public partial class Player : CharacterBody2D, ICharacter
+    public partial class Player : ObservableCharacterBody2D, ICharacter
     {
         #region Private fields
         private AnimatedSprite2D? _sprite;
@@ -66,6 +67,7 @@
             _playerAttack = new(_effectManager.CalculateValues);
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
+            GameManager.Instance!.Player = this;
         }
 
         public override void _PhysicsProcess(double delta)

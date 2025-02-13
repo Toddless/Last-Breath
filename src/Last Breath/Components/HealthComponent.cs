@@ -24,17 +24,7 @@
                 }
                 return Mathf.RoundToInt(_currentHealth);
             }
-            set
-            {
-                if (value > _maxHealth)
-                {
-                    _currentHealth = _maxHealth;
-                }
-                else
-                {
-                    _currentHealth = value;
-                }
-            }
+            set => SetProperty(ref _currentHealth, Math.Min(value, _maxHealth));
         }
 
         public float IncreaseHealth

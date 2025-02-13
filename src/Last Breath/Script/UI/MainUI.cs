@@ -2,6 +2,7 @@
 {
     using Godot;
     using Stateless;
+    using System.ComponentModel;
 
     public partial class MainUI : Control
     {
@@ -12,21 +13,29 @@
         private Button? _characterBtn, _inventoryBtn, _questsBtn, _mapBtn, _debugBtn;
         private PlayerInventoryUI? _inventory;
         private MarginContainer? _uiBackground;
+        private TextureProgressBar? _playerHealth;
+        private GridContainer? _playerEffects;
 
         public override void _Ready()
         {
             _stateMachine = new StateMachine<UIState, Trigger>(UIState.Main);
-            var parent = GetParent();
-            var owneer = GetOwner();
             var root = GetNode<MarginContainer>(nameof(MarginContainer));
             var buttons = root.GetNode<HBoxContainer>("HBoxContainerButtons");
+            _playerHealth = root.GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<TextureProgressBar>("Health");
+            _playerEffects = root.GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<GridContainer>(nameof(GridContainer));
             _inventoryBtn = buttons.GetNode<Button>("Inventory");
             _uiBackground = GetNode<MarginContainer>(nameof(MarginContainer));
             _inventory = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
+
+            _playerHealth.MaxValue = GameManager.Instance.Player!.HealthComponent!.MaxHealth;
+            _playerHealth.Value = GameManager.Instance.Player!.HealthComponent.CurrentHealth;
+            GameManager.Instance.Player.HealthComponent.PropertyChanged += OnHealthChanged;
             SetEvents();
             ConfigureStateMachine();
             SetProcessUnhandledInput(true);
         }
+
+        private void OnHealthChanged(object? sender, PropertyChangedEventArgs e) => _playerHealth!.Value = GameManager.Instance.Player!.HealthComponent!.CurrentHealth;
 
         public override void _UnhandledInput(InputEvent @event)
         {

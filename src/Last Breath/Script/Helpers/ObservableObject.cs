@@ -6,6 +6,7 @@
     public class ObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+       // public event PropertyChangedWithValuesEventArgsEventHandler? PropertyChangedWithValues;
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
@@ -20,7 +21,10 @@
 
         protected virtual void OnPropertyChanged<T>(string? propertyName, T oldValue, T newValue)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedWithValuesEventArgs<T>(propertyName, oldValue, newValue));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+           // PropertyChangedWithValues?.Invoke(this, new PropertyChangedWithValuesEventArgs(propertyName, oldValue, newValue));
         }
     }
+
+  //  public delegate void PropertyChangedWithValuesEventArgsEventHandler(object? sender, PropertyChangedWithValuesEventArgs e);
 }

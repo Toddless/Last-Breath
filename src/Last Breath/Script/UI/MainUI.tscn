@@ -41,27 +41,28 @@ theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="VBoxContainerBars" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_constants/separation = 5
+theme_override_constants/separation = 2
 
-[node name="Health" type="TextureProgressBar" parent="MarginContainer/VBoxContainerBars"]
-custom_minimum_size = Vector2(270, 35)
+[node name="Health" type="TextureProgressBar" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
+value = 64.0
 nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_hnvv8")
 texture_progress = SubResource("AtlasTexture_pksnw")
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainerBars"]
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_constants/h_separation = 2
-columns = 10
+theme_override_constants/h_separation = 1
+columns = 11
 
-[node name="BuffDebuffIcons" type="TextureRect" parent="MarginContainer/VBoxContainerBars/GridContainer"]
+[node name="BuffDebuffIcons" type="TextureRect" parent="MarginContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(25, 25)
 layout_mode = 2
 texture = SubResource("AtlasTexture_7mivm")
@@ -93,12 +94,12 @@ text = "Map"
 layout_mode = 2
 text = "Dev Tools"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="Map" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 
-[node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/VBoxContainer"]
+[node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/Map"]
 custom_minimum_size = Vector2(200, 180)
 layout_mode = 2
 

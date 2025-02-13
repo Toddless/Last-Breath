@@ -4,24 +4,20 @@
     using System.Runtime.CompilerServices;
     using Godot;
 
-    public partial class ObservableNode : Node, INotifyPropertyChanged
+    public partial class ObservableLayer : CanvasLayer, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value))
+            {
                 return false;
+            }
 
-            var oldValue = field;
             field = value;
-            OnPropertyChanged(propertyName, oldValue, value);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             return true;
-        }
-
-        protected virtual void OnPropertyChanged<T>(string? propertyName, T oldValue, T newValue)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedWithValuesEventArgs<T>(propertyName, oldValue, newValue));
         }
     }
 }
