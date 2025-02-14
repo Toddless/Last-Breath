@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Helpers
 {
-    public static class KeyBindings
+    public static class Settings
     {
         public const string Resolution = nameof(Resolution);
         public const string WindowMode = "Window Mode";

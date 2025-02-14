@@ -30,7 +30,7 @@
 
         public override void _UnhandledKeyInput(InputEvent @event)
         {
-            if (@event.IsActionPressed(KeyBindings.Cancel))
+            if (@event.IsActionPressed(Settings.Cancel))
             {
                 if (_machine!.State == State.Options || _machine.State == State.SaveLoad)
                 {

@@ -77,7 +77,7 @@
                 return;
             }
 
-            Vector2 inputDirection = Input.GetVector(KeyBindings.MoveLeft, KeyBindings.MoveRight, KeyBindings.MoveUp, KeyBindings.MoveDown);
+            Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
             Velocity = inputDirection * Speed;
             MoveAndSlide();
         }

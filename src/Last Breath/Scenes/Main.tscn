@@ -1,14 +1,16 @@
-[gd_scene load_steps=13 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=15 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
 [ext_resource type="PackedScene" uid="uid://boqqyrt0sfpve" path="res://Script/UI/MainUI.tscn" id="2_heqcp"]
+[ext_resource type="Script" path="res://Script/UI/MainLayer.cs" id="4_irbx6"]
 [ext_resource type="PackedScene" uid="uid://j6cqo6u0s83x" path="res://Script/UI/BattleUI.tscn" id="4_vfafg"]
 [ext_resource type="PackedScene" uid="uid://b5ardl26n1bo7" path="res://Scenes/BattleScene.tscn" id="4_wn8ry"]
 [ext_resource type="PackedScene" uid="uid://b03h1pcqbp3iw" path="res://Script/UI/PauseMenu.tscn" id="5_17akd"]
 [ext_resource type="Script" path="res://Script/UI/BattleLayer.cs" id="5_bee3c"]
 [ext_resource type="Script" path="res://Script/UI/PauseLayer.cs" id="5_bjedh"]
+[ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/UI/PlayerInventoryUI.tscn" id="6_3tvjc"]
 [ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="6_7fdro"]
 [ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="7_uuajh"]
 [ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
@@ -23,11 +25,17 @@ script = ExtResource("1_dp7k8")
 z_index = 1
 
 [node name="MainLayer" type="CanvasLayer" parent="."]
+process_mode = 1
+script = ExtResource("4_irbx6")
 
 [node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
 metadata/_edit_use_anchors_ = true
 
+[node name="PlayerInventoryUI" parent="MainLayer" instance=ExtResource("6_3tvjc")]
+visible = false
+
 [node name="PauseLayer" type="CanvasLayer" parent="."]
+process_mode = 1
 layer = 2
 visible = false
 script = ExtResource("5_bjedh")
@@ -48,6 +56,7 @@ bus = &"Music"
 parameters/looping = true
 
 [node name="BattleLayer" type="CanvasLayer" parent="."]
+process_mode = 1
 layer = 10
 visible = false
 script = ExtResource("5_bee3c")

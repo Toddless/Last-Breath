@@ -19,9 +19,9 @@
         public override void _Ready()
         {
             _machine = new StateMachine<State, Trigger>(State.World);
-            _mainWorld = GetNode<MainWorld>("MainWorld");
+            _mainWorld = GetNode<MainWorld>(nameof(MainWorld));
 
-            _managerUI = new(GetNode<CanvasLayer>("MainLayer"), GetNode<PauseLayer>(nameof(PauseLayer)), GetNode<BattleLayer>(nameof(BattleLayer)));
+            _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)), GetNode<PauseLayer>(nameof(PauseLayer)), GetNode<BattleLayer>(nameof(BattleLayer)));
             _managerUI.SetReturn(ReturnToMainWorld);
             _managerUI.SetResume(FireResume);
             _managerUI.ConfigureStateMachine();
@@ -32,7 +32,7 @@
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            if (@event.IsActionPressed("ui_cancel"))
+            if (@event.IsActionPressed(Settings.Cancel))
             {
                 if (_machine?.State == State.Paused)
                 {
