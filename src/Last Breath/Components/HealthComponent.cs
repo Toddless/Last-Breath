@@ -13,6 +13,8 @@
         private float _currentHealth;
         private float _maxHealth;
 
+        public event Action<float>? CurrentHealthChanged, MaxHealthChanged;
+
         public float CurrentHealth
         {
             get
@@ -24,7 +26,11 @@
                 }
                 return Mathf.RoundToInt(_currentHealth);
             }
-            set => SetProperty(ref _currentHealth, Math.Min(value, _maxHealth));
+            set
+            {
+                if (SetProperty(ref _currentHealth, Math.Min(value, _maxHealth)))
+                    CurrentHealthChanged?.Invoke(value);
+            }
         }
 
         public float IncreaseHealth
@@ -50,7 +56,11 @@
         public float MaxHealth
         {
             get => Mathf.RoundToInt(_maxHealth);
-            private set => _maxHealth = value;
+            private set
+            {
+                if(SetProperty(ref _maxHealth, value))
+                    MaxHealthChanged?.Invoke(value);
+            }
         }
 
         public HealthComponent(Func<float, float, float, Parameter, float> calculateValue) : base(calculateValue)

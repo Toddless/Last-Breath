@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=18 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
@@ -12,8 +12,11 @@
 [ext_resource type="Script" path="res://Script/UI/PauseLayer.cs" id="5_bjedh"]
 [ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/UI/PlayerInventoryUI.tscn" id="6_3tvjc"]
 [ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="6_7fdro"]
+[ext_resource type="PackedScene" uid="uid://cqr8ohljxh8kt" path="res://Script/UI/QuestsMenu.tscn" id="7_637ag"]
 [ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="7_uuajh"]
 [ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
+[ext_resource type="PackedScene" uid="uid://b7ndt5b1q2dif" path="res://Script/UI/CharacterMenu.tscn" id="8_fr0w8"]
+[ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3
@@ -32,6 +35,15 @@ script = ExtResource("4_irbx6")
 metadata/_edit_use_anchors_ = true
 
 [node name="PlayerInventoryUI" parent="MainLayer" instance=ExtResource("6_3tvjc")]
+visible = false
+
+[node name="QuestsMenu" parent="MainLayer" instance=ExtResource("7_637ag")]
+visible = false
+
+[node name="CharacterMenu" parent="MainLayer" instance=ExtResource("8_fr0w8")]
+visible = false
+
+[node name="MapMenu" parent="MainLayer" instance=ExtResource("9_4lb6e")]
 visible = false
 
 [node name="PauseLayer" type="CanvasLayer" parent="."]

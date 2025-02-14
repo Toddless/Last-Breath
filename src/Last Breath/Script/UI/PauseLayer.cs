@@ -47,6 +47,8 @@
             _menu.Options += () => _machine?.Fire(Trigger.ToOptions);
             _menu.MainMenu += () => GetTree().ChangeSceneToPacked(MainMenu.InitializeAsPackedScene());
             _menu.Exit += () => GetTree().Quit();
+            _options!.ReturnPressed += () => _machine?.Fire(Trigger.Back);
+            _saveLoad!.ReturnPressed += () => _machine?.Fire(Trigger.Back);
         }
 
         private void ConfigureStateMachine()
@@ -62,19 +64,13 @@
                 .Permit(Trigger.ToSaveLoad, State.SaveLoad);
 
             _machine?.Configure(State.Options)
-                .OnEntry(() =>
-                {
-                    _options?.Show();
-                    _saveLoad?.Hide();
-                })
+                .OnEntry(() => { _options?.Show(); })
+                .OnExit(()=> { _options?.Hide(); })
                 .Permit(Trigger.Back, State.PauseMenu);
 
             _machine?.Configure(State.SaveLoad)
-                .OnEntry(() =>
-                {
-                    _options?.Hide();
-                    _saveLoad?.Show();
-                })
+                .OnEntry(() => { _saveLoad?.Show(); })
+                .OnExit(() => { _saveLoad?.Hide(); })
                 .Permit(Trigger.Back, State.PauseMenu);
         }
     }

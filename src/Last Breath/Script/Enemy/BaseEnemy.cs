@@ -192,22 +192,10 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
             var points = SetAttributesDependsOnType(_enemyType);
-            _attribute!.Dexterity!.PropertyChanged += OnDexterityChange;
-            _attribute.Strength!.PropertyChanged += OnStrengthChange;
-            _attribute!.Strength.Total += points.Strength;
+            _attribute!.Strength!.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
             EmitSignal(SignalName.EnemyInitialized);
-        }
-
-        protected void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e is PropertyChangedWithValuesEventArgs<int> args)
-            {
-                if (args.NewValue < args.OldValue)
-                {
-                }
-            }
         }
 
         protected void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
