@@ -9,6 +9,7 @@
     public partial class BattleSceneHandler : ObservableNode2D
     {
         private enum Results { EnemyWon, PlayerWon, PlayerRunAway }
+
         public event Action<float>? PlayerCurrentHealthChanged;
         public event Action<float>? EnemyCurrentHealthChanged;
 

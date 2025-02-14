@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://crpiglshqam38"]
 
-[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="1_jy0md"]
-[ext_resource type="Script" path="res://Script/UI/OptionsMenu.cs" id="1_s22oy"]
-[ext_resource type="PackedScene" uid="uid://cb1hvr35v8ujh" path="res://Script/UI/SettingsTab.tscn" id="3_o136d"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="4_xehp7"]
+[ext_resource type="Script" path="res://Script/UI/OptionsMenu.cs" id="1_y1hxi"]
+[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="2_svexm"]
+[ext_resource type="PackedScene" uid="uid://cb1hvr35v8ujh" path="res://Script/UI/SettingsTab.tscn" id="3_t131v"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="4_4fi0k"]
 
 [node name="Options" type="Control"]
 layout_mode = 3
@@ -12,7 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_s22oy")
+script = ExtResource("1_y1hxi")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -33,10 +33,10 @@ theme_override_constants/separation = -90
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Options"
-label_settings = ExtResource("1_jy0md")
+label_settings = ExtResource("2_svexm")
 horizontal_alignment = 1
 
-[node name="SettingsTab" parent="MarginContainer/VBoxContainer" instance=ExtResource("3_o136d")]
+[node name="SettingsTab" parent="MarginContainer/VBoxContainer" instance=ExtResource("3_t131v")]
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -49,7 +49,7 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("4_xehp7")
+theme_override_fonts/font = ExtResource("4_4fi0k")
 theme_override_font_sizes/font_size = 26
 text = "Return"
 
@@ -57,6 +57,6 @@ text = "Return"
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("4_xehp7")
+theme_override_fonts/font = ExtResource("4_4fi0k")
 theme_override_font_sizes/font_size = 26
 text = "Save"

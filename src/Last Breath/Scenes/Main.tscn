@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=13 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
@@ -8,6 +8,10 @@
 [ext_resource type="PackedScene" uid="uid://b5ardl26n1bo7" path="res://Scenes/BattleScene.tscn" id="4_wn8ry"]
 [ext_resource type="PackedScene" uid="uid://b03h1pcqbp3iw" path="res://Script/UI/PauseMenu.tscn" id="5_17akd"]
 [ext_resource type="Script" path="res://Script/UI/BattleLayer.cs" id="5_bee3c"]
+[ext_resource type="Script" path="res://Script/UI/PauseLayer.cs" id="5_bjedh"]
+[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="6_7fdro"]
+[ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="7_uuajh"]
+[ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3
@@ -18,16 +22,30 @@ script = ExtResource("1_dp7k8")
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
 
-[node name="MainUILayer" type="CanvasLayer" parent="."]
+[node name="MainLayer" type="CanvasLayer" parent="."]
 
-[node name="MainUI" parent="MainUILayer" instance=ExtResource("2_heqcp")]
+[node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
 metadata/_edit_use_anchors_ = true
 
 [node name="PauseLayer" type="CanvasLayer" parent="."]
 layer = 2
 visible = false
+script = ExtResource("5_bjedh")
 
 [node name="PauseMenu" parent="PauseLayer" instance=ExtResource("5_17akd")]
+
+[node name="OptionsMenu" parent="PauseLayer" instance=ExtResource("6_7fdro")]
+visible = false
+
+[node name="SaveLoadMenu" parent="PauseLayer" instance=ExtResource("7_uuajh")]
+visible = false
+focus_mode = 0
+
+[node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="PauseLayer"]
+stream = ExtResource("8_11jk4")
+autoplay = true
+bus = &"Music"
+parameters/looping = true
 
 [node name="BattleLayer" type="CanvasLayer" parent="."]
 layer = 10

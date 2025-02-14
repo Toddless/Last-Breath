@@ -1,20 +1,20 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Playground.Script.Helpers;
     using Playground.Script.Helpers.Extensions;
+    using Playground.Script.ScenesHandlers;
     using Playground.Script.UI;
     using Stateless;
 
     public partial class MainMenu : Control
     {
-        private const string Main = "res://Scenes/Main.tscn";
         private enum State { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }
 
         private StateMachine<State, Trigger>? _machine;
 
         private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
-        private PackedScene? _main;
         private OptionsMenu? _optionsMenu;
         private SaveLoadMenu? _saveLoadMenu;
         private MarginContainer? _marginContainer;
@@ -30,9 +30,8 @@
             _quitButton = root.GetNode<Button>("QuitBtn");
             _loadGameButton = root.GetNode<Button>("LoadGameBtn");
 
-            _optionsMenu = GetNode<OptionsMenu>("Options");
-            _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
-            _main = ResourceLoader.Load<PackedScene>(Main);
+            _optionsMenu = GetNode<OptionsMenu>(nameof(OptionsMenu));
+            _saveLoadMenu = GetNode<SaveLoadMenu>(nameof(SaveLoadMenu));
 
             SetEvents();
             ScreenResizeExtension.CenterWindow();
@@ -41,7 +40,7 @@
 
         public override void _UnhandledKeyInput(InputEvent @event)
         {
-            if (@event.IsActionPressed("ui_cancel"))
+            if (@event.IsActionPressed(KeyBindings.Cancel))
             {
                 if (_machine!.State == State.Options || _machine.State == State.SaveLoad)
                 {
@@ -103,6 +102,8 @@
         private void ReturnPressed() => _machine?.Fire(Trigger.Return);
         private void OptionsButtonPressed() => _machine?.Fire(Trigger.ShowOptions);
         private void QuitButtonPressed() => GetTree().Quit();
-        private void NewGamePressed() => GetTree().ChangeSceneToPacked(_main);
+        private void NewGamePressed() => GetTree().ChangeSceneToPacked(Main.InitializeAsPacked());
+
+        public static PackedScene InitializeAsPackedScene() => ResourceLoader.Load<PackedScene>(ScenePath.MainMenu);
     }
 }

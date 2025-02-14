@@ -18,11 +18,6 @@
             _saveButton.Pressed += SaveButtonPressed;
             _returnButton.Pressed += ReturnButtonPressed;
         }
-        public override void _GuiInput(InputEvent @event)
-        {
-            if (@event.IsActionPressed("ui_cancel"))
-                GD.Print("Call from OptionsMenu.cs");
-        }
 
         private Button GetPathToButton(string name) => GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<Button>(name);
 

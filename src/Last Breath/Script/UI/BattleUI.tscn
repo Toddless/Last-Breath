@@ -1,11 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://j6cqo6u0s83x"]
+[gd_scene load_steps=12 format=3 uid="uid://j6cqo6u0s83x"]
 
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
 [ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="1_th60w"]
 [ext_resource type="Script" path="res://Script/UI/BattleUI.cs" id="1_xg6rw"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
-[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="6_c7ckj"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
 texture = ExtResource("1_th60w")
@@ -17,8 +16,6 @@ region = Rect2(0, 16, 64, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_l5ci7"]
 atlas = ExtResource("2_tr072")
 region = Rect2(0, 32, 64, 16)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wxd0o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_msf74"]
 bg_color = Color(0.998882, 0.000266452, 0.87029, 1)
@@ -42,15 +39,12 @@ script = ExtResource("1_xg6rw")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 clip_contents = true
-layout_mode = 2
-offset_right = 1680.0
-offset_bottom = 920.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 25
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 25
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -99,86 +93,6 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 11
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel15" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel16" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel3" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel4" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel5" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel6" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel7" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel8" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel9" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel10" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel11" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel12" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel13" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel14" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
 [node name="EnemyEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects"]
 custom_minimum_size = Vector2(190, 50)
 layout_mode = 2
@@ -186,86 +100,6 @@ size_flags_horizontal = 10
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 11
-
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel15" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel16" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel3" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel4" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel5" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel6" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel7" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel8" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel9" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel10" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel11" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel12" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel13" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
-
-[node name="Panel14" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wxd0o")
 
 [node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -294,30 +128,12 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Panel"]
-layout_mode = 0
-offset_left = 30.0
-offset_top = 102.0
-offset_right = 224.0
-offset_bottom = 151.0
-text = "Player"
-label_settings = ExtResource("6_c7ckj")
-
 [node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
-
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Panel2"]
-layout_mode = 0
-offset_left = 18.0
-offset_top = 103.0
-offset_right = 212.0
-offset_bottom = 152.0
-text = "Enemy"
-label_settings = ExtResource("6_c7ckj")
 
 [node name="HBoxContainerAttackButtons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2

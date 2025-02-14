@@ -29,16 +29,16 @@
 
         public void LoadSettings(ConfigFileHandler config)
         {
-            _masterSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, SettingsParameter.Master);
-            _musicSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, SettingsParameter.Music);
-            _sfxSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, SettingsParameter.Sfx);
+            _masterSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, KeyBindings.Master);
+            _musicSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, KeyBindings.Music);
+            _sfxSlider!.Value = (float)config.LoadSetting(SettingsSection.Sound, KeyBindings.Sfx);
         }
 
         public void SaveSettings(ConfigFileHandler config)
         {
-            config.SaveSettings(SettingsSection.Sound, SettingsParameter.Master, _masterSlider!.Value);
-            config.SaveSettings(SettingsSection.Sound, SettingsParameter.Music, _musicSlider!.Value);
-            config.SaveSettings(SettingsSection.Sound, SettingsParameter.Sfx, _sfxSlider!.Value);
+            config.SaveSettings(SettingsSection.Sound, KeyBindings.Master, _masterSlider!.Value);
+            config.SaveSettings(SettingsSection.Sound, KeyBindings.Music, _musicSlider!.Value);
+            config.SaveSettings(SettingsSection.Sound, KeyBindings.Sfx, _sfxSlider!.Value);
         }
     }
 }

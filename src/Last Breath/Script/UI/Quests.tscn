@@ -40,6 +40,7 @@ size_flags_vertical = 3
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 1
 
 [node name="Panel" type="Panel" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2

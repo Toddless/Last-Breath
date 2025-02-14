@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.UI
 {
     using Godot;
+    using Playground.Script.Helpers;
     using Stateless;
     using System.ComponentModel;
 
@@ -39,7 +40,7 @@
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            if (@event.IsActionPressed("ui_cancel"))
+            if (@event.IsActionPressed(KeyBindings.Cancel))
             {
                 if (_stateMachine?.State != UIState.Main)
                 {
@@ -51,7 +52,7 @@
 
         public override void _Input(InputEvent @event)
         {
-            if (@event.IsActionPressed("Inventory"))
+            if (@event.IsActionPressed(KeyBindings.Inventory))
             {
                 if (_stateMachine?.State != UIState.Inventory)
                 {
@@ -73,9 +74,6 @@
                 {
                     _uiBackground?.Show();
                     _inventory?.Hide();
-                    /* _quests?.Hide();
-                     * _map?.Hide();
-                     */
                 })
                 .Permit(Trigger.ShowInventory, UIState.Inventory)
                 .Permit(Trigger.ShowQuests, UIState.Quests)

@@ -2,9 +2,9 @@
 {
     public static class SettingsSection
     {
-        public static readonly string Video = nameof(Video);
-        public static readonly string Sound = nameof(Sound);
-        public static readonly string Graphic = nameof(Graphic);
-        public static readonly string Keybinging = nameof(Keybinging);
+        public const string Video = nameof(Video);
+        public const string Sound = nameof(Sound);
+        public const string Graphic = nameof(Graphic);
+        public const string Keybinging = nameof(Keybinging);
     }
 }

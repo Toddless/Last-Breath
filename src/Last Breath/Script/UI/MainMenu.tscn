@@ -1,11 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://bd5wylwyowomd"]
+[gd_scene load_steps=8 format=3 uid="uid://bd5wylwyowomd"]
 
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="1_hrn6o"]
 [ext_resource type="Texture2D" uid="uid://d3s62mu2qu0f1" path="res://Assets/MainMenuBackground.png" id="1_kk64l"]
 [ext_resource type="Script" path="res://Script/UI/MainMenu.cs" id="1_ogonq"]
-[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/Options.tscn" id="4_7ktkb"]
+[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="4_7ktkb"]
 [ext_resource type="AudioStream" uid="uid://c41u82tba0tul" path="res://Assets/Sounds/mainTheme.mp3" id="5_gnfau"]
 [ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="5_ki6sx"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gssjr"]
+texture = ExtResource("1_kk64l")
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -18,14 +21,14 @@ focus_mode = 2
 script = ExtResource("1_ogonq")
 metadata/_edit_use_anchors_ = true
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TextureRect" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_kk64l")
+theme_override_styles/panel = SubResource("StyleBoxTexture_gssjr")
 metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -92,7 +95,7 @@ theme_override_fonts/font = ExtResource("1_hrn6o")
 theme_override_font_sizes/font_size = 36
 text = "Quit"
 
-[node name="Options" parent="." instance=ExtResource("4_7ktkb")]
+[node name="OptionsMenu" parent="." instance=ExtResource("4_7ktkb")]
 visible = false
 layout_mode = 1
 

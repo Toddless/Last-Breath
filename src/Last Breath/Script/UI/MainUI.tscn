@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://boqqyrt0sfpve"]
+[gd_scene load_steps=9 format=3 uid="uid://boqqyrt0sfpve"]
 
 [ext_resource type="Script" path="res://Script/UI/MainUI.cs" id="1_8jnuc"]
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
 [ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/UI/PlayerInventoryUI.tscn" id="3_pe3tt"]
+[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="4_582ut"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hnvv8"]
 atlas = ExtResource("1_v8awq")
@@ -96,8 +97,24 @@ size_flags_horizontal = 8
 size_flags_vertical = 0
 
 [node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/Map"]
-custom_minimum_size = Vector2(200, 180)
+custom_minimum_size = Vector2(350, 280)
 layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/Map/PlaceHolderForMinimap"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Map"
+label_settings = ExtResource("4_582ut")
 
 [node name="PlayerInventoryUI" parent="." instance=ExtResource("3_pe3tt")]
 visible = false

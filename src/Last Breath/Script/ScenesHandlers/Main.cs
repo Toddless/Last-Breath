@@ -2,6 +2,7 @@
 {
     using System.ComponentModel;
     using Godot;
+    using Playground.Script.Helpers;
     using Playground.Script.UI;
     using Stateless;
 
@@ -11,57 +12,22 @@
         private enum Trigger { StartBattle, EndBattle, Pause, Resume }
 
         private StateMachine<State, Trigger>? _machine;
+
         private MainWorld? _mainWorld;
-        private CanvasLayer? _mainUI;
-        private CanvasLayer? _pauseMenu;
-        private BattleLayer? _battleLayer;
-        private BattleSceneHandler? _battleScene;
+        private ManagerUI? _managerUI;
 
         public override void _Ready()
         {
             _machine = new StateMachine<State, Trigger>(State.World);
             _mainWorld = GetNode<MainWorld>("MainWorld");
-            _mainUI = GetNode<CanvasLayer>("MainUILayer");
-            _pauseMenu = GetNode<CanvasLayer>("PauseLayer");
-            _battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
-            _battleScene = _battleLayer.GetNode<BattleSceneHandler>("BattleScene");
+
+            _managerUI = new(GetNode<CanvasLayer>("MainLayer"), GetNode<PauseLayer>(nameof(PauseLayer)), GetNode<BattleLayer>(nameof(BattleLayer)));
+            _managerUI.SetReturn(ReturnToMainWorld);
+            _managerUI.SetResume(FireResume);
+            _managerUI.ConfigureStateMachine();
+
             _mainWorld.PropertyChanged += NewBattleContextCreated;
-            _battleLayer.ReturnToMainWorld = ReturnToMainWorld;
             ConfigureStateMachine();
-        }
-
-        private void ConfigureStateMachine()
-        {
-            _machine?.Configure(State.World)
-                .Permit(Trigger.StartBattle, State.Battle)
-                .Permit(Trigger.Pause, State.Paused);
-
-            _machine?.Configure(State.Battle)
-                .OnEntry(() =>
-                {
-                    _battleLayer!.BattleContext = _mainWorld!.Fight!;
-                    _mainUI?.Hide();
-                })
-                .OnExit(() =>
-                {
-                    _mainUI?.Show();
-                    _mainWorld!.Fight = null;
-                    _mainWorld.ResetBattleState();
-                })
-                .Permit(Trigger.EndBattle, State.World);
-
-            _machine?.Configure(State.Paused)
-              .OnEntry(() =>
-              {
-                  _mainWorld!.GetTree().Paused = true;
-                  _pauseMenu?.Show();
-              })
-              .OnExit(() =>
-              {
-                  _mainWorld!.GetTree().Paused = false;
-                  _pauseMenu?.Hide();
-              })
-              .Permit(Trigger.Resume, State.World);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -79,7 +45,9 @@
             }
         }
 
-        public void FireResume()  => _machine?.Fire(Trigger.Resume);
+        public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
+
+        private void FireResume() => _machine?.Fire(Trigger.Resume);
 
         private void NewBattleContextCreated(object? sender, PropertyChangedEventArgs e)
         {
@@ -89,6 +57,7 @@
 
         private void ReturnToMainWorld(BattleResult result)
         {
+            var battleScene = GetNode<BattleLayer>(nameof(BattleLayer)).GetNode<BattleSceneHandler>("BattleScene");
             if (result.EnemyKilled)
             {
                 _mainWorld?.Enemies?.Remove(result.Enemy);
@@ -96,13 +65,48 @@
             else
             {
                 result.Enemy.Position += new Vector2(30, 30);
-                _battleScene?.CallDeferred("remove_child", result.Enemy);
+                battleScene?.CallDeferred("remove_child", result.Enemy);
                 _mainWorld?.CallDeferred("add_child", result.Enemy);
             }
 
-            _battleScene!.CallDeferred("remove_child", result.Player);
+            battleScene!.CallDeferred("remove_child", result.Player);
             _mainWorld!.CallDeferred("add_child", result.Player);
             _machine?.Fire(Trigger.EndBattle);
+        }
+
+        private void ConfigureStateMachine()
+        {
+            _machine?.Configure(State.World)
+                .Permit(Trigger.StartBattle, State.Battle)
+                .Permit(Trigger.Pause, State.Paused);
+
+            _machine?.Configure(State.Battle)
+                .OnEntry(() =>
+                {
+                    var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
+                    battleLayer!.BattleContext = _mainWorld!.Fight!;
+                    _managerUI?.ShowBattleUI();
+                })
+                .OnExit(() =>
+                {
+                    _managerUI?.ShowMainUI();
+                    _mainWorld!.Fight = null;
+                    _mainWorld.ResetBattleState();
+                })
+                .Permit(Trigger.EndBattle, State.World);
+
+            _machine?.Configure(State.Paused)
+              .OnEntry(() =>
+              {
+                  _mainWorld!.ProcessMode = ProcessModeEnum.Disabled;
+                  _managerUI?.ShowPauseUI();
+              })
+              .OnExit(() =>
+              {
+                  _mainWorld!.ProcessMode = ProcessModeEnum.Inherit;
+                  _managerUI?.ShowMainUI();
+              })
+              .Permit(Trigger.Resume, State.World);
         }
     }
 }

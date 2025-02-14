@@ -46,14 +46,14 @@
 
         public void LoadSettings(ConfigFileHandler config)
         {
-            ResolutionItemSelected(_resolutionOptions.Selected = (int)config.LoadSetting(SettingsSection.Video, SettingsParameter.Resolution));
-            WindowModeItemSelected(_windowModeOptions.Selected = (int)config.LoadSetting(SettingsSection.Video, SettingsParameter.WindowMode));
+            ResolutionItemSelected(_resolutionOptions.Selected = (int)config.LoadSetting(SettingsSection.Video, KeyBindings.Resolution));
+            WindowModeItemSelected(_windowModeOptions.Selected = (int)config.LoadSetting(SettingsSection.Video, KeyBindings.WindowMode));
         }
 
         public void SaveSettings(ConfigFileHandler config)
         {
-            config.SaveSettings(SettingsSection.Video, SettingsParameter.WindowMode, _windowModeOptions.Selected);
-            config.SaveSettings(SettingsSection.Video, SettingsParameter.Resolution, _resolutionOptions.Selected);
+            config.SaveSettings(SettingsSection.Video, KeyBindings.WindowMode, _windowModeOptions.Selected);
+            config.SaveSettings(SettingsSection.Video, KeyBindings.Resolution, _resolutionOptions.Selected);
         }
 
         private void ResolutionItemSelected(long index)

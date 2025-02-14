@@ -14,17 +14,17 @@
             if (!FileAccess.FileExists(ConfigFilePath))
             {
                 _config?.SetValue(SettingsSection.Keybinging, "Equip", "mouse_2");
-                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveLeft, "A");
-                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveRight, "D");
-                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveUp, "W");
-                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.MoveDown, "S");
-                _config?.SetValue(SettingsSection.Keybinging, SettingsParameter.Inventory, "I");
+                _config?.SetValue(SettingsSection.Keybinging, KeyBindings.MoveLeft, "A");
+                _config?.SetValue(SettingsSection.Keybinging, KeyBindings.MoveRight, "D");
+                _config?.SetValue(SettingsSection.Keybinging, KeyBindings.MoveUp, "W");
+                _config?.SetValue(SettingsSection.Keybinging, KeyBindings.MoveDown, "S");
+                _config?.SetValue(SettingsSection.Keybinging, KeyBindings.Inventory, "I");
 
-                _config?.SetValue(SettingsSection.Video, SettingsParameter.Resolution, 0);
-                _config?.SetValue(SettingsSection.Video, SettingsParameter.WindowMode, 1);
-                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Master, 0.1);
-                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Music, 0.1);
-                _config?.SetValue(SettingsSection.Sound, SettingsParameter.Sfx, 0.1);
+                _config?.SetValue(SettingsSection.Video, KeyBindings.Resolution, 0);
+                _config?.SetValue(SettingsSection.Video, KeyBindings.WindowMode, 1);
+                _config?.SetValue(SettingsSection.Sound, KeyBindings.Master, 0.1);
+                _config?.SetValue(SettingsSection.Sound, KeyBindings.Music, 0.1);
+                _config?.SetValue(SettingsSection.Sound, KeyBindings.Sfx, 0.1);
 
                 _config?.Save(ConfigFilePath);
             }
