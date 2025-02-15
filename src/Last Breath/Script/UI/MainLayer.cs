@@ -1,14 +1,13 @@
 ﻿namespace Playground.Script.UI
 {
-    using System;
     using Godot;
     using Playground.Script.Helpers;
     using Stateless;
 
     public partial class MainLayer : CanvasLayer
     {
-        private enum State { Main, Character, Inventory, Quests, Map, Debug }
-        private enum Trigger { ShowMain, ShowCharacter, ShowInventory, ShowQuests, ShowMap, ShowDebug }
+        private enum State { Main, Character, Inventory, Quests, Map }
+        private enum Trigger { ShowMain, ShowCharacter, ShowInventory, ShowQuests, ShowMap }
 
         private StateMachine<State, Trigger>? _machine;
 
@@ -17,7 +16,6 @@
         private QuestsMenu? _questsUI;
         private CharacterMenu? _characterUI;
         private MapMenu? _mapUI;
-        /* private DebugUI _debugUI; */
 
         public override void _Ready()
         {
@@ -47,7 +45,6 @@
             _mainUI.Character += () => _machine?.Fire(Trigger.ShowCharacter);
             _mainUI.Quests += () => _machine?.Fire(Trigger.ShowQuests);
             _mainUI.Map += () => _machine?.Fire(Trigger.ShowMap);
-            //_mainUI.Debug += () => _machine?.Fire(Trigger.ShowDebug);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -122,14 +119,12 @@
                     _questsUI?.Hide();
                     _characterUI?.Hide();
                     _mapUI?.Hide();
-                    /* _debugUI?.Hide();*/
                 })
                 .OnExit(() => { _mainUI?.Hide(); })
                 .Permit(Trigger.ShowCharacter, State.Character)
                 .Permit(Trigger.ShowInventory, State.Inventory)
                 .Permit(Trigger.ShowQuests, State.Quests)
-                .Permit(Trigger.ShowMap, State.Map)
-                .Permit(Trigger.ShowDebug, State.Debug);
+                .Permit(Trigger.ShowMap, State.Map);
 
             _machine?.Configure(State.Character)
                 .OnEntry(() => { _characterUI?.Show(); })
@@ -137,7 +132,6 @@
                 .Permit(Trigger.ShowInventory, State.Inventory)
                 .Permit(Trigger.ShowQuests, State.Quests)
                 .Permit(Trigger.ShowMap, State.Map)
-                .Permit(Trigger.ShowDebug, State.Debug)
                 .Permit(Trigger.ShowMain, State.Main);
 
             _machine?.Configure(State.Inventory)
@@ -146,7 +140,6 @@
                 .Permit(Trigger.ShowCharacter, State.Character)
                 .Permit(Trigger.ShowQuests, State.Quests)
                 .Permit(Trigger.ShowMap, State.Map)
-                .Permit(Trigger.ShowDebug, State.Debug)
                 .Permit(Trigger.ShowMain, State.Main);
 
             _machine?.Configure(State.Quests)
@@ -155,7 +148,6 @@
                 .Permit(Trigger.ShowCharacter, State.Character)
                 .Permit(Trigger.ShowInventory, State.Inventory)
                 .Permit(Trigger.ShowMap, State.Map)
-                .Permit(Trigger.ShowDebug, State.Debug)
                 .Permit(Trigger.ShowMain, State.Main);
 
             _machine?.Configure(State.Map)
@@ -164,16 +156,6 @@
                 .Permit(Trigger.ShowCharacter, State.Character)
                 .Permit(Trigger.ShowInventory, State.Inventory)
                 .Permit(Trigger.ShowQuests, State.Quests)
-                .Permit(Trigger.ShowDebug, State.Debug)
-                .Permit(Trigger.ShowMain, State.Main);
-
-            _machine?.Configure(State.Debug)
-                .OnEntry(() => { /*_debugUI?.Show();*/})
-                .OnExit(() => { /*_debugUI?.Hide();*/ })
-                .Permit(Trigger.ShowCharacter, State.Character)
-                .Permit(Trigger.ShowInventory, State.Inventory)
-                .Permit(Trigger.ShowQuests, State.Quests)
-                .Permit(Trigger.ShowMap, State.Map)
                 .Permit(Trigger.ShowMain, State.Main);
         }
     }

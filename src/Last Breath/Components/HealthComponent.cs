@@ -30,26 +30,33 @@
             {
                 if (SetProperty(ref _currentHealth, Math.Min(value, _maxHealth)))
                     CurrentHealthChanged?.Invoke(value);
+                GD.Print($"Current health {CurrentHealth}");
             }
         }
 
+        [Changeable]
         public float IncreaseHealth
         {
             get => _increaseHealth;
             set
             {
                 if (SetProperty(ref _increaseHealth, value))
+                {
                     UpdateProperties();
+                }
             }
         }
 
+        [Changeable]
         public float AdditionalHealth
         {
             get => _additionalHealth;
             set
             {
                 if (SetProperty(ref _additionalHealth, value))
+                {
                     UpdateProperties();
+                }
             }
         }
 
@@ -58,7 +65,7 @@
             get => Mathf.RoundToInt(_maxHealth);
             private set
             {
-                if(SetProperty(ref _maxHealth, value))
+                if (SetProperty(ref _maxHealth, value))
                     MaxHealthChanged?.Invoke(value);
             }
         }

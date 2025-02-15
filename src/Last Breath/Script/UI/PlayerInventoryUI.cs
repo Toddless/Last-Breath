@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script.UI
 {
-    using System;
     using Godot;
     using Playground.Components;
     using Playground.Script.Helpers;
@@ -31,18 +30,18 @@
             _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
         }
 
-        public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $" {value}";
+        public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $"Health: {value}";
 
-        public void UpdateMaxHealth(int value) => _maxHealth!.Text = $" {value}";
+        public void UpdateMaxHealth(int value) => _maxHealth!.Text = $"Max Health: {value}";
 
-        public void UpdateDamage(int minDamage, int maxDamage) => _damage!.Text = $" {minDamage} - {maxDamage}";
+        public void UpdateDamage(int minDamage, int maxDamage) => _damage!.Text = $"Damage: {minDamage} - {maxDamage}";
 
-        public void UpdateCriticalChance(float criticalChance) => _criticalChance!.Text = $" {criticalChance * 100}";
+        public void UpdateCriticalChance(float criticalChance) => _criticalChance!.Text = $"Critical Strike Chance: {criticalChance * 100}%";
 
-        public void UpdateCriticalDamage(float criticalDamage) => _criticalDamage!.Text = $" {criticalDamage * 100}";
+        public void UpdateCriticalDamage(float criticalDamage) => _criticalDamage!.Text = $"Critical Damage: {criticalDamage * 100}%";
 
-        public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $" {chance * 100}";
+        public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $"Dodge Chance: {chance * 100}%";
 
-        public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" {chance * 100}";
+        public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" Extra Hit Chance {chance * 100}%";
     }
 }

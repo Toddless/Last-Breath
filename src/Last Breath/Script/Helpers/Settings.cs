@@ -17,5 +17,6 @@
         public const string Quests = "ui_quests";
         public const string Character = "ui_character";
         public const string Map = "ui_map";
+        public const string Dev = "ui_dev";
     }
 }

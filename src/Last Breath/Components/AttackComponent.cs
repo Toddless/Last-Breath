@@ -58,6 +58,7 @@ namespace Playground
         public event Action<float, float> CurrentDamageChanged;
         #region Additional Values
 
+        [Changeable]
         public float AdditionalMinDamage
         {
             get => _additionalMinDamage;
@@ -69,6 +70,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalMaxDamage
         {
             get => _additionalMaxDamage;
@@ -80,6 +82,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalCriticalDamage
         {
             get => _additionalCriticalDamage;
@@ -91,6 +94,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalCriticalChance
         {
             get => _additionalCriticalChance;
@@ -102,6 +106,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalExtraHitChance
         {
             get => _additionalExtraHitChance;
@@ -112,7 +117,10 @@ namespace Playground
                     CurrentExtraHitChance = CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
             }
         }
+        #endregion
 
+        #region Increases
+        [Changeable]
         public float IncreaseCriticalChance
         {
             get => _increaseCriticalChance;
@@ -124,6 +132,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float IncreaseExtraHitChance
         {
             get => _increaseExtraHitChance;
@@ -136,6 +145,7 @@ namespace Playground
 
         }
 
+        [Changeable]
         public float IncreaseDamage
         {
             get => _increaseDamage;

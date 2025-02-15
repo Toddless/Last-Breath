@@ -265,43 +265,43 @@ theme_override_constants/separation = 10
 [node name="CurrentHealth" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Health : 120"
+text = "Health : "
 label_settings = ExtResource("3_metwe")
 
 [node name="MaxHealth" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "MaxHealth : 320"
+text = "Max Health : "
 label_settings = ExtResource("3_metwe")
 
 [node name="Damage" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Damage : 10 - 25"
+text = "Damage : "
 label_settings = ExtResource("3_metwe")
 
 [node name="CriticalChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Critical Strike Chance: 15%"
+text = "Critical Strike Chance: "
 label_settings = ExtResource("3_metwe")
 
 [node name="CriticalDamage" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Critical Strike Damage: 130%"
+text = "Critical Strike Damage: "
 label_settings = ExtResource("3_metwe")
 
 [node name="DodgeChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Dodge Chance: 15%"
+text = "Dodge Chance: "
 label_settings = ExtResource("3_metwe")
 
 [node name="ExtraHitChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Extra Hit Chance: 15%"
+text = "Extra Hit Chance: "
 label_settings = ExtResource("3_metwe")
 
 [node name="VBoxContainerInventory" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]

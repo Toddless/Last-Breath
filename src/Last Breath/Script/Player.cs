@@ -43,12 +43,15 @@
             set => _canMove = value;
         }
         [Export]
+        [Changeable]
         public int Speed { get; set; } = 200;
+        [Changeable]
         public HealthComponent? HealthComponent
         {
             get => _playerHealth;
             set => _playerHealth = value;
         }
+        [Changeable]
         public AttackComponent? AttackComponent
         {
             get => _playerAttack;

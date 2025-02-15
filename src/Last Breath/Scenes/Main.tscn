@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=20 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
@@ -17,6 +17,8 @@
 [ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
 [ext_resource type="PackedScene" uid="uid://b7ndt5b1q2dif" path="res://Script/UI/CharacterMenu.tscn" id="8_fr0w8"]
 [ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
+[ext_resource type="Script" path="res://Script/UI/DevLayer.cs" id="18_lw5ck"]
+[ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://Script/UI/DevTools.tscn" id="19_yuu34"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3
@@ -69,10 +71,17 @@ parameters/looping = true
 
 [node name="BattleLayer" type="CanvasLayer" parent="."]
 process_mode = 1
-layer = 10
+layer = 2
 visible = false
 script = ExtResource("5_bee3c")
 
 [node name="BattleScene" parent="BattleLayer" instance=ExtResource("4_wn8ry")]
 
 [node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]
+
+[node name="DevLayer" type="CanvasLayer" parent="."]
+layer = 4
+visible = false
+script = ExtResource("18_lw5ck")
+
+[node name="DevTools" parent="DevLayer" instance=ExtResource("19_yuu34")]

@@ -8,6 +8,9 @@
 
     public partial class Main : Node2D
     {
+#if DEBUG
+        private bool _devOpened = false;
+#endif
         private enum State { World, Battle, Paused }
         private enum Trigger { StartBattle, EndBattle, Pause, Resume }
 
@@ -21,7 +24,14 @@
             _machine = new StateMachine<State, Trigger>(State.World);
             _mainWorld = GetNode<MainWorld>(nameof(MainWorld));
 
-            _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)), GetNode<PauseLayer>(nameof(PauseLayer)), GetNode<BattleLayer>(nameof(BattleLayer)));
+            _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)),
+                GetNode<PauseLayer>(nameof(PauseLayer)),
+                GetNode<BattleLayer>(nameof(BattleLayer)),
+#if !DEBUG
+                null);
+#else
+                GetNode<DevLayer>(nameof(DevLayer)));
+#endif
             _managerUI.SetReturn(ReturnToMainWorld);
             _managerUI.SetResume(FireResume);
             _managerUI.ConfigureStateMachine();
@@ -43,6 +53,21 @@
                     _machine.Fire(Trigger.Pause);
                 }
             }
+#if DEBUG
+            if (@event.IsActionPressed(Settings.Dev))
+            {
+                if (!_devOpened)
+                {
+                    _managerUI?.ShowDevTools();
+                    _devOpened = true;
+                }
+                else
+                {
+                    _managerUI?.HideDevTools();
+                    _devOpened = false;
+                }
+            }
+#endif
         }
 
         public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);

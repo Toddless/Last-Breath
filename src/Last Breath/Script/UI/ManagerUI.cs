@@ -4,22 +4,26 @@
     using Godot;
     using Stateless;
 
-    public class ManagerUI(CanvasLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI)
+    public class ManagerUI(CanvasLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer)
     {
-        private enum State { MainUI, PauseUI, BattleUI }
-        private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI }
+        private enum State { MainUI, PauseUI, BattleUI, DevTools }
+        private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI, ShowDevTools }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.MainUI);
         private readonly CanvasLayer _mainLayer = mainUI;
         private readonly PauseLayer _pauseLayer = pauseUI;
         private readonly BattleLayer _battleLayer = battleUI;
+        private readonly DevLayer? _devLayer = devLayer;
 
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
         public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void ShowBattleUI() => _machine.Fire(Trigger.ShowBattleUI);
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
-
+#if DEBUG
+        public void ShowDevTools() => _devLayer?.Show();
+        public void HideDevTools() => _devLayer?.Hide();
+#endif
         public void ConfigureStateMachine()
         {
             _machine?.Configure(State.MainUI)
@@ -29,6 +33,7 @@
                     _mainLayer.SetProcessUnhandledInput(true);
                     _pauseLayer.Hide();
                     _battleLayer.Hide();
+                    _devLayer?.Hide();
                 })
                 .OnExit(() =>
                 {

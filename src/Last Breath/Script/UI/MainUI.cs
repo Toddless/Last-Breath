@@ -5,7 +5,7 @@
 
     public partial class MainUI : Control
     {
-        private Button? _characterBtn, _inventoryBtn, _questsBtn, _mapBtn, _debugBtn;
+        private Button? _characterBtn, _inventoryBtn, _questsBtn, _mapBtn;
         private TextureProgressBar? _playerHealth;
         private GridContainer? _playerEffects;
 
@@ -41,8 +41,6 @@
             _characterBtn!.Pressed += () => Character?.Invoke();
             _questsBtn!.Pressed += () => Quests?.Invoke();
             _mapBtn!.Pressed += () => Map?.Invoke();
-            //_debugBtn.Pressed += () => Debug?.Invoke();
         }
-
     }
 }
