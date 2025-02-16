@@ -2,6 +2,7 @@
 {
     using System;
     using Godot;
+    using Playground.Script.Helpers;
 
     public partial class MainUI : Control
     {
@@ -14,21 +15,20 @@
 
         public override void _Ready()
         {
-            var root = GetNode<MarginContainer>(nameof(MarginContainer));
-            var buttons = root.GetNode<HBoxContainer>("HBoxContainerButtons");
-            _playerHealth = root.GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<TextureProgressBar>("Health");
-            _playerEffects = root.GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<GridContainer>(nameof(GridContainer));
-            _inventoryBtn = buttons.GetNode<Button>("Inventory");
-            _questsBtn = buttons.GetNode<Button>("Quests");
-            _characterBtn = buttons.GetNode<Button>("Character");
-            _mapBtn = buttons.GetNode<Button>("Map");
+            _playerHealth = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "Health");
+            _playerEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "Effects");
+            _inventoryBtn = (Button?)NodeFinder.FindBFSCached(this, "Inventory");
+            _questsBtn = (Button?)NodeFinder.FindBFSCached(this, "Quests");
+            _characterBtn = (Button?)NodeFinder.FindBFSCached(this, "Character");
+            _mapBtn = (Button?)NodeFinder.FindBFSCached(this, "Map");
             var player = GameManager.Instance.Player;
             if (player != null)
             {
-                _playerHealth.MaxValue = player.HealthComponent!.MaxHealth;
+                _playerHealth!.MaxValue = player.HealthComponent!.MaxHealth;
                 _playerHealth.Value = player.HealthComponent.CurrentHealth;
             }
 
+            NodeFinder.ClearCache();
             SetEvents();
         }
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://cqr8ohljxh8kt"]
 
-[ext_resource type="Script" path="res://Script/UI/QuestsMenu.cs" id="1_l0i88"]
+[ext_resource type="Script" path="res://Script/UI/View/QuestsMenu.cs" id="1_l0i88"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_bax32"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="2_upioa"]
 [ext_resource type="LabelSettings" uid="uid://bvl3lfttlwy3" path="res://Fonts/HeadingsSettings.tres" id="3_ncypl"]
@@ -96,12 +96,12 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerMain/MarginContainer"]
+[node name="MainQuests" type="VBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerMain/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.55
 
-[node name="Label" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerMain/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerMain/MarginContainer/MainQuests"]
 layout_mode = 2
 text = "Survive"
 label_settings = ExtResource("4_b800w")
@@ -127,12 +127,12 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerSide/MarginContainer"]
+[node name="SideQuests" type="VBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerSide/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerSide/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainerSide/MarginContainer/SideQuests"]
 layout_mode = 2
 text = "Crooked Boar Rats"
 label_settings = ExtResource("4_b800w")
@@ -162,7 +162,7 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="RichTextLabel" type="RichTextLabel" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer"]
+[node name="QuestDescription" type="RichTextLabel" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer"]
 clip_contents = false
 layout_mode = 2
 theme_override_constants/line_separation = 3
@@ -185,7 +185,7 @@ layout_mode = 2
 text = "Progress: "
 label_settings = ExtResource("4_b800w")
 
-[node name="Label2" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Target" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "1 / 5"
 label_settings = ExtResource("4_b800w")

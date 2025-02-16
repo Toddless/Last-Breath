@@ -21,18 +21,16 @@
 
         public override void _Ready()
         {
-            // don`t need to call GetParent here.
             _machine = new StateMachine<State, Trigger>(State.Main);
             _marginContainer = GetNode<MarginContainer>(nameof(MarginContainer));
-            var root = _marginContainer.GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
-            _newGameButton = root.GetNode<Button>("NewGameBtn");
-            _optionsButton = root.GetNode<Button>("OptionsBtn");
-            _quitButton = root.GetNode<Button>("QuitBtn");
-            _loadGameButton = root.GetNode<Button>("LoadGameBtn");
+            _newGameButton = (Button?)NodeFinder.FindBFSCached(this, "NewGameBtn");
+            _optionsButton = (Button?)NodeFinder.FindBFSCached(this, "OptionsBtn");
+            _quitButton = (Button?)NodeFinder.FindBFSCached(this, "QuitBtn");
+            _loadGameButton = (Button?)NodeFinder.FindBFSCached(this, "LoadGameBtn");
 
             _optionsMenu = GetNode<OptionsMenu>(nameof(OptionsMenu));
             _saveLoadMenu = GetNode<SaveLoadMenu>(nameof(SaveLoadMenu));
-
+            NodeFinder.ClearCache();
             SetEvents();
             ScreenResizeExtension.CenterWindow();
             ConfigureStateMachine();

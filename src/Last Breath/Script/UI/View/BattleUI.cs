@@ -1,6 +1,7 @@
 namespace Playground
 {
     using Godot;
+    using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
 
     public partial class BattleUI : Control
@@ -21,31 +22,24 @@ namespace Playground
 
         public override void _Ready()
         {
-            var root = GetNode<MarginContainer>(nameof(MarginContainer));
-            var abilityContainer = root.GetNode<HBoxContainer>("HBoxContainerAbilityButtons");
-            var vBoxContainer = root.GetNode<VBoxContainer>(nameof(VBoxContainer));
-            var statusEffects = vBoxContainer.GetNode<HBoxContainer>("HBoxContainerStatusEffects");
-            var healthBars = vBoxContainer.GetNode<HBoxContainer>("HBoxContainerHealthBars");
-            var opponents = root.GetNode<VBoxContainer>("VBoxContainerOpponents").GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<HBoxContainer>(nameof(HBoxContainer));
-            var stanceButtons = root.GetNode<HBoxContainer>("HBoxContainerAttackButtons").GetNode<VBoxContainer>("VBoxContainerStance");
-            var bodyParts = root.GetNode<HBoxContainer>("HBoxContainerAttackButtons").GetNode<VBoxContainer>("VBoxContainerBodyPart");
+            _dexterityStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Dexterity");
+            _strengthStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Intelligence");
+            _intelligenceStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Strength");
 
-            _dexterityStance = stanceButtons.GetNode<TextureButton>("DexterityStance");
-            _strengthStance = stanceButtons.GetNode<TextureButton>("IntelligenceStance");
-            _intelligenceStance = stanceButtons.GetNode<TextureButton>("StrengthStance");
+            _head = (TextureButton?)NodeFinder.FindBFSCached(this, "Head");
+            _body = (TextureButton?)NodeFinder.FindBFSCached(this, "Body");
+            _legs = (TextureButton?)NodeFinder.FindBFSCached(this, "Legs");
 
-            _head = bodyParts.GetNode<TextureButton>("Head");
-            _body = bodyParts.GetNode<TextureButton>("Body");
-            _legs = bodyParts.GetNode<TextureButton>("Legs");
+            _playerHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "PlayerHealth");
+            _enemyHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "EnemyHealth");
+            _playerEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "PlayerEffects");
+            _enemyEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "EnemyEffects");
+            _returnButton = (Button?)NodeFinder.FindBFSCached(this, "ReturnButton");
 
-            _playerHealthBar = healthBars.GetNode<TextureProgressBar>("TextureProgressBarPlayer");
-            _enemyHealthBar = healthBars.GetNode<TextureProgressBar>("TextureProgressBarEnemy");
-            _playerEffects = statusEffects.GetNode<GridContainer>("PlayerEffects");
-            _enemyEffects = statusEffects.GetNode<GridContainer>("EnemyEffects");
-            _returnButton = vBoxContainer.GetNode<Button>(nameof(Button));
+            _panelPlayer = (Panel?)NodeFinder.FindBFSCached(this, "Panel");
+            _panelEnemy = (Panel?)NodeFinder.FindBFSCached(this, "Panel2");
 
-            _panelPlayer = opponents.GetNode<Panel>(nameof(Panel));
-            _panelEnemy = opponents.GetNode<Panel>("Panel2");
+            NodeFinder.ClearCache();
         }
 
         public void InitialSetup(Player player, BaseEnemy enemy)

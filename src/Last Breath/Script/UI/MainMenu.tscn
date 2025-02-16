@@ -2,7 +2,7 @@
 
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="1_hrn6o"]
 [ext_resource type="Texture2D" uid="uid://d3s62mu2qu0f1" path="res://Assets/MainMenuBackground.png" id="1_kk64l"]
-[ext_resource type="Script" path="res://Script/UI/MainMenu.cs" id="1_ogonq"]
+[ext_resource type="Script" path="res://Script/UI/View/MainMenu.cs" id="1_ogonq"]
 [ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="4_7ktkb"]
 [ext_resource type="AudioStream" uid="uid://c41u82tba0tul" path="res://Assets/Sounds/mainTheme.mp3" id="5_gnfau"]
 [ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="5_ki6sx"]

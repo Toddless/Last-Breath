@@ -2,6 +2,7 @@
 {
     using System;
     using Godot;
+    using Playground.Script.Helpers;
 
     public partial class PauseMenu : Control
     {
@@ -10,12 +11,12 @@
 
         public override void _Ready()
         {
-            var root = GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
-            _continueBtn = root.GetNode<Button>("ContinueBtn");
-            _saveLoadBtn = root.GetNode<Button>("SaveLoadBtn");
-            _optionsBtn = root.GetNode<Button>("OptionsBtn");
-            _mainMenuBtn = root.GetNode<Button>("MainMenuBtn");
-            _exitBtn = root.GetNode<Button>("ExitBtn");
+            _continueBtn = (Button?)NodeFinder.FindBFSCached(this, "ContinueBtn");
+            _saveLoadBtn = (Button?)NodeFinder.FindBFSCached(this, "SaveLoadBtn");
+            _optionsBtn = (Button?)NodeFinder.FindBFSCached(this, "OptionsBtn");
+            _mainMenuBtn = (Button?)NodeFinder.FindBFSCached(this, "MainMenuBtn");
+            _exitBtn = (Button?)NodeFinder.FindBFSCached(this, "ExitBtn");
+            NodeFinder.ClearCache();
             SetEvents();
         }
 

@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://b03h1pcqbp3iw"]
 
 [ext_resource type="Texture2D" uid="uid://birlnsko8jyj4" path="res://Assets/PauseMenu_Placeholder.webp" id="1_253hr"]
-[ext_resource type="Script" path="res://Script/UI/PauseMenu.cs" id="1_dbrtl"]
+[ext_resource type="Script" path="res://Script/UI/View/PauseMenu.cs" id="1_dbrtl"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ivxo3"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vf40p"]

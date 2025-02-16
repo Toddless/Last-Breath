@@ -26,6 +26,7 @@
             _inventoryUI = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
             ConfigureMachine();
             AddActionTriggers();
+            SetEvents();
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -69,6 +70,8 @@
             var player = GameManager.Instance.Player;
             if (player != null)
             {
+                player.HealthComponent!.MaxHealthChanged += (value) => _inventoryUI?.UpdateMaxHealth(Mathf.RoundToInt(value));
+                player.HealthComponent.CurrentHealthChanged += (value) => _inventoryUI?.UpdateCurrentHealth(Mathf.RoundToInt(value));
                 player.AttackComponent!.CurrentDamageChanged += (min, max) => _inventoryUI?.UpdateDamage(Mathf.RoundToInt(min), Mathf.RoundToInt(max));
                 player.AttackComponent.CurrentCriticalChanceChanged += (value) => _inventoryUI?.UpdateCriticalChance(value);
                 player.AttackComponent.CurrentCriticalDamageChanged += (value) => _inventoryUI?.UpdateCriticalDamage(value);

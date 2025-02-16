@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://boa2lmvm2an46"]
 
-[ext_resource type="Script" path="res://Script/UI/PlayerInventoryUI.cs" id="1_4n4hh"]
+[ext_resource type="Script" path="res://Script/UI/View/PlayerInventoryUI.cs" id="1_4n4hh"]
 [ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="2_yfe3o"]
 [ext_resource type="LabelSettings" uid="uid://orfhh71cylqw" path="res://Fonts/PlayerParameters.tres" id="3_metwe"]
 
@@ -329,7 +329,7 @@ visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip"]
+[node name="EquipContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.00386697
@@ -347,7 +347,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Crafting"]
+[node name="CraftContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Crafting"]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.002849

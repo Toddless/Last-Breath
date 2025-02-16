@@ -18,13 +18,13 @@
         private BattleUI? _battleUI;
         private BattleContext? _battleContext;
 
+        public Action<BattleResult>? ReturnToMainWorld;
+
         public BattleContext? BattleContext
         {
             get => _battleContext;
             set => SetProperty(ref _battleContext, value);
         }
-
-        public Action<BattleResult>? ReturnToMainWorld;
 
         public override void _Ready()
         {
@@ -65,6 +65,15 @@
                 .Permit(Trigger.Awaiting, State.Await)
                 .Permit(Trigger.PreparingBattle, State.BattleStart);
         }
+        private void ReturnButtonPressed() => _battleScene?.PlayerTryingToRunAway();
+        private void OnEnemyMaxHealthChange(float obj) => _battleUI?.OnEnemyMaxHealthChanged(obj);
+        private void OnPlayerMaxHealthChange(float obj) => _battleUI?.OnPlayerMaxHealthChanged(obj);
+        private void OnEnemyCurrentHealthChange(float obj) => _battleUI?.OnEnemyCurrentHealthChanged(obj);
+        private void OnPlayerCurrentHealthChange(float obj) => _battleUI?.OnPlayerCurrentHealthChanged(obj);
+
+        private void EndBattle(BattleResult battleResult) => ReturnToMainWorld?.Invoke(battleResult);
+
+        private void CleanUp() => _battleContext = null;
 
         private void GettingNewContext(object? sender, PropertyChangedEventArgs e)
         {
@@ -95,17 +104,6 @@
             _battleScene.EnemyMaxHealthChanged += OnEnemyMaxHealthChange;
             _battleUI!.ReturnButton!.Pressed += ReturnButtonPressed;
         }
-
-        private void ReturnButtonPressed() => _battleScene?.PlayerTryingToRunAway();
-
-        private void OnEnemyMaxHealthChange(float obj) => _battleUI?.OnEnemyMaxHealthChanged(obj);
-        private void OnPlayerMaxHealthChange(float obj) => _battleUI?.OnPlayerMaxHealthChanged(obj);
-        private void OnEnemyCurrentHealthChange(float obj) => _battleUI?.OnEnemyCurrentHealthChanged(obj);
-        private void OnPlayerCurrentHealthChange(float obj) => _battleUI?.OnPlayerCurrentHealthChanged(obj);
-
-        private void EndBattle(BattleResult battleResult) => ReturnToMainWorld?.Invoke(battleResult);
-
-        private void CleanUp() => _battleContext = null;
 
         private void SetNewParent(Node child, Node parent)
         {

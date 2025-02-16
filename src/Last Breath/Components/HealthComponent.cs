@@ -24,7 +24,7 @@
                     _currentHealth = 0;
                     return _currentHealth;
                 }
-                return Mathf.RoundToInt(_currentHealth);
+                return _currentHealth;
             }
             set
             {

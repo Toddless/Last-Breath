@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Playground.Script.Helpers;
 
     public partial class OptionsMenu : Control
     {
@@ -13,13 +14,12 @@
 
         public override void _Ready()
         {
-            _returnButton = GetPathToButton("ExitBtn");
-            _saveButton = GetPathToButton("SaveBtn");
+            _returnButton = (Button?)NodeFinder.FindBFSCached(this, "ExitBtn");
+            _saveButton = (Button?)NodeFinder.FindBFSCached(this, "SaveBtn");
             _saveButton.Pressed += SaveButtonPressed;
             _returnButton.Pressed += ReturnButtonPressed;
+            NodeFinder.ClearCache();
         }
-
-        private Button GetPathToButton(string name) => GetNode<MarginContainer>(nameof(MarginContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<Button>(name);
 
         private void SaveButtonPressed() => EmitSignal(SignalName.SavePressed);
         private void ReturnButtonPressed() => EmitSignal(SignalName.ReturnPressed);

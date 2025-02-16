@@ -12,22 +12,20 @@
 
         public override void _Ready()
         {
-            var root = GetNode<MarginContainer>(nameof(MarginContainer));
-            var stats = root.GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer)).GetNode<MarginContainer>("PlayerStats").GetNode<VBoxContainer>(nameof(VBoxContainer));
-            var box = root.GetNode<HBoxContainer>(nameof(HBoxContainer)).GetNode<VBoxContainer>("VBoxContainerInventory").GetNode<TabContainer>(nameof(TabContainer));
             _inventoryEquip = new Inventory();
             _inventoryCrafting = new Inventory();
-            _craftInventory = box.GetNode<TabBar>("Crafting").GetNode<GridContainer>(nameof(GridContainer));
-            _equipInventory = box.GetNode<TabBar>("Equip").GetNode<GridContainer>(nameof(GridContainer));
-            _currentHealth = stats.GetNode<Label>("CurrentHealth");
-            _maxHealth = stats.GetNode<Label>("MaxHealth");
-            _damage = stats.GetNode<Label>("Damage");
-            _criticalChance = stats.GetNode<Label>("CriticalChance");
-            _criticalDamage = stats.GetNode<Label>("CriticalDamage");
-            _dodgeChance = stats.GetNode<Label>("DodgeChance");
-            _extraHitChance = stats.GetNode<Label>("ExtraHitChance");
+            _craftInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "CraftContainer");
+            _equipInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "EquipContainer");
+            _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
+            _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
+            _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
+            _criticalChance = (Label?)NodeFinder.FindBFSCached(this, "CriticalChance");
+            _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
+            _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
+            _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
             _inventoryEquip.Initialize(220, ScenePath.InventorySlot, _equipInventory!);
             _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
+            NodeFinder.ClearCache();
         }
 
         public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $"Health: {value}";

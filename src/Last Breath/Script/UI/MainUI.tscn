@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://boqqyrt0sfpve"]
 
-[ext_resource type="Script" path="res://Script/UI/MainUI.cs" id="1_8jnuc"]
+[ext_resource type="Script" path="res://Script/UI/View/MainUI.cs" id="1_8jnuc"]
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="4_582ut"]
@@ -48,7 +48,7 @@ nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_hnvv8")
 texture_progress = SubResource("AtlasTexture_pksnw")
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Effects" type="GridContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -78,17 +78,17 @@ text = "Quests
 layout_mode = 2
 text = "Map"
 
-[node name="Map" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer"]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 
-[node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/Map"]
+[node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/VBoxContainer2"]
 custom_minimum_size = Vector2(350, 280)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/Map/PlaceHolderForMinimap"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer2/PlaceHolderForMinimap"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

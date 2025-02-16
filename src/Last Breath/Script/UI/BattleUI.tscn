@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
 [ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="1_th60w"]
-[ext_resource type="Script" path="res://Script/UI/BattleUI.cs" id="1_xg6rw"]
+[ext_resource type="Script" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
 
@@ -59,7 +59,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="TextureProgressBarPlayer" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+[node name="PlayerHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_vertical = 4
@@ -69,7 +69,7 @@ nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
 texture_progress = SubResource("AtlasTexture_l5ci7")
 
-[node name="TextureProgressBarEnemy" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+[node name="EnemyHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -101,7 +101,7 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 11
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="ReturnButton" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -147,7 +147,7 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="DexterityStance" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Dexterity" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -155,7 +155,7 @@ size_flags_vertical = 2
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="StrengthStance" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Strength" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -163,7 +163,7 @@ size_flags_vertical = 6
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="IntelligenceStance" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Intelligence" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
