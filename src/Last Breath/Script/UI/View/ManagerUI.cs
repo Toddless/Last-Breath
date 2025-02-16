@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.UI
+﻿namespace Playground.Script.UI.View
 {
     using System;
     using Godot;

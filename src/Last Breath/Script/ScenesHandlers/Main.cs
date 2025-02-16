@@ -4,6 +4,7 @@
     using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.UI;
+    using Playground.Script.UI.View;
     using Stateless;
 
     public partial class Main : Node2D
@@ -21,7 +22,7 @@
 
         public override void _Ready()
         {
-            _machine = new StateMachine<State, Trigger>(State.World);
+            _machine = new (State.World);
             _mainWorld = GetNode<MainWorld>(nameof(MainWorld));
 
             _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)),
@@ -106,18 +107,8 @@
                 .Permit(Trigger.Pause, State.Paused);
 
             _machine?.Configure(State.Battle)
-                .OnEntry(() =>
-                {
-                    var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
-                    battleLayer!.BattleContext = _mainWorld!.Fight!;
-                    _managerUI?.ShowBattleUI();
-                })
-                .OnExit(() =>
-                {
-                    _managerUI?.ShowMainUI();
-                    _mainWorld!.Fight = null;
-                    _mainWorld.ResetBattleState();
-                })
+                .OnEntry(PrepareBattle)
+                .OnExit(AfterBattle)
                 .Permit(Trigger.EndBattle, State.World);
 
             _machine?.Configure(State.Paused)
@@ -132,6 +123,20 @@
                   _managerUI?.ShowMainUI();
               })
               .Permit(Trigger.Resume, State.World);
+        }
+
+        private void AfterBattle()
+        {
+            _managerUI?.ShowMainUI();
+            _mainWorld!.Fight = null;
+            _mainWorld.ResetBattleState();
+        }
+
+        private void PrepareBattle()
+        {
+            var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
+            battleLayer!.BattleContext = _mainWorld!.Fight!;
+            _managerUI?.ShowBattleUI();
         }
     }
 }

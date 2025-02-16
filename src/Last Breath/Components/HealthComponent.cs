@@ -30,7 +30,6 @@
             {
                 if (SetProperty(ref _currentHealth, Math.Min(value, _maxHealth)))
                     CurrentHealthChanged?.Invoke(value);
-                GD.Print($"Current health {CurrentHealth}");
             }
         }
 

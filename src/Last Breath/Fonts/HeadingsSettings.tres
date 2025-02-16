@@ -1,0 +1,7 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://bvl3lfttlwy3"]
+
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="1_jdvfv"]
+
+[resource]
+font = ExtResource("1_jdvfv")
+font_size = 30

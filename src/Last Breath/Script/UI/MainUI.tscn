@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://boqqyrt0sfpve"]
+[gd_scene load_steps=7 format=3 uid="uid://boqqyrt0sfpve"]
 
 [ext_resource type="Script" path="res://Script/UI/MainUI.cs" id="1_8jnuc"]
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
@@ -12,10 +12,6 @@ region = Rect2(0, 16, 64, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_pksnw"]
 atlas = ExtResource("2_ptkne")
 region = Rect2(0, 32, 64, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7mivm"]
-atlas = ExtResource("2_ptkne")
-region = Rect2(0, 32, 16, 16)
 
 [node name="MainUI" type="Control"]
 layout_mode = 3
@@ -59,11 +55,6 @@ size_flags_vertical = 0
 theme_override_constants/h_separation = 1
 columns = 11
 
-[node name="BuffDebuffIcons" type="TextureRect" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 2
-texture = SubResource("AtlasTexture_7mivm")
-
 [node name="HBoxContainerButtons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -88,6 +79,7 @@ layout_mode = 2
 text = "Map"
 
 [node name="Map" type="VBoxContainer" parent="MarginContainer"]
+clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0

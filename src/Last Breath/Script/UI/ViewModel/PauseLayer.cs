@@ -15,6 +15,7 @@
         private PauseMenu? _menu;
         private OptionsMenu? _options;
         private SaveLoadMenu? _saveLoad;
+        private AudioStreamPlayer? _musicPlayer;
 
         public Action? Resume;
 
@@ -24,8 +25,12 @@
             _menu = GetNode<PauseMenu>(nameof(PauseMenu));
             _options = GetNode<OptionsMenu>(nameof(OptionsMenu));
             _saveLoad = GetNode<SaveLoadMenu>(nameof(SaveLoadMenu));
+            _musicPlayer = GetNode<AudioStreamPlayer>("MusicStreamPlayer");
+            _musicPlayer.Stop();
             SetEvents();
             ConfigureStateMachine();
+
+            VisibilityChanged += ChangeVisibility;
         }
 
         public override void _UnhandledKeyInput(InputEvent @event)
@@ -37,6 +42,18 @@
                     _machine.Fire(Trigger.Back);
                     GetViewport().SetInputAsHandled();
                 }
+            }
+        }
+
+        private void ChangeVisibility()
+        {
+            if (Visible)
+            {
+                _musicPlayer?.Play();
+            }
+            else
+            {
+                _musicPlayer?.Stop();
             }
         }
 
@@ -65,7 +82,7 @@
 
             _machine?.Configure(State.Options)
                 .OnEntry(() => { _options?.Show(); })
-                .OnExit(()=> { _options?.Hide(); })
+                .OnExit(() => { _options?.Hide(); })
                 .Permit(Trigger.Back, State.PauseMenu);
 
             _machine?.Configure(State.SaveLoad)
