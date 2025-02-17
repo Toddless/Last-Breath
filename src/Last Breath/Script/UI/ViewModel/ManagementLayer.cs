@@ -1,15 +1,15 @@
 ﻿namespace Playground.Script.UI
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using Godot;
     using Playground.Script.Helpers;
+    using System.Linq;
     using Stateless;
+    using Godot;
 
     public partial class ManagementLayer : CanvasLayer
     {
         private enum State { Management, Character, Inventory, Quests, Map }
-        private enum Trigger { EnterManagement, ShowCharacter, ShowInventory, ShowQuests, ShowMap, Close }
+        private enum Trigger { ShowCharacter, ShowInventory, ShowQuests, ShowMap, Close }
         private readonly Dictionary<string, (Trigger Trigger, State State)> _actionTriggers = [];
         private StateMachine<State, Trigger>? _machine;
         private PlayerInventoryUI? _inventoryUI;
@@ -77,7 +77,6 @@
                 player.AttackComponent.CurrentCriticalDamageChanged += (value) => _inventoryUI?.UpdateCriticalDamage(value);
                 player.AttackComponent.CurrentExtraHitChanged += (value) => _inventoryUI?.UpdateExtraHitChance(value);
             }
-
         }
 
         private void ConfigureMachine()

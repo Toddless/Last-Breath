@@ -18,8 +18,8 @@
 [ext_resource type="PackedScene" uid="uid://b7ndt5b1q2dif" path="res://Script/UI/CharacterMenu.tscn" id="8_fr0w8"]
 [ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
 [ext_resource type="Script" path="res://Script/UI/ViewModel/ManagementLayer.cs" id="10_7cjmf"]
-[ext_resource type="Script" path="res://Debug/DevLayer.cs" id="18_lw5ck"]
-[ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://Debug/DevTools.tscn" id="19_yuu34"]
+[ext_resource type="Script" path="res://DebugTools/DevLayer.cs" id="18_lw5ck"]
+[ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://DebugTools/DevTools.tscn" id="19_yuu34"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3

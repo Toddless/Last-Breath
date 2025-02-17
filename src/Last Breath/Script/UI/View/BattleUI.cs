@@ -1,5 +1,6 @@
 namespace Playground
 {
+    using System;
     using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
@@ -15,10 +16,7 @@ namespace Playground
         private Panel? _panelPlayer, _panelEnemy;
         // ability buttons left
 
-        public Button? ReturnButton
-        {
-            get => _returnButton;
-        }
+        public Action? Return;
 
         public override void _Ready()
         {
@@ -38,7 +36,7 @@ namespace Playground
 
             _panelPlayer = (Panel?)NodeFinder.FindBFSCached(this, "Panel");
             _panelEnemy = (Panel?)NodeFinder.FindBFSCached(this, "Panel2");
-
+            _returnButton!.Pressed += () => Return?.Invoke();
             NodeFinder.ClearCache();
         }
 

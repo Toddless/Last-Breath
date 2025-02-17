@@ -7,7 +7,7 @@
     public partial class MainLayer : CanvasLayer
     {
         private enum State { Main, Management }
-        private enum Trigger { OpenManagement, CloseManagement }
+        private enum Trigger { Open, Close }
 
         private StateMachine<State, Trigger>? _machine;
 
@@ -40,23 +40,27 @@
 
         public override void _UnhandledInput(InputEvent @event)
         {
-            if (@event.IsActionPressed(Settings.Cancel))
+            if (HandleCancel(@event)) return;
+        }
+
+        private bool HandleCancel(InputEvent @event)
+        {
+            if (!@event.IsActionPressed(Settings.Cancel)) return false;
+            if (_machine!.State == State.Management)
             {
-                if (_machine?.State == State.Management)
-                {
-                    _machine?.Fire(Trigger.CloseManagement);
-                    GetViewport().SetInputAsHandled();
-                }
+                _machine?.Fire(Trigger.Close);
+                GetViewport().SetInputAsHandled();
             }
+            return true;
         }
 
         private void ConfigureStateMachine()
         {
             _machine?.Configure(State.Main)
-                .Permit(Trigger.OpenManagement, State.Management);
+                .Permit(Trigger.Open, State.Management);
 
             _machine?.Configure(State.Management)
-                .Permit(Trigger.CloseManagement, State.Main);
+                .Permit(Trigger.Close, State.Main);
         }
     }
 }

@@ -165,6 +165,8 @@ theme_override_constants/margin_bottom = 5
 [node name="QuestDescription" type="RichTextLabel" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer"]
 clip_contents = false
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/line_separation = 3
 theme_override_fonts/normal_font = ExtResource("2_bax32")
 theme_override_font_sizes/normal_font_size = 24

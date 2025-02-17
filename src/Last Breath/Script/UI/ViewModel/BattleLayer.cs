@@ -45,35 +45,23 @@
                 .Permit(Trigger.PreparingBattle, State.BattleStart);
 
             _machine.Configure(State.BattleStart)
-                .OnEntry(() =>
-                {
-                    StartBattle();
-                    _battleScene?.Init(BattleContext!);
-                    Show();
-                })
+                .OnEntry(StartBattle)
                 .Permit(Trigger.Awaiting, State.Await)
                 .Permit(Trigger.EndingBattle, State.BattleEnd);
 
             _machine.Configure(State.BattleEnd)
-                .OnEntry(() =>
-                {
-                    EndBattle(_battleScene?.BattleResult!);
-                    _battleScene?.ReturnStats();
-                    CleanUp();
-                    Hide();
-                })
+                .OnEntry(EndBattle)
                 .Permit(Trigger.Awaiting, State.Await)
                 .Permit(Trigger.PreparingBattle, State.BattleStart);
         }
-        private void ReturnButtonPressed() => _battleScene?.PlayerTryingToRunAway();
-        private void OnEnemyMaxHealthChange(float obj) => _battleUI?.OnEnemyMaxHealthChanged(obj);
-        private void OnPlayerMaxHealthChange(float obj) => _battleUI?.OnPlayerMaxHealthChanged(obj);
-        private void OnEnemyCurrentHealthChange(float obj) => _battleUI?.OnEnemyCurrentHealthChanged(obj);
-        private void OnPlayerCurrentHealthChange(float obj) => _battleUI?.OnPlayerCurrentHealthChanged(obj);
 
-        private void EndBattle(BattleResult battleResult) => ReturnToMainWorld?.Invoke(battleResult);
-
-        private void CleanUp() => _battleContext = null;
+        private void EndBattle()
+        {
+            ReturnToMainWorld?.Invoke(_battleScene?.BattleResult!);
+            _battleScene?.ReturnStats();
+            _battleContext = null;
+            Hide();
+        }
 
         private void GettingNewContext(object? sender, PropertyChangedEventArgs e)
         {
@@ -94,15 +82,17 @@
             SetNewParent(player, _battleScene!);
             SetNewParent(enemy, _battleScene!);
             _battleUI?.InitialSetup(player, enemy);
+            _battleScene?.Init(BattleContext!);
+            Show();
         }
 
         private void SetupEvents()
         {
-            _battleScene!.PlayerCurrentHealthChanged += OnPlayerCurrentHealthChange;
-            _battleScene.EnemyCurrentHealthChanged += OnEnemyCurrentHealthChange;
-            _battleScene.PlayerMaxHealthChanged += OnPlayerMaxHealthChange;
-            _battleScene.EnemyMaxHealthChanged += OnEnemyMaxHealthChange;
-            _battleUI!.ReturnButton!.Pressed += ReturnButtonPressed;
+            _battleScene!.PlayerCurrentHealthChanged += (t) => _battleUI?.OnPlayerCurrentHealthChanged(t);
+            _battleScene.EnemyCurrentHealthChanged += (t) => _battleUI?.OnEnemyCurrentHealthChanged(t);
+            _battleScene.PlayerMaxHealthChanged += (t) => _battleUI?.OnPlayerMaxHealthChanged(t);
+            _battleScene.EnemyMaxHealthChanged += (t) => _battleUI?.OnEnemyMaxHealthChanged(t);
+            _battleUI!.Return = _battleScene.PlayerTryingToRunAway;
         }
 
         private void SetNewParent(Node child, Node parent)

@@ -14,7 +14,6 @@
             _mainQuests = (VBoxContainer?)NodeFinder.FindBFSCached(this, "MainQuests");
             _sideQuests = (VBoxContainer?)NodeFinder.FindBFSCached(this, "SideQuests");
             _questDescription = (RichTextLabel?)NodeFinder.FindBFSCached(this, "QuestDescription");
-
             NodeFinder.ClearCache();
         }
     }

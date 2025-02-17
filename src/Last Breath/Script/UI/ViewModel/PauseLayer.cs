@@ -71,12 +71,7 @@
         private void ConfigureStateMachine()
         {
             _machine?.Configure(State.PauseMenu)
-                .OnEntry(() =>
-                {
-                    _menu?.Show();
-                    _options?.Hide();
-                    _saveLoad?.Hide();
-                })
+                .OnEntry(ShowPauseMenu)
                 .Permit(Trigger.ToOptions, State.Options)
                 .Permit(Trigger.ToSaveLoad, State.SaveLoad);
 
@@ -89,6 +84,13 @@
                 .OnEntry(() => { _saveLoad?.Show(); })
                 .OnExit(() => { _saveLoad?.Hide(); })
                 .Permit(Trigger.Back, State.PauseMenu);
+        }
+
+        private void ShowPauseMenu()
+        {
+            _menu?.Show();
+            _options?.Hide();
+            _saveLoad?.Hide();
         }
     }
 }
