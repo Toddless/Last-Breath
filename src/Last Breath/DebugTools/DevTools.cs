@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.UI
+﻿namespace Playground.DebugTools
 {
     using System;
     using System.Collections.Generic;
     using Godot;
     using Playground.Debug;
-    using Playground.DIComponents;
+    using Playground.Script;
 
     public partial class DevTools : Control
     {

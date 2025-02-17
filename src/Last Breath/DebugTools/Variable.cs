@@ -1,11 +1,11 @@
-﻿namespace Playground.DIComponents
+﻿namespace Playground.DebugTools
 {
     using System;
     using Godot;
 
     public partial class Variable : HBoxContainer
     {
-        private const string Path = "res://Debug/Variable.tscn";
+        private const string Path = "res://DebugTools/Variable.tscn";
         private Button? _add, _remove;
         private SpinBox? _spin;
         private Label? _text;
@@ -25,7 +25,7 @@
         {
             _text!.Text = text;
         }
-
+        
         private void SetEvents()
         {
             _add!.Pressed += () => Add?.Invoke(_spin!.Value);

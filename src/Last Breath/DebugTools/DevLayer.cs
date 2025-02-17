@@ -1,6 +1,8 @@
 ﻿namespace Playground.Script.UI
 {
     using Godot;
+    using Playground.DebugTools;
+
     public partial class DevLayer : CanvasLayer
     {
         private DevTools? _dev;
