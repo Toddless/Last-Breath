@@ -16,8 +16,8 @@
         {
             _returnButton = (Button?)NodeFinder.FindBFSCached(this, "ExitBtn");
             _saveButton = (Button?)NodeFinder.FindBFSCached(this, "SaveBtn");
-            _saveButton.Pressed += SaveButtonPressed;
-            _returnButton.Pressed += ReturnButtonPressed;
+            _saveButton!.Pressed += SaveButtonPressed;
+            _returnButton!.Pressed += ReturnButtonPressed;
             NodeFinder.ClearCache();
         }
 

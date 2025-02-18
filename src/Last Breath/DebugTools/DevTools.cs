@@ -42,12 +42,12 @@
         private void SetPlayerVariables(Player player)
         {
             var fields = PropertyGenerator.GetAllFields(player.GetType());
-            var cont = _playerVariableTabBar!.GetNode<ScrollContainer>(nameof(ScrollContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
+            var tabBar = _playerVariableTabBar!.GetNode<ScrollContainer>(nameof(ScrollContainer)).GetNode<VBoxContainer>(nameof(VBoxContainer));
 
             foreach (var field in fields)
             {
                 var variable = Variable.InitializeAsPackedScene().Instantiate<Variable>();
-                cont.AddChild(variable);
+                tabBar.AddChild(variable);
                 variable!.Initialize(field);
 
                 SetEvents(field, variable);

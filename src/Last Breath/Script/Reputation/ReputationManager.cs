@@ -3,18 +3,11 @@
     using System.Collections.Generic;
     using Playground.Script.Enums;
 
-    public class ReputationManager
+    public class ReputationManager(int elfRep, int dwarfsRep, int humanReps)
     {
-        private ElfsReputation? _elfReputation = new(0);
-        private DwarfsReputation? _dwarfsReputation = new(0);
-        private HumansReputation? _humansReputation = new(0);
-
-        public ReputationManager(int elfRep, int dwarfsRep, int humanReps)
-        {
-            _elfReputation.ChangeReputationPoints(elfRep);
-            _dwarfsReputation.ChangeReputationPoints(dwarfsRep);
-            _humansReputation.ChangeReputationPoints(humanReps);
-        }
+        private ElfsReputation? _elfReputation = new(elfRep);
+        private DwarfsReputation? _dwarfsReputation = new(dwarfsRep);
+        private HumansReputation? _humansReputation = new(humanReps);
 
         public ElfsReputation? ElfReputation
         {
@@ -34,15 +27,12 @@
             private set => _humansReputation = value;
         }
 
-        public void ChangeReputationForMultipleFractions(List<Fractions> fraction, int amount)
-        {
-            fraction.ForEach(fraction => GetReputationByFraction(fraction)?.ChangeReputationPoints(amount));
-        }
+        public void ChangeReputationForMultipleFractions(List<Fractions> fraction, int amount) => fraction.ForEach(fraction => GetReputationByFraction(fraction)?.ChangeReputationPoints(amount));
 
         public void ChangeReputationConflictFractions(Fractions decreaseReputationPoints, Fractions increaseReputationPoints, int amount)
         {
-           GetReputationByFraction(decreaseReputationPoints)?.ChangeReputationPoints(-amount);
-           GetReputationByFraction(increaseReputationPoints)?.ChangeReputationPoints(amount);
+            GetReputationByFraction(decreaseReputationPoints)?.ChangeReputationPoints(-amount);
+            GetReputationByFraction(increaseReputationPoints)?.ChangeReputationPoints(amount);
         }
 
         private BaseReputation? GetReputationByFraction(Fractions fractions) => fractions switch

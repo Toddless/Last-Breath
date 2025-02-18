@@ -7,6 +7,7 @@
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
     using Playground.Script;
+    using Playground.Script.Reputation;
 
     public partial class Player : ObservableCharacterBody2D, ICharacter
     {
@@ -23,6 +24,7 @@
         private EffectManager? _effectManager;
         private HealthComponent? _playerHealth;
         private AttackComponent? _playerAttack;
+        private ReputationManager? _reputation;
         #endregion
 
         [Signal]
@@ -57,6 +59,8 @@
             get => _playerAttack;
             set => _playerAttack = value;
         }
+        [Changeable]
+        public ReputationManager? Reputation => _reputation;
         public EffectManager? EffectManager => _effectManager;
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
         public List<IAbility>? Abilities => _abilities;
@@ -71,6 +75,7 @@
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
             GameManager.Instance!.Player = this;
+            _reputation = new(0, 0, 0);
         }
 
         public override void _PhysicsProcess(double delta)
