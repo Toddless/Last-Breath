@@ -8,6 +8,7 @@
     using Playground.Script.Helpers;
     using Playground.Script;
     using Playground.Script.Reputation;
+    using Playground.Script.Passives.Attacks;
 
     public partial class Player : ObservableCharacterBody2D, ICharacter
     {

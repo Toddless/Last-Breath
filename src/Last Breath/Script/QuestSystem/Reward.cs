@@ -1,4 +1,4 @@
-﻿namespace Playground.Script
+﻿namespace Playground.Script.QuestSystem
 {
     using System.Collections.Generic;
     using Playground.Script.Items;
