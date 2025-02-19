@@ -1,0 +1,105 @@
+[gd_scene load_steps=7 format=3 uid="uid://boqqyrt0sfpve"]
+
+[ext_resource type="Script" path="res://Script/UI/View/MainUI.cs" id="1_8jnuc"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
+[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="4_582ut"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hnvv8"]
+atlas = ExtResource("1_v8awq")
+region = Rect2(0, 16, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pksnw"]
+atlas = ExtResource("2_ptkne")
+region = Rect2(0, 32, 64, 16)
+
+[node name="MainUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+mouse_filter = 1
+script = ExtResource("1_8jnuc")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 2
+
+[node name="Health" type="TextureProgressBar" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+mouse_filter = 0
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_hnvv8")
+texture_progress = SubResource("AtlasTexture_pksnw")
+
+[node name="Effects" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/h_separation = 1
+columns = 11
+
+[node name="HBoxContainerButtons" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 5
+
+[node name="Character" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+text = "Character"
+
+[node name="Inventory" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+text = "Inventory"
+
+[node name="Quests" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+text = "Quests
+"
+
+[node name="Map" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+text = "Map"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="PlaceHolderForMinimap" type="Panel" parent="MarginContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(350, 280)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer2/PlaceHolderForMinimap"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Map"
+label_settings = ExtResource("4_582ut")

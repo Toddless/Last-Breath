@@ -1,0 +1,245 @@
+[gd_scene load_steps=14 format=3 uid="uid://j6cqo6u0s83x"]
+
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
+[ext_resource type="Texture2D" uid="uid://d2vp0yleyhbka" path="res://Assets/BattleScene_1.png" id="1_th60w"]
+[ext_resource type="Script" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
+[ext_resource type="Texture2D" uid="uid://dbi5tjdybuk77" path="res://Assets/DexStance.svg" id="6_s8wmb"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
+texture = ExtResource("1_th60w")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sabj2"]
+atlas = ExtResource("1_671fa")
+region = Rect2(0, 16, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l5ci7"]
+atlas = ExtResource("2_tr072")
+region = Rect2(0, 32, 64, 16)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_msf74"]
+bg_color = Color(0.998882, 0.000266452, 0.87029, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mohmi"]
+atlas = ExtResource("6_s8wmb")
+region = Rect2(8, 0, 80, 96)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_215ms"]
+size = Vector2(75, 75)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi3if"]
+bg_color = Color(0.940777, 0.415391, 0.241381, 1)
+
+[node name="BattleUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_xg6rw")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_nwaqx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HBoxContainerHealthBars" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="PlayerHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+size_flags_vertical = 4
+value = 51.0
+rounded = true
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_sabj2")
+texture_progress = SubResource("AtlasTexture_l5ci7")
+
+[node name="EnemyHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+value = 86.0
+rounded = true
+fill_mode = 1
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_sabj2")
+texture_progress = SubResource("AtlasTexture_l5ci7")
+
+[node name="HBoxContainerStatusEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayerEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects"]
+custom_minimum_size = Vector2(190, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 11
+
+[node name="EnemyEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects"]
+custom_minimum_size = Vector2(190, 50)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 11
+
+[node name="ReturnButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("3_00t1l")
+theme_override_font_sizes/font_size = 16
+text = "Escape"
+
+[node name="VBoxContainerOpponents" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainerOpponents"]
+layout_mode = 2
+theme_override_constants/margin_left = 150
+theme_override_constants/margin_right = 150
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainerOpponents/MarginContainer"]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(350, 350)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
+
+[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(250, 250)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
+
+[node name="HBoxContainerAttackButtons" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_constants/separation = 15
+
+[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/HBoxContainerAttackButtons"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 15
+
+[node name="Dexterity" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+toggle_mode = true
+texture_normal = SubResource("AtlasTexture_mohmi")
+flip_h = true
+
+[node name="Strength" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+toggle_mode = true
+texture_normal = SubResource("PlaceholderTexture2D_215ms")
+
+[node name="Intelligence" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+toggle_mode = true
+texture_normal = SubResource("PlaceholderTexture2D_215ms")
+
+[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/HBoxContainerAttackButtons"]
+custom_minimum_size = Vector2(0, 290)
+layout_mode = 2
+
+[node name="Head" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+toggle_mode = true
+texture_normal = SubResource("PlaceholderTexture2D_215ms")
+
+[node name="Body" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+toggle_mode = true
+texture_normal = SubResource("PlaceholderTexture2D_215ms")
+
+[node name="Legs" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+toggle_mode = true
+texture_normal = SubResource("PlaceholderTexture2D_215ms")
+
+[node name="HBoxContainerAbilityButtons" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 10
+
+[node name="Panel" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel2" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel4" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel5" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel6" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+
+[node name="Panel7" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")

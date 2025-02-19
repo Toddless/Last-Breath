@@ -1,42 +1,91 @@
 ﻿namespace Playground.Components
 {
-    using Godot;
-    using Playground.Script;
-    using Playground.Script.Passives.Attacks;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Playground.Components.Interfaces;
+    using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Scenes;
 
-    // TODO: Need to rework completely
-    [Inject]
+    /// <summary>
+    /// Determine enemies battle behaviors depending on conditions
+    /// </summary>
     public class BattleBehavior
     {
-        private RandomNumberGenerator? _rnd;
-        private BaseEnemy? _enemyBase;
-        private Player? _player;
-        private ICharacter? _selfTarget;
-        private ICharacter? _opponentTarget;
+        private List<IAbilityDecision>? _abilitiesDecisions;
+        private List<ICondition>? _conditions;
+        private IBattleContext? _battleContext;
 
-        public BattleBehavior(BaseEnemy enemy)
+        public BattleBehavior()
         {
-            _enemyBase = enemy;
-            _selfTarget = enemy;
-            DiContainer.InjectDependencies(this);
         }
 
-        [Inject]
-        protected RandomNumberGenerator? Rnd
+        public void SetDependencies(IBattleContext context, IConditionsFactory conditions)
         {
-            get => _rnd;
-            set => _rnd = value;
+            _battleContext = context;
+            _conditions = conditions.SetNewConditions(_battleContext);
+            SetAbilitiesDecisions(_battleContext.Self.Abilities!, _conditions!);
         }
 
-        public void GatherInfo(Player player)
+        public IAbility? MakeDecision()
         {
-            _player = player;
-            _opponentTarget = player;
+            // update decisions bevor taking an ability
+            UpdateAbilitiesDecisions();
+            return _abilitiesDecisions?.OrderByDescending(x => x.Priority).FirstOrDefault(x => x.Ability.Cooldown == 4)?.Ability;
         }
 
         public void BattleEnds()
         {
-            _enemyBase = null;
+            _battleContext = null;
+            _abilitiesDecisions = null;
+            _conditions = null;
+        }
+
+        private float EvaluateAbility(IAbility ability, List<ICondition> conditions)
+        {
+            float biggestPriority = 0;
+            foreach (var condition in conditions)
+            {
+                float priority = condition.Weight * AbilityMatchConditionNeeds(ability, condition);
+                if (priority > biggestPriority)
+                    biggestPriority = priority;
+            }
+            return biggestPriority;
+        }
+
+        private float AbilityMatchConditionNeeds(IAbility ability, ICondition condition)
+        {
+            float priorityModifier = 1;
+            foreach (IEffect effect in ability.Effects)
+            {
+                if (effect.EffectType == condition.EffectNeeded)
+                    priorityModifier += 0.1f;
+                if (condition.CheckCondition.Invoke())
+                    priorityModifier += 0.5f;
+            }
+
+            return priorityModifier;
+        }
+
+        private void SetAbilitiesDecisions(List<IAbility> abilities, List<ICondition> conditions)
+        {
+            _abilitiesDecisions = [];
+            foreach (var ability in abilities)
+            {
+                _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability, conditions)));
+            }
+        }
+
+        private void UpdateAbilitiesDecisions()
+        {
+            foreach (var item in _abilitiesDecisions!)
+            {
+                item.Priority = UpdateAbilityPriority(item.Ability);
+            }
+        }
+
+        private float UpdateAbilityPriority(IAbility ability)
+        {
+            return EvaluateAbility(ability, _conditions!);
         }
     }
 }

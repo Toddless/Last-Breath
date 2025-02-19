@@ -8,6 +8,7 @@ namespace Playground.Script.Enemy
     using Playground.Script.Helpers;
     using Playground.Script.Scenes;
 
+    // TODO: Need to rework this
     [Inject]
     public partial class EnemySpawner : Node, IEnemySpawner
     {
@@ -17,8 +18,8 @@ namespace Playground.Script.Enemy
         private RandomNumberGenerator? _rnd;
         private bool _isProcessing = false;
         private PackedScene? _enemyToSpawn;
-        private Timer? _timer;
 
+        #region Properties
         [Inject]
         protected RandomNumberGenerator? Rnd
         {
@@ -49,12 +50,12 @@ namespace Playground.Script.Enemy
             get => _enemyPosition;
             set => _enemyPosition = value;
         }
+        #endregion
 
         public override void _Ready()
         {
             // TODO: When I am in a battle, enemies spawn in the battle scene
             ParentScene = (BaseSpawnableScene)GetParent();
-            _timer = ParentScene.GetNode<Timer>($"{nameof(EnemySpawner)}/{nameof(Timer)}");
             EnemyToSpawn = ResourceLoader.Load<PackedScene>(ScenePath.EnemyToSpawn);
             ParentScene.Enemies!.CollectionChanged += OnCollectionChanged;
             ResolveDependencies();
@@ -84,13 +85,13 @@ namespace Playground.Script.Enemy
             ParentScene.Enemies!.Add(enemy);
             enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
             enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
-            enemy.PropertyChanged += ParentScene.EnemiePropertyChanged;
+            enemy.PropertyChanged += ParentScene.EnemyReadyToFight;
             enemy.Position = freePosition.Key;
             EnemyPositions![freePosition.Key] = enemy;
         }
 
         /// <summary>
-        /// i need to spawn an enemy only if enemy was killed and removed from list, thats why i have here if-statement
+        /// i need to spawn an enemy only if enemy was killed and removed from list
         /// </summary>
         /// <param name="sender">To be added</param>
         /// <param name="e">To be added</param>
@@ -121,11 +122,8 @@ namespace Playground.Script.Enemy
                 return;
             }
             _isProcessing = true;
-            _timer!.Start(Rnd!.RandiRange(5, 15));
-            if (_timer!.TimeLeft != 0)
-            {
-                await ToSignal(_timer, "timeout");
-            }
+            var timer = GetTree().CreateTimer(Rnd!.RandiRange(5, 15));
+            await ToSignal(timer, "timeout");
             SpawnQueue.Dequeue().Invoke();
 
             _isProcessing = false;

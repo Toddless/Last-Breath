@@ -10,7 +10,7 @@
 
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
-            if(Equals(field, value))
+            if (Equals(field, value))
             {
                 return false;
             }

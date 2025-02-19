@@ -11,9 +11,7 @@ namespace Playground
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.Passives;
-    using Playground.Script.Passives.Attacks;
-    using Playground.Script.StateMachine;
+    using Playground.Script.Scenes;
 
     [Inject]
     public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
@@ -38,7 +36,7 @@ namespace Playground
         private Area2D? _area;
         private BattleBehavior? _battleBehavior;
         private List<IAbility>? _abilities = new();
-        private StateMachine? _machine;
+        private IBattleContext? _battleContext;
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
         private int _level;
@@ -131,10 +129,7 @@ namespace Playground
             get => _enemyFight;
             set
             {
-                if (SetProperty(ref _enemyFight, value))
-                {
-                    IAmInBattle();
-                }
+                SetProperty(ref _enemyFight, value);
             }
         }
 
@@ -156,6 +151,8 @@ namespace Playground
             get => _appliedAbilities;
             set => _appliedAbilities = value;
         }
+
+        public EffectManager? EffectManager => _effectManager;
         #endregion
 
         public override void _Ready()
@@ -170,14 +167,13 @@ namespace Playground
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = new EnemyInventory();
-            Inventory.Initialize(25, ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
+            Inventory.Initialize(25,ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _machine = parentNode.GetNode<StateMachine>(nameof(StateMachine));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _battleBehavior = new BattleBehavior(this);
+            _battleBehavior = new BattleBehavior();
             _inventoryNode.Hide();
             DiContainer.InjectDependencies(this);
             SetStats();
@@ -196,24 +192,10 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
             var points = SetAttributesDependsOnType(_enemyType);
-            _attribute!.Dexterity!.PropertyChanged += OnDexterityChange;
-            _attribute.Strength!.PropertyChanged += OnStrengthChange;
-            _attribute!.Strength.Total += points.Strength;
+            _attribute!.Strength!.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
-            SetRandomAbilities();
             EmitSignal(SignalName.EnemyInitialized);
-        }
-
-        protected void OnDexterityChange(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e is PropertyChangedWithValuesEventArgs<int> args)
-            {
-                if (args.NewValue < args.OldValue)
-                {
-                    GD.Print($"Enemy {this.Name} has: Dex: {_attribute.Dexterity.Total}, CritChance: {_attack.CurrentCriticalChance}, CritDamage: {_attack.CurrentCriticalDamage}");
-                }
-            }
         }
 
         protected void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
@@ -230,8 +212,6 @@ namespace Playground
                 {
                     _health!.IncreaseHealth = _attribute!.Strength!.TotalHealthIncrese();
                 }
-                GD.Print($"Current hp after strength increased: {_health.CurrentHealth}, Max Health: {_health.MaxHealth}\n" +
-                    $"Strength: {_attribute.Strength.Total}");
                 if (!_enemyFight)
                 {
                     _health.RefreshHealth();
@@ -239,12 +219,8 @@ namespace Playground
             }
         }
 
-        protected void IAmInBattle() => _machine!.TransitionTo(States.Battle.ToString());
-
         protected GlobalRarity EnemyRarity()
         {
-            //var rarity = BasedOnRarityLootTable.Instance.GetRarity() ?? new RarityLoodDrop(new Rarity(), GlobalRarity.Uncommon);
-            //return rarity.Rarity;
             return GlobalRarity.Common;
         }
 
@@ -273,17 +249,8 @@ namespace Playground
         public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
         {
             // working fine for buff, but what should i do to debuff someone?
-            //BattleBehavior?.MakeDecision()?.ActivateAbility();
+            BattleBehavior?.MakeDecision()?.ActivateAbility(_battleContext);
             return _attack!.CalculateDamage();
-        }
-
-        protected void SetRandomAbilities()
-        {
-            //var amountAbilities = ConvertGlobalRarity.abilityQuantity[_rarity] + Mathf.Max(1, _level / 10);
-            using (var abilities = new AbilityPool(this))
-            {
-                _abilities = abilities.SelectAbilities(3);
-            }
         }
 
         public void PlayerExited(Node2D body)

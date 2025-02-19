@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://bqlqfsqoepfhs"]
+
+[ext_resource type="Script" path="res://Script/Inventory/InventorySlot.cs" id="1_yg5o5"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ehf1w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_gs3g4"]
+font = ExtResource("2_ehf1w")
+shadow_color = Color(0, 0, 0, 1)
+
+[node name="InventorySlot" type="Button"]
+custom_minimum_size = Vector2(57, 56)
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(1, 1.16)
+mouse_filter = 1
+button_mask = 3
+expand_icon = true
+script = ExtResource("1_yg5o5")
+
+[node name="QuantityText" type="Label" parent="."]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 26.8621
+offset_right = 53.0
+offset_bottom = 49.8621
+scale = Vector2(0.545848, 0.5767)
+label_settings = SubResource("LabelSettings_gs3g4")
+
+[connection signal="mouse_entered" from="." to="." method="OnMouseEntered"]
+[connection signal="mouse_exited" from="." to="." method="OnMouseExited"]
+[connection signal="pressed" from="." to="." method="OnPressed"]

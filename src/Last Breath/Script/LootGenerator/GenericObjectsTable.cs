@@ -1,10 +1,12 @@
 ﻿namespace Playground.Script.LootGenerator
 {
     using Godot;
+    using Playground.Script.Enums;
     using Playground.Script.Items;
     using Playground.Script.Items.Factories;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public abstract class GenericObjectsTable<T>
         where T : GenericObject
@@ -22,7 +24,7 @@
             SetFactories();
             if (LootDropItems != null && LootDropItems.Count > 0)
             {
-                float currentProbabilityWeithMaximum = 0f;
+                float currentProbabilityWeighMaximum = 0f;
 
                 foreach (T lootDropItem in LootDropItems)
                 {
@@ -32,12 +34,12 @@
                     }
                     else
                     {
-                        lootDropItem.ProbabilityRangeFrom = currentProbabilityWeithMaximum;
-                        currentProbabilityWeithMaximum += lootDropItem.ProbabilityWeight;
-                        lootDropItem.ProbabilityRangeTo = currentProbabilityWeithMaximum;
+                        lootDropItem.ProbabilityRangeFrom = currentProbabilityWeighMaximum;
+                        currentProbabilityWeighMaximum += lootDropItem.ProbabilityWeight;
+                        lootDropItem.ProbabilityRangeTo = currentProbabilityWeighMaximum;
                     }
                 }
-                _probabilityTotalWeight = currentProbabilityWeithMaximum;
+                _probabilityTotalWeight = currentProbabilityWeighMaximum;
 
                 foreach (T lootDropItem in LootDropItems)
                 {
@@ -46,53 +48,22 @@
             }
         }
 
-        public virtual Item? GetRandomItem()
+        public virtual Item GetRandomItem()
         {
-            if (LootDropItems == null || Factories == null)
-            {
-                ArgumentNullException.ThrowIfNull(LootDropItems);
-                ArgumentNullException.ThrowIfNull(Factories);
-            }
-            var randomFactory = _random!.RandiRange(0, Factories.Count - 1);
-
-            var factory = Factories[randomFactory];
-
-            float pickedNumber = _random.RandfRange(0, _probabilityTotalWeight);
-            foreach (T lootDropItem in LootDropItems)
-            {
-                if (pickedNumber >= lootDropItem.ProbabilityRangeFrom && pickedNumber <= lootDropItem.ProbabilityRangeTo)
-                {
-                    return factory?.GenerateItem(lootDropItem.Rarity);
-                }
-            }
-            return null;
+            float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
+            return Factories![_random!.RandiRange(0, Factories!.Count - 1)]
+                .GenerateItem(LootDropItems!.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Common);
         }
 
         public virtual T? GetRarity()
         {
             float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
-            foreach (T lootDropItem in LootDropItems!)
-            {
-                if (pickedNumber >= lootDropItem.ProbabilityRangeFrom && pickedNumber <= lootDropItem.ProbabilityRangeTo)
-                {
-                    return lootDropItem;
-                }
-            }
-            return null;
+            return LootDropItems!.FirstOrDefault(rarity => pickedNumber >= rarity.ProbabilityRangeFrom && pickedNumber <= rarity.ProbabilityRangeTo);
         }
 
         public virtual Item? GetItemWithSelectedRarity(int index)
         {
-            if (LootDropItems == null || Factories == null)
-            {
-                ArgumentNullException.ThrowIfNull(Factories);
-                ArgumentNullException.ThrowIfNull(LootDropItems);
-            }
-            var randomFactory = _random!.RandiRange(0, Factories.Count - 1);
-
-            var factory = Factories[randomFactory];
-
-            return factory?.GenerateItem(LootDropItems[index].Rarity);
+            return Factories![_random!.RandiRange(0, Factories.Count - 1)]?.GenerateItem(LootDropItems![index].Rarity);
         }
 
         private void SetFactories()

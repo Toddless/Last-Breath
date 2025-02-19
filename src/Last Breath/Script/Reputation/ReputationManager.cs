@@ -3,23 +3,16 @@
     using System.Collections.Generic;
     using Playground.Script.Enums;
 
-    public class ReputationManager
+    public class ReputationManager(int elfRep, int dwarfsRep, int humanReps)
     {
-        private ElfsReputation? _elfsReputation = new(0);
-        private DwarfsReputation? _dwarfsReputation = new(0);
-        private HumansReputation? _hamansReputation = new(0);
+        private ElfsReputation? _elfReputation = new(elfRep);
+        private DwarfsReputation? _dwarfsReputation = new(dwarfsRep);
+        private HumansReputation? _humansReputation = new(humanReps);
 
-        public ReputationManager(int elfstRep, int dwarfsRep, int humanReps)
+        public ElfsReputation? ElfReputation
         {
-            _elfsReputation.ChangeReputationPoints(elfstRep);
-            _dwarfsReputation.ChangeReputationPoints(dwarfsRep);
-            _hamansReputation.ChangeReputationPoints(humanReps);
-        }
-
-        public ElfsReputation? ElfsReputation
-        {
-            get => _elfsReputation;
-            private set => _elfsReputation = value;
+            get => _elfReputation;
+            private set => _elfReputation = value;
         }
 
         public DwarfsReputation? DwarfsReputation
@@ -30,24 +23,21 @@
 
         public HumansReputation? HumansReputation
         {
-            get => _hamansReputation;
-            private set => _hamansReputation = value;
+            get => _humansReputation;
+            private set => _humansReputation = value;
         }
 
-        public void ChangeReputationForMultipleFractions(List<Fractions> fraction, int amount)
-        {
-            fraction.ForEach(fraction => GetReputationByFraction(fraction)?.ChangeReputationPoints(amount));
-        }
+        public void ChangeReputationForMultipleFractions(List<Fractions> fraction, int amount) => fraction.ForEach(fraction => GetReputationByFraction(fraction)?.ChangeReputationPoints(amount));
 
         public void ChangeReputationConflictFractions(Fractions decreaseReputationPoints, Fractions increaseReputationPoints, int amount)
         {
-           GetReputationByFraction(decreaseReputationPoints)?.ChangeReputationPoints(-amount);
-           GetReputationByFraction(increaseReputationPoints)?.ChangeReputationPoints(amount);
+            GetReputationByFraction(decreaseReputationPoints)?.ChangeReputationPoints(-amount);
+            GetReputationByFraction(increaseReputationPoints)?.ChangeReputationPoints(amount);
         }
 
         private BaseReputation? GetReputationByFraction(Fractions fractions) => fractions switch
         {
-            Fractions.Elf => ElfsReputation,
+            Fractions.Elf => ElfReputation,
             Fractions.Dwarf => DwarfsReputation,
             Fractions.Human => HumansReputation,
             _ => null

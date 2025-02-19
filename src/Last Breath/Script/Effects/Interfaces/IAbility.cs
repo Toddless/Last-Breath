@@ -2,7 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script.Passives.Attacks;
+    using Playground;
+    using Playground.Script.Scenes;
 
     public interface IAbility
     {
@@ -11,10 +12,10 @@
             get; set;
         }
 
-        Action<ICharacter, IAbility> OnReceiveAbilityHandler { get; set; }
+        Action<ICharacter, IAbility> AbilityHandler { get; set; }
 
         List<IEffect> Effects { get; set; }
 
-        void ActivateAbility(ICharacter character);
+        void ActivateAbility(IBattleContext context);
     }
 }

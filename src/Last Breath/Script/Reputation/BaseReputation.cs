@@ -5,9 +5,9 @@
     using System.Linq;
     using Playground.Script.Enums;
 
-    public abstract class BaseReputation
+    public abstract class BaseReputation(int defaultReputation)
     {
-        private int _currentReputationPoints;
+        private int _currentReputationPoints = defaultReputation;
         private ReputationRank _currentRank;
         private readonly Dictionary<Func<int, bool>, ReputationRank> _reputationRanks = new()
         {
@@ -19,11 +19,6 @@
         { v => v > 2000 && v <= 3000, ReputationRank.Reverence},
         { v => v > 3000, ReputationRank.Allyship }
         };
-
-        protected BaseReputation(int defaultReputation)
-        {
-            _currentReputationPoints = defaultReputation;
-        }
 
         public int CurrentReputationPoints
         {

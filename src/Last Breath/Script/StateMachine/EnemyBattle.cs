@@ -2,20 +2,17 @@
 {
     using Godot;
 
-    public partial class EnemyBattle : State
+    public partial class EnemyBattle
     {
         private BaseEnemy? _enemy;
         private Vector2 _vector2;
-        public override void StateReady()
+        public void StateReady()
         {
-            _enemy = GetOwner<BaseEnemy>();
-
-            _vector2 = _enemy.Velocity;
+            _vector2 = _enemy!.Velocity;
         }
 
 
-        public override void Enter() => _enemy!.Velocity = Vector2.Zero;
-
-        public override void Exit() => _enemy!.Velocity = _vector2;
+        public void Enter() => _enemy!.Velocity = Vector2.Zero;
+        public void Exit() => _enemy!.Velocity = _vector2;
     }
 }

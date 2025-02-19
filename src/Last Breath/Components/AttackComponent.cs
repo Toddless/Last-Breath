@@ -54,8 +54,11 @@ namespace Playground
             set => _rnd = value;
         }
 
+        public event Action<float>? CurrentCriticalChanceChanged, CurrentCriticalDamageChanged, CurrentExtraHitChanged;
+        public event Action<float, float> CurrentDamageChanged;
         #region Additional Values
 
+        [Changeable]
         public float AdditionalMinDamage
         {
             get => _additionalMinDamage;
@@ -67,6 +70,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalMaxDamage
         {
             get => _additionalMaxDamage;
@@ -78,6 +82,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalCriticalDamage
         {
             get => _additionalCriticalDamage;
@@ -89,6 +94,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalCriticalChance
         {
             get => _additionalCriticalChance;
@@ -100,6 +106,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float AdditionalExtraHitChance
         {
             get => _additionalExtraHitChance;
@@ -110,7 +117,10 @@ namespace Playground
                     CurrentExtraHitChance = CalculateValues.Invoke(_baseExtraHitChance, AdditionalExtraHitChance, IncreaseExtraHitChance, Parameter.AdditionalStrikeChance);
             }
         }
+        #endregion
 
+        #region Increases
+        [Changeable]
         public float IncreaseCriticalChance
         {
             get => _increaseCriticalChance;
@@ -122,6 +132,7 @@ namespace Playground
             }
         }
 
+        [Changeable]
         public float IncreaseExtraHitChance
         {
             get => _increaseExtraHitChance;
@@ -134,6 +145,7 @@ namespace Playground
 
         }
 
+        [Changeable]
         public float IncreaseDamage
         {
             get => _increaseDamage;
@@ -150,31 +162,51 @@ namespace Playground
         public float CurrentMinDamage
         {
             get => Mathf.RoundToInt(_currentMinDamage);
-            private set => _currentMinDamage = value;
+            private set
+            {
+                if (SetProperty(ref _currentMinDamage, value))
+                    CurrentDamageChanged?.Invoke(value, CurrentMaxDamage);
+            }
         }
 
         public float CurrentMaxDamage
         {
             get => Mathf.RoundToInt(_currentMaxDamage);
-            private set => _currentMaxDamage = value;
+            private set
+            {
+                if (SetProperty(ref _currentMaxDamage, value))
+                    CurrentDamageChanged?.Invoke(CurrentMinDamage, value);
+            }
         }
 
         public float CurrentCriticalChance
         {
             get => _currentCriticalChance;
-            private set => _currentCriticalChance = value;
+            private set
+            {
+                if (SetProperty(ref _currentCriticalChance, value))
+                    CurrentCriticalChanceChanged?.Invoke(value);
+            }
         }
 
         public float CurrentCriticalDamage
         {
             get => _currentCriticalDamage;
-            private set => _currentCriticalDamage = value;
+            private set
+            {
+                if (SetProperty(ref _currentCriticalDamage, value))
+                    CurrentCriticalDamageChanged?.Invoke(value);
+            }
         }
 
         public float CurrentExtraHitChance
         {
             get => _currentExtraHitChance;
-            private set => _currentExtraHitChance = value;
+            private set
+            {
+                if (SetProperty(ref _currentExtraHitChance, value))
+                    CurrentExtraHitChanged?.Invoke(value);
+            }
         }
         #endregion
 

@@ -11,7 +11,7 @@
         public void TestAllThreeRaceNeutral()
         {
             var repManager = new ReputationManager(0, 0, 0);
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentRank == ReputationRank.Neutrality);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentRank == ReputationRank.Neutrality);
             Assert.IsTrue(repManager.HumansReputation?.CurrentRank == ReputationRank.Neutrality);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentRank == ReputationRank.Neutrality);
         }
@@ -21,7 +21,7 @@
         {
             var repManager = new ReputationManager(1001, -1001, 0);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentRank == ReputationRank.Friendliness);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentRank == ReputationRank.Friendliness);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentRank == ReputationRank.Detestation);
         }
 
@@ -30,7 +30,7 @@
         {
             var repManager = new ReputationManager(-1001, 1001, 0);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentRank == ReputationRank.Detestation);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentRank == ReputationRank.Detestation);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentRank == ReputationRank.Friendliness);
         }
 
@@ -41,7 +41,7 @@
             var rankList = new List<Fractions>() { Fractions.Elf, Fractions.Human };
             repManager.ChangeReputationForMultipleFractions(rankList, 10);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentReputationPoints == 10);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentReputationPoints == 10);
             Assert.IsTrue(repManager.HumansReputation?.CurrentReputationPoints == 10);
         }
 
@@ -52,7 +52,7 @@
 
             repManager.ChangeReputationConflictFractions(Fractions.Elf, Fractions.Dwarf, 650);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentReputationPoints == -650);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentReputationPoints == -650);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentReputationPoints == 650);
         }
 
@@ -62,7 +62,7 @@
             var repManager = new ReputationManager(0, 0, 0);
             repManager.ChangeReputationForMultipleFractions([Fractions.Human, Fractions.Dwarf, Fractions.Elf], 50);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentReputationPoints == 50);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentReputationPoints == 50);
             Assert.IsTrue(repManager.HumansReputation?.CurrentReputationPoints == 50);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentReputationPoints == 50);
         }
@@ -73,7 +73,7 @@
             var repManager = new ReputationManager(0, 0, 0);
             repManager.ChangeReputationForMultipleFractions([Fractions.Human, Fractions.Dwarf, Fractions.Elf], -50);
 
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentReputationPoints == -50);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentReputationPoints == -50);
             Assert.IsTrue(repManager.HumansReputation?.CurrentReputationPoints == -50);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentReputationPoints == -50);
         }
@@ -85,7 +85,7 @@
 
             repManager.ChangeReputationForMultipleFractions([Fractions.None], 50);
             Assert.IsTrue(repManager.HumansReputation?.CurrentReputationPoints == 0);
-            Assert.IsTrue(repManager.ElfsReputation?.CurrentReputationPoints == 0);
+            Assert.IsTrue(repManager.ElfReputation?.CurrentReputationPoints == 0);
             Assert.IsTrue(repManager.DwarfsReputation?.CurrentReputationPoints == 0);
         }
     }
