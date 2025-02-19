@@ -141,3 +141,4 @@ paket-files/
 /src/Last Breath/NewFolder/IAbilityStrategy.cs
 /src/Last Breath/NewFolder/TestAbility.cs
 /src/Last Breath/Components/MessageBus.cs
+/src/Last Breath/Properties/launchSettings.json
