@@ -2,24 +2,32 @@
 {
     using System;
     using Godot;
+    using Playground.Script.NPC;
+    using Playground.Script.UI.Layers;
     using Stateless;
 
-    public class ManagerUI(CanvasLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer)
+    public class ManagerUI(CanvasLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer, DialogLayer dialog)
     {
-        private enum State { MainUI, PauseUI, BattleUI, DevTools }
-        private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI, ShowDevTools }
+        private enum State { MainUI, PauseUI, BattleUI, DevTools, DialogUI }
+        private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI, ShowDevTools, ShowDialog }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.MainUI);
         private readonly CanvasLayer _mainLayer = mainUI;
         private readonly PauseLayer _pauseLayer = pauseUI;
         private readonly BattleLayer _battleLayer = battleUI;
         private readonly DevLayer? _devLayer = devLayer;
+        private readonly DialogLayer _dialogLayer = dialog;
 
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
         public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void ShowBattleUI() => _machine.Fire(Trigger.ShowBattleUI);
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
+        public void ShowDialog(BaseNPC npc)
+        {
+            _dialogLayer.SetupWindow(npc);
+            _machine.Fire(Trigger.ShowDialog);
+        }
 #if DEBUG
         public void ShowDevTools() => _devLayer?.Show();
         public void HideDevTools() => _devLayer?.Hide();
@@ -27,20 +35,14 @@
         public void ConfigureStateMachine()
         {
             _machine?.Configure(State.MainUI)
-                .OnEntry(() =>
-                {
-                    _mainLayer.Show();
-                    _mainLayer.SetProcessUnhandledInput(true);
-                    _pauseLayer.Hide();
-                    _battleLayer.Hide();
-                    _devLayer?.Hide();
-                })
+                .OnEntry(HideAllExceptMain)
                 .OnExit(() =>
                 {
                     _mainLayer.SetProcessUnhandledInput(false);
                 })
                 .Permit(Trigger.ShowPauseUI, State.PauseUI)
-                .Permit(Trigger.ShowBattleUI, State.BattleUI);
+                .Permit(Trigger.ShowBattleUI, State.BattleUI)
+                .Permit(Trigger.ShowDialog, State.DialogUI);
 
             _machine?.Configure(State.BattleUI)
                 .OnEntry(() =>
@@ -67,6 +69,30 @@
                     _pauseLayer?.Hide();
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
+
+            _machine?.Configure(State.DialogUI)
+                .OnEntry(() =>
+                {
+                    _dialogLayer.SetProcessUnhandledInput(true);
+                    _dialogLayer.Show();
+                })
+                .OnExit(() =>
+                {
+                    _dialogLayer.SetProcessUnhandledInput(false);
+                    _dialogLayer?.Hide();
+                })
+                .Permit(Trigger.ShowMainUI, State.MainUI);
+
+        }
+
+        private void HideAllExceptMain()
+        {
+            _mainLayer.Show();
+            _mainLayer.SetProcessUnhandledInput(true);
+            _pauseLayer.Hide();
+            _battleLayer.Hide();
+            _devLayer?.Hide();
+            _dialogLayer?.Hide();
         }
     }
 }

@@ -8,7 +8,6 @@
     using Playground.Script.Helpers;
     using Playground.Script;
     using Playground.Script.Reputation;
-    using Playground.Script.Passives.Attacks;
 
     public partial class Player : ObservableCharacterBody2D, ICharacter
     {
@@ -19,6 +18,7 @@
         private ObservableCollection<IEffect>? _effects;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private List<IAbility>? _abilities;
+        private Sprite2D? _playerAvatar;
         #endregion
 
         #region Components
@@ -65,6 +65,7 @@
         public EffectManager? EffectManager => _effectManager;
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
         public List<IAbility>? Abilities => _abilities;
+        public Sprite2D? PlayerAvatar => _playerAvatar;
         #endregion
 
         public override void _Ready()
@@ -74,6 +75,7 @@
             _playerHealth = new(_effectManager.CalculateValues);
             _playerAttack = new(_effectManager.CalculateValues);
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
+            _playerAvatar = GetNode<Sprite2D>(nameof(Sprite2D));
             _sprite.Play("Idle_down");
             GameManager.Instance!.Player = this;
             _reputation = new(0, 0, 0);

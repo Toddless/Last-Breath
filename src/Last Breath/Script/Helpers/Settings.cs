@@ -18,5 +18,6 @@
         public const string Character = "ui_character";
         public const string Map = "ui_map";
         public const string Dev = "ui_dev";
+        public const string Dialog = "ui_dialog";
     }
 }

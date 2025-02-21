@@ -1,9 +1,13 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
+    using System;
     using System.ComponentModel;
+    using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
+    using Playground.Script.NPC;
     using Playground.Script.UI;
+    using Playground.Script.UI.Layers;
     using Playground.Script.UI.View;
     using Stateless;
 
@@ -12,17 +16,18 @@
 #if DEBUG
         private bool _devOpened = false;
 #endif
-        private enum State { World, Battle, Paused }
-        private enum Trigger { StartBattle, EndBattle, Pause, Resume }
+        private enum State { World, Battle, Paused, Dialog }
+        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog }
 
         private StateMachine<State, Trigger>? _machine;
+        private StateMachine<State, Trigger>.TriggerWithParameters<BaseNPC>? _showDialog;
 
         private MainWorld? _mainWorld;
         private ManagerUI? _managerUI;
 
         public override void _Ready()
         {
-            _machine = new (State.World);
+            _machine = new(State.World);
             _mainWorld = GetNode<MainWorld>(nameof(MainWorld));
 
             _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)),
@@ -31,7 +36,8 @@
 #if !DEBUG
                 null);
 #else
-                GetNode<DevLayer>(nameof(DevLayer)));
+                GetNode<DevLayer>(nameof(DevLayer)),
+                GetNode<DialogLayer>(nameof(DialogLayer)));
 #endif
             _managerUI.SetReturn(ReturnToMainWorld);
             _managerUI.SetResume(FireResume);
@@ -47,11 +53,22 @@
             {
                 if (_machine?.State == State.Paused)
                 {
-                    _machine?.Fire(Trigger.Resume);
+                    _machine.Fire(Trigger.Resume);
                 }
                 else if (_machine?.State == State.World)
                 {
                     _machine.Fire(Trigger.Pause);
+                }
+                GetViewport().SetInputAsHandled();
+            }
+
+            if (@event.IsActionPressed(Settings.Dialog))
+            {
+                if (_mainWorld!.NPCs?.Any(x => x.IsPlayerNearby()) != true) return;
+                if (_machine?.State == State.World)
+                {
+                    _machine.Fire(_showDialog!, _mainWorld!.NPCs?.First(x=>x.IsPlayerNearby() == true));
+                    GetViewport().SetInputAsHandled();
                 }
             }
 #if DEBUG
@@ -102,9 +119,16 @@
 
         private void ConfigureStateMachine()
         {
+            _showDialog = _machine?.SetTriggerParameters<BaseNPC>(Trigger.Dialog);
+
+            _machine?.Configure(State.Dialog)
+                .OnEntryFrom(_showDialog, OpenDialog)
+                .Permit(Trigger.Resume, State.World);
+
             _machine?.Configure(State.World)
                 .Permit(Trigger.StartBattle, State.Battle)
-                .Permit(Trigger.Pause, State.Paused);
+                .Permit(Trigger.Pause, State.Paused)
+                .Permit(Trigger.Dialog, State.Dialog);
 
             _machine?.Configure(State.Battle)
                 .OnEntry(PrepareBattle)
@@ -124,6 +148,14 @@
               })
               .Permit(Trigger.Resume, State.World);
         }
+
+        private void OpenDialog(BaseNPC npc)
+        {
+            _managerUI.ShowDialog(npc);
+        }
+
+        private void CloseDialogWindow() => throw new NotImplementedException();
+
 
         private void AfterBattle()
         {

@@ -5,22 +5,30 @@ namespace Playground
     using Playground.Script.Enemy;
     using Playground.Script.Scenes;
     using System.Linq;
+    using System.Collections.Generic;
+    using Playground.Script.NPC;
 
     public partial class MainWorld : BaseSpawnableScene
     {
         private BattleContext? _fight;
         private bool _isBattleActive;
+        private readonly List<BaseNPC> _npcs = [];
         public BattleContext? Fight
         {
             get => _fight;
             set => SetProperty(ref _fight, value);
         }
 
+        public List<BaseNPC> NPCs => _npcs;
+
         public override void _Ready()
         {
             EnemySpawner = GetNode<IEnemySpawner>(nameof(EnemySpawner));
+            AddNpcsToList();
             InitializeEnemies();
         }
+
+        private void AddNpcsToList() => _npcs.AddRange(GetChildren().OfType<BaseNPC>().ToList());
 
         private void InitializeEnemies()
         {
