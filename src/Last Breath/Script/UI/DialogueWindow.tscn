@@ -1,15 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://eh2wvi8x5l80"]
+[gd_scene load_steps=3 format=3 uid="uid://eh2wvi8x5l80"]
 
-[ext_resource type="Script" path="res://Script/UI/View/DialogWindow.cs" id="1_yteki"]
+[ext_resource type="Script" path="res://Script/UI/View/DialogueWindow.cs" id="1_q0bu3"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_e8eok"]
 
-[node name="DialogWindow" type="Control"]
+[node name="DialogueWindow" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_yteki")
+script = ExtResource("1_q0bu3")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -25,12 +26,6 @@ theme_override_constants/margin_bottom = 25
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -52,11 +47,22 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
 
-[node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/TextPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextPanel"]
 layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/TextPanel/MarginContainer"]
+clip_contents = false
+layout_mode = 2
+theme_override_fonts/normal_font = ExtResource("2_e8eok")
+theme_override_font_sizes/normal_font_size = 24
+text = "Some Test Text"
 
 [node name="OptionsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(300, 300)
+custom_minimum_size = Vector2(500, 300)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
@@ -64,7 +70,16 @@ size_flags_vertical = 8
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel"]
 layout_mode = 2
 
-[node name="Options" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Options" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

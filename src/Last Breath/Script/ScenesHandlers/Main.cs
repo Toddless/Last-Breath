@@ -1,15 +1,14 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
-    using System;
-    using System.ComponentModel;
-    using System.Linq;
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.NPC;
-    using Playground.Script.UI;
-    using Playground.Script.UI.Layers;
-    using Playground.Script.UI.View;
     using Stateless;
+    using System.Linq;
+    using Playground.Script.UI;
+    using System.ComponentModel;
+    using Playground.Script.NPC;
+    using Playground.Script.UI.View;
+    using Playground.Script.Helpers;
+    using Playground.Script.UI.Layers;
 
     public partial class Main : Node2D
     {
@@ -17,7 +16,7 @@
         private bool _devOpened = false;
 #endif
         private enum State { World, Battle, Paused, Dialog }
-        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog }
+        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, Close }
 
         private StateMachine<State, Trigger>? _machine;
         private StateMachine<State, Trigger>.TriggerWithParameters<BaseNPC>? _showDialog;
@@ -34,13 +33,14 @@
                 GetNode<PauseLayer>(nameof(PauseLayer)),
                 GetNode<BattleLayer>(nameof(BattleLayer)),
 #if !DEBUG
-                null);
+                null,
 #else
                 GetNode<DevLayer>(nameof(DevLayer)),
-                GetNode<DialogLayer>(nameof(DialogLayer)));
 #endif
+                GetNode<DialogueLayer>(nameof(DialogueLayer)));
             _managerUI.SetReturn(ReturnToMainWorld);
             _managerUI.SetResume(FireResume);
+            _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
 
             _mainWorld.PropertyChanged += NewBattleContextCreated;
@@ -67,7 +67,7 @@
                 if (_mainWorld!.NPCs?.Any(x => x.IsPlayerNearby()) != true) return;
                 if (_machine?.State == State.World)
                 {
-                    _machine.Fire(_showDialog!, _mainWorld!.NPCs?.First(x=>x.IsPlayerNearby() == true));
+                    _machine.Fire(_showDialog!, _mainWorld!.NPCs?.First(x => x.IsPlayerNearby() == true));
                     GetViewport().SetInputAsHandled();
                 }
             }
@@ -91,6 +91,8 @@
         public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
 
         private void FireResume() => _machine?.Fire(Trigger.Resume);
+
+        private void Close() => _machine?.Fire(Trigger.Close);
 
         private void NewBattleContextCreated(object? sender, PropertyChangedEventArgs e)
         {
@@ -123,15 +125,20 @@
 
             _machine?.Configure(State.Dialog)
                 .OnEntryFrom(_showDialog, OpenDialog)
-                .Permit(Trigger.Resume, State.World);
+                .Permit(Trigger.Close, State.World);
 
             _machine?.Configure(State.World)
+                .OnEntry(() => _managerUI?.ShowMainUI())
                 .Permit(Trigger.StartBattle, State.Battle)
                 .Permit(Trigger.Pause, State.Paused)
                 .Permit(Trigger.Dialog, State.Dialog);
 
             _machine?.Configure(State.Battle)
-                .OnEntry(PrepareBattle)
+                .OnEntry(() =>
+                {
+                    PrepareBattle();
+                    _managerUI?.ShowBattleUI();
+                })
                 .OnExit(AfterBattle)
                 .Permit(Trigger.EndBattle, State.World);
 
@@ -141,25 +148,17 @@
                   _mainWorld!.ProcessMode = ProcessModeEnum.Disabled;
                   _managerUI?.ShowPauseUI();
               })
-              .OnExit(() =>
-              {
-                  _mainWorld!.ProcessMode = ProcessModeEnum.Inherit;
-                  _managerUI?.ShowMainUI();
-              })
+              .OnExit(() => { _mainWorld!.ProcessMode = ProcessModeEnum.Inherit; })
               .Permit(Trigger.Resume, State.World);
         }
 
         private void OpenDialog(BaseNPC npc)
         {
-            _managerUI.ShowDialog(npc);
+            _managerUI?.ShowDialog(npc);
         }
-
-        private void CloseDialogWindow() => throw new NotImplementedException();
-
 
         private void AfterBattle()
         {
-            _managerUI?.ShowMainUI();
             _mainWorld!.Fight = null;
             _mainWorld.ResetBattleState();
         }
@@ -168,7 +167,6 @@
         {
             var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
             battleLayer!.BattleContext = _mainWorld!.Fight!;
-            _managerUI?.ShowBattleUI();
         }
     }
 }

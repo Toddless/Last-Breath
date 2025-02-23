@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=8 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/MainWorld.cs" id="1_k6wnk"]
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/MainLev.png" id="2_abp17"]
 [ext_resource type="Script" path="res://Script/Enemy/EnemySpawner.cs" id="4_yvpx8"]
-[ext_resource type="PackedScene" uid="uid://cgbo08fo7mqcj" path="res://Scenes/Digry.tscn" id="5_a3a4j"]
+[ext_resource type="PackedScene" uid="uid://cgbo08fo7mqcj" path="res://Script/NPC/Digry.tscn" id="5_a3a4j"]
+[ext_resource type="PackedScene" uid="uid://dx2kou0dpsa56" path="res://Script/NPC/Guardian.tscn" id="5_dp5mw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
 texture = ExtResource("2_abp17")
@@ -592,4 +593,8 @@ script = ExtResource("4_yvpx8")
 
 [node name="Digry" parent="." instance=ExtResource("5_a3a4j")]
 z_index = 1
-position = Vector2(989, 543)
+position = Vector2(1253, 141)
+
+[node name="Guardian" parent="." instance=ExtResource("5_dp5mw")]
+z_index = 1
+position = Vector2(1713, 745)

@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.QuestSystem
 {
-    using Playground.Script.Helpers;
+    using Playground.Localization;
     public abstract class QuestObjective
     {
         public LocalizedText? Description { get; set; }

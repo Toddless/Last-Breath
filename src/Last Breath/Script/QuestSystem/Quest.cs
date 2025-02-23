@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.QuestSystem
 {
     using System.Collections.Generic;
-    using Playground.Script.Helpers;
+    using Playground.Localization;
 
     public class Quest
     {

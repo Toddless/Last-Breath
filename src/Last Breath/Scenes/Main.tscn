@@ -20,8 +20,8 @@
 [ext_resource type="Script" path="res://Script/UI/Layers/BattleLayer.cs" id="16_vnox3"]
 [ext_resource type="Script" path="res://DebugTools/DevLayer.cs" id="18_lw5ck"]
 [ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://DebugTools/DevTools.tscn" id="19_yuu34"]
-[ext_resource type="PackedScene" uid="uid://eh2wvi8x5l80" path="res://Script/UI/DialogWindow.tscn" id="21_rf13s"]
-[ext_resource type="Script" path="res://Script/UI/Layers/DialogLayer.cs" id="21_uolv1"]
+[ext_resource type="Script" path="res://Script/UI/Layers/DialogueLayer.cs" id="21_nfb6a"]
+[ext_resource type="PackedScene" uid="uid://eh2wvi8x5l80" path="res://Script/UI/DialogueWindow.tscn" id="21_rf13s"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3
@@ -89,8 +89,8 @@ script = ExtResource("18_lw5ck")
 
 [node name="DevTools" parent="DevLayer" instance=ExtResource("19_yuu34")]
 
-[node name="DialogLayer" type="CanvasLayer" parent="."]
+[node name="DialogueLayer" type="CanvasLayer" parent="."]
 visible = false
-script = ExtResource("21_uolv1")
+script = ExtResource("21_nfb6a")
 
-[node name="DialogWindow" parent="DialogLayer" instance=ExtResource("21_rf13s")]
+[node name="DialogueWindow" parent="DialogueLayer" instance=ExtResource("21_rf13s")]

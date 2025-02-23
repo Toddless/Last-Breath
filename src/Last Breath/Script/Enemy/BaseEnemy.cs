@@ -2,7 +2,7 @@ namespace Playground
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
+    using System.Linq;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -180,6 +180,8 @@ namespace Playground
             SpawnItems();
         }
 
+        public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;
+
         protected void SpawnItems()
         {
             _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -196,27 +198,6 @@ namespace Playground
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
             EmitSignal(SignalName.EnemyInitialized);
-        }
-
-        protected void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e is PropertyChangedWithValuesEventArgs<int> args)
-            {
-                if (args.NewValue < args.OldValue)
-                {
-                    var diff = args.OldValue - args.NewValue;
-                    _health!.IncreaseHealth -= _attribute!.Strength!.HealthIncrease * diff;
-
-                }
-                else
-                {
-                    _health!.IncreaseHealth = _attribute!.Strength!.TotalHealthIncrese();
-                }
-                if (!_enemyFight)
-                {
-                    _health.RefreshHealth();
-                }
-            }
         }
 
         protected GlobalRarity EnemyRarity()
@@ -244,13 +225,6 @@ namespace Playground
                     _sprite!.Play("Bat_Uncomm");
                     break;
             }
-        }
-
-        public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
-        {
-            // working fine for buff, but what should i do to debuff someone?
-            BattleBehavior?.MakeDecision()?.ActivateAbility(_battleContext);
-            return _attack!.CalculateDamage();
         }
 
         public void PlayerExited(Node2D body)
