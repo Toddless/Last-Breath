@@ -12,6 +12,7 @@
         private Area2D? _area2D;
         private Dictionary<string, DialogueNode> _dialogs = [];
 
+        public bool FirstTimeMeetPlayer = true;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
 
         protected Area2D? Area

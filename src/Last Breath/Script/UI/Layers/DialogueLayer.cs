@@ -1,12 +1,12 @@
 ﻿namespace Playground.Script.UI.Layers
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Godot;
+    using Playground.Script.UI.View;
     using Playground.Localization;
     using Playground.Script.NPC;
-    using Playground.Script.UI.View;
+    using System.Linq;
+    using System;
+    using Godot;
 
     public partial class DialogueLayer : CanvasLayer
     {
@@ -28,12 +28,15 @@
             SetCurrentNode(startNode);
         }
 
-        private void SetCurrentNode(string startNode)
+        private async void SetCurrentNode(string startNode)
         {
-            if (_currentNpc!.Dialogs.TryGetValue(startNode, out var node))
+            if (_currentNpc!.Dialogs.TryGetValue(startNode, out DialogueNode? node))
             {
                 _currentNode = node;
-                UpdateUI();
+                UpdateUI(GetText(_currentNode?.Texts));
+                await ToSignal(_dialogWindow, "CanContinue");
+                if (_currentNode?.Options != null)
+                    ShowOptions();
             }
             else
             {
@@ -50,51 +53,53 @@
             _previousNode = null;
         }
 
-        private void UpdateUI()
+        private void UpdateUI(string text)
         {
-            _dialogWindow?.Clear();
-            _dialogWindow?.UpdateText(GetText(_currentNode?.Texts));
-            if (_currentNode?.Options != null)
-            {
-                foreach (var item in _currentNode.Options)
-                {
-                    var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
-                    option.Bind(item);
-                    option.Option += OnOptionSelected;
-                    _dialogWindow?.AddOption(option);
-                }
-            }
-        }
-
-        private string GetText(List<DialogueText>? texts)
-        {
-            if (texts == null || texts.Count == 0) return "No text";
-
-            var eligibleText = texts.Where(x => x.MinRelation <= _currentRelation)
-                .OrderByDescending(x => x.MinRelation)
-                .ToList();
-
-            return eligibleText.FirstOrDefault()?.NpcText ?? "No text";
+            _dialogWindow!.Clear();
+            _dialogWindow.UpdateText(text);
         }
 
         private async void OnOptionSelected(DialogueOption option)
         {
             _currentRelation = Mathf.Clamp(_currentRelation + option.RelationEffect, -100, 100);
 
-            if (!string.IsNullOrEmpty(option.TargetNode))
+            if (!string.IsNullOrWhiteSpace(option.Text))
+            {
+                UpdateUI(option.Text);
+                await ToSignal(_dialogWindow, "CanContinue");
+            }
+
+            if (!string.IsNullOrWhiteSpace(option.TargetNode))
             {
                 _previousNode = _currentNode;
                 SetCurrentNode(option.TargetNode);
             }
             else
             {
-                if (!string.IsNullOrEmpty(option.Text))
-                {
-                    _dialogWindow?.UpdateText(option.Text);
-                    await ToSignal(_dialogWindow, "TextEnd");
-                }
                 EndDialogue();
             }
+        }
+
+        private void ShowOptions()
+        {
+            foreach (var item in _currentNode?.Options!)
+            {
+                var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
+                option.Bind(item);
+                option.Option += OnOptionSelected;
+                _dialogWindow?.AddOption(option);
+            }
+        }
+
+        private string GetText(List<DialogueText>? texts)
+        {
+            if (texts == null || texts.Count == 0) return "Text not found";
+
+            var eligibleText = texts.Where(x => x.MinRelation <= _currentRelation)
+                .OrderByDescending(x => x.MinRelation)
+                .ToList();
+
+            return eligibleText.FirstOrDefault()?.NpcText ?? "Text not found";
         }
     }
 }

@@ -2,17 +2,10 @@
 {
     using System.Collections.Generic;
     using Playground.Script.Items;
-    public class Reward
+    public class Reward(int exp, int gold, params Item[] items)
     {
-        public int Exp { get; }
-        public int Gold { get; }
-        public List<Item> Items { get; }
-
-        public Reward(int exp, int gold, params Item[] items)
-        {
-            Exp = exp;
-            Gold = gold;
-            Items = [.. items];
-        }
+        public int Exp { get; } = exp;
+        public int Gold { get; } = gold;
+        public List<Item> Items { get; } = [.. items];
     }
 }
