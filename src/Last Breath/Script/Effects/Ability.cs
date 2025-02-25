@@ -1,10 +1,9 @@
-﻿namespace Playground.Script.Passives.Attacks
+﻿namespace Playground.Script.Effects
 {
     using System;
     using System.Collections.Generic;
-    using Playground;
     using Playground.Script.Effects.Interfaces;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     public abstract class Ability : IAbility
     {

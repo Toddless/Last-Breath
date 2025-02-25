@@ -1,10 +1,11 @@
 ﻿namespace Playground.Script.UI
 {
     using System.Collections.Generic;
-    using Playground.Script.Helpers;
     using System.Linq;
-    using Stateless;
     using Godot;
+    using Playground.Script.Helpers;
+    using Playground.Script.QuestSystem;
+    using Stateless;
 
     public partial class ManagementLayer : CanvasLayer
     {
@@ -14,6 +15,7 @@
         private StateMachine<State, Trigger>? _machine;
         private PlayerInventoryUI? _inventoryUI;
         private QuestsMenu? _questsUI;
+        private QuestManager? _questManager;
         private CharacterMenu? _characterUI;
         private MapMenu? _mapUI;
 
@@ -24,6 +26,7 @@
             _characterUI = GetNode<CharacterMenu>(nameof(CharacterMenu));
             _mapUI = GetNode<MapMenu>(nameof(MapMenu));
             _inventoryUI = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
+            _questManager = DiContainer.GetService<QuestManager>();
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();

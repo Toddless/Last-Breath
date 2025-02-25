@@ -1,12 +1,11 @@
 ﻿namespace PlaygroundTest
 {
     using Moq;
-    using Playground;
     using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     [TestClass]
     public class BattleBehaviorTest

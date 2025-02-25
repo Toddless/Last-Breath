@@ -1,4 +1,4 @@
-﻿namespace PlaygroundTesting
+﻿namespace PlaygroundTest
 {
     using Playground.Script.Enums;
     using Playground.Script.Reputation;

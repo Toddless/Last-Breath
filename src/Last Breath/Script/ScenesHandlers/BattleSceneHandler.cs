@@ -4,7 +4,6 @@
     using Godot;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
-    using Playground.Script.Scenes;
 
     public partial class BattleSceneHandler : ObservableNode2D
     {

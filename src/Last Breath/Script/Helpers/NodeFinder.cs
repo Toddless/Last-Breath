@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
-using Godot;
-
-namespace Playground.Script.Helpers
+﻿namespace Playground.Script.Helpers
 {
+    using System.Collections.Generic;
+    using Godot;
+
     public static class NodeFinder
     {
         private static readonly Dictionary<string, Node> s_cache = [];
 
+        /// <summary>
+        /// Find desired node from current location. Dont forget <see cref="ClearCache"/>.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
         public static Node? FindBFSCached(Node root, string target)
         {
             if (s_cache.TryGetValue(target, out Node? cachedNode))

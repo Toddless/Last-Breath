@@ -1,4 +1,4 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Components.Interfaces
 {
     public interface IHealthComponent
     {

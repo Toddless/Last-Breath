@@ -10,16 +10,18 @@
   <ItemGroup>
     <Compile Remove="Scenes\Components\**" />
     <Compile Remove="Script\Chest\**" />
+    <Compile Remove="Script\Items\ItemsAbilities\**" />
+    <Compile Remove="Script\Items\UniqItems\**" />
     <EmbeddedResource Remove="Scenes\Components\**" />
     <EmbeddedResource Remove="Script\Chest\**" />
+    <EmbeddedResource Remove="Script\Items\ItemsAbilities\**" />
+    <EmbeddedResource Remove="Script\Items\UniqItems\**" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="C:\Users\faust\.nuget\packages\gdunit4.api\4.3.1\contentFiles\any\net8.0\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scenes\" />
-    <Folder Include="Script\Items\ItemsAbilities\" />
-    <Folder Include="Script\Items\UniqItems\" />
     <Folder Include="Script\Effects\Utility\" />
   </ItemGroup>
   <ItemGroup>

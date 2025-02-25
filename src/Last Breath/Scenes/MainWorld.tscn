@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=9 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Script" path="res://Script/ScenesHandlers/MainWorld.cs" id="1_k6wnk"]
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/MainLev.png" id="2_abp17"]
@@ -578,6 +578,9 @@ texture_region_size = Vector2i(64, 64)
 tile_size = Vector2i(64, 64)
 sources/1 = SubResource("TileSetAtlasSource_e7h3s")
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_6wsfm"]
+radius = 16.5236
+
 [node name="MainWorld" type="Node2D"]
 process_mode = 1
 script = ExtResource("1_k6wnk")
@@ -598,3 +601,11 @@ position = Vector2(1253, 141)
 [node name="Guardian" parent="." instance=ExtResource("5_dp5mw")]
 z_index = 1
 position = Vector2(1713, 745)
+
+[node name="Area2D" type="Area2D" parent="."]
+position = Vector2(110, 145)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+z_index = 1
+scale = Vector2(5.36, 5.36)
+shape = SubResource("CircleShape2D_6wsfm")

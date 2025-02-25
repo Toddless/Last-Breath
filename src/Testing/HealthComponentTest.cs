@@ -2,7 +2,6 @@
 {
     using System.Collections.ObjectModel;
     using Moq;
-    using Playground;
     using Playground.Components;
     using Playground.Script.Effects.Interfaces;
 

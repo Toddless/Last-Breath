@@ -2,8 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using Playground;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     public interface IAbility
     {

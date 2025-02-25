@@ -1,11 +1,11 @@
 ﻿namespace Playground.Script.Scenes
 {
-    using System.Collections.ObjectModel;
-    using Playground.Script.Helpers;
-    using Playground.Script.Enemy;
-    using Godot;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using Godot;
+    using Playground.Script.Enemy;
+    using Playground.Script.Helpers;
 
     [Inject]
     public abstract partial class BaseSpawnableScene : ObservableNode2D

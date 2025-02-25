@@ -1,6 +1,6 @@
 ﻿namespace PlaygroundTest
 {
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     [TestClass]
     public class AbilityTest

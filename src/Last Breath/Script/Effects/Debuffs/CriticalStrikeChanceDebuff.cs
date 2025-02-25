@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.Passives.Debuffs
+﻿namespace Playground.Script.Effects.Debuffs
 {
     using Playground.Script.Enums;
+
     public class CriticalStrikeChanceDebuff : AbstractEffect
     {
         public CriticalStrikeChanceDebuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)

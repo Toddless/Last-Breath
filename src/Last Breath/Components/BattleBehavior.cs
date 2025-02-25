@@ -4,7 +4,7 @@
     using System.Linq;
     using Playground.Components.Interfaces;
     using Playground.Script.Effects.Interfaces;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     /// <summary>
     /// Determine enemies battle behaviors depending on conditions
@@ -22,7 +22,7 @@
         public void SetDependencies(IBattleContext context, IConditionsFactory conditions)
         {
             _battleContext = context;
-            _conditions = conditions.SetNewConditions(_battleContext);
+            //_conditions = conditions.SetNewConditions(_battleContext);
             SetAbilitiesDecisions(_battleContext.Self.Abilities!, _conditions!);
         }
 

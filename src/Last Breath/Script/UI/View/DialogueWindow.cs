@@ -8,9 +8,10 @@
         private VBoxContainer? _options;
         private RichTextLabel? _text;
         private TextureRect? _playerIcon;
+        private Label? _questAdded;
         private Button? _skip, _moreSpeed, _lessSpeed, _default;
         private double _time = 0.015;
-        private bool _canProsed = false;
+        private bool _canProceed = false;
 
         [Signal]
         public delegate void CanContinueEventHandler();
@@ -24,7 +25,18 @@
             _moreSpeed = (Button?)NodeFinder.FindBFSCached(this, "MoreSpeed");
             _lessSpeed = (Button?)NodeFinder.FindBFSCached(this, "LessSpeed");
             _default = (Button?)NodeFinder.FindBFSCached(this, "Default");
+            _questAdded = (Label?)NodeFinder.FindBFSCached(this, "Label");
+            _questAdded?.Hide();
             SetEvents();
+
+            NodeFinder.ClearCache();
+        }
+
+        public async void NewQuestAdded()
+        {
+            _questAdded?.Show();
+            await ToSignal(GetTree().CreateTimer(1.5), "timeout");
+            _questAdded?.Hide();
         }
 
         public void SetAvatar(Texture2D icon) => _playerIcon!.Texture = icon;
@@ -40,8 +52,8 @@
                 _text.Text += c;
                 await ToSignal(GetTree().CreateTimer(_time), "timeout");
             }
+            _canProceed = true;
             _options?.Show();
-            _canProsed = true;
         }
 
         public void AddOption(DialogueUIOption option) => _options?.AddChild(option);
@@ -65,10 +77,10 @@
 
         private void OnTextClicked(InputEvent @event)
         {
-            if (_canProsed && @event.IsActionPressed("LMB"))
+            if (_canProceed && @event.IsActionPressed("LMB"))
             {
                 EmitSignal(SignalName.CanContinue);
-                _canProsed = false;
+                _canProceed = false;
             }
         }
     }

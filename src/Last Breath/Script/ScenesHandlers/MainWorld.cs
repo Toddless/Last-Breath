@@ -1,18 +1,23 @@
 namespace Playground
 {
-    using Playground.Script;
-    using System.ComponentModel;
-    using Playground.Script.Enemy;
-    using Playground.Script.Scenes;
-    using System.Linq;
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
+    using Godot;
+    using Playground.Script;
+    using Playground.Script.Enemy;
     using Playground.Script.NPC;
+    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     public partial class MainWorld : BaseSpawnableScene
     {
         private BattleContext? _fight;
         private bool _isBattleActive;
         private readonly List<BaseNPC> _npcs = [];
+        private Area2D? _area2D;
+
         public BattleContext? Fight
         {
             get => _fight;
@@ -20,12 +25,24 @@ namespace Playground
         }
 
         public List<BaseNPC> NPCs => _npcs;
+        public event Action<string>? CutScene;
 
         public override void _Ready()
         {
+            _area2D = GetNode<Area2D>(nameof(Area2D));
             EnemySpawner = GetNode<IEnemySpawner>(nameof(EnemySpawner));
+            _area2D.BodyEntered += OnEnterArea;
             AddNpcsToList();
             InitializeEnemies();
+        }
+
+        private void OnEnterArea(Node2D body)
+        {
+            if (body is Player p && p.FirstSpawn)
+            {
+                CutScene?.Invoke("Awaking");
+                p.FirstSpawn = false;
+            }
         }
 
         private void AddNpcsToList() => _npcs.AddRange(GetChildren().OfType<BaseNPC>().ToList());

@@ -1,15 +1,18 @@
 ﻿namespace Playground.Components
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using System.Collections.Generic;
-    using System.Linq;
 
-    public class Inventory 
+    public class Inventory
     {
         private List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
+
+        public event Action<string>? SpecialItemAdded;
 
         public void Initialize(int size, string path, GridContainer container)
         {
@@ -29,6 +32,9 @@
             {
                 return;
             }
+
+            if (!string.IsNullOrWhiteSpace(item.SpecialId))
+                SpecialItemAdded?.Invoke(item.SpecialId);
 
             if (slot.Item == null)
             {

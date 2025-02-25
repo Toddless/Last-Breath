@@ -1,8 +1,8 @@
 ﻿namespace Playground.Script.Items
 {
+    using System;
     using Godot;
     using Playground.Script.Enums;
-    using System;
 
     [GlobalClass]
     public partial class Item : Resource
@@ -22,9 +22,12 @@
         public GlobalRarity Rarity;
         [Export]
         public int Quantity;
+        // Id for quest items, or something special. By default should be empty
+        [Export]
+        public string SpecialId = string.Empty;
         #endregion
 
-        public Guid Guid { get; private set; } = Guid.NewGuid();
+        public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
 
         public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity)
         {

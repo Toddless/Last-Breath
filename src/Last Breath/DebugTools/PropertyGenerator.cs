@@ -1,9 +1,10 @@
-﻿namespace Playground.Debug
+﻿namespace Playground.DebugTools
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     public static class PropertyGenerator
     {
         public static List<string> GetAllFields(Type type)

@@ -25,7 +25,7 @@
         {
             _text!.Text = text;
         }
-        
+
         private void SetEvents()
         {
             _add!.Pressed += () => Add?.Invoke(_spin!.Value);

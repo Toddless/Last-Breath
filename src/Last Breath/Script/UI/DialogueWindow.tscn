@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://eh2wvi8x5l80"]
+[gd_scene load_steps=4 format=3 uid="uid://eh2wvi8x5l80"]
 
 [ext_resource type="Script" path="res://Script/UI/View/DialogueWindow.cs" id="1_q0bu3"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_e8eok"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1ugkb"]
+font = ExtResource("2_e8eok")
+font_size = 18
 
 [node name="DialogueWindow" type="Control"]
 layout_mode = 3
@@ -78,6 +82,12 @@ focus_mode = 0
 theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 18
 text = "Default"
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "New quest added to Journal"
+label_settings = SubResource("LabelSettings_1ugkb")
 
 [node name="TextPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 250)

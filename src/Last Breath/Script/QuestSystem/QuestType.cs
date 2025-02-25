@@ -5,6 +5,7 @@
         None = 0,
         Main,
         Side,
-        Random
+        Reputation,
+        Generic
     }
 }

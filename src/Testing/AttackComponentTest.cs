@@ -2,7 +2,6 @@
 {
     using System.Collections.ObjectModel;
     using Moq;
-    using Playground;
     using Playground.Components;
     using Playground.Script.Effects.Interfaces;
 
@@ -81,8 +80,8 @@
         {
             Assert.IsNotNull(_attackComponent);
             _attackComponent.IncreaseDamage += 0.3f;
-            Assert.IsTrue(_attackComponent.CurrentMinDamage ==52);
-            Assert.IsTrue(_attackComponent.CurrentMaxDamage ==130);
+            Assert.IsTrue(_attackComponent.CurrentMinDamage == 52);
+            Assert.IsTrue(_attackComponent.CurrentMaxDamage == 130);
         }
 
         [TestMethod]

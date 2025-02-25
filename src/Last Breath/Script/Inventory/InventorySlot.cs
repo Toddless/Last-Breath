@@ -5,20 +5,15 @@ namespace Playground.Script.Inventory
 
     public partial class InventorySlot : Button
     {
-        #region Private fields
         private Label? _quantityLabel;
         private Item? _item;
         private int _quantity;
-        #endregion
 
-        #region Properties
         public Item? Item
         {
             get => _item;
             set => _item = value;
         }
-
-        #endregion
 
         public override void _Ready()
         {
@@ -59,7 +54,6 @@ namespace Playground.Script.Inventory
             _quantity += item.Quantity;
             UpdateQuantity();
         }
-
         public void RemoveItem(Item item)
         {
             _quantity -= item.Quantity;

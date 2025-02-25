@@ -1,4 +1,4 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.Attribute
 {
     using Playground.Script.Helpers;
 

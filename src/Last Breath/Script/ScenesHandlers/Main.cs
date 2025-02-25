@@ -1,25 +1,26 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
-    using Godot;
-    using Stateless;
-    using System.Linq;
-    using Playground.Script.UI;
     using System.ComponentModel;
-    using Playground.Script.NPC;
-    using Playground.Script.UI.View;
+    using System.Linq;
+    using Godot;
     using Playground.Script.Helpers;
+    using Playground.Script.NPC;
+    using Playground.Script.UI;
     using Playground.Script.UI.Layers;
+    using Playground.Script.UI.View;
+    using Stateless;
 
     public partial class Main : Node2D
     {
 #if DEBUG
         private bool _devOpened = false;
 #endif
-        private enum State { World, Battle, Paused, Dialog }
-        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, Close }
+        private enum State { World, Battle, Paused, Dialog, CutScene }
+        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, StartCutScene, Close }
 
         private StateMachine<State, Trigger>? _machine;
-        private StateMachine<State, Trigger>.TriggerWithParameters<BaseNPC>? _showDialog;
+        private StateMachine<State, Trigger>.TriggerWithParameters<ISpeaking>? _showDialog;
+        private StateMachine<State, Trigger>.TriggerWithParameters<string>? _showCutScene;
 
         private MainWorld? _mainWorld;
         private ManagerUI? _managerUI;
@@ -42,7 +43,7 @@
             _managerUI.SetResume(FireResume);
             _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
-
+            _mainWorld.CutScene += (t) => _machine.Fire(Trigger.StartCutScene);
             _mainWorld.PropertyChanged += NewBattleContextCreated;
             ConfigureStateMachine();
         }
@@ -121,16 +122,14 @@
 
         private void ConfigureStateMachine()
         {
-            _showDialog = _machine?.SetTriggerParameters<BaseNPC>(Trigger.Dialog);
-
-            _machine?.Configure(State.Dialog)
-                .OnEntryFrom(_showDialog, OpenDialog)
-                .Permit(Trigger.Close, State.World);
+            _showDialog = _machine?.SetTriggerParameters<ISpeaking>(Trigger.Dialog);
+            _showCutScene = _machine?.SetTriggerParameters<string>(Trigger.StartCutScene);
 
             _machine?.Configure(State.World)
                 .OnEntry(() => _managerUI?.ShowMainUI())
                 .Permit(Trigger.StartBattle, State.Battle)
                 .Permit(Trigger.Pause, State.Paused)
+                .Permit(Trigger.StartCutScene, State.CutScene)
                 .Permit(Trigger.Dialog, State.Dialog);
 
             _machine?.Configure(State.Battle)
@@ -150,9 +149,22 @@
               })
               .OnExit(() => { _mainWorld!.ProcessMode = ProcessModeEnum.Inherit; })
               .Permit(Trigger.Resume, State.World);
+
+            _machine?.Configure(State.Dialog)
+                .OnEntryFrom(_showDialog, OpenDialog)
+                .Permit(Trigger.Close, State.World);
+
+            _machine?.Configure(State.CutScene)
+                .OnEntryFrom(_showCutScene, StartCutScene)
+                .Permit(Trigger.Close, State.World);
         }
 
-        private void OpenDialog(BaseNPC npc)
+        private void StartCutScene(string firstNode)
+        {
+            _managerUI?.ShowCutScene(firstNode);
+        }
+
+        private void OpenDialog(ISpeaking npc)
         {
             _managerUI?.ShowDialog(npc);
         }

@@ -1,21 +1,25 @@
 ﻿namespace Playground.Script.UI
 {
+    using System;
     using Godot;
-    using Playground.Components;
     using Playground.Script.Helpers;
-
+    using Playground.Components;
     public partial class PlayerInventoryUI : Control
     {
-        private GridContainer? _equipInventory, _craftInventory;
-        private Inventory? _inventoryEquip, _inventoryCrafting;
+        private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
+        private Inventory? _inventoryEquip, _inventoryCrafting, _inventoryQuestItems;
         private Label? _currentHealth, _maxHealth, _damage, _criticalChance, _criticalDamage, _dodgeChance, _extraHitChance;
+
+        public event Action<string>? QuestItemAdded;
 
         public override void _Ready()
         {
             _inventoryEquip = new Inventory();
             _inventoryCrafting = new Inventory();
+            _inventoryQuestItems = new Inventory();
             _craftInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "CraftContainer");
             _equipInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "EquipContainer");
+            _questItemsInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "QuestItems");
             _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
             _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
             _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
@@ -25,6 +29,8 @@
             _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
             _inventoryEquip.Initialize(220, ScenePath.InventorySlot, _equipInventory!);
             _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
+            _inventoryQuestItems.Initialize(220, ScenePath.InventorySlot, _questItemsInventory!);
+            SetEvents();
             NodeFinder.ClearCache();
         }
 
@@ -41,5 +47,10 @@
         public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $"Dodge Chance: {chance * 100}%";
 
         public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" Extra Hit Chance {chance * 100}%";
+
+        private void SetEvents()
+        {
+            _inventoryQuestItems!.SpecialItemAdded += (t) => QuestItemAdded?.Invoke(t);
+        }
     }
 }

@@ -4,7 +4,7 @@
     using System.Linq;
     using Playground.Components.Interfaces;
     using Playground.Script.Enums;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     public class ConditionsFactory : IConditionsFactory
     {

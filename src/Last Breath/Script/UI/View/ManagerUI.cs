@@ -23,7 +23,12 @@
         public void ShowBattleUI() => _machine.Fire(Trigger.ShowBattleUI);
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
-        public void ShowDialog(BaseNPC npc)
+        public void ShowCutScene(string firstNode)
+        {
+            _dialogLayer.StartCutScene(firstNode);
+            _machine?.Fire(Trigger.ShowDialogUI);
+        }
+        public void ShowDialog(ISpeaking npc)
         {
             _dialogLayer.StartDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);

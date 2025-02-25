@@ -1,15 +1,17 @@
 ﻿namespace Playground
 {
-    using Godot;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using Godot;
     using Playground.Components;
+    using Playground.Localization;
+    using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
-    using Playground.Script;
+    using Playground.Script.NPC;
     using Playground.Script.Reputation;
 
-    public partial class Player : ObservableCharacterBody2D, ICharacter
+    public partial class Player : ObservableCharacterBody2D, ICharacter, ISpeaking
     {
         #region Private fields
         private AnimatedSprite2D? _sprite;
@@ -17,6 +19,8 @@
         private bool _canMove = true;
         private ObservableCollection<IEffect>? _effects;
         private ObservableCollection<IAbility>? _appliedAbilities;
+        private PlayerProgress? _progress;
+        private Dictionary<string, DialogueNode> _dialogs = [];
         private List<IAbility>? _abilities;
         private Sprite2D? _playerAvatar;
         #endregion
@@ -45,9 +49,13 @@
             get => _canMove;
             set => _canMove = value;
         }
+
+        [Export]
+        public bool FirstSpawn { get; set; } = true;
         [Export]
         [Changeable]
         public int Speed { get; set; } = 200;
+        public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         [Changeable]
         public HealthComponent? HealthComponent
         {
@@ -74,11 +82,13 @@
             _effectManager = new(_effects);
             _playerHealth = new(_effectManager.CalculateValues);
             _playerAttack = new(_effectManager.CalculateValues);
+            _progress = new();
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _playerAvatar = GetNode<Sprite2D>(nameof(Sprite2D));
             _sprite.Play("Idle_down");
-            GameManager.Instance!.Player = this;
             _reputation = new(0, 0, 0);
+            _dialogs = LocalizationManager.LoadDialogue("Resource/Dialogues/playerDialogues.json");
+            GameManager.Instance!.Player = this;
         }
 
         public override void _PhysicsProcess(double delta)

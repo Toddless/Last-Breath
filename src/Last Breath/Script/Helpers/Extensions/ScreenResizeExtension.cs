@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.Helpers.Extensions
 {
     using Godot;
+
     public static class ScreenResizeExtension
     {
         public static void CenterWindow()

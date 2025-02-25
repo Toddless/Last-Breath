@@ -1,7 +1,5 @@
 ﻿namespace Playground.Script.Attribute
 {
-    using Playground.Components;
-
     public class Strength : Attribute
     {
         private float _damageIncrease = 0.01f;

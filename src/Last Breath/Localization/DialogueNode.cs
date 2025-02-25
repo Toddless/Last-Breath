@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace Playground.Localization
+﻿namespace Playground.Localization
 {
+    using System.Collections.Generic;
+    using System.Text.Json.Serialization;
+
     public class DialogueNode
     {
         [JsonPropertyName(nameof(Id))]
@@ -13,5 +13,11 @@ namespace Playground.Localization
 
         [JsonPropertyName(nameof(Options))]
         public List<DialogueOption>? Options { get; set; }
+
+        [JsonPropertyName(nameof(ReturnToPrevious))]
+        public bool ReturnToPrevious { get; set; } = false;
+
+        [JsonPropertyName(nameof(Quests))]
+        public List<string>? Quests { get; set; }
     }
 }

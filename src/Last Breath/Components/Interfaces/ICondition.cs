@@ -1,8 +1,8 @@
-﻿using System;
-using Playground.Script.Enums;
-
-namespace Playground.Components.Interfaces
+﻿namespace Playground.Components.Interfaces
 {
+    using System;
+    using Playground.Script.Enums;
+
     public interface ICondition
     {
         Func<bool> CheckCondition { get; set; }

@@ -4,7 +4,6 @@
     using System.ComponentModel;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.Scenes;
     using Playground.Script.ScenesHandlers;
     using Stateless;
 

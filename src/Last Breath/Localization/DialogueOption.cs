@@ -1,12 +1,12 @@
-﻿using System.Text.Json.Serialization;
-using Playground.Script.Items;
-
-namespace Playground.Localization
+﻿namespace Playground.Localization
 {
+    using System.Text.Json.Serialization;
+    using Playground.Script.Items;
+
     public class DialogueOption
     {
         [JsonPropertyName(nameof(OptionName))]
-        public string OptionName {  get; set; } = string.Empty;
+        public string OptionName { get; set; } = string.Empty;
 
         [JsonPropertyName(nameof(Text))]
         public string Text { get; set; } = string.Empty;
