@@ -9,6 +9,7 @@
         public const string Sfx = nameof(Sfx);
         public const string Inventory = nameof(Inventory);
         public const string Equip = nameof(Equip);
+        public const string Language = nameof(Language);
         public const string MoveDown = "ui_down";
         public const string MoveUp = "ui_up";
         public const string MoveRight = "ui_right";

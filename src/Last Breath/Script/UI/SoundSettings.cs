@@ -1,15 +1,19 @@
 ﻿namespace Playground.Script.UI
 {
+    using System;
     using Godot;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
 
     public class SoundSettings : ISettings
     {
-        private HSlider? _musicSlider, _sfxSlider, _masterSlider;
+        private readonly HSlider? _musicSlider, _sfxSlider, _masterSlider;
 
-        public SoundSettings(HSlider musicSlider, HSlider sfxSlider, HSlider masterSlider)
+        public SoundSettings(HSlider? musicSlider, HSlider? sfxSlider, HSlider? masterSlider)
         {
+            ArgumentNullException.ThrowIfNull(musicSlider);
+            ArgumentNullException.ThrowIfNull(sfxSlider);
+            ArgumentNullException.ThrowIfNull(masterSlider);
             _masterSlider = masterSlider;
             _musicSlider = musicSlider;
             _sfxSlider = sfxSlider;

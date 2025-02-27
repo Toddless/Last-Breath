@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueData" load_steps=63 format=3 uid="uid://b3p7cbmyyly8y"]
+[gd_resource type="Resource" script_class="DialogueData" load_steps=68 format=3 uid="uid://b3p7cbmyyly8y"]
 
 [ext_resource type="Script" path="res://Localization/LocalizedString.cs" id="1_tt1un"]
 [ext_resource type="Script" path="res://Localization/DialogueData.cs" id="1_ykqmd"]
@@ -292,11 +292,37 @@ Options = []
 DialogueId = "BadNews"
 ReturnToPrevious = true
 
+[sub_resource type="Resource" id="Resource_43xgl"]
+script = ExtResource("1_tt1un")
+Key = "dialogConclusionsOption1"
+
+[sub_resource type="Resource" id="Resource_k2suc"]
+script = ExtResource("2_q81ff")
+OptionName = SubResource("Resource_43xgl")
+TargetNode = ""
+RelationEffect = 0
+
+[sub_resource type="Resource" id="Resource_7ncp0"]
+script = ExtResource("1_tt1un")
+Key = "dialogConclusionsText1"
+
+[sub_resource type="Resource" id="Resource_ifs8l"]
+script = ExtResource("1_tt1un")
+Key = "dialogConclusionsText2"
+
+[sub_resource type="Resource" id="Resource_8vfwc"]
+script = ExtResource("3_35leg")
+Texts = [SubResource("Resource_7ncp0"), SubResource("Resource_ifs8l")]
+Options = [SubResource("Resource_k2suc")]
+DialogueId = "Conclusions"
+ReturnToPrevious = false
+
 [resource]
 script = ExtResource("1_ykqmd")
 Dialogs = {
 "Awaking": SubResource("Resource_y4pmj"),
 "BadNews": SubResource("Resource_6i35i"),
+"Conclusions": SubResource("Resource_8vfwc"),
 "DeathMemory": SubResource("Resource_fqqq4"),
 "EvaluateSituation": SubResource("Resource_o0huw"),
 "GoodNews": SubResource("Resource_gtoay"),

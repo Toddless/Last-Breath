@@ -15,7 +15,7 @@
         {
             _option = GetNode<Button>(nameof(Button));
             _dialogueOption = option;
-           // _option!.Text = option.OptionName;
+            _option!.Text = option.OptionName?.Text;
             _option.Pressed += () => Option?.Invoke(_dialogueOption);
         }
 

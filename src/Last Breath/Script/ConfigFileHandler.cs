@@ -25,6 +25,7 @@
                 _config?.SetValue(SettingsSection.Sound, Settings.Master, 0.1);
                 _config?.SetValue(SettingsSection.Sound, Settings.Music, 0.1);
                 _config?.SetValue(SettingsSection.Sound, Settings.Sfx, 0.1);
+                _config?.SetValue(SettingsSection.UI, Settings.Language, 0);
 
                 _config?.Save(ConfigFilePath);
             }

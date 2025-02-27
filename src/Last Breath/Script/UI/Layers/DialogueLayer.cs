@@ -27,7 +27,7 @@
         {
             _speaking = GameManager.Instance.Player;
             _cutScene = true;
-            HandleDialogueNode(firstNode);
+            HandleDialogueNode("EvaluateSituation");
         }
 
         public void StartDialogue(ISpeaking npc, string node = "Greeting")
