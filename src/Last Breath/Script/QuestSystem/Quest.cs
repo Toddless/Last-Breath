@@ -2,6 +2,7 @@
 {
     using Godot;
     using Godot.Collections;
+    using Playground.Localization;
     using Playground.Script.QuestSystem;
 
     [GlobalClass]
@@ -10,11 +11,11 @@
         [Export]
         public string Id { get; set; } = string.Empty;
         [Export]
-        public string? NameKey { get; set; }
+        public LocalizedString? NameKey { get; set; }
         [Export]
-        public string? DescriptionKey { get; set; }
+        public LocalizedString? DescriptionKey { get; set; }
         [Export]
-        public string? RewardId { get; set; }
+        public LocalizedString? RewardId { get; set; }
         [Export]
         public Array<QuestCondition> Conditions { get; set; } = [];
         [Export(PropertyHint.Range, "1, 15")]

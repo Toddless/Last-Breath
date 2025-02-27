@@ -6,10 +6,10 @@ uid="uid://cnegl7m5gdi4g"
 
 [deps]
 
-files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation"]
+files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.en.translation"]
 
 source_file="res://Resource/Dialogues/GuardianDialogues/guardianDialogues.csv"
-dest_files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation"]
+dest_files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.en.translation"]
 
 [params]
 

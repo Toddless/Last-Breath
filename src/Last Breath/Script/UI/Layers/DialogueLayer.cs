@@ -30,7 +30,7 @@
             HandleDialogueNode("EvaluateSituation");
         }
 
-        public void StartDialogue(ISpeaking npc, string node = "Greeting")
+        public void StartDialogue(ISpeaking npc, string node = "FirstMeeting")
         {
             _speaking = npc;
             HandleDialogueNode(node);
