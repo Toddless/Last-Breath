@@ -10,7 +10,6 @@
                     "Conditions": [
                         {
                             "Type": "DialogueCompleted",
-                            "Description": "",
                             "DialogueId":"InspectBody"
                         }
                     ]

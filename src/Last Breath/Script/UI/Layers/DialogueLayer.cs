@@ -1,13 +1,12 @@
 ﻿namespace Playground.Script.UI.Layers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Godot;
-    using Playground.Localization;
+    using System;
     using Playground.Script.NPC;
-    using Playground.Script.QuestSystem;
+    using Playground.Localization;
     using Playground.Script.UI.View;
+    using System.Collections.Generic;
+    using Playground.Script.QuestSystem;
 
     public partial class DialogueLayer : CanvasLayer
     {
@@ -44,11 +43,10 @@
                 _currentNode = node;
                 foreach (var text in _currentNode?.Texts!)
                 {
-                    UpdateUI(text.NpcText);
+                    UpdateUI(text.Text);
                     await ToSignal(_dialogWindow!, "CanContinue");
                 }
-                if (_currentNode.Quests != null)
-                    AddQuests(_currentNode.Quests);
+
                 if (_currentNode?.Options != null)
                     ShowOptions();
                 if (_currentNode!.ReturnToPrevious)
@@ -60,16 +58,6 @@
             }
         }
 
-        private void AddQuests(List<string> quests)
-        {
-            var questManager = DiContainer.GetService<QuestManager>();
-            if (questManager == null) return;
-            foreach (var quest in quests)
-            {
-                if (questManager.AddNewQuest(quest))
-                    _dialogWindow?.NewQuestAdded();
-            }
-        }
 
         private void ShowPreviousOptions()
         {
@@ -104,6 +92,7 @@
             // I need to save the last node with options so I can return to it later.
             if (_currentNode?.Options != null)
             {
+                // i need to save all previous node so i can then decide what text i should show
                 _previousNode = _currentNode;
             }
 
@@ -128,15 +117,15 @@
             }
         }
 
-        private string GetText(List<DialogueText>? texts)
+        private void HandleQuests(List<string> quests)
         {
-            if (texts == null || texts.Count == 0) return "Text not found";
-
-            var eligibleText = texts.Where(x => x.MinRelation <= _currentRelation)
-                .OrderByDescending(x => x.MinRelation)
-                .ToList();
-
-            return eligibleText.FirstOrDefault()?.NpcText ?? "Text not found";
+            var questManager = DiContainer.GetService<QuestManager>();
+            if (questManager == null) return;
+            foreach (var quest in quests)
+            {
+                if (questManager.AddNewQuest(quest))
+                    _dialogWindow?.NewQuestAdded();
+            }
         }
     }
 }

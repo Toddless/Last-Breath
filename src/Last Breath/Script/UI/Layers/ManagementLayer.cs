@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
+    using Playground.Resource.Quests;
     using Playground.Script.Helpers;
     using Playground.Script.QuestSystem;
     using Stateless;

@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cnegl7m5gdi4g"
+
+[deps]
+
+files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation"]
+
+source_file="res://Resource/Dialogues/GuardianDialogues/guardianDialogues.csv"
+dest_files=["res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation"]
+
+[params]
+
+compress=true
+delimiter=0

@@ -1,11 +1,24 @@
 ﻿namespace Playground.Localization
 {
-    using System.Collections.Generic;
-    using System.Text.Json.Serialization;
+    using Godot;
+    using Godot.Collections;
 
-    public class DialogueData
+    [GlobalClass]
+    public partial class DialogueData : Resource
     {
-        [JsonPropertyName("Dialogs")]
-        public List<DialogueNode>? Dialogs { get; set; }
+        [Export]
+        public Dictionary<string, DialogueNode>? Dialogs { get; set; }
+
+
+        public void _Validate()
+        {
+            foreach (var item in Dialogs.Values)
+            {
+                if (item.Texts.Count == 0)
+                {
+                    // log node has no text
+                }
+            }
+        }
     }
 }

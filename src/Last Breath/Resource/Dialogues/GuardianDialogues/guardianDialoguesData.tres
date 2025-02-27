@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=18 format=3 uid="uid://d1q318pk7iham"]
+
+[ext_resource type="Script" path="res://Localization/DialogueData.cs" id="1_oaf6b"]
+[ext_resource type="Resource" uid="uid://bpmnbtxkieacd" path="res://Resource/Dialogues/GuardianDialogues/guardianDialogues.tres" id="1_vkomo"]
+[ext_resource type="Script" path="res://Localization/LocalizedString.cs" id="2_ul0kl"]
+[ext_resource type="Script" path="res://Localization/DialogueOption.cs" id="3_ondml"]
+[ext_resource type="Script" path="res://Localization/DialogueNode.cs" id="4_b2tc0"]
+
+[sub_resource type="Resource" id="Resource_h6qy2"]
+script = ExtResource("2_ul0kl")
+Key = "dialogVendorLieOption1"
+
+[sub_resource type="Resource" id="Resource_uihjf"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_h6qy2")
+TargetNode = "AnswerDirection"
+RelationEffect = -15
+
+[sub_resource type="Resource" id="Resource_qrqvf"]
+script = ExtResource("2_ul0kl")
+Key = "dialogVendorLieText1"
+
+[sub_resource type="Resource" id="Resource_erneb"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_qrqvf")]
+Options = [SubResource("Resource_uihjf")]
+DialogueId = "VendorLie"
+
+[sub_resource type="Resource" id="Resource_ks7vv"]
+script = ExtResource("2_ul0kl")
+Key = "dialogHalfLieOption1"
+
+[sub_resource type="Resource" id="Resource_213fs"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_ks7vv")
+TargetNode = "AnswerDirection"
+RelationEffect = 0
+
+[sub_resource type="Resource" id="Resource_kxk4u"]
+script = ExtResource("2_ul0kl")
+Key = "dialogHalfLieText1"
+
+[sub_resource type="Resource" id="Resource_aptem"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_kxk4u")]
+Options = [SubResource("Resource_213fs")]
+DialogueId = "HalfLie"
+
+[sub_resource type="Resource" id="Resource_i48mn"]
+script = ExtResource("2_ul0kl")
+Key = "dialogAnswerDirectionOption1"
+
+[sub_resource type="Resource" id="Resource_m6g4u"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_i48mn")
+TargetNode = "ThanksAndEnd"
+RelationEffect = 0
+
+[sub_resource type="Resource" id="Resource_2krxc"]
+script = ExtResource("2_ul0kl")
+Key = "dialogAnswerDirectionText1"
+
+[sub_resource type="Resource" id="Resource_xuemg"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_2krxc")]
+Options = [SubResource("Resource_m6g4u")]
+DialogueId = "AnswerDirection"
+
+[resource]
+script = ExtResource("1_oaf6b")
+Dialogs = {
+"AnswerDirection": SubResource("Resource_xuemg"),
+"FirstMeetins": ExtResource("1_vkomo"),
+"HalfLie": SubResource("Resource_aptem"),
+"VendorLie": SubResource("Resource_erneb")
+}

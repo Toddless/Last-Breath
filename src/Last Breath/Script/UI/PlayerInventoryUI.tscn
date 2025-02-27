@@ -363,3 +363,13 @@ size_flags_stretch_ratio = 1.25
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 22
+
+[node name="QuestItems" type="TabBar" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="QuestItemsContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/QuestItems"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

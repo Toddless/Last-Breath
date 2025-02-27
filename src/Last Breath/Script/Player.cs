@@ -19,7 +19,7 @@
         private bool _canMove = true;
         private ObservableCollection<IEffect>? _effects;
         private ObservableCollection<IAbility>? _appliedAbilities;
-        private PlayerProgress? _progress;
+        private PlayerProgress _progress = new();
         private Dictionary<string, DialogueNode> _dialogs = [];
         private List<IAbility>? _abilities;
         private Sprite2D? _playerAvatar;
@@ -70,6 +70,7 @@
         }
         [Changeable]
         public ReputationManager? Reputation => _reputation;
+        public PlayerProgress Progress => _progress;
         public EffectManager? EffectManager => _effectManager;
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
         public List<IAbility>? Abilities => _abilities;
@@ -82,13 +83,22 @@
             _effectManager = new(_effects);
             _playerHealth = new(_effectManager.CalculateValues);
             _playerAttack = new(_effectManager.CalculateValues);
-            _progress = new();
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _playerAvatar = GetNode<Sprite2D>(nameof(Sprite2D));
             _sprite.Play("Idle_down");
             _reputation = new(0, 0, 0);
-            _dialogs = LocalizationManager.LoadDialogue("Resource/Dialogues/playerDialogues.json");
+            LoadDialogues();
             GameManager.Instance!.Player = this;
+        }
+
+        private void LoadDialogues()
+        {
+            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres");
+            if (dialogueData.Dialogs == null) return;
+            foreach (var item in dialogueData.Dialogs)
+            {
+                _dialogs.Add(item.Key, item.Value);
+            }
         }
 
         public override void _PhysicsProcess(double delta)

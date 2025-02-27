@@ -1,5 +1,6 @@
-﻿namespace Playground.Resource.Quests
+﻿namespace Playground.Script.QuestSystem
 {
+    using Playground.Resource.Quests;
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
 

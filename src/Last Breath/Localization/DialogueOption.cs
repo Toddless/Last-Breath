@@ -1,23 +1,17 @@
 ﻿namespace Playground.Localization
 {
-    using System.Text.Json.Serialization;
-    using Playground.Script.Items;
+    using Godot;
 
-    public class DialogueOption
+    [GlobalClass]
+    public partial class DialogueOption : Resource
     {
-        [JsonPropertyName(nameof(OptionName))]
-        public string OptionName { get; set; } = string.Empty;
+        [Export]
+        public LocalizedString? OptionName { set; get; }
 
-        [JsonPropertyName(nameof(Text))]
-        public string Text { get; set; } = string.Empty;
-
-        [JsonPropertyName(nameof(TargetNode))]
+        [Export]
         public string TargetNode { get; set; } = string.Empty;
 
-        [JsonPropertyName(nameof(RelationEffect))]
+        [Export]
         public int RelationEffect { get; set; } = 0;
-
-        [JsonPropertyName(nameof(RequiredItem))]
-        public Item? RequiredItem { get; set; }
     }
 }

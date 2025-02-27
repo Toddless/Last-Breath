@@ -7,7 +7,6 @@
     [GlobalClass]
     public partial class Item : Resource
     {
-        #region Export fields
         [Export]
         public string? ItemResourcePath;
         [Export]
@@ -25,7 +24,6 @@
         // Id for quest items, or something special. By default should be empty
         [Export]
         public string SpecialId = string.Empty;
-        #endregion
 
         public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
 

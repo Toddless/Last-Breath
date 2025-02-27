@@ -132,6 +132,10 @@ ui_dialog={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation")
+
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.268665, 0.371091, 0.22191, 1)

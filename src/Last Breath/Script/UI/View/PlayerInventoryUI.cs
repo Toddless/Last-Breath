@@ -19,7 +19,7 @@
             _inventoryQuestItems = new Inventory();
             _craftInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "CraftContainer");
             _equipInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "EquipContainer");
-            _questItemsInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "QuestItems");
+          //  _questItemsInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "QuestItems");
             _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
             _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
             _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
@@ -29,7 +29,7 @@
             _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
             _inventoryEquip.Initialize(220, ScenePath.InventorySlot, _equipInventory!);
             _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
-            _inventoryQuestItems.Initialize(220, ScenePath.InventorySlot, _questItemsInventory!);
+           // _inventoryQuestItems.Initialize(220, ScenePath.InventorySlot, _questItemsInventory!);
             SetEvents();
             NodeFinder.ClearCache();
         }

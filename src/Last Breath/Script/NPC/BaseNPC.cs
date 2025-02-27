@@ -35,7 +35,12 @@
 
         protected void SetDialogs(string path)
         {
-            _dialogs = LocalizationManager.LoadDialogue(path);
+            var dialogueData = ResourceLoader.Load<DialogueData>(path);
+            if (dialogueData.Dialogs == null) return;
+            foreach (var item in dialogueData.Dialogs)
+            {
+                _dialogs.Add(item.Key, item.Value);
+            }
         }
 
         public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;

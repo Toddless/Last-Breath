@@ -43,9 +43,9 @@
             _managerUI.SetResume(FireResume);
             _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
-            _mainWorld.CutScene += (t) => _machine.Fire(Trigger.StartCutScene);
-            _mainWorld.PropertyChanged += NewBattleContextCreated;
             ConfigureStateMachine();
+            _mainWorld.CutScene += (t) => _machine.Fire(_showCutScene, t);
+            _mainWorld.PropertyChanged += NewBattleContextCreated;
         }
 
         public override void _UnhandledInput(InputEvent @event)

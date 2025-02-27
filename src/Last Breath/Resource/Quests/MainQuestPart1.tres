@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://da38obpf5ee17"]
+
+[ext_resource type="Script" path="res://Script/QuestSystem/Quest.cs" id="1_ut43o"]
+
+[resource]
+script = ExtResource("1_ut43o")
+Id = "Main_Awaking_Part1"
+NameKey = ""
+DescriptionKey = ""
+RewardId = "Main_Awaking_Part1_Reward"
+Conditions = []
+RequiredConditions = 1
+AllConditionsMustMet = false

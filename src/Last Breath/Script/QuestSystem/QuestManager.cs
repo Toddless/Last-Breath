@@ -1,42 +1,75 @@
 ﻿namespace Playground.Script.QuestSystem
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.IO;
+    using System;
     using System.Linq;
-    using System.Text.Json;
     using Playground.Resource.Quests;
+    using System.Collections.Generic;
+    using Godot;
     using Playground.Script.Helpers;
 
     public class QuestManager
     {
-        private List<Quest> _allQuests = [];
-        private ObservableCollection<Quest> _quests = [];
-        public ObservableCollection<Quest> QuestsId => _quests;
+        private readonly Dictionary<string, Quest> _allQuests = [];
+        private readonly List<Quest> _quests = [];
+
+        public event Action<Quest>? QuestAdded;
+
+        public QuestManager()
+        {
+            LoadAllQuests();
+        }
 
         public bool AddNewQuest(string questId)
         {
-            if (_quests.Any(x => x.Id == questId))
-            {
-                return false;
-            }
+            if (!_allQuests.TryGetValue(questId, out var quest)) return false;
+            if (_quests.Any(x => x.Id == quest.Id)) return false;
+            if (!CheckForConditions(quest)) return false;
+
+            var clonedQuest = quest.Duplicate(true) as Quest;
+            _quests.Add(clonedQuest);
+            QuestAdded?.Invoke(clonedQuest);
             return true;
         }
 
-        private bool QuestConditionsFulfilled(string questId)
+        private bool CheckForConditions(Quest quest)
         {
-            return true;
+            if (quest.Conditions.Count == 0) return true;
+
+            var player = GameManager.Instance.Player;
+            var cnt = quest.Conditions.Count(x => x.IsMet(player.Progress));
+
+            return quest.AllConditionsMustMet ? cnt == quest.Conditions.Count : cnt >= quest.RequiredConditions;
         }
-
-
-
 
         private void LoadAllQuests()
         {
-            var data = JsonSerializer.Deserialize<QuestData>(File.ReadAllText(ResourcePath.QuestData));
-            foreach (var quest in data.Quests)
+            _allQuests.Clear();
+
+            var quests = ResourceLoader.Load<QuestCollection>(ResourcePath.QuestData);
+
+            foreach (var quest in quests.Quests)
             {
 
+                try
+                {
+                    if (string.IsNullOrEmpty(quest.Id))
+                    {
+                        // log
+                    }
+
+                    if (_allQuests.ContainsKey(quest.Id))
+                    {
+                        // log
+                        continue;
+                    }
+                    quest._Validate();
+                    _allQuests[quest.Id] = quest;
+
+                }
+                catch (Exception ex)
+                {
+                    // Log ex.Message
+                }
             }
         }
     }
