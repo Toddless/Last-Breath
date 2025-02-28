@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Resource.Quests;
     using Playground.Script.Helpers;
     using Playground.Script.QuestSystem;
     using Stateless;
@@ -15,10 +14,10 @@
         private readonly Dictionary<string, (Trigger Trigger, State State)> _actionTriggers = [];
         private StateMachine<State, Trigger>? _machine;
         private PlayerInventoryUI? _inventoryUI;
-        private QuestsMenu? _questsUI;
-        private QuestManager? _questManager;
         private CharacterMenu? _characterUI;
+        private QuestsMenu? _questsUI;
         private MapMenu? _mapUI;
+        private QuestManager? _questManager;
 
         public override void _Ready()
         {

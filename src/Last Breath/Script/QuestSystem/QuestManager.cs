@@ -10,25 +10,22 @@
     public class QuestManager
     {
         private readonly Dictionary<string, Quest> _allQuests = [];
-        private readonly List<Quest> _quests = [];
+        private readonly List<Quest> _activeQuests = [];
+        private readonly List<Quest> _failedQuests = [];
+        private readonly List<Quest> _completedQuests = [];
 
-        public event Action<Quest>? QuestAdded;
+        public event Action<Quest>? QuestAccepted, QuestFailed, QuestCompleted, QuestCancelled;
 
         public QuestManager()
         {
             LoadAllQuests();
         }
 
-        public bool AddNewQuest(string questId)
+        public bool QuestCanBeAdded(string questId)
         {
             if (!_allQuests.TryGetValue(questId, out var quest)) return false;
-            if (_quests.Any(x => x.Id == quest.Id)) return false;
-            if (!CheckForConditions(quest)) return false;
-
-            var clonedQuest = quest.Duplicate(true) as Quest;
-            _quests.Add(clonedQuest);
-            QuestAdded?.Invoke(clonedQuest);
-            return true;
+            if (_activeQuests.Any(x => x.Id == quest.Id)) return false;
+            return CheckForConditions(quest);
         }
 
         private bool CheckForConditions(Quest quest)
@@ -63,6 +60,7 @@
                         continue;
                     }
                     quest._Validate();
+                    SetQuestEvents(quest);
                     _allQuests[quest.Id] = quest;
 
                 }
@@ -71,6 +69,38 @@
                     // Log ex.Message
                 }
             }
+        }
+
+        private void SetQuestEvents(Quest quest)
+        {
+            quest.QuestAccepted += OnQuestAccepted;
+            quest.QuestCancelled += OnQuestCancelled;
+            quest.QuestFailed += OnQuesFailed;
+            quest.QuestCompleted += OnQuestCompleted;
+        }
+        private void OnQuestCompleted(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _completedQuests.Add(quest);
+            QuestCompleted?.Invoke(quest);
+        }
+        private void OnQuestCancelled(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _allQuests.Add(quest.Id, quest);
+            QuestCancelled?.Invoke(quest);
+        }
+        private void OnQuestAccepted(Quest quest)
+        {
+            _allQuests.Remove(quest.Id);
+            _activeQuests.Add(quest);
+            QuestAccepted?.Invoke(quest);
+        }
+        private void OnQuesFailed(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _failedQuests.Add(quest);
+            QuestFailed?.Invoke(quest);
         }
     }
 }

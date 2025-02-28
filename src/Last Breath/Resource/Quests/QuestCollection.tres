@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="QuestCollection" load_steps=2 format=3 uid="uid://h2s25lbq7350"]
-
-[ext_resource type="Script" path="res://Script/QuestSystem/QuestCollection.cs" id="1_ms0jw"]
-
-[resource]
-script = ExtResource("1_ms0jw")
-Quests = []

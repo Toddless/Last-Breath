@@ -1,19 +1,17 @@
 ﻿namespace Playground.Script.NPC
 {
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using Godot;
-    using Playground.Localization;
+    using Playground.Script.Enums;
 
     public partial class BaseNPC : CharacterBody2D
     {
         private CollisionShape2D? _collisionShape2D;
         private Sprite2D? _sprite2D;
         private Area2D? _area2D;
-        private Dictionary<string, DialogueNode> _dialogs = [];
-
-        public bool FirstTimeMeetPlayer = true;
-        public Dictionary<string, DialogueNode> Dialogs => _dialogs;
+        private string _npcId = string.Empty;
+        private Fractions _fraction;
 
         protected Area2D? Area
         {
@@ -33,14 +31,23 @@
             set => _collisionShape2D = value;
         }
 
-        protected void SetDialogs(string path)
+        public string NpcId => _npcId;
+
+        protected void SetFraction(Fractions fraction) => _fraction = fraction;
+
+        protected void SetNpcId()
         {
-            var dialogueData = ResourceLoader.Load<DialogueData>(path);
-            if (dialogueData.Dialogs == null) return;
-            foreach (var item in dialogueData.Dialogs)
-            {
-                _dialogs.Add(item.Key, item.Value);
-            }
+            var builder = new StringBuilder();
+            builder.AppendLine(this.Name);
+            builder.AppendLine(this._fraction.ToString());
+            _npcId = builder.ToString();
+        }
+
+        public override void _EnterTree()
+        {
+            if (string.IsNullOrEmpty(_npcId))
+                SetNpcId();
+            base._EnterTree();
         }
 
         public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;

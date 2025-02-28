@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://5yr7jab4u6sg"]
 
 [ext_resource type="Texture2D" uid="uid://6bjplofclo64" path="res://Assets/Weapon/fantasy_weapons_pack1_noglow.png" id="1_8l3ax"]
-[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_kjr3m"]
+[ext_resource type="Script" path="res://Script/Items/Item.cs" id="1_kjr3m"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_edtl5"]
 atlas = ExtResource("1_8l3ax")

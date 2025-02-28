@@ -13,5 +13,7 @@
 
         [Export]
         public int RelationEffect { get; set; } = 0;
+        [Export]
+        public bool UsePlayerSource { get; set; } = true;
     }
 }

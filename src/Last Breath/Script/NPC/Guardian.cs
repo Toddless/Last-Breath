@@ -2,7 +2,7 @@
 {
     using Godot;
 
-    public partial class Guardian : BaseNPC, ISpeaking
+    public partial class Guardian : BaseSpeakingNPC
     {
         public override void _Ready()
         {

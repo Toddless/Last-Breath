@@ -5,6 +5,7 @@
 
     public interface ISpeaking
     {
+        bool NpcTalking { get; set; } 
         Dictionary<string, DialogueNode> Dialogs { get; }
     }
 }

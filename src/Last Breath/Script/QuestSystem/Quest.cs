@@ -1,5 +1,6 @@
 ﻿namespace Playground.Resource.Quests
 {
+    using System;
     using Godot;
     using Godot.Collections;
     using Playground.Localization;
@@ -8,6 +9,8 @@
     [GlobalClass]
     public partial class Quest : Resource
     {
+        public event Action<Quest>? QuestAccepted, QuestFailed, QuestCancelled, QuestCompleted;
+
         [Export]
         public string Id { get; set; } = string.Empty;
         [Export]
@@ -19,9 +22,18 @@
         [Export]
         public Array<QuestCondition> Conditions { get; set; } = [];
         [Export(PropertyHint.Range, "1, 15")]
-        public int RequiredConditions {  get; set; }
+        public int RequiredConditions { get; set; }
         [Export]
-        public bool AllConditionsMustMet {  get; set; } = false;
+        public bool AllConditionsMustMet { get; set; } = false;
+        [Export]
+        public bool ConfirmationRequired { get; set; } = true;
+
+        public bool CanAcceptQuest(QuestManager manager) => manager.QuestCanBeAdded(Id);
+
+        public void AcceptQuest() => QuestAccepted?.Invoke(this);
+        public void CancelQuest() => QuestCancelled?.Invoke(this);
+        public void FailedQuest() => QuestFailed?.Invoke(this);
+        public void CompletedQuest() => QuestCompleted?.Invoke(this);
 
         public void _Validate()
         {
@@ -31,7 +43,7 @@
                 GD.PushError("Quest ID must be set!");
             }
 
-            if(Conditions?.Count > 0 && RequiredConditions > Conditions.Count)
+            if (Conditions?.Count > 0 && RequiredConditions > Conditions.Count)
             {
                 // log
                 GD.PushWarning("RequiredConditions exceeds total conditions count");

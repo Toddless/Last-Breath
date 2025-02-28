@@ -1,50 +1,50 @@
 {
-    "Quests": [
-        {
-            "Main": [
-                {
-                    "Id": "Main_Awaking_Part1",
-                    "Name": "Пробуждение",
-                    "DescriptionId": "Main_Awaking_Part1_Description",
-                    "RewardId": "Main_Awaking_Part1_Reward",
-                    "Conditions": [
-                        {
-                            "Type": "DialogueCompleted",
-                            "DialogueId":"InspectBody"
-                        }
-                    ]
-                }
-            ],
-            "Side": [
-                {
-                    "Id": "Side_Battle_Skills",
-                    "Name": "Оценить боевые навыки",
-                    "DescriptionId": "",
-                    "RewardId": "",
-                    "Conditions": ""
-                },
-                {
-                    "Id": "Side_First_Equip",
-                    "Name": "Добыть снаряжение",
-                    "DescriptionId": "",
-                    "RewardId": "",
-                    "Conditions": ""
-                },
-                {
-                    "Id": "Side_Who_Am_I",
-                    "Name": "Разузнать где я нахожусь",
-                    "DescriptionId": "",
-                    "RewardId": "",
-                    "Conditions": ""
-                },
-                {
-                    "Id": "Side_I_Need_Food",
-                    "Name": "Раздобыть еды",
-                    "DescriptionId": "",
-                    "RewardId": "",
-                    "Conditions": ""
-                }
-            ]
-        }
-    ]
+	"Quests": [
+		{
+			"Main": [
+				{
+					"Id": "Main_Awaking_Part1",
+					"Name": "Пробуждение",
+					"DescriptionId": "Main_Awaking_Part1_Description",
+					"RewardId": "Main_Awaking_Part1_Reward",
+					"Conditions": [
+						{
+							"Type": "DialogueCompleted",
+							"DialogueId":"InspectBody"
+						}
+					]
+				}
+			],
+			"Side": [
+				{
+					"Id": "Side_Battle_Skills",
+					"Name": "Оценить боевые навыки",
+					"DescriptionId": "",
+					"RewardId": "",
+					"Conditions": ""
+				},
+				{
+					"Id": "Side_First_Equip",
+					"Name": "Добыть снаряжение",
+					"DescriptionId": "",
+					"RewardId": "",
+					"Conditions": ""
+				},
+				{
+					"Id": "Side_Who_Am_I",
+					"Name": "Разузнать где я нахожусь",
+					"DescriptionId": "",
+					"RewardId": "",
+					"Conditions": ""
+				},
+				{
+					"Id": "Side_I_Need_Food",
+					"Name": "Раздобыть еды",
+					"DescriptionId": "",
+					"RewardId": "",
+					"Conditions": ""
+				}
+			]
+		}
+	]
 }

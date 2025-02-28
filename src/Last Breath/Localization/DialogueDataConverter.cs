@@ -2,7 +2,9 @@
 {
     using System.IO;
     using Godot;
+    using Godot.Collections;
     using Newtonsoft.Json;
+    using Playground.Resource.Quests;
 
     public static class DialogueDataConverter
     {
@@ -48,6 +50,13 @@
                         RelationEffect = option.RelationEffect
                     });
                 }
+
+                for (int y = 0; y < jsonNode.Quests.Count; y++)
+                {
+                    dialogueNode.Quests[y].ConfirmationRequired = jsonNode.Quests[y].ConfirmationRequired;
+                    dialogueNode.Quests.Add(jsonNode.Quests[y]);
+                }
+
                 dialogueNode.ReturnToPrevious = jsonNode.ReturnToPrevious;
                 dialogueData.Dialogs[jsonNode.Id] = dialogueNode;
             }
@@ -68,6 +77,8 @@
 
             [JsonProperty(nameof(ReturnToPrevious))]
             public bool ReturnToPrevious { get; set; }
+            [JsonProperty(nameof(Quests))]
+            public Array<Quest> Quests { get; set; } = [];
         }
 
         private class TextEntry

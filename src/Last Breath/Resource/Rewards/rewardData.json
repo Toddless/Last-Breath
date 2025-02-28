@@ -1,14 +1,14 @@
 {
-    "Rewards": [
-        {
-            "RewardId": "",
-            "Exp": 10,
-            "Gold": 300,
-            "Items": [
-                {
-                    "Id":""
-                }
-            ]
-        }
-    ]
+	"Rewards": [
+		{
+			"RewardId": "",
+			"Exp": 10,
+			"Gold": 300,
+			"Items": [
+				{
+					"Id":""
+				}
+			]
+		}
+	]
 }

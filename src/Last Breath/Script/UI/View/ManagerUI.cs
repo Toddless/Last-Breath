@@ -1,18 +1,17 @@
 ﻿namespace Playground.Script.UI.View
 {
     using System;
-    using Godot;
     using Playground.Script.NPC;
     using Playground.Script.UI.Layers;
     using Stateless;
 
-    public class ManagerUI(CanvasLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer, DialogueLayer dialog)
+    public class ManagerUI(MainLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer, DialogueLayer dialog)
     {
         private enum State { MainUI, PauseUI, BattleUI, DialogUI, DevTools }
         private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI, ShowDialogUI, ShowDevTools }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.MainUI);
-        private readonly CanvasLayer _mainLayer = mainUI;
+        private readonly MainLayer _mainLayer = mainUI;
         private readonly PauseLayer _pauseLayer = pauseUI;
         private readonly BattleLayer _battleLayer = battleUI;
         private readonly DevLayer? _devLayer = devLayer;
@@ -30,7 +29,7 @@
         }
         public void ShowDialog(ISpeaking npc)
         {
-            _dialogLayer.StartDialogue(npc);
+            _dialogLayer.StartDialogueNode(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
 #if DEBUG
