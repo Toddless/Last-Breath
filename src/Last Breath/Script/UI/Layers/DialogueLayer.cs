@@ -17,28 +17,29 @@
         private Player? _player;
         private int _currentRelation;
         private bool _cutScene = false;
-        private ISpeaking? _speaking;
-        private readonly System.Collections.Generic.Dictionary<string, ISpeaking> _speakers = [];
+        private BaseSpeakingNPC? _speaking;
+        private readonly System.Collections.Generic.Dictionary<string, BaseSpeakingNPC> _speakers = [];
+        private Array<Quest>? _quests;
 
         public Action? DialogueEnded;
         public override void _Ready()
         {
             _dialogWindow = GetNode<DialogueWindow>(nameof(DialogueWindow));
             _player = GameManager.Instance.Player;
+            _dialogWindow.QuitPressed += () => DialogueEnded?.Invoke();
+            _dialogWindow.QuestsPressed += QuestsPressed;
         }
 
         public void StartCutScene(string firstNode)
         {
             _cutScene = true;
-            //HandleDialogueNode(firstNode);
+            StartDialogueNode(firstNode);
         }
 
-        public void SetSpeakers(List<BaseSpeakingNPC> npcs)
+        public void StartDialogue(BaseSpeakingNPC npcs)
         {
-            foreach (var npc in npcs)
-            {
-                _speakers.Add(npc.NpcId, npc);
-            }
+            _speaking = npcs;
+            StartDialogueNode();
         }
 
         public void StartDialogueNode(string firstNode = "FirstMeeting")
@@ -53,7 +54,6 @@
                 return;
             }
             HandleDialogueNode(node);
-
         }
 
         private async void HandleDialogueNode(DialogueNode node)
@@ -66,46 +66,26 @@
             }
             if (_currentNode.IsDialogMatterForQuest)
                 _player?.Progress.OnDialogueCompleted(_currentNode.DialogueId);
-            if (_currentNode?.Quests.Count > 0)
-                ShowQuests(_currentNode.Quests);
             if (_currentNode?.Options.Count > 0)
                 ShowOptions();
             if (_currentNode!.ReturnToPrevious)
                 ShowPreviousOptions();
         }
 
-        private void ShowQuests(Array<Quest> quests)
+        private void QuestsPressed()
         {
+            var questMenu = NPCsQuests.Initialize().Instantiate<NPCsQuests>();
             var manager = DiContainer.GetService<QuestManager>();
-            if (manager == null) return;
-            foreach (var quest in quests)
+            if (_speaking == null || manager == null) return;
+            _dialogWindow?.AddQuestOption(questMenu);
+
+            // i need to show all quests that this npc have
+            foreach (var quest in _speaking.Quests)
             {
-                if (!quest.ConfirmationRequired)
-                {
-                    if (quest.CanAcceptQuest(manager))
-                    {
-                        quest.AcceptQuest();
-                        _dialogWindow?.NewQuestAdded();
-                    }
-                }
-                else
-                {
-                    ShowQuestsAsOptions(quest);
-                }
+                if(!quest.QuestCanBeAccepted(manager)) continue;
+                questMenu.AddQuests(quest);
             }
-        }
-
-        private void ShowQuestsAsOptions(Quest quest)
-        {
-           var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
-            option.BindQuest(quest);
-            option.Quest += OnQuestPressed;
-            _dialogWindow?.AddOption(option);
-        }
-
-        private void OnQuestPressed(Quest quest)
-        {
-
+            _dialogWindow?.HideDialogueButtons();
         }
 
         private void OnOptionSelected(DialogueOption option)
@@ -149,12 +129,8 @@
 
         private void EndDialogue()
         {
-            DialogueEnded?.Invoke();
             _dialogWindow?.Clear();
-            _previousNode = null;
-            _currentNode = null;
-            _cutScene = false;
-            _speaking = null;
+            _dialogWindow?.ShowDialogueButtons();
         }
 
         private void UpdateUI(string text)
@@ -162,8 +138,6 @@
             _dialogWindow!.Clear();
             _dialogWindow.UpdateText(text);
         }
-
-       
 
         private void ShowOptions()
         {

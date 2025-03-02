@@ -1,27 +1,19 @@
 ﻿namespace Playground.Script.QuestSystem
 {
-    using System.Collections.Generic;
     using Godot;
+    using Godot.Collections;
     using Playground.Script.Items;
 
     [GlobalClass]
     public partial class Reward : Resource
     {
         [Export]
+        public string Id { get; set; } = string.Empty;
+        [Export]
         public int Exp { get; set; }
         [Export]
         public int Gold { get; set; }
-        public List<Item>? Items { get; set; }
-
-        public Reward(int exp, int gold, params Item[] items)
-        {
-            Exp = exp;
-            Gold = gold;
-            Items = [.. items];
-        }
-        public Reward()
-        {
-
-        }
+        [Export]
+        public Array<Item> Items { get; set; } = [];
     }
 }

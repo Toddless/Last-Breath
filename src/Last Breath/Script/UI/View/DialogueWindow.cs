@@ -1,20 +1,26 @@
 ﻿namespace Playground.Script.UI.View
 {
+    using System;
     using Godot;
     using Playground.Script.Helpers;
 
     public partial class DialogueWindow : Control
     {
-        private VBoxContainer? _options;
+        private VBoxContainer? _options, _buttonsContainer;
         private RichTextLabel? _text;
         private TextureRect? _playerIcon;
         private Label? _questAdded;
-        private Button? _skip, _moreSpeed, _lessSpeed, _default;
+        private Control? _questOptions;
+        private Button? _skip, _moreSpeed, _lessSpeed, _default, _quests, _quit;
         private double _time = 0.015;
         private bool _canProceed = false;
 
         [Signal]
         public delegate void CanContinueEventHandler();
+        [Signal]
+        public delegate void QuitPressedEventHandler();
+        [Signal]
+        public delegate void QuestsPressedEventHandler();
 
         public override void _Ready()
         {
@@ -26,7 +32,12 @@
             _lessSpeed = (Button?)NodeFinder.FindBFSCached(this, "LessSpeed");
             _default = (Button?)NodeFinder.FindBFSCached(this, "Default");
             _questAdded = (Label?)NodeFinder.FindBFSCached(this, "Label");
+            _buttonsContainer = (VBoxContainer?)NodeFinder.FindBFSCached(this, "ButtonsContainer");
+            _quests = (Button?)NodeFinder.FindBFSCached(this, "Quests");
+            _quit = (Button?)NodeFinder.FindBFSCached(this, "Quit");
+            _questOptions = (Control?)NodeFinder.FindBFSCached(this, "QuestOptionsElement");
             _questAdded?.Hide();
+            _buttonsContainer?.Hide();
             SetEvents();
 
             NodeFinder.ClearCache();
@@ -40,8 +51,9 @@
         }
 
         public void SetAvatar(Texture2D icon) => _playerIcon!.Texture = icon;
-
         public void SetOptions(Label option) => _options?.AddChild(option);
+        public void ShowDialogueButtons() => _buttonsContainer?.Show();
+        public void HideDialogueButtons() => _buttonsContainer?.Hide();
 
         public async void UpdateText(string text)
         {
@@ -58,6 +70,19 @@
 
         public void AddOption(DialogueUIOption option) => _options?.AddChild(option);
 
+        public void AddQuestOption(NPCsQuests nPCsQuests)
+        {
+            nPCsQuests.ClosePressed += OnClosedPressed;
+            _questOptions?.AddChild(nPCsQuests);
+        }
+
+        private void OnClosedPressed()
+        {
+            var quests = _questOptions?.GetChild<NPCsQuests>(0);
+            if (quests != null) quests.ClosePressed -= OnClosedPressed;
+            _buttonsContainer?.Show();
+        }
+
         public void Clear()
         {
             if (_options == null) return;
@@ -73,6 +98,8 @@
             _lessSpeed!.Pressed += () => _time += 0.01f;
             _default!.Pressed += () => _time = 0.015f;
             _skip!.Pressed += () => _time = 0;
+            _quit!.Pressed += () => EmitSignal(SignalName.QuitPressed);
+            _quests!.Pressed += () => EmitSignal(SignalName.QuestsPressed);
         }
 
         private void OnTextClicked(InputEvent @event)

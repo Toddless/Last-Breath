@@ -18,6 +18,6 @@
         public static readonly string BodyArmorEpic = "res://Resource/Items/BodyArmorEpic.tres";
         public static readonly string BodyArmorLegendary = "res://Resource/Items/BodyArmorLegendary.tres";
 
-        public static readonly string QuestData = "res://Resource/Quests/QuestCollection.tres";
+        public static readonly string QuestData = "res://Resource/Quests/questData.tres";
     }
 }

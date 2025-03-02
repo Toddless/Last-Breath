@@ -5,79 +5,6 @@
 [ext_resource type="Script" path="res://Localization/DialogueOption.cs" id="3_ondml"]
 [ext_resource type="Script" path="res://Localization/DialogueNode.cs" id="4_b2tc0"]
 
-[sub_resource type="Resource" id="Resource_t1jba"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingOption1"
-
-[sub_resource type="Resource" id="Resource_bghvc"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_t1jba")
-TargetNode = "MerchantLie"
-RelationEffect = 0
-
-[sub_resource type="Resource" id="Resource_pi8hy"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingOption2"
-
-[sub_resource type="Resource" id="Resource_ce77a"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_pi8hy")
-TargetNode = "PartialLie"
-RelationEffect = 0
-
-[sub_resource type="Resource" id="Resource_biowu"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingText1"
-
-[sub_resource type="Resource" id="Resource_3kj34"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_biowu")]
-Options = [SubResource("Resource_bghvc"), SubResource("Resource_ce77a")]
-DialogueId = "FirstMeeting"
-ReturnToPrevious = false
-
-[sub_resource type="Resource" id="Resource_6bvyo"]
-script = ExtResource("2_ul0kl")
-Key = "dialogMerchantLieOption1"
-
-[sub_resource type="Resource" id="Resource_aexa5"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_6bvyo")
-TargetNode = "AnswerDirection"
-RelationEffect = 0
-
-[sub_resource type="Resource" id="Resource_iwt46"]
-script = ExtResource("2_ul0kl")
-Key = "dialogMerchantLieText1"
-
-[sub_resource type="Resource" id="Resource_1pary"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_iwt46")]
-Options = [SubResource("Resource_aexa5")]
-DialogueId = "MerchantLie"
-ReturnToPrevious = false
-
-[sub_resource type="Resource" id="Resource_lo4cm"]
-script = ExtResource("2_ul0kl")
-Key = "dialogPartialLieOption1"
-
-[sub_resource type="Resource" id="Resource_mgnak"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_lo4cm")
-TargetNode = "AnswerDirection"
-RelationEffect = 0
-
-[sub_resource type="Resource" id="Resource_tbrtn"]
-script = ExtResource("2_ul0kl")
-Key = "dialogPartialLieText1"
-
-[sub_resource type="Resource" id="Resource_rh2gh"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_tbrtn")]
-Options = [SubResource("Resource_mgnak")]
-DialogueId = "PartialLie"
-ReturnToPrevious = false
-
 [sub_resource type="Resource" id="Resource_canqg"]
 script = ExtResource("2_ul0kl")
 Key = "dialogAnswerDirectionOption1"
@@ -87,6 +14,7 @@ script = ExtResource("3_ondml")
 OptionName = SubResource("Resource_canqg")
 TargetNode = "ThanksAndEnd"
 RelationEffect = 0
+UsePlayerSource = true
 
 [sub_resource type="Resource" id="Resource_6v7fr"]
 script = ExtResource("2_ul0kl")
@@ -98,6 +26,91 @@ Texts = [SubResource("Resource_6v7fr")]
 Options = [SubResource("Resource_thbe6")]
 DialogueId = "AnswerDirection"
 ReturnToPrevious = false
+Quests = []
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_t1jba"]
+script = ExtResource("2_ul0kl")
+Key = "dialogFirstMeetingOption1"
+
+[sub_resource type="Resource" id="Resource_bghvc"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_t1jba")
+TargetNode = "MerchantLie"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_pi8hy"]
+script = ExtResource("2_ul0kl")
+Key = "dialogFirstMeetingOption2"
+
+[sub_resource type="Resource" id="Resource_ce77a"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_pi8hy")
+TargetNode = "PartialLie"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_biowu"]
+script = ExtResource("2_ul0kl")
+Key = "dialogFirstMeetingText1"
+
+[sub_resource type="Resource" id="Resource_3kj34"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_biowu")]
+Options = [SubResource("Resource_bghvc"), SubResource("Resource_ce77a")]
+DialogueId = "FirstMeeting"
+ReturnToPrevious = false
+Quests = []
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_6bvyo"]
+script = ExtResource("2_ul0kl")
+Key = "dialogMerchantLieOption1"
+
+[sub_resource type="Resource" id="Resource_aexa5"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_6bvyo")
+TargetNode = "AnswerDirection"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_iwt46"]
+script = ExtResource("2_ul0kl")
+Key = "dialogMerchantLieText1"
+
+[sub_resource type="Resource" id="Resource_1pary"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_iwt46")]
+Options = [SubResource("Resource_aexa5")]
+DialogueId = "MerchantLie"
+ReturnToPrevious = false
+Quests = []
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_lo4cm"]
+script = ExtResource("2_ul0kl")
+Key = "dialogPartialLieOption1"
+
+[sub_resource type="Resource" id="Resource_mgnak"]
+script = ExtResource("3_ondml")
+OptionName = SubResource("Resource_lo4cm")
+TargetNode = "AnswerDirection"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_tbrtn"]
+script = ExtResource("2_ul0kl")
+Key = "dialogPartialLieText1"
+
+[sub_resource type="Resource" id="Resource_rh2gh"]
+script = ExtResource("4_b2tc0")
+Texts = [SubResource("Resource_tbrtn")]
+Options = [SubResource("Resource_mgnak")]
+DialogueId = "PartialLie"
+ReturnToPrevious = false
+Quests = []
+IsDialogMatterForQuest = false
 
 [sub_resource type="Resource" id="Resource_y1g7r"]
 script = ExtResource("2_ul0kl")
@@ -108,6 +121,7 @@ script = ExtResource("3_ondml")
 OptionName = SubResource("Resource_y1g7r")
 TargetNode = ""
 RelationEffect = 0
+UsePlayerSource = true
 
 [sub_resource type="Resource" id="Resource_6t7lf"]
 script = ExtResource("2_ul0kl")
@@ -119,6 +133,8 @@ Texts = [SubResource("Resource_6t7lf")]
 Options = [SubResource("Resource_f7x28")]
 DialogueId = "ThanksAndEnd"
 ReturnToPrevious = false
+Quests = []
+IsDialogMatterForQuest = false
 
 [resource]
 script = ExtResource("1_oaf6b")

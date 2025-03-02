@@ -27,9 +27,9 @@
             _dialogLayer.StartCutScene(firstNode);
             _machine?.Fire(Trigger.ShowDialogUI);
         }
-        public void ShowDialog(ISpeaking npc)
+        public void ShowDialog(BaseSpeakingNPC npc)
         {
-            _dialogLayer.StartDialogueNode(npc);
+            _dialogLayer.StartDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
 #if DEBUG

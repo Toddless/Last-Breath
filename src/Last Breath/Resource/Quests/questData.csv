@@ -1,0 +1,11 @@
+keys,ru,en
+Main_Awaking_Part1_Name,"Пробуждение","Awaking"
+Main_Awaking_Part1_Description,"Я очнулся в незнакомом месте, без оружия, денег, еды и одежды. Казалось бы, самое важное то, что я жив. Однако данный факт напрягает больше всего, поскольку я отчетливо помню что еще совсем недавно (или уже довольно давно?) я был мертв. Как бы то ни было, нужно найти хоть какую то информацию.","I woke up in an unfamiliar place, without weapons, money, food and clothes. It would seem that the most important thing is that I am alive. However, this fact is the most stressful, because I clearly remember that not long ago (or has it been quite a while?) I was dead. I need to find some information about it."
+Side_Battle_Skills_Name,"Оценить свои способности.","Evaluate the level of skills"
+Side_Battle_Skills_Description,"Неизвестно как давно я мертв. Нужно оценить свой текущий уровень подготовки. Самое просто - ввязаться в драку.","There's no telling how long I've been dead. I need to assess my current level of skill. The easiest thing to do is get into a fight."
+Side_First_Equip_Name,"Начальная экипировка","First Equipment"
+Side_First_Equip_Description,"Нужно найти какую нибудь экипировку. Как то не хочется быть укушенным в задницу пробегающим мимо волком. А если он промахнется? Чем мне тогда звинеть?","I need to find some equipment. I don't want to get bit in the ass by a wolf running by. What if he misses? What am I supposed to jingle with?"
+Side_Who_Am_I_Name,"Где я?","Who am i?"
+Side_Who_Am_I_Description,"Места вроде бы знакомые, но пока не совсем понятно где я нахожусь. Спросить направление или найти что то вроде карты было бы неплохо.","The places seem familiar, but I'm not quite sure where I am yet. Asking for directions or finding some sort of map would be good."
+Side_I_Need_Food_Name,"Добыть еды.","Find some Food."
+Side_I_Need_Food_Description,"Я голоден, зверски. Сожрал бы сейчас кабана, да где его поймаешь. Нужно найти хоть что то съедобное.","I'm hungry, starving. I could eat a wild boar right now, but I can't catch one. I'd have to find something edible."

@@ -10,5 +10,7 @@
         public static readonly string Main = "res://Scenes/Main.tscn";
         public static readonly string MainMenu = "res://Script/UI/MainMenu.tscn";
         public static readonly string DialogueOption = "res://Script/UI/DialogueUIOption.tscn";
+        public static readonly string NPCsQuests = "res://Script/UI/NPCsQuests.tscn";
+        public static readonly string QuestOption = "res://Script/UI/QuestOption.tscn";
     }
 }

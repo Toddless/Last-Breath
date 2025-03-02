@@ -8,10 +8,9 @@
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
-    using Playground.Script.NPC;
     using Playground.Script.Reputation;
 
-    public partial class Player : ObservableCharacterBody2D, ICharacter, ISpeaking
+    public partial class Player : ObservableCharacterBody2D, ICharacter
     {
         #region Private fields
         private AnimatedSprite2D? _sprite;

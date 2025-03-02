@@ -134,7 +134,7 @@ ui_dialog={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resource/Dialogues/PlayerDialogues/playerDialogues.en.translation")
+locale/translations=PackedStringArray("res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resource/Dialogues/PlayerDialogues/playerDialogues.en.translation", "res://Resource/Quests/questData.en.translation", "res://Resource/Quests/questData.ru.translation")
 
 [rendering]
 

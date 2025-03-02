@@ -13,5 +13,6 @@ ItemResourcePath = "res://Resource/SwordMythic.tres"
 ItemName = "Sword Mythic"
 MaxStackSize = 1
 Icon = SubResource("AtlasTexture_edtl5")
-Rarity = 32
+Rarity = 5
 Quantity = 1
+SpecialId = ""

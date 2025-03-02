@@ -19,7 +19,7 @@
         private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, StartCutScene, Close }
 
         private StateMachine<State, Trigger>? _machine;
-        private StateMachine<State, Trigger>.TriggerWithParameters<ISpeaking>? _showDialog;
+        private StateMachine<State, Trigger>.TriggerWithParameters<BaseSpeakingNPC>? _showDialog;
         private StateMachine<State, Trigger>.TriggerWithParameters<string>? _showCutScene;
 
         private MainWorld? _mainWorld;
@@ -122,7 +122,7 @@
 
         private void ConfigureStateMachine()
         {
-            _showDialog = _machine?.SetTriggerParameters<ISpeaking>(Trigger.Dialog);
+            _showDialog = _machine?.SetTriggerParameters<BaseSpeakingNPC>(Trigger.Dialog);
             _showCutScene = _machine?.SetTriggerParameters<string>(Trigger.StartCutScene);
 
             _machine?.Configure(State.World)
@@ -164,7 +164,7 @@
             _managerUI?.ShowCutScene(firstNode);
         }
 
-        private void OpenDialog(ISpeaking npc)
+        private void OpenDialog(BaseSpeakingNPC npc)
         {
             _managerUI?.ShowDialog(npc);
         }

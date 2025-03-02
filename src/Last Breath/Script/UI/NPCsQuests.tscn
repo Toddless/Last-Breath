@@ -1,0 +1,51 @@
+[gd_scene load_steps=5 format=3 uid="uid://cal2dmcbd722k"]
+
+[ext_resource type="Script" path="res://Script/UI/View/NPCsQuests.cs" id="1_n1dsx"]
+[ext_resource type="Texture2D" uid="uid://dqlmbs82w33r6" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Close Normal.png" id="1_otfxr"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_n5g3f"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dillh"]
+atlas = ExtResource("1_otfxr")
+region = Rect2(0, 0, 48, 48)
+
+[node name="NPCsQuests" type="HBoxContainer"]
+custom_minimum_size = Vector2(550, 450)
+script = ExtResource("1_n1dsx")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_top = 55
+
+[node name="QuestList" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.76
+theme_override_constants/separation = 6
+
+[node name="QuestDetails" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="QuestDetails"]
+layout_mode = 2
+
+[node name="Close" type="Button" parent="QuestDetails/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 8
+icon = SubResource("AtlasTexture_dillh")
+
+[node name="QuestDescription" type="RichTextLabel" parent="QuestDetails"]
+clip_contents = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("2_n5g3f")
+theme_override_font_sizes/normal_font_size = 24
+
+[node name="Accept" type="Button" parent="QuestDetails"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 22
+text = "Accept"

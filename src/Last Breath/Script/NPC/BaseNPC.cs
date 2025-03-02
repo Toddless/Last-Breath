@@ -33,23 +33,30 @@
 
         public string NpcId => _npcId;
 
-        protected void SetFraction(Fractions fraction) => _fraction = fraction;
-
-        protected void SetNpcId()
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine(this.Name);
-            builder.AppendLine(this._fraction.ToString());
-            _npcId = builder.ToString();
-        }
-
         public override void _EnterTree()
         {
             if (string.IsNullOrEmpty(_npcId))
                 SetNpcId();
+            SetDialogs();
+            LoadQuests();
             base._EnterTree();
         }
 
         public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;
+
+        protected virtual void LoadQuests()
+        {
+
+        }
+
+        protected virtual void SetDialogs()
+        {
+
+        }
+
+        protected void SetNpcId()
+        {
+            _npcId = Name;
+        }
     }
 }

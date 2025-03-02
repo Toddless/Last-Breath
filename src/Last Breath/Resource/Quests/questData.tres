@@ -1,0 +1,109 @@
+[gd_resource type="Resource" script_class="QuestCollection" load_steps=19 format=3 uid="uid://eu1ds1de1dl3"]
+
+[ext_resource type="Script" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
+[ext_resource type="Script" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
+[ext_resource type="Script" path="res://Script/QuestSystem/QuestCollection.cs" id="1_m4456"]
+
+[sub_resource type="Resource" id="Resource_yqodm"]
+script = ExtResource("1_fdmv3")
+Key = "Main_Awaking_Part1_Description"
+
+[sub_resource type="Resource" id="Resource_3e484"]
+script = ExtResource("1_fdmv3")
+Key = "Main_Awaking_Part1_Name"
+
+[sub_resource type="Resource" id="Resource_swsdw"]
+script = ExtResource("1_6dcs4")
+Id = "Main_Awaking_Part1"
+NameKey = SubResource("Resource_3e484")
+DescriptionKey = SubResource("Resource_yqodm")
+RewardId = "Main_Awaking_Part1_Reward"
+Conditions = []
+RequiredConditions = 0
+AllConditionsMustMet = false
+ConfirmationRequired = false
+NpcId = ""
+
+[sub_resource type="Resource" id="Resource_05yyd"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Battle_Skills_Description"
+
+[sub_resource type="Resource" id="Resource_brg8h"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Battle_Skills_Name"
+
+[sub_resource type="Resource" id="Resource_p122i"]
+script = ExtResource("1_6dcs4")
+Id = "Side_Battle_Skills"
+NameKey = SubResource("Resource_brg8h")
+DescriptionKey = SubResource("Resource_05yyd")
+RewardId = "Side_Battle_Skills_Reward"
+Conditions = []
+RequiredConditions = 0
+AllConditionsMustMet = false
+ConfirmationRequired = true
+NpcId = "Guardian"
+
+[sub_resource type="Resource" id="Resource_oufmo"]
+script = ExtResource("1_fdmv3")
+Key = "Side_First_Equip_Description"
+
+[sub_resource type="Resource" id="Resource_nsukd"]
+script = ExtResource("1_fdmv3")
+Key = "Side_First_Equip_Name"
+
+[sub_resource type="Resource" id="Resource_bxdv6"]
+script = ExtResource("1_6dcs4")
+Id = "Side_First_Equip"
+NameKey = SubResource("Resource_nsukd")
+DescriptionKey = SubResource("Resource_oufmo")
+RewardId = "Side_First_Equip_Reward"
+Conditions = []
+RequiredConditions = 0
+AllConditionsMustMet = false
+ConfirmationRequired = true
+NpcId = "Guardian"
+
+[sub_resource type="Resource" id="Resource_1ixhe"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Who_Am_I_Description"
+
+[sub_resource type="Resource" id="Resource_t62kh"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Who_Am_I_Name"
+
+[sub_resource type="Resource" id="Resource_7p4tv"]
+script = ExtResource("1_6dcs4")
+Id = "Side_Who_Am_I"
+NameKey = SubResource("Resource_t62kh")
+DescriptionKey = SubResource("Resource_1ixhe")
+RewardId = "Side_Who_Am_I_Reward"
+Conditions = []
+RequiredConditions = 0
+AllConditionsMustMet = false
+ConfirmationRequired = true
+NpcId = "Guardian"
+
+[sub_resource type="Resource" id="Resource_fkgnj"]
+script = ExtResource("1_fdmv3")
+Key = "Side_I_Need_Food_Description"
+
+[sub_resource type="Resource" id="Resource_fn0bj"]
+script = ExtResource("1_fdmv3")
+Key = "Side_I_Need_Food_Name"
+
+[sub_resource type="Resource" id="Resource_tjhi7"]
+script = ExtResource("1_6dcs4")
+Id = "Side_I_Need_Food"
+NameKey = SubResource("Resource_fn0bj")
+DescriptionKey = SubResource("Resource_fkgnj")
+RewardId = "Side_I_Need_Food_Reward"
+Conditions = []
+RequiredConditions = 0
+AllConditionsMustMet = false
+ConfirmationRequired = true
+NpcId = "Guardian"
+
+[resource]
+script = ExtResource("1_m4456")
+Quests = [SubResource("Resource_swsdw"), SubResource("Resource_p122i"), SubResource("Resource_bxdv6"), SubResource("Resource_7p4tv"), SubResource("Resource_tjhi7")]

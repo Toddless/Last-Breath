@@ -31,6 +31,11 @@ theme_override_constants/margin_bottom = 25
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
+[node name="QuestOptionsElement" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 10
@@ -45,15 +50,15 @@ size_flags_vertical = 8
 [node name="Avatar" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Player"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="TextContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer"]
 layout_mode = 2
 size_flags_vertical = 10
 
-[node name="Skip" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Skip" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
@@ -62,40 +67,40 @@ theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 20
 text = "Skip"
 
-[node name="MoreSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="MoreSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
 theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 18
 text = "Text Speed +"
 
-[node name="LessSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="LessSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
 theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 18
 text = "Text Speed -"
 
-[node name="Default" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Default" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
 theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 18
 text = "Default"
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "New quest added to Journal"
 label_settings = SubResource("LabelSettings_1ugkb")
 
-[node name="TextPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="TextPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer"]
 custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 10
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/TextPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel"]
 layout_mode = 2
 mouse_filter = 0
 theme_override_constants/margin_left = 18
@@ -103,7 +108,7 @@ theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 18
 
-[node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/TextPanel/MarginContainer"]
+[node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer"]
 clip_contents = false
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_e8eok")
@@ -128,9 +133,24 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Options" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Options" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
 
-[connection signal="gui_input" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/TextPanel/MarginContainer/Text" to="." method="OnTextClicked"]
+[node name="ButtonsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Quests" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Quests"
+
+[node name="Quit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Quit"
+
+[connection signal="gui_input" from="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer/Text" to="." method="OnTextClicked"]
