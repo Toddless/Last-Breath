@@ -2,15 +2,15 @@
 {
     public static class ScenePath
     {
-        public static readonly string Inventory = "res://Components/InventoryComponent.cs";
-        public static readonly string InventorySlot = "res://Script/UI/InventorySlot.tscn";
-        public static readonly string Item = "res://Scenes/Item.tscn";
-        public static readonly string EnemyToSpawn = "res://Scenes/Enemy.tscn";
-        public static readonly string BattleScene = "res://Script/UI/BattleUI.tscn";
-        public static readonly string Main = "res://Scenes/Main.tscn";
-        public static readonly string MainMenu = "res://Script/UI/MainMenu.tscn";
-        public static readonly string DialogueOption = "res://Script/UI/DialogueUIOption.tscn";
-        public static readonly string NPCsQuests = "res://Script/UI/NPCsQuests.tscn";
-        public static readonly string QuestOption = "res://Script/UI/QuestOption.tscn";
+        public static readonly string Inventory = "uid://cknfmn360kiqk";
+        public static readonly string InventorySlot = "uid://bqlqfsqoepfhs";
+        public static readonly string Item = "uid://cqwj0a1y5emy7";
+        public static readonly string EnemyToSpawn = "uid://bw2mbm6teo27u";
+        public static readonly string BattleScene = "uid://j6cqo6u0s83x";
+        public static readonly string Main = "uid://drgs10sgp405d";
+        public static readonly string MainMenu = "uid://bd5wylwyowomd";
+        public static readonly string DialogueUIOption = "uid://c2mjqshkahaja";
+        public static readonly string NPCsQuests = "uid://cal2dmcbd722k";
+        public static readonly string QuestOption = "uid://d01ts4xanfyuv";
     }
 }

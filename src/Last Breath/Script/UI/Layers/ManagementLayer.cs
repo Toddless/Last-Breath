@@ -80,6 +80,8 @@
                 player.AttackComponent.CurrentCriticalDamageChanged += (value) => _inventoryUI?.UpdateCriticalDamage(value);
                 player.AttackComponent.CurrentExtraHitChanged += (value) => _inventoryUI?.UpdateExtraHitChance(value);
             }
+
+            _questManager!.QuestAccepted += _questsUI.AddQuests;
         }
 
         private void ConfigureMachine()

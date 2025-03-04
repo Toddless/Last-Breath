@@ -5,7 +5,7 @@
     using Playground.Resource.Quests;
 
     [GlobalClass]
-    public partial class QuestCollection : Resource
+    public partial class QuestData : Resource
     {
         [Export]
         public Array<Quest> Quests { get; set; } = [];

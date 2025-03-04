@@ -4,6 +4,7 @@
     using Godot;
     using Godot.Collections;
     using Playground.Localization;
+    using Playground.Script.Enums;
     using Playground.Script.QuestSystem;
 
     [GlobalClass]
@@ -15,7 +16,7 @@
         public event Action<Quest>? QuestAccepted, QuestFailed, QuestCancelled, QuestCompleted;
 
         [Export]
-        public string Id { get; private set; } = string.Empty;
+        public string Id { get; set; } = string.Empty;
         [Export]
         public LocalizedString? NameKey { get; set; }
         [Export]
@@ -32,6 +33,8 @@
         public bool ConfirmationRequired { get; set; } = true;
         [Export]
         public string NpcId { get; set; } = string.Empty;
+        [Export]
+        public QuestType Type { get; set; }
 
         public bool QuestCanBeAccepted(QuestManager manager) => manager.QuestCanBeAccepted(this);
         public void AcceptQuest() => QuestAccepted?.Invoke(this);

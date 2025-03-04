@@ -30,7 +30,7 @@
 
         protected override void LoadQuests()
         {
-            var quests = ResourceLoader.Load<QuestCollection>(ResourcePath.QuestData);
+            var quests = ResourceLoader.Load<QuestData>(ResourcePath.QuestData);
             _quests.AddRange(quests.Quests.Where(quest => quest.NpcId == NpcId));
         }
     }

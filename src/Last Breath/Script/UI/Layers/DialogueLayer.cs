@@ -33,7 +33,7 @@
         public void StartCutScene(string firstNode)
         {
             _cutScene = true;
-            StartDialogueNode("EvaluateSituation");
+            StartDialogueNode("TryToMove");
         }
 
         public void StartDialogue(BaseSpeakingNPC npcs)

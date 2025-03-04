@@ -21,14 +21,18 @@
             if (_failedQuests.Contains(quest)) return false;
             if (_completedQuests.Contains(quest)) return false;
             if (_cancelledQuests.Contains(quest)) return false;
-            if (!CheckForConditions(quest)) return false;
-            return true;
+            if (CheckForConditions(quest))
+            {
+                SetQuestEvents(quest);
+                return true;
+            }
+            return false;
         }
 
         private bool CheckForConditions(Quest quest)
         {
             if (quest.Conditions.Count == 0) return true;
-            if(!quest.AllConditionsMustMet && quest.RequiredConditions > quest.Conditions.Count) return false;
+            if (!quest.AllConditionsMustMet && quest.RequiredConditions > quest.Conditions.Count) return false;
 
             var player = GameManager.Instance.Player;
             var cnt = quest.Conditions.Count(x => x.IsMet(player.Progress));
@@ -70,7 +74,6 @@
         private void OnQuestAccepted(Quest quest)
         {
             _activeQuests.Add(quest);
-            SetQuestEvents(quest);
             QuestAccepted?.Invoke(quest);
         }
         private void OnQuestFailed(Quest quest)

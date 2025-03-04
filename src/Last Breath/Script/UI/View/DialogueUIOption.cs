@@ -20,7 +20,7 @@
             _option.Pressed += OnOptionPressed;
         }
 
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath.DialogueOption);
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath.DialogueUIOption);
 
         private void OnOptionPressed()
         {

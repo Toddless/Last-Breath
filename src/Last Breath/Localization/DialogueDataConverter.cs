@@ -51,15 +51,6 @@
                     });
                 }
 
-                if (jsonNode.Quests.Count > 0)
-                {
-                    for (int y = 0; y < jsonNode.Quests.Count; y++)
-                    {
-                        dialogueNode.Quests[y].ConfirmationRequired = jsonNode.Quests[y].ConfirmationRequired;
-                        dialogueNode.Quests.Add(jsonNode.Quests[y]);
-                    }
-                }
-
                 dialogueNode.ReturnToPrevious = jsonNode.ReturnToPrevious;
                 dialogueData.Dialogs[jsonNode.Id] = dialogueNode;
             }
