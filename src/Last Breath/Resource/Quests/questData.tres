@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="QuestCollection" load_steps=19 format=3 uid="uid://eu1ds1de1dl3"]
+[gd_resource type="Resource" script_class="QuestCollection" load_steps=20 format=3 uid="uid://eu1ds1de1dl3"]
 
-[ext_resource type="Script" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
-[ext_resource type="Script" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
-[ext_resource type="Script" path="res://Script/QuestSystem/QuestCollection.cs" id="1_m4456"]
+[ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
+[ext_resource type="Script" uid="uid://sv0haan1s1cq" path="res://Script/QuestSystem/QuestCollection.cs" id="1_m4456"]
+[ext_resource type="Script" uid="uid://b0i87ba30h61a" path="res://Script/QuestSystem/QuestCondition.cs" id="2_xiwmg"]
 
 [sub_resource type="Resource" id="Resource_yqodm"]
 script = ExtResource("1_fdmv3")
@@ -18,7 +19,7 @@ Id = "Main_Awaking_Part1"
 NameKey = SubResource("Resource_3e484")
 DescriptionKey = SubResource("Resource_yqodm")
 RewardId = "Main_Awaking_Part1_Reward"
-Conditions = []
+Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
 AllConditionsMustMet = false
 ConfirmationRequired = false
@@ -38,11 +39,11 @@ Id = "Side_Battle_Skills"
 NameKey = SubResource("Resource_brg8h")
 DescriptionKey = SubResource("Resource_05yyd")
 RewardId = "Side_Battle_Skills_Reward"
-Conditions = []
+Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
 AllConditionsMustMet = false
-ConfirmationRequired = true
-NpcId = "Guardian"
+ConfirmationRequired = false
+NpcId = ""
 
 [sub_resource type="Resource" id="Resource_oufmo"]
 script = ExtResource("1_fdmv3")
@@ -58,11 +59,11 @@ Id = "Side_First_Equip"
 NameKey = SubResource("Resource_nsukd")
 DescriptionKey = SubResource("Resource_oufmo")
 RewardId = "Side_First_Equip_Reward"
-Conditions = []
+Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
 AllConditionsMustMet = false
-ConfirmationRequired = true
-NpcId = "Guardian"
+ConfirmationRequired = false
+NpcId = ""
 
 [sub_resource type="Resource" id="Resource_1ixhe"]
 script = ExtResource("1_fdmv3")
@@ -78,11 +79,11 @@ Id = "Side_Who_Am_I"
 NameKey = SubResource("Resource_t62kh")
 DescriptionKey = SubResource("Resource_1ixhe")
 RewardId = "Side_Who_Am_I_Reward"
-Conditions = []
+Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
 AllConditionsMustMet = false
-ConfirmationRequired = true
-NpcId = "Guardian"
+ConfirmationRequired = false
+NpcId = ""
 
 [sub_resource type="Resource" id="Resource_fkgnj"]
 script = ExtResource("1_fdmv3")
@@ -98,12 +99,12 @@ Id = "Side_I_Need_Food"
 NameKey = SubResource("Resource_fn0bj")
 DescriptionKey = SubResource("Resource_fkgnj")
 RewardId = "Side_I_Need_Food_Reward"
-Conditions = []
+Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
 AllConditionsMustMet = false
-ConfirmationRequired = true
-NpcId = "Guardian"
+ConfirmationRequired = false
+NpcId = ""
 
 [resource]
 script = ExtResource("1_m4456")
-Quests = [SubResource("Resource_swsdw"), SubResource("Resource_p122i"), SubResource("Resource_bxdv6"), SubResource("Resource_7p4tv"), SubResource("Resource_tjhi7")]
+Quests = Array[ExtResource("1_6dcs4")]([SubResource("Resource_swsdw"), SubResource("Resource_p122i"), SubResource("Resource_bxdv6"), SubResource("Resource_7p4tv"), SubResource("Resource_tjhi7")])

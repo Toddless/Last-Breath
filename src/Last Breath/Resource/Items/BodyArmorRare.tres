@@ -1,16 +1,3 @@
-[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://begc2bdehpylo"]
-
-[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_dfh13"]
-[ext_resource type="Texture2D" uid="uid://ccq6q78k5plf5" path="res://Assets/BodyArmor/Rare.png" id="1_fhchu"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_int0d"]
-atlas = ExtResource("1_fhchu")
+[gd_resource type="Resource" format=3 uid="uid://begc2bdehpylo"]
 
 [resource]
-script = ExtResource("1_dfh13")
-ItemResourcePath = "res://Resource/BodyArmorRare.tres"
-ItemName = "Body Armor Silver"
-MaxStackSize = 1
-Icon = SubResource("AtlasTexture_int0d")
-Rarity = 4
-Quantity = 1

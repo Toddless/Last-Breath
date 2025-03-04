@@ -8,39 +8,41 @@
 
     public class QuestManager
     {
-        private readonly List<Quest> _activeQuests = [];
-        private readonly List<Quest> _failedQuests = [];
-        private readonly List<Quest> _completedQuests = [];
-        private readonly List<Quest> _cancelledQuests = [];
+        private readonly HashSet<Quest> _activeQuests = [];
+        private readonly HashSet<Quest> _failedQuests = [];
+        private readonly HashSet<Quest> _completedQuests = [];
+        private readonly HashSet<Quest> _cancelledQuests = [];
 
         public event Action<Quest>? QuestAccepted, QuestFailed, QuestCompleted, QuestCancelled;
 
         public bool QuestCanBeAccepted(Quest quest)
         {
-            if (_activeQuests.Any(x => x.Id == quest.Id)) return false;
-            if (_failedQuests.Any(x => x.Id == quest.Id)) return false;
-            if (_completedQuests.Any(x => x.Id == quest.Id)) return false;
-            if (_cancelledQuests.Any(x => x.Id == quest.Id)) return false;
+            if (_activeQuests.Contains(quest)) return false;
+            if (_failedQuests.Contains(quest)) return false;
+            if (_completedQuests.Contains(quest)) return false;
+            if (_cancelledQuests.Contains(quest)) return false;
             if (!CheckForConditions(quest)) return false;
-            SetQuestEvents(quest);
             return true;
         }
 
         private bool CheckForConditions(Quest quest)
         {
             if (quest.Conditions.Count == 0) return true;
+            if(!quest.AllConditionsMustMet && quest.RequiredConditions > quest.Conditions.Count) return false;
 
             var player = GameManager.Instance.Player;
             var cnt = quest.Conditions.Count(x => x.IsMet(player.Progress));
 
-            return quest.AllConditionsMustMet ? cnt == quest.Conditions.Count : cnt >= quest.RequiredConditions;
+            return quest.AllConditionsMustMet
+                ? cnt == quest.Conditions.Count
+                : cnt >= quest.RequiredConditions;
         }
 
         private void RemoveQuestEvents(Quest quest)
         {
             quest.QuestAccepted -= OnQuestAccepted;
             quest.QuestCancelled -= OnQuestCancelled;
-            quest.QuestFailed -= OnQuesFailed;
+            quest.QuestFailed -= OnQuestFailed;
             quest.QuestCompleted -= OnQuestCompleted;
         }
 
@@ -48,7 +50,7 @@
         {
             quest.QuestAccepted += OnQuestAccepted;
             quest.QuestCancelled += OnQuestCancelled;
-            quest.QuestFailed += OnQuesFailed;
+            quest.QuestFailed += OnQuestFailed;
             quest.QuestCompleted += OnQuestCompleted;
         }
         private void OnQuestCompleted(Quest quest)
@@ -68,10 +70,10 @@
         private void OnQuestAccepted(Quest quest)
         {
             _activeQuests.Add(quest);
-            RemoveQuestEvents(quest);
+            SetQuestEvents(quest);
             QuestAccepted?.Invoke(quest);
         }
-        private void OnQuesFailed(Quest quest)
+        private void OnQuestFailed(Quest quest)
         {
             _activeQuests.Remove(quest);
             _failedQuests.Add(quest);

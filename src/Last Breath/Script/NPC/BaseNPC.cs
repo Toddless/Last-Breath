@@ -1,7 +1,6 @@
 ﻿namespace Playground.Script.NPC
 {
     using System.Linq;
-    using System.Text;
     using Godot;
     using Playground.Script.Enums;
 

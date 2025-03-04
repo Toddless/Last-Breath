@@ -51,6 +51,7 @@
             if (_questToAccept == null) return;
             _questToAccept.AcceptQuest();
             _questsList?.GetChildren().Cast<QuestOption>()?.FirstOrDefault(x => x.IsMatch(_questToAccept.Id) == true)?.QueueFree();
+            _description!.Text = string.Empty;
             _questToAccept = null;
         }
 

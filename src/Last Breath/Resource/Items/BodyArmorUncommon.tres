@@ -1,16 +1,3 @@
-[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://bivx6ma2itlym"]
-
-[ext_resource type="Texture2D" uid="uid://dkqlbyi508qxo" path="res://Assets/BodyArmor/Uncommon.png" id="1_1owd3"]
-[ext_resource type="Script" path="res://Script/Inventory/Item.cs" id="1_wcb5n"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vnltm"]
-atlas = ExtResource("1_1owd3")
+[gd_resource type="Resource" format=3 uid="uid://bivx6ma2itlym"]
 
 [resource]
-script = ExtResource("1_wcb5n")
-ItemResourcePath = "res://Resource/BodyArmorUncommon.tres"
-ItemName = "Broze Armor"
-MaxStackSize = 1
-Icon = SubResource("AtlasTexture_vnltm")
-Rarity = 2
-Quantity = 1

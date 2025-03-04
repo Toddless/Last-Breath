@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script.UI.View
 {
-    using System;
     using Godot;
     using Playground.Script.Helpers;
 

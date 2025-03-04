@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://j6cqo6u0s83x"]
 
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
-[ext_resource type="Script" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
+[ext_resource type="Script" uid="uid://402jw803k746" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
 [ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_c5cqn"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]

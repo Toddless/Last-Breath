@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://boqqyrt0sfpve"]
 
-[ext_resource type="Script" path="res://Script/UI/View/MainUI.cs" id="1_8jnuc"]
+[ext_resource type="Script" uid="uid://rx4nq2jh70l7" path="res://Script/UI/View/MainUI.cs" id="1_8jnuc"]
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="4_582ut"]

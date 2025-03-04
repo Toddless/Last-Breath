@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bdf7wlmerio80"]
 
-[ext_resource type="Script" path="res://DebugTools/Variable.cs" id="1_d1mc0"]
+[ext_resource type="Script" uid="uid://dhftrff6hjotl" path="res://DebugTools/Variable.cs" id="1_d1mc0"]
 
 [node name="Variable" type="HBoxContainer"]
 size_flags_horizontal = 0

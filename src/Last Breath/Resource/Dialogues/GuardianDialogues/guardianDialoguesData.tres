@@ -1,147 +1,167 @@
-[gd_resource type="Resource" script_class="DialogueData" load_steps=27 format=3 uid="uid://d1q318pk7iham"]
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://7uhwt2ap1p0d"]
 
-[ext_resource type="Script" path="res://Localization/DialogueData.cs" id="1_oaf6b"]
-[ext_resource type="Script" path="res://Localization/LocalizedString.cs" id="2_ul0kl"]
-[ext_resource type="Script" path="res://Localization/DialogueOption.cs" id="3_ondml"]
-[ext_resource type="Script" path="res://Localization/DialogueNode.cs" id="4_b2tc0"]
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_hqulp"]
+[ext_resource type="Script" uid="uid://cyvkrnhly51mt" path="res://Localization/DialogueOption.cs" id="2_i5oyb"]
+[ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="3_gkm0q"]
+[ext_resource type="Script" uid="uid://uywgsrrxxqx1" path="res://Localization/DialogueNode.cs" id="3_hbv15"]
+[ext_resource type="Script" uid="uid://bio3h5r26ydx1" path="res://Localization/DialogueData.cs" id="4_y6vxq"]
 
-[sub_resource type="Resource" id="Resource_canqg"]
-script = ExtResource("2_ul0kl")
-Key = "dialogAnswerDirectionOption1"
+[sub_resource type="Resource" id="Resource_kul55"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianAnswerDirectionOption1"
 
-[sub_resource type="Resource" id="Resource_thbe6"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_canqg")
+[sub_resource type="Resource" id="Resource_8nfe3"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_kul55")
 TargetNode = "ThanksAndEnd"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_6v7fr"]
-script = ExtResource("2_ul0kl")
-Key = "dialogAnswerDirectionText1"
+[sub_resource type="Resource" id="Resource_t2ud7"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianAnswerDirectionText1"
 
-[sub_resource type="Resource" id="Resource_tog8n"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_6v7fr")]
-Options = [SubResource("Resource_thbe6")]
-DialogueId = "AnswerDirection"
+[sub_resource type="Resource" id="Resource_fj76b"]
+script = ExtResource("3_hbv15")
+Texts = Array[ExtResource("1_hqulp")]([SubResource("Resource_t2ud7")])
+Options = Array[ExtResource("2_i5oyb")]([SubResource("Resource_8nfe3")])
+DialogueId = "GuardianAnswerDirection"
 ReturnToPrevious = false
-Quests = []
+Quests = Array[ExtResource("3_gkm0q")]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_t1jba"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingOption1"
+[sub_resource type="Resource" id="Resource_ctypk"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianFirstMeetingOption1"
 
-[sub_resource type="Resource" id="Resource_bghvc"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_t1jba")
-TargetNode = "MerchantLie"
+[sub_resource type="Resource" id="Resource_p22jt"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_ctypk")
+TargetNode = "PlayerMerchantLie"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_pi8hy"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingOption2"
+[sub_resource type="Resource" id="Resource_mvyys"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianFirstMeetingOption2"
 
-[sub_resource type="Resource" id="Resource_ce77a"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_pi8hy")
-TargetNode = "PartialLie"
+[sub_resource type="Resource" id="Resource_c2xme"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_mvyys")
+TargetNode = "PlayerPartialLie"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_biowu"]
-script = ExtResource("2_ul0kl")
-Key = "dialogFirstMeetingText1"
+[sub_resource type="Resource" id="Resource_gv4wy"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianFirstMeetingText1"
 
-[sub_resource type="Resource" id="Resource_3kj34"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_biowu")]
-Options = [SubResource("Resource_bghvc"), SubResource("Resource_ce77a")]
-DialogueId = "FirstMeeting"
+[sub_resource type="Resource" id="Resource_o221v"]
+script = ExtResource("3_hbv15")
+Texts = Array[ExtResource("1_hqulp")]([SubResource("Resource_gv4wy")])
+Options = Array[ExtResource("2_i5oyb")]([SubResource("Resource_p22jt"), SubResource("Resource_c2xme")])
+DialogueId = "GuardianFirstMeeting"
 ReturnToPrevious = false
-Quests = []
+Quests = Array[ExtResource("3_gkm0q")]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_6bvyo"]
-script = ExtResource("2_ul0kl")
-Key = "dialogMerchantLieOption1"
+[sub_resource type="Resource" id="Resource_fwaa6"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianReqularMeetingOption1"
 
-[sub_resource type="Resource" id="Resource_aexa5"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_6bvyo")
-TargetNode = "AnswerDirection"
+[sub_resource type="Resource" id="Resource_87vs2"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_fwaa6")
+TargetNode = "GuardianQuests"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_iwt46"]
-script = ExtResource("2_ul0kl")
-Key = "dialogMerchantLieText1"
+[sub_resource type="Resource" id="Resource_hp6fs"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianReqularMeetingOption2"
 
-[sub_resource type="Resource" id="Resource_1pary"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_iwt46")]
-Options = [SubResource("Resource_aexa5")]
-DialogueId = "MerchantLie"
+[sub_resource type="Resource" id="Resource_vft4i"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_hp6fs")
+TargetNode = "GuardianInformation"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_jxq5e"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianReqularMeetingOption3"
+
+[sub_resource type="Resource" id="Resource_bft88"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_jxq5e")
+TargetNode = "End"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_4wxh7"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianReqularMeetingText1"
+
+[sub_resource type="Resource" id="Resource_uu744"]
+script = ExtResource("3_hbv15")
+Texts = Array[ExtResource("1_hqulp")]([SubResource("Resource_4wxh7")])
+Options = Array[ExtResource("2_i5oyb")]([SubResource("Resource_87vs2"), SubResource("Resource_vft4i"), SubResource("Resource_bft88")])
+DialogueId = "GuardianReqularMeeting"
 ReturnToPrevious = false
-Quests = []
+Quests = Array[ExtResource("3_gkm0q")]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_lo4cm"]
-script = ExtResource("2_ul0kl")
-Key = "dialogPartialLieOption1"
+[sub_resource type="Resource" id="Resource_1lnb8"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption1"
 
-[sub_resource type="Resource" id="Resource_mgnak"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_lo4cm")
-TargetNode = "AnswerDirection"
+[sub_resource type="Resource" id="Resource_fe4ek"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_1lnb8")
+TargetNode = "PlayerJokeAnswer"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_tbrtn"]
-script = ExtResource("2_ul0kl")
-Key = "dialogPartialLieText1"
+[sub_resource type="Resource" id="Resource_i702l"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption2"
 
-[sub_resource type="Resource" id="Resource_rh2gh"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_tbrtn")]
-Options = [SubResource("Resource_mgnak")]
-DialogueId = "PartialLie"
-ReturnToPrevious = false
-Quests = []
-IsDialogMatterForQuest = false
-
-[sub_resource type="Resource" id="Resource_y1g7r"]
-script = ExtResource("2_ul0kl")
-Key = "dialogThanksAndEndOption1"
-
-[sub_resource type="Resource" id="Resource_f7x28"]
-script = ExtResource("3_ondml")
-OptionName = SubResource("Resource_y1g7r")
-TargetNode = ""
+[sub_resource type="Resource" id="Resource_neqc7"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_i702l")
+TargetNode = "PlayerOffensiveAnswer"
 RelationEffect = 0
 UsePlayerSource = true
 
-[sub_resource type="Resource" id="Resource_6t7lf"]
-script = ExtResource("2_ul0kl")
-Key = "dialogThanksAndEndText1"
+[sub_resource type="Resource" id="Resource_xyxww"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption3"
 
-[sub_resource type="Resource" id="Resource_jbmry"]
-script = ExtResource("4_b2tc0")
-Texts = [SubResource("Resource_6t7lf")]
-Options = [SubResource("Resource_f7x28")]
-DialogueId = "ThanksAndEnd"
+[sub_resource type="Resource" id="Resource_ut37p"]
+script = ExtResource("2_i5oyb")
+OptionName = SubResource("Resource_xyxww")
+TargetNode = "PlayerIgnoreJoke"
+RelationEffect = 0
+UsePlayerSource = true
+
+[sub_resource type="Resource" id="Resource_1e1m8"]
+script = ExtResource("1_hqulp")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsText1"
+
+[sub_resource type="Resource" id="Resource_ryb5k"]
+script = ExtResource("3_hbv15")
+Texts = Array[ExtResource("1_hqulp")]([SubResource("Resource_1e1m8")])
+Options = Array[ExtResource("2_i5oyb")]([SubResource("Resource_fe4ek"), SubResource("Resource_neqc7"), SubResource("Resource_ut37p")])
+DialogueId = "GuardianSecondMeetingPlayerHasItems"
 ReturnToPrevious = false
-Quests = []
+Quests = Array[ExtResource("3_gkm0q")]([])
 IsDialogMatterForQuest = false
 
 [resource]
-script = ExtResource("1_oaf6b")
+script = ExtResource("4_y6vxq")
 Dialogs = {
-"AnswerDirection": SubResource("Resource_tog8n"),
-"FirstMeeting": SubResource("Resource_3kj34"),
-"MerchantLie": SubResource("Resource_1pary"),
-"PartialLie": SubResource("Resource_rh2gh"),
-"ThanksAndEnd": SubResource("Resource_jbmry")
+"GuardianAnswerDirection": SubResource("Resource_fj76b"),
+"GuardianFirstMeeting": SubResource("Resource_o221v"),
+"GuardianReqularMeeting": SubResource("Resource_uu744"),
+"GuardianSecondMeetingPlayerHasItems": SubResource("Resource_ryb5k")
 }

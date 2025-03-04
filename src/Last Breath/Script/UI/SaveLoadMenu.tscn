@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cserxppd6wiui"]
 
-[ext_resource type="Script" path="res://Script/UI/View/SaveLoadMenu.cs" id="1_0v6sy"]
+[ext_resource type="Script" uid="uid://de5y2fhjwxkrt" path="res://Script/UI/View/SaveLoadMenu.cs" id="1_0v6sy"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="1_rjefs"]
 [ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="3_kenvw"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_lkn28"]

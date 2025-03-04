@@ -21,7 +21,7 @@
             _buttonsTabBar = root.GetNode<TabBar>("Buttons");
             _updatePropertiesBtn = _buttonsTabBar.GetNode<Button>(nameof(Button));
             FillDictionary();
-            SetPlayerVariables(_player);
+          //  SetPlayerVariables(_player);
         }
 
         private void FillDictionary()

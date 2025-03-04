@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cb1hvr35v8ujh"]
 
-[ext_resource type="Script" path="res://Script/UI/SettingsTab.cs" id="1_46baa"]
+[ext_resource type="Script" uid="uid://cjtuj8amjeijo" path="res://Script/UI/SettingsTab.cs" id="1_46baa"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_iywr4"]
 [ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="3_nwe1g"]
 

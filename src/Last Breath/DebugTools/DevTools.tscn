@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://belchp2lhqykb"]
 
-[ext_resource type="Script" path="res://DebugTools/DevTools.cs" id="1_iqu3t"]
+[ext_resource type="Script" uid="uid://bwk2ljs0b0jiv" path="res://DebugTools/DevTools.cs" id="1_iqu3t"]
 
 [node name="DevTools" type="Control"]
 layout_mode = 3

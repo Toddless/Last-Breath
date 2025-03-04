@@ -14,18 +14,18 @@
     {
         private DialogueWindow? _dialogWindow;
         private DialogueNode? _currentNode, _previousNode;
+        private QuestManager? _questManager;
         private Player? _player;
         private int _currentRelation;
         private bool _cutScene = false;
         private BaseSpeakingNPC? _speaking;
-        private readonly System.Collections.Generic.Dictionary<string, BaseSpeakingNPC> _speakers = [];
-        private Array<Quest>? _quests;
 
         public Action? DialogueEnded;
         public override void _Ready()
         {
             _dialogWindow = GetNode<DialogueWindow>(nameof(DialogueWindow));
             _player = GameManager.Instance.Player;
+            _questManager = DiContainer.GetService<QuestManager>();
             _dialogWindow.QuitPressed += () => DialogueEnded?.Invoke();
             _dialogWindow.QuestsPressed += QuestsPressed;
         }
@@ -33,7 +33,7 @@
         public void StartCutScene(string firstNode)
         {
             _cutScene = true;
-            StartDialogueNode(firstNode);
+            StartDialogueNode("EvaluateSituation");
         }
 
         public void StartDialogue(BaseSpeakingNPC npcs)
@@ -44,9 +44,17 @@
 
         public void StartDialogueNode(string firstNode = "FirstMeeting")
         {
-            DialogueNode? node = _speaking!.NpcTalking
-                ? _speaking!.Dialogs.GetValueOrDefault(firstNode)
-                : _player!.Dialogs.GetValueOrDefault(firstNode);
+            DialogueNode? node = null;
+            if (!_cutScene)
+            {
+                node = _speaking!.NpcTalking
+                   ? _speaking!.Dialogs.GetValueOrDefault(firstNode)
+                   : _player!.Dialogs.GetValueOrDefault(firstNode);
+            }
+            else
+            {
+                node = _player?.Dialogs.GetValueOrDefault(firstNode);
+            }
             if (node == null)
             {
                 // log
@@ -66,23 +74,37 @@
             }
             if (_currentNode.IsDialogMatterForQuest)
                 _player?.Progress.OnDialogueCompleted(_currentNode.DialogueId);
+            if (_currentNode.Quests.Count > 0)
+                CheckAndAddQuests(_currentNode.Quests);
             if (_currentNode?.Options.Count > 0)
                 ShowOptions();
             if (_currentNode!.ReturnToPrevious)
                 ShowPreviousOptions();
         }
 
+        private void CheckAndAddQuests(Array<Quest> quests)
+        {
+            if (_questManager == null) return;
+            foreach (var quest in quests)
+            {
+                if (quest.QuestCanBeAccepted(_questManager) && !quest.ConfirmationRequired)
+                {
+                    quest.AcceptQuest();
+                    _dialogWindow?.NewQuestAdded();
+                }
+            }
+        }
+
         private void QuestsPressed()
         {
             var questMenu = NPCsQuests.Initialize().Instantiate<NPCsQuests>();
-            var manager = DiContainer.GetService<QuestManager>();
-            if (_speaking == null || manager == null) return;
+            if (_speaking == null || _questManager == null) return;
             _dialogWindow?.AddQuestOption(questMenu);
 
             // i need to show all quests that this npc have
             foreach (var quest in _speaking.Quests)
             {
-                if(!quest.QuestCanBeAccepted(manager)) continue;
+                if (!quest.QuestCanBeAccepted(_questManager)) continue;
                 questMenu.AddQuests(quest);
             }
             _dialogWindow?.HideDialogueButtons();
@@ -92,12 +114,15 @@
         {
             _currentRelation = Mathf.Clamp(_currentRelation + option.RelationEffect, -100, 100);
             // I need to save the last node with options so I can return to it.
-            if (_currentNode?.Options != null)
+            if (_currentNode?.Options.Count > 0)
             {
                 _previousNode = _currentNode;
             }
-
-            if (!string.IsNullOrWhiteSpace(option.TargetNode))
+            if (_cutScene)
+            {
+                StartDialogueNode(option.TargetNode);
+            }
+            else
             {
                 if (option.UsePlayerSource)
                 {
@@ -109,10 +134,6 @@
                     _speaking!.NpcTalking = true;
                     StartDialogueNode(option.TargetNode);
                 }
-            }
-            else
-            {
-                EndDialogue();
             }
         }
 

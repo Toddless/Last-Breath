@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cgbo08fo7mqcj"]
 
-[ext_resource type="Script" path="res://Script/NPC/Digry.cs" id="1_y84j0"]
+[ext_resource type="Script" uid="uid://buxpxmohnuoqk" path="res://Script/NPC/Digry.cs" id="1_y84j0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gdp1s"]
 size = Vector2(30, 36)

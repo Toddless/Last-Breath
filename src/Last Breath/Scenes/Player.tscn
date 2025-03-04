@@ -1,6 +1,6 @@
 [gd_scene load_steps=96 format=3 uid="uid://dt02wd1ss75rn"]
 
-[ext_resource type="Script" path="res://Script/Player.cs" id="1_nuf03"]
+[ext_resource type="Script" uid="uid://dtvgj0dnl2fng" path="res://Script/Player.cs" id="1_nuf03"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_mu4dn"]
 [ext_resource type="Texture2D" uid="uid://cdvyvrevjhnqq" path="res://Assets/Player/Warrior_walk_run.png" id="3_ajmxy"]
 [ext_resource type="Texture2D" uid="uid://dbi5tjdybuk77" path="res://Assets/DexStance.svg" id="4_ktjf6"]
