@@ -4,7 +4,7 @@
     using Playground.Components;
 
     [GlobalClass]
-    public partial class DialogueCompletedCondition : QuestCondition
+    public partial class DialogueCompletedCondition : Condition
     {
         [Export]
         public string DialogueId { get; set; } = string.Empty;

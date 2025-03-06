@@ -4,7 +4,7 @@
     using Playground.Components;
 
     [GlobalClass]
-    public partial class NpcInteractionCondition : QuestCondition
+    public partial class NpcInteractionCondition : Condition
     {
         [Export(PropertyHint.File, "*.tres, *.res")]
         public string NpcNameKey { get; set; } = string.Empty;

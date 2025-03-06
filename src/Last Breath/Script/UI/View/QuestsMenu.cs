@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script.UI
 {
-    using System;
     using Godot;
     using Playground.Resource.Quests;
     using Playground.Script.Helpers;

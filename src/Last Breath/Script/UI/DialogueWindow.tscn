@@ -1,11 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://eh2wvi8x5l80"]
+[gd_scene load_steps=3 format=3 uid="uid://eh2wvi8x5l80"]
 
 [ext_resource type="Script" uid="uid://c2fipqliahv3c" path="res://Script/UI/View/DialogueWindow.cs" id="1_q0bu3"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_e8eok"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_1ugkb"]
-font = ExtResource("2_e8eok")
-font_size = 18
+[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Fonts/BaseFonts20Pix.tres" id="2_p6x8j"]
 
 [node name="DialogueWindow" type="Control"]
 layout_mode = 3
@@ -63,36 +59,32 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 focus_mode = 0
-theme_override_fonts/font = ExtResource("2_e8eok")
 theme_override_font_sizes/font_size = 20
 text = "Skip"
 
 [node name="MoreSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
-theme_override_fonts/font = ExtResource("2_e8eok")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Text Speed +"
 
 [node name="LessSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
-theme_override_fonts/font = ExtResource("2_e8eok")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Text Speed -"
 
 [node name="Default" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 focus_mode = 0
-theme_override_fonts/font = ExtResource("2_e8eok")
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Default"
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
 text = "New quest added to Journal"
-label_settings = SubResource("LabelSettings_1ugkb")
+label_settings = ExtResource("2_p6x8j")
 
 [node name="TextPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer"]
 custom_minimum_size = Vector2(0, 250)
@@ -111,7 +103,6 @@ theme_override_constants/margin_bottom = 18
 [node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer"]
 clip_contents = false
 layout_mode = 2
-theme_override_fonts/normal_font = ExtResource("2_e8eok")
 theme_override_font_sizes/normal_font_size = 24
 scroll_following = true
 
@@ -146,11 +137,13 @@ layout_mode = 2
 [node name="Quests" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
 text = "Quests"
 
 [node name="Quit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
 text = "Quit"
 
 [connection signal="gui_input" from="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer/Text" to="." method="OnTextClicked"]

@@ -24,12 +24,12 @@
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
         public void ShowCutScene(string firstNode)
         {
-            _dialogLayer.StartCutScene(firstNode);
+            _dialogLayer.InitializeCutScene(firstNode);
             _machine?.Fire(Trigger.ShowDialogUI);
         }
         public void ShowDialog(BaseSpeakingNPC npc)
         {
-            _dialogLayer.StartDialogue(npc);
+            _dialogLayer.InitializeDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
 #if DEBUG

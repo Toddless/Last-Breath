@@ -2,7 +2,6 @@
 {
     using Godot;
     using Godot.Collections;
-    using Playground.Resource.Quests;
 
     [GlobalClass]
     public partial class DialogueNode : Resource
@@ -16,7 +15,7 @@
         [Export]
         public bool ReturnToPrevious { get; set; } = false;
         [Export]
-        public Array<Quest> Quests { get; set; } = [];
+        public Array<string> Quests { get; set; } = [];
         [Export]
         public bool IsDialogMatterForQuest {  get; set; } = false;
     }

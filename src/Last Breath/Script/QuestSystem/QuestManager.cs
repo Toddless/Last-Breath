@@ -32,14 +32,9 @@
         private bool CheckForConditions(Quest quest)
         {
             if (quest.Conditions.Count == 0) return true;
-            if (!quest.AllConditionsMustMet && quest.RequiredConditions > quest.Conditions.Count) return false;
+            if (quest.RequiredConditions > quest.Conditions.Count) return false;
 
-            var player = GameManager.Instance.Player;
-            var cnt = quest.Conditions.Count(x => x.IsMet(player.Progress));
-
-            return quest.AllConditionsMustMet
-                ? cnt == quest.Conditions.Count
-                : cnt >= quest.RequiredConditions;
+            return quest.Conditions.Count(x => x.IsMet(GameManager.Instance.Player.Progress)) >= quest.RequiredConditions;
         }
 
         private void RemoveQuestEvents(Quest quest)

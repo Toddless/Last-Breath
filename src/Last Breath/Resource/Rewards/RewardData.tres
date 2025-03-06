@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RewardData" load_steps=3 format=3 uid="uid://b17770l8n6cpr"]
+
+[ext_resource type="Script" uid="uid://bbubmixsxx00s" path="res://Script/QuestSystem/Reward.cs" id="1_l33k3"]
+[ext_resource type="Script" uid="uid://c88tjk7aeeqvs" path="res://Script/QuestSystem/RewardData.cs" id="2_myn7r"]
+
+[resource]
+script = ExtResource("2_myn7r")
+Rewards = Array[ExtResource("1_l33k3")]([])
+metadata/_custom_type_script = "uid://c88tjk7aeeqvs"

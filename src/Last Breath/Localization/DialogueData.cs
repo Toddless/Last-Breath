@@ -7,7 +7,7 @@
     public partial class DialogueData : Resource
     {
         [Export]
-        public Dictionary<string, DialogueNode>? Dialogs { get; set; }
+        public Dictionary<string, DialogueNode> Dialogs { get; set; } = [];
 
 
         public void _Validate()

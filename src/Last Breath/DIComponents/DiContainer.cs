@@ -65,7 +65,6 @@
             });
             provider.AddSingleton<QuestManager>();
             provider.AddSingleton<RandomNumberGenerator>();
-            provider.AddTransient<IConditionsFactory, ConditionsFactory>();
             ServiceProvider = provider.BuildServiceProvider();
         }
 

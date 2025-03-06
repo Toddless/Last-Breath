@@ -4,7 +4,6 @@
     using Godot;
     using Godot.Collections;
     using Newtonsoft.Json;
-    using Playground.Resource.Quests;
 
     public static class DialogueDataConverter
     {
@@ -34,21 +33,24 @@
 
                 for (int i = 0; i < jsonNode.Texts.Count; i++)
                 {
-                    var key = $"dialog{jsonNode.Id}Text{i + 1}";
-                    dialogueNode.Texts.Add(new LocalizedString { Key = key });
+                    dialogueNode.Texts.Add(new LocalizedString { Key = $"dialog{jsonNode.Id}Text{i + 1}" });
                 }
 
                 for (int j = 0; j < jsonNode.Options.Count; j++)
                 {
                     var option = jsonNode.Options[j];
-                    var optionKey = $"dialog{jsonNode.Id}Option{j + 1}";
 
                     dialogueNode.Options.Add(new DialogueOption
                     {
-                        OptionName = new LocalizedString { Key = optionKey },
+                        OptionName = new LocalizedString { Key = $"dialog{jsonNode.Id}Option{j + 1}" },
                         TargetNode = option.TargetNode,
                         RelationEffect = option.RelationEffect
                     });
+                }
+
+                foreach (var item in jsonNode.Quests)
+                {
+                    dialogueNode.Quests.Add(item);
                 }
 
                 dialogueNode.ReturnToPrevious = jsonNode.ReturnToPrevious;
@@ -72,7 +74,7 @@
             [JsonProperty(nameof(ReturnToPrevious))]
             public bool ReturnToPrevious { get; set; }
             [JsonProperty(nameof(Quests))]
-            public Array<Quest> Quests { get; set; } = [];
+            public Array<string> Quests { get; set; } = [];
         }
 
         private class TextEntry

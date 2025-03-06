@@ -24,11 +24,9 @@
         [Export]
         public string RewardId { get; set; } = string.Empty;
         [Export]
-        public Array<QuestCondition> Conditions { get; set; } = [];
+        public Array<Condition> Conditions { get; set; } = [];
         [Export(PropertyHint.Range, "0, 15")]
         public int RequiredConditions { get; set; }
-        [Export]
-        public bool AllConditionsMustMet { get; set; } = false;
         [Export]
         public bool ConfirmationRequired { get; set; } = true;
         [Export]

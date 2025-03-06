@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c3hx7deqyukqj" path="res://Script/QuestSystem/QuestData.cs" id="1_3dxwi"]
 [ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
 [ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
-[ext_resource type="Script" uid="uid://b0i87ba30h61a" path="res://Script/QuestSystem/QuestCondition.cs" id="2_xiwmg"]
+[ext_resource type="Script" uid="uid://ciwpxedfvild" path="res://Script/QuestSystem/Condition.cs" id="2_xiwmg"]
 
 [sub_resource type="Resource" id="Resource_xiwmg"]
 script = ExtResource("1_fdmv3")
@@ -23,7 +23,6 @@ DescriptionKey = SubResource("Resource_xiwmg")
 RewardId = "Main_Awaking_Part1_Reward"
 Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
-AllConditionsMustMet = false
 ConfirmationRequired = false
 NpcId = ""
 Type = 1
@@ -47,7 +46,6 @@ DescriptionKey = SubResource("Resource_8bgjv")
 RewardId = "Side_Battle_Skills_Reward"
 Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
-AllConditionsMustMet = false
 ConfirmationRequired = false
 NpcId = ""
 Type = 2
@@ -71,7 +69,6 @@ DescriptionKey = SubResource("Resource_3ke73")
 RewardId = "Side_First_Equip_Reward"
 Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
-AllConditionsMustMet = false
 ConfirmationRequired = false
 NpcId = ""
 Type = 2
@@ -95,7 +92,6 @@ DescriptionKey = SubResource("Resource_0r81x")
 RewardId = "Side_Who_Am_I_Reward"
 Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
-AllConditionsMustMet = false
 ConfirmationRequired = false
 NpcId = ""
 Type = 2
@@ -119,7 +115,6 @@ DescriptionKey = SubResource("Resource_y0bru")
 RewardId = "Side_I_Need_Food_Reward"
 Conditions = Array[ExtResource("2_xiwmg")]([])
 RequiredConditions = 0
-AllConditionsMustMet = false
 ConfirmationRequired = false
 NpcId = ""
 Type = 2
@@ -127,4 +122,4 @@ metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [resource]
 script = ExtResource("1_3dxwi")
-Quests = [SubResource("Resource_t15wk"), SubResource("Resource_1mtw7"), SubResource("Resource_ope5b"), SubResource("Resource_be1fe"), SubResource("Resource_6fekf")]
+Quests = Array[ExtResource("1_6dcs4")]([SubResource("Resource_t15wk"), SubResource("Resource_1mtw7"), SubResource("Resource_ope5b"), SubResource("Resource_be1fe"), SubResource("Resource_6fekf")])

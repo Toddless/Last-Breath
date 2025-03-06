@@ -8,7 +8,7 @@
     using Playground.Script.QuestSystem;
     using Godot.Collections;
     using Playground.Resource.Quests;
-    using System.Collections.Generic;
+    using Playground.Resource;
 
     public partial class DialogueLayer : CanvasLayer
     {
@@ -17,8 +17,8 @@
         private QuestManager? _questManager;
         private Player? _player;
         private int _currentRelation;
-        private bool _cutScene = false;
         private BaseSpeakingNPC? _speaking;
+        private IDialogueStrategy? _dialogueStrategy;
 
         public Action? DialogueEnded;
         public override void _Ready()
@@ -26,35 +26,28 @@
             _dialogWindow = GetNode<DialogueWindow>(nameof(DialogueWindow));
             _player = GameManager.Instance.Player;
             _questManager = DiContainer.GetService<QuestManager>();
+            // dialogue layer initialize one time for the entire life cycle
             _dialogWindow.QuitPressed += () => DialogueEnded?.Invoke();
             _dialogWindow.QuestsPressed += QuestsPressed;
         }
 
-        public void StartCutScene(string firstNode)
+        public void InitializeCutScene(string firstNode)
         {
-            _cutScene = true;
-            StartDialogueNode("TryToMove");
+            _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player);
+            StartDialogueNode(firstNode);
         }
 
-        public void StartDialogue(BaseSpeakingNPC npcs)
+        public void InitializeDialogue(BaseSpeakingNPC npc)
         {
-            _speaking = npcs;
+            _speaking = npc;
+            _dialogueStrategy = new OneToOneDialogueStrategy(npc, _player ??= GameManager.Instance.Player);
             StartDialogueNode();
         }
 
-        public void StartDialogueNode(string firstNode = "FirstMeeting")
+        public void StartDialogueNode(string firstNode = "GuardianFirstMeeting")
         {
-            DialogueNode? node = null;
-            if (!_cutScene)
-            {
-                node = _speaking!.NpcTalking
-                   ? _speaking!.Dialogs.GetValueOrDefault(firstNode)
-                   : _player!.Dialogs.GetValueOrDefault(firstNode);
-            }
-            else
-            {
-                node = _player?.Dialogs.GetValueOrDefault(firstNode);
-            }
+            var node = _dialogueStrategy?.GetNextDialogueNode(firstNode);
+
             if (node == null)
             {
                 // log
@@ -72,21 +65,42 @@
                 UpdateUI(text.Text);
                 await ToSignal(_dialogWindow!, "CanContinue");
             }
-            if (_currentNode.IsDialogMatterForQuest)
-                _player?.Progress.OnDialogueCompleted(_currentNode.DialogueId);
-            if (_currentNode.Quests.Count > 0)
-                CheckAndAddQuests(_currentNode.Quests);
-            if (_currentNode?.Options.Count > 0)
-                ShowOptions();
-            if (_currentNode!.ReturnToPrevious)
-                ShowPreviousOptions();
+            UpdatePlayerDialoguesProgress(_currentNode);
+            HandleQuests(_currentNode);
+            HandleOptions(_currentNode);
+            HandleReturnToPreviousNode(_currentNode);
         }
 
-        private void CheckAndAddQuests(Array<Quest> quests)
+        private void HandleReturnToPreviousNode(DialogueNode node)
+        {
+            if (!node.ReturnToPrevious || _previousNode == null) return;
+            ShowOptions(_previousNode.Options);
+        }
+
+        private void HandleOptions(DialogueNode node)
+        {
+            if (node.Options.Count == 0) return;
+            ShowOptions(node.Options);
+        }
+
+        private void HandleQuests(DialogueNode node)
+        {
+            if (node.Quests.Count == 0) return;
+            CheckAndAcceptQuests(node.Quests);
+        }
+
+        private void UpdatePlayerDialoguesProgress(DialogueNode node)
+        {
+            if (!node.IsDialogMatterForQuest) return;
+            _player?.Progress.OnDialogueCompleted(node.DialogueId);
+        }
+
+        private void CheckAndAcceptQuests(Array<string> quests)
         {
             if (_questManager == null) return;
-            foreach (var quest in quests)
+            foreach (var item in quests)
             {
+                if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
                 if (quest.QuestCanBeAccepted(_questManager) && !quest.ConfirmationRequired)
                 {
                     quest.AcceptQuest();
@@ -112,40 +126,9 @@
 
         private void OnOptionSelected(DialogueOption option)
         {
-            _currentRelation = Mathf.Clamp(_currentRelation + option.RelationEffect, -100, 100);
             // I need to save the last node with options so I can return to it.
-            if (_currentNode?.Options.Count > 0)
-            {
-                _previousNode = _currentNode;
-            }
-            if (_cutScene)
-            {
-                StartDialogueNode(option.TargetNode);
-            }
-            else
-            {
-                if (option.UsePlayerSource)
-                {
-                    _speaking!.NpcTalking = false;
-                    StartDialogueNode(option.TargetNode);
-                }
-                else
-                {
-                    _speaking!.NpcTalking = true;
-                    StartDialogueNode(option.TargetNode);
-                }
-            }
-        }
-
-        private void ShowPreviousOptions()
-        {
-            foreach (var item in _previousNode?.Options!)
-            {
-                var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
-                option.Bind(item);
-                option.Option += OnOptionSelected;
-                _dialogWindow?.AddOption(option);
-            }
+            if (_currentNode?.Options.Count > 0) _previousNode = _currentNode;
+            StartDialogueNode(option.TargetNode);
         }
 
         private void EndDialogue()
@@ -160,9 +143,9 @@
             _dialogWindow.UpdateText(text);
         }
 
-        private void ShowOptions()
+        private void ShowOptions(Array<DialogueOption> options)
         {
-            foreach (var item in _currentNode?.Options!)
+            foreach (var item in options)
             {
                 var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
                 option.Bind(item);
