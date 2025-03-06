@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://b02oqnnxdhla3"]
+
+[ext_resource type="Script" uid="uid://brm4jyg57fhml" path="res://Script/Items/Item.cs" id="1_ha03y"]
+
+[resource]
+script = ExtResource("1_ha03y")
+ItemResourcePath = ""
+ItemName = "List of Dead"
+MaxStackSize = 0
+Rarity = 2
+Quantity = 1
+SpecialId = "ListOfDead"
+metadata/_custom_type_script = "uid://brm4jyg57fhml"

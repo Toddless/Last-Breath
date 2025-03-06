@@ -14,7 +14,6 @@
 
         protected virtual void LoadData()
         {
-
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Playground.Resource
 {
+    using System.Linq;
     using Godot;
     using Playground.Resource.Quests;
     using Playground.Script.Helpers;
@@ -13,6 +14,11 @@
         {
             Instance ??= this;
             LoadData();
+        }
+
+        public void GetAllQuests(string npcId)
+        {
+            Elements.Where(x => x.Value.NpcId == npcId).ToList();
         }
 
         protected override void LoadData()

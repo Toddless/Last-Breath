@@ -7,8 +7,6 @@
     using Godot;
     using Microsoft.CodeAnalysis;
     using Microsoft.Extensions.DependencyInjection;
-    using Playground.Components;
-    using Playground.Components.Interfaces;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Playground.Script.QuestSystem;
 

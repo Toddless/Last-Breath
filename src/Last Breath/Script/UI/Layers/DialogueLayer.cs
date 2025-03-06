@@ -115,9 +115,11 @@
             if (_speaking == null || _questManager == null) return;
             _dialogWindow?.AddQuestOption(questMenu);
 
+
             // i need to show all quests that this npc have
-            foreach (var quest in _speaking.Quests)
+            foreach (var item in _speaking.Quests)
             {
+                if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
                 if (!quest.QuestCanBeAccepted(_questManager)) continue;
                 questMenu.AddQuests(quest);
             }

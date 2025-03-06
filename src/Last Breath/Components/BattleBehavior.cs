@@ -12,18 +12,17 @@
     public class BattleBehavior
     {
         private List<IAbilityDecision>? _abilitiesDecisions;
-        private List<ICondition>? _conditions;
         private IBattleContext? _battleContext;
 
         public BattleBehavior()
         {
         }
 
-        public void SetDependencies(IBattleContext context, IConditionsFactory conditions)
+        public void SetDependencies(IBattleContext context)
         {
             _battleContext = context;
             //_conditions = conditions.SetNewConditions(_battleContext);
-            SetAbilitiesDecisions(_battleContext.Self.Abilities!, _conditions!);
+            SetAbilitiesDecisions(_battleContext.Self.Abilities!);
         }
 
         public IAbility? MakeDecision()
@@ -37,41 +36,35 @@
         {
             _battleContext = null;
             _abilitiesDecisions = null;
-            _conditions = null;
         }
 
-        private float EvaluateAbility(IAbility ability, List<ICondition> conditions)
+        private float EvaluateAbility(IAbility ability)
         {
             float biggestPriority = 0;
-            foreach (var condition in conditions)
-            {
-                float priority = condition.Weight * AbilityMatchConditionNeeds(ability, condition);
-                if (priority > biggestPriority)
-                    biggestPriority = priority;
-            }
+           
             return biggestPriority;
         }
 
-        private float AbilityMatchConditionNeeds(IAbility ability, ICondition condition)
+        private float AbilityMatchConditionNeeds(IAbility ability)
         {
             float priorityModifier = 1;
             foreach (IEffect effect in ability.Effects)
             {
-                if (effect.EffectType == condition.EffectNeeded)
+              //  if (effect.EffectType == condition.EffectNeeded)
                     priorityModifier += 0.1f;
-                if (condition.CheckCondition.Invoke())
+              //if (condition.CheckCondition.Invoke())
                     priorityModifier += 0.5f;
             }
 
             return priorityModifier;
         }
 
-        private void SetAbilitiesDecisions(List<IAbility> abilities, List<ICondition> conditions)
+        private void SetAbilitiesDecisions(List<IAbility> abilities)
         {
             _abilitiesDecisions = [];
             foreach (var ability in abilities)
             {
-                _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability, conditions)));
+                _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability)));
             }
         }
 
@@ -85,7 +78,7 @@
 
         private float UpdateAbilityPriority(IAbility ability)
         {
-            return EvaluateAbility(ability, _conditions!);
+            return EvaluateAbility(ability);
         }
     }
 }
