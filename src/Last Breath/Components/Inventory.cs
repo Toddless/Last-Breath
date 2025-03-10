@@ -9,14 +9,14 @@
 
     public class Inventory
     {
-        private List<InventorySlot> _slots = [];
+        private readonly List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
 
         public event Action<string>? SpecialItemAdded;
 
-        public void Initialize(int size, string path, GridContainer container)
+        public void Initialize(int size, GridContainer container)
         {
-            _inventorySlot = ResourceLoader.Load<PackedScene>(path);
+            _inventorySlot = InventorySlot.Initialize();
             for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot!.Instantiate<InventorySlot>();
@@ -33,28 +33,23 @@
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(item.SpecialId))
-                SpecialItemAdded?.Invoke(item.SpecialId);
-
-            if (slot.Item == null)
-            {
-                slot.SetItem(item);
-            }
-            else if (slot.Item.Guid == item.Guid)
+            if(slot.Item != null)
             {
                 slot.AddItem(item);
+            }
+            else
+            {
+                slot.SetItem(item);
             }
         }
 
         public InventorySlot? GetSlotToAdd(Item item)
         {
-            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Guid == item.Guid && itemSlot.Item.MaxStackSize >= item.Quantity));
+            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Guid == item.Guid && itemSlot.Item.MaxStackSize > item.Quantity));
         }
 
         public InventorySlot? GetSlotToRemove(Item? item)
         {
-            // this method work correctly without first condition only if i equip or remove an item from right to left
-            // cause if an item is removed from left to right, then after first cycle method return null
             return _slots.FirstOrDefault(x => x.Item != null && x.Item.Guid == item?.Guid);
         }
 
@@ -80,6 +75,14 @@
         {
             if (items.Count > 0)
                 items.ForEach(AddItem!);
+        }
+
+        public void Clear()
+        {
+            foreach (var item in _slots)
+            {
+                item.Clear();
+            }
         }
     }
 }

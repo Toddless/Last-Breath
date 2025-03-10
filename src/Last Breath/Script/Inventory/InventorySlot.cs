@@ -5,6 +5,7 @@ namespace Playground.Script.Inventory
 
     public partial class InventorySlot : Button
     {
+        private const string UID = "uid://bqlqfsqoepfhs";
         private Label? _quantityLabel;
         private Item? _item;
         private int _quantity;
@@ -18,19 +19,6 @@ namespace Playground.Script.Inventory
         public override void _Ready()
         {
             _quantityLabel = GetNode<Label>("QuantityText");
-        }
-
-        private void OnMouseEntered()
-        {
-        }
-
-        private void OnMouseExited()
-        {
-        }
-
-        private void OnPressed()
-        {
-            GD.Print("Pressed");
         }
 
         public void SetItem(Item? item)
@@ -54,6 +42,7 @@ namespace Playground.Script.Inventory
             _quantity += item.Quantity;
             UpdateQuantity();
         }
+
         public void RemoveItem(Item item)
         {
             _quantity -= item.Quantity;
@@ -64,6 +53,7 @@ namespace Playground.Script.Inventory
                 SetItem(null);
             }
         }
+
         public void UpdateQuantity()
         {
             if (_quantity <= 1)
@@ -71,5 +61,15 @@ namespace Playground.Script.Inventory
             else
                 _quantityLabel!.Text = _quantity.ToString();
         }
+
+        public void Clear()
+        {
+            this.Item = null;
+            this.Icon = null;
+            this._quantityLabel!.Text = string.Empty;
+            _quantity = 0;
+        }
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }
 }

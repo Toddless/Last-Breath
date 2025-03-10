@@ -16,6 +16,7 @@ namespace Playground
         private BattleContext? _fight;
         private bool _isBattleActive;
         private readonly List<BaseNPC> _npcs = [];
+        private readonly List<BaseOpenableObject> _openableObjects = [];
         private Area2D? _area2D;
 
         public BattleContext? Fight
@@ -24,6 +25,7 @@ namespace Playground
             set => SetProperty(ref _fight, value);
         }
 
+        public List<BaseOpenableObject> OpenableObjects => _openableObjects;
         public List<BaseNPC> NPCs => _npcs;
         public event Action<string>? CutScene;
 
@@ -32,9 +34,42 @@ namespace Playground
             _area2D = GetNode<Area2D>(nameof(Area2D));
             EnemySpawner = GetNode<IEnemySpawner>(nameof(EnemySpawner));
             _area2D.BodyEntered += OnEnterArea;
+            ChildEnteredTree += OnChildAdded;
             AddNpcsToList();
+            AddOpenableObjects();
             InitializeEnemies();
         }
+
+        // if i need dynamically add new openableObjects
+        private void OnChildAdded(Node node)
+        {
+            if(node is BaseOpenableObject obj)
+            {
+                _openableObjects.Add(obj);
+                obj.ChildExitingTree += OnChildExiting;
+            }
+            if(node is BaseNPC npc)
+            {
+                _npcs.Add(npc);
+            }
+        }
+
+        private void AddOpenableObjects()
+        {
+            _openableObjects.AddRange(GetChildren().OfType<BaseOpenableObject>().ToList());
+            _openableObjects.ForEach(x => x.ChildExitingTree += OnChildExiting);
+        }
+
+        private void OnChildExiting(Node node)
+        {
+            if(node is BaseOpenableObject obj)
+            {
+                _openableObjects.Remove(obj);
+                obj.ChildExitingTree -= OnChildExiting;
+            }
+        }
+
+        private void AddNpcsToList() => _npcs.AddRange(GetChildren().OfType<BaseNPC>().ToList());
 
         private void OnEnterArea(Node2D body)
         {
@@ -44,8 +79,6 @@ namespace Playground
                 p.FirstSpawn = false;
             }
         }
-
-        private void AddNpcsToList() => _npcs.AddRange(GetChildren().OfType<BaseNPC>().ToList());
 
         private void InitializeEnemies()
         {

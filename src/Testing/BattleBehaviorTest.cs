@@ -2,7 +2,6 @@
 {
     using Moq;
     using Playground.Components;
-    using Playground.Components.Interfaces;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
     using Playground.Script.ScenesHandlers;
@@ -12,7 +11,6 @@
     {
         private BattleBehavior? _behavior;
         private IBattleContext? _battleContext;
-        private IConditionsFactory? _conditionsFactory;
 
         [TestInitialize]
         public void Initialize()
@@ -40,10 +38,6 @@
             mockBattleContext.Setup(x => x.Opponent.EffectManager).Returns(new EffectManager([]));
             _battleContext = mockBattleContext.Object;
 
-            var mockFactory = new Mock<IConditionsFactory>();
-            mockFactory.Setup(x => x.SetNewConditions(mockBattleContext.Object)).Returns(SetupConditions);
-            _conditionsFactory = mockFactory.Object;
-            _behavior.SetDependencies(_battleContext, _conditionsFactory);
         }
 
         private List<IAbility> SetupAbilities()
@@ -137,36 +131,12 @@
             return [mockPoisonAbility.Object, mockHealthBuff.Object, mockAttackDebuff.Object, mockAttackBuff.Object, mockCriticalChanceDebufAbility.Object, mockCriticalChanceBuffAbility.Object, mockDamageDebuf.Object, mockDamageBuff.Object, mockRegen.Object, mockCriticalDamageDebuf.Object, mockCriticalDamageBuff.Object];
         }
 
-        public List<ICondition> SetupConditions()
-        {
-            var mockHealthCondition = new Mock<ICondition>();
-            var mockDebuffCondition = new Mock<ICondition>();
-            var mockPoisonCondition = new Mock<ICondition>();
-            var mockFuncCheck = new Mock<Func<bool>>();
-            mockFuncCheck.Setup(x => x.Invoke()).Returns(true);
-
-            mockHealthCondition.Setup(x => x.Weight).Returns(5);
-            mockHealthCondition.Setup(x => x.EffectNeeded).Returns(EffectType.Regeneration | EffectType.Buff);
-            mockHealthCondition.Setup(x => x.CheckCondition).Returns(mockFuncCheck.Object);
-
-            mockDebuffCondition.Setup(x => x.Weight).Returns(7);
-            mockDebuffCondition.Setup(x => x.EffectNeeded).Returns(EffectType.Buff | EffectType.Cleans);
-            mockDebuffCondition.Setup(x => x.CheckCondition).Returns(mockFuncCheck.Object);
-
-            mockPoisonCondition.Setup(x => x.Weight).Returns(6);
-            mockPoisonCondition.Setup(x => x.EffectNeeded).Returns(EffectType.Buff | EffectType.Cleans | EffectType.Regeneration);
-            mockPoisonCondition.Setup(x => x.CheckCondition).Returns(mockFuncCheck.Object);
-
-            return [mockHealthCondition.Object, mockDebuffCondition.Object, mockPoisonCondition.Object];
-        }
-
+      
         [TestMethod]
         public void SetDependency_Throws_NoExceptions_Test()
         {
             Assert.IsNotNull(_behavior);
-            Assert.IsNotNull(_conditionsFactory);
             Assert.IsNotNull(_battleContext);
-            _behavior.SetDependencies(_battleContext, _conditionsFactory);
         }
 
         [TestMethod]

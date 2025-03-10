@@ -44,8 +44,7 @@
             _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
             ConfigureStateMachine();
-            _mainWorld.CutScene += (t) => _machine.Fire(_showCutScene, t);
-            _mainWorld.PropertyChanged += NewBattleContextCreated;
+            SetEvents();
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -89,11 +88,31 @@
 #endif
         }
 
+        public override void _ExitTree()
+        {
+            Unsubscribe();
+            base._ExitTree();
+        } 
+
         public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
 
         private void FireResume() => _machine?.Fire(Trigger.Resume);
 
         private void Close() => _machine?.Fire(Trigger.Close);
+
+        private void SetEvents()
+        {
+            if (_mainWorld == null) return;
+            _mainWorld.CutScene += (t) => _machine?.Fire(_showCutScene, t);
+            _mainWorld.PropertyChanged += NewBattleContextCreated;
+
+            foreach (var obj in _mainWorld.OpenableObjects)
+            {
+                obj.OpenObject += ObjectOpen;
+            }
+        }
+
+        private void ObjectOpen(BaseOpenableObject obj) => _managerUI?.OpenInventory(obj);
 
         private void NewBattleContextCreated(object? sender, PropertyChangedEventArgs e)
         {
@@ -179,6 +198,13 @@
         {
             var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
             battleLayer!.BattleContext = _mainWorld!.Fight!;
+        }
+
+        private void Unsubscribe()
+        {
+            if(_mainWorld == null) return;
+            _mainWorld.CutScene -= (t) => _machine?.Fire(_showCutScene, t);
+            _mainWorld.PropertyChanged -= NewBattleContextCreated;
         }
     }
 }

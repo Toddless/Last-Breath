@@ -16,7 +16,7 @@
 [ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
 [ext_resource type="PackedScene" uid="uid://b7ndt5b1q2dif" path="res://Script/UI/CharacterMenu.tscn" id="8_fr0w8"]
 [ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
-[ext_resource type="Script" uid="uid://d1c6yhjh7d3mm" path="res://Script/UI/Layers/ManagementLayer.cs" id="10_7cjmf"]
+[ext_resource type="PackedScene" uid="uid://dolelj83vd4cv" path="res://Script/UI/Inventory.tscn" id="11_jyqft"]
 [ext_resource type="Script" uid="uid://dv52xthi2iu6h" path="res://Script/UI/Layers/BattleLayer.cs" id="16_vnox3"]
 [ext_resource type="Script" uid="uid://ck1m7101hqevv" path="res://DebugTools/DevLayer.cs" id="18_lw5ck"]
 [ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://DebugTools/DevTools.tscn" id="19_yuu34"]
@@ -40,19 +40,19 @@ script = ExtResource("5_bee3c")
 [node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
 metadata/_edit_use_anchors_ = true
 
-[node name="ManagementLayer" type="CanvasLayer" parent="MainLayer"]
-script = ExtResource("10_7cjmf")
-
-[node name="PlayerInventoryUI" parent="MainLayer/ManagementLayer" instance=ExtResource("6_3tvjc")]
+[node name="PlayerInventoryUI" parent="MainLayer" instance=ExtResource("6_3tvjc")]
 visible = false
 
-[node name="QuestsMenu" parent="MainLayer/ManagementLayer" instance=ExtResource("7_637ag")]
+[node name="QuestsMenu" parent="MainLayer" instance=ExtResource("7_637ag")]
 visible = false
 
-[node name="CharacterMenu" parent="MainLayer/ManagementLayer" instance=ExtResource("8_fr0w8")]
+[node name="CharacterMenu" parent="MainLayer" instance=ExtResource("8_fr0w8")]
 visible = false
 
-[node name="MapMenu" parent="MainLayer/ManagementLayer" instance=ExtResource("9_4lb6e")]
+[node name="MapMenu" parent="MainLayer" instance=ExtResource("9_4lb6e")]
+visible = false
+
+[node name="Inventory" parent="MainLayer" instance=ExtResource("11_jyqft")]
 visible = false
 
 [node name="PauseLayer" type="CanvasLayer" parent="."]

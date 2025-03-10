@@ -26,9 +26,9 @@
             set => _hideInventory = value;
         }
 
-        public void Initialize(int size, string path, GridContainer container, Action? hideInventory, Action? showInventory)
+        public void Initialize(int size, GridContainer container, Action? hideInventory, Action? showInventory)
         {
-            _inventorySlot = ResourceLoader.Load<PackedScene>(path);
+            _inventorySlot = InventorySlot.Initialize();
             for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot.Instantiate<InventorySlot>();

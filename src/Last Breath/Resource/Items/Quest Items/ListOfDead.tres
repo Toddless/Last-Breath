@@ -1,12 +1,18 @@
-[gd_resource type="Resource" script_class="Item" load_steps=2 format=3 uid="uid://b02oqnnxdhla3"]
+[gd_resource type="Resource" script_class="Item" load_steps=4 format=3 uid="uid://b02oqnnxdhla3"]
 
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="1_eoy7e"]
 [ext_resource type="Script" uid="uid://brm4jyg57fhml" path="res://Script/Items/Item.cs" id="1_ha03y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7t3bw"]
+atlas = ExtResource("1_eoy7e")
+region = Rect2(0, 24, 64, 24)
 
 [resource]
 script = ExtResource("1_ha03y")
-ItemResourcePath = ""
+ItemResourcePath = "uid://b02oqnnxdhla3"
 ItemName = "List of Dead"
-MaxStackSize = 0
+MaxStackSize = 1
+Icon = SubResource("AtlasTexture_7t3bw")
 Rarity = 2
 Quantity = 1
 SpecialId = "ListOfDead"

@@ -16,26 +16,31 @@
         private readonly BattleLayer _battleLayer = battleUI;
         private readonly DevLayer? _devLayer = devLayer;
         private readonly DialogueLayer _dialogLayer = dialog;
+
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
         public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void SetClose(Action close) => _dialogLayer.DialogueEnded = close;
         public void ShowBattleUI() => _machine.Fire(Trigger.ShowBattleUI);
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
+
         public void ShowCutScene(string firstNode)
         {
             _dialogLayer.InitializeCutScene(firstNode);
             _machine?.Fire(Trigger.ShowDialogUI);
         }
+
         public void ShowDialog(BaseSpeakingNPC npc)
         {
             _dialogLayer.InitializeDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
+        public void OpenInventory(BaseOpenableObject obj) => _mainLayer.OpenInventory(obj);
 #if DEBUG
         public void ShowDevTools() => _devLayer?.Show();
         public void HideDevTools() => _devLayer?.Hide();
 #endif
+
         public void ConfigureStateMachine()
         {
             _machine?.Configure(State.MainUI)

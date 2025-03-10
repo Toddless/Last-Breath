@@ -12,6 +12,7 @@ custom_minimum_size = Vector2(57, 56)
 offset_right = 40.0
 offset_bottom = 40.0
 scale = Vector2(1, 1.16)
+focus_mode = 0
 mouse_filter = 1
 button_mask = 3
 expand_icon = true
@@ -19,10 +20,10 @@ script = ExtResource("1_yg5o5")
 
 [node name="QuantityText" type="Label" parent="."]
 layout_mode = 0
-offset_left = 26.0
-offset_top = 26.8621
-offset_right = 53.0
-offset_bottom = 49.8621
+offset_left = 41.0
+offset_top = 41.3793
+offset_right = 68.0
+offset_bottom = 64.3793
 scale = Vector2(0.545848, 0.5767)
 label_settings = SubResource("LabelSettings_gs3g4")
 

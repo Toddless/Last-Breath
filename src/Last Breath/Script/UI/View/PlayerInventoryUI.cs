@@ -27,8 +27,8 @@
             _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
             _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
             _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
-            _inventoryEquip.Initialize(220, ScenePath.InventorySlot, _equipInventory!);
-            _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
+            _inventoryEquip.Initialize(220, _equipInventory!);
+            _inventoryCrafting.Initialize(220, _craftInventory!);
            // _inventoryQuestItems.Initialize(220, ScenePath.InventorySlot, _questItemsInventory!);
             SetEvents();
             NodeFinder.ClearCache();
