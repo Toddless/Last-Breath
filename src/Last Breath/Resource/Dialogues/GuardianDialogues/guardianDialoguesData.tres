@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="DialogueData" load_steps=31 format=3 uid="uid://srjitriqp2jg"]
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://srjitriqp2jg"]
 
 [ext_resource type="Script" uid="uid://uywgsrrxxqx1" path="res://Localization/DialogueNode.cs" id="1_dvrwy"]
+[ext_resource type="Script" uid="uid://ciwpxedfvild" path="res://Script/QuestSystem/Condition.cs" id="2_4bkck"]
 [ext_resource type="Script" uid="uid://cyvkrnhly51mt" path="res://Localization/DialogueOption.cs" id="2_gkm0q"]
 [ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="3_4bkck"]
 [ext_resource type="Script" uid="uid://bio3h5r26ydx1" path="res://Localization/DialogueData.cs" id="4_7b34w"]
@@ -15,7 +16,9 @@ OptionName = SubResource("Resource_rdma4")
 TargetNode = "ThanksAndEnd"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_h8ie0"]
 script = ExtResource("3_4bkck")
@@ -40,7 +43,9 @@ OptionName = SubResource("Resource_k3w38")
 TargetNode = "PlayerMerchantLie"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_l3030"]
 script = ExtResource("3_4bkck")
@@ -52,7 +57,9 @@ OptionName = SubResource("Resource_l3030")
 TargetNode = "PlayerPartialLie"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_fw462"]
 script = ExtResource("3_4bkck")
@@ -77,7 +84,9 @@ OptionName = SubResource("Resource_oyae5")
 TargetNode = "GuardianQuests"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_fuwlv"]
 script = ExtResource("3_4bkck")
@@ -89,7 +98,9 @@ OptionName = SubResource("Resource_fuwlv")
 TargetNode = "GuardianInformation"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_qerdk"]
 script = ExtResource("3_4bkck")
@@ -101,7 +112,9 @@ OptionName = SubResource("Resource_qerdk")
 TargetNode = "End"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_rg7sy"]
 script = ExtResource("3_4bkck")
@@ -126,7 +139,9 @@ OptionName = SubResource("Resource_638je")
 TargetNode = "PlayerJokeAnswer"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_a5ei2"]
 script = ExtResource("3_4bkck")
@@ -138,7 +153,9 @@ OptionName = SubResource("Resource_a5ei2")
 TargetNode = "PlayerOffensiveAnswer"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_h0olo"]
 script = ExtResource("3_4bkck")
@@ -150,7 +167,9 @@ OptionName = SubResource("Resource_h0olo")
 TargetNode = "PlayerIgnoreJoke"
 RelationEffect = 0
 UsePlayerSource = true
-Conditions = []
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
 
 [sub_resource type="Resource" id="Resource_vgye3"]
 script = ExtResource("3_4bkck")
@@ -167,9 +186,9 @@ IsDialogMatterForQuest = false
 
 [resource]
 script = ExtResource("4_7b34w")
-Dialogs = Dictionary[String, ExtResource("1_dvrwy")]({
+Dialogs = {
 "GuardianAnswerDirection": SubResource("Resource_0jsvc"),
 "GuardianFirstMeeting": SubResource("Resource_dgraq"),
 "GuardianReqularMeeting": SubResource("Resource_kxmqf"),
 "GuardianSecondMeetingPlayerHasItems": SubResource("Resource_0ywxp")
-})
+}

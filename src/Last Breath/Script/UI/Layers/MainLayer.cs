@@ -3,6 +3,8 @@
     using System;
     using System.Linq;
     using Godot;
+    using Playground.Components;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
@@ -24,6 +26,7 @@
         private InventoryUI? _inventoryUI;
         private BaseOpenableObject? _currentOpenedObj;
         private Action? _inventoryCloseHandler;
+        private PlayerProgress? _playerProgress;
 
         public override void _Ready()
         {
@@ -35,6 +38,7 @@
             _playerInventory = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
             _inventoryUI = GetNode<InventoryUI>("Inventory");
             _questManager = DiContainer.GetService<QuestManager>();
+            _playerProgress = GameManager.Instance.Player.Progress;
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
@@ -68,11 +72,10 @@
             {
                 if (_inventoryCloseHandler != null) _inventoryUI.Close -= _inventoryCloseHandler;
                 _currentOpenedObj = obj;
-                // Save it here so I can unsubscribe if the object changes.
-                _inventoryCloseHandler = () => _currentOpenedObj?.Close();
-                _currentOpenedObj.CloseObject += ObjectClosing;
                 // Handler for pressing the "Close" button
+                _inventoryCloseHandler = () => _currentOpenedObj?.Close();
                 _inventoryUI.Close += _inventoryCloseHandler;
+                _currentOpenedObj.CloseObject += ObjectClosing;
             }
             if (_machine?.State == State.Inventory) return;
             _machine?.Fire(Trigger.ShowInventory);
@@ -133,13 +136,31 @@
             var items = _currentOpenedObj.Items.ToList();
             foreach (var item in items)
             {
-                // add item to inventory
+                AddItemToAppropriateInventory(item);
                 _currentOpenedObj.Items.Remove(item);
             }
+            // object has no items in it, should delete it
+            _currentOpenedObj.SetDeletingTimer();
             // nothing to take, just close it
             _currentOpenedObj.Close();
         }
 
+        private void AddItemToAppropriateInventory(Item item)
+        {
+            switch (item.Type)
+            {
+                case ItemType.Quest:
+                    _playerInventory?.AddQuestItem(item);
+                    _playerProgress?.OnQuestItemCollected(item);
+                    break;
+                case ItemType.Equipment:
+                    _playerInventory?.AddEquipItem(item);
+                    break;
+                case ItemType.Crafting:
+                    _playerInventory?.AddCraftingItem(item);
+                    break;
+            }
+        }
 
         private void ConfigureMachine()
         {
@@ -189,11 +210,11 @@
                     UpdateItems();
                     _inventoryUI?.Show();
                 })
-                .OnExit(ClearAndUnsubscribe)
+                .OnExit(Clear)
                 .Permit(Trigger.Close, State.Main);
         }
 
-        private void ClearAndUnsubscribe()
+        private void Clear()
         {
             if (_currentOpenedObj != null)
             {

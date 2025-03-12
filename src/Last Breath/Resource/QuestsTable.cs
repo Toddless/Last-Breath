@@ -1,5 +1,6 @@
 ﻿namespace Playground.Resource
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Godot;
     using Playground.Resource.Quests;
@@ -16,10 +17,9 @@
             LoadData();
         }
 
-        public void GetAllQuests(string npcId)
-        {
-            Elements.Where(x => x.Value.NpcId == npcId).ToList();
-        }
+        public static void AddNewQuest(Quest quest) => Elements.TryAdd(quest.Id, quest);
+
+        public static Dictionary<string, Quest> GetAllQuests(string npcId) => Elements.Where(x => x.Value.NpcId == npcId).ToDictionary();
 
         protected override void LoadData()
         {

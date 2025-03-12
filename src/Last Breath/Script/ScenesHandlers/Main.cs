@@ -92,7 +92,7 @@
         {
             Unsubscribe();
             base._ExitTree();
-        } 
+        }
 
         public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
 
@@ -178,15 +178,9 @@
                 .Permit(Trigger.Close, State.World);
         }
 
-        private void StartCutScene(string firstNode)
-        {
-            _managerUI?.ShowCutScene(firstNode);
-        }
+        private void StartCutScene(string firstNode) => _managerUI?.ShowCutScene(firstNode);
 
-        private void OpenDialog(BaseSpeakingNPC npc)
-        {
-            _managerUI?.ShowDialog(npc);
-        }
+        private void OpenDialog(BaseSpeakingNPC npc) => _managerUI?.ShowDialog(npc);
 
         private void AfterBattle()
         {
@@ -202,7 +196,7 @@
 
         private void Unsubscribe()
         {
-            if(_mainWorld == null) return;
+            if (_mainWorld == null) return;
             _mainWorld.CutScene -= (t) => _machine?.Fire(_showCutScene, t);
             _mainWorld.PropertyChanged -= NewBattleContextCreated;
         }

@@ -1,4 +1,6 @@
-﻿namespace Playground.Localization
+﻿using System.Linq;
+
+namespace Playground.Localization
 {
     using Godot;
     using Godot.Collections;
@@ -9,42 +11,26 @@
     {
         [Export]
         public LocalizedString? OptionName { set; get; }
-
         [Export]
         public string TargetNode { get; set; } = string.Empty;
-
         [Export]
         public int RelationEffect { get; set; } = 0;
         [Export]
         public bool UsePlayerSource { get; set; } = true;
         [Export]
         public Array<Condition> Conditions { get; set; } = [];
+        [Export]
+        public bool AllConditionsMustMet { get; set; } = false;
+        [Export]
+        public int MinimumConditionsRequirement { get; set; } = 0;
 
-        public bool AllConditionsMet(Player player)
+        public bool CheckConditions(Player player)
         {
             if (Conditions.Count == 0) return true;
-            int cnt = 0;
-
-            foreach (var item in Conditions)
-            {
-                if (item.IsMet(player.Progress))
-                    cnt++;
-            }
-
-            return cnt == Conditions.Count;
-        }
-
-        public bool MinConditionsMet(Player player, int amount)
-        {
-            if (Conditions.Count == 0) return true;
-            int cnt = 0;
-            foreach (var item in Conditions)
-            {
-                if(item.IsMet(player.Progress))
-                    cnt++;
-            }
-
-            return cnt >= amount;
+            int cnt = Conditions.Where(item => item.IsMet(player.Progress)).Count();
+            return AllConditionsMustMet
+                ? cnt == Conditions.Count
+                : cnt >= MinimumConditionsRequirement;
         }
     }
 }

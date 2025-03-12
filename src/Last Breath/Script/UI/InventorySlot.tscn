@@ -26,7 +26,3 @@ offset_right = 68.0
 offset_bottom = 64.3793
 scale = Vector2(0.545848, 0.5767)
 label_settings = SubResource("LabelSettings_gs3g4")
-
-[connection signal="mouse_entered" from="." to="." method="OnMouseEntered"]
-[connection signal="mouse_exited" from="." to="." method="OnMouseExited"]
-[connection signal="pressed" from="." to="." method="OnPressed"]

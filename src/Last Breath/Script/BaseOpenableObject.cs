@@ -58,6 +58,13 @@
 
         public void Close() => _machine?.Fire(Trigger.Close);
 
+        public async void SetDeletingTimer()
+        {
+            await ToSignal(GetTree().CreateTimer(5), "timeout");
+            EmitSignalChildExitingTree(this);
+            QueueFree();
+        }
+
         private void ConfigureMachine()
         {
             _machine?.Configure(State.Open)

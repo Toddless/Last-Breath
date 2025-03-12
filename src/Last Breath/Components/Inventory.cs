@@ -1,6 +1,5 @@
 ﻿namespace Playground.Components
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
@@ -11,8 +10,6 @@
     {
         private readonly List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
-
-        public event Action<string>? SpecialItemAdded;
 
         public void Initialize(int size, GridContainer container)
         {
@@ -45,12 +42,12 @@
 
         public InventorySlot? GetSlotToAdd(Item item)
         {
-            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Guid == item.Guid && itemSlot.Item.MaxStackSize > item.Quantity));
+            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Id == item.Id && itemSlot.Item.MaxStackSize > item.Quantity));
         }
 
         public InventorySlot? GetSlotToRemove(Item? item)
         {
-            return _slots.FirstOrDefault(x => x.Item != null && x.Item.Guid == item?.Guid);
+            return _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == item?.Id);
         }
 
         public void RemoveItem(Item item)
@@ -66,7 +63,7 @@
 
         public int GetNumberOfItems(Item item)
         {
-            return _slots.FindAll(slot => slot.Item != null && slot.Item.Guid == item.Guid).Count;
+            return _slots.FindAll(slot => slot.Item != null && slot.Item.Id == item.Id).Count;
         }
 
         public List<Item?> GiveAllItems() => _slots.Where(x => x.Item != null).Select(x => x.Item).ToList();

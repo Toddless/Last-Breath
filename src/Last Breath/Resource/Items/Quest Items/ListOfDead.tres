@@ -15,5 +15,5 @@ MaxStackSize = 1
 Icon = SubResource("AtlasTexture_7t3bw")
 Rarity = 2
 Quantity = 1
-SpecialId = "ListOfDead"
+Type = 3
 metadata/_custom_type_script = "uid://brm4jyg57fhml"

@@ -86,7 +86,7 @@
         private void HandleQuests(DialogueNode node)
         {
             if (node.Quests.Count == 0) return;
-            CheckAndAcceptQuests(node.Quests);
+            AcceptQuests(node.Quests);
         }
 
         private void UpdatePlayerDialoguesProgress(DialogueNode node)
@@ -95,7 +95,7 @@
             _player?.Progress.OnDialogueCompleted(node.DialogueId);
         }
 
-        private void CheckAndAcceptQuests(Array<string> quests)
+        private void AcceptQuests(Array<string> quests)
         {
             if (_questManager == null) return;
             foreach (var item in quests)
@@ -149,6 +149,7 @@
         {
             foreach (var item in options)
             {
+                if (!item.CheckConditions(_player ??= GameManager.Instance.Player)) continue;
                 var option = DialogueUIOption.Initialize().Instantiate<DialogueUIOption>();
                 option.Bind(item);
                 option.Option += OnOptionSelected;

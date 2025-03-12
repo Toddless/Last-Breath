@@ -2,11 +2,13 @@
 {
     using System;
     using Godot;
+    using Playground.Localization;
     using Playground.Script.Enums;
 
     [GlobalClass]
     public partial class Item : Resource
     {
+        private string _id = string.Empty;
         [Export]
         public string? ItemResourcePath;
         [Export]
@@ -16,16 +18,27 @@
         [Export]
         public Texture2D? Icon;
         [Export]
-        public PackedScene? ItemScene;
-        [Export]
         public GlobalRarity Rarity;
         [Export]
         public int Quantity;
-        // Id for quest items, or something special. By default should be empty
         [Export]
-        public string SpecialId = string.Empty;
+        public ItemType Type;
+        [Export]
+        public LocalizedString Description;
 
-        public string Guid { get; private set; } = System.Guid.NewGuid().ToString();
+        public string Id
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_id))
+                {
+                    _id = !string.IsNullOrEmpty(ItemResourcePath)
+                        ? ItemResourcePath.GetHashCode().ToString()
+                        : "-1";
+                }
+                return _id;
+            }
+        }
 
         public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity)
         {
@@ -39,30 +52,6 @@
 
         public Item()
         {
-        }
-
-        public void Add(int amount)
-        {
-            if (amount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(amount), "Amount to add must be greater than zero.");
-            }
-            Quantity += amount;
-        }
-
-        public bool Remove(int amount)
-        {
-            if (amount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(amount), "Amount to remove must be greater than zero.");
-            }
-            if (Quantity < amount)
-            {
-                return false;
-            }
-
-            Quantity -= amount;
-            return true;
         }
 
         public bool Equals(Item other)
