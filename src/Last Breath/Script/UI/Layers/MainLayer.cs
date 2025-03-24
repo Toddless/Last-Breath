@@ -3,8 +3,6 @@
     using System;
     using System.Linq;
     using Godot;
-    using Playground.Components;
-    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
@@ -20,13 +18,13 @@
         private PlayerInventoryUI? _playerInventory;
         private CharacterMenu? _characterUI;
         private QuestsMenu? _questsUI;
-        private MapMenu? _mapUI;
         private QuestManager? _questManager;
-        private MainUI? _mainUI;
         private InventoryUI? _inventoryUI;
+        private MapMenu? _mapUI;
+        private MainUI? _mainUI;
         private BaseOpenableObject? _currentOpenedObj;
         private Action? _inventoryCloseHandler;
-        private PlayerProgress? _playerProgress;
+        private Player? _player;
 
         public override void _Ready()
         {
@@ -37,8 +35,10 @@
             _mapUI = GetNode<MapMenu>(nameof(MapMenu));
             _playerInventory = GetNode<PlayerInventoryUI>(nameof(PlayerInventoryUI));
             _inventoryUI = GetNode<InventoryUI>("Inventory");
-            _questManager = DiContainer.GetService<QuestManager>();
-            _playerProgress = GameManager.Instance.Player.Progress;
+            _questManager = QuestManager.Instance;
+            _player = GameManager.Instance.Player;
+            _playerInventory.InitializeInventories(_player.EquipInventory, _player.CraftingInventory, _player.QuestItemsInventory);
+            _questManager.Initialize();
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
@@ -145,22 +145,7 @@
             _currentOpenedObj.Close();
         }
 
-        private void AddItemToAppropriateInventory(Item item)
-        {
-            switch (item.Type)
-            {
-                case ItemType.Quest:
-                    _playerInventory?.AddQuestItem(item);
-                    _playerProgress?.OnQuestItemCollected(item);
-                    break;
-                case ItemType.Equipment:
-                    _playerInventory?.AddEquipItem(item);
-                    break;
-                case ItemType.Crafting:
-                    _playerInventory?.AddCraftingItem(item);
-                    break;
-            }
-        }
+        private void AddItemToAppropriateInventory(Item item) => _player?.AddItemToInventory(item);
 
         private void ConfigureMachine()
         {

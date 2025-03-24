@@ -24,13 +24,13 @@
         /// <param name="item"></param>
         public void OnQuestItemCollected(Item item)
         {
-            if (item.Type == ItemType.Quest)
+            if (item.Type != ItemType.Quest) return;
+
+            if (!QuestItems.TryAdd(item.Id, item.Quantity))
             {
-                if (!QuestItems.TryAdd(item.Id, item.Quantity))
-                {
-                    // log
-                }
+                // log
             }
+
         }
 
         public void OnQuestItemRemoved(string id, int amount)

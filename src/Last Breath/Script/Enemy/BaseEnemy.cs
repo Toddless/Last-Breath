@@ -1,8 +1,10 @@
 namespace Playground
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Text;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -40,6 +42,7 @@ namespace Playground
         private EnemyType? _enemyType;
         private GlobalRarity _rarity;
         private int _level;
+        private string? _enemyId;
 
         [Signal]
         public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
@@ -152,7 +155,24 @@ namespace Playground
             set => _appliedAbilities = value;
         }
 
+        [Export]
+        public Fractions Fraction { get; set; }
+
+        [Export]
+        public string NpcName { get; set; } = string.Empty;
+
         public EffectManager? EffectManager => _effectManager;
+
+        public string EnemyId => _enemyId ??= SetId();
+
+        private string SetId()
+        {
+            var id = new StringBuilder();
+            id.Append(NpcName);
+            id.Append('_');
+            id.Append(Fraction.ToString());
+            return id.ToString();
+        }
         #endregion
 
         public override void _Ready()

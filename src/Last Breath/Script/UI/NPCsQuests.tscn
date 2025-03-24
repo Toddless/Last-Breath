@@ -8,7 +8,7 @@ atlas = ExtResource("1_otfxr")
 region = Rect2(0, 0, 46, 42)
 
 [node name="NPCsQuests" type="HBoxContainer"]
-custom_minimum_size = Vector2(650, 550)
+custom_minimum_size = Vector2(350, 350)
 script = ExtResource("1_n1dsx")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]

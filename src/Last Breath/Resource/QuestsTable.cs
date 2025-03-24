@@ -19,7 +19,9 @@
 
         public static void AddNewQuest(Quest quest) => Elements.TryAdd(quest.Id, quest);
 
-        public static Dictionary<string, Quest> GetAllQuests(string npcId) => Elements.Where(x => x.Value.NpcId == npcId).ToDictionary();
+        public static List<string> GetAllQuests(string npcId) => Elements.Where(x => x.Value.NpcId == npcId).Select(x => x.Value.Id).ToList();
+
+        public static Quest? GetQuest(string id) => TryGetElement(id, out Quest? quest) ? quest : null;
 
         protected override void LoadData()
         {

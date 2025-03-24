@@ -27,12 +27,16 @@
         public Array<Condition> Conditions { get; set; } = [];
         [Export(PropertyHint.Range, "0, 15")]
         public int RequiredConditions { get; set; }
+        // for accepting quest due dialogue
         [Export]
         public bool ConfirmationRequired { get; set; } = true;
+        // to witch npcs quest belong
         [Export]
         public string NpcId { get; set; } = string.Empty;
         [Export]
         public QuestType Type { get; set; }
+        [Export]
+        public QuestObjective? QuestObjective { get; set; }
 
         public bool QuestCanBeAccepted(QuestManager manager) => manager.QuestCanBeAccepted(this);
         public void AcceptQuest() => QuestAccepted?.Invoke(this);

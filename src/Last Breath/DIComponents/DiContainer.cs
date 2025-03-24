@@ -8,7 +8,6 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.Extensions.DependencyInjection;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.QuestSystem;
 
     public partial class DiContainer : Node
     {
@@ -61,7 +60,6 @@
                 instance.ValidateTable();
                 return instance;
             });
-            provider.AddSingleton<QuestManager>();
             provider.AddSingleton<RandomNumberGenerator>();
             ServiceProvider = provider.BuildServiceProvider();
         }

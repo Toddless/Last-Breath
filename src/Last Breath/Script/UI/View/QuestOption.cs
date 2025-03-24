@@ -14,12 +14,10 @@
         {
             _quest = quest;
             this.Text = quest.NameKey?.Text;
-            this.Pressed += ThisPressed;
+            this.Pressed += QuestSelected;
         }
 
         public bool IsMatch(string questId) => _quest?.Id == questId;
-
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath.QuestOption);
 
         public override void _ExitTree()
         {
@@ -27,13 +25,15 @@
             base._ExitTree();
         }
 
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(ScenePath.QuestOption);
+
         private void Unbind()
         {
             if (_quest != null) _quest = null;
-            this.Pressed -= ThisPressed;
+            this.Pressed -= QuestSelected;
             QuestDescription = null;
         }
 
-        private void ThisPressed() => QuestDescription?.Invoke(_quest?.DescriptionKey?.Text ?? string.Empty, _quest);
+        private void QuestSelected() => QuestDescription?.Invoke(_quest?.DescriptionKey?.Text ?? string.Empty, _quest);
     }
 }

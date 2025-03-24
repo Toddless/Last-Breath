@@ -8,7 +8,7 @@
     [GlobalClass]
     public partial class Item : Resource
     {
-        private string _id = string.Empty;
+        private string? _id;
         [Export]
         public string? ItemResourcePath;
         [Export]
@@ -24,23 +24,18 @@
         [Export]
         public ItemType Type;
         [Export]
-        public LocalizedString Description;
+        public LocalizedString Description = new();
 
-        public string Id
+        public string Id => _id ??= SetId();
+
+        private string SetId()
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_id))
-                {
-                    _id = !string.IsNullOrEmpty(ItemResourcePath)
-                        ? ItemResourcePath.GetHashCode().ToString()
-                        : "-1";
-                }
-                return _id;
-            }
+            // TODO: Later item name is LocalizedString, i need to take en name
+            if(string.IsNullOrEmpty(ItemName)) return string.Empty;
+            return ItemName.Replace(' ', '_');
         }
 
-        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity)
+        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity, string descriptionKey)
         {
             ItemResourcePath = resourcePath;
             ItemName = itemName;
@@ -48,6 +43,7 @@
             Icon = icon;
             Rarity = rarity;
             Quantity = quantity;
+            Description.Key = descriptionKey;
         }
 
         public Item()

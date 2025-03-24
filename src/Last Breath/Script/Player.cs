@@ -1,5 +1,6 @@
 ﻿namespace Playground
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Godot;
@@ -8,6 +9,7 @@
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
+    using Playground.Script.Items;
     using Playground.Script.Reputation;
 
     public partial class Player : ObservableCharacterBody2D, ICharacter
@@ -22,6 +24,7 @@
         private Dictionary<string, DialogueNode> _dialogs = [];
         private List<IAbility>? _abilities;
         private Sprite2D? _playerAvatar;
+        private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
         #endregion
 
         #region Components
@@ -74,6 +77,14 @@
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
         public List<IAbility>? Abilities => _abilities;
         public Sprite2D? PlayerAvatar => _playerAvatar;
+
+        public Inventory EquipInventory => _equipInventory ??= new();
+        public Inventory CraftingInventory => _craftingInventory ??= new();
+        public Inventory QuestItemsInventory => _questItemsInventory ??= new();
+        #endregion
+
+        #region Events
+        public event Action<string>? ItemCollected, EnemyKilled, QuestCompleted, LocationVisited, DialogueCompleted;
         #endregion
 
         public override void _Ready()
@@ -86,8 +97,44 @@
             _playerAvatar = GetNode<Sprite2D>(nameof(Sprite2D));
             _sprite.Play("Idle_down");
             _reputation = new(0, 0, 0);
+            _equipInventory = new();
+            _craftingInventory = new();
+            _questItemsInventory = new();
             LoadDialogues();
             GameManager.Instance!.Player = this;
+        }
+
+        public void AddItemToInventory(Item item)
+        {
+            switch (item.Type)
+            {
+                case Script.Enums.ItemType.Equipment:
+                    _equipInventory?.AddItem(item);
+                    break;
+                case Script.Enums.ItemType.Crafting:
+                    _craftingInventory?.AddItem(item);
+                    break;
+                case Script.Enums.ItemType.Quest:
+                    _questItemsInventory?.AddItem(item);
+                    Progress.OnQuestItemCollected(item);
+                    break;
+                default:
+                    break;
+
+            }
+            ItemCollected?.Invoke(item.Id);
+        }
+
+        public void OnDialogueCompleted(string id)
+        {
+            Progress.OnDialogueCompleted(id);
+            DialogueCompleted?.Invoke(id);
+        }
+
+        public void OnQuestCompleted(string id)
+        {
+            Progress?.OnQuestCompleted(id);
+            QuestCompleted?.Invoke(id);
         }
 
         private void LoadDialogues()

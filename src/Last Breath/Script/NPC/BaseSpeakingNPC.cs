@@ -3,11 +3,12 @@
     using System.Collections.Generic;
     using Godot;
     using Playground.Localization;
+    using Playground.Resource;
 
     public partial class BaseSpeakingNPC : BaseNPC, ISpeaking
     {
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
-        private readonly List<string> _quests = [];
+        private List<string> _quests = [];
         public bool NpcTalking { get; set; } = true;
         public bool FirstTimeMeetPlayer = true;
 
@@ -23,5 +24,7 @@
                 _dialogs.Add(item.Key, item.Value);
             }
         }
+
+        protected override void SetQuests() => _quests = QuestsTable.GetAllQuests(NpcId);
     }
 }

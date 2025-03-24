@@ -1,7 +1,6 @@
-﻿using System.Linq;
-
-namespace Playground.Localization
+﻿namespace Playground.Localization
 {
+    using System.Linq;
     using Godot;
     using Godot.Collections;
     using Playground.Script.QuestSystem;

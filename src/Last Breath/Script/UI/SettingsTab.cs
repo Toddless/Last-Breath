@@ -12,7 +12,7 @@
 
         public override void _Ready()
         {
-            Configuration = GetNode<ConfigFileHandler>(NodePathHelper.ConfigFileHandler);
+            Configuration = GetNode<ConfigFileHandler>(SingletonNodes.ConfigFileHandler);
             // dont like it, maybe i will find a better solution
             var optionsMenu = GetOwner() as OptionsMenu;
 

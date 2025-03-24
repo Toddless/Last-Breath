@@ -37,12 +37,18 @@
             if (string.IsNullOrEmpty(_npcId))
                 SetNpcId();
             SetDialogs();
+            SetQuests();
             base._EnterTree();
         }
 
         public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;
 
         protected virtual void SetDialogs()
+        {
+
+        }
+
+        protected virtual void SetQuests()
         {
 
         }

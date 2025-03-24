@@ -3,20 +3,15 @@
     using Godot;
     using Playground.Script.Helpers;
     using Playground.Components;
-    using Playground.Script.Items;
 
     public partial class PlayerInventoryUI : Control
     {
         private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
-        private Inventory? _inventoryEquip, _inventoryCrafting, _inventoryQuestItems;
         private Label? _currentHealth, _maxHealth, _damage, _criticalChance, _criticalDamage, _dodgeChance, _extraHitChance;
         private TabBar? _equip, _craft, _quest;
 
         public override void _Ready()
         {
-            _inventoryEquip = new Inventory();
-            _inventoryCrafting = new Inventory();
-            _inventoryQuestItems = new Inventory();
             _equip = (TabBar?)NodeFinder.FindBFSCached(this, "Equip");
             _quest = (TabBar?)NodeFinder.FindBFSCached(this, "QuestItems");
             _craft = (TabBar?)NodeFinder.FindBFSCached(this, "Crafting");
@@ -30,17 +25,16 @@
             _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
             _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
             _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
-            _inventoryEquip.Initialize(220, _equipInventory!);
-            _inventoryCrafting.Initialize(220, _craftInventory!);
-            _inventoryQuestItems.Initialize(220, _questItemsInventory!);
+           
             NodeFinder.ClearCache();
         }
 
-        public void AddCraftingItem(Item item) => _inventoryCrafting?.AddItem(item);
-
-        public void AddQuestItem(Item item) => _inventoryQuestItems?.AddItem(item);
-
-        public void AddEquipItem(Item item) => _inventoryEquip?.AddItem(item);
+        public void InitializeInventories(Inventory equipInventory, Inventory craftingInventory, Inventory questItemsInventory)
+        {
+            equipInventory.Initialize(220, _equipInventory!);
+            craftingInventory.Initialize(220, _craftInventory!);
+            questItemsInventory.Initialize(220, _questItemsInventory!);
+        }
 
         #region Stats
 

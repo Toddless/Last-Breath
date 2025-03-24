@@ -25,7 +25,7 @@
         {
             _dialogWindow = GetNode<DialogueWindow>(nameof(DialogueWindow));
             _player = GameManager.Instance.Player;
-            _questManager = DiContainer.GetService<QuestManager>();
+            _questManager = QuestManager.Instance;
             // dialogue layer initialize one time for the entire life cycle
             _dialogWindow.QuitPressed += () => DialogueEnded?.Invoke();
             _dialogWindow.QuestsPressed += QuestsPressed;
@@ -34,13 +34,14 @@
         public void InitializeCutScene(string firstNode)
         {
             _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player);
-            StartDialogueNode(firstNode);
+            StartDialogueNode("Conclusions");
         }
 
         public void InitializeDialogue(BaseSpeakingNPC npc)
         {
             _speaking = npc;
             _dialogueStrategy = new OneToOneDialogueStrategy(npc, _player ??= GameManager.Instance.Player);
+
             StartDialogueNode();
         }
 
@@ -92,7 +93,7 @@
         private void UpdatePlayerDialoguesProgress(DialogueNode node)
         {
             if (!node.IsDialogMatterForQuest) return;
-            _player?.Progress.OnDialogueCompleted(node.DialogueId);
+            _player?.OnDialogueCompleted(node.DialogueId);
         }
 
         private void AcceptQuests(Array<string> quests)

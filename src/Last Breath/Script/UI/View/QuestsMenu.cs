@@ -16,8 +16,10 @@
             _mainQuests = (VBoxContainer?)NodeFinder.FindBFSCached(this, "MainQuests");
             _sideQuests = (VBoxContainer?)NodeFinder.FindBFSCached(this, "SideQuests");
             _questDescription = (RichTextLabel?)NodeFinder.FindBFSCached(this, "QuestDescription");
+            Hidden += QuestMenuHidden;
             NodeFinder.ClearCache();
         }
+
 
         public void AddQuests(Quest quest)
         {
@@ -35,9 +37,13 @@
             }
         }
 
+        // TODO: Decide later if i wanna clear description after menu is hidden
+        private void QuestMenuHidden() => _questDescription!.Text = string.Empty;
+
         private void OnDescription(string arg1, Quest? quest)
         {
             _questDescription!.Text = arg1;
+            // TODO: Show quest reward, progression
         }
     }
 }

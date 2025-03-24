@@ -21,6 +21,18 @@ namespace Playground.Script.Inventory
             _quantityLabel = GetNode<Label>("QuantityText");
         }
 
+        public override void _GuiInput(InputEvent @event)
+        {
+            if(@event is InputEventMouseButton p)
+            {
+                if(p.ButtonIndex == MouseButton.Right && p.Pressed)
+                {
+
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+
         public void SetItem(Item? item)
         {
             if (item != null)
