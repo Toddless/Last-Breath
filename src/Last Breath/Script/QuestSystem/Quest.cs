@@ -10,10 +10,8 @@
     [GlobalClass]
     public partial class Quest : Resource
     {
-        /// <summary>
-        /// For ques accepting, cancelling etc. use respective methods
-        /// </summary>
-        public event Action<Quest>? QuestAccepted, QuestFailed, QuestCancelled, QuestCompleted;
+        private QuestStatus _questStatus = QuestStatus.NotAccepted;
+        public event Action<string, QuestStatus>? StatusChanged;
 
         [Export]
         public string Id { get; set; } = string.Empty;
@@ -34,28 +32,30 @@
         [Export]
         public string NpcId { get; set; } = string.Empty;
         [Export]
+        public string DialogueIdOnComplete { get; set; } = string.Empty;
+        [Export]
         public QuestType Type { get; set; }
         [Export]
+        public bool IsNpcNeededForQuestCompletion { get; set; } = false;
+        [Export]
         public QuestObjective? QuestObjective { get; set; }
-
-        public bool QuestCanBeAccepted(QuestManager manager) => manager.QuestCanBeAccepted(this);
-        public void AcceptQuest() => QuestAccepted?.Invoke(this);
-        public void CancelQuest() => QuestCancelled?.Invoke(this);
-        public void FailedQuest() => QuestFailed?.Invoke(this);
-        public void CompletedQuest() => QuestCompleted?.Invoke(this);
-        public override int GetHashCode() => Id?.GetHashCode() ?? 0;
-        public override bool Equals(object? obj) => obj is Quest q && Id == q.Id;
-
-        protected override void Dispose(bool disposing)
+        /// <summary>
+        /// For tracking and changing on UI
+        /// </summary>
+        public QuestStatus QuestStatus
         {
-            if (disposing)
+            get => _questStatus;
+            set
             {
-                QuestAccepted = null;
-                QuestFailed = null;
-                QuestCancelled = null;
-                QuestCompleted = null;
+                if (_questStatus == value) return;
+
+                _questStatus = value;
+                StatusChanged?.Invoke(Id, _questStatus);
             }
-            base.Dispose(disposing);
         }
+
+        public override int GetHashCode() => Id?.GetHashCode() ?? 0;
+
+        public override bool Equals(object? obj) => obj is Quest q && Id == q.Id;
     }
 }

@@ -25,7 +25,7 @@
         {
             var questOption = QuestOption.Initialize().Instantiate<QuestOption>();
             questOption.Bind(quest);
-            questOption.QuestDescription += OnDescription;
+            questOption.QuestDetails += OnQuestDetails;
             switch (quest.Type)
             {
                 case Enums.QuestType.Main:
@@ -37,12 +37,12 @@
             }
         }
 
-        // TODO: Decide later if i wanna clear description after menu is hidden
+        // TODO: Decide later if i wanna clear description after hiding menu
         private void QuestMenuHidden() => _questDescription!.Text = string.Empty;
 
-        private void OnDescription(string arg1, Quest? quest)
+        private void OnQuestDetails(string questDescription, Quest? quest)
         {
-            _questDescription!.Text = arg1;
+            _questDescription!.Text = questDescription;
             // TODO: Show quest reward, progression
         }
     }

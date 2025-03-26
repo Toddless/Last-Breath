@@ -38,6 +38,7 @@
                 SetNpcId();
             SetDialogs();
             SetQuests();
+            SetFirstDialogueNode();
             base._EnterTree();
         }
 
@@ -49,6 +50,11 @@
         }
 
         protected virtual void SetQuests()
+        {
+
+        }
+
+        protected virtual void SetFirstDialogueNode()
         {
 
         }

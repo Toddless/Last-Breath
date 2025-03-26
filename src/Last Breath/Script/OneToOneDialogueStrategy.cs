@@ -8,7 +8,7 @@
         private readonly BaseSpeakingNPC _speakingNPC = speakingNPC;
         private readonly Player _player = player;
 
-        public DialogueNode? GetNextDialogueNode(string nextNode = "FirstMeeting")
+        public DialogueNode? GetNextDialogueNode(string nextNode)
         {
             DialogueNode? node = null;
             // all dialogues have unique ids

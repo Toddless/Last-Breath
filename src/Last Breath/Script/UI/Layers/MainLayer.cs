@@ -38,7 +38,7 @@
             _questManager = QuestManager.Instance;
             _player = GameManager.Instance.Player;
             _playerInventory.InitializeInventories(_player.EquipInventory, _player.CraftingInventory, _player.QuestItemsInventory);
-            _questManager.Initialize();
+            _questManager?.Initialize();
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
@@ -121,7 +121,6 @@
                 player.HealthComponent.MaxHealthChanged += (value) => _mainUI?.UpdateMaxHealthBar(Mathf.RoundToInt(value));
                 player.HealthComponent!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
             }
-
             _questManager!.QuestAccepted += _questsUI!.AddQuests;
             _mainUI!.Character += ShowCharacter;
             _mainUI!.Inventory += ShowPlayerInventory;

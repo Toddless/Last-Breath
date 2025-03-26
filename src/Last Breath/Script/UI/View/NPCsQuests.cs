@@ -4,6 +4,7 @@
     using Playground.Script.Helpers;
     using Playground.Resource.Quests;
     using System.Linq;
+    using Playground.Script.QuestSystem;
 
     public partial class NPCsQuests : HBoxContainer
     {
@@ -30,7 +31,7 @@
         {
             var questOption = QuestOption.Initialize().Instantiate<QuestOption>();
             questOption.Bind(quest);
-            questOption.QuestDescription += OnDescription;
+            questOption.QuestDetails += OnDescription;
             _questsList?.AddChild(questOption);
         }
 
@@ -49,7 +50,7 @@
         private void OnAcceptPressed()
         {
             if (_questToAccept == null) return;
-            _questToAccept.AcceptQuest();
+            QuestManager.Instance.OnQuestAccepted(_questToAccept);
             _questsList?.GetChildren().Cast<QuestOption>()?.FirstOrDefault(x => x.IsMatch(_questToAccept.Id) == true)?.QueueFree();
             _description!.Text = string.Empty;
             _questToAccept = null;
@@ -62,7 +63,7 @@
             {
                 item.QueueFree();
             }
-            this.QueueFree();
+            QueueFree();
         }
 
         private void OnDescription(string obj, Quest? quest)
@@ -76,7 +77,7 @@
             _close!.Pressed -= OnClosePressed;
             _accept!.Pressed -= OnAcceptPressed;
             if (_questToAccept != null) _questToAccept = null;
-            if(_description?.Text != null) _description.Text = null;
+            if (_description?.Text != null) _description.Text = null;
         }
     }
 }

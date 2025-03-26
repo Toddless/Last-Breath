@@ -5,8 +5,8 @@
 
     public class MonologueStrategy(Player player) : IDialogueStrategy
     {
-        private Player _player = player;
+        private readonly Player _player = player;
 
-        public DialogueNode? GetNextDialogueNode(string firstNode = "FirstMeeting") => _player.Dialogs.GetValueOrDefault(firstNode);
+        public DialogueNode? GetNextDialogueNode(string firstNode) => _player.Dialogs.GetValueOrDefault(firstNode);
     }
 }

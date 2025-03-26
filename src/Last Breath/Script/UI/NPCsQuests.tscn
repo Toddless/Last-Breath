@@ -1,11 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://cal2dmcbd722k"]
+[gd_scene load_steps=2 format=3 uid="uid://cal2dmcbd722k"]
 
 [ext_resource type="Script" uid="uid://cev33tf0f3r1u" path="res://Script/UI/View/NPCsQuests.cs" id="1_n1dsx"]
-[ext_resource type="Texture2D" uid="uid://dqlmbs82w33r6" path="res://Assets/UI MMORPG Dark Templar/Game Menu/Buttons/Button Close Normal.png" id="1_otfxr"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_dillh"]
-atlas = ExtResource("1_otfxr")
-region = Rect2(0, 0, 46, 42)
 
 [node name="NPCsQuests" type="HBoxContainer"]
 custom_minimum_size = Vector2(350, 350)
@@ -34,7 +29,8 @@ layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 8
 focus_mode = 0
-icon = SubResource("AtlasTexture_dillh")
+theme_override_font_sizes/font_size = 20
+text = "Close"
 
 [node name="QuestDescription" type="RichTextLabel" parent="QuestDetails"]
 layout_mode = 2

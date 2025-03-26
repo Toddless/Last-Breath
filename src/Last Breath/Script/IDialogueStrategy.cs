@@ -4,6 +4,6 @@
 
     public interface IDialogueStrategy
     {
-        DialogueNode? GetNextDialogueNode(string firstNode = "FirstMeeting");
+        DialogueNode? GetNextDialogueNode(string firstNode);
     }
 }

@@ -14,9 +14,9 @@
         private readonly HashSet<Quest> _completedQuests = [];
         private readonly HashSet<Quest> _cancelledQuests = [];
 
-        public event Action<Quest>? QuestAccepted, QuestFailed, QuestCompleted, QuestCancelled;
+        public static QuestManager? Instance { get; private set; }
 
-        public static QuestManager Instance { get; private set; } = new();
+        public event Action<Quest>? QuestAccepted;
 
         public bool QuestCanBeAccepted(Quest quest)
         {
@@ -26,7 +26,6 @@
             if (_cancelledQuests.Contains(quest)) return false;
             if (CheckForConditions(quest))
             {
-                SetQuestEvents(quest);
                 return true;
             }
             return false;
@@ -46,6 +45,32 @@
         {
             _player = GameManager.Instance.Player;
             SetEvents();
+        }
+
+        public void OnQuestCompleted(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _completedQuests.Add(quest);
+            quest.QuestStatus = QuestStatus.Completed;
+        }
+        public void OnQuestCancelled(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _cancelledQuests.Add(quest);
+            quest.QuestStatus = QuestStatus.Canceled;
+        }
+        public void OnQuestAccepted(Quest quest)
+        {
+            _activeQuests.Add(quest);
+            QuestAccepted?.Invoke(quest);
+            quest.QuestStatus = QuestStatus.Progressing;
+        }
+
+        public void OnQuestFailed(Quest quest)
+        {
+            _activeQuests.Remove(quest);
+            _failedQuests.Add(quest);
+            quest.QuestStatus = QuestStatus.Failed;
         }
 
         private void SetEvents()
@@ -79,52 +104,8 @@
         {
             if (quest.QuestObjective!.IsCompleted)
             {
-                quest.CompletedQuest();
+                OnQuestCompleted(quest);
             }
-        }
-
-        private void RemoveQuestEvents(Quest quest)
-        {
-            quest.QuestAccepted -= OnQuestAccepted;
-            quest.QuestCancelled -= OnQuestCancelled;
-            quest.QuestFailed -= OnQuestFailed;
-            quest.QuestCompleted -= OnQuestCompleted;
-        }
-
-        private void SetQuestEvents(Quest quest)
-        {
-            quest.QuestAccepted += OnQuestAccepted;
-            quest.QuestCancelled += OnQuestCancelled;
-            quest.QuestFailed += OnQuestFailed;
-            quest.QuestCompleted += OnQuestCompleted;
-        }
-        private void OnQuestCompleted(Quest quest)
-        {
-            _activeQuests.Remove(quest);
-            _completedQuests.Add(quest);
-            RemoveQuestEvents(quest);
-            QuestCompleted?.Invoke(quest);
-            GD.Print($"Quest completed {quest.Id}");
-        }
-        private void OnQuestCancelled(Quest quest)
-        {
-            _activeQuests.Remove(quest);
-            _cancelledQuests.Add(quest);
-            RemoveQuestEvents(quest);
-            QuestCancelled?.Invoke(quest);
-        }
-        private void OnQuestAccepted(Quest quest)
-        {
-            _activeQuests.Add(quest);
-            QuestAccepted?.Invoke(quest);
-        }
-
-        private void OnQuestFailed(Quest quest)
-        {
-            _activeQuests.Remove(quest);
-            _failedQuests.Add(quest);
-            RemoveQuestEvents(quest);
-            QuestFailed?.Invoke(quest);
         }
     }
 }

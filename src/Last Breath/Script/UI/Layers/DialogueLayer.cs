@@ -1,14 +1,14 @@
 ﻿namespace Playground.Script.UI.Layers
 {
-    using Godot;
     using System;
-    using Playground.Script.NPC;
-    using Playground.Localization;
-    using Playground.Script.UI.View;
-    using Playground.Script.QuestSystem;
+    using Godot;
     using Godot.Collections;
-    using Playground.Resource.Quests;
+    using Playground.Localization;
     using Playground.Resource;
+    using Playground.Resource.Quests;
+    using Playground.Script.NPC;
+    using Playground.Script.QuestSystem;
+    using Playground.Script.UI.View;
 
     public partial class DialogueLayer : CanvasLayer
     {
@@ -31,7 +31,7 @@
             _dialogWindow.QuestsPressed += QuestsPressed;
         }
 
-        public void InitializeCutScene(string firstNode)
+        public void InitializeMonologue(string firstNode)
         {
             _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player);
             StartDialogueNode("Conclusions");
@@ -42,10 +42,10 @@
             _speaking = npc;
             _dialogueStrategy = new OneToOneDialogueStrategy(npc, _player ??= GameManager.Instance.Player);
 
-            StartDialogueNode();
+            StartDialogueNode(_speaking.FirstDialogueNode);
         }
 
-        public void StartDialogueNode(string firstNode = "GuardianFirstMeeting")
+        public void StartDialogueNode(string firstNode)
         {
             var node = _dialogueStrategy?.GetNextDialogueNode(firstNode);
 
@@ -98,13 +98,13 @@
 
         private void AcceptQuests(Array<string> quests)
         {
-            if (_questManager == null) return;
+            _questManager ??= QuestManager.Instance;
             foreach (var item in quests)
             {
                 if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
-                if (quest.QuestCanBeAccepted(_questManager) && !quest.ConfirmationRequired)
+                if (_questManager.QuestCanBeAccepted(quest) && !quest.ConfirmationRequired)
                 {
-                    quest.AcceptQuest();
+                    _questManager.OnQuestAccepted(quest);
                     _dialogWindow?.NewQuestAdded();
                 }
             }
@@ -116,12 +116,11 @@
             if (_speaking == null || _questManager == null) return;
             _dialogWindow?.AddQuestOption(questMenu);
 
-
             // i need to show all quests that this npc have
             foreach (var item in _speaking.Quests)
             {
                 if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
-                if (!quest.QuestCanBeAccepted(_questManager)) continue;
+                if (!QuestManager.Instance.QuestCanBeAccepted(quest)) continue;
                 questMenu.AddQuests(quest);
             }
             _dialogWindow?.HideDialogueButtons();

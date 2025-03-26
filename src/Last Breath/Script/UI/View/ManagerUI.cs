@@ -26,7 +26,7 @@
 
         public void ShowCutScene(string firstNode)
         {
-            _dialogLayer.InitializeCutScene(firstNode);
+            _dialogLayer.InitializeMonologue(firstNode);
             _machine?.Fire(Trigger.ShowDialogUI);
         }
 
