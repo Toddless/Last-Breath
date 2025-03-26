@@ -1,32 +1,17 @@
 <Project Sdk="Godot.NET.Sdk/4.4.0">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Nullable>enable</Nullable>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <UserSecretsId>0132e77a-2c43-41e0-acc0-5791c77b2d87</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Scenes\Components\**" />
-    <Compile Remove="Script\Chest\**" />
-    <Compile Remove="Script\Items\ItemsAbilities\**" />
-    <Compile Remove="Script\Items\UniqItems\**" />
-    <EmbeddedResource Remove="Scenes\Components\**" />
-    <EmbeddedResource Remove="Script\Chest\**" />
-    <EmbeddedResource Remove="Script\Items\ItemsAbilities\**" />
-    <EmbeddedResource Remove="Script\Items\UniqItems\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Remove="C:\Users\faust\.nuget\packages\gdunit4.api\4.3.1\contentFiles\any\net8.0\LICENSE" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Scenes\" />
-    <Folder Include="Script\Effects\Utility\" />
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Remove=".editorconfig" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
