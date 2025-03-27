@@ -25,9 +25,8 @@
         public Array<Condition> Conditions { get; set; } = [];
         [Export(PropertyHint.Range, "0, 15")]
         public int RequiredConditions { get; set; }
-        // for accepting quest due dialogue
         [Export]
-        public bool ConfirmationRequired { get; set; } = true;
+        public bool IsTriggerQuest { get; set; } = true;
         // to witch npcs quest belong
         [Export]
         public string NpcId { get; set; } = string.Empty;
@@ -57,5 +56,14 @@
         public override int GetHashCode() => Id?.GetHashCode() ?? 0;
 
         public override bool Equals(object? obj) => obj is Quest q && Id == q.Id;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                StatusChanged = null;
+            }
+            base.Dispose(disposing);
+        }
     }
 }

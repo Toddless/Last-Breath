@@ -20,6 +20,9 @@
         private BaseSpeakingNPC? _speaking;
         private IDialogueStrategy? _dialogueStrategy;
 
+        [Signal]
+        public delegate void CloseDialogueWindowEventHandler();
+
         public Action? DialogueEnded;
         public override void _Ready()
         {
@@ -29,20 +32,22 @@
             // dialogue layer initialize one time for the entire life cycle
             _dialogWindow.QuitPressed += () => DialogueEnded?.Invoke();
             _dialogWindow.QuestsPressed += QuestsPressed;
+            _dialogWindow.CloseDialogueWindow += ClosingDialogueWindow;
         }
 
         public void InitializeMonologue(string firstNode)
         {
-            _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player);
+            _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player, _dialogWindow!);
+            DisablePlayerMovement();
             StartDialogueNode("Conclusions");
         }
 
         public void InitializeDialogue(BaseSpeakingNPC npc)
         {
             _speaking = npc;
-            _dialogueStrategy = new OneToOneDialogueStrategy(npc, _player ??= GameManager.Instance.Player);
-
-            StartDialogueNode(_speaking.FirstDialogueNode);
+            _dialogueStrategy = new OneToOneDialogueStrategy(npc, _player ??= GameManager.Instance.Player, _dialogWindow!);
+            DisablePlayerMovement();
+            StartDialogueNode(_speaking.InitialDialogueId);
         }
 
         public void StartDialogueNode(string firstNode)
@@ -52,10 +57,16 @@
             if (node == null)
             {
                 // log
-                EndDialogue();
+                _dialogueStrategy?.EndDialogue();
                 return;
             }
             HandleDialogueNode(node);
+        }
+
+        private void ClosingDialogueWindow()
+        {
+            EnablePlayerMovement();
+            EmitSignal(SignalName.CloseDialogueWindow);
         }
 
         private async void HandleDialogueNode(DialogueNode node)
@@ -64,6 +75,7 @@
             foreach (var text in _currentNode?.Texts!)
             {
                 UpdateUI(text.Text);
+                // TODO: Rework this part, to bad
                 await ToSignal(_dialogWindow!, "CanContinue");
             }
             UpdatePlayerDialoguesProgress(_currentNode);
@@ -101,8 +113,8 @@
             _questManager ??= QuestManager.Instance;
             foreach (var item in quests)
             {
-                if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
-                if (_questManager.QuestCanBeAccepted(quest) && !quest.ConfirmationRequired)
+                if (!QuestsTable.Instance.TryGetElement(item, out Quest? quest) || quest == null) continue;
+                if (_questManager!.QuestCanBeAccepted(quest) && quest.IsTriggerQuest)
                 {
                     _questManager.OnQuestAccepted(quest);
                     _dialogWindow?.NewQuestAdded();
@@ -115,12 +127,12 @@
             var questMenu = NPCsQuests.Initialize().Instantiate<NPCsQuests>();
             if (_speaking == null || _questManager == null) return;
             _dialogWindow?.AddQuestOption(questMenu);
-
+            _questManager ??= QuestManager.Instance;
             // i need to show all quests that this npc have
             foreach (var item in _speaking.Quests)
             {
-                if (!QuestsTable.TryGetElement(item, out Quest? quest) || quest == null) continue;
-                if (!QuestManager.Instance.QuestCanBeAccepted(quest)) continue;
+                if (!QuestsTable.Instance.TryGetElement(item, out Quest? quest) || quest == null) continue;
+                if (!QuestManager.Instance!.QuestCanBeAccepted(quest)) continue;
                 questMenu.AddQuests(quest);
             }
             _dialogWindow?.HideDialogueButtons();
@@ -131,12 +143,6 @@
             // I need to save the last node with options so I can return to it.
             if (_currentNode?.Options.Count > 0) _previousNode = _currentNode;
             StartDialogueNode(option.TargetNode);
-        }
-
-        private void EndDialogue()
-        {
-            _dialogWindow?.Clear();
-            _dialogWindow?.ShowDialogueButtons();
         }
 
         private void UpdateUI(string text)
@@ -156,5 +162,9 @@
                 _dialogWindow?.AddOption(option);
             }
         }
+
+        private void DisablePlayerMovement() => _player!.CanMove = false;
+
+        private void EnablePlayerMovement() => _player!.CanMove = true;
     }
 }

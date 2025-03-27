@@ -15,12 +15,12 @@
 #if DEBUG
         private bool _devOpened = false;
 #endif
-        private enum State { World, Battle, Paused, Dialog, CutScene }
-        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, StartCutScene, Close }
+        private enum State { World, Battle, Paused, Dialog, Monologue }
+        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, Monologue, Close }
 
         private StateMachine<State, Trigger>? _machine;
-        private StateMachine<State, Trigger>.TriggerWithParameters<BaseSpeakingNPC>? _showDialog;
-        private StateMachine<State, Trigger>.TriggerWithParameters<string>? _showCutScene;
+        private StateMachine<State, Trigger>.TriggerWithParameters<BaseSpeakingNPC>? _showDialogue;
+        private StateMachine<State, Trigger>.TriggerWithParameters<string>? _showMonologue;
 
         private MainWorld? _mainWorld;
         private ManagerUI? _managerUI;
@@ -43,6 +43,7 @@
             _managerUI.SetResume(FireResume);
             _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
+            _managerUI.SetEvents();
             ConfigureStateMachine();
             SetEvents();
         }
@@ -67,7 +68,7 @@
                 if (_mainWorld!.NPCs?.Any(x => x.IsPlayerNearby()) != true) return;
                 if (_machine?.State == State.World)
                 {
-                    _machine.Fire(_showDialog!, _mainWorld!.NPCs?.First(x => x.IsPlayerNearby() == true));
+                    _machine.Fire(_showDialogue!, _mainWorld!.NPCs?.First(x => x.IsPlayerNearby() == true));
                     GetViewport().SetInputAsHandled();
                 }
             }
@@ -103,7 +104,7 @@
         private void SetEvents()
         {
             if (_mainWorld == null) return;
-            _mainWorld.CutScene += (t) => _machine?.Fire(_showCutScene, t);
+            _mainWorld.CutScene += (t) => _machine?.Fire(_showMonologue, t);
             _mainWorld.PropertyChanged += NewBattleContextCreated;
 
             foreach (var obj in _mainWorld.OpenableObjects)
@@ -141,14 +142,14 @@
 
         private void ConfigureStateMachine()
         {
-            _showDialog = _machine?.SetTriggerParameters<BaseSpeakingNPC>(Trigger.Dialog);
-            _showCutScene = _machine?.SetTriggerParameters<string>(Trigger.StartCutScene);
+            _showDialogue = _machine?.SetTriggerParameters<BaseSpeakingNPC>(Trigger.Dialog);
+            _showMonologue = _machine?.SetTriggerParameters<string>(Trigger.Monologue);
 
             _machine?.Configure(State.World)
                 .OnEntry(() => _managerUI?.ShowMainUI())
                 .Permit(Trigger.StartBattle, State.Battle)
                 .Permit(Trigger.Pause, State.Paused)
-                .Permit(Trigger.StartCutScene, State.CutScene)
+                .Permit(Trigger.Monologue, State.Monologue)
                 .Permit(Trigger.Dialog, State.Dialog);
 
             _machine?.Configure(State.Battle)
@@ -170,17 +171,17 @@
               .Permit(Trigger.Resume, State.World);
 
             _machine?.Configure(State.Dialog)
-                .OnEntryFrom(_showDialog, OpenDialog)
+                .OnEntryFrom(_showDialogue, OpenDialogue)
                 .Permit(Trigger.Close, State.World);
 
-            _machine?.Configure(State.CutScene)
-                .OnEntryFrom(_showCutScene, StartCutScene)
+            _machine?.Configure(State.Monologue)
+                .OnEntryFrom(_showMonologue, OpenMonologue)
                 .Permit(Trigger.Close, State.World);
         }
 
-        private void StartCutScene(string firstNode) => _managerUI?.ShowCutScene(firstNode);
+        private void OpenMonologue(string firstNode) => _managerUI?.OpenMonologue(firstNode);
 
-        private void OpenDialog(BaseSpeakingNPC npc) => _managerUI?.ShowDialog(npc);
+        private void OpenDialogue(BaseSpeakingNPC npc) => _managerUI?.OpenDialogue(npc);
 
         private void AfterBattle()
         {
@@ -197,7 +198,7 @@
         private void Unsubscribe()
         {
             if (_mainWorld == null) return;
-            _mainWorld.CutScene -= (t) => _machine?.Fire(_showCutScene, t);
+            _mainWorld.CutScene -= (t) => _machine?.Fire(_showMonologue, t);
             _mainWorld.PropertyChanged -= NewBattleContextCreated;
         }
     }

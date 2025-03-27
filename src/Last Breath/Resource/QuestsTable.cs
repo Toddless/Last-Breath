@@ -9,19 +9,9 @@
 
     public partial class QuestsTable : Table<Quest>
     {
-        public static QuestsTable Instance { get; private set; } = new();
+        private static QuestsTable? s_instance;
 
-        public override void _EnterTree()
-        {
-            Instance ??= this;
-            LoadData();
-        }
-
-        public void AddNewQuest(Quest quest) => Elements.TryAdd(quest.Id, quest);
-
-        public List<string> GetAllQuests(string npcId) => Elements.Where(x => x.Value.NpcId == npcId).Select(x => x.Value.Id).ToList();
-
-        public Quest? GetQuest(string id) => TryGetElement(id, out Quest? quest) ? quest : null;
+        public static QuestsTable Instance => s_instance ??= new();
 
         protected override void LoadData()
         {
@@ -33,5 +23,15 @@
                 Elements[quest.Id] = quest;
             }
         }
+
+        public override void _EnterTree()
+        {
+            s_instance ??= this;
+            LoadData();
+        }
+
+        public override void AddNewElement(Quest quest) => Elements.TryAdd(quest.Id, quest);
+
+        public override List<string> GetAllElements(string id)=> Elements.Where(x=>x.Value.NpcId == id).Select(x=>x.Value.Id).ToList();
     }
 }

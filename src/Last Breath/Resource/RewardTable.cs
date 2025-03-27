@@ -6,13 +6,9 @@
 
     public partial class RewardTable : Table<Reward>
     {
-        public static RewardTable Instance { get; private set; } = new();
+        private static RewardTable? s_instance;
 
-        public override void _EnterTree()
-        {
-            Instance ??= this;
-            LoadData();
-        }
+        public static RewardTable Instance => s_instance ??= new();
 
         protected override void LoadData()
         {
@@ -23,6 +19,14 @@
 
                 Elements[reward.Id] = reward;
             }
+        }
+
+        public override void AddNewElement(Reward element) => Elements.TryAdd(element.Id, element);
+
+        public override void _EnterTree()
+        {
+            s_instance ??= this;
+            LoadData();
         }
     }
 }

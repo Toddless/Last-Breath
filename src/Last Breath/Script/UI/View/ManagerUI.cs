@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.UI.View
 {
     using System;
+    using Godot;
     using Playground.Script.NPC;
     using Playground.Script.UI.Layers;
     using Stateless;
@@ -17,6 +18,7 @@
         private readonly DevLayer? _devLayer = devLayer;
         private readonly DialogueLayer _dialogLayer = dialog;
 
+      
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
         public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void SetClose(Action close) => _dialogLayer.DialogueEnded = close;
@@ -24,13 +26,13 @@
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
 
-        public void ShowCutScene(string firstNode)
+        public void OpenMonologue(string firstNode)
         {
             _dialogLayer.InitializeMonologue(firstNode);
             _machine?.Fire(Trigger.ShowDialogUI);
         }
 
-        public void ShowDialog(BaseSpeakingNPC npc)
+        public void OpenDialogue(BaseSpeakingNPC npc)
         {
             _dialogLayer.InitializeDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
@@ -40,6 +42,10 @@
         public void ShowDevTools() => _devLayer?.Show();
         public void HideDevTools() => _devLayer?.Hide();
 #endif
+        public void SetEvents()
+        {
+            _dialogLayer.CloseDialogueWindow += () => _machine.Fire(Trigger.ShowMainUI);
+        }
 
         public void ConfigureStateMachine()
         {
@@ -55,11 +61,13 @@
                 {
                     _battleLayer.SetProcessUnhandledInput(true);
                     _battleLayer.Show();
+                    GD.Print("ManagerUI enter battle state");
                 })
                 .OnExit(() =>
                 {
                     _battleLayer.SetProcessUnhandledInput(false);
                     _battleLayer.Hide();
+                    GD.Print("ManagerUI exit battle state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
 
@@ -68,11 +76,13 @@
                 {
                     _pauseLayer.SetProcessUnhandledKeyInput(true);
                     _pauseLayer.Show();
+                    GD.Print("ManagerUI enter PauseUI state");
                 })
                 .OnExit(() =>
                 {
                     _pauseLayer.SetProcessUnhandledKeyInput(false);
                     _pauseLayer?.Hide();
+                    GD.Print("ManagerUI exit PauseUI state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
 
@@ -81,11 +91,13 @@
                 {
                     _dialogLayer.SetProcessUnhandledInput(true);
                     _dialogLayer.Show();
+                    GD.Print("ManagerUI enter DialogUI state");
                 })
                 .OnExit(() =>
                 {
                     _dialogLayer.SetProcessUnhandledInput(false);
                     _dialogLayer?.Hide();
+                    GD.Print("ManagerUI exit DialogUI state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
         }

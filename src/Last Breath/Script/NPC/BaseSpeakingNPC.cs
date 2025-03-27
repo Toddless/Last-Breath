@@ -5,6 +5,7 @@
     using Godot;
     using Playground.Localization;
     using Playground.Resource;
+    using Playground.Resource.Quests;
     using Playground.Script.QuestSystem;
 
     public partial class BaseSpeakingNPC : BaseNPC, ISpeaking
@@ -12,13 +13,19 @@
         private const string DialoguePath = "res://Resource/Dialogues/GuardianDialogues/guardianDialoguesData.tres";
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
         private List<string> _quests = [];
-        private string? _dialogueNodeId;
+        private string _initialDialogueNodeId = string.Empty;
         public bool NpcTalking { get; set; } = true;
         public bool FirstTimeMeetPlayer = true;
 
         public List<string> Quests => _quests;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
-        public string? FirstDialogueNode => _dialogueNodeId;
+        public string InitialDialogueId => _initialDialogueNodeId;
+
+        public void OnPlayerAcceptQuest(string questId)
+        {
+            if (!QuestsTable.Instance.TryGetElement(NpcId, out Quest? quest) || quest == null) return;
+            quest.StatusChanged += OnQuestStatusChanged;
+        }
 
         protected override void SetDialogs()
         {
@@ -30,31 +37,23 @@
             }
         }
 
-        protected override void SetQuests()
-        {
-            _quests = QuestsTable.Instance.GetAllQuests(NpcId);
-            foreach (var quest in _quests)
-            {
-                var questToSubscribe = QuestsTable.Instance.GetQuest(quest);
-                if (questToSubscribe == null) continue;
-                questToSubscribe.StatusChanged += OnQuestStatusChanged;
-            }
-        }
+        protected override void SetQuests() => _quests = QuestsTable.Instance.GetAllElements(NpcId);
 
         protected override void SetFirstDialogueNode()
         {
             var fistDialogueNode = new StringBuilder();
             fistDialogueNode.Append(Name);
             fistDialogueNode.Append("FirstMeeting");
-            _dialogueNodeId = fistDialogueNode.ToString();
+            _initialDialogueNodeId = fistDialogueNode.ToString();
         }
 
         private void OnQuestStatusChanged(string questId, QuestStatus status)
         {
+            // TODO: what if player can complete multiple quests?
             if (status != QuestStatus.Completed) return;
-            var dialogue = QuestsTable.Instance.GetQuest(questId);
-            if(dialogue == null) return;
-            _dialogueNodeId = _dialogs[dialogue.DialogueIdOnComplete].DialogueId;
+            var quest = QuestsTable.Instance.GetValue(questId);
+            if (quest == null) return;
+            _initialDialogueNodeId = quest.DialogueIdOnComplete;
         }
     }
 }

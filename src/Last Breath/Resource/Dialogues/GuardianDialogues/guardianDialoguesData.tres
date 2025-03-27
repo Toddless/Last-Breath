@@ -186,9 +186,9 @@ IsDialogMatterForQuest = false
 
 [resource]
 script = ExtResource("4_7b34w")
-Dialogs = {
+Dialogs = Dictionary[String, ExtResource("1_dvrwy")]({
 "GuardianAnswerDirection": SubResource("Resource_0jsvc"),
 "GuardianFirstMeeting": SubResource("Resource_dgraq"),
 "GuardianReqularMeeting": SubResource("Resource_kxmqf"),
 "GuardianSecondMeetingPlayerHasItems": SubResource("Resource_0ywxp")
-}
+})

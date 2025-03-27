@@ -26,6 +26,7 @@ ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
 GameManager="*res://Script/GameManager.cs"
 QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
 QuestsTable="*res://Resource/QuestsTable.cs"
+RewardTable="*res://Resource/RewardTable.cs"
 
 [display]
 

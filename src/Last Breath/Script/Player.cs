@@ -10,6 +10,7 @@
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
+    using Playground.Script.QuestSystem;
     using Playground.Script.Reputation;
 
     public partial class Player : ObservableCharacterBody2D, ICharacter
@@ -25,6 +26,8 @@
         private List<IAbility>? _abilities;
         private Sprite2D? _playerAvatar;
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
+        private int _exp;
+        private int _gold;
         #endregion
 
         #region Components
@@ -137,14 +140,18 @@
             QuestCompleted?.Invoke(id);
         }
 
-        private void LoadDialogues()
+        public void AcceptReward(Reward reward)
         {
-            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres");
-            if (dialogueData.Dialogs == null) return;
-            foreach (var item in dialogueData.Dialogs)
+            if (reward.Items.Count > 0)
             {
-                _dialogs.Add(item.Key, item.Value);
+                foreach (var item in reward.Items)
+                {
+                    AddItemToInventory(item);
+                }
             }
+            _exp += reward.Exp;
+            _gold += reward.Gold;
+            reward.Free();
         }
 
         public override void _PhysicsProcess(double delta)
@@ -157,6 +164,16 @@
             Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
             Velocity = inputDirection * Speed;
             MoveAndSlide();
+        }
+
+        private void LoadDialogues()
+        {
+            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres");
+            if (dialogueData.Dialogs == null) return;
+            foreach (var item in dialogueData.Dialogs)
+            {
+                _dialogs.Add(item.Key, item.Value);
+            }
         }
     }
 }

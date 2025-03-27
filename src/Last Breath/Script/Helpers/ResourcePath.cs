@@ -18,6 +18,6 @@
         public static readonly string BodyArmorLegendary = "uid://bnxv2a1imkj1j";
 
         public static readonly string QuestData = "uid://eu1ds1de1dl3";
-        public static readonly string RewardData = "";
+        public static readonly string RewardData = "uid://b17770l8n6cpr";
     }
 }

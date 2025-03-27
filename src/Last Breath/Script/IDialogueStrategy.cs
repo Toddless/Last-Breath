@@ -5,5 +5,7 @@
     public interface IDialogueStrategy
     {
         DialogueNode? GetNextDialogueNode(string firstNode);
+
+        void EndDialogue();
     }
 }

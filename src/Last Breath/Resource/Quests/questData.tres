@@ -24,9 +24,11 @@ DescriptionKey = SubResource("Resource_xiwmg")
 RewardId = "Main_Awaking_Part1_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = false
+IsTriggerQuest = false
 NpcId = ""
+DialogueIdOnComplete = ""
 Type = 1
+IsNpcNeededForQuestCompletion = false
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_8bgjv"]
@@ -47,9 +49,11 @@ DescriptionKey = SubResource("Resource_8bgjv")
 RewardId = "Side_Battle_Skills_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = false
+IsTriggerQuest = true
 NpcId = ""
+DialogueIdOnComplete = ""
 Type = 2
+IsNpcNeededForQuestCompletion = false
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_3ke73"]
@@ -70,9 +74,11 @@ DescriptionKey = SubResource("Resource_3ke73")
 RewardId = "Side_First_Equip_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = false
+IsTriggerQuest = true
 NpcId = ""
+DialogueIdOnComplete = ""
 Type = 2
+IsNpcNeededForQuestCompletion = false
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_0r81x"]
@@ -93,9 +99,11 @@ DescriptionKey = SubResource("Resource_0r81x")
 RewardId = "Side_Who_Am_I_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = false
+IsTriggerQuest = true
 NpcId = ""
+DialogueIdOnComplete = ""
 Type = 2
+IsNpcNeededForQuestCompletion = false
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_y0bru"]
@@ -116,9 +124,11 @@ DescriptionKey = SubResource("Resource_y0bru")
 RewardId = "Side_I_Need_Food_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = false
+IsTriggerQuest = true
 NpcId = ""
+DialogueIdOnComplete = ""
 Type = 2
+IsNpcNeededForQuestCompletion = false
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_iyh2a"]
@@ -146,9 +156,11 @@ DescriptionKey = SubResource("Resource_iyh2a")
 RewardId = "FindAList_Reward"
 Conditions = Array[ExtResource("2_v62y8")]([])
 RequiredConditions = 0
-ConfirmationRequired = true
+IsTriggerQuest = false
 NpcId = "Guardian"
+DialogueIdOnComplete = "GuardianFindAListComplete"
 Type = 2
+IsNpcNeededForQuestCompletion = true
 QuestObjective = SubResource("Resource_fwuc8")
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 

@@ -20,6 +20,8 @@
         public delegate void QuitPressedEventHandler();
         [Signal]
         public delegate void QuestsPressedEventHandler();
+        [Signal]
+        public delegate void CloseDialogueWindowEventHandler();
 
         public override void _Ready()
         {
@@ -31,9 +33,11 @@
             _lessSpeed = (Button?)NodeFinder.FindBFSCached(this, "LessSpeed");
             _default = (Button?)NodeFinder.FindBFSCached(this, "Default");
             _questAdded = (Label?)NodeFinder.FindBFSCached(this, "Label");
+
             _buttonsContainer = (VBoxContainer?)NodeFinder.FindBFSCached(this, "ButtonsContainer");
             _quests = (Button?)NodeFinder.FindBFSCached(this, "Quests");
             _quit = (Button?)NodeFinder.FindBFSCached(this, "Quit");
+
             _questOptions = (Control?)NodeFinder.FindBFSCached(this, "QuestOptionsElement");
             _questAdded?.Hide();
             _buttonsContainer?.Hide();
@@ -75,13 +79,6 @@
             _questOptions?.AddChild(nPCsQuests);
         }
 
-        private void OnClosedPressed()
-        {
-            var quests = _questOptions?.GetChild<NPCsQuests>(0);
-            if (quests != null) quests.ClosePressed -= OnClosedPressed;
-            _buttonsContainer?.Show();
-        }
-
         public void Clear()
         {
             if (_options == null) return;
@@ -89,6 +86,15 @@
             {
                 item.QueueFree();
             }
+        }
+
+        public void CloseWindow() => EmitSignal(SignalName.CloseDialogueWindow);
+
+        private void OnClosedPressed()
+        {
+            var quests = _questOptions?.GetChild<NPCsQuests>(0);
+            if (quests != null) quests.ClosePressed -= OnClosedPressed;
+            _buttonsContainer?.Show();
         }
 
         private void SetEvents()
