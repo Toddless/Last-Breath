@@ -89,19 +89,22 @@
 
         private void OnLocationVisited(string obj) => UpdateQuestObjectives(ObjectiveType.LocationVisit, obj);
 
-        private void OnEnemyKilled(string obj) => UpdateQuestObjectives(ObjectiveType.EnemyKilling, obj);
+        private void OnEnemyKilled(EnemyKilledEventArgs args) => UpdateQuestObjectives(ObjectiveType.EnemyKilling, args);
 
         private void OnItemCollected(string obj) => UpdateQuestObjectives(ObjectiveType.ItemCollection, obj);
 
-        private void UpdateQuestObjectives(ObjectiveType type, string obj)
+        private void UpdateQuestObjectives(ObjectiveType type, object eventData)
         {
             foreach (var quest in _activeQuests)
             {
                 if (quest.QuestObjective == null) continue;
-                if (quest.QuestObjective.QuestObjectiveType == type && quest.QuestObjective.TargetId == obj)
+                if (quest.QuestObjective.QuestObjectiveType == type)
                 {
-                    quest.QuestObjective.CurrentAmount++;
-                    CheckQuestCompletion(quest);
+                    if (quest.QuestObjective.IsEventMatching(eventData))
+                    {
+                        quest.QuestObjective.CurrentAmount++;
+                        CheckQuestCompletion(quest);
+                    }
                 }
             }
         }

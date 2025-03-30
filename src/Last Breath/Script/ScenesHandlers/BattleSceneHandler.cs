@@ -62,7 +62,7 @@
             if (!(_rnd.RandfRange(0, 1) <= _chanceToEscape)) return;
             // need method to refresh enemy stats
             BattleResult = BattleFinished(Results.PlayerRunAway);
-            _player?.OnEnemyKilled(_enemy!.EnemyId);
+            _player?.OnEnemyKilled(_enemy);
         }
 
         private BattleResult? BattleFinished(Results results)

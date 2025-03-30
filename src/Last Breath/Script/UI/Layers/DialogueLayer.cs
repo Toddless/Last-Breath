@@ -47,7 +47,7 @@
         {
             _dialogueStrategy = new MonologueStrategy(_player ??= GameManager.Instance.Player, _dialogWindow!);
             DisablePlayerMovement();
-            StartDialogueNode(firstNode);
+            StartDialogueNode(/*firstNode*/ "Conclusion");
         }
 
         public void InitializeDialogue(BaseSpeakingNPC npc)

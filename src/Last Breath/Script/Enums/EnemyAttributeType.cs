@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Enums
 {
-    public enum EnemyType
+    public enum EnemyAttributeType
     {
         None = 0,
         DexterityBased,

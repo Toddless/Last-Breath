@@ -15,5 +15,12 @@
         public int CurrentAmount { get; set; }
 
         public bool IsCompleted => CurrentAmount >= RequiredAmount;
+
+        public virtual bool IsEventMatching(object eventData)
+        {
+            if(eventData is string obj)
+                return TargetId == obj;
+            return false;
+        }
     }
 }

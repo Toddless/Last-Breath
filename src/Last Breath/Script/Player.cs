@@ -81,14 +81,14 @@
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
         public List<IAbility>? Abilities => _abilities;
         public Sprite2D? PlayerAvatar => _playerAvatar;
-
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
         #endregion
 
         #region Events
-        public event Action<string>? ItemCollected, EnemyKilled, QuestCompleted, LocationVisited, DialogueCompleted;
+        public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
+        public event Action<EnemyKilledEventArgs>? EnemyKilled;
         #endregion
 
         public override void _Ready()
@@ -129,7 +129,7 @@
             ItemCollected?.Invoke(item.Id);
         }
 
-        public void OnEnemyKilled(string id) => EnemyKilled?.Invoke(id);
+        public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
 
         public void OnDialogueCompleted(string id)
         {
@@ -143,6 +143,7 @@
             AcceptReward(quest.GetReward());
             QuestCompleted?.Invoke(quest.Id);
         }
+        public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
         private void AcceptReward(Reward? reward)
         {

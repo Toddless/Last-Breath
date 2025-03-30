@@ -134,7 +134,8 @@
         private void OnQuestCompleted(Quest quest)
         {
             _questsUI!.RemoveQuest(quest);
-            RemoveQuestItems(quest);
+            // not sure should i remove quest item or not
+            // RemoveQuestItems(quest);
         }
 
         private void RemoveQuestItems(Quest quest)

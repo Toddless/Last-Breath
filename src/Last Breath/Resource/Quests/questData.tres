@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="QuestData" load_steps=26 format=3 uid="uid://eu1ds1de1dl3"]
+[gd_resource type="Resource" script_class="QuestData" load_steps=27 format=3 uid="uid://eu1ds1de1dl3"]
 
 [ext_resource type="Script" uid="uid://c3hx7deqyukqj" path="res://Script/QuestSystem/QuestData.cs" id="1_3dxwi"]
 [ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
 [ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
 [ext_resource type="Script" uid="uid://ciwpxedfvild" path="res://Script/QuestSystem/Condition.cs" id="2_v62y8"]
+[ext_resource type="Script" uid="uid://b2gfkbh62vuru" path="res://Script/QuestSystem/EnemyKillingQuestObjective.cs" id="4_8bgjv"]
 [ext_resource type="Script" uid="uid://cb8gyk1c3kei8" path="res://Script/QuestSystem/QuestObjective.cs" id="4_t15wk"]
 
 [sub_resource type="Resource" id="Resource_xiwmg"]
@@ -42,11 +43,12 @@ Key = "Side_Battle_Skills_Name"
 metadata/_custom_type_script = "uid://uct5wx6u2cu4"
 
 [sub_resource type="Resource" id="Resource_xj0x0"]
-script = ExtResource("4_t15wk")
-QuestObjectiveType = 0
+script = ExtResource("4_8bgjv")
+TargetEnemyType = 0
+QuestObjectiveType = 2
 TargetId = ""
 RequiredAmount = 1
-metadata/_custom_type_script = "uid://cb8gyk1c3kei8"
+metadata/_custom_type_script = "uid://b2gfkbh62vuru"
 
 [sub_resource type="Resource" id="Resource_1mtw7"]
 script = ExtResource("1_6dcs4")

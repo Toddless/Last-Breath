@@ -38,10 +38,11 @@ namespace Playground
         private BattleBehavior? _battleBehavior;
         private List<IAbility>? _abilities = new();
         private IBattleContext? _battleContext;
-        private EnemyType? _enemyType;
+        private EnemyAttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
         private int _level;
         private string? _enemyId;
+        private EnemyType _enemyType;
 
         [Signal]
         public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
@@ -59,6 +60,7 @@ namespace Playground
 
 
         #region Properties
+        public EnemyType EnemyType => _enemyType;
 
         public NavigationAgent2D? NavigationAgent2D
         {
@@ -208,11 +210,11 @@ namespace Playground
 
         protected void SetStats()
         {
-            _enemyType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
+            _enemyAttributeType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
             _respawnPosition = Position;
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
-            var points = SetAttributesDependsOnType(_enemyType);
+            var points = SetAttributesDependsOnType(_enemyAttributeType);
             _attribute!.Strength!.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
@@ -262,7 +264,7 @@ namespace Playground
             }
         }
 
-        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyType? enemyType)
+        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyAttributeType? enemyType)
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
@@ -271,20 +273,20 @@ namespace Playground
 
             return enemyType switch
             {
-                EnemyType.DexterityBased => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                EnemyType.StrengthBased => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
-                EnemyType.IntelligenceBased => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                EnemyAttributeType.DexterityBased => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                EnemyAttributeType.StrengthBased => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
+                EnemyAttributeType.IntelligenceBased => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
 
-        protected EnemyType SetRandomEnemyType(int index)
+        protected EnemyAttributeType SetRandomEnemyType(int index)
         {
             return index switch
             {
-                1 => EnemyType.DexterityBased,
-                2 => EnemyType.StrengthBased,
-                _ => EnemyType.None,
+                1 => EnemyAttributeType.DexterityBased,
+                2 => EnemyAttributeType.StrengthBased,
+                _ => EnemyAttributeType.None,
             };
         }
     }
