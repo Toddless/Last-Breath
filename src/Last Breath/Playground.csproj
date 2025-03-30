@@ -1,37 +1,26 @@
-<Project Sdk="Godot.NET.Sdk/4.3.0">
+<Project Sdk="Godot.NET.Sdk/4.4.0">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Nullable>enable</Nullable>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <UserSecretsId>0132e77a-2c43-41e0-acc0-5791c77b2d87</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Scenes\Components\**" />
-    <Compile Remove="Script\Chest\**" />
-    <EmbeddedResource Remove="Scenes\Components\**" />
-    <EmbeddedResource Remove="Script\Chest\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Remove="C:\Users\faust\.nuget\packages\gdunit4.api\4.3.1\contentFiles\any\net8.0\LICENSE" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Scenes\" />
-    <Folder Include="Script\Items\ItemsAbilities\" />
-    <Folder Include="Script\Items\UniqItems\" />
-    <Folder Include="Script\Effects\Utility\" />
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Remove=".editorconfig" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Stateless" Version="5.17.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
 </Project>

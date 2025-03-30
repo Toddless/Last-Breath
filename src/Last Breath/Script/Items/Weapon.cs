@@ -30,7 +30,7 @@
         }
 
 
-        public Weapon(string weaponName, GlobalRarity rarity, float minDamage, float maxDamage, float criticalStrikeChance, string resourcePath, Texture2D icon, int stackSize, int quantity) : base(weaponName, rarity, resourcePath, icon, stackSize, quantity)
+        public Weapon(string weaponName, GlobalRarity rarity, float minDamage, float maxDamage, float criticalStrikeChance, string resourcePath, Texture2D icon, int stackSize, int quantity, string descriptionKey) : base(weaponName, rarity, resourcePath, icon, stackSize, quantity,descriptionKey)
         {
             _minDamage = minDamage;
             _maxDamage = maxDamage;

@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2mjqshkahaja"]
+
+[ext_resource type="Script" uid="uid://casmgho5osnso" path="res://Script/UI/View/DialogueUIOption.cs" id="1_uipka"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_j37s5"]
+
+[node name="DialogueUIOption" type="HBoxContainer"]
+script = ExtResource("1_uipka")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_j37s5")
+theme_override_font_sizes/font_size = 22

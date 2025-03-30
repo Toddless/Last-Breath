@@ -1,4 +1,4 @@
-﻿namespace PlaygroundTesting
+﻿namespace PlaygroundTest
 {
     using Moq;
     using Playground.Script.Reputation;

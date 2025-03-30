@@ -5,6 +5,8 @@
         Unknown = 0,
         Progressing,
         Completed,
-        Canceled
+        Canceled,
+        Failed,
+        NotAccepted
     }
 }

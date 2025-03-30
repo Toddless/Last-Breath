@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Passives
+﻿namespace Playground.Script.Effects
 {
-    using Playground;
     using Playground.Script.Effects.Interfaces;
+
     public class AbilityHandler
     {
         public static void ApplyAbility(ICharacter character, IAbility ability) => character.AppliedAbilities?.Add(ability);

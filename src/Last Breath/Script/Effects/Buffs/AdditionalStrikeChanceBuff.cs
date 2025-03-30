@@ -1,7 +1,7 @@
-﻿using Playground.Script.Enums;
-
-namespace Playground.Script.Passives.Buffs
+﻿namespace Playground.Script.Effects.Buffs
 {
+    using Playground.Script.Enums;
+
     public class AdditionalStrikeChanceBuff : AbstractEffect
     {
         public AdditionalStrikeChanceBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)

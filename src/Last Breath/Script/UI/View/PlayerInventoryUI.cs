@@ -1,21 +1,23 @@
 ﻿namespace Playground.Script.UI
 {
     using Godot;
-    using Playground.Components;
     using Playground.Script.Helpers;
+    using Playground.Components;
 
     public partial class PlayerInventoryUI : Control
     {
-        private GridContainer? _equipInventory, _craftInventory;
-        private Inventory? _inventoryEquip, _inventoryCrafting;
+        private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
         private Label? _currentHealth, _maxHealth, _damage, _criticalChance, _criticalDamage, _dodgeChance, _extraHitChance;
+        private TabBar? _equip, _craft, _quest;
 
         public override void _Ready()
         {
-            _inventoryEquip = new Inventory();
-            _inventoryCrafting = new Inventory();
+            _equip = (TabBar?)NodeFinder.FindBFSCached(this, "Equip");
+            _quest = (TabBar?)NodeFinder.FindBFSCached(this, "QuestItems");
+            _craft = (TabBar?)NodeFinder.FindBFSCached(this, "Crafting");
             _craftInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "CraftContainer");
             _equipInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "EquipContainer");
+            _questItemsInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "QuestItemsContainer");
             _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
             _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
             _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
@@ -23,10 +25,18 @@
             _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
             _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
             _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
-            _inventoryEquip.Initialize(220, ScenePath.InventorySlot, _equipInventory!);
-            _inventoryCrafting.Initialize(220, ScenePath.InventorySlot, _craftInventory!);
+           
             NodeFinder.ClearCache();
         }
+
+        public void InitializeInventories(Inventory equipInventory, Inventory craftingInventory, Inventory questItemsInventory)
+        {
+            equipInventory.Initialize(220, _equipInventory!);
+            craftingInventory.Initialize(220, _craftInventory!);
+            questItemsInventory.Initialize(220, _questItemsInventory!);
+        }
+
+        #region Stats
 
         public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $"Health: {value}";
 
@@ -41,5 +51,7 @@
         public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $"Dodge Chance: {chance * 100}%";
 
         public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" Extra Hit Chance {chance * 100}%";
+
+        #endregion
     }
 }

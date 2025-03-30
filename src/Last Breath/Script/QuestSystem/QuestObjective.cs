@@ -1,10 +1,26 @@
 ﻿namespace Playground.Script.QuestSystem
 {
-    using Playground.Script.Helpers;
-    public abstract class QuestObjective
+    using Godot;
+
+    [GlobalClass]
+    public partial class QuestObjective : Resource
     {
-        public LocalizedText? Description { get; set; }
-        public bool IsDone { get; set; }
-        public abstract void UpdateProgress(object eventData);
+        [Export]
+        public ObjectiveType QuestObjectiveType { get; set; }
+        [Export]
+        public string TargetId { get; set; } = string.Empty;
+        [Export]
+        public int RequiredAmount { get; set; } = 1;
+
+        public int CurrentAmount { get; set; }
+
+        public bool IsCompleted => CurrentAmount >= RequiredAmount;
+
+        public virtual bool IsEventMatching(object eventData)
+        {
+            if(eventData is string obj)
+                return TargetId == obj;
+            return false;
+        }
     }
 }

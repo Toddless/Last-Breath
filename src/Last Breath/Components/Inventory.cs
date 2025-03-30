@@ -1,19 +1,19 @@
 ﻿namespace Playground.Components
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
-    using System.Collections.Generic;
-    using System.Linq;
 
-    public class Inventory 
+    public class Inventory
     {
-        private List<InventorySlot> _slots = [];
+        private readonly List<InventorySlot> _slots = [];
         private PackedScene? _inventorySlot;
 
-        public void Initialize(int size, string path, GridContainer container)
+        public void Initialize(int size, GridContainer container)
         {
-            _inventorySlot = ResourceLoader.Load<PackedScene>(path);
+            _inventorySlot = InventorySlot.Initialize();
             for (int i = 0; i < size; i++)
             {
                 InventorySlot inventorySlot = _inventorySlot!.Instantiate<InventorySlot>();
@@ -30,43 +30,41 @@
                 return;
             }
 
-            if (slot.Item == null)
-            {
-                slot.SetItem(item);
-            }
-            else if (slot.Item.Guid == item.Guid)
+            if (slot.Item != null)
             {
                 slot.AddItem(item);
             }
+            else
+            {
+                slot.SetItem(item);
+            }
         }
 
-        public InventorySlot? GetSlotToAdd(Item item)
-        {
-            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Guid == item.Guid && itemSlot.Item.MaxStackSize >= item.Quantity));
-        }
+        public InventorySlot? GetSlotToAdd(Item item) => _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Id == item.Id && itemSlot.Item.MaxStackSize > item.Quantity));
 
-        public InventorySlot? GetSlotToRemove(Item? item)
-        {
-            // this method work correctly without first condition only if i equip or remove an item from right to left
-            // cause if an item is removed from left to right, then after first cycle method return null
-            return _slots.FirstOrDefault(x => x.Item != null && x.Item.Guid == item?.Guid);
-        }
+        public InventorySlot? GetSlotToRemove(string itemId) => _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == itemId);
 
-        public void RemoveItem(Item item)
+        public void RemoveItem(string itemId)
         {
-            var slot = GetSlotToRemove(item);
+            var slot = GetSlotToRemove(itemId);
 
             if (slot == null)
             {
+                // TODO: Log
+                return;
+            }
+            var item = GetItem(itemId);
+            if (item == null)
+            {
+                //TODO: Log
                 return;
             }
             slot.RemoveItem(item);
         }
 
-        public int GetNumberOfItems(Item item)
-        {
-            return _slots.FindAll(slot => slot.Item != null && slot.Item.Guid == item.Guid).Count;
-        }
+        public Item? GetItem(string id) => _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == id)?.Item;
+
+        public int GetNumberOfItems(Item item) => _slots.FindAll(slot => slot.Item != null && slot.Item.Id == item.Id).Count;
 
         public List<Item?> GiveAllItems() => _slots.Where(x => x.Item != null).Select(x => x.Item).ToList();
 
@@ -74,6 +72,14 @@
         {
             if (items.Count > 0)
                 items.ForEach(AddItem!);
+        }
+
+        public void Clear()
+        {
+            foreach (var item in _slots)
+            {
+                item.Clear();
+            }
         }
     }
 }

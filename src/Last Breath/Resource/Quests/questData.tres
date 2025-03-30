@@ -1,0 +1,179 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=27 format=3 uid="uid://eu1ds1de1dl3"]
+
+[ext_resource type="Script" uid="uid://c3hx7deqyukqj" path="res://Script/QuestSystem/QuestData.cs" id="1_3dxwi"]
+[ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_fdmv3"]
+[ext_resource type="Script" uid="uid://ciwpxedfvild" path="res://Script/QuestSystem/Condition.cs" id="2_v62y8"]
+[ext_resource type="Script" uid="uid://b2gfkbh62vuru" path="res://Script/QuestSystem/EnemyKillingQuestObjective.cs" id="4_8bgjv"]
+[ext_resource type="Script" uid="uid://cb8gyk1c3kei8" path="res://Script/QuestSystem/QuestObjective.cs" id="4_t15wk"]
+
+[sub_resource type="Resource" id="Resource_xiwmg"]
+script = ExtResource("1_fdmv3")
+Key = "Main_Awaking_Part1_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_v62y8"]
+script = ExtResource("1_fdmv3")
+Key = "Main_Awaking_Part1_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_t15wk"]
+script = ExtResource("1_6dcs4")
+Id = "Main_Awaking_Part1"
+NameKey = SubResource("Resource_v62y8")
+DescriptionKey = SubResource("Resource_xiwmg")
+RewardId = "Main_Awaking_Part1_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = false
+NpcId = ""
+DialogueIdOnComplete = ""
+Type = 1
+IsNpcNeededForQuestCompletion = false
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[sub_resource type="Resource" id="Resource_8bgjv"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Battle_Skills_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_o831m"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Battle_Skills_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_xj0x0"]
+script = ExtResource("4_8bgjv")
+TargetEnemyType = 0
+QuestObjectiveType = 2
+TargetId = ""
+RequiredAmount = 1
+metadata/_custom_type_script = "uid://b2gfkbh62vuru"
+
+[sub_resource type="Resource" id="Resource_1mtw7"]
+script = ExtResource("1_6dcs4")
+Id = "Side_Battle_Skills"
+NameKey = SubResource("Resource_o831m")
+DescriptionKey = SubResource("Resource_8bgjv")
+RewardId = "Side_Battle_Skills_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = true
+NpcId = ""
+DialogueIdOnComplete = ""
+Type = 2
+IsNpcNeededForQuestCompletion = false
+QuestObjective = SubResource("Resource_xj0x0")
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[sub_resource type="Resource" id="Resource_3ke73"]
+script = ExtResource("1_fdmv3")
+Key = "Side_First_Equip_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_uu2wq"]
+script = ExtResource("1_fdmv3")
+Key = "Side_First_Equip_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_ope5b"]
+script = ExtResource("1_6dcs4")
+Id = "Side_First_Equip"
+NameKey = SubResource("Resource_uu2wq")
+DescriptionKey = SubResource("Resource_3ke73")
+RewardId = "Side_First_Equip_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = true
+NpcId = ""
+DialogueIdOnComplete = ""
+Type = 2
+IsNpcNeededForQuestCompletion = false
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[sub_resource type="Resource" id="Resource_0r81x"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Who_Am_I_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_guife"]
+script = ExtResource("1_fdmv3")
+Key = "Side_Who_Am_I_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_be1fe"]
+script = ExtResource("1_6dcs4")
+Id = "Side_Who_Am_I"
+NameKey = SubResource("Resource_guife")
+DescriptionKey = SubResource("Resource_0r81x")
+RewardId = "Side_Who_Am_I_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = true
+NpcId = ""
+DialogueIdOnComplete = ""
+Type = 2
+IsNpcNeededForQuestCompletion = false
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[sub_resource type="Resource" id="Resource_y0bru"]
+script = ExtResource("1_fdmv3")
+Key = "Side_I_Need_Food_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_8oqyy"]
+script = ExtResource("1_fdmv3")
+Key = "Side_I_Need_Food_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_6fekf"]
+script = ExtResource("1_6dcs4")
+Id = "Side_I_Need_Food"
+NameKey = SubResource("Resource_8oqyy")
+DescriptionKey = SubResource("Resource_y0bru")
+RewardId = "Side_I_Need_Food_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = true
+NpcId = ""
+DialogueIdOnComplete = ""
+Type = 2
+IsNpcNeededForQuestCompletion = false
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[sub_resource type="Resource" id="Resource_iyh2a"]
+script = ExtResource("1_fdmv3")
+Key = "FindAList_Description"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_rwi2l"]
+script = ExtResource("1_fdmv3")
+Key = "FindAList_Name"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_fwuc8"]
+script = ExtResource("4_t15wk")
+QuestObjectiveType = 1
+TargetId = "List_of_Dead"
+RequiredAmount = 1
+metadata/_custom_type_script = "uid://cb8gyk1c3kei8"
+
+[sub_resource type="Resource" id="Resource_e8dnr"]
+script = ExtResource("1_6dcs4")
+Id = "FindAList"
+NameKey = SubResource("Resource_rwi2l")
+DescriptionKey = SubResource("Resource_iyh2a")
+RewardId = "FindAList_Reward"
+Conditions = Array[ExtResource("2_v62y8")]([])
+RequiredConditions = 0
+IsTriggerQuest = false
+NpcId = "Guardian"
+DialogueIdOnComplete = "GuardianFindAListComplete"
+Type = 2
+IsNpcNeededForQuestCompletion = true
+QuestObjective = SubResource("Resource_fwuc8")
+metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
+
+[resource]
+script = ExtResource("1_3dxwi")
+Quests = Array[ExtResource("1_6dcs4")]([SubResource("Resource_t15wk"), SubResource("Resource_1mtw7"), SubResource("Resource_ope5b"), SubResource("Resource_be1fe"), SubResource("Resource_6fekf"), SubResource("Resource_e8dnr")])

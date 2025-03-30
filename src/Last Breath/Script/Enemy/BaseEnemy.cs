@@ -2,7 +2,8 @@ namespace Playground
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
+    using System.Linq;
+    using System.Text;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -11,7 +12,7 @@ namespace Playground
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.Scenes;
+    using Playground.Script.ScenesHandlers;
 
     [Inject]
     public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
@@ -37,9 +38,11 @@ namespace Playground
         private BattleBehavior? _battleBehavior;
         private List<IAbility>? _abilities = new();
         private IBattleContext? _battleContext;
-        private EnemyType? _enemyType;
+        private EnemyAttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
         private int _level;
+        private string? _enemyId;
+        private EnemyType _enemyType;
 
         [Signal]
         public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
@@ -57,6 +60,7 @@ namespace Playground
 
 
         #region Properties
+        public EnemyType EnemyType => _enemyType;
 
         public NavigationAgent2D? NavigationAgent2D
         {
@@ -152,7 +156,24 @@ namespace Playground
             set => _appliedAbilities = value;
         }
 
+        [Export]
+        public Fractions Fraction { get; set; }
+
+        [Export]
+        public string NpcName { get; set; } = string.Empty;
+
         public EffectManager? EffectManager => _effectManager;
+
+        public string EnemyId => _enemyId ??= SetId();
+
+        private string SetId()
+        {
+            var id = new StringBuilder();
+            id.Append(NpcName);
+            id.Append('_');
+            id.Append(Fraction.ToString());
+            return id.ToString();
+        }
         #endregion
 
         public override void _Ready()
@@ -167,7 +188,7 @@ namespace Playground
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = new EnemyInventory();
-            Inventory.Initialize(25,ScenePath.InventorySlot, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
+            Inventory.Initialize(25, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
@@ -180,6 +201,8 @@ namespace Playground
             SpawnItems();
         }
 
+        public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;
+
         protected void SpawnItems()
         {
             _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -187,36 +210,15 @@ namespace Playground
 
         protected void SetStats()
         {
-            _enemyType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
+            _enemyAttributeType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
             _respawnPosition = Position;
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
-            var points = SetAttributesDependsOnType(_enemyType);
+            var points = SetAttributesDependsOnType(_enemyAttributeType);
             _attribute!.Strength!.Total += points.Strength;
             _attribute!.Dexterity!.Total += points.Dexterity;
             SetAnimation();
             EmitSignal(SignalName.EnemyInitialized);
-        }
-
-        protected void OnStrengthChange(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e is PropertyChangedWithValuesEventArgs<int> args)
-            {
-                if (args.NewValue < args.OldValue)
-                {
-                    var diff = args.OldValue - args.NewValue;
-                    _health!.IncreaseHealth -= _attribute!.Strength!.HealthIncrease * diff;
-
-                }
-                else
-                {
-                    _health!.IncreaseHealth = _attribute!.Strength!.TotalHealthIncrese();
-                }
-                if (!_enemyFight)
-                {
-                    _health.RefreshHealth();
-                }
-            }
         }
 
         protected GlobalRarity EnemyRarity()
@@ -246,13 +248,6 @@ namespace Playground
             }
         }
 
-        public (float damage, bool crit, float leeched) ActivateAbilityBeforeDealDamage()
-        {
-            // working fine for buff, but what should i do to debuff someone?
-            BattleBehavior?.MakeDecision()?.ActivateAbility(_battleContext);
-            return _attack!.CalculateDamage();
-        }
-
         public void PlayerExited(Node2D body)
         {
             if (body is Player s && !_area!.OverlapsBody(s))
@@ -269,7 +264,7 @@ namespace Playground
             }
         }
 
-        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyType? enemyType)
+        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyAttributeType? enemyType)
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
@@ -278,20 +273,20 @@ namespace Playground
 
             return enemyType switch
             {
-                EnemyType.DexterityBased => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                EnemyType.StrengthBased => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
-                EnemyType.IntelligenceBased => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                EnemyAttributeType.DexterityBased => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                EnemyAttributeType.StrengthBased => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
+                EnemyAttributeType.IntelligenceBased => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
 
-        protected EnemyType SetRandomEnemyType(int index)
+        protected EnemyAttributeType SetRandomEnemyType(int index)
         {
             return index switch
             {
-                1 => EnemyType.DexterityBased,
-                2 => EnemyType.StrengthBased,
-                _ => EnemyType.None,
+                1 => EnemyAttributeType.DexterityBased,
+                2 => EnemyAttributeType.StrengthBased,
+                _ => EnemyAttributeType.None,
             };
         }
     }

@@ -1,7 +1,6 @@
-﻿namespace Playground.Script.Passives.Debuffs
+﻿namespace Playground.Script.Effects.Debuffs
 {
     using Playground.Script.Enums;
-    using Playground.Script.Passives;
 
     public class StrikeDamageDebuff : AbstractEffect
     {

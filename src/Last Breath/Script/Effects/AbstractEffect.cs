@@ -1,7 +1,8 @@
-﻿namespace Playground.Script.Passives
+﻿namespace Playground.Script.Effects
 {
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enums;
+
     public abstract class AbstractEffect(string name, string desc, float modifier, int duration) : IEffect
     {
         private string _name = name;

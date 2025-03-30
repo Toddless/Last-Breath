@@ -1,12 +1,12 @@
 ﻿namespace Playground.Script.LootGenerator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Playground.Script.Enums;
     using Playground.Script.Items;
     using Playground.Script.Items.Factories;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
 
     public abstract class GenericObjectsTable<T>
         where T : GenericObject

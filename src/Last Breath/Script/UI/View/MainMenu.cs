@@ -6,9 +6,17 @@
     using Playground.Script.ScenesHandlers;
     using Playground.Script.UI;
     using Stateless;
+    using Playground.Localization;
+    using Godot.Collections;
 
     public partial class MainMenu : Control
     {
+        // only for now, later i need other place for this kind of things
+        private Dictionary<string, string> _dialoguesPath = new()
+        {
+            { "res://Resource/Dialogues/GuardianDialogues/guardianDialoguesData.tres", "G:\\Localization\\guardianDialogues.json"},
+            {  "res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres", "G:\\Localization\\playerDialogues.json"}
+        };
         private enum State { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }
 
@@ -34,6 +42,17 @@
             SetEvents();
             ScreenResizeExtension.CenterWindow();
             ConfigureStateMachine();
+            // only for now
+            LoadDialoguesData();
+        }
+
+        private void LoadDialoguesData()
+        {
+            foreach (var dialogue in _dialoguesPath)
+            {
+                if (!FileAccess.FileExists(dialogue.Key))
+                    DialogueDataConverter.LoadDialogueData(dialogue.Value, dialogue.Key);
+            }
         }
 
         public override void _UnhandledKeyInput(InputEvent @event)
@@ -51,13 +70,14 @@
         private void SetEvents()
         {
             GetViewport().SizeChanged += OnWindowSizeChanged;
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             _loadGameButton.Pressed += LoadGamePressed;
             _newGameButton.Pressed += NewGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += QuitButtonPressed;
-
             _saveLoadMenu.ReturnPressed += ReturnPressed;
             _optionsMenu.ReturnPressed += ReturnPressed;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
         private void ConfigureStateMachine()

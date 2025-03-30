@@ -1,15 +1,13 @@
 ﻿namespace Playground.Script
 {
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Microsoft.Extensions.DependencyInjection;
-    using System.Collections.Generic;
-    using Microsoft.CodeAnalysis;
-    using System.Reflection;
-    using System.Linq;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using Godot;
-    using Playground.Components;
-    using Playground.Components.Interfaces;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.Extensions.DependencyInjection;
+    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class DiContainer : Node
     {
@@ -45,7 +43,7 @@
             }
         }
 
-        public static T GetService<T> ()
+        public static T? GetService<T>()
             where T : class
         {
             return ServiceProvider?.GetService<T>();
@@ -63,7 +61,6 @@
                 return instance;
             });
             provider.AddSingleton<RandomNumberGenerator>();
-            provider.AddTransient<IConditionsFactory, ConditionsFactory>();
             ServiceProvider = provider.BuildServiceProvider();
         }
 

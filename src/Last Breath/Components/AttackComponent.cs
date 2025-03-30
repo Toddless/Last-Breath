@@ -1,8 +1,8 @@
-namespace Playground
+namespace Playground.Components
 {
     using System;
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Enums;
 

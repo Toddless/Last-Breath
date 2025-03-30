@@ -1,8 +1,8 @@
-﻿namespace Playground
+﻿namespace Playground.Components
 {
     using System;
     using Godot;
-    using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
     public class HealthComponent : ComponentBase, IHealthComponent
@@ -85,7 +85,7 @@
         {
             var oldMaxHealth = MaxHealth;
             MaxHealth = CalculateValues.Invoke(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);
-            CurrentHealth = (CurrentHealth / oldMaxHealth) * MaxHealth;
+            CurrentHealth = CurrentHealth / oldMaxHealth * MaxHealth;
             if (CurrentHealth > MaxHealth)
                 CurrentHealth = MaxHealth;
         }

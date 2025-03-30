@@ -1,5 +1,6 @@
 ﻿namespace Playground.Components
 {
+    using Playground.Components.Interfaces;
     using Playground.Script.Attribute;
 
     // TODO: Rework

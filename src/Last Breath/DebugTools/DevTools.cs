@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Debug;
+    using Playground.Components;
     using Playground.Script;
 
     public partial class DevTools : Control
@@ -21,7 +21,7 @@
             _buttonsTabBar = root.GetNode<TabBar>("Buttons");
             _updatePropertiesBtn = _buttonsTabBar.GetNode<Button>(nameof(Button));
             FillDictionary();
-            SetPlayerVariables(_player);
+          //  SetPlayerVariables(_player);
         }
 
         private void FillDictionary()

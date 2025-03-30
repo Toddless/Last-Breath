@@ -1,7 +1,5 @@
 ﻿namespace Playground.Script.Attribute
 {
-    using Playground.Components;
-
     public class Dexterity : Attribute
     {
         private float _criticalStrikeChance = 0.01f;

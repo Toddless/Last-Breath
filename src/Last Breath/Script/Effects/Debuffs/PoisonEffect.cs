@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Passives.Debuffs
+﻿namespace Playground.Script.Effects.Debuffs
 {
     public class PoisonEffect : AbstractEffect
     {

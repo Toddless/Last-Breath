@@ -21,15 +21,5 @@
         {
 
         }
-
-        protected T GetUIElement<T>(TabBar parent, string containerName, string elementType)
-            where T : class
-        {
-            return parent.GetNode<MarginContainer>(nameof(MarginContainer))
-                .GetNode<ScrollContainer>(nameof(ScrollContainer))
-                .GetNode<VBoxContainer>(nameof(VBoxContainer))
-                .GetNode<HBoxContainer>(containerName)
-                .GetNode<T>(elementType);
-        }
     }
 }

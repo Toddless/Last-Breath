@@ -1,7 +1,7 @@
-﻿using Playground.Script.Effects.Interfaces;
-
-namespace Playground.Components.Interfaces
+﻿namespace Playground.Components.Interfaces
 {
+    using Playground.Script.Effects.Interfaces;
+
     public interface IAbilityDecision
     {
         IAbility Ability { get; set; }

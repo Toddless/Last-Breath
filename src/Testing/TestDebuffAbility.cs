@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Passives
+﻿namespace PlaygroundTest
 {
     //using Playground.Script.Passives.Attacks;
     //using Playground.Script.Passives.Debuffs;

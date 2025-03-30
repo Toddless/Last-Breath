@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Passives
+﻿namespace Playground.Script.Effects
 {
     using System;
     using System.Collections.Generic;

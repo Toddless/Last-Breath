@@ -1,12 +1,13 @@
 ﻿namespace Playground.Script.UI
 {
+    using System;
     using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.Helpers.Extensions;
 
     public class VideoSettings : ISettings
     {
-        private OptionButton _windowModeOptions, _resolutionOptions;
+        private readonly OptionButton _windowModeOptions, _resolutionOptions;
         private const string InitialResolution = "1366 x 768";
         private const string FullHD = "1920 x 1080";
         private const string QuadHD = "2560 x 1440";
@@ -21,8 +22,10 @@
             new(2560, 1440)
         ];
 
-        public VideoSettings(OptionButton windowMode, OptionButton resolution)
+        public VideoSettings(OptionButton? windowMode, OptionButton? resolution)
         {
+            ArgumentNullException.ThrowIfNull(windowMode);
+            ArgumentNullException.ThrowIfNull(resolution);
             _windowModeOptions = windowMode;
             _resolutionOptions = resolution;
             _windowModeOptions.ItemSelected += WindowModeItemSelected;
@@ -90,6 +93,5 @@
         }
 
         private void SetBorderlessFlag(bool flag) => DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Borderless, flag);
-
     }
 }

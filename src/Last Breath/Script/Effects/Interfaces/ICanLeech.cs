@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Passives.Interfaces
+﻿namespace Playground.Script.Effects.Interfaces
 {
     public interface ICanLeech
-    {       
+    {
     }
 }

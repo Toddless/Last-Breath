@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Scenes
+﻿namespace Playground.Script.ScenesHandlers
 {
     public class BattleContext(ICharacter opponent, ICharacter self) : IBattleContext
     {

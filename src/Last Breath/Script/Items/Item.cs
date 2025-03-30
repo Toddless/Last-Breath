@@ -1,13 +1,14 @@
 ﻿namespace Playground.Script.Items
 {
-    using Godot;
-    using Playground.Script.Enums;
     using System;
+    using Godot;
+    using Playground.Localization;
+    using Playground.Script.Enums;
 
     [GlobalClass]
     public partial class Item : Resource
     {
-        #region Export fields
+        private string? _id;
         [Export]
         public string? ItemResourcePath;
         [Export]
@@ -17,16 +18,24 @@
         [Export]
         public Texture2D? Icon;
         [Export]
-        public PackedScene? ItemScene;
-        [Export]
         public GlobalRarity Rarity;
         [Export]
         public int Quantity;
-        #endregion
+        [Export]
+        public ItemType Type;
+        [Export]
+        public LocalizedString Description = new();
 
-        public Guid Guid { get; private set; } = Guid.NewGuid();
+        public string Id => _id ??= SetId();
 
-        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity)
+        private string SetId()
+        {
+            // TODO: Later item name is LocalizedString, i need to take en name
+            if(string.IsNullOrEmpty(ItemName)) return string.Empty;
+            return ItemName.Replace(' ', '_');
+        }
+
+        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity, string descriptionKey)
         {
             ItemResourcePath = resourcePath;
             ItemName = itemName;
@@ -34,34 +43,11 @@
             Icon = icon;
             Rarity = rarity;
             Quantity = quantity;
+            Description.Key = descriptionKey;
         }
 
         public Item()
         {
-        }
-
-        public void Add(int amount)
-        {
-            if (amount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(amount), "Amount to add must be greater than zero.");
-            }
-            Quantity += amount;
-        }
-
-        public bool Remove(int amount)
-        {
-            if (amount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(amount), "Amount to remove must be greater than zero.");
-            }
-            if (Quantity < amount)
-            {
-                return false;
-            }
-
-            Quantity -= amount;
-            return true;
         }
 
         public bool Equals(Item other)
