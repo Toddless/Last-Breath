@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using Godot;
+    using Playground.Resource.Quests;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
@@ -122,11 +123,24 @@
                 player.HealthComponent!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
             }
             _questManager!.QuestAccepted += _questsUI!.AddQuests;
+            _questManager.QuestCompleted += OnQuestCompleted;
             _mainUI!.Character += ShowCharacter;
             _mainUI!.Inventory += ShowPlayerInventory;
             _mainUI!.Quests += ShowQuests;
             _mainUI!.Map += ShowMap;
             _inventoryUI!.TakeAll += OnInventoryTakeAll;
+        }
+
+        private void OnQuestCompleted(Quest quest)
+        {
+            _questsUI!.RemoveQuest(quest);
+            RemoveQuestItems(quest);
+        }
+
+        private void RemoveQuestItems(Quest quest)
+        {
+            if (quest.QuestObjective == null || quest.QuestObjective.QuestObjectiveType != ObjectiveType.ItemCollection) return;
+            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId);
         }
 
         private void OnInventoryTakeAll()

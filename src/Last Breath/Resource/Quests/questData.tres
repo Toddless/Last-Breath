@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="QuestData" load_steps=25 format=3 uid="uid://eu1ds1de1dl3"]
+[gd_resource type="Resource" script_class="QuestData" load_steps=26 format=3 uid="uid://eu1ds1de1dl3"]
 
 [ext_resource type="Script" uid="uid://c3hx7deqyukqj" path="res://Script/QuestSystem/QuestData.cs" id="1_3dxwi"]
 [ext_resource type="Script" uid="uid://dsxdxi17tfcv7" path="res://Script/QuestSystem/Quest.cs" id="1_6dcs4"]
@@ -41,6 +41,13 @@ script = ExtResource("1_fdmv3")
 Key = "Side_Battle_Skills_Name"
 metadata/_custom_type_script = "uid://uct5wx6u2cu4"
 
+[sub_resource type="Resource" id="Resource_xj0x0"]
+script = ExtResource("4_t15wk")
+QuestObjectiveType = 0
+TargetId = ""
+RequiredAmount = 1
+metadata/_custom_type_script = "uid://cb8gyk1c3kei8"
+
 [sub_resource type="Resource" id="Resource_1mtw7"]
 script = ExtResource("1_6dcs4")
 Id = "Side_Battle_Skills"
@@ -54,6 +61,7 @@ NpcId = ""
 DialogueIdOnComplete = ""
 Type = 2
 IsNpcNeededForQuestCompletion = false
+QuestObjective = SubResource("Resource_xj0x0")
 metadata/_custom_type_script = "uid://dsxdxi17tfcv7"
 
 [sub_resource type="Resource" id="Resource_3ke73"]
@@ -143,7 +151,7 @@ metadata/_custom_type_script = "uid://uct5wx6u2cu4"
 
 [sub_resource type="Resource" id="Resource_fwuc8"]
 script = ExtResource("4_t15wk")
-QuestType = 1
+QuestObjectiveType = 1
 TargetId = "List_of_Dead"
 RequiredAmount = 1
 metadata/_custom_type_script = "uid://cb8gyk1c3kei8"

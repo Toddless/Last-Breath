@@ -10,8 +10,6 @@
 
         public bool TryGetElement(string id, out T? element) => Elements.TryGetValue(id, out element);
 
-        public virtual T? GetValue(string id) => TryGetElement(id, out T? element) ? element : null;
-
         public virtual List<string> GetAllElements(string id) => [];
 
         public virtual void AddNewElement(T element) { }

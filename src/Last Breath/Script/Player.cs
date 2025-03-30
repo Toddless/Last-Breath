@@ -6,6 +6,7 @@
     using Godot;
     using Playground.Components;
     using Playground.Localization;
+    using Playground.Resource.Quests;
     using Playground.Script;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Helpers;
@@ -128,20 +129,24 @@
             ItemCollected?.Invoke(item.Id);
         }
 
+        public void OnEnemyKilled(string id) => EnemyKilled?.Invoke(id);
+
         public void OnDialogueCompleted(string id)
         {
             Progress.OnDialogueCompleted(id);
             DialogueCompleted?.Invoke(id);
         }
 
-        public void OnQuestCompleted(string id)
+        public void OnQuestCompleted(Quest quest)
         {
-            Progress?.OnQuestCompleted(id);
-            QuestCompleted?.Invoke(id);
+            Progress?.OnQuestCompleted(quest.Id);
+            AcceptReward(quest.GetReward());
+            QuestCompleted?.Invoke(quest.Id);
         }
 
-        public void AcceptReward(Reward reward)
+        private void AcceptReward(Reward? reward)
         {
+            if(reward == null) return;
             if (reward.Items.Count > 0)
             {
                 foreach (var item in reward.Items)
@@ -151,7 +156,6 @@
             }
             _exp += reward.Exp;
             _gold += reward.Gold;
-            reward.Free();
         }
 
         public override void _PhysicsProcess(double delta)

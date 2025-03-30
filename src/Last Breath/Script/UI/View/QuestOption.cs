@@ -10,12 +10,14 @@
     {
         private Quest? _quest;
         public event Action<string, Quest?>? QuestDetails;
+        [Signal]
+        public delegate void QuestSelectedEventHandler();
 
         public void Bind(Quest quest)
         {
             _quest = quest;
             this.Text = quest.NameKey?.Text;
-            this.Pressed += QuestSelected;
+            this.Pressed += QuestPressed;
             _quest.StatusChanged += QuestStatusChanged;
         }
 
@@ -36,7 +38,7 @@
                 _quest.StatusChanged -= QuestStatusChanged;
                 _quest = null;
             }
-            this.Pressed -= QuestSelected;
+            this.Pressed -= QuestPressed;
             QuestDetails = null;
         }
 
@@ -61,6 +63,11 @@
             }
         }
 
-        private void QuestSelected() => QuestDetails?.Invoke(_quest?.DescriptionKey?.Text ?? string.Empty, _quest);
+        private void QuestPressed()
+        {
+            // different description depends on quest status??
+            QuestDetails?.Invoke(_quest?.DescriptionKey?.Text ?? string.Empty, _quest);
+            EmitSignal(SignalName.QuestSelected);
+        }
     }
 }

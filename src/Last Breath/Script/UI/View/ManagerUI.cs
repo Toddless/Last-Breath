@@ -1,7 +1,6 @@
 ﻿namespace Playground.Script.UI.View
 {
     using System;
-    using Godot;
     using Playground.Script.NPC;
     using Playground.Script.UI.Layers;
     using Stateless;
@@ -61,13 +60,11 @@
                 {
                     _battleLayer.SetProcessUnhandledInput(true);
                     _battleLayer.Show();
-                    GD.Print("ManagerUI enter battle state");
                 })
                 .OnExit(() =>
                 {
                     _battleLayer.SetProcessUnhandledInput(false);
                     _battleLayer.Hide();
-                    GD.Print("ManagerUI exit battle state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
 
@@ -76,13 +73,11 @@
                 {
                     _pauseLayer.SetProcessUnhandledKeyInput(true);
                     _pauseLayer.Show();
-                    GD.Print("ManagerUI enter PauseUI state");
                 })
                 .OnExit(() =>
                 {
                     _pauseLayer.SetProcessUnhandledKeyInput(false);
                     _pauseLayer?.Hide();
-                    GD.Print("ManagerUI exit PauseUI state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
 
@@ -91,13 +86,11 @@
                 {
                     _dialogLayer.SetProcessUnhandledInput(true);
                     _dialogLayer.Show();
-                    GD.Print("ManagerUI enter DialogUI state");
                 })
                 .OnExit(() =>
                 {
                     _dialogLayer.SetProcessUnhandledInput(false);
                     _dialogLayer?.Hide();
-                    GD.Print("ManagerUI exit DialogUI state");
                 })
                 .Permit(Trigger.ShowMainUI, State.MainUI);
         }

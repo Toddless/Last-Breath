@@ -22,6 +22,12 @@
         public void EndDialogue()
         {
             _dialogueWindow.Clear();
+            _dialogueWindow.ShowMainButtons();
+            if (_speakingNPC.FirstTimeMeetPlayer)
+            {
+                _speakingNPC.FirstTimeMeetPlayer = false;
+                _speakingNPC.UpdateFirstDialogueNode();
+            }
         }
     }
 }

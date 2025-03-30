@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://cqr8ohljxh8kt"]
+[gd_scene load_steps=7 format=3 uid="uid://cqr8ohljxh8kt"]
 
 [ext_resource type="Script" uid="uid://bj7o3b0blw1so" path="res://Script/UI/View/QuestsMenu.cs" id="1_l0i88"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_bax32"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="2_upioa"]
 [ext_resource type="LabelSettings" uid="uid://bvl3lfttlwy3" path="res://Fonts/HeadingsSettings.tres" id="3_ncypl"]
 [ext_resource type="LabelSettings" uid="uid://b23ryeqb5g6qo" path="res://Fonts/QuestsMenu.tres" id="4_b800w"]
+[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Fonts/BaseFonts20Pix.tres" id="5_c7ebf"]
 
 [node name="QuestsMenu" type="Control"]
 clip_contents = true
@@ -162,8 +163,12 @@ theme_override_fonts/normal_font = ExtResource("2_bax32")
 theme_override_font_sizes/normal_font_size = 24
 fit_content = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
+[node name="QuestStatus" type="HBoxContainer" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="Status" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/QuestStatus"]
+layout_mode = 2
+label_settings = ExtResource("5_c7ebf")
 
 [node name="Label" type="Label" parent="HBoxContainer/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2

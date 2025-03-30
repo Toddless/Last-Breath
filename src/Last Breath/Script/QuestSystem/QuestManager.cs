@@ -16,7 +16,7 @@
 
         public static QuestManager? Instance { get; private set; }
 
-        public event Action<Quest>? QuestAccepted;
+        public event Action<Quest>? QuestAccepted, QuestCompleted;
 
         public bool QuestCanBeAccepted(Quest quest)
         {
@@ -51,14 +51,18 @@
         {
             _activeQuests.Remove(quest);
             _completedQuests.Add(quest);
-            quest.QuestStatus = QuestStatus.Completed;
+            _player?.OnQuestCompleted(quest);
+            QuestCompleted?.Invoke(quest);
+
         }
+
         public void OnQuestCancelled(Quest quest)
         {
             _activeQuests.Remove(quest);
             _cancelledQuests.Add(quest);
             quest.QuestStatus = QuestStatus.Canceled;
         }
+
         public void OnQuestAccepted(Quest quest)
         {
             _activeQuests.Add(quest);
@@ -81,6 +85,8 @@
             _player.LocationVisited += OnLocationVisited;
         }
 
+        private void SetStatusCompleted(Quest quest) => quest.QuestStatus = QuestStatus.Completed;
+
         private void OnLocationVisited(string obj) => UpdateQuestObjectives(ObjectiveType.LocationVisit, obj);
 
         private void OnEnemyKilled(string obj) => UpdateQuestObjectives(ObjectiveType.EnemyKilling, obj);
@@ -92,7 +98,7 @@
             foreach (var quest in _activeQuests)
             {
                 if (quest.QuestObjective == null) continue;
-                if (quest.QuestObjective.QuestType == type && quest.QuestObjective.TargetId == obj)
+                if (quest.QuestObjective.QuestObjectiveType == type && quest.QuestObjective.TargetId == obj)
                 {
                     quest.QuestObjective.CurrentAmount++;
                     CheckQuestCompletion(quest);
@@ -104,7 +110,7 @@
         {
             if (quest.QuestObjective!.IsCompleted)
             {
-                OnQuestCompleted(quest);
+                SetStatusCompleted(quest);
             }
         }
     }

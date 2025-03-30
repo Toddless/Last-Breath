@@ -1,16 +1,17 @@
 ﻿namespace Playground.Script.UI.View
 {
     using Godot;
+    using Godot.Collections;
     using Playground.Script.Helpers;
 
     public partial class DialogueWindow : Control
     {
-        private VBoxContainer? _options, _buttonsContainer;
+        private VBoxContainer? _options, _buttonsContainer, _questsContainer;
         private RichTextLabel? _text;
         private TextureRect? _playerIcon;
         private Label? _questAdded;
         private Control? _questOptions;
-        private Button? _skip, _moreSpeed, _lessSpeed, _default, _quests, _quit;
+        private Button? _skip, _moreSpeed, _lessSpeed, _default, _quests, _quit, _back, _accept, _completedQuests, _completeQuest;
         private double _time = 0.015;
         private bool _canProceed = false;
 
@@ -22,6 +23,14 @@
         public delegate void QuestsPressedEventHandler();
         [Signal]
         public delegate void CloseDialogueWindowEventHandler();
+        [Signal]
+        public delegate void AcceptPressedEventHandler();
+        [Signal]
+        public delegate void BackPressedEventHandler();
+        [Signal]
+        public delegate void CompletedQuestsPressedEventHandler();
+        [Signal]
+        public delegate void QuestCompletedEventHandler();
 
         public override void _Ready()
         {
@@ -35,8 +44,13 @@
             _questAdded = (Label?)NodeFinder.FindBFSCached(this, "Label");
 
             _buttonsContainer = (VBoxContainer?)NodeFinder.FindBFSCached(this, "ButtonsContainer");
-            _quests = (Button?)NodeFinder.FindBFSCached(this, "Quests");
+            _quests = (Button?)NodeFinder.FindBFSCached(this, "QuestsBtn");
             _quit = (Button?)NodeFinder.FindBFSCached(this, "Quit");
+            _questsContainer = (VBoxContainer?)NodeFinder.FindBFSCached(this, "Quests");
+            _back = (Button?)NodeFinder.FindBFSCached(this, "Back");
+            _accept = (Button?)NodeFinder.FindBFSCached(this, "Accept");
+            _completedQuests = (Button?)NodeFinder.FindBFSCached(this, "CompletedQuests");
+            _completeQuest = (Button?)NodeFinder.FindBFSCached(this, "CompleteQuest");
 
             _questOptions = (Control?)NodeFinder.FindBFSCached(this, "QuestOptionsElement");
             _questAdded?.Hide();
@@ -55,9 +69,19 @@
 
         public void SetAvatar(Texture2D icon) => _playerIcon!.Texture = icon;
         public void SetOptions(Label option) => _options?.AddChild(option);
-        public void ShowDialogueButtons() => _buttonsContainer?.Show();
-        public void HideDialogueButtons() => _buttonsContainer?.Hide();
 
+        public void ShowMainButtons() => _buttonsContainer?.Show();
+        public void HideMainButtons() => _buttonsContainer?.Hide();
+        public void ShowQuests() => _questsContainer?.Show();
+        public void HideQuests() => _questsContainer?.Hide();
+        public void ShowBackButton() => _back?.Show();
+        public void HideBackButton() => _back?.Hide();
+        public void ShowAcceptButton() => _accept?.Show();
+        public void HideAcceptButton() => _accept?.Hide();
+        public void ShowCompleteQuestButton() => _completeQuest?.Show();
+        public void HideCompleteQuestButton() => _completeQuest?.Hide();
+
+        public Array<Node> GetQuests() => _questsContainer?.GetChildren() ?? [];
         public async void UpdateText(string text)
         {
             _options?.Hide();
@@ -73,11 +97,7 @@
 
         public void AddOption(DialogueUIOption option) => _options?.AddChild(option);
 
-        public void AddQuestOption(NPCsQuests nPCsQuests)
-        {
-            nPCsQuests.ClosePressed += OnClosedPressed;
-            _questOptions?.AddChild(nPCsQuests);
-        }
+        public void AddQuest(QuestOption quest) => _questsContainer?.AddChild(quest);
 
         public void Clear()
         {
@@ -88,14 +108,9 @@
             }
         }
 
-        public void CloseWindow() => EmitSignal(SignalName.CloseDialogueWindow);
+        public void ClearText() => _text?.Clear();
 
-        private void OnClosedPressed()
-        {
-            var quests = _questOptions?.GetChild<NPCsQuests>(0);
-            if (quests != null) quests.ClosePressed -= OnClosedPressed;
-            _buttonsContainer?.Show();
-        }
+        public void CloseWindow() => EmitSignal(SignalName.CloseDialogueWindow);
 
         private void SetEvents()
         {
@@ -105,6 +120,10 @@
             _skip!.Pressed += () => _time = 0;
             _quit!.Pressed += () => EmitSignal(SignalName.QuitPressed);
             _quests!.Pressed += () => EmitSignal(SignalName.QuestsPressed);
+            _accept!.Pressed += () => EmitSignal(SignalName.AcceptPressed);
+            _back!.Pressed += () => EmitSignal(SignalName.BackPressed);
+            _completedQuests!.Pressed += () => EmitSignal(SignalName.CompletedQuestsPressed);
+            _completeQuest!.Pressed += () => EmitSignal(SignalName.QuestCompleted);
         }
 
         private void OnTextClicked(InputEvent @event)

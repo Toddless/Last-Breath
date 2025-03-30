@@ -134,16 +134,47 @@ size_flags_horizontal = 3
 [node name="ButtonsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Quests" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+[node name="QuestsBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 20
-text = "Quests"
+text = "I need a job."
+
+[node name="CompletedQuests" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "About your quest..."
 
 [node name="Quit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 20
 text = "Quit"
+
+[node name="Quests" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Accept" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Accept"
+
+[node name="CompleteQuest" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Complete"
+
+[node name="Back" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Back
+"
 
 [connection signal="gui_input" from="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer/Text" to="." method="OnTextClicked"]

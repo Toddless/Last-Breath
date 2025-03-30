@@ -6,7 +6,7 @@
     public partial class QuestObjective : Resource
     {
         [Export]
-        public ObjectiveType QuestType { get; set; }
+        public ObjectiveType QuestObjectiveType { get; set; }
         [Export]
         public string TargetId { get; set; } = string.Empty;
         [Export]

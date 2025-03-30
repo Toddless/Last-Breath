@@ -53,6 +53,8 @@
             }
         }
 
+        public Reward? GetReward() => RewardTable.Instance.TryGetElement(RewardId, out Reward? element) ? element : null;
+
         public override int GetHashCode() => Id?.GetHashCode() ?? 0;
 
         public override bool Equals(object? obj) => obj is Quest q && Id == q.Id;

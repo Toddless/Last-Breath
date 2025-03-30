@@ -30,7 +30,7 @@
                 return;
             }
 
-            if(slot.Item != null)
+            if (slot.Item != null)
             {
                 slot.AddItem(item);
             }
@@ -40,31 +40,31 @@
             }
         }
 
-        public InventorySlot? GetSlotToAdd(Item item)
-        {
-            return _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Id == item.Id && itemSlot.Item.MaxStackSize > item.Quantity));
-        }
+        public InventorySlot? GetSlotToAdd(Item item) => _slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Id == item.Id && itemSlot.Item.MaxStackSize > item.Quantity));
 
-        public InventorySlot? GetSlotToRemove(Item? item)
-        {
-            return _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == item?.Id);
-        }
+        public InventorySlot? GetSlotToRemove(string itemId) => _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == itemId);
 
-        public void RemoveItem(Item item)
+        public void RemoveItem(string itemId)
         {
-            var slot = GetSlotToRemove(item);
+            var slot = GetSlotToRemove(itemId);
 
             if (slot == null)
             {
+                // TODO: Log
+                return;
+            }
+            var item = GetItem(itemId);
+            if (item == null)
+            {
+                //TODO: Log
                 return;
             }
             slot.RemoveItem(item);
         }
 
-        public int GetNumberOfItems(Item item)
-        {
-            return _slots.FindAll(slot => slot.Item != null && slot.Item.Id == item.Id).Count;
-        }
+        public Item? GetItem(string id) => _slots.FirstOrDefault(x => x.Item != null && x.Item.Id == id)?.Item;
+
+        public int GetNumberOfItems(Item item) => _slots.FindAll(slot => slot.Item != null && slot.Item.Id == item.Id).Count;
 
         public List<Item?> GiveAllItems() => _slots.Where(x => x.Item != null).Select(x => x.Item).ToList();
 
