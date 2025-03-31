@@ -9,17 +9,8 @@
     {
         private enum Results { EnemyWon, PlayerWon, PlayerRunAway }
 
-        public event Action<float>? PlayerCurrentHealthChanged;
-        public event Action<float>? EnemyCurrentHealthChanged;
-
-        public event Action<float>? PlayerMaxHealthChanged;
-        public event Action<float>? EnemyMaxHealthChanged;
-
-        public event Action<IEffect>? PlayerEffectAdded;
-        public event Action<IEffect>? EnemyEffectAdded;
-
-        public event Action<IEffect>? PlayerEffectRemoved;
-        public event Action<IEffect>? EnemyEffectRemoved;
+        public event Action<float>? PlayerMaxHealthChanged, PlayerCurrentHealthChanged, EnemyMaxHealthChanged, EnemyCurrentHealthChanged;
+        public event Action<IEffect>? PlayerEffectAdded, PlayerEffectRemoved, EnemyEffectRemoved, EnemyEffectAdded;
 
         private float _chanceToEscape = 0.5f;
         private RandomNumberGenerator _rnd = new();

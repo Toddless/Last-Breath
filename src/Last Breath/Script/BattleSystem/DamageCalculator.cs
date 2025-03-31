@@ -2,6 +2,10 @@
 {
     public class DamageCalculator
     {
+        public static float GetBaseDamage()
+        {
 
+            return 0;
+        }
     }
 }
