@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Helpers
 {
-    public class ObservableObject
+    public class ObservableProperty
     {
         protected bool SetProperty<T>(ref T field, T value)
         {

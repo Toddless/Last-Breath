@@ -1,11 +1,9 @@
 ﻿namespace Playground.Script.BattleSystem
 {
+    using Godot;
+
     public class DamageCalculator
     {
-        public static float GetBaseDamage()
-        {
-
-            return 0;
-        }
+        private static readonly RandomNumberGenerator s_rnd = new();
     }
 }

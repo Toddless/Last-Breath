@@ -1,33 +1,40 @@
 ﻿namespace Playground.Script.Attribute
 {
-    public class Dexterity : Attribute
+    using System.Collections.Generic;
+    using Playground.Components;
+    using Playground.Script.Enums;
+
+    public class Dexterity(ModifierManager manager) : AttributeBase(GetEffects(), manager)
     {
-        private float _criticalStrikeChance = 0.01f;
-        private float _additionalAttackChance = 0.01f;
-        private float _dodgeChance = 0.01f;
-
-        public float CriticalStrikeChance
+        private static IEnumerable<AttributeEffect> GetEffects()
         {
-            get => _criticalStrikeChance;
-            set => _criticalStrikeChance = value;
+            yield return new AttributeEffect
+               (Parameter.CriticalStrikeChance,
+               ModifierType.Additive,
+               0.01f,
+               priority: ModifierPriorities.BaseParameters
+               );
+
+            yield return new AttributeEffect
+              (Parameter.CriticalStrikeDamage,
+              ModifierType.Additive,
+              0.5f,
+              priority: ModifierPriorities.BaseParameters
+              );
+
+            yield return new AttributeEffect
+              (Parameter.AdditionalStrikeChance,
+              ModifierType.Additive,
+              0.02f,
+              priority: ModifierPriorities.BaseParameters
+              );
+
+            yield return new AttributeEffect
+              (Parameter.Dodge,
+              ModifierType.Additive,
+              0.01f,
+              priority: ModifierPriorities.BaseParameters
+              );
         }
-
-        public float AdditionalAttackChance
-        {
-            get => _additionalAttackChance;
-            set => _additionalAttackChance = value;
-        }
-
-        public float DodgeChance
-        {
-            get => _dodgeChance;
-            set => _dodgeChance = value;
-        }
-
-        public float TotalCriticalStrikeChance() => _criticalStrikeChance * Total;
-
-        public float TotalAdditionalAttackChance() => _additionalAttackChance * Total;
-
-        public float TotalDodgeChance() => _dodgeChance * Total;
     }
 }

@@ -42,11 +42,11 @@ namespace Playground
 
         public void InitialSetup(Player player, BaseEnemy enemy)
         {
-            _playerHealthBar.MaxValue = player.HealthComponent.MaxHealth;
-            _playerHealthBar.Value = player.HealthComponent.CurrentHealth;
+            _playerHealthBar.MaxValue = player.PlayerHealth.MaxHealth;
+            _playerHealthBar.Value = player.PlayerHealth.CurrentHealth;
 
-            _enemyHealthBar.MaxValue = enemy.HealthComponent.MaxHealth;
-            _enemyHealthBar.Value = enemy.HealthComponent.CurrentHealth;
+            _enemyHealthBar.MaxValue = enemy.EnemyHealth.MaxHealth;
+            _enemyHealthBar.Value = enemy.EnemyHealth.CurrentHealth;
             player.Position = _panelPlayer.GlobalPosition;
             enemy.Position = _panelEnemy.GlobalPosition;
         }

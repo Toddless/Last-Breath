@@ -2,92 +2,61 @@
 {
     using System;
     using Godot;
-    using Playground.Components.Interfaces;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
-    public class HealthComponent : ComponentBase, IHealthComponent
+    public class HealthComponent : ObservableProperty
     {
-        private readonly float _baseHealth = 100;
-        private float _increaseHealth = 1;
-        private float _additionalHealth;
+        private const float BaseHealth = 100;
         private float _currentHealth;
         private float _maxHealth;
+        private readonly ModifierManager _modifierManager;
 
         public event Action<float>? CurrentHealthChanged, MaxHealthChanged;
 
         public float CurrentHealth
         {
-            get
-            {
-                if (_currentHealth <= 0)
-                {
-                    _currentHealth = 0;
-                    return _currentHealth;
-                }
-                return _currentHealth;
-            }
-            set
-            {
-                if (SetProperty(ref _currentHealth, Math.Min(value, _maxHealth)))
-                    CurrentHealthChanged?.Invoke(value);
-            }
-        }
-
-        [Changeable]
-        public float IncreaseHealth
-        {
-            get => _increaseHealth;
-            set
-            {
-                if (SetProperty(ref _increaseHealth, value))
-                {
-                    UpdateProperties();
-                }
-            }
-        }
-
-        [Changeable]
-        public float AdditionalHealth
-        {
-            get => _additionalHealth;
-            set
-            {
-                if (SetProperty(ref _additionalHealth, value))
-                {
-                    UpdateProperties();
-                }
-            }
-        }
-
-        public float MaxHealth
-        {
-            get => Mathf.RoundToInt(_maxHealth);
+            get => MathF.Max(0, _currentHealth);
             private set
             {
-                if (SetProperty(ref _maxHealth, value))
-                    MaxHealthChanged?.Invoke(value);
+                if (SetProperty(ref _currentHealth, value))
+                    CurrentHealthChanged?.Invoke(_currentHealth);
             }
         }
 
-        public HealthComponent(Func<float, float, float, Parameter, float> calculateValue) : base(calculateValue)
+        public float MaxHealth => Mathf.RoundToInt(_maxHealth);
+
+        public HealthComponent(ModifierManager modifierManager)
         {
-            UpdateProperties();
-            RefreshHealth();
+            _modifierManager = modifierManager;
+            _modifierManager.ParameterModifiersChanged += OnParameterModifiersChanges;
+            UpdateMaxHealth();
+            _currentHealth = _maxHealth;
+
         }
 
-        public void RefreshHealth() => CurrentHealth = MaxHealth;
-
+        // TODO: action or signal for hp == 0
         public void TakeDamage(float damage) => CurrentHealth = Math.Max(0, CurrentHealth - damage);
 
         public void Heal(float amount) => CurrentHealth = Math.Min(MaxHealth, CurrentHealth + amount);
 
-        public override void UpdateProperties()
+        private void OnParameterModifiersChanges(Parameter parameter)
         {
-            var oldMaxHealth = MaxHealth;
-            MaxHealth = CalculateValues.Invoke(_baseHealth, AdditionalHealth, IncreaseHealth, Parameter.Health);
-            CurrentHealth = CurrentHealth / oldMaxHealth * MaxHealth;
-            if (CurrentHealth > MaxHealth)
-                CurrentHealth = MaxHealth;
+            if (parameter != Parameter.MaxHealth)
+                return;
+            UpdateMaxHealth();
+        }
+
+        private void UpdateMaxHealth()
+        {
+            var newMaxHealth = _modifierManager.CalculateFloatValue(BaseHealth, Parameter.MaxHealth);
+            if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
+            {
+                _maxHealth = newMaxHealth;
+                MaxHealthChanged?.Invoke(_maxHealth);
+                if (CurrentHealth > MaxHealth)
+                    CurrentHealth = MaxHealth;
+            }
         }
     }
 }

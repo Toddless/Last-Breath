@@ -1,44 +1,33 @@
 ﻿namespace Playground.Script.Attribute
 {
-    public class Strength : Attribute
+    using System.Collections.Generic;
+    using Playground.Components;
+    using Playground.Script.Enums;
+
+    public class Strength(ModifierManager manager) : AttributeBase(GetEffects(),manager)
     {
-        private float _damageIncrease = 0.01f;
-        private float _healthIncrease = 0.1f;
-        private float _defenceIncrease = 0.01f;
-
-
-        public float DamageIncrease
+        private static IEnumerable<AttributeEffect> GetEffects()
         {
-            get => _damageIncrease;
-            set
-            {
-                _damageIncrease = value;
-            }
+            yield return new AttributeEffect
+              (Parameter.StrikeDamage,
+              ModifierType.Additive,
+              15f,
+              priority: ModifierPriorities.BaseParameters
+              );
+
+            yield return new AttributeEffect
+              (Parameter.Armor,
+              ModifierType.Additive,
+              100f,
+              priority: ModifierPriorities.BaseParameters
+              );
+
+            yield return new AttributeEffect
+              (Parameter.MaxHealth,
+              ModifierType.Additive,
+              10f,
+              priority: ModifierPriorities.BaseParameters
+              );
         }
-
-        public float HealthIncrease
-        {
-            get => _healthIncrease;
-            set
-            {
-                _healthIncrease = value;
-            }
-        }
-
-        public float DefenceIncrease
-        {
-            get => _defenceIncrease;
-            set
-            {
-                _defenceIncrease = value;
-            }
-        }
-
-        public float TotalDamageIncrese() => _damageIncrease * Total;
-
-        public float TotalHealthIncrese() => _healthIncrease * Total + 1;
-
-
-        public float TotalDefenceIncrease() => _defenceIncrease * Total;
     }
 }

@@ -2,16 +2,17 @@
 {
     public enum Parameter
     {
-        None = 0,
-        StrikeDamage,
+        StrikeDamage = 0,
         CriticalStrikeChance,
         CriticalStrikeDamage,
         AdditionalStrikeChance,
-        Health,
+        MaxHealth,
         Dexterity,
         Strength,
         Intelligence,
         Armor,
         Dodge,
+        EnergyBarrier,
+        SpellDamage
     }
 }

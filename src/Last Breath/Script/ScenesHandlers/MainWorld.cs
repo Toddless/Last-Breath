@@ -107,7 +107,7 @@ namespace Playground
                 if (enemy != null)
                 {
                     _isBattleActive = true;
-                    Fight = new BattleContext(enemy, GameManager.Instance.Player!);
+                  //  Fight = new BattleContext(enemy, GameManager.Instance.Player!);
                 }
             }
         }

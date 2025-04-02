@@ -8,18 +8,17 @@
     public class PlayerTest : ICharacter
     {
         private HealthComponent? _healthComponent;
-        private AttackComponent? _attackComponent;
+        private DamageComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _effects;
         private List<IAbility> _abilities;
-        private EffectManager _effectManager;
 
-        public HealthComponent? HealthComponent
+        public HealthComponent? EnemyHealth
         {
             get => _healthComponent;
             set => _healthComponent = value;
         }
-        public AttackComponent? AttackComponent
+        public DamageComponent? EnemyDamage
         {
             get => _attackComponent;
             set => _attackComponent = value;
@@ -40,11 +39,6 @@
         {
             get => _abilities;
         }
-
-        public EffectManager EffectManager
-        {
-            get => _effectManager;
-        }
         // Only for test class
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. 
         public PlayerTest()
@@ -52,14 +46,6 @@
         {
             Effects = [];
             AppliedAbilities ??= [];
-            _effectManager = new(Effects);
-            HealthComponent = new(_effectManager.CalculateValues);
-            AttackComponent = new(_effectManager.CalculateValues);
-            AppliedAbilities.CollectionChanged += _effectManager.OnChangeAbility;
-            _effectManager.TakeDamage += HealthComponent.TakeDamage;
-            _effectManager.Heal += HealthComponent.Heal;
-            _effectManager.UpdateProperties += HealthComponent.UpdateProperties;
-            _effectManager.UpdateProperties += AttackComponent.UpdateProperties;
         }
     }
 }

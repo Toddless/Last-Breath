@@ -7,6 +7,8 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Attribute;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
@@ -18,15 +20,14 @@ namespace Playground
     public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
     {
         #region Components
-        private AttributeComponent? _attribute;
-        private HealthComponent? _health;
-        private AttackComponent? _attack;
+        private readonly AttributeComponent _enemyAttribute = new();
+        private HealthComponent? _enemyHealth;
+        private DamageComponent? _enemyDamage;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false;
         private ObservableCollection<IEffect>? _effects;
         private ObservableCollection<IAbility>? _appliedAbilities = [];
-        private EffectManager? _effectManager;
         private IBasedOnRarityLootTable? _lootTable;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
@@ -43,6 +44,7 @@ namespace Playground
         private int _level;
         private string? _enemyId;
         private EnemyType _enemyType;
+        private readonly ModifierManager _modifierManager = new();
 
         [Signal]
         public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
@@ -80,22 +82,21 @@ namespace Playground
             get => _area;
         }
 
-        public AttackComponent? AttackComponent
+        public DamageComponent? EnemyDamage
         {
-            get => _attack;
-            set => _attack = value;
+            get => _enemyDamage;
+            set => _enemyDamage = value;
         }
 
-        public HealthComponent? HealthComponent
+        public HealthComponent? EnemyHealth
         {
-            get => _health;
-            set => _health = value;
+            get => _enemyHealth;
+            set => _enemyHealth = value;
         }
 
         public AttributeComponent? EnemyAttribute
         {
-            get => _attribute;
-            set => _attribute = value;
+            get => _enemyAttribute;
         }
 
         [Inject]
@@ -162,8 +163,6 @@ namespace Playground
         [Export]
         public string NpcName { get; set; } = string.Empty;
 
-        public EffectManager? EffectManager => _effectManager;
-
         public string EnemyId => _enemyId ??= SetId();
 
         private string SetId()
@@ -179,10 +178,9 @@ namespace Playground
         public override void _Ready()
         {
             _effects = [];
-            _effectManager = new(_effects);
-            _attack = new AttackComponent(_effectManager.CalculateValues);
-            _health = new HealthComponent(_effectManager.CalculateValues);
-            _attribute = new AttributeComponent();
+            _enemyHealth = new HealthComponent(_modifierManager);
+            // later i need strategy for enemies
+            _enemyDamage = new DamageComponent(new UnarmedDamageStrategy(), _modifierManager);
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
@@ -215,8 +213,9 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 50);
             var points = SetAttributesDependsOnType(_enemyAttributeType);
-            _attribute!.Strength!.Total += points.Strength;
-            _attribute!.Dexterity!.Total += points.Dexterity;
+            _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = points.Dexterity });
+            _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = points.Strength });
+            _enemyAttribute.AddAttribute(new Intelligence(_modifierManager) { InvestedPoints = points.Intelligence });
             SetAnimation();
             EmitSignal(SignalName.EnemyInitialized);
         }

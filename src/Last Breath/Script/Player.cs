@@ -2,40 +2,34 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using Godot;
     using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Localization;
     using Playground.Resource.Quests;
     using Playground.Script;
-    using Playground.Script.Effects.Interfaces;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
-    using Playground.Script.Reputation;
 
-    public partial class Player : ObservableCharacterBody2D, ICharacter
+    public partial class Player : ObservableCharacterBody2D
     {
         #region Private fields
         private AnimatedSprite2D? _sprite;
         private Vector2 _lastPosition;
         private bool _canMove = true;
-        private ObservableCollection<IEffect>? _effects;
-        private ObservableCollection<IAbility>? _appliedAbilities;
-        private PlayerProgress _progress = new();
-        private Dictionary<string, DialogueNode> _dialogs = [];
-        private List<IAbility>? _abilities;
-        private Sprite2D? _playerAvatar;
+        private readonly PlayerProgress _progress = new();
+        private readonly Dictionary<string, DialogueNode> _dialogs = [];
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
         private int _exp;
         private int _gold;
         #endregion
 
         #region Components
-        private EffectManager? _effectManager;
         private HealthComponent? _playerHealth;
-        private AttackComponent? _playerAttack;
-        private ReputationManager? _reputation;
+        private DamageComponent? _playerDamage;
+        private readonly ModifierManager _modifierManager = new();
         #endregion
 
         [Signal]
@@ -59,28 +53,20 @@
         [Export]
         public bool FirstSpawn { get; set; } = true;
         [Export]
-        [Changeable]
         public int Speed { get; set; } = 200;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
-        [Changeable]
-        public HealthComponent? HealthComponent
+        public HealthComponent? PlayerHealth
         {
             get => _playerHealth;
             set => _playerHealth = value;
         }
-        [Changeable]
-        public AttackComponent? AttackComponent
+        public DamageComponent? PlayerDamage
         {
-            get => _playerAttack;
-            set => _playerAttack = value;
+            get => _playerDamage;
+            set => _playerDamage = value;
         }
-        [Changeable]
-        public ReputationManager? Reputation => _reputation;
         public PlayerProgress Progress => _progress;
-        public EffectManager? EffectManager => _effectManager;
-        public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
-        public List<IAbility>? Abilities => _abilities;
-        public Sprite2D? PlayerAvatar => _playerAvatar;
+
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
@@ -93,14 +79,10 @@
 
         public override void _Ready()
         {
-            _effects = [];
-            _effectManager = new(_effects);
-            _playerHealth = new(_effectManager.CalculateValues);
-            _playerAttack = new(_effectManager.CalculateValues);
+            _playerHealth = new(_modifierManager);
+            _playerDamage = new(new UnarmedDamageStrategy(), _modifierManager);
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _playerAvatar = GetNode<Sprite2D>(nameof(Sprite2D));
             _sprite.Play("Idle_down");
-            _reputation = new(0, 0, 0);
             _equipInventory = new();
             _craftingInventory = new();
             _questItemsInventory = new();
@@ -128,6 +110,8 @@
             }
             ItemCollected?.Invoke(item.Id);
         }
+
+        public void OnEquipWeapon(IDamageStrategy strategy) => _playerDamage?.ChangeStrategy(strategy);
 
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
 

@@ -8,17 +8,15 @@
     public interface ICharacter
     {
 
-        HealthComponent? HealthComponent
+        HealthComponent? EnemyHealth
         {
             get; set;
         }
 
-        AttackComponent? AttackComponent
+        DamageComponent? EnemyDamage
         {
             get; set;
         }
-
-        EffectManager? EffectManager { get; }
 
         ObservableCollection<IAbility>? AppliedAbilities { get; set; }
 

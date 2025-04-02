@@ -6,7 +6,7 @@
     {
         public HealthBuff(string name, string desc, float modifier, int duration) : base(name, desc, modifier, duration)
         {
-            Parameter = Parameter.Health;
+           // Parameter = Parameter.Health;
             EffectType = EffectType.Buff;
         }
     }

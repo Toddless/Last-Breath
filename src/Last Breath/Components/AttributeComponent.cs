@@ -1,35 +1,19 @@
 ﻿namespace Playground.Components
 {
+    using System;
+    using System.Collections.Generic;
     using Playground.Components.Interfaces;
-    using Playground.Script.Attribute;
 
-    // TODO: Rework
-    public class AttributeComponent : IAttributeComponent
+    public class AttributeComponent
     {
-        private Dexterity? _dexterity;
-        private Strength? _strength;
-        private Intelligence? _intelligence;
+        private readonly Dictionary<Type, IAttribute> _attributes = [];
 
-        public Dexterity? Dexterity
-        {
-            get => _dexterity;
-        }
+        public T? GetAttribute<T>() where T : class, IAttribute => _attributes.TryGetValue(typeof(T), out var attribute) ? attribute as T : null;
 
-        public Strength? Strength
+        public void AddAttribute<T>(T attribute) where T : IAttribute
         {
-            get => _strength;
-        }
-
-        public Intelligence? Intelligence
-        {
-            get => _intelligence;
-        }
-
-        public AttributeComponent()
-        {
-            _dexterity = new Dexterity();
-            _strength = new Strength();
-            _intelligence = new Intelligence();
+            _attributes[typeof(T)] = attribute;
+            attribute.UpdateModifiers();
         }
     }
 }
