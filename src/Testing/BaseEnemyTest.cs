@@ -1,9 +1,10 @@
 ﻿namespace PlaygroundTest
 {
     using System.Collections.ObjectModel;
-    using Playground;
     using Playground.Components;
+    using Playground.Script;
     using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Enums;
 
     public class BaseEnemyTest : ICharacter
     {
@@ -14,11 +15,15 @@
         private List<IAbility> _abilities;
 
 
-        public HealthComponent? EnemyHealth { get => _healthComponent; set => _healthComponent = value; }
-        public DamageComponent? EnemyDamage { get => _attackComponent; set => _attackComponent = value; }
+        public HealthComponent? Health { get => _healthComponent; }
+        public DamageComponent? Damage { get => _attackComponent; }
         public ObservableCollection<IAbility>? AppliedAbilities { get => _appliedAbilities; set => _appliedAbilities = value; }
 
         public List<IAbility> Abilities { get => _abilities; }
+
+        public DefenseComponent? Defense => throw new NotImplementedException();
+
+        public Stance Stance { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public BaseEnemyTest()
         {

@@ -8,8 +8,8 @@ namespace Playground.Components
     public class DamageComponent(IDamageStrategy strategy, ModifierManager modifier)
     {
         // Random range for damage
-        private const float From = 0.85f;
-        private const float To = 1.15f;
+        private const float From = 0.70f;
+        private const float To = 1.30f;
         private readonly RandomNumberGenerator _rnd = new();
         // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
         // TODO: Rename strategy
@@ -28,7 +28,8 @@ namespace Playground.Components
         /// Flat damage between min and max damage range after all bonuses calculation 
         /// </summary>
         /// <returns>Round int</returns>
-        public int GetFlatDamage() => _modifierManager.CalculateIntValue(_rnd.RandfRange(From, To) * _strategy.GetDamage(), Parameter.StrikeDamage);
+        public float GetFlatDamage() => _modifierManager.CalculateFloatValue(_strategy.GetDamage() * _rnd.RandfRange(From, To), Parameter.StrikeDamage);
+        
         /// <summary>
         /// Critical chance after all bonuses calculation
         /// </summary>

@@ -8,28 +8,33 @@
     using Playground.Localization;
     using Playground.Resource.Quests;
     using Playground.Script;
+    using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
 
-    public partial class Player : ObservableCharacterBody2D
+    public partial class Player : ObservableCharacterBody2D, ICharacter
     {
         #region Private fields
         private AnimatedSprite2D? _sprite;
-        private Vector2 _lastPosition;
-        private bool _canMove = true;
+        private Vector2 _targetPosition, _startPosition;
+        private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
         private readonly PlayerProgress _progress = new();
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
-        private int _exp;
-        private int _gold;
+        private int _exp, _gold;
+        private Stance _stance;
+        private float _moveProgress = 0f;
         #endregion
 
         #region Components
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
+        private DefenseComponent? _playerDefense;
         private readonly ModifierManager _modifierManager = new();
+        private readonly AttributeComponent _attribute = new();
         #endregion
 
         [Signal]
@@ -39,15 +44,15 @@
         public delegate void PlayerExitedTheBattleEventHandler();
 
         #region Properties
-        public Vector2 PlayerLastPosition
-        {
-            get => _lastPosition;
-            set => _lastPosition = value;
-        }
         public bool CanMove
         {
             get => _canMove;
             set => _canMove = value;
+        }
+        public bool CanFight
+        {
+            get => _canFight;
+            set => _canFight = value;
         }
 
         [Export]
@@ -55,21 +60,27 @@
         [Export]
         public int Speed { get; set; } = 200;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
-        public HealthComponent? PlayerHealth
+
+        public HealthComponent? Health
         {
             get => _playerHealth;
-            set => _playerHealth = value;
         }
-        public DamageComponent? PlayerDamage
+        public DamageComponent? Damage
         {
             get => _playerDamage;
-            set => _playerDamage = value;
         }
         public PlayerProgress Progress => _progress;
-
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
+
+        public DefenseComponent? Defense => _playerDefense;
+
+        public Stance Stance
+        {
+            get => _stance;
+            set => _stance = value;
+        }
         #endregion
 
         #region Events
@@ -81,6 +92,7 @@
         {
             _playerHealth = new(_modifierManager);
             _playerDamage = new(new UnarmedDamageStrategy(), _modifierManager);
+            _playerDefense = new(_modifierManager);
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
             _equipInventory = new();
@@ -88,6 +100,9 @@
             _questItemsInventory = new();
             LoadDialogues();
             GameManager.Instance!.Player = this;
+            _attribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
+            _attribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
+            _playerHealth.HealUpToMax();
         }
 
         public void AddItemToInventory(Item item)
@@ -111,6 +126,14 @@
             ItemCollected?.Invoke(item.Id);
         }
 
+        public void OnRunAway(Vector2 enemyPosition)
+        {
+            _targetPosition = enemyPosition;
+            _startPosition = Position;
+            _moveProgress = 0;
+            _isPlayerRunning = true;
+        }
+
         public void OnEquipWeapon(IDamageStrategy strategy) => _playerDamage?.ChangeStrategy(strategy);
 
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
@@ -127,11 +150,12 @@
             AcceptReward(quest.GetReward());
             QuestCompleted?.Invoke(quest.Id);
         }
+
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
         private void AcceptReward(Reward? reward)
         {
-            if(reward == null) return;
+            if (reward == null) return;
             if (reward.Items.Count > 0)
             {
                 foreach (var item in reward.Items)
@@ -145,10 +169,22 @@
 
         public override void _PhysicsProcess(double delta)
         {
-            if (!_canMove)
+            if (_isPlayerRunning)
             {
-                return;
+                _moveProgress += (float)delta;
+                float t = Mathf.Clamp(_moveProgress / 0.06f, 0f, 6f);
+                Position = _targetPosition.Lerp(_startPosition, t);
+                if(t >= 6f)
+                {
+                    GD.Print("Target reached");
+                    _canMove = true;
+                    _canFight = true;
+                    GD.Print($"Player can move: {_canMove}. And fight: {_canFight}");
+                    _isPlayerRunning = false;
+                }
             }
+
+            if (!_canMove) return;
 
             Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
             Velocity = inputDirection * Speed;

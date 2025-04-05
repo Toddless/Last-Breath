@@ -2,68 +2,252 @@
 {
     using System;
     using Godot;
-    using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Stateless;
 
-    public partial class BattleSceneHandler : ObservableNode2D
+    public partial class BattleSceneHandler : ObservableProperty
     {
-        private enum Results { EnemyWon, PlayerWon, PlayerRunAway }
+      
+        private enum State { Player, Enemy, Awaiting }
+        private enum Trigger { PlayerTurn, EnemyTurn, Await }
 
-        public event Action<float>? PlayerMaxHealthChanged, PlayerCurrentHealthChanged, EnemyMaxHealthChanged, EnemyCurrentHealthChanged;
-        public event Action<IEffect>? PlayerEffectAdded, PlayerEffectRemoved, EnemyEffectRemoved, EnemyEffectAdded;
+        private readonly StateMachine<State, Trigger> _machine = new(State.Awaiting);
 
-        private float _chanceToEscape = 0.5f;
-        private RandomNumberGenerator _rnd = new();
+        public event Action? HideAttackButtons, ShowAttackButtons;
+        // Rework later. This chance should depends on some stats (e.g. if player has lower chance to escape, if enemy has more levels)
+        private const float ChanceToEscape = 0.5f;
+        private readonly RandomNumberGenerator _rnd = new();
         private Player? _player;
         private BaseEnemy? _enemy;
-        private BattleResult? _battleResult;
+        private ICharacter? _attacker, _defender;
 
-        public BattleResult? BattleResult
+        public event Action<BattleResult>? BattleEnd;
+
+        public BattleSceneHandler()
         {
-            get => _battleResult;
-            set => SetProperty(ref _battleResult, value);
-        }
-
-        public override void _Ready()
-        {
-
+            ConfigureStateMachine();
         }
 
         public void Init(BattleContext context)
         {
-            _player = (Player)context.Self;
+            // TODO: Rework context
+            _player = (Player)context.Player;
             _enemy = (BaseEnemy)context.Opponent;
-            _player.CanMove = false;
-            _enemy.EnemyFight = true;
-        }
-
-        public void ReturnStats()
-        {
-            _player!.CanMove = true;
-        }
-
-        public void ClearBattleScene()
-        {
-            _player = null;
-            _enemy = null;
+            DecideFirstTurn();
         }
 
         public void PlayerTryingToRunAway()
         {
-            if (!(_rnd.RandfRange(0, 1) <= _chanceToEscape)) return;
+            if (!(_rnd.RandfRange(0, 1) <= ChanceToEscape)) return;
             // need method to refresh enemy stats
-            BattleResult = BattleFinished(Results.PlayerRunAway);
-            _player?.OnEnemyKilled(_enemy);
+            BattleEnd?.Invoke(BattleFinished(BattleResults.PlayerRunAway));
+            _machine?.Fire(Trigger.Await);
         }
 
-        private BattleResult? BattleFinished(Results results)
+        public void DexterityStance()
         {
-            return (results) switch
+            _player!.Stance = Enums.Stance.Dexterity;
+            GD.Print($"Player stance: {_player.Stance}");
+        }
+
+        public void StrengthStance()
+        {
+            _player!.Stance = Enums.Stance.Strength;
+            GD.Print($"Player stance: {_player.Stance}");
+        }
+
+        public void PlayerTurn()
+        {
+            TryAttack();
+            _machine.Fire(Trigger.EnemyTurn);
+        }
+
+        private void EnemyMakesTurn()
+        {
+            TryAttack();
+            _machine.Fire(Trigger.PlayerTurn);
+        }
+
+        private void ConfigureStateMachine()
+        {
+            _machine.Configure(State.Awaiting)
+                .OnEntry(() =>
+                {
+                    ClearBattleScene();
+                })
+                .Permit(Trigger.PlayerTurn, State.Player)
+                .Permit(Trigger.EnemyTurn, State.Enemy);
+
+            _machine.Configure(State.Player)
+                .OnEntry(() =>
+                {
+                    GD.Print("Player turn");
+                })
+                .OnExit(() =>
+                {
+                    SwitchRoles();
+                    GD.Print("Player turn ends");
+                })
+                .Permit(Trigger.Await, State.Awaiting)
+                .Permit(Trigger.EnemyTurn, State.Enemy);
+
+            _machine.Configure(State.Enemy)
+                .OnEntry(() =>
+                {
+                    HideAttackButtons?.Invoke();
+                    GD.Print("Enemy turn");
+                    EnemyMakesTurn();
+                })
+                .OnExit(() =>
+                {
+                    SwitchRoles();
+                    GD.Print("Enemy turn ends");
+                    ShowAttackButtons?.Invoke();
+                })
+                .Permit(Trigger.Await, State.Awaiting)
+                .Permit(Trigger.PlayerTurn, State.Player);
+        }
+
+        private void TryAttack()
+        {
+            bool additionalHit;
+            do
             {
-                Results.EnemyWon => BattleResult = new(_player!, _enemy!, false),
-                Results.PlayerWon => BattleResult = new(_player!, _enemy!, true),
-                Results.PlayerRunAway => BattleResult = new(_player!, _enemy!, false),
-                _ => null
+                if (!PerformAttack())
+                {
+                    HandleEvadedAttack();
+                    break;
+                }
+                additionalHit = IsAdditionalHit(_attacker);
+            } while (additionalHit);
+        }
+
+        private bool PerformAttack()
+        {
+            if (IsEvade(_defender))
+            {
+                GD.Print($"{GetCharacterName(_defender)} evaded attack");
+                return false;
+            }
+            ApplyDamage(CalculateDamage());
+            return true;
+        }
+
+        private void HandleEvadedAttack()
+        {
+            GD.Print($"Handling evaded attack. Defender: {GetCharacterName(_defender)}");
+            switch (_defender.Stance)
+            {
+                case Enums.Stance.Dexterity:
+                    SwitchRoles();
+                    TryCounterAttack();
+                    break;
+                case Enums.Stance.Strength:
+                    break;
+                case Enums.Stance.Intelligence:
+                    break;
+            }
+        }
+
+        private void TryCounterAttack()
+        {
+            GD.Print($"{GetCharacterName(_attacker)} performing counter attack");
+            bool additionalHit;
+            do
+            {
+                if (!PerformAttack())
+                {
+                    break;
+                }
+                additionalHit = IsAdditionalHit(_attacker);
+
+            } while (additionalHit);
+            SwitchRoles();
+        }
+
+        private float CalculateDamage()
+        {
+            float damage = _attacker!.Damage!.GetFlatDamage();
+            if (IsCrit(_attacker))
+            {
+                damage *= _attacker.Damage.GetCriticalDamage();
+            }
+            return Mathf.Max(0, damage * (1 - Mathf.Min(_defender!.Defense!.GetArmor() / 100, 0.7f)));
+        }
+
+        private void ApplyDamage(float damage)
+        {
+            _defender?.Health!.TakeDamage(damage);
+            CheckBattleEnds();
+            GD.Print($"Dialed Damage: {damage} to {GetCharacterName(_defender)}");
+        }
+
+        private void DecideFirstTurn()
+        {
+            if (_rnd.Randf() >= 0.51f)
+            {
+                _attacker = _player;
+                _defender = _enemy;
+                _machine.Fire(Trigger.PlayerTurn);
+            }
+            else
+            {
+                _attacker = _enemy;
+                _defender = _player;
+                _machine.Fire(Trigger.EnemyTurn);
+            }
+        }
+
+        private void SwitchRoles()
+        {
+            if (_attacker == _player && _defender == _enemy)
+            {
+                _attacker = _enemy;
+                _defender = _player;
+            }
+            else
+            {
+                _attacker = _player;
+                _defender = _enemy;
+            }
+            GD.Print($"Attacker: {GetCharacterName(_attacker)}, Defender: {GetCharacterName(_defender)}");
+        }
+
+        private string GetCharacterName(ICharacter character) => character.GetType().Name;
+        private bool IsAdditionalHit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage?.GetAdditionalHitChance();
+        private bool IsCrit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage?.GetCriticalChance();
+        private bool IsEvade(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Defense?.GetDodgeChance();
+
+        private void CheckBattleEnds()
+        {
+            if (_player?.Health?.CurrentHealth <= 0)
+            {
+                BattleEnd?.Invoke(BattleFinished(BattleResults.EnemyWon));
+                _machine.Fire(Trigger.Await);
+            }
+            else if (_enemy?.Health?.CurrentHealth <= 0)
+            {
+                BattleEnd?.Invoke(BattleFinished(BattleResults.PlayerWon));
+                _machine.Fire(Trigger.Await);
+            }
+        }
+
+        private void ClearBattleScene()
+        {
+            _player = null;
+            _enemy = null;
+            _defender = null;
+            _attacker = null;
+        }
+
+        private BattleResult BattleFinished(BattleResults results)
+        {
+            return results switch
+            {
+                BattleResults.EnemyWon => new(_player!, _enemy!, BattleResults.EnemyWon),
+                BattleResults.PlayerWon => new(_player!, _enemy!, BattleResults.PlayerWon),
+                _ => new(_player!, _enemy!, BattleResults.PlayerRunAway),
             };
         }
     }

@@ -1,11 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=22 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" uid="uid://hl7koqv3auw2" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
 [ext_resource type="PackedScene" uid="uid://boqqyrt0sfpve" path="res://Script/UI/MainUI.tscn" id="2_heqcp"]
 [ext_resource type="PackedScene" uid="uid://j6cqo6u0s83x" path="res://Script/UI/BattleUI.tscn" id="4_vfafg"]
-[ext_resource type="PackedScene" uid="uid://b5ardl26n1bo7" path="res://Scenes/BattleScene.tscn" id="4_wn8ry"]
 [ext_resource type="PackedScene" uid="uid://b03h1pcqbp3iw" path="res://Script/UI/PauseMenu.tscn" id="5_17akd"]
 [ext_resource type="Script" uid="uid://dxjawyd26k7nx" path="res://Script/UI/Layers/MainLayer.cs" id="5_bee3c"]
 [ext_resource type="Script" uid="uid://c3cd54sl0tbrs" path="res://Script/UI/Layers/PauseLayer.cs" id="5_bjedh"]
@@ -79,8 +78,6 @@ parameters/looping = true
 process_mode = 1
 visible = false
 script = ExtResource("16_vnox3")
-
-[node name="BattleScene" parent="BattleLayer" instance=ExtResource("4_wn8ry")]
 
 [node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]
 

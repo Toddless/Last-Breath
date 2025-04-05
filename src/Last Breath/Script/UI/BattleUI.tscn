@@ -123,11 +123,12 @@ theme_override_constants/margin_right = 150
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainerOpponents/MarginContainer"]
 layout_mode = 2
+mouse_filter = 0
 
 [node name="Panel" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(350, 350)
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
 
@@ -178,7 +179,6 @@ keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
 [node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/HBoxContainerAttackButtons"]
-visible = false
 custom_minimum_size = Vector2(0, 290)
 layout_mode = 2
 
@@ -187,7 +187,6 @@ custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
-toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
 [node name="Body" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
@@ -211,15 +210,13 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
 
-[node name="Panel" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="FirstAbility" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
 
-[node name="Panel2" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="SecondAbility" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
 
 [node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)

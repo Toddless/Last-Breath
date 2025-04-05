@@ -11,22 +11,25 @@
             yield return new AttributeEffect
               (Parameter.StrikeDamage,
               ModifierType.Additive,
-              15f,
-              priority: ModifierPriorities.BaseParameters
+              15f
               );
 
             yield return new AttributeEffect
               (Parameter.Armor,
               ModifierType.Additive,
-              100f,
-              priority: ModifierPriorities.BaseParameters
+              100f
               );
+
+            yield return new AttributeEffect
+                (Parameter.Armor,
+                ModifierType.MultiplicativeSum,
+                0.02f
+                );
 
             yield return new AttributeEffect
               (Parameter.MaxHealth,
               ModifierType.Additive,
-              10f,
-              priority: ModifierPriorities.BaseParameters
+              10f
               );
         }
     }

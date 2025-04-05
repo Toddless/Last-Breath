@@ -1,103 +1,90 @@
 ﻿namespace Playground.Script.UI
 {
     using System;
-    using System.ComponentModel;
-    using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
-    using Stateless;
 
     public partial class BattleLayer : ObservableLayer
     {
-        private enum State { BattleStart, BattleEnd, Await }
-        private enum Trigger { PreparingBattle, EndingBattle, Awaiting }
-
-        private StateMachine<State, Trigger>? _machine;
-        private BattleSceneHandler? _battleScene;
+        private BattleSceneHandler? _battleSceneHandler;
         private BattleUI? _battleUI;
-        private BattleContext? _battleContext;
 
-        public Action<BattleResult>? ReturnToMainWorld;
-
-        public BattleContext? BattleContext
-        {
-            get => _battleContext;
-            set => SetProperty(ref _battleContext, value);
-        }
+        public Action<BattleResult?>? ReturnToMainWorld;
+        public event Action? BattleEnds;
 
         public override void _Ready()
         {
-            _machine = new StateMachine<State, Trigger>(State.Await);
-            _battleScene = GetNode<BattleSceneHandler>("BattleScene");
+            _battleSceneHandler = new BattleSceneHandler();
             _battleUI = GetNode<BattleUI>(nameof(BattleUI));
-            this.PropertyChanged += GettingNewContext;
-            _battleScene.PropertyChanged += BattleFinished;
             SetupEvents();
-            ConfigureStateMachine();
         }
 
-        private void ConfigureStateMachine()
+        public void Init(BattleContext context)
         {
-            _machine!.Configure(State.Await)
-                .OnEntry(Hide)
-                .Permit(Trigger.EndingBattle, State.BattleEnd)
-                .Permit(Trigger.PreparingBattle, State.BattleStart);
-
-            _machine.Configure(State.BattleStart)
-                .OnEntry(StartBattle)
-                .Permit(Trigger.Awaiting, State.Await)
-                .Permit(Trigger.EndingBattle, State.BattleEnd);
-
-            _machine.Configure(State.BattleEnd)
-                .OnEntry(EndBattle)
-                .Permit(Trigger.Awaiting, State.Await)
-                .Permit(Trigger.PreparingBattle, State.BattleStart);
-        }
-
-        private void EndBattle()
-        {
-            ReturnToMainWorld?.Invoke(_battleScene?.BattleResult!);
-            _battleScene?.ReturnStats();
-            _battleContext = null;
-            Hide();
-        }
-
-        private void GettingNewContext(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BattleContext) && BattleContext != null)
-                _machine?.Fire(Trigger.PreparingBattle);
-        }
-
-        private void BattleFinished(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BattleSceneHandler.BattleResult) && _battleScene?.BattleResult != null)
-                _machine?.Fire(Trigger.EndingBattle);
-        }
-
-        private void StartBattle()
-        {
-            var player = (Player)BattleContext!.Self;
-            var enemy = (BaseEnemy)BattleContext.Opponent;
-            SetNewParent(player, _battleScene!);
-            SetNewParent(enemy, _battleScene!);
-            _battleUI?.InitialSetup(player, enemy);
-            _battleScene?.Init(BattleContext!);
-            Show();
+            HandleFightStart(context);
+            _battleSceneHandler?.Init(context);
         }
 
         private void SetupEvents()
         {
-            _battleScene!.PlayerCurrentHealthChanged += (t) => _battleUI?.OnPlayerCurrentHealthChanged(t);
-            _battleScene.EnemyCurrentHealthChanged += (t) => _battleUI?.OnEnemyCurrentHealthChanged(t);
-            _battleScene.PlayerMaxHealthChanged += (t) => _battleUI?.OnPlayerMaxHealthChanged(t);
-            _battleScene.EnemyMaxHealthChanged += (t) => _battleUI?.OnEnemyMaxHealthChanged(t);
-            _battleUI!.Return = _battleScene.PlayerTryingToRunAway;
+            _battleUI!.DexterityStance += () => _battleSceneHandler?.DexterityStance();
+            _battleUI.StrengthStance += () => _battleSceneHandler?.StrengthStance();
+            _battleUI.HeadButtonPressed += () => _battleSceneHandler?.PlayerTurn();
+            _battleSceneHandler!.ShowAttackButtons += _battleUI.ShowAttackButtons;
+            _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
+            _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
+            _battleSceneHandler.BattleEnd += OnBattleEnds;
         }
 
-        private void SetNewParent(Node child, Node parent)
+        private void HandleFightStart(BattleContext context)
         {
-            child.GetParent().CallDeferred("remove_child", child);
-            parent.CallDeferred("add_child", child);
+            context.Player.CanFight = false;
+            context.Player.CanMove = false;
+            context.Opponent.CanFight = false;
+            context.Opponent.CanMove = false;
+            // adding to UI Player and Enemy Animations
+        }
+
+        private void OnBattleEnds(BattleResult result)
+        {
+            switch (result.Results)
+            {
+                case Enums.BattleResults.EnemyWon:
+                    HandleEnemyWon(result);
+                    break;
+                    case Enums.BattleResults.PlayerWon:
+                    HandleEnemyKilled(result.Enemy);
+                    break;
+                    case Enums.BattleResults.PlayerRunAway:
+                    HandlePlayerRunAway(result);
+                    break;
+            }
+            // данную часть изменить/разделить. Иначе начнется новый бой сразу же после окончания старого
+            // может ли игрок в случае поражения драться, пока под вопросом
+            BattleEnds?.Invoke();
+        }
+
+        private void HandleEnemyWon(BattleResult result)
+        {
+
+        }
+
+        private void HandlePlayerRunAway(BattleResult result)
+        {
+            var player = (Player)result.Player;
+            var enemy = (BaseEnemy)result.Enemy;
+            player.OnRunAway(enemy.Position);
+            enemy.CanMove = true;
+            enemy.CanFight = true;
+        }
+
+        private void HandleEnemyKilled(ICharacter enemy)
+        {
+            // нужен каст к базовому противнику (??)
+            // сменить ассет
+            // противник не может двигаться
+            // противник не может драться
+            // игрок может облутать поверженного противника
         }
     }
 }

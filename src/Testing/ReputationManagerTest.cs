@@ -1,8 +1,5 @@
 ﻿namespace PlaygroundTest
 {
-    using Playground.Script.Enums;
-    using Playground.Script.Reputation;
-
     [TestClass]
     public class ReputationManagerTest
     {

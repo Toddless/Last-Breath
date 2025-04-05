@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Components;
     using Playground.Script;
 
     public partial class DevTools : Control

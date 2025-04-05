@@ -1,20 +1,16 @@
 namespace Playground
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
+    using System;
     using System.Text;
     using Godot;
     using Playground.Components;
     using Playground.Script;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
-    using Playground.Script.Effects.Interfaces;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.ScenesHandlers;
 
     [Inject]
     public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
@@ -23,11 +19,12 @@ namespace Playground
         private readonly AttributeComponent _enemyAttribute = new();
         private HealthComponent? _enemyHealth;
         private DamageComponent? _enemyDamage;
+        private DefenseComponent? _enemyDefense;
         #endregion
 
-        private bool _enemyFight = false, _playerEncounter = false;
-        private ObservableCollection<IEffect>? _effects;
-        private ObservableCollection<IAbility>? _appliedAbilities = [];
+        private bool _enemyFight = false, _playerEncounter = false, _canMove;
+        private int _level;
+        private string? _enemyId;
         private IBasedOnRarityLootTable? _lootTable;
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
@@ -37,21 +34,11 @@ namespace Playground
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private BattleBehavior? _battleBehavior;
-        private List<IAbility>? _abilities = new();
-        private IBattleContext? _battleContext;
         private EnemyAttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
-        private int _level;
-        private string? _enemyId;
         private EnemyType _enemyType;
+        private Stance _stance;
         private readonly ModifierManager _modifierManager = new();
-
-        [Signal]
-        public delegate void EnemyDiedEventHandler(BaseEnemy enemy);
-        [Signal]
-        public delegate void EnemyInitializedEventHandler();
-        [Signal]
-        public delegate void EnemyReachedNewPositionEventHandler();
 
         #region UI
         private Node2D? _inventoryNode;
@@ -60,9 +47,25 @@ namespace Playground
         private EnemyInventory? _inventory;
         #endregion
 
-
         #region Properties
         public EnemyType EnemyType => _enemyType;
+        public EnemyAttributeType? AttributeType => _enemyAttributeType;
+        public bool CanFight
+        {
+            get => _enemyFight;
+            set => _enemyFight = value;
+        }
+
+        public bool CanMove
+        {
+            get => _canMove;
+            set => _canMove = value;
+        }
+        public Stance Stance
+        {
+            get => _stance;
+            set => _stance = value;
+        }
 
         public NavigationAgent2D? NavigationAgent2D
         {
@@ -70,33 +73,19 @@ namespace Playground
             set => _navigationAgent2D = value;
         }
 
-        [Inject]
-        public BattleBehavior? BattleBehavior
-        {
-            get => _battleBehavior;
-            set => _battleBehavior = value;
-        }
-
         public Area2D? Area
         {
             get => _area;
         }
 
-        public DamageComponent? EnemyDamage
+        public DamageComponent? Damage
         {
             get => _enemyDamage;
-            set => _enemyDamage = value;
         }
 
-        public HealthComponent? EnemyHealth
+        public HealthComponent? Health
         {
             get => _enemyHealth;
-            set => _enemyHealth = value;
-        }
-
-        public AttributeComponent? EnemyAttribute
-        {
-            get => _enemyAttribute;
         }
 
         [Inject]
@@ -106,20 +95,9 @@ namespace Playground
             set => _rnd = value;
         }
 
-        public List<IAbility>? Abilities
-        {
-            get => _abilities;
-        }
-
         public Vector2 RespawnPosition
         {
             get => _respawnPosition;
-        }
-
-        public bool PlayerEncounter
-        {
-            get => _playerEncounter;
-            set => SetProperty(ref _playerEncounter, value);
         }
 
         public GlobalRarity Rarity
@@ -127,15 +105,6 @@ namespace Playground
             get => _rarity;
             set => _rarity = value;
 
-        }
-
-        public bool EnemyFight
-        {
-            get => _enemyFight;
-            set
-            {
-                SetProperty(ref _enemyFight, value);
-            }
         }
 
         public EnemyInventory? Inventory
@@ -150,13 +119,6 @@ namespace Playground
             get => _lootTable;
             set => _lootTable = value;
         }
-
-        public ObservableCollection<IAbility>? AppliedAbilities
-        {
-            get => _appliedAbilities;
-            set => _appliedAbilities = value;
-        }
-
         [Export]
         public Fractions Fraction { get; set; }
 
@@ -165,22 +127,18 @@ namespace Playground
 
         public string EnemyId => _enemyId ??= SetId();
 
-        private string SetId()
-        {
-            var id = new StringBuilder();
-            id.Append(NpcName);
-            id.Append('_');
-            id.Append(Fraction.ToString());
-            return id.ToString();
-        }
+        public DefenseComponent? Defense => _enemyDefense;
+
+        public event Action<BaseEnemy>? InitializeFight;
+
         #endregion
 
         public override void _Ready()
         {
-            _effects = [];
-            _enemyHealth = new HealthComponent(_modifierManager);
+            _enemyHealth = new(_modifierManager);
+            _enemyDefense = new(_modifierManager);
             // later i need strategy for enemies
-            _enemyDamage = new DamageComponent(new UnarmedDamageStrategy(), _modifierManager);
+            _enemyDamage = new(new UnarmedDamageStrategy(), _modifierManager);
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
@@ -196,36 +154,51 @@ namespace Playground
             _inventoryNode.Hide();
             DiContainer.InjectDependencies(this);
             SetStats();
-            SpawnItems();
+            SetEvents();
+            // SpawnItems();
+            Health?.HealUpToMax();
         }
-
-        public bool IsPlayerNearby() => Area?.GetOverlappingBodies().Any(x => x is Player) == true;
 
         protected void SpawnItems()
         {
             _inventory?.AddItem(LootTable?.GetRandomItem());
         }
 
-        protected void SetStats()
+        private void SetStats()
         {
             _enemyAttributeType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
             _respawnPosition = Position;
             Rarity = EnemyRarity();
-            _level = Rnd.RandiRange(1, 50);
+            _level = Rnd.RandiRange(1, 300);
             var points = SetAttributesDependsOnType(_enemyAttributeType);
-            _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = points.Dexterity });
-            _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = points.Strength });
-            _enemyAttribute.AddAttribute(new Intelligence(_modifierManager) { InvestedPoints = points.Intelligence });
+            _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
+            _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
             SetAnimation();
-            EmitSignal(SignalName.EnemyInitialized);
+            _stance = SetStance(_enemyAttributeType);
         }
 
-        protected GlobalRarity EnemyRarity()
+        private void SetEvents()
+        {
+            _area!.BodyEntered += PlayerEntered;
+        }
+
+        private Stance SetStance(EnemyAttributeType? enemyAttributeType)
+        {
+            return enemyAttributeType switch
+            {
+                EnemyAttributeType.DexterityBased => Stance.Dexterity,
+                EnemyAttributeType.StrengthBased => Stance.Strength,
+                EnemyAttributeType.IntelligenceBased => Stance.Intelligence,
+                _ => Stance.None
+            };
+        }
+
+        private GlobalRarity EnemyRarity()
         {
             return GlobalRarity.Common;
         }
 
-        protected void SetAnimation()
+        private void SetAnimation()
         {
             switch (Rarity)
             {
@@ -247,28 +220,21 @@ namespace Playground
             }
         }
 
-        public void PlayerExited(Node2D body)
-        {
-            if (body is Player s && !_area!.OverlapsBody(s))
-            {
-                PlayerEncounter = false;
-            }
-        }
-
-        public void PlayerEntered(Node2D body)
+        private void PlayerEntered(Node2D body)
         {
             if (body is Player s && _area!.OverlapsBody(s))
             {
-                PlayerEncounter = true;
+                InitializeFight?.Invoke(this);
+                CanFight = true;
             }
         }
 
-        protected (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyAttributeType? enemyType)
+        private (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyAttributeType? enemyType)
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
-            int dominantAttribute = (int)(totalAttributes * 0.6f);
-            int secondaryAttribute = (int)(totalAttributes * 0.2f);
+            int dominantAttribute = (int)(totalAttributes * 0.8f);
+            int secondaryAttribute = (int)(totalAttributes * 0.1f);
 
             return enemyType switch
             {
@@ -279,7 +245,7 @@ namespace Playground
             };
         }
 
-        protected EnemyAttributeType SetRandomEnemyType(int index)
+        private EnemyAttributeType SetRandomEnemyType(int index)
         {
             return index switch
             {
@@ -287,6 +253,15 @@ namespace Playground
                 2 => EnemyAttributeType.StrengthBased,
                 _ => EnemyAttributeType.None,
             };
+        }
+
+        private string SetId()
+        {
+            var id = new StringBuilder();
+            id.Append(NpcName);
+            id.Append('_');
+            id.Append(Fraction.ToString());
+            return id.ToString();
         }
     }
 }

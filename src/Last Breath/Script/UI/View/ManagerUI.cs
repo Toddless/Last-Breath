@@ -2,6 +2,7 @@
 {
     using System;
     using Playground.Script.NPC;
+    using Playground.Script.ScenesHandlers;
     using Playground.Script.UI.Layers;
     using Stateless;
 
@@ -17,13 +18,19 @@
         private readonly DevLayer? _devLayer = devLayer;
         private readonly DialogueLayer _dialogLayer = dialog;
 
-      
+        public event Action? ExitedBattle, ExitedPause, ExitedDialogue;
+
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
         public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void SetClose(Action close) => _dialogLayer.DialogueEnded = close;
-        public void ShowBattleUI() => _machine.Fire(Trigger.ShowBattleUI);
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
+
+        public void OpenBattleUI(BattleContext context)
+        {
+            _battleLayer.Init(context);
+            _machine.Fire(Trigger.ShowBattleUI);
+        }
 
         public void OpenMonologue(string firstNode)
         {
@@ -37,12 +44,17 @@
             _machine.Fire(Trigger.ShowDialogUI);
         }
         public void OpenInventory(BaseOpenableObject obj) => _mainLayer.OpenInventory(obj);
+
+        #region Dev
 #if DEBUG
         public void ShowDevTools() => _devLayer?.Show();
         public void HideDevTools() => _devLayer?.Hide();
 #endif
+        #endregion
+
         public void SetEvents()
         {
+            _battleLayer.BattleEnds += () => _machine.Fire(Trigger.ShowMainUI);
             _dialogLayer.CloseDialogueWindow += () => _machine.Fire(Trigger.ShowMainUI);
         }
 
@@ -63,6 +75,7 @@
                 })
                 .OnExit(() =>
                 {
+                    ExitedBattle?.Invoke();
                     _battleLayer.SetProcessUnhandledInput(false);
                     _battleLayer.Hide();
                 })
@@ -76,6 +89,7 @@
                 })
                 .OnExit(() =>
                 {
+                    ExitedPause?.Invoke();
                     _pauseLayer.SetProcessUnhandledKeyInput(false);
                     _pauseLayer?.Hide();
                 })
@@ -89,6 +103,7 @@
                 })
                 .OnExit(() =>
                 {
+                    ExitedDialogue?.Invoke();
                     _dialogLayer.SetProcessUnhandledInput(false);
                     _dialogLayer?.Hide();
                 })

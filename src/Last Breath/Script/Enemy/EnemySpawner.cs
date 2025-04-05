@@ -6,14 +6,12 @@ namespace Playground.Script.Enemy
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.Scenes;
 
     // TODO: Need to rework this
-    [Inject]
     public partial class EnemySpawner : Node, IEnemySpawner
     {
         private Dictionary<Vector2, BaseEnemy?> _enemyPosition = new();
-        private BaseSpawnableScene? _parentScene;
+        private MainWorld? _parentScene;
         private Queue<Action> _spawnQueue = new();
         private RandomNumberGenerator? _rnd;
         private bool _isProcessing = false;
@@ -39,7 +37,7 @@ namespace Playground.Script.Enemy
             set => _enemyToSpawn = value;
         }
 
-        protected BaseSpawnableScene? ParentScene
+        protected MainWorld? ParentScene
         {
             get => _parentScene;
             set => _parentScene = value;
@@ -55,7 +53,7 @@ namespace Playground.Script.Enemy
         public override void _Ready()
         {
             // TODO: When I am in a battle, enemies spawn in the battle scene
-            ParentScene = (BaseSpawnableScene)GetParent();
+            ParentScene = (MainWorld)GetParent();
             EnemyToSpawn = ResourceLoader.Load<PackedScene>(ScenePath.EnemyToSpawn);
             ParentScene.Enemies!.CollectionChanged += OnCollectionChanged;
             ResolveDependencies();
@@ -83,9 +81,7 @@ namespace Playground.Script.Enemy
             BaseEnemy enemy = EnemyToSpawn!.Instantiate<BaseEnemy>();
             ParentScene!.CallDeferred("add_child", enemy);
             ParentScene.Enemies!.Add(enemy);
-            enemy.GetNode<Area2D>("Area2D").BodyEntered += enemy.PlayerEntered;
-            enemy.GetNode<Area2D>("Area2D").BodyExited += enemy.PlayerExited;
-            enemy.PropertyChanged += ParentScene.EnemyReadyToFight;
+            enemy.InitializeFight += ParentScene.InitializingFight;
             enemy.Position = freePosition.Key;
             EnemyPositions![freePosition.Key] = enemy;
         }
@@ -97,18 +93,13 @@ namespace Playground.Script.Enemy
         /// <param name="e">To be added</param>
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action is not NotifyCollectionChangedAction.Remove)
-            {
-                return;
-            }
-
+            if (e.Action is not NotifyCollectionChangedAction.Remove) return;
             EnqueueSpawnEnemyEvent();
         }
 
         private void EnqueueSpawnEnemyEvent()
         {
             SpawnQueue.Enqueue(SpawnNewEnemy);
-
             ProcessingQueue();
         }
 

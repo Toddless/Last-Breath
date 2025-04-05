@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
-    using System.ComponentModel;
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
@@ -15,8 +14,8 @@
 #if DEBUG
         private bool _devOpened = false;
 #endif
-        private enum State { World, Battle, Paused, Dialog, Monologue }
-        private enum Trigger { StartBattle, EndBattle, Pause, Resume, Dialog, Monologue, Close }
+        private enum State { Play, Paused, Dialog, Monologue }
+        private enum Trigger { Resume, Pause, Dialog, Monologue, Close }
 
         private StateMachine<State, Trigger>? _machine;
         private StateMachine<State, Trigger>.TriggerWithParameters<BaseSpeakingNPC>? _showDialogue;
@@ -27,7 +26,7 @@
 
         public override void _Ready()
         {
-            _machine = new(State.World);
+            _machine = new(State.Play);
             _mainWorld = GetNode<MainWorld>(nameof(MainWorld));
 
             _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)),
@@ -39,7 +38,6 @@
                 GetNode<DevLayer>(nameof(DevLayer)),
 #endif
                 GetNode<DialogueLayer>(nameof(DialogueLayer)));
-            _managerUI.SetReturn(ReturnToMainWorld);
             _managerUI.SetResume(FireResume);
             _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
@@ -56,7 +54,7 @@
                 {
                     _machine.Fire(Trigger.Resume);
                 }
-                else if (_machine?.State == State.World)
+                else if (_machine?.State == State.Play)
                 {
                     _machine.Fire(Trigger.Pause);
                 }
@@ -66,7 +64,7 @@
             if (@event.IsActionPressed(Settings.Dialog))
             {
                 if (_mainWorld!.NPCs?.Any(x => x.IsPlayerNearby()) != true) return;
-                if (_machine?.State == State.World)
+                if (_machine?.State == State.Play)
                 {
                     _machine.Fire(_showDialogue!, _mainWorld!.NPCs?.First(x => x.IsPlayerNearby() == true));
                     GetViewport().SetInputAsHandled();
@@ -97,15 +95,12 @@
 
         public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
 
-        private void FireResume() => _machine?.Fire(Trigger.Resume);
-
-        private void Close() => _machine?.Fire(Trigger.Close);
-
         private void SetEvents()
         {
             if (_mainWorld == null) return;
             _mainWorld.CutScene += (t) => _machine?.Fire(_showMonologue, t);
-            _mainWorld.PropertyChanged += NewBattleContextCreated;
+            _mainWorld.InitializeFight += StartFight;
+            _managerUI!.ExitedBattle += _mainWorld.ResetBattleState;
 
             foreach (var obj in _mainWorld.OpenableObjects)
             {
@@ -113,53 +108,19 @@
             }
         }
 
-        private void ObjectOpen(BaseOpenableObject obj) => _managerUI?.OpenInventory(obj);
-
-        private void NewBattleContextCreated(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(MainWorld.Fight) && _mainWorld?.Fight != null)
-                _machine?.Fire(Trigger.StartBattle);
-        }
-
-        private void ReturnToMainWorld(BattleResult result)
-        {
-            var battleScene = GetNode<BattleLayer>(nameof(BattleLayer)).GetNode<BattleSceneHandler>("BattleScene");
-            if (result.EnemyKilled)
-            {
-                _mainWorld?.Enemies?.Remove(result.Enemy);
-            }
-            else
-            {
-                result.Enemy.Position += new Vector2(30, 30);
-                battleScene?.CallDeferred("remove_child", result.Enemy);
-                _mainWorld?.CallDeferred("add_child", result.Enemy);
-            }
-
-            battleScene!.CallDeferred("remove_child", result.Player);
-            _mainWorld!.CallDeferred("add_child", result.Player);
-            _machine?.Fire(Trigger.EndBattle);
-        }
-
         private void ConfigureStateMachine()
         {
             _showDialogue = _machine?.SetTriggerParameters<BaseSpeakingNPC>(Trigger.Dialog);
             _showMonologue = _machine?.SetTriggerParameters<string>(Trigger.Monologue);
 
-            _machine?.Configure(State.World)
-                .OnEntry(() => _managerUI?.ShowMainUI())
-                .Permit(Trigger.StartBattle, State.Battle)
+            _machine?.Configure(State.Play)
+                .OnEntry(() =>
+                {
+                    _managerUI?.ShowMainUI();
+                })
                 .Permit(Trigger.Pause, State.Paused)
                 .Permit(Trigger.Monologue, State.Monologue)
                 .Permit(Trigger.Dialog, State.Dialog);
-
-            _machine?.Configure(State.Battle)
-                .OnEntry(() =>
-                {
-                    PrepareBattle();
-                    _managerUI?.ShowBattleUI();
-                })
-                .OnExit(AfterBattle)
-                .Permit(Trigger.EndBattle, State.World);
 
             _machine?.Configure(State.Paused)
               .OnEntry(() =>
@@ -168,38 +129,28 @@
                   _managerUI?.ShowPauseUI();
               })
               .OnExit(() => { _mainWorld!.ProcessMode = ProcessModeEnum.Inherit; })
-              .Permit(Trigger.Resume, State.World);
+              .Permit(Trigger.Resume, State.Play);
 
             _machine?.Configure(State.Dialog)
                 .OnEntryFrom(_showDialogue, OpenDialogue)
-                .Permit(Trigger.Close, State.World);
+                .Permit(Trigger.Close, State.Play);
 
             _machine?.Configure(State.Monologue)
                 .OnEntryFrom(_showMonologue, OpenMonologue)
-                .Permit(Trigger.Close, State.World);
+                .Permit(Trigger.Close, State.Play);
         }
 
+        private void FireResume() => _machine?.Fire(Trigger.Resume);
+        private void Close() => _machine?.Fire(Trigger.Close);
+        private void ObjectOpen(BaseOpenableObject obj) => _managerUI?.OpenInventory(obj);
+        private void StartFight(BattleContext context) => _managerUI?.OpenBattleUI(context);
         private void OpenMonologue(string firstNode) => _managerUI?.OpenMonologue(firstNode);
-
         private void OpenDialogue(BaseSpeakingNPC npc) => _managerUI?.OpenDialogue(npc);
-
-        private void AfterBattle()
-        {
-            _mainWorld!.Fight = null;
-            _mainWorld.ResetBattleState();
-        }
-
-        private void PrepareBattle()
-        {
-            var battleLayer = GetNode<BattleLayer>(nameof(BattleLayer));
-            battleLayer!.BattleContext = _mainWorld!.Fight!;
-        }
 
         private void Unsubscribe()
         {
             if (_mainWorld == null) return;
             _mainWorld.CutScene -= (t) => _machine?.Fire(_showMonologue, t);
-            _mainWorld.PropertyChanged -= NewBattleContextCreated;
         }
     }
 }

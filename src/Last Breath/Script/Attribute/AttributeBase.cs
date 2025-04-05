@@ -27,6 +27,7 @@
 
         public virtual void UpdateModifiers()
         {
+            // for now i just remove all and recalculate
             RemoveAllModifiers();
             foreach (var effect in _effects)
             {

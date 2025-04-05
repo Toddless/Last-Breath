@@ -671,7 +671,6 @@ atlas = ExtResource("4_ktjf6")
 
 [node name="Player" type="CharacterBody2D"]
 physics_interpolation_mode = 2
-position = Vector2(86, 154)
 script = ExtResource("1_nuf03")
 Speed = 600
 

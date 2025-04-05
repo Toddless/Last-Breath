@@ -2,7 +2,6 @@
 {
     using Playground.Components;
     using Playground.Script.Effects;
-    using Playground.Script.Enums;
 
     [TestClass]
     public class DamageComponentTest

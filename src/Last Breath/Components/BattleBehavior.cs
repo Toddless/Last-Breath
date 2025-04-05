@@ -1,84 +1,74 @@
 ﻿namespace Playground.Components
 {
     using System.Collections.Generic;
-    using System.Linq;
     using Playground.Components.Interfaces;
-    using Playground.Script.Effects.Interfaces;
     using Playground.Script.ScenesHandlers;
 
-    /// <summary>
-    /// Determine enemies battle behaviors depending on conditions
-    /// </summary>
+    // TODO: Rework
     public class BattleBehavior
     {
         private List<IAbilityDecision>? _abilitiesDecisions;
         private IBattleContext? _battleContext;
 
-        public BattleBehavior()
-        {
-        }
+        //public void SetDependencies(IBattleContext context)
+        //{
+        //    _battleContext = context;
+        //    SetAbilitiesDecisions(_battleContext.Self.Abilities!);
+        //}
 
-        public void SetDependencies(IBattleContext context)
-        {
-            _battleContext = context;
-            //_conditions = conditions.SetNewConditions(_battleContext);
-            SetAbilitiesDecisions(_battleContext.Self.Abilities!);
-        }
+        //public IAbility? MakeDecision()
+        //{
+        //    UpdateAbilitiesDecisions();
+        //    return _abilitiesDecisions?.OrderByDescending(x => x.Priority).FirstOrDefault(x => x.Ability.Cooldown == 4)?.Ability;
+        //}
 
-        public IAbility? MakeDecision()
-        {
-            // update decisions bevor taking an ability
-            UpdateAbilitiesDecisions();
-            return _abilitiesDecisions?.OrderByDescending(x => x.Priority).FirstOrDefault(x => x.Ability.Cooldown == 4)?.Ability;
-        }
+        //public void BattleEnds()
+        //{
+        //    _battleContext = null;
+        //    _abilitiesDecisions = null;
+        //}
 
-        public void BattleEnds()
-        {
-            _battleContext = null;
-            _abilitiesDecisions = null;
-        }
-
-        private float EvaluateAbility(IAbility ability)
-        {
-            float biggestPriority = 0;
+        //private float EvaluateAbility(IAbility ability)
+        //{
+        //    float biggestPriority = 0;
            
-            return biggestPriority;
-        }
+        //    return biggestPriority;
+        //}
 
-        private float AbilityMatchConditionNeeds(IAbility ability)
-        {
-            float priorityModifier = 1;
-            foreach (IEffect effect in ability.Effects)
-            {
-              //  if (effect.EffectType == condition.EffectNeeded)
-                    priorityModifier += 0.1f;
-              //if (condition.CheckCondition.Invoke())
-                    priorityModifier += 0.5f;
-            }
+        //private float AbilityMatchConditionNeeds(IAbility ability)
+        //{
+        //    float priorityModifier = 1;
+        //    foreach (IEffect effect in ability.Effects)
+        //    {
+        //      //  if (effect.EffectType == condition.EffectNeeded)
+        //            priorityModifier += 0.1f;
+        //      //if (condition.CheckCondition.Invoke())
+        //            priorityModifier += 0.5f;
+        //    }
 
-            return priorityModifier;
-        }
+        //    return priorityModifier;
+        //}
 
-        private void SetAbilitiesDecisions(List<IAbility> abilities)
-        {
-            _abilitiesDecisions = [];
-            foreach (var ability in abilities)
-            {
-                _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability)));
-            }
-        }
+        //private void SetAbilitiesDecisions(List<IAbility> abilities)
+        //{
+        //    _abilitiesDecisions = [];
+        //    foreach (var ability in abilities)
+        //    {
+        //        _abilitiesDecisions?.Add(new AbilityDecision(ability, EvaluateAbility(ability)));
+        //    }
+        //}
 
-        private void UpdateAbilitiesDecisions()
-        {
-            foreach (var item in _abilitiesDecisions!)
-            {
-                item.Priority = UpdateAbilityPriority(item.Ability);
-            }
-        }
+        //private void UpdateAbilitiesDecisions()
+        //{
+        //    foreach (var item in _abilitiesDecisions!)
+        //    {
+        //        item.Priority = UpdateAbilityPriority(item.Ability);
+        //    }
+        //}
 
-        private float UpdateAbilityPriority(IAbility ability)
-        {
-            return EvaluateAbility(ability);
-        }
+        //private float UpdateAbilityPriority(IAbility ability)
+        //{
+        //    return EvaluateAbility(ability);
+        //}
     }
 }

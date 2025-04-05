@@ -40,6 +40,7 @@
 
         public void Heal(float amount) => CurrentHealth = Math.Min(MaxHealth, CurrentHealth + amount);
 
+        public void HealUpToMax() => CurrentHealth = MaxHealth;
         private void OnParameterModifiersChanges(Parameter parameter)
         {
             if (parameter != Parameter.MaxHealth)

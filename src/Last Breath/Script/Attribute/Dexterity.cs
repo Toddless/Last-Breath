@@ -18,7 +18,7 @@
             yield return new AttributeEffect
               (Parameter.CriticalStrikeDamage,
               ModifierType.Additive,
-              0.5f,
+              0.01f,
               priority: ModifierPriorities.BaseParameters
               );
 
