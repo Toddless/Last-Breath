@@ -115,10 +115,6 @@
             {
                 player.Health!.MaxHealthChanged += (value) => _playerInventory?.UpdateMaxHealth(Mathf.RoundToInt(value));
                 player.Health.CurrentHealthChanged += (value) => _playerInventory?.UpdateCurrentHealth(Mathf.RoundToInt(value));
-                //player.AttackComponent!.CurrentDamageChanged += (min, max) => _playerInventory?.UpdateDamage(Mathf.RoundToInt(min), Mathf.RoundToInt(max));
-                //player.AttackComponent.CurrentCriticalChanceChanged += (value) => _playerInventory?.UpdateCriticalChance(value);
-                //player.AttackComponent.CurrentCriticalDamageChanged += (value) => _playerInventory?.UpdateCriticalDamage(value);
-                //player.AttackComponent.CurrentExtraHitChanged += (value) => _playerInventory?.UpdateExtraHitChance(value);
                 player.Health.MaxHealthChanged += (value) => _mainUI?.UpdateMaxHealthBar(Mathf.RoundToInt(value));
                 player.Health!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
             }

@@ -6,6 +6,7 @@
         CriticalStrikeChance,
         CriticalStrikeDamage,
         AdditionalStrikeChance,
+        CurrentHealth,
         MaxHealth,
         Dexterity,
         Strength,

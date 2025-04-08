@@ -21,10 +21,10 @@
         public event Action? ExitedBattle, ExitedPause, ExitedDialogue;
 
         public void SetResume(Action resume) => _pauseLayer.Resume = resume;
-        public void SetReturn(Action<BattleResult> action) => _battleLayer.ReturnToMainWorld = action;
         public void SetClose(Action close) => _dialogLayer.DialogueEnded = close;
         public void ShowMainUI() => _machine.Fire(Trigger.ShowMainUI);
         public void ShowPauseUI() => _machine?.Fire(Trigger.ShowPauseUI);
+        public void OpenInventory(BaseOpenableObject obj) => _mainLayer.OpenInventory(obj);
 
         public void OpenBattleUI(BattleContext context)
         {
@@ -43,7 +43,6 @@
             _dialogLayer.InitializeDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
-        public void OpenInventory(BaseOpenableObject obj) => _mainLayer.OpenInventory(obj);
 
         #region Dev
 #if DEBUG

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://j6cqo6u0s83x"]
+[gd_scene load_steps=14 format=3 uid="uid://j6cqo6u0s83x"]
 
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
 [ext_resource type="Script" uid="uid://402jw803k746" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
@@ -26,8 +26,11 @@ size = Vector2(75, 75)
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_215ms"]
 size = Vector2(75, 75)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hi3if"]
-bg_color = Color(0.940777, 0.415391, 0.241381, 1)
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mc3dc"]
+size = Vector2(50, 50)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7diyt"]
+size = Vector2(50, 50)
 
 [node name="BattleUI" type="Control"]
 layout_mode = 3
@@ -210,35 +213,37 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
 
-[node name="FirstAbility" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability1" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+texture_normal = SubResource("PlaceholderTexture2D_mc3dc")
 
-[node name="SecondAbility" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability2" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")
 
-[node name="Panel3" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability3" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")
 
-[node name="Panel4" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability4" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")
 
-[node name="Panel5" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability5" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")
 
-[node name="Panel6" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability6" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")
 
-[node name="Panel7" type="Panel" parent="MarginContainer/HBoxContainerAbilityButtons"]
+[node name="Ability7" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hi3if")
+texture_normal = SubResource("PlaceholderTexture2D_7diyt")

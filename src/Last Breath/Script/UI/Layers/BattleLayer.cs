@@ -8,8 +8,7 @@
     {
         private BattleSceneHandler? _battleSceneHandler;
         private BattleUI? _battleUI;
-
-        public Action<BattleResult?>? ReturnToMainWorld;
+        
         public event Action? BattleEnds;
 
         public override void _Ready()
@@ -34,6 +33,10 @@
             _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
             _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
             _battleSceneHandler.BattleEnd += OnBattleEnds;
+
+            #region Abilities
+            _battleUI.FirstAbilityPressed += () => _battleSceneHandler?.FirsAbilityPressed();
+            #endregion
         }
 
         private void HandleFightStart(BattleContext context)
@@ -42,6 +45,7 @@
             context.Player.CanMove = false;
             context.Opponent.CanFight = false;
             context.Opponent.CanMove = false;
+            _battleUI?.SubscribeBattleUI((Player)context.Player, (BaseEnemy)context.Opponent);
             // adding to UI Player and Enemy Animations
         }
 
@@ -53,21 +57,18 @@
                     HandleEnemyWon(result);
                     break;
                     case Enums.BattleResults.PlayerWon:
-                    HandleEnemyKilled(result.Enemy);
+                    HandlePlayerRunAway(result);
+                   // HandleEnemyKilled(result.Enemy);
                     break;
                     case Enums.BattleResults.PlayerRunAway:
                     HandlePlayerRunAway(result);
                     break;
             }
-            // данную часть изменить/разделить. Иначе начнется новый бой сразу же после окончания старого
-            // может ли игрок в случае поражения драться, пока под вопросом
+            _battleUI?.UnsubscribeBattleUI((Player)result.Player, (BaseEnemy)result.Enemy);
             BattleEnds?.Invoke();
         }
 
-        private void HandleEnemyWon(BattleResult result)
-        {
-
-        }
+        private void HandleEnemyWon(BattleResult result) => HandlePlayerRunAway(result);
 
         private void HandlePlayerRunAway(BattleResult result)
         {

@@ -3,9 +3,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System;
-    using Playground.Script.Effects;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Playground.Script.Abilities.Modifiers;
 
     public class ModifierManager : ObservableProperty
     {
@@ -27,14 +27,18 @@
         // clear temporary modifiers (for example we remove all modifiers after fight ends)
         public void Reset() => _temporaryModifiers.Clear();
 
-        // calculate ant convert to int value for specific parameter 
-        public int CalculateIntValue(float value, Parameter parameter) => Math.Max(0, (int)CalculateFloatValue(value, parameter));
+        public float CalculateFloatValue(float value, Parameter parameter) => Math.Max(0, CalculateModifiers(GetCombinedModifiers(parameter), value));
 
-        public float CalculateFloatValue(float value, Parameter parameter)
+        private List<IModifier> GetCombinedModifiers(Parameter parameter)
         {
-            var allModifiers = _permanentModifiers.GetValueOrDefault(parameter, []).Concat(_temporaryModifiers.GetValueOrDefault(parameter, [])).OrderBy(m => m.Priority).ToList();
-            value = CalculateModifiers(allModifiers, value);
-            return Math.Max(0, value);
+            var modifiers = new List<IModifier>();
+            if (_permanentModifiers.TryGetValue(parameter, out var permanent))
+                modifiers.AddRange(permanent);
+
+            if (_temporaryModifiers.TryGetValue(parameter, out var temp))
+                modifiers.AddRange(temp);
+
+            return modifiers;
         }
 
         private void AddToCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)

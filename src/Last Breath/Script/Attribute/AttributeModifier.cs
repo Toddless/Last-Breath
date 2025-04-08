@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.Attribute
 {
     using Playground.Components.Interfaces;
-    using Playground.Script.Effects;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
     public class AttributeModifier(Parameter param, float value, ModifierType type, IAttribute source, int priority = 0) : IModifier

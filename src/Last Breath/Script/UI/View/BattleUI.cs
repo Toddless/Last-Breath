@@ -3,7 +3,6 @@ namespace Playground
     using System;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.ScenesHandlers;
 
     public partial class BattleUI : Control
     {
@@ -11,8 +10,8 @@ namespace Playground
         private TextureProgressBar? _playerHealthBar, _enemyHealthBar;
         private GridContainer? _playerEffects, _enemyEffects;
         private RandomNumberGenerator? _rnd;
-        private TextureButton? _dexterityStance, _strengthStance, _intelligenceStance, _head, _body, _legs, _firstAbility, _secondAbility;
-        private BattleSceneHandler? _battleSceneHandler;
+        private TextureButton? _dexterityStance, _strengthStance, _intelligenceStance, _head, _body, _legs;
+        private TextureButton? _abilityOne, _abilityTwo, _abilityThree, _abilityFour, _abilityFive, _abilitySix, _abilitySeven;
         private Panel? _panelPlayer, _panelEnemy;
         private HBoxContainer? _buttons;
         private VBoxContainer? _stanceContainer, _bodyContainer;
@@ -27,6 +26,21 @@ namespace Playground
         [Signal]
         public delegate void IntelligenceStanceEventHandler();
 
+        [Signal]
+        public delegate void FirstAbilityPressedEventHandler();
+        [Signal]
+        public delegate void SecondAbilityPressedEventHandler();
+        [Signal]
+        public delegate void ThirdAbilityPressedEventHandler();
+        [Signal]
+        public delegate void FourthAbilityPressedEventHandler();
+        [Signal]
+        public delegate void FifthAbilityPressedEventHandler();
+        [Signal]
+        public delegate void SixthAbilityPressedEventHandler();
+        [Signal]
+        public delegate void SeventhAbilityPressedEventHandler();
+
         public override void _Ready()
         {
             _buttons = (HBoxContainer?)NodeFinder.FindBFSCached(this, "HBoxContainerAttackButtons");
@@ -40,8 +54,14 @@ namespace Playground
             _head = (TextureButton?)NodeFinder.FindBFSCached(this, "Head");
             _body = (TextureButton?)NodeFinder.FindBFSCached(this, "Body");
             _legs = (TextureButton?)NodeFinder.FindBFSCached(this, "Legs");
-            _firstAbility = (TextureButton?)NodeFinder.FindBFSCached(this, "FirstAbility");
-            _secondAbility = (TextureButton?)NodeFinder.FindBFSCached(this, "SecondAbility");
+
+            _abilityOne = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability1");
+            _abilityTwo = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability2");
+            _abilityThree = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability3");
+            _abilityFour = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability4");
+            _abilityFive = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability5");
+            _abilitySix = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability6");
+            _abilitySeven = (TextureButton?)NodeFinder.FindBFSCached(this, "Ability7");
 
             _playerHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "PlayerHealth");
             _enemyHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "EnemyHealth");
@@ -62,22 +82,40 @@ namespace Playground
             _dexterityStance!.Pressed += () => EmitSignal(SignalName.DexterityStance);
             _strengthStance!.Pressed += () => EmitSignal(SignalName.StrengthStance);
             _intelligenceStance!.Pressed += () => EmitSignal(SignalName.IntelligenceStance);
+
+            #region Abilities
+            _abilityOne!.Pressed += () => EmitSignal(SignalName.FirstAbilityPressed);
+            _abilityTwo!.Pressed += () => EmitSignal(SignalName.SecondAbilityPressed);
+            _abilityThree!.Pressed += () => EmitSignal(SignalName.ThirdAbilityPressed);
+            _abilityFour!.Pressed += () => EmitSignal(SignalName.FourthAbilityPressed);
+            _abilityFive!.Pressed += () => EmitSignal(SignalName.FifthAbilityPressed);
+            _abilitySix!.Pressed += () => EmitSignal(SignalName.SixthAbilityPressed);
+            _abilitySeven!.Pressed += () => EmitSignal(SignalName.SeventhAbilityPressed);
+            #endregion
         }
 
-        public void InitialSetup(Player player, BaseEnemy enemy)
+        // TODO: Method to set abilities icons
+
+        public void SubscribeBattleUI(Player player, BaseEnemy enemy)
         {
             _playerHealthBar.MaxValue = player.Health.MaxHealth;
             _playerHealthBar.Value = player.Health.CurrentHealth;
 
             _enemyHealthBar.MaxValue = enemy.Health.MaxHealth;
             _enemyHealthBar.Value = enemy.Health.CurrentHealth;
-            player.Position = _panelPlayer.GlobalPosition;
-            enemy.Position = _panelEnemy.GlobalPosition;
 
             player.Health.CurrentHealthChanged += OnPlayerCurrentHealthChanged;
             player.Health.MaxHealthChanged += OnPlayerMaxHealthChanged;
             enemy.Health.CurrentHealthChanged += OnEnemyCurrentHealthChanged;
             enemy.Health.MaxHealthChanged += OnEnemyMaxHealthChanged;
+        }
+
+        public void UnsubscribeBattleUI(Player player, BaseEnemy enemy)
+        {
+            player.Health.CurrentHealthChanged -= OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged -= OnPlayerMaxHealthChanged;
+            enemy.Health.CurrentHealthChanged -= OnEnemyCurrentHealthChanged;
+            enemy.Health.MaxHealthChanged -= OnEnemyMaxHealthChanged;
         }
 
         public void HideAttackButtons() => _buttons?.Hide();

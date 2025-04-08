@@ -8,6 +8,7 @@
     using Playground.Localization;
     using Playground.Resource.Quests;
     using Playground.Script;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
@@ -27,15 +28,19 @@
         private int _exp, _gold;
         private Stance _stance;
         private float _moveProgress = 0f;
-        #endregion
 
         #region Components
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
         private DefenseComponent? _playerDefense;
+        private EffectsManager? _effectsManager;
+        private ResourceManager? _resourceManager;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         #endregion
+
+        #endregion
+
 
         [Signal]
         public delegate void PlayerEnterTheBattleEventHandler();
@@ -79,8 +84,19 @@
         public Stance Stance
         {
             get => _stance;
-            set => _stance = value;
+            set
+            {
+                _stance = value;
+                Resource.SetCurrentResource(_stance);
+            }
         }
+
+        public EffectsManager Effects => _effectsManager ??= new(this);
+
+        public ModifierManager Modifiers => _modifierManager;
+
+        // TODO: i need default resource
+        public ResourceManager Resource => _resourceManager ??= new(_stance);
         #endregion
 
         #region Events
@@ -90,6 +106,7 @@
 
         public override void _Ready()
         {
+            _effectsManager = new(this);
             _playerHealth = new(_modifierManager);
             _playerDamage = new(new UnarmedDamageStrategy(), _modifierManager);
             _playerDefense = new(_modifierManager);
@@ -102,6 +119,7 @@
             GameManager.Instance!.Player = this;
             _attribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
             _attribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
+            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600));
             _playerHealth.HealUpToMax();
         }
 
@@ -174,12 +192,10 @@
                 _moveProgress += (float)delta;
                 float t = Mathf.Clamp(_moveProgress / 0.06f, 0f, 6f);
                 Position = _targetPosition.Lerp(_startPosition, t);
-                if(t >= 6f)
+                if (t >= 6f)
                 {
-                    GD.Print("Target reached");
                     _canMove = true;
                     _canFight = true;
-                    GD.Print($"Player can move: {_canMove}. And fight: {_canFight}");
                     _isPlayerRunning = false;
                 }
             }

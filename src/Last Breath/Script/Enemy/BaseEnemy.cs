@@ -5,6 +5,7 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
@@ -17,9 +18,12 @@ namespace Playground
     {
         #region Components
         private readonly AttributeComponent _enemyAttribute = new();
+        private readonly ModifierManager _modifierManager = new();
+        private EffectsManager? _effectsManager;
         private HealthComponent? _enemyHealth;
         private DamageComponent? _enemyDamage;
         private DefenseComponent? _enemyDefense;
+        private ResourceManager? _resourceManager;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false, _canMove;
@@ -38,7 +42,6 @@ namespace Playground
         private GlobalRarity _rarity;
         private EnemyType _enemyType;
         private Stance _stance;
-        private readonly ModifierManager _modifierManager = new();
 
         #region UI
         private Node2D? _inventoryNode;
@@ -63,8 +66,8 @@ namespace Playground
         }
         public Stance Stance
         {
-            get => _stance;
-            set => _stance = value;
+             get => _stance;
+             set => _stance = value;
         }
 
         public NavigationAgent2D? NavigationAgent2D
@@ -129,12 +132,19 @@ namespace Playground
 
         public DefenseComponent? Defense => _enemyDefense;
 
+        public EffectsManager Effects => _effectsManager ??= new(this);
+
+        public ModifierManager Modifiers => _modifierManager;
+
+        public ResourceManager Resource => _resourceManager ??= new(_stance);
+
         public event Action<BaseEnemy>? InitializeFight;
 
         #endregion
 
         public override void _Ready()
         {
+            _effectsManager = new(this);
             _enemyHealth = new(_modifierManager);
             _enemyDefense = new(_modifierManager);
             // later i need strategy for enemies
@@ -157,6 +167,11 @@ namespace Playground
             SetEvents();
             // SpawnItems();
             Health?.HealUpToMax();
+        }
+
+        public IAbility? GetAbility()
+        {
+            return null;
         }
 
         protected void SpawnItems()

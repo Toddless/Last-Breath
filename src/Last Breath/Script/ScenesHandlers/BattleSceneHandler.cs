@@ -8,7 +8,6 @@
 
     public partial class BattleSceneHandler : ObservableProperty
     {
-      
         private enum State { Player, Enemy, Awaiting }
         private enum Trigger { PlayerTurn, EnemyTurn, Await }
 
@@ -31,7 +30,7 @@
 
         public void Init(BattleContext context)
         {
-            // TODO: Rework context
+            // TODO: Rework context, if i will let enemies fighting each other on this layer
             _player = (Player)context.Player;
             _enemy = (BaseEnemy)context.Opponent;
             DecideFirstTurn();
@@ -39,7 +38,13 @@
 
         public void PlayerTryingToRunAway()
         {
-            if (!(_rnd.RandfRange(0, 1) <= ChanceToEscape)) return;
+            // instead i should hide this button on enemy turn
+            if (_machine.State == State.Enemy) return;
+            if (!(_rnd.RandfRange(0, 1) <= ChanceToEscape))
+            {
+                _machine.Fire(Trigger.EnemyTurn);
+                return;
+            }
             // need method to refresh enemy stats
             BattleEnd?.Invoke(BattleFinished(BattleResults.PlayerRunAway));
             _machine?.Fire(Trigger.Await);
@@ -47,35 +52,49 @@
 
         public void DexterityStance()
         {
-            _player!.Stance = Enums.Stance.Dexterity;
+            _player!.Stance = Stance.Dexterity;
             GD.Print($"Player stance: {_player.Stance}");
         }
 
         public void StrengthStance()
         {
-            _player!.Stance = Enums.Stance.Strength;
+            _player!.Stance = Stance.Strength;
             GD.Print($"Player stance: {_player.Stance}");
+        }
+
+        public void FirsAbilityPressed()
+        {
+            // TODO for today: Have some abilities. Each of them can be activated and give the player some effects
+            // then depends on stance abilities changes
+            // dont forget about cooldown
         }
 
         public void PlayerTurn()
         {
             TryAttack();
+            // Method for resource generation
             _machine.Fire(Trigger.EnemyTurn);
         }
 
         private void EnemyMakesTurn()
         {
+            // Decide ability to use
+            // check if enough resources and cast second ability if needed (need to create system for that, so enemy do not use some ability, even though he has resources)
+            DecideAbility();
             TryAttack();
+            // Method for resource generation
             _machine.Fire(Trigger.PlayerTurn);
+        }
+
+        private void DecideAbility()
+        {
+           
         }
 
         private void ConfigureStateMachine()
         {
             _machine.Configure(State.Awaiting)
-                .OnEntry(() =>
-                {
-                    ClearBattleScene();
-                })
+                .OnEntry(ClearBattleScene)
                 .Permit(Trigger.PlayerTurn, State.Player)
                 .Permit(Trigger.EnemyTurn, State.Enemy);
 
@@ -86,6 +105,7 @@
                 })
                 .OnExit(() =>
                 {
+                    _player?.Effects.UpdateEffects();
                     SwitchRoles();
                     GD.Print("Player turn ends");
                 })
@@ -101,6 +121,7 @@
                 })
                 .OnExit(() =>
                 {
+                    _enemy?.Effects.UpdateEffects();
                     SwitchRoles();
                     GD.Print("Enemy turn ends");
                     ShowAttackButtons?.Invoke();
@@ -125,6 +146,7 @@
 
         private bool PerformAttack()
         {
+            // _defender cannot evade attack if stunned
             if (IsEvade(_defender))
             {
                 GD.Print($"{GetCharacterName(_defender)} evaded attack");
@@ -139,30 +161,25 @@
             GD.Print($"Handling evaded attack. Defender: {GetCharacterName(_defender)}");
             switch (_defender.Stance)
             {
-                case Enums.Stance.Dexterity:
+                case Stance.Dexterity:
                     SwitchRoles();
                     TryCounterAttack();
                     break;
-                case Enums.Stance.Strength:
+                case Stance.Strength:
+                    // TODO: Mechanic for stance
                     break;
-                case Enums.Stance.Intelligence:
+                case Stance.Intelligence:
+                    // TODO: Mechanic for stance
                     break;
             }
         }
 
+        // for later: if this method still remain the same, just add bool with default value to TryAttack
+        // and call it in HandleEvadedAttack
         private void TryCounterAttack()
         {
             GD.Print($"{GetCharacterName(_attacker)} performing counter attack");
-            bool additionalHit;
-            do
-            {
-                if (!PerformAttack())
-                {
-                    break;
-                }
-                additionalHit = IsAdditionalHit(_attacker);
-
-            } while (additionalHit);
+            TryAttack();
             SwitchRoles();
         }
 
