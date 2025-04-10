@@ -5,7 +5,7 @@
 
     public class ClumsinessEffect(int duration = 3, int stacks = 1, bool permanent = false)
         :EffectBase(effect: Effects.ReducedEvasion,
-            modifier: new DodgeModifier(ModifierType.Multiplicative, 0.1f, ModifierPriorities.Debuffs),
+            modifier: new DodgeModifier(ModifierType.Multiplicative, 1.1f, ModifierPriorities.Debuffs),
             duration,
             stacks,
             permanent)

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_c5cqn"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
+[ext_resource type="Script" uid="uid://du3w1tmvgffcx" path="res://Script/UI/AbilityButtons.cs" id="6_mc3dc"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
 texture = ExtResource("2_c5cqn")
@@ -17,20 +18,17 @@ region = Rect2(0, 16, 64, 32)
 atlas = ExtResource("2_tr072")
 region = Rect2(0, 32, 64, 16)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_msf74"]
-bg_color = Color(0.998882, 0.000266452, 0.87029, 1)
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_fnpvt"]
+size = Vector2(450, 450)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_2f6ns"]
+size = Vector2(250, 250)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ingfk"]
 size = Vector2(75, 75)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_215ms"]
 size = Vector2(75, 75)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mc3dc"]
-size = Vector2(50, 50)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7diyt"]
-size = Vector2(50, 50)
 
 [node name="BattleUI" type="Control"]
 layout_mode = 3
@@ -128,33 +126,33 @@ theme_override_constants/margin_right = 150
 layout_mode = 2
 mouse_filter = 0
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
+[node name="Player" type="TextureButton" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(350, 350)
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
+texture_normal = SubResource("PlaceholderTexture2D_fnpvt")
 
-[node name="Panel2" type="Panel" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
+[node name="Enemy" type="TextureButton" parent="MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_msf74")
+texture_normal = SubResource("PlaceholderTexture2D_2f6ns")
 
-[node name="HBoxContainerAttackButtons" type="HBoxContainer" parent="MarginContainer"]
+[node name="AttackButtons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_constants/separation = 15
 
-[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/HBoxContainerAttackButtons"]
+[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
 custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="Dexterity" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Dexterity" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
@@ -163,7 +161,7 @@ keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_ingfk")
 flip_h = true
 
-[node name="Strength" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Strength" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -172,7 +170,7 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Intelligence" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerStance"]
+[node name="Intelligence" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -181,18 +179,18 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/HBoxContainerAttackButtons"]
+[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
 custom_minimum_size = Vector2(0, 290)
 layout_mode = 2
 
-[node name="Head" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+[node name="Head" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Body" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+[node name="Body" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -200,7 +198,7 @@ size_flags_vertical = 6
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Legs" type="TextureButton" parent="MarginContainer/HBoxContainerAttackButtons/VBoxContainerBodyPart"]
+[node name="Legs" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -208,42 +206,8 @@ size_flags_vertical = 10
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="HBoxContainerAbilityButtons" type="HBoxContainer" parent="MarginContainer"]
+[node name="AbilityButtons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
-
-[node name="Ability1" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_mc3dc")
-
-[node name="Ability2" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
-
-[node name="Ability3" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
-
-[node name="Ability4" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
-
-[node name="Ability5" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
-
-[node name="Ability6" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
-
-[node name="Ability7" type="TextureButton" parent="MarginContainer/HBoxContainerAbilityButtons"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture_normal = SubResource("PlaceholderTexture2D_7diyt")
+script = ExtResource("6_mc3dc")

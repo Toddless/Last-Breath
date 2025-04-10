@@ -6,7 +6,7 @@
     using Playground.Components.Interfaces;
     using Playground.Script.Helpers;
 
-    public abstract class AttributeBase(IEnumerable<AttributeEffect> effects, ModifierManager manager) : ObservableProperty, IAttribute
+    public abstract class AttributeBase(IEnumerable<AttributeEffect> effects, ModifierManager manager) : IAttribute
     {
         private const int BaseValue = 1;
         private int _investedPoints;
@@ -18,7 +18,7 @@
             get => _investedPoints;
             set
             {
-                if (SetProperty(ref _investedPoints, value))
+                if (ObservableProperty.SetProperty(ref _investedPoints, value))
                 {
                     UpdateModifiers();
                 }

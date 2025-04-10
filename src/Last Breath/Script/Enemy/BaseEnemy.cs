@@ -5,7 +5,9 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Abilities.Effects;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
@@ -23,7 +25,7 @@ namespace Playground
         private HealthComponent? _enemyHealth;
         private DamageComponent? _enemyDamage;
         private DefenseComponent? _enemyDefense;
-        private ResourceManager? _resourceManager;
+        private ResourceComponent? _resourceManager;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false, _canMove;
@@ -37,7 +39,6 @@ namespace Playground
         private AnimatedSprite2D? _sprite;
         private Vector2 _respawnPosition;
         private Area2D? _area;
-        private BattleBehavior? _battleBehavior;
         private EnemyAttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
         private EnemyType _enemyType;
@@ -66,8 +67,8 @@ namespace Playground
         }
         public Stance Stance
         {
-             get => _stance;
-             set => _stance = value;
+            get => _stance;
+            set => _stance = value;
         }
 
         public NavigationAgent2D? NavigationAgent2D
@@ -79,16 +80,6 @@ namespace Playground
         public Area2D? Area
         {
             get => _area;
-        }
-
-        public DamageComponent? Damage
-        {
-            get => _enemyDamage;
-        }
-
-        public HealthComponent? Health
-        {
-            get => _enemyHealth;
         }
 
         [Inject]
@@ -130,13 +121,17 @@ namespace Playground
 
         public string EnemyId => _enemyId ??= SetId();
 
-        public DefenseComponent? Defense => _enemyDefense;
+        public DamageComponent Damage => _enemyDamage ??= new(new UnarmedDamageStrategy(), _modifierManager);
+
+        public HealthComponent Health => _enemyHealth ??= new(_modifierManager);
+
+        public DefenseComponent Defense => _enemyDefense ??= new(_modifierManager);
 
         public EffectsManager Effects => _effectsManager ??= new(this);
 
         public ModifierManager Modifiers => _modifierManager;
 
-        public ResourceManager Resource => _resourceManager ??= new(_stance);
+        public ResourceComponent Resource => _resourceManager ??= new(_stance, _modifierManager);
 
         public event Action<BaseEnemy>? InitializeFight;
 
@@ -160,7 +155,6 @@ namespace Playground
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _battleBehavior = new BattleBehavior();
             _inventoryNode.Hide();
             DiContainer.InjectDependencies(this);
             SetStats();
@@ -172,6 +166,19 @@ namespace Playground
         public IAbility? GetAbility()
         {
             return null;
+        }
+
+        public void OnTurnEnd()
+        {
+            Effects.UpdateEffects();
+            RecoverResource();
+        }
+
+        public void OnFightEnds()
+        {
+            Effects.RemoveAllEffects();
+            // TODO: on reset temporary i still might have some effects in effects manager
+            Modifiers.ResetTemporaryModifiers();
         }
 
         protected void SpawnItems()
@@ -188,8 +195,19 @@ namespace Playground
             var points = SetAttributesDependsOnType(_enemyAttributeType);
             _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
             _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
+            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 500));
             SetAnimation();
             _stance = SetStance(_enemyAttributeType);
+        }
+
+        private void RecoverResource()
+        {
+            // TODO: instead of GoliathEffect should be effect that block resource recovery
+            //if (Effects.IsEffectApplied(typeof(GoliathEffect)))
+            //{
+            //    return;
+            //}
+            //_resourceManager?.RecoverCurrentResource();
         }
 
         private void SetEvents()

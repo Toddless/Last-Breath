@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [audio]
 
-buses/default_bus_layout="res://Resource/default_bus_layout.tres"
+buses/default_bus_layout="uid://blfs8ca5iilus"
 
 [autoload]
 
@@ -25,8 +25,8 @@ DiContainer="*res://DIComponents/DiContainer.cs"
 ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
 GameManager="*res://Script/GameManager.cs"
 QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
-QuestsTable="*res://Resource/QuestsTable.cs"
-RewardTable="*res://Resource/RewardTable.cs"
+QuestsTable="*res://Resources/QuestsTable.cs"
+RewardTable="*res://Resources/RewardTable.cs"
 
 [display]
 
@@ -59,6 +59,10 @@ settings/test/flaky_check_enable=true
 [global_group]
 
 MovingObstacles=""
+
+[gui]
+
+timers/tooltip_delay_sec=0.1
 
 [input]
 
@@ -137,7 +141,7 @@ ui_dialog={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resource/Dialogues/PlayerDialogues/playerDialogues.en.translation", "res://Resource/Quests/questData.en.translation", "res://Resource/Quests/questData.ru.translation", "res://Resource/Dialogues/GuardianDialogues/guardianDialogues.en.translation")
+locale/translations=PackedStringArray("res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/GuardianDialogues/guardianDialogues.en.translation", "res://Resources/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resources/Quests/questData.en.translation", "res://Resources/Quests/questData.ru.translation")
 
 [rendering]
 

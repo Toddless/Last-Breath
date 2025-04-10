@@ -14,6 +14,9 @@
         Armor,
         Dodge,
         EnergyBarrier,
-        SpellDamage
+        SpellDamage,
+        Mana,
+        Fury,
+        Combopoint
     }
 }

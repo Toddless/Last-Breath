@@ -20,7 +20,7 @@ namespace Playground.Components
 
         // TODO: on change strategy i need to recalculate modifiers
         public void ChangeStrategy(IDamageStrategy strategy)
-        {
+        {  
             _strategy = strategy;
             StrategyChanges?.Invoke();
         }

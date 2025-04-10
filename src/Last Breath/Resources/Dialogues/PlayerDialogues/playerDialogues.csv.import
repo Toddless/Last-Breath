@@ -6,10 +6,10 @@ uid="uid://cu84nn5t5mqwt"
 
 [deps]
 
-files=["res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
+files=["res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
 
-source_file="res://Resource/Dialogues/PlayerDialogues/playerDialogues.csv"
-dest_files=["res://Resource/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resource/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
+source_file="res://Resources/Dialogues/PlayerDialogues/playerDialogues.csv"
+dest_files=["res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
 
 [params]
 

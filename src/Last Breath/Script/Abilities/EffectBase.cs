@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.Abilities
 {
     using System;
+    using Godot;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
 
@@ -29,6 +30,7 @@
         public virtual void OnTick(ICharacter character)
         {
             if(!Permanent) Duration--;
+            GD.Print($"Effect: {GetType().Name} Duration: {Duration}");
         }
 
         public virtual void OnStacks(IEffect newEffect)

@@ -5,7 +5,9 @@
     public class PrecisionStrike(ICharacter owner)
         : AbilityBase(owner,
             cooldown: 3,
-            cost: 2)
+            cost: 2,
+            type: Enums.ResourceType.Combopoints,
+            activateOnlyOnCaster: false)
     {
         protected override AbilityEffectConfig ConfigureEffects() => new()
         {

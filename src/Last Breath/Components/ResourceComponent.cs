@@ -1,13 +1,14 @@
 ﻿namespace Playground.Components
 {
     using System.Collections.Generic;
+    using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
-    public class ResourceManager
+    public class ResourceComponent
     {
-        // TODO: Add modifiers calculation for resource recovery
         private IResource _currentResource;
+        private readonly ModifierManager _modifierManager;
         // maybe i should use stance instead of resurceType?
         private readonly Dictionary<Stance, IResource> _resources = new()
         {
@@ -16,13 +17,14 @@
             { Stance.Strength, new Fury()}
         };
 
-        public ResourceManager(Stance type)
+        public ResourceComponent(Stance type, ModifierManager modifierManager)
         {
             _currentResource = SetCurrentResource(type);
+            _modifierManager = modifierManager;
         }
 
         public IResource CurrentResource => _currentResource;
-        // TODO: How i will recover current resource?
+
         public IResource SetCurrentResource(Stance type)
         {
             if (!_resources.TryGetValue(type, out var resource))
@@ -34,14 +36,19 @@
             return resource;
         }
 
+        public void RecoverCurrentResource()
+        {
+            _currentResource.RecoveryAmount = Mathf.Max(0, _modifierManager.CalculateFloatValue(_currentResource.GetBaseRecovery(), _currentResource.Parameter));
+            _currentResource.Recover();
+        }
+
         public bool IsResourceHasRightType(ResourceType type) => _currentResource.Type == type;
 
         private static IResource CreateResource(Stance type) => type switch
         {
             Stance.Dexterity => new ComboPoints(),
             Stance.Strength => new Fury(),
-            Stance.Intelligence => new Mana(),
-            _ => new Mana()  // TODO: Log 
+            _ => new Mana() // default should be mana
         };
     }
 }

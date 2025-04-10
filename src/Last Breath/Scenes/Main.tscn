@@ -71,7 +71,6 @@ focus_mode = 0
 [node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="PauseLayer"]
 stream = ExtResource("8_11jk4")
 autoplay = true
-bus = &"Music"
 parameters/looping = true
 
 [node name="BattleLayer" type="CanvasLayer" parent="."]

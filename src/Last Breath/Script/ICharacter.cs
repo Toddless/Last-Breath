@@ -5,15 +5,19 @@
 
     public interface ICharacter
     {
-        public HealthComponent? Health { get; }
-        public DamageComponent? Damage { get; }
-        public DefenseComponent? Defense { get; }
+        public HealthComponent Health { get; }
+        public DamageComponent Damage { get; }
+        public DefenseComponent Defense { get; }
         public EffectsManager Effects {  get; }
         public ModifierManager Modifiers { get; }
-        public ResourceManager Resource { get; }
+        public ResourceComponent Resource { get; }
         Stance Stance { get; set; }
         bool CanFight { get; set; }
         bool CanMove { get; set; }
+
+
+        void OnTurnEnd();
+        void OnFightEnds();
 
         // TODO: Resources class
         // i need 3 types, for each stance

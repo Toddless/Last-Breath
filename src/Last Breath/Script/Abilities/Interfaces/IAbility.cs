@@ -1,5 +1,6 @@
 ﻿namespace Playground.Script.Abilities.Interfaces
 {
+    using System;
     using Playground.Script.Enums;
 
     public interface IAbility
@@ -8,10 +9,13 @@
         string Description { get; }
         int Cooldown { get; set; }
         int Cost { get; }
-        bool CanActivateOnCaster { get; }
+        bool ActivateOnlyOnCaster { get; }
         ResourceType Type { get; }
+
+        event Action? OnCooldown, OnCost, OnTarget;
         void Activate(ICharacter target);
-        bool AbilityCanActivate();
+        bool AbilityCanActivate(ICharacter target);
+        void UpdateCooldown();
 
         // for now i ignore UI, animations and sounds
         // i should add this later

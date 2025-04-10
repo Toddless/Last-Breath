@@ -6,7 +6,7 @@
     using Playground.Script.Helpers;
     using Stateless;
 
-    public partial class BattleSceneHandler : ObservableProperty
+    public partial class BattleSceneHandler
     {
         private enum State { Player, Enemy, Awaiting }
         private enum Trigger { PlayerTurn, EnemyTurn, Await }
@@ -19,9 +19,23 @@
         private readonly RandomNumberGenerator _rnd = new();
         private Player? _player;
         private BaseEnemy? _enemy;
-        private ICharacter? _attacker, _defender;
+        private ICharacter? _attacker, _defender, _playerTarget;
+        private bool _isPlayerTurn = false;
 
         public event Action<BattleResult>? BattleEnd;
+        public event Action<ICharacter?>? TargetChanges;
+        public event Action? PlayerTurnEnds;
+
+        public ICharacter? Target
+        {
+            get => _playerTarget;
+            set
+            {
+                // TODO: What do i do on enemy turn? Can player still switch targets?
+                if (ObservableProperty.SetProperty(ref _playerTarget, value))
+                    TargetChanges?.Invoke(_playerTarget);
+            }
+        }
 
         public BattleSceneHandler()
         {
@@ -62,17 +76,24 @@
             GD.Print($"Player stance: {_player.Stance}");
         }
 
-        public void FirsAbilityPressed()
+        public void OnEnemyAreaPressed()
         {
-            // TODO for today: Have some abilities. Each of them can be activated and give the player some effects
-            // then depends on stance abilities changes
-            // dont forget about cooldown
+            if(!_isPlayerTurn) return;
+            Target = _enemy;
+        }
+
+        public void OnPlayerAreaPressed()
+        {
+            if (!_isPlayerTurn) return;
+            Target = _player;
         }
 
         public void PlayerTurn()
         {
+            // TODO: In Strenght stance player and enemy cannot attack multiple times
             TryAttack();
             // Method for resource generation
+            // TODO: On end turn give player abilities EXP
             _machine.Fire(Trigger.EnemyTurn);
         }
 
@@ -88,7 +109,7 @@
 
         private void DecideAbility()
         {
-           
+
         }
 
         private void ConfigureStateMachine()
@@ -101,10 +122,13 @@
             _machine.Configure(State.Player)
                 .OnEntry(() =>
                 {
+                    _isPlayerTurn = true;
                     GD.Print("Player turn");
                 })
                 .OnExit(() =>
                 {
+                    PlayerTurnEnds?.Invoke();
+                    _isPlayerTurn = false;
                     _player?.Effects.UpdateEffects();
                     SwitchRoles();
                     GD.Print("Player turn ends");
@@ -256,6 +280,7 @@
             _enemy = null;
             _defender = null;
             _attacker = null;
+            _playerTarget = null;
         }
 
         private BattleResult BattleFinished(BattleResults results)

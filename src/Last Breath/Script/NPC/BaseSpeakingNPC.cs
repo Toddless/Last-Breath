@@ -10,7 +10,7 @@
 
     public partial class BaseSpeakingNPC : BaseNPC
     {
-        private const string DialoguePath = "res://Resource/Dialogues/GuardianDialogues/guardianDialoguesData.tres";
+        private const string DialoguePath = "res://Resources/Dialogues/GuardianDialogues/guardianDialoguesData.tres";
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
         private List<string> _quests = [];
         private string _initialDialogueNodeId = string.Empty;

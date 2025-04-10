@@ -4,10 +4,10 @@
     using System.Linq;
     using System;
     using Playground.Script.Enums;
-    using Playground.Script.Helpers;
     using Playground.Script.Abilities.Modifiers;
+    using Godot;
 
-    public class ModifierManager : ObservableProperty
+    public class ModifierManager
     {
         // all modifiers from equipment, passive abilities etc.
         protected readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
@@ -15,19 +15,21 @@
         protected readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
 
         public event Action<Parameter>? ParameterModifiersChanged;
-
         public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
-        // adding modifiers
+
+
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
-        // removing modifiers
+
+
         public void RemovePermanentModifier(IModifier modifier) => RemoveFromCategory(_permanentModifiers, modifier);
         public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
-        // clear temporary modifiers (for example we remove all modifiers after fight ends)
-        public void Reset() => _temporaryModifiers.Clear();
 
-        public float CalculateFloatValue(float value, Parameter parameter) => Math.Max(0, CalculateModifiers(GetCombinedModifiers(parameter), value));
+
+        public void ResetTemporaryModifiers() => _temporaryModifiers.Clear();
+
+        public float CalculateFloatValue(float value, Parameter parameter) => Math.Max(0, FilterModifiers(GetCombinedModifiers(parameter), value));
 
         private List<IModifier> GetCombinedModifiers(Parameter parameter)
         {
@@ -49,7 +51,7 @@
                 category[modifier.Parameter] = list;
             }
             list.Add(modifier);
-
+            GD.Print($"Modifier added: {modifier.GetType().Name}. Parameter: {modifier.Parameter}. Value: {modifier.Value}");
             ParameterModifiersChanged?.Invoke(modifier.Parameter);
         }
 
@@ -68,7 +70,7 @@
             ParameterModifiersChanged?.Invoke(modifier.Parameter);
         }
 
-        private float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
+        private float FilterModifiers(IEnumerable<IModifier> modifiers, float value)
         {
             var factor = 1f;
             foreach (var group in modifiers.GroupBy(m => m.Type).OrderBy(g => g.Key))
@@ -76,13 +78,13 @@
                 switch (group.Key)
                 {
                     case ModifierType.Additive:
-                        value = ApplyModifiers(value, group);
+                        value = ModifyValue(value, group);
                         break;
                     case ModifierType.MultiplicativeSum:
                         value *= factor += group.Sum(x => x.Value);
                         break;
                     case ModifierType.Multiplicative:
-                        value = ApplyModifiers(value, group);
+                        value = ModifyValue(value, group);
                         break;
 
                 }
@@ -90,7 +92,7 @@
             return value;
         }
 
-        private float ApplyModifiers(float value, IGrouping<ModifierType, IModifier> modifiers)
+        private float ModifyValue(float value, IGrouping<ModifierType, IModifier> modifiers)
         {
             foreach (var modifier in modifiers.OrderBy(x => x.Priority))
             {

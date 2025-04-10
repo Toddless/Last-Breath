@@ -8,7 +8,7 @@
     {
         private BattleSceneHandler? _battleSceneHandler;
         private BattleUI? _battleUI;
-        
+
         public event Action? BattleEnds;
 
         public override void _Ready()
@@ -33,20 +33,32 @@
             _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
             _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
             _battleSceneHandler.BattleEnd += OnBattleEnds;
-
-            #region Abilities
-            _battleUI.FirstAbilityPressed += () => _battleSceneHandler?.FirsAbilityPressed();
-            #endregion
+            _battleUI!.PlayerAreaPressed += _battleSceneHandler.OnPlayerAreaPressed;
+            _battleUI!.EnemyAreaPressed += _battleSceneHandler.OnEnemyAreaPressed;
+            _battleSceneHandler.TargetChanges += (t) => _battleUI?.OnTargetChanges(t);
+            _battleSceneHandler.PlayerTurnEnds += _battleUI.OnTurnEnds;
         }
 
         private void HandleFightStart(BattleContext context)
         {
+            var player = (Player)context.Player;
             context.Player.CanFight = false;
             context.Player.CanMove = false;
             context.Opponent.CanFight = false;
             context.Opponent.CanMove = false;
+            // setup players ability in subscribeBattleUi or SetAbilities?
             _battleUI?.SubscribeBattleUI((Player)context.Player, (BaseEnemy)context.Opponent);
-            // adding to UI Player and Enemy Animations
+            // adding to UI Player and Enemy Animatio1ns
+            // i just set as default target an enemy
+            SetAbilities(player);
+        }
+
+        private void SetAbilities(Player player)
+        {
+            foreach (var ability in player.Abilities)
+            {
+                _battleUI?.SetAbility(ability);
+            }
         }
 
         private void OnBattleEnds(BattleResult result)
@@ -56,11 +68,11 @@
                 case Enums.BattleResults.EnemyWon:
                     HandleEnemyWon(result);
                     break;
-                    case Enums.BattleResults.PlayerWon:
+                case Enums.BattleResults.PlayerWon:
                     HandlePlayerRunAway(result);
-                   // HandleEnemyKilled(result.Enemy);
+                    // HandleEnemyKilled(result.Enemy);
                     break;
-                    case Enums.BattleResults.PlayerRunAway:
+                case Enums.BattleResults.PlayerRunAway:
                     HandlePlayerRunAway(result);
                     break;
             }

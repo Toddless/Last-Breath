@@ -5,7 +5,7 @@
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
 
-    public class HealthComponent : ObservableProperty
+    public class HealthComponent
     {
         private const float BaseHealth = 100;
         private float _currentHealth;
@@ -19,8 +19,12 @@
             get => MathF.Max(0, _currentHealth);
             private set
             {
-                if (SetProperty(ref _currentHealth, value))
+                GD.Print($"Old current health: {_currentHealth}");
+                if (ObservableProperty.SetProperty(ref _currentHealth, value))
+                {
                     CurrentHealthChanged?.Invoke(_currentHealth);
+                    GD.Print($"New current health: {value}");
+                }
             }
         }
 
@@ -50,10 +54,12 @@
 
         private void UpdateMaxHealth()
         {
+            GD.Print($"Old max health: {_maxHealth}");
             var newMaxHealth = _modifierManager.CalculateFloatValue(BaseHealth, Parameter.MaxHealth);
             if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
             {
                 _maxHealth = newMaxHealth;
+                GD.Print($"Max health set to: {newMaxHealth}");
                 MaxHealthChanged?.Invoke(_maxHealth);
                 if (CurrentHealth > MaxHealth)
                     CurrentHealth = MaxHealth;

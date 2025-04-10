@@ -8,6 +8,9 @@
     using Playground.Localization;
     using Playground.Resource.Quests;
     using Playground.Script;
+    using Playground.Script.Abilities;
+    using Playground.Script.Abilities.Effects;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
@@ -19,28 +22,26 @@
     public partial class Player : ObservableCharacterBody2D, ICharacter
     {
         #region Private fields
-        private AnimatedSprite2D? _sprite;
-        private Vector2 _targetPosition, _startPosition;
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
-        private readonly PlayerProgress _progress = new();
-        private readonly Dictionary<string, DialogueNode> _dialogs = [];
-        private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
+        private float _moveProgress = 0f;
         private int _exp, _gold;
         private Stance _stance;
-        private float _moveProgress = 0f;
+        private AnimatedSprite2D? _sprite;
+        private Vector2 _targetPosition, _startPosition;
+        private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
+        private List<IAbility> _abilities = [];
+        private readonly Dictionary<string, DialogueNode> _dialogs = [];
 
-        #region Components
-        private HealthComponent? _playerHealth;
-        private DamageComponent? _playerDamage;
+        private ResourceComponent? _resourceManager;
+        private IDamageStrategy? _damageStrategy;
         private DefenseComponent? _playerDefense;
         private EffectsManager? _effectsManager;
-        private ResourceManager? _resourceManager;
+        private HealthComponent? _playerHealth;
+        private DamageComponent? _playerDamage;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
+        private readonly PlayerProgress _progress = new();
         #endregion
-
-        #endregion
-
 
         [Signal]
         public delegate void PlayerEnterTheBattleEventHandler();
@@ -59,28 +60,6 @@
             get => _canFight;
             set => _canFight = value;
         }
-
-        [Export]
-        public bool FirstSpawn { get; set; } = true;
-        [Export]
-        public int Speed { get; set; } = 200;
-        public Dictionary<string, DialogueNode> Dialogs => _dialogs;
-
-        public HealthComponent? Health
-        {
-            get => _playerHealth;
-        }
-        public DamageComponent? Damage
-        {
-            get => _playerDamage;
-        }
-        public PlayerProgress Progress => _progress;
-        public Inventory EquipInventory => _equipInventory ??= new();
-        public Inventory CraftingInventory => _craftingInventory ??= new();
-        public Inventory QuestItemsInventory => _questItemsInventory ??= new();
-
-        public DefenseComponent? Defense => _playerDefense;
-
         public Stance Stance
         {
             get => _stance;
@@ -91,12 +70,26 @@
             }
         }
 
+        [Export]
+        public bool FirstSpawn { get; set; } = true;
+        [Export]
+        public int Speed { get; set; } = 200;
+        public Dictionary<string, DialogueNode> Dialogs => _dialogs;
+        public PlayerProgress Progress => _progress;
+        public DefenseComponent? Defense => _playerDefense;
+        public HealthComponent Health => _playerHealth ??= new(_modifierManager);
+        public DamageComponent Damage => _playerDamage ??= new(Strategy, _modifierManager);
+        public Inventory EquipInventory => _equipInventory ??= new();
+        public Inventory CraftingInventory => _craftingInventory ??= new();
+        public Inventory QuestItemsInventory => _questItemsInventory ??= new();
+        public IDamageStrategy Strategy => _damageStrategy ??= new UnarmedDamageStrategy();
         public EffectsManager Effects => _effectsManager ??= new(this);
-
         public ModifierManager Modifiers => _modifierManager;
+        // i think i need some ability component later, because i need a place where player can modifiy, learn and forget abilities
+        public List<IAbility> Abilities => _abilities;
 
         // TODO: i need default resource
-        public ResourceManager Resource => _resourceManager ??= new(_stance);
+        public ResourceComponent Resource => _resourceManager ??= new(_stance, _modifierManager);
         #endregion
 
         #region Events
@@ -106,9 +99,10 @@
 
         public override void _Ready()
         {
+            _damageStrategy = new UnarmedDamageStrategy();
             _effectsManager = new(this);
             _playerHealth = new(_modifierManager);
-            _playerDamage = new(new UnarmedDamageStrategy(), _modifierManager);
+            _playerDamage = new(Strategy, _modifierManager);
             _playerDefense = new(_modifierManager);
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
@@ -121,19 +115,22 @@
             _attribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
             _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600));
             _playerHealth.HealUpToMax();
+            _abilities.Add(new TouchOfGod(this));
+            _abilities.Add(new PrecisionStrike(this));
+            GD.Print($"Player health: {_playerHealth.CurrentHealth}");
         }
 
         public void AddItemToInventory(Item item)
         {
             switch (item.Type)
             {
-                case Script.Enums.ItemType.Equipment:
+                case ItemType.Equipment:
                     _equipInventory?.AddItem(item);
                     break;
-                case Script.Enums.ItemType.Crafting:
+                case ItemType.Crafting:
                     _craftingInventory?.AddItem(item);
                     break;
-                case Script.Enums.ItemType.Quest:
+                case ItemType.Quest:
                     _questItemsInventory?.AddItem(item);
                     Progress.OnQuestItemCollected(item);
                     break;
@@ -153,8 +150,9 @@
         }
 
         public void OnEquipWeapon(IDamageStrategy strategy) => _playerDamage?.ChangeStrategy(strategy);
-
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
+        public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
+
 
         public void OnDialogueCompleted(string id)
         {
@@ -169,7 +167,28 @@
             QuestCompleted?.Invoke(quest.Id);
         }
 
-        public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
+        public void OnTurnEnd()
+        {
+            Effects.UpdateEffects();
+            RecoverResource();
+        }
+
+        public void OnFightEnds()
+        {
+            Effects.RemoveAllEffects();
+            // TODO: on reset temporary i still might have some effects in effects manager
+            Modifiers.ResetTemporaryModifiers();
+        }
+
+        private void RecoverResource()
+        {
+            // TODO: instead of GoliathEffect should be effect that block resource recovery
+            if (Effects.IsEffectApplied(typeof(GoliathEffect)))
+            {
+                return;
+            }
+            _resourceManager?.RecoverCurrentResource();
+        }
 
         private void AcceptReward(Reward? reward)
         {
@@ -209,7 +228,7 @@
 
         private void LoadDialogues()
         {
-            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres");
+            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resources/Dialogues/PlayerDialogues/playerDialoguesData.tres");
             if (dialogueData.Dialogs == null) return;
             foreach (var item in dialogueData.Dialogs)
             {
