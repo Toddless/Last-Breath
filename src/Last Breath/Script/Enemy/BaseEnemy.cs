@@ -5,7 +5,6 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
-    using Playground.Script.Abilities.Effects;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
@@ -65,6 +64,7 @@ namespace Playground
             get => _canMove;
             set => _canMove = value;
         }
+
         public Stance Stance
         {
             get => _stance;

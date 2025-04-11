@@ -15,8 +15,6 @@
         Dodge,
         EnergyBarrier,
         SpellDamage,
-        Mana,
-        Fury,
-        Combopoint
+        Resource
     }
 }

@@ -9,7 +9,6 @@
     using Playground.Resource.Quests;
     using Playground.Script;
     using Playground.Script.Abilities;
-    using Playground.Script.Abilities.Effects;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
@@ -65,8 +64,10 @@
             get => _stance;
             set
             {
-                _stance = value;
-                Resource.SetCurrentResource(_stance);
+                if (ObservableProperty.SetProperty(ref _stance, value))
+                {
+                    Resource.SetCurrentResource(value);
+                }
             }
         }
 
@@ -76,7 +77,7 @@
         public int Speed { get; set; } = 200;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
-        public DefenseComponent? Defense => _playerDefense;
+        public DefenseComponent Defense => _playerDefense ??= new(_modifierManager);
         public HealthComponent Health => _playerHealth ??= new(_modifierManager);
         public DamageComponent Damage => _playerDamage ??= new(Strategy, _modifierManager);
         public Inventory EquipInventory => _equipInventory ??= new();
@@ -170,7 +171,7 @@
         public void OnTurnEnd()
         {
             Effects.UpdateEffects();
-            RecoverResource();
+            _resourceManager?.CurrentResource.Recover();
         }
 
         public void OnFightEnds()
@@ -178,16 +179,6 @@
             Effects.RemoveAllEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.ResetTemporaryModifiers();
-        }
-
-        private void RecoverResource()
-        {
-            // TODO: instead of GoliathEffect should be effect that block resource recovery
-            if (Effects.IsEffectApplied(typeof(GoliathEffect)))
-            {
-                return;
-            }
-            _resourceManager?.RecoverCurrentResource();
         }
 
         private void AcceptReward(Reward? reward)

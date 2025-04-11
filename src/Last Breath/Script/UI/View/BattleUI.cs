@@ -1,10 +1,10 @@
 namespace Playground
 {
     using System;
-    using System.Collections.Generic;
     using Godot;
     using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.UI;
 
@@ -15,6 +15,7 @@ namespace Playground
         private GridContainer? _playerEffects, _enemyEffects;
         private RandomNumberGenerator? _rnd;
         private TextureButton? _dexterityStance, _strengthStance, _intelligenceStance, _head, _body, _legs;
+        private ResourceProgressBar? _playerResource, _enemyResource;
         private TextureButton? _player, _enemy;
         private AbilityButtons? _abilities;
         private HBoxContainer? _attackButtons;
@@ -53,6 +54,8 @@ namespace Playground
 
             _playerHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "PlayerHealth");
             _enemyHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "EnemyHealth");
+            _playerResource = (ResourceProgressBar?)NodeFinder.FindBFSCached(this, "PlayerResource");
+            _enemyResource = (ResourceProgressBar?)NodeFinder.FindBFSCached(this, "EnemyResource");
             _playerEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "PlayerEffects");
             _enemyEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "EnemyEffects");
             _returnButton = (Button?)NodeFinder.FindBFSCached(this, "ReturnButton");
@@ -86,19 +89,36 @@ namespace Playground
             _enemyHealthBar!.MaxValue = enemy.Health.MaxHealth;
             _enemyHealthBar.Value = enemy.Health.CurrentHealth;
 
+            _playerResource?.SetResourceTexture(player.Resource.GetCurrentResource());
+            _enemyResource?.SetResourceTexture(enemy.Resource.GetCurrentResource());
+
+            _playerResource!.MaxValue = player.Resource.CurrentResource.MaximumAmount;
+            _playerResource.Value = player.Resource.CurrentResource.Current;
+            GD.Print($"Set player current resource: {player.Resource.CurrentResource.Current}");
+            _enemyResource!.MaxValue = enemy.Resource.CurrentResource.MaximumAmount;
+            _enemyResource.Value = enemy.Resource.CurrentResource.Current;
+            GD.Print($"Set enemy current resource: {enemy.Resource.CurrentResource.Current}");
+
+            player.Resource.CurrentResource.CurrentChanges += OnPlayerCurrenResourceChanges;
             player.Health.CurrentHealthChanged += OnPlayerCurrentHealthChanged;
             player.Health.MaxHealthChanged += OnPlayerMaxHealthChanged;
+            enemy.Resource.CurrentResource.CurrentChanges += OnEnemyCurrentResourceChanges;
             enemy.Health.CurrentHealthChanged += OnEnemyCurrentHealthChanged;
             enemy.Health.MaxHealthChanged += OnEnemyMaxHealthChanged;
         }
+
+
 
         public void UnsubscribeBattleUI(Player player, BaseEnemy enemy)
         {
             player.Health.CurrentHealthChanged -= OnPlayerCurrentHealthChanged;
             player.Health.MaxHealthChanged -= OnPlayerMaxHealthChanged;
+            player.Resource.CurrentResource.CurrentChanges -= OnPlayerCurrenResourceChanges;
             enemy.Health.CurrentHealthChanged -= OnEnemyCurrentHealthChanged;
             enemy.Health.MaxHealthChanged -= OnEnemyMaxHealthChanged;
+            enemy.Resource.CurrentResource.CurrentChanges -= OnEnemyCurrentResourceChanges;
         }
+
 
         public void OnTurnEnds() => _abilities?.UpdateAbiliesCooldown();
 
@@ -111,10 +131,13 @@ namespace Playground
         public void SetAbility(IAbility ability) => _abilities?.BindAbilitysButton(ability);
         public void HideAttackButtons() => _attackButtons?.Hide();
         public void ShowAttackButtons() => _attackButtons?.Show();
+        public void OnPlayerResourceChanges(ResourceType resourceType) => _playerResource?.SetResourceTexture(resourceType);
 
-        public void OnPlayerCurrentHealthChanged(float newValue) => _playerHealthBar!.Value = newValue;
-        public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
-        public void OnPlayerMaxHealthChanged(float newValue) => _playerHealthBar!.MaxValue = newValue;
-        public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
+        private void OnPlayerCurrentHealthChanged(float newValue) => _playerHealthBar!.Value = newValue;
+        private void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
+        private void OnPlayerMaxHealthChanged(float newValue) => _playerHealthBar!.MaxValue = newValue;
+        private void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
+        private void OnPlayerCurrenResourceChanges(float obj) => _playerResource!.Value = obj;
+        private void OnEnemyCurrentResourceChanges(float obj) => _enemyResource!.Value = obj;
     }
 }

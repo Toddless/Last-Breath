@@ -45,6 +45,7 @@
         public void Heal(float amount) => CurrentHealth = Math.Min(MaxHealth, CurrentHealth + amount);
 
         public void HealUpToMax() => CurrentHealth = MaxHealth;
+
         private void OnParameterModifiersChanges(Parameter parameter)
         {
             if (parameter != Parameter.MaxHealth)
@@ -55,7 +56,7 @@
         private void UpdateMaxHealth()
         {
             GD.Print($"Old max health: {_maxHealth}");
-            var newMaxHealth = _modifierManager.CalculateFloatValue(BaseHealth, Parameter.MaxHealth);
+            var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, _modifierManager.GetCombinedModifiers(Parameter.MaxHealth));
             if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
             {
                 _maxHealth = newMaxHealth;

@@ -25,6 +25,7 @@
         public event Action<BattleResult>? BattleEnd;
         public event Action<ICharacter?>? TargetChanges;
         public event Action? PlayerTurnEnds;
+        public event Action<ResourceType>? TypeChanges;
 
         public ICharacter? Target
         {
@@ -67,12 +68,14 @@
         public void DexterityStance()
         {
             _player!.Stance = Stance.Dexterity;
+            TypeChanges?.Invoke(_player.Resource.GetCurrentResource());
             GD.Print($"Player stance: {_player.Stance}");
         }
 
         public void StrengthStance()
         {
             _player!.Stance = Stance.Strength;
+            TypeChanges?.Invoke(_player.Resource.GetCurrentResource());
             GD.Print($"Player stance: {_player.Stance}");
         }
 
@@ -209,12 +212,12 @@
 
         private float CalculateDamage()
         {
-            float damage = _attacker!.Damage!.GetFlatDamage();
+            float damage = _attacker!.Damage.Damage;
             if (IsCrit(_attacker))
             {
-                damage *= _attacker.Damage.GetCriticalDamage();
+                damage *= _attacker.Damage.CriticalDamage;
             }
-            return Mathf.Max(0, damage * (1 - Mathf.Min(_defender!.Defense!.GetArmor() / 100, 0.7f)));
+            return Mathf.Max(0, damage * (1 - Mathf.Min(_defender!.Defense.CurrentArmor / 100, 0.7f)));
         }
 
         private void ApplyDamage(float damage)
@@ -256,9 +259,9 @@
         }
 
         private string GetCharacterName(ICharacter character) => character.GetType().Name;
-        private bool IsAdditionalHit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage?.GetAdditionalHitChance();
-        private bool IsCrit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage?.GetCriticalChance();
-        private bool IsEvade(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Defense?.GetDodgeChance();
+        private bool IsAdditionalHit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage.AdditionalHit;
+        private bool IsCrit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage.CriticalChance;
+        private bool IsEvade(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Defense.CurrentDodge;
 
         private void CheckBattleEnds()
         {

@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.UI
 {
     using System;
+    using Godot;
     using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
 
@@ -37,19 +38,23 @@
             _battleUI!.EnemyAreaPressed += _battleSceneHandler.OnEnemyAreaPressed;
             _battleSceneHandler.TargetChanges += (t) => _battleUI?.OnTargetChanges(t);
             _battleSceneHandler.PlayerTurnEnds += _battleUI.OnTurnEnds;
+            _battleSceneHandler.TypeChanges += _battleUI.OnPlayerResourceChanges;
         }
 
         private void HandleFightStart(BattleContext context)
         {
             var player = (Player)context.Player;
+            var enemy = (BaseEnemy)context.Opponent;
             context.Player.CanFight = false;
             context.Player.CanMove = false;
             context.Opponent.CanFight = false;
             context.Opponent.CanMove = false;
             // setup players ability in subscribeBattleUi or SetAbilities?
-            _battleUI?.SubscribeBattleUI((Player)context.Player, (BaseEnemy)context.Opponent);
+            _battleUI?.SubscribeBattleUI(player, enemy);
             // adding to UI Player and Enemy Animatio1ns
             // i just set as default target an enemy
+            GD.Print($"Enemy current Resource: {enemy.Resource.GetCurrentResource()}");
+            GD.Print($"Player current Resource: {player.Resource.GetCurrentResource()}");
             SetAbilities(player);
         }
 

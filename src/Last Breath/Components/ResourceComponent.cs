@@ -12,20 +12,23 @@
         // maybe i should use stance instead of resurceType?
         private readonly Dictionary<Stance, IResource> _resources = new()
         {
+            // TODO: for enemy i need only one stance, all 3 Resources make no sense
             { Stance.Intelligence, new Mana()},
             { Stance.Dexterity , new ComboPoints()},
             { Stance.Strength, new Fury()}
         };
 
-        public ResourceComponent(Stance type, ModifierManager modifierManager)
-        {
-            _currentResource = SetCurrentResource(type);
-            _modifierManager = modifierManager;
-        }
-
         public IResource CurrentResource => _currentResource;
 
-        public IResource SetCurrentResource(Stance type)
+        public ResourceComponent(Stance type, ModifierManager modifierManager)
+        {
+            _currentResource = CreateResource(type);
+            _modifierManager = modifierManager;
+            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
+        }
+
+
+        public void SetCurrentResource(Stance type)
         {
             if (!_resources.TryGetValue(type, out var resource))
             {
@@ -33,16 +36,18 @@
                 resource = CreateResource(type);
                 _resources[type] = resource;
             }
-            return resource;
+            _currentResource = resource;
         }
 
-        public void RecoverCurrentResource()
-        {
-            _currentResource.RecoveryAmount = Mathf.Max(0, _modifierManager.CalculateFloatValue(_currentResource.GetBaseRecovery(), _currentResource.Parameter));
-            _currentResource.Recover();
-        }
+        public ResourceType GetCurrentResource() => _currentResource.Type;
 
         public bool IsResourceHasRightType(ResourceType type) => _currentResource.Type == type;
+
+        private void OnParameterChanges(Parameter parameter)
+        {
+            if (parameter != Parameter.Resource) return;
+            CurrentResource.RecoveryAmount = Mathf.Max(0, Calculations.CalculateFloatValue(CurrentResource.GetBaseRecovery(), _modifierManager.GetCombinedModifiers(Parameter.Resource)));
+        }
 
         private static IResource CreateResource(Stance type) => type switch
         {

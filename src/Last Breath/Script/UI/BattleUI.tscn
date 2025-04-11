@@ -1,11 +1,15 @@
-[gd_scene load_steps=14 format=3 uid="uid://j6cqo6u0s83x"]
+[gd_scene load_steps=18 format=3 uid="uid://j6cqo6u0s83x"]
 
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
 [ext_resource type="Script" uid="uid://402jw803k746" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
 [ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_c5cqn"]
 [ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
+[ext_resource type="Script" uid="uid://kgidvbxkxbav" path="res://Script/UI/ResourceProgressBar.cs" id="5_nkmc7"]
 [ext_resource type="Script" uid="uid://du3w1tmvgffcx" path="res://Script/UI/AbilityButtons.cs" id="6_mc3dc"]
+[ext_resource type="Texture2D" uid="uid://dw4nn6k6cfbap" path="res://Assets/Combo.bmp" id="6_tuwow"]
+[ext_resource type="Texture2D" uid="uid://wrycjitbr00h" path="res://Assets/Mana.bmp" id="7_l2rcb"]
+[ext_resource type="Texture2D" uid="uid://b02h28hf5wiqv" path="res://Assets/Fury.bmp" id="8_506f5"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
 texture = ExtResource("2_c5cqn")
@@ -84,6 +88,41 @@ fill_mode = 1
 nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
 texture_progress = SubResource("AtlasTexture_l5ci7")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayerResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 10.0
+rounded = true
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_sabj2")
+script = ExtResource("5_nkmc7")
+TextureByResourceType = Dictionary[int, Texture2D]({
+0: ExtResource("7_l2rcb"),
+1: ExtResource("6_tuwow"),
+2: ExtResource("8_506f5")
+})
+
+[node name="EnemyResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+max_value = 10.0
+rounded = true
+fill_mode = 1
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_sabj2")
+script = ExtResource("5_nkmc7")
+TextureByResourceType = Dictionary[int, Texture2D]({
+0: ExtResource("7_l2rcb"),
+1: ExtResource("6_tuwow"),
+2: ExtResource("8_506f5")
+})
 
 [node name="HBoxContainerStatusEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2

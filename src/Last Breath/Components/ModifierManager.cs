@@ -1,7 +1,6 @@
 ﻿namespace Playground.Components
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System;
     using Playground.Script.Enums;
     using Playground.Script.Abilities.Modifiers;
@@ -11,10 +10,11 @@
     {
         // all modifiers from equipment, passive abilities etc.
         protected readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
-        // temporary modifiers like buffs and debuffs
+        // temporary modifiers from abilities, weapon effect etc.
         protected readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
 
         public event Action<Parameter>? ParameterModifiersChanged;
+
         public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
 
@@ -26,12 +26,10 @@
         public void RemovePermanentModifier(IModifier modifier) => RemoveFromCategory(_permanentModifiers, modifier);
         public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
 
-
         public void ResetTemporaryModifiers() => _temporaryModifiers.Clear();
 
-        public float CalculateFloatValue(float value, Parameter parameter) => Math.Max(0, FilterModifiers(GetCombinedModifiers(parameter), value));
 
-        private List<IModifier> GetCombinedModifiers(Parameter parameter)
+        public List<IModifier> GetCombinedModifiers(Parameter parameter)
         {
             var modifiers = new List<IModifier>();
             if (_permanentModifiers.TryGetValue(parameter, out var permanent))
@@ -68,37 +66,6 @@
                 category.Remove(modifier.Parameter);
             }
             ParameterModifiersChanged?.Invoke(modifier.Parameter);
-        }
-
-        private float FilterModifiers(IEnumerable<IModifier> modifiers, float value)
-        {
-            var factor = 1f;
-            foreach (var group in modifiers.GroupBy(m => m.Type).OrderBy(g => g.Key))
-            {
-                switch (group.Key)
-                {
-                    case ModifierType.Additive:
-                        value = ModifyValue(value, group);
-                        break;
-                    case ModifierType.MultiplicativeSum:
-                        value *= factor += group.Sum(x => x.Value);
-                        break;
-                    case ModifierType.Multiplicative:
-                        value = ModifyValue(value, group);
-                        break;
-
-                }
-            }
-            return value;
-        }
-
-        private float ModifyValue(float value, IGrouping<ModifierType, IModifier> modifiers)
-        {
-            foreach (var modifier in modifiers.OrderBy(x => x.Priority))
-            {
-                value = modifier.ModifyValue(value);
-            }
-            return value;
         }
     }
 }
