@@ -7,7 +7,7 @@
     public interface IEffect
     {
         Effects Effect { get; }
-        IModifier Modifier { get; }
+        IModifier? Modifier { get; }
         int Duration { get; set; }
         int Stacks { get; set; }
         bool Permanent { get; }

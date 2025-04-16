@@ -5,10 +5,10 @@
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
 
-    public abstract class EffectBase(Enums.Effects effect, IModifier modifier, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
+    public abstract class EffectBase(Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
         public Enums.Effects Effect { get; } = effect;
-        public IModifier Modifier { get; } = modifier;
+        public IModifier? Modifier { get; protected set; } 
         public int Duration { get; set; } = duration;
         public int Stacks { get; set; } = stacks;
         public bool Permanent { get; } = permanent;

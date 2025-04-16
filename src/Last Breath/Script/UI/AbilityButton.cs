@@ -7,57 +7,43 @@
     {
         private const string UID = "uid://rxcf0iao3twp";
         private IAbility? _ability;
-        private ICharacter? _target;
-        // On changing this bool we change ability state (for example ability will be gray if false)
         private bool _canActivate;
-        // TODO: I can potentially  update ability activate state on target change
 
         public static PackedScene InitializeButton() => ResourceLoader.Load<PackedScene>(UID);
 
         public void BindAbility(IAbility ability)
         {
             _ability = ability;
+            _ability.AbilityUpdateState += UpdateActivationState;
             Pressed += OnAbilityPressed;
             MouseEntered += OnMouseEntered;
-            UpdateActivationState();
+            if (ability.Icon != null)
+                TextureNormal = ability.Icon;
         }
 
-        // we update ability state on target change
-        public void UpdateAbilityTarget(ICharacter target)
-        {
-            if (_ability == null) return;
-            _target = target;
-            UpdateActivationState();
-        }
-
-        private void UpdateActivationState()
-        {
-            if (_ability == null) return;
-            if (_target == null)
-            {
-                _canActivate = false;
-                UpdateButtonState();
-                return;
-            }
-            _canActivate = _ability.AbilityCanActivate(_target);
-            UpdateButtonState();
-        }
-
-        public void UpdateAbilityCooldown()
-        {
-            _ability?.UpdateCooldown();
-            UpdateActivationState();
-        }
 
         public void UnbindAbility()
         {
+            if (_ability != null)
+            {
+                _ability.AbilityUpdateState -= UpdateActivationState;
+                _ability = null;
+            }
             Pressed -= OnAbilityPressed;
             MouseEntered -= OnMouseEntered;
-            _target = null;
-            _ability = null;
+            TextureNormal = null;
         }
 
         public bool AbilitySet() => _ability != null;
+
+        // we update ability state on target change
+        private void UpdateActivationState()
+        {
+            if (_ability == null) return;
+            _canActivate = _ability.AbilityCanActivate();
+            UpdateButtonState();
+        }
+
         private void OnMouseEntered()
         {
             while (IsHovered())
@@ -69,14 +55,12 @@
 
         private void OnAbilityPressed()
         {
-            if (!_canActivate || _target == null)
+            if (_canActivate)
             {
-                //TODO: For now just return, later change icon (more gray)
-                return;
+                GD.Print($"Aсtivating ability: {_ability?.GetType().Name}");
+                _ability?.Activate();
+                UpdateActivationState();
             }
-            GD.Print($"ACtivating ability: {_ability?.GetType().Name}");
-            _ability?.Activate(_target);
-            UpdateActivationState();
         }
 
         private void UpdateButtonState() => Modulate = _canActivate ? Colors.White : Colors.Gray;

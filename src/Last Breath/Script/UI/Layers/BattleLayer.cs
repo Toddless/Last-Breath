@@ -1,7 +1,9 @@
 ﻿namespace Playground.Script.UI
 {
     using System;
+    using System.Collections.Generic;
     using Godot;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
 
@@ -29,16 +31,11 @@
         {
             _battleUI!.DexterityStance += () => _battleSceneHandler?.DexterityStance();
             _battleUI.StrengthStance += () => _battleSceneHandler?.StrengthStance();
-            _battleUI.HeadButtonPressed += () => _battleSceneHandler?.PlayerTurn();
+            _battleUI!.HeadButtonPressed += () => _battleSceneHandler?.PlayerTurn();
             _battleSceneHandler!.ShowAttackButtons += _battleUI.ShowAttackButtons;
             _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
             _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
             _battleSceneHandler.BattleEnd += OnBattleEnds;
-            _battleUI!.PlayerAreaPressed += _battleSceneHandler.OnPlayerAreaPressed;
-            _battleUI!.EnemyAreaPressed += _battleSceneHandler.OnEnemyAreaPressed;
-            _battleSceneHandler.TargetChanges += (t) => _battleUI?.OnTargetChanges(t);
-            _battleSceneHandler.PlayerTurnEnds += _battleUI.OnTurnEnds;
-            _battleSceneHandler.TypeChanges += _battleUI.OnPlayerResourceChanges;
         }
 
         private void HandleFightStart(BattleContext context)
@@ -50,17 +47,63 @@
             context.Opponent.CanFight = false;
             context.Opponent.CanMove = false;
             // setup players ability in subscribeBattleUi or SetAbilities?
-            _battleUI?.SubscribeBattleUI(player, enemy);
+            SubscribeToBattleUI(player, enemy);
             // adding to UI Player and Enemy Animatio1ns
             // i just set as default target an enemy
             GD.Print($"Enemy current Resource: {enemy.Resource.GetCurrentResource()}");
-            GD.Print($"Player current Resource: {player.Resource.GetCurrentResource()}");
             SetAbilities(player);
+        }
+
+        private void SubscribeToBattleUI(Player player, BaseEnemy enemy)
+        {
+            _battleUI!.PlayerAreaPressed += () => player.Target = player;
+            _battleUI!.EnemyAreaPressed += () => player.Target = enemy;
+            SubscribePlayerElements(player);
+            SubscribeEnemyElements(enemy);
+        }
+
+        private void SubscribeEnemyElements(BaseEnemy enemy)
+        {
+            _battleUI?.SetEnemyHealthBar(enemy.Health.CurrentHealth, enemy.Health.MaxHealth);
+            _battleUI?.SetEnemyResource(enemy.Resource.GetCurrentResource(), enemy.Resource.CurrentResource.Current, enemy.Resource.CurrentResource.MaximumAmount);
+            GD.Print($"Set enemy current resource: {enemy.Resource.CurrentResource.Current}");
+            enemy.Resource.CurrentResourceValueChanges += _battleUI!.OnEnemyCurrentResourceChanges;
+            enemy.Health.CurrentHealthChanged += _battleUI.OnEnemyCurrentHealthChanged;
+            enemy.Health.MaxHealthChanged += _battleUI.OnEnemyMaxHealthChanged;
+        }
+
+        private void SubscribePlayerElements(Player player)
+        {
+            _battleUI?.SetPlayerHealthBar(player.Health.CurrentHealth, player.Health.MaxHealth);
+            _battleUI?.SetPlayerResource(player.Resource.GetCurrentResource(), player.Resource.CurrentResource.Current, player.Resource.CurrentResource.MaximumAmount);
+            GD.Print($"Set player current resource: {player.Resource.CurrentResource.Current}");
+            player.SetAvailableAbilities += OnNewSetAbility;
+            player.Resource.CurrentResourceValueChanges += _battleUI!.OnPlayerCurrenResourceChanges;
+            player.Resource.CurrentResourceTypeChanges += _battleUI.SetPlayerResource;
+            player.Health.CurrentHealthChanged += _battleUI.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged += _battleUI.OnPlayerMaxHealthChanged;
+        }
+
+        private void OnNewSetAbility(List<IAbility> list) => list.ForEach(ability => _battleUI?.SetAbility(ability));
+
+        public void UnsubscribeBattleUI(Player player, BaseEnemy enemy)
+        {
+            player.Health.CurrentHealthChanged -= _battleUI!.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged -= _battleUI.OnPlayerMaxHealthChanged;
+            player.Resource.CurrentResourceValueChanges -= _battleUI.OnPlayerCurrenResourceChanges;
+            player.Resource.CurrentResourceTypeChanges -= _battleUI.SetPlayerResource;
+            player.SetAvailableAbilities -= OnNewSetAbility;
+
+            enemy.Health.CurrentHealthChanged -= _battleUI.OnEnemyCurrentHealthChanged;
+            enemy.Health.MaxHealthChanged -= _battleUI.OnEnemyMaxHealthChanged;
+            enemy.Resource.CurrentResourceValueChanges -= _battleUI.OnEnemyCurrentResourceChanges;
+            _battleUI.ClearAbilities();
         }
 
         private void SetAbilities(Player player)
         {
-            foreach (var ability in player.Abilities)
+            if(player.Stance == Enums.Stance.None) return;
+            foreach (var ability in player.Abilities[player.Stance])
             {
                 _battleUI?.SetAbility(ability);
             }
@@ -81,7 +124,7 @@
                     HandlePlayerRunAway(result);
                     break;
             }
-            _battleUI?.UnsubscribeBattleUI((Player)result.Player, (BaseEnemy)result.Enemy);
+            UnsubscribeBattleUI((Player)result.Player, (BaseEnemy)result.Enemy);
             BattleEnds?.Invoke();
         }
 
@@ -94,15 +137,6 @@
             player.OnRunAway(enemy.Position);
             enemy.CanMove = true;
             enemy.CanFight = true;
-        }
-
-        private void HandleEnemyKilled(ICharacter enemy)
-        {
-            // нужен каст к базовому противнику (??)
-            // сменить ассет
-            // противник не может двигаться
-            // противник не может драться
-            // игрок может облутать поверженного противника
         }
     }
 }

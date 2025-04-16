@@ -3,12 +3,15 @@
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
-    public class GoliathEffect(int duration = 3, int stacks = 1, bool permanent = false)
-        : EffectBase(effect: Effects.HealthIncrease,
-              modifier: new MaxHealthModifier(ModifierType.Multiplicative, 1.1f, ModifierPriorities.Buffs),
-              duration,
-              stacks,
-              permanent)
+    public class GoliathEffect : EffectBase
     {
+        public GoliathEffect(int duration = 3, int stacks = 1, bool permanent = false)
+            : base(effect: Effects.HealthIncrease,
+                  duration,
+                  stacks,
+                  permanent)
+        {
+            Modifier = new MaxHealthModifier(ModifierType.Multiplicative, 1.1f, this ,ModifierPriorities.Buffs);
+        }
     }
 }

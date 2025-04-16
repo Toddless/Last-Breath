@@ -4,10 +4,11 @@
     using System;
     using Playground.Script.Enums;
     using Playground.Script.Abilities.Modifiers;
-    using Godot;
+    using System.Linq;
 
     public class ModifierManager
     {
+        private readonly HashSet<object> _suppressed = [];
         // all modifiers from equipment, passive abilities etc.
         protected readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
         // temporary modifiers from abilities, weapon effect etc.
@@ -18,6 +19,23 @@
         public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
 
+        public void SuppressSource(object source)
+        {
+            if (_suppressed.Add(source))
+                HandleParameters(source);
+        }
+
+        public void RemoveSuppression(object source)
+        {
+            if (_suppressed.Remove(source))
+                HandleParameters(source);
+        }
+
+        private void HandleParameters(object source)
+        {
+            foreach (var param in GetAffectedParameters(source))
+                ParameterModifiersChanged?.Invoke(param);
+        }
 
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
@@ -33,12 +51,22 @@
         {
             var modifiers = new List<IModifier>();
             if (_permanentModifiers.TryGetValue(parameter, out var permanent))
-                modifiers.AddRange(permanent);
+                IgnoreSuppressedModifiers(modifiers, permanent);
 
             if (_temporaryModifiers.TryGetValue(parameter, out var temp))
-                modifiers.AddRange(temp);
+                IgnoreSuppressedModifiers(modifiers, temp);
 
             return modifiers;
+        }
+
+        private void IgnoreSuppressedModifiers(List<IModifier> modifiers, List<IModifier> permanent)
+        {
+            foreach (var mod in permanent)
+            {
+                if (_suppressed.Contains(mod.Source))
+                    continue;
+                modifiers.Add(mod);
+            }
         }
 
         private void AddToCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
@@ -49,7 +77,6 @@
                 category[modifier.Parameter] = list;
             }
             list.Add(modifier);
-            GD.Print($"Modifier added: {modifier.GetType().Name}. Parameter: {modifier.Parameter}. Value: {modifier.Value}");
             ParameterModifiersChanged?.Invoke(modifier.Parameter);
         }
 
@@ -66,6 +93,15 @@
                 category.Remove(modifier.Parameter);
             }
             ParameterModifiersChanged?.Invoke(modifier.Parameter);
+        }
+
+        private IEnumerable<Parameter> GetAffectedParameters(object source)
+        {
+            return _permanentModifiers
+                .Concat(_temporaryModifiers)
+                .Where(x => x.Value.Any(m => m.Source == source))
+                .Select(x => x.Key)
+                .Distinct();
         }
     }
 }

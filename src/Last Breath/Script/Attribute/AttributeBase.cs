@@ -10,7 +10,7 @@
     {
         private const int BaseValue = 1;
         private int _investedPoints;
-        private readonly List<AttributeEffect> _effects = effects.ToList();
+        private readonly List<AttributeEffect> _effects = [.. effects];
         private readonly ModifierManager _modifierManager = manager;
 
         public int InvestedPoints

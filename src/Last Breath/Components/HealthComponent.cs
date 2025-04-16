@@ -19,11 +19,9 @@
             get => MathF.Max(0, _currentHealth);
             private set
             {
-                GD.Print($"Old current health: {_currentHealth}");
                 if (ObservableProperty.SetProperty(ref _currentHealth, value))
                 {
                     CurrentHealthChanged?.Invoke(_currentHealth);
-                    GD.Print($"New current health: {value}");
                 }
             }
         }
@@ -55,12 +53,10 @@
 
         private void UpdateMaxHealth()
         {
-            GD.Print($"Old max health: {_maxHealth}");
             var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, _modifierManager.GetCombinedModifiers(Parameter.MaxHealth));
             if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
             {
                 _maxHealth = newMaxHealth;
-                GD.Print($"Max health set to: {newMaxHealth}");
                 MaxHealthChanged?.Invoke(_maxHealth);
                 if (CurrentHealth > MaxHealth)
                     CurrentHealth = MaxHealth;

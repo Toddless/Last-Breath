@@ -16,6 +16,8 @@
 
         public IAttribute SourceAttribute { get; } = source;
 
+        public object Source => SourceAttribute;
+
         public float ModifyValue(float value)
         {
             return Type switch

@@ -171,7 +171,7 @@ namespace Playground
         public void OnTurnEnd()
         {
             Effects.UpdateEffects();
-            RecoverResource();
+            _resourceManager?.HandleResourceRecoveryEvent(new RecoveryEventContext(this, RecoveryEventType.OnTurnEnd));
         }
 
         public void OnFightEnds()
@@ -195,19 +195,12 @@ namespace Playground
             var points = SetAttributesDependsOnType(_enemyAttributeType);
             _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
             _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 500));
+            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 500, this));
+          //  _modifierManager.AddPermanentModifier(new DodgeModifier(ModifierType.Additive, 0.9f, this));
+            _modifierManager.AddPermanentModifier(new AdditionalHitModifier(ModifierType.Additive, 0.3f, this));
             SetAnimation();
             _stance = SetStance(_enemyAttributeType);
-        }
-
-        private void RecoverResource()
-        {
-            // TODO: instead of GoliathEffect should be effect that block resource recovery
-            //if (Effects.IsEffectApplied(typeof(GoliathEffect)))
-            //{
-            //    return;
-            //}
-            //_resourceManager?.RecoverCurrentResource();
+            _resourceManager?.SetCurrentResource(_stance);
         }
 
         private void SetEvents()

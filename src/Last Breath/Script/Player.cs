@@ -13,6 +13,7 @@
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
+    using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Items;
@@ -24,11 +25,12 @@
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
         private float _moveProgress = 0f;
         private int _exp, _gold;
+        private ICharacter? _target;
         private Stance _stance;
         private AnimatedSprite2D? _sprite;
         private Vector2 _targetPosition, _startPosition;
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
-        private List<IAbility> _abilities = [];
+        private Dictionary<Stance, List<IAbility>> _abilities = [];
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
 
         private ResourceComponent? _resourceManager;
@@ -54,11 +56,13 @@
             get => _canMove;
             set => _canMove = value;
         }
+
         public bool CanFight
         {
             get => _canFight;
             set => _canFight = value;
         }
+
         public Stance Stance
         {
             get => _stance;
@@ -66,10 +70,23 @@
             {
                 if (ObservableProperty.SetProperty(ref _stance, value))
                 {
-                    Resource.SetCurrentResource(value);
+                    OnStanceChanges(value);
                 }
             }
         }
+
+        public ICharacter Target
+        {
+            get => _target;
+            set
+            {
+                if (ObservableProperty.SetProperty(ref _target, value))
+                {
+                    UpdateTargetForCurrentSetOfAbilities(value);
+                }
+            }
+        }
+
 
         [Export]
         public bool FirstSpawn { get; set; } = true;
@@ -87,7 +104,7 @@
         public EffectsManager Effects => _effectsManager ??= new(this);
         public ModifierManager Modifiers => _modifierManager;
         // i think i need some ability component later, because i need a place where player can modifiy, learn and forget abilities
-        public List<IAbility> Abilities => _abilities;
+        public Dictionary<Stance, List<IAbility>> Abilities => _abilities;
 
         // TODO: i need default resource
         public ResourceComponent Resource => _resourceManager ??= new(_stance, _modifierManager);
@@ -96,6 +113,7 @@
         #region Events
         public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
         public event Action<EnemyKilledEventArgs>? EnemyKilled;
+        public event Action<List<IAbility>>? SetAvailableAbilities;
         #endregion
 
         public override void _Ready()
@@ -114,11 +132,35 @@
             GameManager.Instance!.Player = this;
             _attribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
             _attribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600));
+            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600, this));
+            // _modifierManager.AddPermanentModifier(new DodgeModifier(ModifierType.Additive, 0.3f, this));
+            // _modifierManager.AddPermanentModifier(new AdditionalHitModifier(ModifierType.Additive, 0.3f, this));
             _playerHealth.HealUpToMax();
-            _abilities.Add(new TouchOfGod(this));
-            _abilities.Add(new PrecisionStrike(this));
+            _abilities.Add(Stance.Strength, [new TouchOfGod(this)]);
+            _abilities.Add(Stance.Dexterity, [new PrecisionStrike(this)]);
             GD.Print($"Player health: {_playerHealth.CurrentHealth}");
+        }
+
+        public override void _PhysicsProcess(double delta)
+        {
+            if (_isPlayerRunning)
+            {
+                _moveProgress += (float)delta;
+                float t = Mathf.Clamp(_moveProgress / 0.06f, 0f, 6f);
+                Position = _targetPosition.Lerp(_startPosition, t);
+                if (t >= 6f)
+                {
+                    _canMove = true;
+                    _canFight = true;
+                    _isPlayerRunning = false;
+                }
+            }
+
+            if (!_canMove) return;
+
+            Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
+            Velocity = inputDirection * Speed;
+            MoveAndSlide();
         }
 
         public void AddItemToInventory(Item item)
@@ -154,7 +196,6 @@
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
-
         public void OnDialogueCompleted(string id)
         {
             Progress.OnDialogueCompleted(id);
@@ -171,7 +212,14 @@
         public void OnTurnEnd()
         {
             Effects.UpdateEffects();
-            _resourceManager?.CurrentResource.Recover();
+            _resourceManager?.HandleResourceRecoveryEvent(new RecoveryEventContext(this, RecoveryEventType.OnTurnEnd));
+            UpdateAbilityCoodowns();
+        }
+
+        public void UpdateAbilityState()
+        {
+            if (_stance == Stance.None) return;
+            UpdateAbilityStates();
         }
 
         public void OnFightEnds()
@@ -179,6 +227,28 @@
             Effects.RemoveAllEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.ResetTemporaryModifiers();
+        }
+
+
+        private void UpdateTargetForCurrentSetOfAbilities(ICharacter value)
+        {
+            if (_stance == Stance.None) return;
+            _abilities[_stance].ForEach(x => x.Target = value);
+        }
+
+        private void UpdateAbilityStates()
+        {
+            foreach (var abilityList in _abilities)
+            {
+                abilityList.Value.ForEach(x => x.UpdateState());
+            }
+        }
+        private void UpdateAbilityCoodowns()
+        {
+            foreach (var abilityList in _abilities)
+            {
+                abilityList.Value.ForEach(x => x.UpdateCooldown());
+            }
         }
 
         private void AcceptReward(Reward? reward)
@@ -195,26 +265,25 @@
             _gold += reward.Gold;
         }
 
-        public override void _PhysicsProcess(double delta)
+        private void OnStanceChanges(Stance value)
         {
-            if (_isPlayerRunning)
+            Resource.SetCurrentResource(value);
+            SetStanceBonuses(value);
+            SetAvailableAbilities?.Invoke(_abilities[value]);
+        }
+
+        private void SetStanceBonuses(Stance value)
+        {
+            switch (value)
             {
-                _moveProgress += (float)delta;
-                float t = Mathf.Clamp(_moveProgress / 0.06f, 0f, 6f);
-                Position = _targetPosition.Lerp(_startPosition, t);
-                if (t >= 6f)
-                {
-                    _canMove = true;
-                    _canFight = true;
-                    _isPlayerRunning = false;
-                }
+                case Stance.Dexterity:
+                    break;
+                case Stance.Strength:
+                    break;
+                case Stance.Intelligence:
+                    break;
+
             }
-
-            if (!_canMove) return;
-
-            Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
-            Velocity = inputDirection * Speed;
-            MoveAndSlide();
         }
 
         private void LoadDialogues()

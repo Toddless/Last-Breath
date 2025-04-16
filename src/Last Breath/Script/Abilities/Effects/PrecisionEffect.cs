@@ -3,12 +3,11 @@
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
-    public class PrecisionEffect( int duration = 3, int stacks = 1, bool permanent = false)
-        : EffectBase(effect:Effects.IncreasedAdditionalHit,
-            modifier: new AdditionalHitModifier(ModifierType.Additive, 0.2f, ModifierPriorities.Buffs),
-            duration,
-            stacks,
-            permanent)
+    public class PrecisionEffect : EffectBase
     {
+        public PrecisionEffect(int duration = 3, int stacks = 1, bool permanent = false) : base(effect: Effects.IncreasedAdditionalHit, duration, stacks, permanent)
+        {
+            Modifier = new AdditionalHitModifier(ModifierType.Additive, 0.2f, this, ModifierPriorities.Buffs);
+        }
     }
 }

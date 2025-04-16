@@ -11,7 +11,6 @@
 
         private readonly List<AbilityButton> _buttons = [];
 
-
         public void Initialize()
         {
             for (int i = 0; i < Slots; i++)
@@ -22,17 +21,14 @@
             }
         }
 
-        public void UpdateAbilitiesTarget(ICharacter target)
+        public void UnbindAbilityButtons()
         {
-            foreach (var button in _buttons)
+            foreach (var button in _buttons.Where(button => button.AbilitySet()))
             {
-                button.UpdateAbilityTarget(target);
+                button.UnbindAbility();
             }
         }
 
-        public void UpdateAbiliesCooldown() => _buttons.ForEach(x => x.UpdateAbilityCooldown());
-
-        public void UnbindAbilityButtons() => _buttons.ForEach(button => button.UnbindAbility());
         // TODO: Handle no more free ability sockets
         public void BindAbilitysButton(IAbility ability) => _buttons.First(x => x.AbilitySet() == false).BindAbility(ability);
     }

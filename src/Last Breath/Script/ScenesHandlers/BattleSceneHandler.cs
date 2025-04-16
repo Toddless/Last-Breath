@@ -2,8 +2,8 @@
 {
     using System;
     using Godot;
+    using Playground.Components;
     using Playground.Script.Enums;
-    using Playground.Script.Helpers;
     using Stateless;
 
     public partial class BattleSceneHandler
@@ -14,29 +14,16 @@
         private readonly StateMachine<State, Trigger> _machine = new(State.Awaiting);
 
         public event Action? HideAttackButtons, ShowAttackButtons;
-        // Rework later. This chance should depends on some stats (e.g. if player has lower chance to escape, if enemy has more levels)
+        // Rework later. This chance should depends on some stats (e.g. player has lower chance to escape, if enemy has more levels)
         private const float ChanceToEscape = 0.5f;
         private readonly RandomNumberGenerator _rnd = new();
         private Player? _player;
         private BaseEnemy? _enemy;
-        private ICharacter? _attacker, _defender, _playerTarget;
-        private bool _isPlayerTurn = false;
+        private ICharacter? _attacker, _defender;
 
         public event Action<BattleResult>? BattleEnd;
         public event Action<ICharacter?>? TargetChanges;
         public event Action? PlayerTurnEnds;
-        public event Action<ResourceType>? TypeChanges;
-
-        public ICharacter? Target
-        {
-            get => _playerTarget;
-            set
-            {
-                // TODO: What do i do on enemy turn? Can player still switch targets?
-                if (ObservableProperty.SetProperty(ref _playerTarget, value))
-                    TargetChanges?.Invoke(_playerTarget);
-            }
-        }
 
         public BattleSceneHandler()
         {
@@ -48,6 +35,7 @@
             // TODO: Rework context, if i will let enemies fighting each other on this layer
             _player = (Player)context.Player;
             _enemy = (BaseEnemy)context.Opponent;
+            _player.UpdateAbilityState();
             DecideFirstTurn();
         }
 
@@ -68,27 +56,13 @@
         public void DexterityStance()
         {
             _player!.Stance = Stance.Dexterity;
-            TypeChanges?.Invoke(_player.Resource.GetCurrentResource());
             GD.Print($"Player stance: {_player.Stance}");
         }
 
         public void StrengthStance()
         {
             _player!.Stance = Stance.Strength;
-            TypeChanges?.Invoke(_player.Resource.GetCurrentResource());
             GD.Print($"Player stance: {_player.Stance}");
-        }
-
-        public void OnEnemyAreaPressed()
-        {
-            if(!_isPlayerTurn) return;
-            Target = _enemy;
-        }
-
-        public void OnPlayerAreaPressed()
-        {
-            if (!_isPlayerTurn) return;
-            Target = _player;
         }
 
         public void PlayerTurn()
@@ -125,14 +99,13 @@
             _machine.Configure(State.Player)
                 .OnEntry(() =>
                 {
-                    _isPlayerTurn = true;
                     GD.Print("Player turn");
                 })
                 .OnExit(() =>
                 {
                     PlayerTurnEnds?.Invoke();
-                    _isPlayerTurn = false;
                     _player?.Effects.UpdateEffects();
+                    _player?.OnTurnEnd();
                     SwitchRoles();
                     GD.Print("Player turn ends");
                 })
@@ -149,6 +122,7 @@
                 .OnExit(() =>
                 {
                     _enemy?.Effects.UpdateEffects();
+                    _enemy?.OnTurnEnd();
                     SwitchRoles();
                     GD.Print("Enemy turn ends");
                     ShowAttackButtons?.Invoke();
@@ -167,6 +141,7 @@
                     HandleEvadedAttack();
                     break;
                 }
+                _attacker?.Resource.HandleResourceRecoveryEvent(new RecoveryEventContext(_attacker, Enemy.RecoveryEventType.OnHit));
                 additionalHit = IsAdditionalHit(_attacker);
             } while (additionalHit);
         }
@@ -206,6 +181,17 @@
         private void TryCounterAttack()
         {
             GD.Print($"{GetCharacterName(_attacker)} performing counter attack");
+            // if i need resource recovery on counter attack, i need to copy paste code from try attack, so i can be sure resource will be recovered only on counter attack
+
+            //bool additionalHit;
+            //do
+            //{
+            //    if (!PerformAttack())
+            //    {
+            //        break;
+            //    }
+            //    additionalHit = IsAdditionalHit(_attacker);
+            //} while (additionalHit);
             TryAttack();
             SwitchRoles();
         }
@@ -223,6 +209,7 @@
         private void ApplyDamage(float damage)
         {
             _defender?.Health!.TakeDamage(damage);
+            _defender?.Resource.HandleResourceRecoveryEvent(new RecoveryEventContext(_defender, Enemy.RecoveryEventType.OnDamageTaken));
             CheckBattleEnds();
             GD.Print($"Dialed Damage: {damage} to {GetCharacterName(_defender)}");
         }
@@ -283,7 +270,6 @@
             _enemy = null;
             _defender = null;
             _attacker = null;
-            _playerTarget = null;
         }
 
         private BattleResult BattleFinished(BattleResults results)

@@ -15,8 +15,8 @@
 
         float GetBaseRecovery();
         float GetBaseMaximumAmount();
-        void Recover();
         void OnSpend(int amount);
         bool IsEnough(int amountToSpend);
+        void HandleRecoveryEvent(RecoveryEventContext context);
     }
 }

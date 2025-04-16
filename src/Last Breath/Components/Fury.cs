@@ -1,32 +1,19 @@
 ﻿namespace Playground.Components
 {
-    using System;
-    using Playground.Components.Interfaces;
     using Playground.Script.Enums;
 
-    public class Fury : IResource
+    public class Fury : BaseResource
     {
         private const float BaseMaximumAmount = 6f;
         private const float BaseRecovery = 1f;
 
-        public event Action<float>? CurrentChanges, MaximumChanges;
-
-        public Parameter Parameter { get; } = Parameter.Resource;
-        public ResourceType Type { get; } = ResourceType.Fury;
-        public float Current { get; private set; } = 0;
-        public float RecoveryAmount { get; set; }
-        public float MaximumAmount { get; set; } = BaseMaximumAmount;
-
-        public bool IsEnough(int amountToSpend) => Current >= amountToSpend;
-        public void Recover()
+        public Fury() : base
+            (parameter: Parameter.Resource,
+            type: ResourceType.Fury,
+            recoveryAmount: BaseRecovery,
+            maximumAmount: BaseMaximumAmount,
+            new FuryRecoveryRule())
         {
-            Current += RecoveryAmount;
-            if (Current > MaximumAmount)
-                Current = MaximumAmount;
-            CurrentChanges?.Invoke(Current);
         }
-        public void OnSpend(int amount) => Current -= amount;
-        public float GetBaseRecovery() => BaseRecovery;
-        public float GetBaseMaximumAmount() => MaximumAmount;
     }
 }

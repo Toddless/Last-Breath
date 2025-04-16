@@ -4,9 +4,12 @@
     using Godot;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
     public abstract class AbilityBase(ICharacter owner, int cooldown, int cost, ResourceType type, bool activateOnlyOnCaster) : IAbility
     {
+        public Texture2D? Icon { get; protected set; }
+        private ICharacter? _target;
         // TODO: Icons, Animations etc
         private readonly int _baseCooldown = cooldown;
         private readonly ICharacter _owner = owner;
@@ -17,38 +20,29 @@
         public int Cost { get; set; } = cost;
         public ResourceType Type { get; } = type;
         public bool ActivateOnlyOnCaster { get; } = activateOnlyOnCaster;
-        // ability change action to update ability state on ui?
-        // ability cannot be activate if:
-        // 1. Player/Enemy has not enough resources // on resource change
-        // 2. Wrong target // when i change target?
-        // 3. Cooldown // this will be animated
-        // 4. Wrong current resource // on stance change
 
-        // i habe 3 types of Costs for each ability depends on stance:
-        // 1. Dex => Combopoints
-        // 2. Str => Fury
-        // 3. Int => Mana
+        public ICharacter Target
+        {
+            get => _target ??= _owner;
+            set
+            {
+                if (ObservableProperty.SetProperty(ref _target, value))
+                {
+                    AbilityUpdateState?.Invoke();
+                }
+            }
+        }
 
-        /* Each type of costs have own regeneration mechanics
-         *  Dex => Obtain 1 point for each additional strike
-         *  Str => Obtain 1 point for each taken hit
-         *  // TODO: Int stance is the weakest, need to invest more time in it
-         *  Int => Obtaint 1 Mana at the turn end
-         *  
-         *  I need typical triangle 
-         *  
-         *  Int => Str => Dex => Int
-         */
+        public event Action? OnCooldown, OnCost, OnTarget, AbilityUpdateState;
 
-        public event Action? OnCooldown, OnCost, OnTarget;
-
-        public virtual void Activate(ICharacter target)
+        public virtual void Activate()
         {
             _owner.Resource.CurrentResource.OnSpend(Cost);
             Cooldown = _baseCooldown;
+            AbilityUpdateState?.Invoke();
             var config = ConfigureEffects();
             ApplyOwnerEffects(config);
-            ApplyTargetEffects(target, config);
+            ApplyTargetEffects(Target, config);
             ApplyEffectsOnMultipleTargets(config);
         }
 
@@ -56,10 +50,11 @@
         {
             if (Cooldown == 0) return;
             Cooldown--;
-            GD.Print($"Cooldown reduced: {Cooldown} for ability {this.GetType().Name}");
+            AbilityUpdateState?.Invoke();
+            GD.Print($"Cooldown reduced: {Cooldown} for ability {GetType().Name}");
         }
 
-        public bool AbilityCanActivate(ICharacter target)
+        public bool AbilityCanActivate()
         {
             if (Cooldown > 0)
             {
@@ -73,26 +68,19 @@
                 OnCost?.Invoke();
                 return false;
             }
-            if (_owner.Resource.IsResourceHasRightType(Type))
-            {
-                GD.Print($"You cannot use this ability with it stance: {Type}");
-                // TODO: Give player info what is wrong
-                return false;
-            }
-            if (ActivateOnlyOnCaster && target != _owner)
+            if (ActivateOnlyOnCaster && Target != _owner)
             {
                 // TODO: Give player info what is wrong
                 OnTarget?.Invoke();
                 return false;
             }
-            if (target == null)
-            {
-                return false;
-            }
             return true;
         }
 
+        public void UpdateState() => AbilityUpdateState?.Invoke();
+
         protected abstract AbilityEffectConfig ConfigureEffects();
+        protected abstract void LoadTexture();
 
         private void ApplyEffectsOnMultipleTargets(AbilityEffectConfig config)
         {
@@ -111,7 +99,7 @@
             }
         }
 
-        private static void ApplyTargetEffects(ICharacter target, AbilityEffectConfig config)
+        private void ApplyTargetEffects(ICharacter target, AbilityEffectConfig config)
         {
             foreach (var effect in config.TargetEffects)
             {
