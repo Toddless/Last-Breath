@@ -1,10 +1,9 @@
 ﻿namespace Playground.Script.Attribute
 {
     using System.Collections.Generic;
-    using Playground.Components;
     using Playground.Script.Enums;
 
-    public class Strength(ModifierManager manager) : AttributeBase(GetEffects(),manager)
+    public class Strength() : AttributeBase(GetEffects())
     {
         private static IEnumerable<AttributeEffect> GetEffects()
         {

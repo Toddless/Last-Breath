@@ -1,57 +1,54 @@
 ﻿namespace Playground.Script.Attribute
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Script.Helpers;
 
-    public abstract class AttributeBase(IEnumerable<AttributeEffect> effects, ModifierManager manager) : IAttribute
+    public abstract class AttributeBase(IEnumerable<AttributeEffect> effects) : IAttribute
     {
         private const int BaseValue = 1;
         private int _investedPoints;
         private readonly List<AttributeEffect> _effects = [.. effects];
-        private readonly ModifierManager _modifierManager = manager;
+
+        public event Action<IAttribute>? AttributeChanged;
 
         public int InvestedPoints
         {
             get => _investedPoints;
-            set
+            private set
             {
                 if (ObservableProperty.SetProperty(ref _investedPoints, value))
-                {
-                    UpdateModifiers();
-                }
+                    AttributeChanged?.Invoke(this);
             }
+
         }
 
-        public virtual void UpdateModifiers()
+        public virtual void IncreasePoints() => InvestedPoints++;
+
+        public virtual void InscreasePointsByAmount(int amount) => InvestedPoints += amount;
+
+        public virtual void DecreasePoints() => InvestedPoints--;
+
+        public virtual void DescreasePointsByAmount(int amount) => InvestedPoints -= amount;
+
+
+        public List<AttributeModifier> AttributeModifiers()
         {
-            // for now i just remove all and recalculate
-            RemoveAllModifiers();
+            List<AttributeModifier> modifiers = [];
+
             foreach (var effect in _effects)
             {
-                var modifier = new AttributeModifier
-                    (effect.TargetParameter,
+                var modifier = new AttributeModifier(
+                    effect.TargetParameter,
                     (BaseValue + _investedPoints) * effect.ValuePerPoint,
                     effect.ModifierType,
                     this,
-                    effect.Priority
-                    );
+                    effect.Priority);
 
-                _modifierManager.AddPermanentModifier(modifier);
+                modifiers.Add(modifier);
             }
-        }
-
-        private void RemoveAllModifiers()
-        {
-            var modifiersToRemove = _modifierManager.PermanentModifiers
-                .SelectMany(x => x.Value)
-                .OfType<AttributeModifier>()
-                .Where(x => x.SourceAttribute == this)
-                .ToList();
-
-            modifiersToRemove.ForEach(_modifierManager.RemovePermanentModifier);
+            return modifiers;
         }
     }
 }

@@ -11,7 +11,6 @@
     using Playground.Script.Abilities;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
@@ -82,6 +81,7 @@
             {
                 if (ObservableProperty.SetProperty(ref _target, value))
                 {
+                    GD.Print($"New Target set to: {_target?.GetType().Name}");
                     UpdateTargetForCurrentSetOfAbilities(value);
                 }
             }
@@ -94,20 +94,20 @@
         public int Speed { get; set; } = 200;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
-        public DefenseComponent Defense => _playerDefense ??= new(_modifierManager);
-        public HealthComponent Health => _playerHealth ??= new(_modifierManager);
-        public DamageComponent Damage => _playerDamage ??= new(Strategy, _modifierManager);
+        public DefenseComponent Defense => _playerDefense ??= new();
+        public HealthComponent Health => _playerHealth ??= new();
+        public DamageComponent Damage => _playerDamage ??= new(Strategy);
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
         public IDamageStrategy Strategy => _damageStrategy ??= new UnarmedDamageStrategy();
         public EffectsManager Effects => _effectsManager ??= new(this);
         public ModifierManager Modifiers => _modifierManager;
-        // i think i need some ability component later, because i need a place where player can modifiy, learn and forget abilities
+        // i think i need some ability component later, because i need a place where player can modifiy, learn or forget abilities
         public Dictionary<Stance, List<IAbility>> Abilities => _abilities;
 
         // TODO: i need default resource
-        public ResourceComponent Resource => _resourceManager ??= new(_stance, _modifierManager);
+        public ResourceComponent Resource => _resourceManager ??= new(_stance);
         #endregion
 
         #region Events
@@ -119,26 +119,34 @@
         public override void _Ready()
         {
             _damageStrategy = new UnarmedDamageStrategy();
+            _playerDamage = new(Strategy);
             _effectsManager = new(this);
-            _playerHealth = new(_modifierManager);
-            _playerDamage = new(Strategy, _modifierManager);
-            _playerDefense = new(_modifierManager);
+            _playerHealth = new();
+            _playerDefense = new();
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
             _equipInventory = new();
             _craftingInventory = new();
             _questItemsInventory = new();
             LoadDialogues();
+            SetEvents();
             GameManager.Instance!.Player = this;
-            _attribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
-            _attribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
+            _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
+            _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
             _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600, this));
-            // _modifierManager.AddPermanentModifier(new DodgeModifier(ModifierType.Additive, 0.3f, this));
-            // _modifierManager.AddPermanentModifier(new AdditionalHitModifier(ModifierType.Additive, 0.3f, this));
             _playerHealth.HealUpToMax();
             _abilities.Add(Stance.Strength, [new TouchOfGod(this)]);
             _abilities.Add(Stance.Dexterity, [new PrecisionStrike(this)]);
             GD.Print($"Player health: {_playerHealth.CurrentHealth}");
+        }
+
+        private void SetEvents()
+        {
+            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
+            _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
         public override void _PhysicsProcess(double delta)

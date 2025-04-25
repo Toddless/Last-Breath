@@ -111,14 +111,15 @@
 
         private void OnBattleEnds(BattleResult result)
         {
+            var player = result.Player;
+            var enemy = result.Enemy;
             switch (result.Results)
             {
                 case Enums.BattleResults.EnemyWon:
                     HandleEnemyWon(result);
                     break;
                 case Enums.BattleResults.PlayerWon:
-                    HandlePlayerRunAway(result);
-                    // HandleEnemyKilled(result.Enemy);
+                    HandleEnemyKilled(enemy, player);
                     break;
                 case Enums.BattleResults.PlayerRunAway:
                     HandlePlayerRunAway(result);
@@ -126,6 +127,16 @@
             }
             UnsubscribeBattleUI((Player)result.Player, (BaseEnemy)result.Enemy);
             BattleEnds?.Invoke();
+        }
+
+        private void HandleEnemyKilled(ICharacter enemy, ICharacter player)
+        {
+            if(enemy is BaseEnemy baseEnemy && player is Player p)
+            {
+                p.OnEnemyKilled(baseEnemy);
+                p.CanMove = true;
+                p.CanFight = true;
+            }
         }
 
         private void HandleEnemyWon(BattleResult result) => HandlePlayerRunAway(result);

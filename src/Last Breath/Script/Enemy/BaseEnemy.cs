@@ -7,7 +7,6 @@ namespace Playground
     using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Attribute;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
@@ -121,17 +120,17 @@ namespace Playground
 
         public string EnemyId => _enemyId ??= SetId();
 
-        public DamageComponent Damage => _enemyDamage ??= new(new UnarmedDamageStrategy(), _modifierManager);
+        public DamageComponent Damage => _enemyDamage ??= new(new UnarmedDamageStrategy());
 
-        public HealthComponent Health => _enemyHealth ??= new(_modifierManager);
+        public HealthComponent Health => _enemyHealth ??= new();
 
-        public DefenseComponent Defense => _enemyDefense ??= new(_modifierManager);
+        public DefenseComponent Defense => _enemyDefense ??= new();
 
         public EffectsManager Effects => _effectsManager ??= new(this);
 
         public ModifierManager Modifiers => _modifierManager;
 
-        public ResourceComponent Resource => _resourceManager ??= new(_stance, _modifierManager);
+        public ResourceComponent Resource => _resourceManager ??= new(_stance);
 
         public event Action<BaseEnemy>? InitializeFight;
 
@@ -140,10 +139,10 @@ namespace Playground
         public override void _Ready()
         {
             _effectsManager = new(this);
-            _enemyHealth = new(_modifierManager);
-            _enemyDefense = new(_modifierManager);
+            _enemyHealth = new();
+            _enemyDefense = new();
             // later i need strategy for enemies
-            _enemyDamage = new(new UnarmedDamageStrategy(), _modifierManager);
+            _enemyDamage = new(new UnarmedDamageStrategy());
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
@@ -156,9 +155,9 @@ namespace Playground
             _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _inventoryNode.Hide();
+            SetEvents();
             DiContainer.InjectDependencies(this);
             SetStats();
-            SetEvents();
             // SpawnItems();
             Health?.HealUpToMax();
         }
@@ -181,6 +180,15 @@ namespace Playground
             Modifiers.ResetTemporaryModifiers();
         }
 
+        public void OnGettingKill()
+        {
+            CanFight = false;
+            CanMove = false;
+            // TODO: Turn "death" state on in witch enemy lay down for N time befor reincarnated
+            // change sprite and animation
+            Area?.Hide();
+        }
+
         protected void SpawnItems()
         {
             _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -193,11 +201,9 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 300);
             var points = SetAttributesDependsOnType(_enemyAttributeType);
-            _enemyAttribute.AddAttribute(new Dexterity(_modifierManager) { InvestedPoints = 5 });
-            _enemyAttribute.AddAttribute(new Strength(_modifierManager) { InvestedPoints = 5 });
+            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
+            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
             _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 500, this));
-          //  _modifierManager.AddPermanentModifier(new DodgeModifier(ModifierType.Additive, 0.9f, this));
-            _modifierManager.AddPermanentModifier(new AdditionalHitModifier(ModifierType.Additive, 0.3f, this));
             SetAnimation();
             _stance = SetStance(_enemyAttributeType);
             _resourceManager?.SetCurrentResource(_stance);
@@ -206,6 +212,11 @@ namespace Playground
         private void SetEvents()
         {
             _area!.BodyEntered += PlayerEntered;
+            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
+            _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
         private Stance SetStance(EnemyAttributeType? enemyAttributeType)
@@ -251,7 +262,7 @@ namespace Playground
             if (body is Player s && _area!.OverlapsBody(s))
             {
                 InitializeFight?.Invoke(this);
-                CanFight = true;
+                CanFight = false;
             }
         }
 

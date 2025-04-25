@@ -76,9 +76,6 @@
 
         private void EnemyMakesTurn()
         {
-            // Decide ability to use
-            // check if enough resources and cast second ability if needed (need to create system for that, so enemy do not use some ability, even though he has resources)
-            DecideAbility();
             TryAttack();
             // Method for resource generation
             _machine.Fire(Trigger.PlayerTurn);
@@ -198,12 +195,20 @@
 
         private float CalculateDamage()
         {
-            float damage = _attacker!.Damage.Damage;
-            if (IsCrit(_attacker))
+            if (_attacker == null || _defender == null)
             {
-                damage *= _attacker.Damage.CriticalDamage;
+                // TODO: Log
+                return 0;
             }
-            return Mathf.Max(0, damage * (1 - Mathf.Min(_defender!.Defense.CurrentArmor / 100, 0.7f)));
+
+            float damage = _attacker.Damage.Damage;
+
+            if (_attacker.Damage.IsCrit())
+            {
+                // TODO: I need to animate this
+                damage = Calculations.DamageAfterCrit(damage, _attacker);
+            }
+            return Calculations.DamageAfterArmor(damage, _defender);
         }
 
         private void ApplyDamage(float damage)
@@ -246,9 +251,8 @@
         }
 
         private string GetCharacterName(ICharacter character) => character.GetType().Name;
-        private bool IsAdditionalHit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage.AdditionalHit;
-        private bool IsCrit(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Damage.CriticalChance;
-        private bool IsEvade(ICharacter? character) => _rnd.RandfRange(1, 2) <= character?.Defense.CurrentDodge;
+        private bool IsAdditionalHit(ICharacter? character) => _rnd.Randf() <= character?.Damage.AdditionalHit;
+        private bool IsEvade(ICharacter? character) => _rnd.Randf() <= character?.Defense.CurrentDodge;
 
         private void CheckBattleEnds()
         {

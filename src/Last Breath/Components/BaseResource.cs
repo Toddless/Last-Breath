@@ -39,7 +39,12 @@
 
         public bool IsEnough(int amountToSpend) => Current <= amountToSpend;
 
-        public void OnSpend(int amount) => Current -= amount;
+        public void OnSpend(int amount)
+        {
+            Current -= amount;
+            CurrentChanges?.Invoke(amount);
+        }
+
         public float GetBaseRecovery() => _baseRecoveryAmount;
         public float GetBaseMaximumAmount() => _baseMaximumAmount;
 

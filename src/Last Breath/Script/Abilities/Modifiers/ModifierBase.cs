@@ -10,7 +10,7 @@
 
         public int Priority { get; } = priority;
 
-        public float Value { get; } = value;
+        public float Value { get; set; } = value;
 
         public object Source { get; } = source;
 

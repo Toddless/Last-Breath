@@ -80,7 +80,7 @@
         public void UpdateState() => AbilityUpdateState?.Invoke();
 
         protected abstract AbilityEffectConfig ConfigureEffects();
-        protected abstract void LoadTexture();
+        protected abstract void LoadData();
 
         private void ApplyEffectsOnMultipleTargets(AbilityEffectConfig config)
         {

@@ -5,6 +5,7 @@
 
     public class PrecisionStrike : AbilityBase
     {
+        private float _damage = 0;
         private const string TextureUID = "uid://du5wtjaopx2pd";
         public PrecisionStrike(ICharacter owner) : base(owner,
                 cooldown: 3,
@@ -12,7 +13,13 @@
                 type: Enums.ResourceType.Combopoints,
                 activateOnlyOnCaster: false)
         {
-            LoadTexture();
+            LoadData();
+        }
+
+        public override void Activate()
+        {
+            base.Activate();
+            Target.Health.TakeDamage(_damage);
         }
 
         protected override AbilityEffectConfig ConfigureEffects() => new()
@@ -21,9 +28,10 @@
             TargetEffects = [new ClumsinessEffect()]
         };
 
-        protected override void LoadTexture()
+        protected override void LoadData()
         {
             Icon = ResourceLoader.Load<Texture2D>(TextureUID);
+            // e.x _damage = GetDamageFromConfigFile();
         }
     }
 }

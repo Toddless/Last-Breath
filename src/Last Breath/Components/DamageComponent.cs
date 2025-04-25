@@ -1,32 +1,75 @@
 namespace Playground.Components
 {
     using System;
+    using System.Collections.Generic;
     using Godot;
     using Playground.Components.Interfaces;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
     public class DamageComponent
     {
         // Random range for damage
         private const float From = 0.70f;
         private const float To = 1.30f;
-        private float _damage, _criticalChance, _criticalDamage, _additionalHit;
+        private float _damage, _criticalChance, _criticalDamage, _additionalHit, _maxCriticalChance = 0.75f;
         private readonly RandomNumberGenerator _rnd = new();
         // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
         // TODO: Rename strategy
         private IDamageStrategy _strategy;
-        private readonly ModifierManager _modifierManager;
 
-        public float Damage => _damage * _rnd.RandfRange(From, To);
-        public float CriticalChance => _criticalChance;
-        public float CriticalDamage => _criticalDamage;
-        public float AdditionalHit => _additionalHit;
+        public float Damage
+        {
+            get => _damage * _rnd.RandfRange(From, To);
+            private set
+            {
+                if (ObservableProperty.SetProperty(ref _damage, value))
+                {
+                    // TODO: Raise event with new value to show on UI
+                }
+            }
+        }
 
-        public DamageComponent(IDamageStrategy strategy, ModifierManager modifier)
+        public float CriticalChance
+        {
+            get => _criticalChance;
+            private set
+            {
+                if (ObservableProperty.SetProperty(ref _criticalChance, value))
+                {
+                    // TODO: Raise event with new value to show on UI
+                }
+            }
+        }
+
+        public float CriticalDamage
+        {
+            get => _criticalDamage;
+            private set
+            {
+                if (ObservableProperty.SetProperty(ref _criticalDamage, value))
+                {
+                    // TODO: Raise event with new value to show on UI
+                }
+            }
+        }
+
+        public float AdditionalHit
+        {
+            get => _additionalHit;
+            private set
+            {
+                if (ObservableProperty.SetProperty(ref _additionalHit, value))
+                {
+                    // TODO: Raise event with new value to show on UI
+                }
+            }
+        }
+
+        public DamageComponent(IDamageStrategy strategy)
         {
             _strategy = strategy;
-            _modifierManager = modifier;
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
         }
 
         public event Action? StrategyChanges;
@@ -38,25 +81,27 @@ namespace Playground.Components
             StrategyChanges?.Invoke();
         }
 
-        private void OnParameterChanges(Parameter parameter)
+        public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
         {
             switch (parameter)
             {
                 case Parameter.StrikeDamage:
-                    _damage = Calculations.CalculateFloatValue(_strategy.GetDamage(), _modifierManager.GetCombinedModifiers(parameter));
+                    Damage = Calculations.CalculateFloatValue(_strategy.GetDamage(), modifiers);
                     break;
                 case Parameter.CriticalStrikeChance:
-                    _criticalChance = Calculations.CalculateFloatValue(_strategy.GetBaseCriticalChance(), _modifierManager.GetCombinedModifiers(parameter));
+                    CriticalChance = Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseCriticalChance(), modifiers), _maxCriticalChance);
                     break;
                 case Parameter.CriticalStrikeDamage:
-                    _criticalDamage = Calculations.CalculateFloatValue(_strategy.GetBaseCriticalDamage(), _modifierManager.GetCombinedModifiers(parameter));
+                    CriticalDamage = Calculations.CalculateFloatValue(_strategy.GetBaseCriticalDamage(), modifiers);
                     break;
                 case Parameter.AdditionalStrikeChance:
-                    _additionalHit = Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), _modifierManager.GetCombinedModifiers(parameter));
+                    AdditionalHit = Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), modifiers);
                     break;
                 default:
                     break;
             }
         }
+
+        public bool IsCrit() => _rnd.Randf() <= CriticalChance;
     }
 }

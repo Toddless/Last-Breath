@@ -21,7 +21,8 @@
                 TextureNormal = ability.Icon;
         }
 
-
+        // TODO: Update ability state after battle start
+        // update ability state after activation
         public void UnbindAbility()
         {
             if (_ability != null)
@@ -36,7 +37,6 @@
 
         public bool AbilitySet() => _ability != null;
 
-        // we update ability state on target change
         private void UpdateActivationState()
         {
             if (_ability == null) return;

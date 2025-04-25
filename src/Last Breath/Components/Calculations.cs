@@ -5,10 +5,16 @@
     using System.Collections.Generic;
     using System.Linq;
     using System;
+    using Playground.Script;
+    using Godot;
 
     public class Calculations
     {
         public static float CalculateFloatValue(float value, List<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
+
+        public static float DamageAfterCrit(float damage, ICharacter attacker) => damage *= attacker.Damage.CriticalDamage;
+
+        public static float DamageAfterArmor(float damage, ICharacter defender) => Mathf.Max(0, damage * (1 - Mathf.Min(defender.Defense.CurrentArmor / 100, defender.Defense.CurrentMaxReduce)));
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
         {

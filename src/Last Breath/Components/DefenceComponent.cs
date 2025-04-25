@@ -1,37 +1,38 @@
 ﻿namespace Playground.Components
 {
+    using System.Collections.Generic;
+    using Godot;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
     public class DefenseComponent
     {
         private const float BaseArmor = 100f;
-        private const float BaseDodge = 1f;
+        private const float BaseDodge = 0f;
         private const float BaseEnergyBarrier = 0f;
+        private const float BaseMaxReduce = 0.7f;
 
-        private readonly ModifierManager _modifierManager;
+        public float CurrentArmor { get; private set; } = BaseArmor;
+        public float CurrentDodge { get; private set; } = BaseDodge;
+        public float CurrentEnergyBarrier { get; private set; } = BaseEnergyBarrier;
+        public float CurrentMaxReduce { get; private set; } = BaseMaxReduce;
 
-        public float CurrentArmor { get; private set; }
-        public float CurrentDodge { get; private set; }
-        public float CurrentEnergyBarrier { get; private set; }
-
-        public DefenseComponent(ModifierManager modifierManager)
-        {
-            _modifierManager = modifierManager;
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
-        }
-
-        private void OnParameterChanges(Parameter parameter)
+        public void OnParameterChanges(Parameter parameter,List<IModifier> modifiers)
         {
             switch (parameter)
             {
                 case Parameter.Armor:
-                    CurrentArmor = Calculations.CalculateFloatValue(BaseArmor, _modifierManager.GetCombinedModifiers(parameter));
+                    CurrentArmor = Calculations.CalculateFloatValue(BaseArmor, modifiers);
+                    GD.Print($"CurrentArmor set to: {CurrentArmor}");
                     break;
                 case Parameter.Dodge:
-                    CurrentDodge = Calculations.CalculateFloatValue(BaseDodge, _modifierManager.GetCombinedModifiers(parameter));
+                    CurrentDodge = Calculations.CalculateFloatValue(BaseDodge, modifiers);
                     break;
                 case Parameter.EnergyBarrier:
-                    CurrentEnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, _modifierManager.GetCombinedModifiers(parameter));
+                    CurrentEnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, modifiers);
+                    break;
+                case Parameter.MaxReduce:
+                    CurrentMaxReduce = Calculations.CalculateFloatValue(BaseMaxReduce, modifiers);
                     break;
                 default:
                     break;

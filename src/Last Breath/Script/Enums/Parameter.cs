@@ -2,6 +2,7 @@
 {
     public enum Parameter
     {
+        // TODO: Need to rename some parts
         StrikeDamage = 0,
         CriticalStrikeChance,
         CriticalStrikeDamage,
@@ -15,6 +16,7 @@
         Dodge,
         EnergyBarrier,
         SpellDamage,
-        Resource
+        Resource,
+        MaxReduce
     }
 }

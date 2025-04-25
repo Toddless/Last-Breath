@@ -4,12 +4,12 @@
     using System.Collections.Generic;
     using Godot;
     using Playground.Components.Interfaces;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
     public class ResourceComponent
     {
         private IResource _currentResource;
-        private readonly ModifierManager _modifierManager;
         // maybe i should use stance instead of resurceType?
         private readonly Dictionary<Stance, IResource> _resources = [];
 
@@ -18,11 +18,10 @@
         public event Action<float>? CurrentResourceValueChanges;
 
         public event Action<ResourceType, float, float>? CurrentResourceTypeChanges;
-        public ResourceComponent(Stance type, ModifierManager modifierManager)
+
+        public ResourceComponent(Stance type)
         {
             _currentResource = InitialResource(type);
-            _modifierManager = modifierManager;
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             SetEvents();
         }
 
@@ -46,15 +45,14 @@
 
         public bool IsResourceHasRightType(ResourceType type) => _currentResource.Type == type;
 
-        private void OnParameterChanges(Parameter parameter)
+        public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
         {
             if (parameter != Parameter.Resource) return;
-            CurrentResource.RecoveryAmount = Mathf.Max(0, Calculations.CalculateFloatValue(CurrentResource.GetBaseRecovery(), _modifierManager.GetCombinedModifiers(Parameter.Resource)));
+            CurrentResource.RecoveryAmount = Mathf.Max(0, Calculations.CalculateFloatValue(CurrentResource.GetBaseRecovery(), modifiers));
         }
 
         private void SetEvents()
         {
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             _currentResource.CurrentChanges += OnCurrentChanges;
         }
 

@@ -1,7 +1,9 @@
 ﻿namespace Playground.Components
 {
     using System;
+    using System.Collections.Generic;
     using Godot;
+    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
 
@@ -10,7 +12,6 @@
         private const float BaseHealth = 100;
         private float _currentHealth;
         private float _maxHealth;
-        private readonly ModifierManager _modifierManager;
 
         public event Action<float>? CurrentHealthChanged, MaxHealthChanged;
 
@@ -28,13 +29,9 @@
 
         public float MaxHealth => Mathf.RoundToInt(_maxHealth);
 
-        public HealthComponent(ModifierManager modifierManager)
+        public HealthComponent()
         {
-            _modifierManager = modifierManager;
-            _modifierManager.ParameterModifiersChanged += OnParameterModifiersChanges;
-            UpdateMaxHealth();
             _currentHealth = _maxHealth;
-
         }
 
         // TODO: action or signal for hp == 0
@@ -44,16 +41,11 @@
 
         public void HealUpToMax() => CurrentHealth = MaxHealth;
 
-        private void OnParameterModifiersChanges(Parameter parameter)
+        public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
         {
             if (parameter != Parameter.MaxHealth)
                 return;
-            UpdateMaxHealth();
-        }
-
-        private void UpdateMaxHealth()
-        {
-            var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, _modifierManager.GetCombinedModifiers(Parameter.MaxHealth));
+            var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, modifiers);
             if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
             {
                 _maxHealth = newMaxHealth;

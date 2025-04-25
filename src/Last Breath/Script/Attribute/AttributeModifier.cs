@@ -1,10 +1,9 @@
 ﻿namespace Playground.Script.Attribute
 {
-    using Playground.Components.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
-    public class AttributeModifier(Parameter param, float value, ModifierType type, IAttribute source, int priority = 0) : IModifier
+    public class AttributeModifier(Parameter param, float value, ModifierType type, object source, int priority = 0) : IModifier
     {
         public Parameter Parameter { get; } = param;
 
@@ -12,11 +11,9 @@
 
         public int Priority { get; } = priority;
 
-        public float Value { get; } = value;
+        public float Value { get; set; } = value;
 
-        public IAttribute SourceAttribute { get; } = source;
-
-        public object Source => SourceAttribute;
+        public object Source { get; } = source;
 
         public float ModifyValue(float value)
         {
