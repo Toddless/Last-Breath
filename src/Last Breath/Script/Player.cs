@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
@@ -41,6 +42,8 @@
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
+
+        private AnimatedSprite2D _sprite2;
         #endregion
 
         [Signal]
@@ -234,7 +237,7 @@
         {
             Effects.RemoveAllEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
-            Modifiers.ResetTemporaryModifiers();
+            Modifiers.RemoveAllTemporaryModifiers();
         }
 
 
@@ -302,6 +305,11 @@
             {
                 _dialogs.Add(item.Key, item.Value);
             }
+        }
+
+        public void OnAnimation()
+        {
+           
         }
     }
 }

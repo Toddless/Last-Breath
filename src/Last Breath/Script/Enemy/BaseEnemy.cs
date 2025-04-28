@@ -177,7 +177,7 @@ namespace Playground
         {
             Effects.RemoveAllEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
-            Modifiers.ResetTemporaryModifiers();
+            Modifiers.RemoveAllTemporaryModifiers();
         }
 
         public void OnGettingKill()
@@ -299,6 +299,11 @@ namespace Playground
             id.Append('_');
             id.Append(Fraction.ToString());
             return id.ToString();
+        }
+
+        public async void OnAnimation()
+        {
+           
         }
     }
 }

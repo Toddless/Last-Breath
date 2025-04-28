@@ -8,7 +8,7 @@
         public HealthComponent Health { get; }
         public DamageComponent Damage { get; }
         public DefenseComponent Defense { get; }
-        public EffectsManager Effects {  get; }
+        public EffectsManager Effects { get; }
         public ModifierManager Modifiers { get; }
         public ResourceComponent Resource { get; }
         Stance Stance { get; set; }
@@ -18,6 +18,8 @@
 
         void OnTurnEnd();
         void OnFightEnds();
+
+        void OnAnimation();
 
         // TODO: Resources class
         // i need 3 types, for each stance

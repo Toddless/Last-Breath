@@ -24,6 +24,7 @@
         public event Action<BattleResult>? BattleEnd;
         public event Action<ICharacter?>? TargetChanges;
         public event Action? PlayerTurnEnds;
+        public event Action<int, ICharacter, bool>? DamageDealed;
 
         public BattleSceneHandler()
         {
@@ -81,11 +82,6 @@
             _machine.Fire(Trigger.PlayerTurn);
         }
 
-        private void DecideAbility()
-        {
-
-        }
-
         private void ConfigureStateMachine()
         {
             _machine.Configure(State.Awaiting)
@@ -133,6 +129,7 @@
             bool additionalHit;
             do
             {
+                _attacker?.OnAnimation();
                 if (!PerformAttack())
                 {
                     HandleEvadedAttack();
@@ -149,6 +146,8 @@
             if (IsEvade(_defender))
             {
                 GD.Print($"{GetCharacterName(_defender)} evaded attack");
+                // Добавлять анимации в очередь??
+                _defender.OnAnimation();
                 return false;
             }
             ApplyDamage(CalculateDamage());
@@ -178,17 +177,6 @@
         private void TryCounterAttack()
         {
             GD.Print($"{GetCharacterName(_attacker)} performing counter attack");
-            // if i need resource recovery on counter attack, i need to copy paste code from try attack, so i can be sure resource will be recovered only on counter attack
-
-            //bool additionalHit;
-            //do
-            //{
-            //    if (!PerformAttack())
-            //    {
-            //        break;
-            //    }
-            //    additionalHit = IsAdditionalHit(_attacker);
-            //} while (additionalHit);
             TryAttack();
             SwitchRoles();
         }
@@ -202,13 +190,17 @@
             }
 
             float damage = _attacker.Damage.Damage;
-
-            if (_attacker.Damage.IsCrit())
+            bool crit = _attacker.Damage.IsCrit();
+            if (crit)
             {
                 // TODO: I need to animate this
                 damage = Calculations.DamageAfterCrit(damage, _attacker);
             }
-            return Calculations.DamageAfterArmor(damage, _defender);
+
+            var afterArmor = Calculations.DamageAfterArmor(damage, _defender);
+
+            DamageDealed?.Invoke(Mathf.RoundToInt(afterArmor), _defender, crit);
+            return afterArmor;
         }
 
         private void ApplyDamage(float damage)

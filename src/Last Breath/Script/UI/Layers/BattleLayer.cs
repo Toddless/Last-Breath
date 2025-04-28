@@ -10,14 +10,13 @@
     public partial class BattleLayer : ObservableLayer
     {
         private BattleSceneHandler? _battleSceneHandler;
-        private BattleUI? _battleUI;
+        [Export] private BattleUI? _battleUI;
 
         public event Action? BattleEnds;
 
         public override void _Ready()
         {
             _battleSceneHandler = new BattleSceneHandler();
-            _battleUI = GetNode<BattleUI>(nameof(BattleUI));
             SetupEvents();
         }
 
@@ -32,10 +31,13 @@
             _battleUI!.DexterityStance += () => _battleSceneHandler?.DexterityStance();
             _battleUI.StrengthStance += () => _battleSceneHandler?.StrengthStance();
             _battleUI!.HeadButtonPressed += () => _battleSceneHandler?.PlayerTurn();
+
             _battleSceneHandler!.ShowAttackButtons += _battleUI.ShowAttackButtons;
             _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
-            _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
+            _battleSceneHandler!.DamageDealed += _battleUI.OnDamageDealed;
             _battleSceneHandler.BattleEnd += OnBattleEnds;
+
+            _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
         }
 
         private void HandleFightStart(BattleContext context)

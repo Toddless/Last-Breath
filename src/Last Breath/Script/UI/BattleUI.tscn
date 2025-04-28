@@ -26,7 +26,7 @@ region = Rect2(0, 32, 64, 16)
 size = Vector2(450, 450)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_2f6ns"]
-size = Vector2(250, 250)
+size = Vector2(450, 450)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ingfk"]
 size = Vector2(75, 75)

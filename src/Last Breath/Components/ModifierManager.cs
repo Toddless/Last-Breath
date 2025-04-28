@@ -11,15 +11,17 @@
     {
         private readonly HashSet<object> _suppressed = [];
         // all modifiers from equipment, passive abilities etc.
-        protected readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
         // temporary modifiers from abilities, weapon effect etc.
         // TODO: Separate this, because i will have temporary modifiers not only in battle
-        protected readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
-
-        public event Action<Parameter, List<IModifier>>? ParameterModifiersChanged;
+        private readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifier>> _battleModifiers = [];
 
         public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifier>> BattleModifiers => _battleModifiers;
+
+        public event Action<Parameter, List<IModifier>>? ParameterModifiersChanged;
 
         public void SuppressSource(object source)
         {
@@ -44,14 +46,18 @@
 
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
+        public void AddBattleModifier(IModifier modifier) => AddToCategory(_battleModifiers, modifier);
 
         public void UpdatePermanentModifier(IModifier modifier) => UpdateModifier(_permanentModifiers, modifier);
         public void UpdateTemporaryModifier(IModifier modifier) => UpdateModifier(_temporaryModifiers, modifier);
+        public void UpdateBattleModifier(IModifier modifier) => UpdateModifier(_battleModifiers, modifier);
 
         public void RemovePermanentModifier(IModifier modifier) => RemoveFromCategory(_permanentModifiers, modifier);
         public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
+        public void RemoveBattleModifier(IModifier modifier) => RemoveFromCategory(_battleModifiers, modifier);
 
-        public void ResetTemporaryModifiers() => _temporaryModifiers.Clear();
+        public void RemoveAllTemporaryModifiers() => _temporaryModifiers.Clear();
+        public void RemoveAllBattleModifiers() => _battleModifiers.Clear();
 
 
         public List<IModifier> GetCombinedModifiers(Parameter parameter)
@@ -59,9 +65,10 @@
             var modifiers = new List<IModifier>();
             if (_permanentModifiers.TryGetValue(parameter, out var permanent))
                 IgnoreSuppressedModifiers(modifiers, permanent);
-
             if (_temporaryModifiers.TryGetValue(parameter, out var temp))
                 IgnoreSuppressedModifiers(modifiers, temp);
+            if (_battleModifiers.TryGetValue(parameter, out var battle))
+                IgnoreSuppressedModifiers(modifiers, battle);
 
             return modifiers;
         }

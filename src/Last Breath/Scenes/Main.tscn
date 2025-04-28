@@ -73,10 +73,11 @@ stream = ExtResource("8_11jk4")
 autoplay = true
 parameters/looping = true
 
-[node name="BattleLayer" type="CanvasLayer" parent="."]
+[node name="BattleLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("_battleUI")]
 process_mode = 1
 visible = false
 script = ExtResource("16_vnox3")
+_battleUI = NodePath("BattleUI")
 
 [node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]
 
