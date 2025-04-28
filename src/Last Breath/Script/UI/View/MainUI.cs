@@ -24,8 +24,8 @@
             var player = GameManager.Instance.Player;
             if (player != null)
             {
-                _playerHealth!.MaxValue = player.HealthComponent!.MaxHealth;
-                _playerHealth.Value = player.HealthComponent.CurrentHealth;
+                _playerHealth!.MaxValue = player.Health!.MaxHealth;
+                _playerHealth.Value = player.Health.CurrentHealth;
             }
 
             NodeFinder.ClearCache();

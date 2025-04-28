@@ -2,16 +2,21 @@
 {
     public enum Parameter
     {
-        None = 0,
-        StrikeDamage,
+        // TODO: Need to rename some parts
+        StrikeDamage = 0,
         CriticalStrikeChance,
         CriticalStrikeDamage,
         AdditionalStrikeChance,
-        Health,
+        CurrentHealth,
+        MaxHealth,
         Dexterity,
         Strength,
         Intelligence,
         Armor,
         Dodge,
+        EnergyBarrier,
+        SpellDamage,
+        Resource,
+        MaxReduce
     }
 }

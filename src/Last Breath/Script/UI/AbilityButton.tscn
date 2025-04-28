@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://rxcf0iao3twp"]
+
+[ext_resource type="Script" uid="uid://cu5g3i30ncbvc" path="res://Script/UI/AbilityButton.cs" id="1_7aa3d"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_smjpv"]
+size = Vector2(45, 45)
+
+[node name="AbilityButton" type="TextureButton"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = SubResource("PlaceholderTexture2D_smjpv")
+script = ExtResource("1_7aa3d")

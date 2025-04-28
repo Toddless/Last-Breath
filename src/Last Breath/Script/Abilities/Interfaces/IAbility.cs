@@ -1,0 +1,34 @@
+﻿namespace Playground.Script.Abilities.Interfaces
+{
+    using System;
+    using Godot;
+    using Playground.Script.Enums;
+
+    public interface IAbility
+    {
+        Texture2D? Icon { get; }
+        string Name { get; }
+        string Description { get; }
+        int Cooldown { get; set; }
+        int Cost { get; }
+        bool ActivateOnlyOnCaster { get; }
+        ResourceType Type { get; }
+        ICharacter Target { get; set; }
+
+        event Action? OnCooldown, OnCost, OnTarget, AbilityUpdateState;
+        void Activate();
+        bool AbilityCanActivate();
+        void UpdateCooldown();
+        void UpdateState();
+
+        // for now i ignore UI, animations and sounds
+        // i should add this later
+
+        // Resource??
+        // int   str   dex
+        // Mana, Fury, Combo-Points
+
+        // we do not care about abilities in stances for enemies
+        // each enemy have only one stance
+    }
+}

@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://dtvgj0dnl2fng" path="res://Script/Player.cs" id="1_nuf03"]
 [ext_resource type="Texture2D" uid="uid://d3pygeq0tr3oo" path="res://Assets/Player/Warrior_idle.png" id="2_mu4dn"]
 [ext_resource type="Texture2D" uid="uid://cdvyvrevjhnqq" path="res://Assets/Player/Warrior_walk_run.png" id="3_ajmxy"]
-[ext_resource type="Texture2D" uid="uid://dbi5tjdybuk77" path="res://Assets/DexStance.svg" id="4_ktjf6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1qjy"]
 atlas = ExtResource("2_mu4dn")
@@ -666,12 +665,14 @@ animations = [{
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1c8vr"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_gntrk"]
+load_path = "res://.godot/imported/DexStance.svg-2027081f95d53ecb4679ae5db7fbd56e.ctex"
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_24sl4"]
-atlas = ExtResource("4_ktjf6")
+atlas = SubResource("CompressedTexture2D_gntrk")
 
 [node name="Player" type="CharacterBody2D"]
 physics_interpolation_mode = 2
-position = Vector2(86, 154)
 script = ExtResource("1_nuf03")
 Speed = 600
 

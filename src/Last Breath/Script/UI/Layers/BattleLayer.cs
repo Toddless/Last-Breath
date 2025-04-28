@@ -1,103 +1,155 @@
 ﻿namespace Playground.Script.UI
 {
     using System;
-    using System.ComponentModel;
+    using System.Collections.Generic;
     using Godot;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
-    using Stateless;
 
     public partial class BattleLayer : ObservableLayer
     {
-        private enum State { BattleStart, BattleEnd, Await }
-        private enum Trigger { PreparingBattle, EndingBattle, Awaiting }
+        private BattleSceneHandler? _battleSceneHandler;
+        [Export] private BattleUI? _battleUI;
 
-        private StateMachine<State, Trigger>? _machine;
-        private BattleSceneHandler? _battleScene;
-        private BattleUI? _battleUI;
-        private BattleContext? _battleContext;
-
-        public Action<BattleResult>? ReturnToMainWorld;
-
-        public BattleContext? BattleContext
-        {
-            get => _battleContext;
-            set => SetProperty(ref _battleContext, value);
-        }
+        public event Action? BattleEnds;
 
         public override void _Ready()
         {
-            _machine = new StateMachine<State, Trigger>(State.Await);
-            _battleScene = GetNode<BattleSceneHandler>("BattleScene");
-            _battleUI = GetNode<BattleUI>(nameof(BattleUI));
-            this.PropertyChanged += GettingNewContext;
-            _battleScene.PropertyChanged += BattleFinished;
+            _battleSceneHandler = new BattleSceneHandler();
             SetupEvents();
-            ConfigureStateMachine();
         }
 
-        private void ConfigureStateMachine()
+        public void Init(BattleContext context)
         {
-            _machine!.Configure(State.Await)
-                .OnEntry(Hide)
-                .Permit(Trigger.EndingBattle, State.BattleEnd)
-                .Permit(Trigger.PreparingBattle, State.BattleStart);
-
-            _machine.Configure(State.BattleStart)
-                .OnEntry(StartBattle)
-                .Permit(Trigger.Awaiting, State.Await)
-                .Permit(Trigger.EndingBattle, State.BattleEnd);
-
-            _machine.Configure(State.BattleEnd)
-                .OnEntry(EndBattle)
-                .Permit(Trigger.Awaiting, State.Await)
-                .Permit(Trigger.PreparingBattle, State.BattleStart);
-        }
-
-        private void EndBattle()
-        {
-            ReturnToMainWorld?.Invoke(_battleScene?.BattleResult!);
-            _battleScene?.ReturnStats();
-            _battleContext = null;
-            Hide();
-        }
-
-        private void GettingNewContext(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BattleContext) && BattleContext != null)
-                _machine?.Fire(Trigger.PreparingBattle);
-        }
-
-        private void BattleFinished(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BattleSceneHandler.BattleResult) && _battleScene?.BattleResult != null)
-                _machine?.Fire(Trigger.EndingBattle);
-        }
-
-        private void StartBattle()
-        {
-            var player = (Player)BattleContext!.Self;
-            var enemy = (BaseEnemy)BattleContext.Opponent;
-            SetNewParent(player, _battleScene!);
-            SetNewParent(enemy, _battleScene!);
-            _battleUI?.InitialSetup(player, enemy);
-            _battleScene?.Init(BattleContext!);
-            Show();
+            HandleFightStart(context);
+            _battleSceneHandler?.Init(context);
         }
 
         private void SetupEvents()
         {
-            _battleScene!.PlayerCurrentHealthChanged += (t) => _battleUI?.OnPlayerCurrentHealthChanged(t);
-            _battleScene.EnemyCurrentHealthChanged += (t) => _battleUI?.OnEnemyCurrentHealthChanged(t);
-            _battleScene.PlayerMaxHealthChanged += (t) => _battleUI?.OnPlayerMaxHealthChanged(t);
-            _battleScene.EnemyMaxHealthChanged += (t) => _battleUI?.OnEnemyMaxHealthChanged(t);
-            _battleUI!.Return = _battleScene.PlayerTryingToRunAway;
+            _battleUI!.DexterityStance += () => _battleSceneHandler?.DexterityStance();
+            _battleUI.StrengthStance += () => _battleSceneHandler?.StrengthStance();
+            _battleUI!.HeadButtonPressed += () => _battleSceneHandler?.PlayerTurn();
+
+            _battleSceneHandler!.ShowAttackButtons += _battleUI.ShowAttackButtons;
+            _battleSceneHandler!.HideAttackButtons += _battleUI.HideAttackButtons;
+            _battleSceneHandler!.DamageDealed += _battleUI.OnDamageDealed;
+            _battleSceneHandler.BattleEnd += OnBattleEnds;
+
+            _battleUI!.Return = _battleSceneHandler.PlayerTryingToRunAway;
         }
 
-        private void SetNewParent(Node child, Node parent)
+        private void HandleFightStart(BattleContext context)
         {
-            child.GetParent().CallDeferred("remove_child", child);
-            parent.CallDeferred("add_child", child);
+            var player = (Player)context.Player;
+            var enemy = (BaseEnemy)context.Opponent;
+            context.Player.CanFight = false;
+            context.Player.CanMove = false;
+            context.Opponent.CanFight = false;
+            context.Opponent.CanMove = false;
+            // setup players ability in subscribeBattleUi or SetAbilities?
+            SubscribeToBattleUI(player, enemy);
+            // adding to UI Player and Enemy Animatio1ns
+            // i just set as default target an enemy
+            GD.Print($"Enemy current Resource: {enemy.Resource.GetCurrentResource()}");
+            SetAbilities(player);
+        }
+
+        private void SubscribeToBattleUI(Player player, BaseEnemy enemy)
+        {
+            _battleUI!.PlayerAreaPressed += () => player.Target = player;
+            _battleUI!.EnemyAreaPressed += () => player.Target = enemy;
+            SubscribePlayerElements(player);
+            SubscribeEnemyElements(enemy);
+        }
+
+        private void SubscribeEnemyElements(BaseEnemy enemy)
+        {
+            _battleUI?.SetEnemyHealthBar(enemy.Health.CurrentHealth, enemy.Health.MaxHealth);
+            _battleUI?.SetEnemyResource(enemy.Resource.GetCurrentResource(), enemy.Resource.CurrentResource.Current, enemy.Resource.CurrentResource.MaximumAmount);
+            GD.Print($"Set enemy current resource: {enemy.Resource.CurrentResource.Current}");
+            enemy.Resource.CurrentResourceValueChanges += _battleUI!.OnEnemyCurrentResourceChanges;
+            enemy.Health.CurrentHealthChanged += _battleUI.OnEnemyCurrentHealthChanged;
+            enemy.Health.MaxHealthChanged += _battleUI.OnEnemyMaxHealthChanged;
+        }
+
+        private void SubscribePlayerElements(Player player)
+        {
+            _battleUI?.SetPlayerHealthBar(player.Health.CurrentHealth, player.Health.MaxHealth);
+            _battleUI?.SetPlayerResource(player.Resource.GetCurrentResource(), player.Resource.CurrentResource.Current, player.Resource.CurrentResource.MaximumAmount);
+            GD.Print($"Set player current resource: {player.Resource.CurrentResource.Current}");
+            player.SetAvailableAbilities += OnNewSetAbility;
+            player.Resource.CurrentResourceValueChanges += _battleUI!.OnPlayerCurrenResourceChanges;
+            player.Resource.CurrentResourceTypeChanges += _battleUI.SetPlayerResource;
+            player.Health.CurrentHealthChanged += _battleUI.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged += _battleUI.OnPlayerMaxHealthChanged;
+        }
+
+        private void OnNewSetAbility(List<IAbility> list) => list.ForEach(ability => _battleUI?.SetAbility(ability));
+
+        public void UnsubscribeBattleUI(Player player, BaseEnemy enemy)
+        {
+            player.Health.CurrentHealthChanged -= _battleUI!.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged -= _battleUI.OnPlayerMaxHealthChanged;
+            player.Resource.CurrentResourceValueChanges -= _battleUI.OnPlayerCurrenResourceChanges;
+            player.Resource.CurrentResourceTypeChanges -= _battleUI.SetPlayerResource;
+            player.SetAvailableAbilities -= OnNewSetAbility;
+
+            enemy.Health.CurrentHealthChanged -= _battleUI.OnEnemyCurrentHealthChanged;
+            enemy.Health.MaxHealthChanged -= _battleUI.OnEnemyMaxHealthChanged;
+            enemy.Resource.CurrentResourceValueChanges -= _battleUI.OnEnemyCurrentResourceChanges;
+            _battleUI.ClearAbilities();
+        }
+
+        private void SetAbilities(Player player)
+        {
+            if(player.Stance == Enums.Stance.None) return;
+            foreach (var ability in player.Abilities[player.Stance])
+            {
+                _battleUI?.SetAbility(ability);
+            }
+        }
+
+        private void OnBattleEnds(BattleResult result)
+        {
+            var player = result.Player;
+            var enemy = result.Enemy;
+            switch (result.Results)
+            {
+                case Enums.BattleResults.EnemyWon:
+                    HandleEnemyWon(result);
+                    break;
+                case Enums.BattleResults.PlayerWon:
+                    HandleEnemyKilled(enemy, player);
+                    break;
+                case Enums.BattleResults.PlayerRunAway:
+                    HandlePlayerRunAway(result);
+                    break;
+            }
+            UnsubscribeBattleUI((Player)result.Player, (BaseEnemy)result.Enemy);
+            BattleEnds?.Invoke();
+        }
+
+        private void HandleEnemyKilled(ICharacter enemy, ICharacter player)
+        {
+            if(enemy is BaseEnemy baseEnemy && player is Player p)
+            {
+                p.OnEnemyKilled(baseEnemy);
+                p.CanMove = true;
+                p.CanFight = true;
+            }
+        }
+
+        private void HandleEnemyWon(BattleResult result) => HandlePlayerRunAway(result);
+
+        private void HandlePlayerRunAway(BattleResult result)
+        {
+            var player = (Player)result.Player;
+            var enemy = (BaseEnemy)result.Enemy;
+            player.OnRunAway(enemy.Position);
+            enemy.CanMove = true;
+            enemy.CanFight = true;
         }
     }
 }

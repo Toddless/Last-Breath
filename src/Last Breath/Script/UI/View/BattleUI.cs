@@ -1,62 +1,110 @@
-namespace Playground
+﻿namespace Playground
 {
     using System;
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.ScenesHandlers;
+    using Playground.Script;
+    using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.Enums;
+    using Playground.Script.UI;
+    using Playground.Script.UI.View;
 
     public partial class BattleUI : Control
     {
-        private Button? _returnButton;
-        private TextureProgressBar? _playerHealthBar, _enemyHealthBar;
-        private GridContainer? _playerEffects, _enemyEffects;
         private RandomNumberGenerator? _rnd;
-        private TextureButton? _dexterityStance, _strengthStance, _intelligenceStance, _head, _body, _legs;
-        private BattleSceneHandler? _battleSceneHandler;
-        private Panel? _panelPlayer, _panelEnemy;
-        // ability buttons left
+        [Export] private Button? _returnButton;
+        [Export] private TextureProgressBar? _playerHealthBar, _enemyHealthBar;
+        [Export] private GridContainer? _playerEffects, _enemyEffects;
+        [Export] private TextureButton? _dexterityStance, _strengthStance, _intelligenceStance, _head, _body, _legs;
+        [Export] private ResourceProgressBar? _playerResource, _enemyResource;
+        [Export] private TextureButton? _player, _enemy;
+        [Export] private AbilityButtons? _abilities;
+        [Export] private HBoxContainer? _attackButtons;
+        [Export] private VBoxContainer? _stanceContainer, _bodyContainer;
+
 
         public Action? Return;
 
+        [Signal]
+        public delegate void HeadButtonPressedEventHandler();
+
+        [Signal]
+        public delegate void DexterityStanceEventHandler();
+        [Signal]
+        public delegate void StrengthStanceEventHandler();
+        [Signal]
+        public delegate void IntelligenceStanceEventHandler();
+
+        [Signal]
+        public delegate void PlayerAreaPressedEventHandler();
+        [Signal]
+        public delegate void EnemyAreaPressedEventHandler();
+
         public override void _Ready()
         {
-            _dexterityStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Dexterity");
-            _strengthStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Intelligence");
-            _intelligenceStance = (TextureButton?)NodeFinder.FindBFSCached(this, "Strength");
-
-            _head = (TextureButton?)NodeFinder.FindBFSCached(this, "Head");
-            _body = (TextureButton?)NodeFinder.FindBFSCached(this, "Body");
-            _legs = (TextureButton?)NodeFinder.FindBFSCached(this, "Legs");
-
-            _playerHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "PlayerHealth");
-            _enemyHealthBar = (TextureProgressBar?)NodeFinder.FindBFSCached(this, "EnemyHealth");
-            _playerEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "PlayerEffects");
-            _enemyEffects = (GridContainer?)NodeFinder.FindBFSCached(this, "EnemyEffects");
-            _returnButton = (Button?)NodeFinder.FindBFSCached(this, "ReturnButton");
-
-            _panelPlayer = (Panel?)NodeFinder.FindBFSCached(this, "Panel");
-            _panelEnemy = (Panel?)NodeFinder.FindBFSCached(this, "Panel2");
-            _returnButton!.Pressed += () => Return?.Invoke();
-            NodeFinder.ClearCache();
+            _abilities?.Initialize();
+            SetEvents();
         }
 
-        public void InitialSetup(Player player, BaseEnemy enemy)
+        private void SetEvents()
         {
-            _playerHealthBar.MaxValue = player.HealthComponent.MaxHealth;
-            _playerHealthBar.Value = player.HealthComponent.CurrentHealth;
-
-            _enemyHealthBar.MaxValue = enemy.HealthComponent.MaxHealth;
-            _enemyHealthBar.Value = enemy.HealthComponent.CurrentHealth;
-            player.Position = _panelPlayer.GlobalPosition;
-            enemy.Position = _panelEnemy.GlobalPosition;
+            _returnButton!.Pressed += () => Return?.Invoke();
+            _dexterityStance!.Pressed += () => EmitSignal(SignalName.DexterityStance);
+            _strengthStance!.Pressed += () => EmitSignal(SignalName.StrengthStance);
+            _intelligenceStance!.Pressed += () => EmitSignal(SignalName.IntelligenceStance);
+            _head!.Pressed += () => EmitSignal(SignalName.HeadButtonPressed);
+            _player!.Pressed += () => EmitSignal(SignalName.PlayerAreaPressed);
+            _enemy!.Pressed += () => EmitSignal(SignalName.EnemyAreaPressed);
         }
 
+        // TODO: On stance change update Abilities
+        // TODO: Method to set abilities icons
+
+        public void SetEnemyHealthBar(float current, float max)
+        {
+            _enemyHealthBar!.MaxValue = max;
+            _enemyHealthBar.Value = current;
+            GD.Print($"Enemy hp set: {_enemyHealthBar!.Value}. Max health: {_enemyHealthBar.MaxValue}");
+        }
+
+        public void SetPlayerHealthBar(float current, float max)
+        {
+            _playerHealthBar!.MaxValue = max;
+            _playerHealthBar.Value = current;
+            GD.Print($"Player hp set: {_playerHealthBar!.Value}. Max health: {_playerHealthBar.MaxValue}");
+        }
+
+        public void SetAbility(IAbility ability)
+        {
+            _abilities?.UnbindAbilityButtons();
+            _abilities?.BindAbilitysButton(ability);
+        }
+
+        public void ClearAbilities() => _abilities?.UnbindAbilityButtons();
+        public void HideAttackButtons() => _attackButtons?.Hide();
+        public void ShowAttackButtons() => _attackButtons?.Show();
+        public void SetPlayerResource(ResourceType type, float current, float max) => _playerResource?.SetNewResource(type, current, max);
+        public void SetEnemyResource(ResourceType type, float current, float max) => _enemyResource?.SetNewResource(type, current, max);
+
+        public void OnPlayerCurrenResourceChanges(float obj) => _playerResource!.Value = obj;
         public void OnPlayerCurrentHealthChanged(float newValue) => _playerHealthBar!.Value = newValue;
-
-        public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
-
         public void OnPlayerMaxHealthChanged(float newValue) => _playerHealthBar!.MaxValue = newValue;
 
+        public void OnEnemyCurrentResourceChanges(float obj) => _enemyResource!.Value = obj;
+        public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
         public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
+
+        public void OnDamageDealed(int damage, ICharacter target, bool crit)
+        {
+            // TODO: Remove this from here
+
+            var floatingText = new FloatingText();
+            var targetRect = target is Player ? _player.GetGlobalRect() : _enemy.GetGlobalRect();
+            Vector2 globalPosition = new(targetRect.Position.X + targetRect.Size.X / 2,targetRect.Position.Y);
+            Vector2 localPosition = GetGlobalTransform().AffineInverse() * globalPosition;
+            floatingText.Position = localPosition;
+            this.AddChild(floatingText);
+
+            floatingText.ShowValue(damage.ToString(), new Vector2(0, -75), 1f, 5f, crit);
+        }
     }
 }

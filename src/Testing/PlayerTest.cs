@@ -1,28 +1,26 @@
 ﻿namespace PlaygroundTest
 {
     using System.Collections.ObjectModel;
-    using Playground;
     using Playground.Components;
+    using Playground.Script;
     using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Enums;
 
     public class PlayerTest : ICharacter
     {
         private HealthComponent? _healthComponent;
-        private AttackComponent? _attackComponent;
+        private DamageComponent? _attackComponent;
         private ObservableCollection<IAbility>? _appliedAbilities;
         private ObservableCollection<IEffect> _effects;
         private List<IAbility> _abilities;
-        private EffectManager _effectManager;
 
-        public HealthComponent? HealthComponent
+        public HealthComponent? Health
         {
             get => _healthComponent;
-            set => _healthComponent = value;
         }
-        public AttackComponent? AttackComponent
+        public DamageComponent? Damage
         {
             get => _attackComponent;
-            set => _attackComponent = value;
         }
         public ObservableCollection<IAbility>? AppliedAbilities
         {
@@ -41,10 +39,10 @@
             get => _abilities;
         }
 
-        public EffectManager EffectManager
-        {
-            get => _effectManager;
-        }
+        public DefenseComponent? Defense => throw new NotImplementedException();
+
+        public Stance Stance { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         // Only for test class
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable. 
         public PlayerTest()
@@ -52,14 +50,6 @@
         {
             Effects = [];
             AppliedAbilities ??= [];
-            _effectManager = new(Effects);
-            HealthComponent = new(_effectManager.CalculateValues);
-            AttackComponent = new(_effectManager.CalculateValues);
-            AppliedAbilities.CollectionChanged += _effectManager.OnChangeAbility;
-            _effectManager.TakeDamage += HealthComponent.TakeDamage;
-            _effectManager.Heal += HealthComponent.Heal;
-            _effectManager.UpdateProperties += HealthComponent.UpdateProperties;
-            _effectManager.UpdateProperties += AttackComponent.UpdateProperties;
         }
     }
 }

@@ -2,32 +2,48 @@ namespace Playground
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using Godot;
     using Playground.Script;
     using Playground.Script.Enemy;
+    using Playground.Script.Helpers;
     using Playground.Script.NPC;
-    using Playground.Script.Scenes;
     using Playground.Script.ScenesHandlers;
 
-    public partial class MainWorld : BaseSpawnableScene
+    public partial class MainWorld : ObservableNode2D
     {
-        private BattleContext? _fight;
         private bool _isBattleActive;
         private readonly List<BaseNPC> _npcs = [];
         private readonly List<BaseOpenableObject> _openableObjects = [];
         private Area2D? _area2D;
+        private ObservableCollection<BaseEnemy>? _enemies = [];
+        private IEnemySpawner? _enemySpawner;
+        private List<Vector2>? _enemiesRespawnPosition;
 
-        public BattleContext? Fight
+        public ObservableCollection<BaseEnemy>? Enemies
         {
-            get => _fight;
-            set => SetProperty(ref _fight, value);
+            get => _enemies;
+            set => SetProperty(ref _enemies, value);
+        }
+
+        public IEnemySpawner? EnemySpawner
+        {
+            get => _enemySpawner;
+            set => _enemySpawner = value;
+        }
+
+        public List<Vector2>? EnemiesRespawnPosition
+        {
+            get => _enemiesRespawnPosition;
+            set => _enemiesRespawnPosition = value;
         }
 
         public List<BaseOpenableObject> OpenableObjects => _openableObjects;
         public List<BaseNPC> NPCs => _npcs;
         public event Action<string>? CutScene;
+
+        public event Action<BattleContext>? InitializeFight;
 
         public override void _Ready()
         {
@@ -40,15 +56,26 @@ namespace Playground
             InitializeEnemies();
         }
 
+        public void InitializingFight(BaseEnemy enemy)
+        {
+            if (_isBattleActive) return;
+            InitializeFight?.Invoke(new BattleContext(enemy, GameManager.Instance.Player!));
+            _isBattleActive = true;
+        }
+
+        public void ResetBattleState() => _isBattleActive = false;
+
+        protected void ResolveDependencies() => DiContainer.InjectDependencies(this);
+
         // if i need dynamically add new openableObjects
         private void OnChildAdded(Node node)
         {
-            if(node is BaseOpenableObject obj)
+            if (node is BaseOpenableObject obj)
             {
                 _openableObjects.Add(obj);
                 obj.ChildExitingTree += OnChildExiting;
             }
-            if(node is BaseNPC npc)
+            if (node is BaseNPC npc)
             {
                 _npcs.Add(npc);
             }
@@ -62,7 +89,7 @@ namespace Playground
 
         private void OnChildExiting(Node node)
         {
-            if(node is BaseOpenableObject obj)
+            if (node is BaseOpenableObject obj)
             {
                 _openableObjects.Remove(obj);
                 obj.ChildExitingTree -= OnChildExiting;
@@ -97,23 +124,5 @@ namespace Playground
                 EnemySpawner?.SpawnNewEnemy();
             }
         }
-
-        public override void EnemyReadyToFight(object? sender, PropertyChangedEventArgs e)
-        {
-            if (_isBattleActive) return;
-            if (e.PropertyName == nameof(BaseEnemy.PlayerEncounter))
-            {
-                var enemy = Enemies!.FirstOrDefault(x => x.PlayerEncounter == true);
-                if (enemy != null)
-                {
-                    _isBattleActive = true;
-                    Fight = new BattleContext(enemy, GameManager.Instance.Player!);
-                }
-            }
-        }
-
-        public void ResetBattleState() => _isBattleActive = false;
-
-        protected override void ResolveDependencies() => DiContainer.InjectDependencies(this);
     }
 }

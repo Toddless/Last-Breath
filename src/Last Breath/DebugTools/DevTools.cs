@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Components;
     using Playground.Script;
 
     public partial class DevTools : Control
@@ -27,16 +26,16 @@
         private void FillDictionary()
         {
             // Need to change it
-            _fieldActions.Add(nameof(HealthComponent.AdditionalHealth), delta => _player!.HealthComponent!.AdditionalHealth += (int)delta);
-            _fieldActions.Add(nameof(HealthComponent.IncreaseHealth), delta => _player!.HealthComponent!.IncreaseHealth += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.AdditionalMinDamage), delta => _player!.AttackComponent!.AdditionalMinDamage += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.AdditionalMaxDamage), delta => _player!.AttackComponent!.AdditionalMaxDamage += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.AdditionalExtraHitChance), delta => _player!.AttackComponent!.AdditionalExtraHitChance += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.AdditionalCriticalChance), delta => _player!.AttackComponent!.AdditionalCriticalChance += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.AdditionalCriticalDamage), delta => _player!.AttackComponent!.AdditionalCriticalDamage += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.IncreaseDamage), delta => _player!.AttackComponent!.IncreaseDamage += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.IncreaseCriticalChance), delta => _player!.AttackComponent!.IncreaseCriticalChance += (float)delta);
-            _fieldActions.Add(nameof(AttackComponent.IncreaseExtraHitChance), delta => _player!.AttackComponent!.IncreaseExtraHitChance += (float)delta);
+            //_fieldActions.Add(nameof(HealthComponent.AdditionalHealth), delta => _player!.HealthComponent!.AdditionalHealth += (int)delta);
+            //_fieldActions.Add(nameof(HealthComponent.IncreaseHealth), delta => _player!.HealthComponent!.IncreaseHealth += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.AdditionalMinDamage), delta => _player!.AttackComponent!.AdditionalMinDamage += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.AdditionalMaxDamage), delta => _player!.AttackComponent!.AdditionalMaxDamage += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.AdditionalExtraHitChance), delta => _player!.AttackComponent!.AdditionalExtraHitChance += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.AdditionalCriticalChance), delta => _player!.AttackComponent!.AdditionalCriticalChance += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.AdditionalCriticalDamage), delta => _player!.AttackComponent!.AdditionalCriticalDamage += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.IncreaseDamage), delta => _player!.AttackComponent!.IncreaseDamage += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.IncreaseCriticalChance), delta => _player!.AttackComponent!.IncreaseCriticalChance += (float)delta);
+            //_fieldActions.Add(nameof(DamageComponent.IncreaseExtraHitChance), delta => _player!.AttackComponent!.IncreaseExtraHitChance += (float)delta);
         }
 
         private void SetPlayerVariables(Player player)

@@ -1,7 +1,7 @@
 ﻿namespace Playground.Components
 {
     using Playground.Components.Interfaces;
-    using Playground.Script.Effects.Interfaces;
+    using Playground.Script.Abilities.Interfaces;
 
     public class AbilityDecision(IAbility ability, float priority) : IAbilityDecision
     {

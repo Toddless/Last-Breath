@@ -14,8 +14,8 @@
         // only for now, later i need other place for this kind of things
         private Dictionary<string, string> _dialoguesPath = new()
         {
-            { "res://Resource/Dialogues/GuardianDialogues/guardianDialoguesData.tres", "G:\\Localization\\guardianDialogues.json"},
-            {  "res://Resource/Dialogues/PlayerDialogues/playerDialoguesData.tres", "G:\\Localization\\playerDialogues.json"}
+            { "res://Resources/Dialogues/GuardianDialogues/guardianDialoguesData.tres", "G:\\Localization\\guardianDialogues.json"},
+            {  "res://Resources/Dialogues/PlayerDialogues/playerDialoguesData.tres", "G:\\Localization\\playerDialogues.json"}
         };
         private enum State { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }

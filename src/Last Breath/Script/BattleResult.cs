@@ -1,11 +1,13 @@
 ﻿namespace Playground.Script
 {
-    public class BattleResult(Player player, BaseEnemy enemy, bool enemyKilled)
+    using Playground.Script.Enums;
+
+    public class BattleResult(ICharacter player, ICharacter enemy, BattleResults result)
     {
-        public Player Player { get; set; } = player;
+        public ICharacter Player { get; set; } = player;
 
-        public BaseEnemy Enemy { get; set; } = enemy;
+        public ICharacter Enemy { get; set; } = enemy;
 
-        public bool EnemyKilled { get; set; } = enemyKilled;
+        public BattleResults Results { get; set; } = result;
     }
 }

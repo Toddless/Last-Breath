@@ -1,0 +1,148 @@
+﻿namespace Playground.Components
+{
+    using System.Collections.Generic;
+    using System;
+    using Playground.Script.Enums;
+    using Playground.Script.Abilities.Modifiers;
+    using System.Linq;
+    using Godot;
+
+    public class ModifierManager
+    {
+        private readonly HashSet<object> _suppressed = [];
+        // all modifiers from equipment, passive abilities etc.
+        private readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
+        // temporary modifiers from abilities, weapon effect etc.
+        // TODO: Separate this, because i will have temporary modifiers not only in battle
+        private readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifier>> _battleModifiers = [];
+
+        public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifier>> BattleModifiers => _battleModifiers;
+
+        public event Action<Parameter, List<IModifier>>? ParameterModifiersChanged;
+
+        public void SuppressSource(object source)
+        {
+            if (_suppressed.Add(source))
+                HandleParameters(source);
+        }
+
+        public void RemoveSuppression(object source)
+        {
+            if (_suppressed.Remove(source))
+                HandleParameters(source);
+        }
+
+        private void HandleParameters(object source)
+        {
+            foreach (var param in GetAffectedParameters(source))
+                RaiseEvent(param);
+        }
+
+        // adding multiple modifiers via foreach generate to many unnecessary calls
+        private void RaiseEvent(Parameter parameter) => ParameterModifiersChanged?.Invoke(parameter, GetCombinedModifiers(parameter));
+
+        public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
+        public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
+        public void AddBattleModifier(IModifier modifier) => AddToCategory(_battleModifiers, modifier);
+
+        public void UpdatePermanentModifier(IModifier modifier) => UpdateModifier(_permanentModifiers, modifier);
+        public void UpdateTemporaryModifier(IModifier modifier) => UpdateModifier(_temporaryModifiers, modifier);
+        public void UpdateBattleModifier(IModifier modifier) => UpdateModifier(_battleModifiers, modifier);
+
+        public void RemovePermanentModifier(IModifier modifier) => RemoveFromCategory(_permanentModifiers, modifier);
+        public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
+        public void RemoveBattleModifier(IModifier modifier) => RemoveFromCategory(_battleModifiers, modifier);
+
+        public void RemoveAllTemporaryModifiers() => _temporaryModifiers.Clear();
+        public void RemoveAllBattleModifiers() => _battleModifiers.Clear();
+
+
+        public List<IModifier> GetCombinedModifiers(Parameter parameter)
+        {
+            var modifiers = new List<IModifier>();
+            if (_permanentModifiers.TryGetValue(parameter, out var permanent))
+                IgnoreSuppressedModifiers(modifiers, permanent);
+            if (_temporaryModifiers.TryGetValue(parameter, out var temp))
+                IgnoreSuppressedModifiers(modifiers, temp);
+            if (_battleModifiers.TryGetValue(parameter, out var battle))
+                IgnoreSuppressedModifiers(modifiers, battle);
+
+            return modifiers;
+        }
+
+        private void IgnoreSuppressedModifiers(List<IModifier> modifiers, List<IModifier> permanent)
+        {
+            foreach (var mod in permanent)
+            {
+                if (_suppressed.Contains(mod.Source))
+                    continue;
+                modifiers.Add(mod);
+            }
+        }
+
+        private void UpdateModifier(Dictionary<Parameter, List<IModifier>> category, IModifier newModifier)
+        {
+            if (!category.TryGetValue(newModifier.Parameter, out var list))
+            {
+                //TODO: Log
+                list = [];
+                category[newModifier.Parameter] = list;
+            }
+            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.Type == newModifier.Type);
+            if (existingModifier == null)
+            {
+                // TODO: Log
+                list.Add(newModifier);
+            }
+            else
+            {
+                // TODO: should i change all properties?
+               existingModifier.Value = newModifier.Value;
+            }
+            RaiseEvent(newModifier.Parameter);
+        }
+
+        private void AddToCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
+        {
+            if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
+            {
+                list = [];
+                category[modifier.Parameter] = list;
+            }
+            if (!list.Contains(modifier))
+            {
+                list.Add(modifier);
+                GD.Print($"Added to list: {modifier.Parameter}");
+            }
+
+           RaiseEvent(modifier.Parameter);
+        }
+
+        private void RemoveFromCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
+        {
+            if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
+            {
+                // log
+                return;
+            }
+            list.Remove(modifier);
+            if (list.Count == 0)
+            {
+                category.Remove(modifier.Parameter);
+            }
+            RaiseEvent(modifier.Parameter);
+        }
+
+        private IEnumerable<Parameter> GetAffectedParameters(object source)
+        {
+            return _permanentModifiers
+                .Concat(_temporaryModifiers)
+                .Where(x => x.Value.Any(m => m.Source == source))
+                .Select(x => x.Key)
+                .Distinct();
+        }
+    }
+}
