@@ -13,7 +13,7 @@ namespace Playground.Components
         // Random range for damage
         private const float From = 0.70f;
         private const float To = 1.30f;
-        private float _damage, _criticalChance, _criticalDamage, _additionalHit, _maxCriticalChance = 0.75f;
+        private float _damage, _criticalChance, _criticalDamage, _additionalHit, _maxCriticalChance = 0.75f, _maxAdditionalHitChance = 0.9f;
         private readonly RandomNumberGenerator _rnd = new();
         // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
         // TODO: Rename strategy
@@ -88,14 +88,14 @@ namespace Playground.Components
                 case Parameter.StrikeDamage:
                     Damage = Calculations.CalculateFloatValue(_strategy.GetDamage(), modifiers);
                     break;
-                case Parameter.CriticalStrikeChance:
+                case Parameter.CriticalChance:
                     CriticalChance = Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseCriticalChance(), modifiers), _maxCriticalChance);
                     break;
-                case Parameter.CriticalStrikeDamage:
+                case Parameter.CriticalDamage:
                     CriticalDamage = Calculations.CalculateFloatValue(_strategy.GetBaseCriticalDamage(), modifiers);
                     break;
-                case Parameter.AdditionalStrikeChance:
-                    AdditionalHit = Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), modifiers);
+                case Parameter.AdditionalAttackChance:
+                    AdditionalHit = Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), modifiers), _maxAdditionalHitChance);
                     break;
                 default:
                     break;

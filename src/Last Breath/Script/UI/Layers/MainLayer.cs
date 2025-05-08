@@ -4,7 +4,9 @@
     using System.Linq;
     using Godot;
     using Playground.Resource.Quests;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Playground.Script.Inventory;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
     using Playground.Script.UI.View;
@@ -24,8 +26,9 @@
         private MapMenu? _mapUI;
         private MainUI? _mainUI;
         private BaseOpenableObject? _currentOpenedObj;
-        private Action? _inventoryCloseHandler;
         private Player? _player;
+
+        private Action? _inventoryCloseHandler;
 
         public override void _Ready()
         {
@@ -125,6 +128,83 @@
             _mainUI!.Quests += ShowQuests;
             _mainUI!.Map += ShowMap;
             _inventoryUI!.TakeAll += OnInventoryTakeAll;
+            _playerInventory!.InventorySlotClicked += OnInventorySlotClicked;
+            _playerInventory.EquipItemPressed += OnEquipItemPressed;
+        }
+
+        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed)
+        {
+            switch (pressed)
+            {
+                case MouseButtonPressed.RightClick:
+                    HandleItemUnequip(slot);
+                    break;
+                default: break;
+            }
+        }
+
+        private void HandleItemUnequip(EquipmentSlot slot)
+        {
+            if (_playerInventory == null)
+            {
+                // TODO : Log
+                return;
+            }
+            // EquipItemPressed event will fire only if EquipItem not null
+            _player?.AddItemToInventory(slot.CurrentItem!);
+            slot.UnequipItem();
+        }
+
+        private void OnInventorySlotClicked(Item itemClicked, MouseButtonPressed pressed, Inventory inventory)
+        {
+            if (itemClicked is EquipItem item)
+            {
+                HandleEquipmentItemPressed(item, pressed, inventory);
+            }
+        }
+
+        private void HandleEquipmentItemPressed(EquipItem item, MouseButtonPressed pressed, Inventory inventory)
+        {
+            switch (pressed)
+            {
+                case MouseButtonPressed.CtrRightClick:
+                    HandleItemEquipment(item, inventory);
+                    break;
+                case MouseButtonPressed.CtrLeftClick:
+                    // TODO: Action on ctr + left click
+                    break;
+
+                default: break;
+                    // TODO: Other cases
+            }
+        }
+
+        private void HandleItemEquipment(EquipItem item, Inventory inventory)
+        {
+            if (_playerInventory == null)
+            {
+                // TODO: Log
+                return;
+            }
+            var equipSlot = _playerInventory.GetEquipmentSlot(item.EquipmentPart);
+            if (equipSlot.CurrentItem != null)
+            {
+                HandleItemTransfer(item, equipSlot, inventory);
+            }
+            else
+            {
+                equipSlot.EquipItem(item);
+                inventory.RemoveItem(item.Id);
+            }
+        }
+
+        private void HandleItemTransfer(EquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
+        {
+            var oldEquipedItem = equipSlot.CurrentItem;
+            equipSlot.EquipItem(newItem);
+            inventory.RemoveItem(newItem.Id);
+            // old item != null, we check this in method above
+            inventory.AddItem(oldEquipedItem!);
         }
 
         private void OnQuestCompleted(Quest quest)
@@ -137,7 +217,7 @@
         private void RemoveQuestItems(Quest quest)
         {
             if (quest.QuestObjective == null || quest.QuestObjective.QuestObjectiveType != ObjectiveType.ItemCollection) return;
-            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId);
+            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId, quest.QuestObjective.CurrentAmount);
         }
 
         private void OnInventoryTakeAll()
@@ -243,5 +323,6 @@
             GetViewport().SetInputAsHandled();
             return true;
         }
+
     }
 }

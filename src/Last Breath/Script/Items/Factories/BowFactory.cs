@@ -12,7 +12,7 @@
             Rnd = random;
         }
 
-        public override Bow? GenerateItem(GlobalRarity globalRarity)
+        public override EquipItem? GenerateItem(GlobalRarity globalRarity)
         {
             return globalRarity switch
             {

@@ -2,7 +2,6 @@
 {
     public enum GlobalRarity
     {
-        Common = 0,
         Uncommon,
         Rare,
         Epic,

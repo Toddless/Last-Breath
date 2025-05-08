@@ -39,8 +39,9 @@ script = ExtResource("5_bee3c")
 [node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
 metadata/_edit_use_anchors_ = true
 
-[node name="PlayerInventoryUI" parent="MainLayer" instance=ExtResource("6_3tvjc")]
+[node name="PlayerInventoryUI" parent="MainLayer" node_paths=PackedStringArray("_slots") instance=ExtResource("6_3tvjc")]
 visible = false
+_slots = {}
 
 [node name="QuestsMenu" parent="MainLayer" instance=ExtResource("7_637ag")]
 visible = false

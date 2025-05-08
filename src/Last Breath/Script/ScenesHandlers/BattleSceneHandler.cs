@@ -244,7 +244,7 @@
 
         private string GetCharacterName(ICharacter character) => character.GetType().Name;
         private bool IsAdditionalHit(ICharacter? character) => _rnd.Randf() <= character?.Damage.AdditionalHit;
-        private bool IsEvade(ICharacter? character) => _rnd.Randf() <= character?.Defense.CurrentDodge;
+        private bool IsEvade(ICharacter? character) => _rnd.Randf() <= character?.Defense.Evade;
 
         private void CheckBattleEnds()
         {

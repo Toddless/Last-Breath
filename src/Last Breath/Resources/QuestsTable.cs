@@ -32,6 +32,6 @@
 
         public override void AddNewElement(Quest quest) => Elements.TryAdd(quest.Id, quest);
 
-        public override List<string> GetAllElements(string id)=> Elements.Where(x=>x.Value.NpcId == id).Select(x=>x.Value.Id).ToList();
+        public override List<string> GetAllElements(string id) => Elements.Where(x => x.Value.NpcId == id).Select(x => x.Value.Id).ToList();
     }
 }

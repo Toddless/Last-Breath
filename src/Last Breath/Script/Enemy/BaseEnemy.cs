@@ -10,11 +10,10 @@ namespace Playground
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
-    using Playground.Script.Helpers;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     [Inject]
-    public partial class BaseEnemy : ObservableCharacterBody2D, ICharacter
+    public partial class BaseEnemy : CharacterBody2D, ICharacter
     {
         #region Components
         private readonly AttributeComponent _enemyAttribute = new();
@@ -37,7 +36,7 @@ namespace Playground
         private AnimatedSprite2D? _sprite;
         private Vector2 _respawnPosition;
         private Area2D? _area;
-        private EnemyAttributeType? _enemyAttributeType;
+        private AttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
         private EnemyType _enemyType;
         private Stance _stance;
@@ -51,7 +50,7 @@ namespace Playground
 
         #region Properties
         public EnemyType EnemyType => _enemyType;
-        public EnemyAttributeType? AttributeType => _enemyAttributeType;
+        public AttributeType? AttributeType => _enemyAttributeType;
         public bool CanFight
         {
             get => _enemyFight;
@@ -148,7 +147,7 @@ namespace Playground
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
             Inventory = new EnemyInventory();
-            Inventory.Initialize(25, _inventoryContainer, _inventoryNode.Hide, _inventoryNode.Show);
+            Inventory.Initialize(25, _inventoryContainer);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
@@ -175,7 +174,7 @@ namespace Playground
 
         public void OnFightEnds()
         {
-            Effects.RemoveAllEffects();
+            Effects.RemoveAllTemporaryEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.RemoveAllTemporaryModifiers();
         }
@@ -219,20 +218,20 @@ namespace Playground
             _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
-        private Stance SetStance(EnemyAttributeType? enemyAttributeType)
+        private Stance SetStance(AttributeType? enemyAttributeType)
         {
             return enemyAttributeType switch
             {
-                EnemyAttributeType.DexterityBased => Stance.Dexterity,
-                EnemyAttributeType.StrengthBased => Stance.Strength,
-                EnemyAttributeType.IntelligenceBased => Stance.Intelligence,
+                Script.Enums.AttributeType.Dexterity => Stance.Dexterity,
+                Script.Enums.AttributeType.Strength => Stance.Strength,
+                Script.Enums.AttributeType.Intelligence => Stance.Intelligence,
                 _ => Stance.None
             };
         }
 
         private GlobalRarity EnemyRarity()
         {
-            return GlobalRarity.Common;
+            return GlobalRarity.Uncommon;
         }
 
         private void SetAnimation()
@@ -266,7 +265,7 @@ namespace Playground
             }
         }
 
-        private (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(EnemyAttributeType? enemyType)
+        private (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(AttributeType? enemyType)
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
@@ -275,20 +274,20 @@ namespace Playground
 
             return enemyType switch
             {
-                EnemyAttributeType.DexterityBased => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                EnemyAttributeType.StrengthBased => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
-                EnemyAttributeType.IntelligenceBased => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                Script.Enums.AttributeType.Strength => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
+                Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
 
-        private EnemyAttributeType SetRandomEnemyType(int index)
+        private AttributeType SetRandomEnemyType(int index)
         {
             return index switch
             {
-                1 => EnemyAttributeType.DexterityBased,
-                2 => EnemyAttributeType.StrengthBased,
-                _ => EnemyAttributeType.None,
+                1 => Script.Enums.AttributeType.Dexterity,
+                2 => Script.Enums.AttributeType.Strength,
+                _ => Script.Enums.AttributeType.None,
             };
         }
 
@@ -303,7 +302,7 @@ namespace Playground
 
         public async void OnAnimation()
         {
-           
+
         }
     }
 }

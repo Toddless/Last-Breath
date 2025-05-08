@@ -1,12 +1,12 @@
 ﻿namespace Playground.Components
 {
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System;
-    using Playground.Script;
     using Godot;
+    using Playground.Script;
+    using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.Enums;
 
     public class Calculations
     {
@@ -14,7 +14,7 @@
 
         public static float DamageAfterCrit(float damage, ICharacter attacker) => damage *= attacker.Damage.CriticalDamage;
 
-        public static float DamageAfterArmor(float damage, ICharacter defender) => Mathf.Max(0, damage * (1 - Mathf.Min(defender.Defense.CurrentArmor / 100, defender.Defense.CurrentMaxReduce)));
+        public static float DamageAfterArmor(float damage, ICharacter defender) => Mathf.Max(0, damage * (1 - Mathf.Min(defender.Defense.Armor / 100, defender.Defense.MaxReduce)));
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
         {

@@ -3,6 +3,7 @@
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
+    using Playground.Script.Items;
     using Playground.Script.NPC;
     using Playground.Script.UI;
     using Playground.Script.UI.Layers;
@@ -44,6 +45,9 @@
             _managerUI.SetEvents();
             ConfigureStateMachine();
             SetEvents();
+            var dagger = new Dagger(Enums.GlobalRarity.Rare);
+
+            var anotherDagger = new Dagger(Enums.GlobalRarity.Epic);
         }
 
         public override void _UnhandledInput(InputEvent @event)

@@ -15,7 +15,7 @@
 
         public List<ItemCreator>? Factories;
 
-        private RandomNumberGenerator? _random = new();
+        private readonly RandomNumberGenerator _random = new();
 
         private float _probabilityTotalWeight;
 
@@ -52,7 +52,7 @@
         {
             float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
             return Factories![_random!.RandiRange(0, Factories!.Count - 1)]
-                .GenerateItem(LootDropItems!.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Common);
+                .GenerateItem(LootDropItems!.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Uncommon);
         }
 
         public virtual T? GetRarity()

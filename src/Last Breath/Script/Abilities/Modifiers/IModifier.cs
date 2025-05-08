@@ -11,7 +11,7 @@
         /// </summary>
         int Priority { get; }
         float Value { get; set; }
-        object Source {  get; }
+        object Source { get; }
         /// <summary>
         /// Call this method only for <see cref="ModifierType.Additive"/> and <see cref="ModifierType.Multiplicative"/>. For <see cref="ModifierType.MultiplicativeSum"/> just use Linq.Sum
         /// </summary>

@@ -18,7 +18,7 @@
         public float CurrentHealth
         {
             get => MathF.Max(0, _currentHealth);
-            private set
+            set
             {
                 if (ObservableProperty.SetProperty(ref _currentHealth, value))
                 {

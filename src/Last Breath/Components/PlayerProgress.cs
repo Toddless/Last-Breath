@@ -1,8 +1,7 @@
 ﻿namespace Playground.Components
 {
-    using Playground.Script.Enums;
-    using Playground.Script.Items;
     using System.Collections.Generic;
+    using Playground.Script.Items;
 
     public class PlayerProgress
     {
@@ -24,7 +23,7 @@
         /// <param name="item"></param>
         public void OnQuestItemCollected(Item item)
         {
-            if (item.Type != ItemType.Quest) return;
+            if (item is not QuestItem) return;
 
             if (!QuestItems.TryAdd(item.Id, item.Quantity))
             {

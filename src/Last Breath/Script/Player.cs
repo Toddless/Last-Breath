@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
@@ -16,10 +15,11 @@
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Playground.Script.Inventory;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
 
-    public partial class Player : ObservableCharacterBody2D, ICharacter
+    public partial class Player : CharacterBody2D, ICharacter
     {
         #region Private fields
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
@@ -176,22 +176,22 @@
 
         public void AddItemToInventory(Item item)
         {
-            switch (item.Type)
-            {
-                case ItemType.Equipment:
-                    _equipInventory?.AddItem(item);
-                    break;
-                case ItemType.Crafting:
-                    _craftingInventory?.AddItem(item);
-                    break;
-                case ItemType.Quest:
-                    _questItemsInventory?.AddItem(item);
-                    Progress.OnQuestItemCollected(item);
-                    break;
-                default:
-                    break;
+            if (item is EquipItem)
+                _equipInventory?.AddItem(item);
 
+            // if (item is CraftingItem)
+            // _craftingInventory?.AddItem(item);
+
+            if (item is QuestItem)
+            {
+                _questItemsInventory?.AddItem(item);
+                Progress.OnQuestItemCollected(item);
             }
+        }
+
+        public void OnItemCollect(Item item)
+        {
+            AddItemToInventory(item);
             ItemCollected?.Invoke(item.Id);
         }
 
@@ -235,7 +235,7 @@
 
         public void OnFightEnds()
         {
-            Effects.RemoveAllEffects();
+            Effects.RemoveAllTemporaryEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.RemoveAllTemporaryModifiers();
         }
@@ -309,7 +309,7 @@
 
         public void OnAnimation()
         {
-           
+
         }
     }
 }

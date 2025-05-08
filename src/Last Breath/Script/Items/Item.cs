@@ -9,45 +9,21 @@
     public partial class Item : Resource
     {
         private string? _id;
-        [Export]
-        public string? ItemResourcePath;
-        [Export]
-        public string? ItemName;
-        [Export]
-        public int MaxStackSize;
-        [Export]
-        public Texture2D? Icon;
-        [Export]
-        public GlobalRarity Rarity;
-        [Export]
-        public int Quantity;
-        [Export]
-        public ItemType Type;
-        [Export]
-        public LocalizedString Description = new();
+        //  [Export] public string? ItemResourcePath;
+        [Export] public string? ItemName;
+        [Export] public int MaxStackSize;
+        [Export] public Texture2D? Icon;
+        [Export] public GlobalRarity Rarity;
+        [Export] public int Quantity;
+        [Export] public LocalizedString Description = new();
 
         public string Id => _id ??= SetId();
 
         private string SetId()
         {
-            // TODO: Later item name is LocalizedString, i need to take en name
-            if(string.IsNullOrEmpty(ItemName)) return string.Empty;
+            // TODO: Later item name is LocalizedString, i need to take an en name
+            if (string.IsNullOrEmpty(ItemName)) return string.Empty;
             return ItemName.Replace(' ', '_');
-        }
-
-        public Item(string itemName, GlobalRarity rarity, string resourcePath, Texture2D? icon, int stackSize, int quantity, string descriptionKey)
-        {
-            ItemResourcePath = resourcePath;
-            ItemName = itemName;
-            MaxStackSize = stackSize;
-            Icon = icon;
-            Rarity = rarity;
-            Quantity = quantity;
-            Description.Key = descriptionKey;
-        }
-
-        public Item()
-        {
         }
 
         public bool Equals(Item other)

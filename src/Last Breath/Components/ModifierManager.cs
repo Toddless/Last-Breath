@@ -1,11 +1,11 @@
 ﻿namespace Playground.Components
 {
-    using System.Collections.Generic;
     using System;
-    using Playground.Script.Enums;
-    using Playground.Script.Abilities.Modifiers;
+    using System.Collections.Generic;
     using System.Linq;
     using Godot;
+    using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.Enums;
 
     public class ModifierManager
     {
@@ -100,7 +100,7 @@
             else
             {
                 // TODO: should i change all properties?
-               existingModifier.Value = newModifier.Value;
+                existingModifier.Value = newModifier.Value;
             }
             RaiseEvent(newModifier.Parameter);
         }
@@ -118,7 +118,7 @@
                 GD.Print($"Added to list: {modifier.Parameter}");
             }
 
-           RaiseEvent(modifier.Parameter);
+            RaiseEvent(modifier.Parameter);
         }
 
         private void RemoveFromCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
