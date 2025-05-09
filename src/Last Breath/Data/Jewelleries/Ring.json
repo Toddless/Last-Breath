@@ -1,19 +1,19 @@
 {
     "Strength": {
         "Uncommon": {
-            "Strenght": 5
+            "Strength": 5
         },
         "Rare": {
-            "Strenght": 8,
+            "Strength": 8,
             "Defence": 100
         },
         "Epic": {
-            "Strenght": 10,
+            "Strength": 10,
             "Defence": 100,
             "Health": 150
         },
         "Legendary": {
-            "Strenght": 15,
+            "Strength": 15,
             "Defence": 100,
             "Health": 200,
             "BaseDamage": 20

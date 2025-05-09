@@ -29,6 +29,10 @@
             BaseAdditionalHitChance = Mathf.Max(0, Rnd.RandfRange(From, To) * data.AdditionalHitChance);
             BaseCritDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.CritDamage));
             BaseDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.BaseDamage));
+            var mediaData = ItemsMediaHandler.Inctance?.GetWeaponMediaData(WeaponType.Dagger, rarity);
+            if (mediaData == null) return;
+
+            Icon = mediaData.Texture;
         }
     }
 }

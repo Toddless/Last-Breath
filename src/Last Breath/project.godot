@@ -27,6 +27,7 @@ GameManager="*res://Script/GameManager.cs"
 QuestsTable="*res://Resources/QuestsTable.cs"
 RewardTable="*res://Resources/RewardTable.cs"
 QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
+ItemsMediaHandler="*res://Script/Items/ItemData/ItemsMediaHandler.cs"
 
 [display]
 

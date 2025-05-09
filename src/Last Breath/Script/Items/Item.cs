@@ -10,20 +10,20 @@
     {
         private string? _id;
         //  [Export] public string? ItemResourcePath;
-        [Export] public string? ItemName;
+        [Export] public LocalizedString? ItemName;
         [Export] public int MaxStackSize;
         [Export] public Texture2D? Icon;
         [Export] public GlobalRarity Rarity;
         [Export] public int Quantity;
-        [Export] public LocalizedString Description = new();
+        [Export] public LocalizedString? Description;
 
         public string Id => _id ??= SetId();
 
         private string SetId()
         {
             // TODO: Later item name is LocalizedString, i need to take an en name
-            if (string.IsNullOrEmpty(ItemName)) return string.Empty;
-            return ItemName.Replace(' ', '_');
+            if (string.IsNullOrEmpty(ItemName?.Text)) return string.Empty;
+            return ItemName.Text.Replace(' ', '_');
         }
 
         public bool Equals(Item other)

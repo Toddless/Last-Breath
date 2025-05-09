@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=6 format=3 uid="uid://bgyt3vacw15ik"]
+[gd_resource type="Resource" script_class="QuestItem" load_steps=6 format=3 uid="uid://bgyt3vacw15ik"]
 
 [ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_7t3bw"]
 [ext_resource type="Script" uid="uid://curr877vpisc3" path="res://Script/Items/QuestItem.cs" id="2_ftup6"]

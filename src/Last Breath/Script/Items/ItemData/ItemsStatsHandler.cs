@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using Godot;
     using Newtonsoft.Json;
     using Playground.Script.Enums;
 
-    public class ItemsStatsHandler : BaseItemHandler, IItemStatsHandler
+    public class ItemsStatsHandler : IItemStatsHandler
     {
         private readonly Dictionary<WeaponType, WeaponStatsData> _weaponStats = [];
         private readonly Dictionary<JewelleryType, JewelleriesStatsData> _jewelleriesStats = [];
@@ -13,6 +15,16 @@
 
         public void LoadData()
         {
+            // for correctly working i need to put jsons with data outside res:// folder (e.ge %APPDATA%/Godot/app_userdata/Game/Data)
+            var userDir = ProjectSettings.GlobalizePath("user://");
+            var userDataPath = Path.Combine(userDir, "Data");
+
+            if (!Directory.Exists(userDataPath))
+            {
+                Directory.CreateDirectory(userDataPath);
+                CopyDirectory(ProjectSettings.GlobalizePath("res://Data"), userDataPath);
+            }
+
             LoadJewelleryData();
             LoadWeaponData();
             LoadArmorData();
@@ -25,16 +37,16 @@
                 data = new();
             }
 
-            return data.GetSimpleStats(rarity);
+            return data.GetSimpleData(rarity);
         }
 
-        public ItemStats GetAttributeJewelleryStats(JewelleryType type, GlobalRarity rarity, AttributeType attributeType) => GetJewelleriesData(type).GetAttributeStats(attributeType, rarity);
+        public ItemStats GetAttributeJewelleryStats(JewelleryType type, GlobalRarity rarity, AttributeType attributeType) => GetJewelleriesData(type).GetAttributeData(attributeType, rarity);
 
-        public ItemStats GetAttributeBodyArmorStats(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) => GetArmorData(type).GetAttributeStats(attributeType, rarity);
+        public ItemStats GetAttributeBodyArmorStats(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) => GetArmorData(type).GetAttributeData(attributeType, rarity);
 
-        public ItemStats GetJewelleryStats(JewelleryType type, GlobalRarity rarity) => GetJewelleriesData(type).GetSimpleStats(rarity);
+        public ItemStats GetJewelleryStats(JewelleryType type, GlobalRarity rarity) => GetJewelleriesData(type).GetSimpleData(rarity);
 
-        public ItemStats GetBodyArmorStats(BodyArmorType type, GlobalRarity rarity) => GetArmorData(type).GetSimpleStats(rarity);
+        public ItemStats GetBodyArmorStats(BodyArmorType type, GlobalRarity rarity) => GetArmorData(type).GetSimpleData(rarity);
 
         private ArmorStatsData GetArmorData(BodyArmorType type)
         {
@@ -58,13 +70,13 @@
         {
             foreach (var type in Enum.GetValues<WeaponType>())
             {
-                var json = GetJson(Weapons, $"{type}.json");
+                var json = ItemsDataPaths.GetWeaponDataFromJsonFile($"{type}.json");
                 if (string.IsNullOrWhiteSpace(json))
                 {
                     // TODO: Log
                     continue;
                 }
-                WeaponStatsData weaponData = new() { SimpleStats = DeserializeItemStats(json) };
+                WeaponStatsData weaponData = new() { SimpleData = DeserializeItemStats(json) };
                 _weaponStats.Add(type, weaponData);
             }
         }
@@ -73,7 +85,7 @@
         {
             foreach (var type in Enum.GetValues<BodyArmorType>())
             {
-                var json = GetJson(Armors, $"{type}.json");
+                var json = ItemsDataPaths.GetArmorDataFromJsonFile($"{type}.json");
                 if (string.IsNullOrWhiteSpace(json))
                 {
                     // TODO: Log
@@ -87,7 +99,7 @@
         {
             foreach (var type in Enum.GetValues<JewelleryType>())
             {
-                var json = GetJson(Jewelleries, $"{type}.json");
+                var json = ItemsDataPaths.GetJewelleriesDataFromJsonFile($"{type}.json");
                 if (string.IsNullOrWhiteSpace(json))
                 {
                     // TODO: Log
@@ -103,10 +115,10 @@
             switch (type)
             {
                 case BodyArmorType.Cloak:
-                    armorData.SimpleStats = DeserializeItemStats(json);
+                    armorData.SimpleData = DeserializeItemStats(json);
                     return armorData;
                 default:
-                    armorData.AttributeStats = DeserializeAttributeStats(json);
+                    armorData.AttributeData = DeserializeAttributeStats(json);
                     return armorData;
 
             }
@@ -118,10 +130,10 @@
             switch (type)
             {
                 case JewelleryType.Ring:
-                    jewelleriesData.AttributeStats = DeserializeAttributeStats(json);
+                    jewelleriesData.AttributeData = DeserializeAttributeStats(json);
                     return jewelleriesData;
                 default:
-                    jewelleriesData.SimpleStats = DeserializeItemStats(json);
+                    jewelleriesData.SimpleData = DeserializeItemStats(json);
                     return jewelleriesData;
             }
         }
@@ -131,5 +143,17 @@
 
         private static Dictionary<GlobalRarity, ItemStats> DeserializeItemStats(string json)
             => JsonConvert.DeserializeObject<Dictionary<GlobalRarity, ItemStats>>(json) ?? [];
+
+        private void CopyDirectory(string srcDir, string userDataPath)
+        {
+            foreach (var dir in Directory.GetDirectories(srcDir, "*", SearchOption.AllDirectories))
+                Directory.CreateDirectory(dir.Replace(srcDir, userDataPath));
+
+            foreach (var file in Directory.GetFiles(srcDir, "*.json", SearchOption.AllDirectories))
+            {
+                var dest = file.Replace(srcDir, userDataPath);
+                File.Copy(file, dest, overwrite: true);
+            }
+        }
     }
 }

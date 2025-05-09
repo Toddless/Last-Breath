@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=4 uid="uid://8k6f2la171lp"]
+[gd_scene load_steps=27 format=4 uid="uid://8k6f2la171lp"]
 
 [ext_resource type="Script" uid="uid://difvhxultd8h6" path="res://Script/ScenesHandlers/MainWorld.cs" id="1_k6wnk"]
 [ext_resource type="Texture2D" uid="uid://dp5jknlgx8xk4" path="res://Assets/AncientForest/MainLev.png" id="2_abp17"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://d06ag6h6rbej2" path="res://Assets/Retro Chest - SpriteSheet.png" id="6_akxle"]
 [ext_resource type="Script" uid="uid://djtvshat4didc" path="res://Script/BaseOpenableObject.cs" id="6_kcicw"]
 [ext_resource type="Resource" uid="uid://bgyt3vacw15ik" path="res://Resources/Items/Quest Items/ListOfDead.tres" id="7_12qju"]
+[ext_resource type="Script" uid="uid://brm4jyg57fhml" path="res://Script/Items/Item.cs" id="7_umaly"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]
 texture = ExtResource("2_abp17")
@@ -720,7 +721,7 @@ position = Vector2(611, 49)
 input_pickable = true
 physics_material_override = SubResource("PhysicsMaterial_akxle")
 script = ExtResource("6_kcicw")
-Items = [ExtResource("7_12qju")]
+Items = Array[ExtResource("7_umaly")]([ExtResource("7_12qju")])
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="ChestWithList"]
 scale = Vector2(0.45, 0.45)
