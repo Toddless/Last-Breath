@@ -6,15 +6,13 @@
     using Playground.Script.Helpers;
     using Playground.Script.Items;
 
-    public partial class InventorySlot : Button
+    public partial class InventorySlot : BaseSlot<Item>
     {
         private const string UID = "uid://bqlqfsqoepfhs";
         private Label? _quantityLabel;
         private int _quantity;
 
         public event Action<Item, MouseButtonPressed>? OnClick;
-
-        public Item? Item { get; private set; }
 
         public int Quantity
         {
@@ -29,22 +27,25 @@
         public override void _Ready()
         {
             _quantityLabel = GetNode<Label>("QuantityText");
+            this.MouseEntered += OnMouseEnter;
+            this.MouseExited += OnMouseExit;
+            this.TextureNormal = DefaltTexture;
         }
 
         public override void _GuiInput(InputEvent @event)
         {
-            if (@event is InputEventMouseButton p && Item != null)
+            if (@event is InputEventMouseButton p && CurrentItem != null)
             {
-                OnClick?.Invoke(Item, MouseInputHelper.GetPressedButtons(p));
+                OnClick?.Invoke(CurrentItem, MouseInputHelper.GetPressedButtons(p));
                 GetViewport().SetInputAsHandled();
             }
         }
 
         public void AddNewItem(Item item)
         {
-            Item = item;
+            CurrentItem = item;
             Quantity += item.Quantity;
-            Icon = item.Icon;
+            this.TextureNormal = item.Icon;
         }
 
         public bool RemoveItemStacks(int amount)
@@ -59,9 +60,9 @@
 
         public int AddItemStacks(int amount)
         {
-            if (Item == null) return amount;
+            if (CurrentItem == null) return amount;
 
-            int availableSpace = Item.MaxStackSize - Quantity;
+            int availableSpace = CurrentItem.MaxStackSize - Quantity;
             int addAmount = Mathf.Min(availableSpace, amount);
             Quantity += addAmount;
 
@@ -70,8 +71,8 @@
 
         public void ClearSlot()
         {
-            Item = null;
-            Icon = null;
+            CurrentItem = null;
+            this.TextureNormal = DefaltTexture;
             _quantityLabel!.Text = string.Empty;
             Quantity = 0;
         }
@@ -83,7 +84,9 @@
             if (Quantity < 1)
                 ClearSlot();
             else
-                _quantityLabel!.Text = Quantity.ToString();
+                _quantityLabel!.Text = SetQuantity();
         }
+
+        private string SetQuantity() => Quantity > 1 ? Quantity.ToString() : string.Empty;
     }
 }

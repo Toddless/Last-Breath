@@ -12,5 +12,6 @@
         public static readonly string DialogueUIOption = "uid://c2mjqshkahaja";
         public static readonly string NPCsQuests = "uid://cal2dmcbd722k";
         public static readonly string QuestOption = "uid://d01ts4xanfyuv";
+        public static readonly string ItemDescription = "uid://c3nlyaormf73w";
     }
 }

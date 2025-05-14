@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://boa2lmvm2an46"]
+[gd_scene load_steps=8 format=3 uid="uid://boa2lmvm2an46"]
 
 [ext_resource type="Script" uid="uid://drt218ly22vev" path="res://Script/UI/View/PlayerInventoryUI.cs" id="1_4n4hh"]
 [ext_resource type="Script" uid="uid://ka5ngsnrbjq2" path="res://Script/Inventory/EquipmentSlot.cs" id="2_o4cd7"]
 [ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="2_yfe3o"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="3_6yjsd"]
 [ext_resource type="LabelSettings" uid="uid://orfhh71cylqw" path="res://Fonts/PlayerParameters.tres" id="3_metwe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0gy2x"]
@@ -14,7 +15,11 @@ border_width_bottom = 5
 border_color = Color(0.8, 0.016, 0.016, 1)
 border_blend = true
 
-[node name="PlayerInventoryUI" type="Control" node_paths=PackedStringArray("_equipInventory", "_craftInventory", "_questItemsInventory", "_equip", "_craft", "_quest")]
+[sub_resource type="AtlasTexture" id="AtlasTexture_esc5x"]
+atlas = ExtResource("3_6yjsd")
+region = Rect2(16, 16, 32, 32)
+
+[node name="PlayerInventoryUI" type="Control" node_paths=PackedStringArray("_equipInventory", "_craftInventory", "_questItemsInventory", "_equip", "_craft", "_quest", "_slots")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,6 +34,10 @@ _questItemsInventory = NodePath("MarginContainer/HBoxContainer/VBoxContainerInve
 _equip = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip")
 _craft = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Crafting")
 _quest = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/QuestItems")
+_slots = {
+0: NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/BodyArmorSlot"),
+9: NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/WeaponSlot")
+}
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -79,6 +88,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HelmetSlot"]
 layout_mode = 0
@@ -114,6 +124,7 @@ custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 size_flags_vertical = 0
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/WeaponSlot"]
 layout_mode = 0
@@ -131,6 +142,7 @@ custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 size_flags_vertical = 10
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/GlovesSlot"]
 layout_mode = 0
@@ -156,6 +168,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/LeftRingSlot"]
 layout_mode = 0
@@ -174,6 +187,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/BodyArmorSlot"]
 layout_mode = 0
@@ -196,6 +210,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2/AmuletSlot"]
 layout_mode = 0
@@ -214,6 +229,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2/RightRingSlot"]
 layout_mode = 0
@@ -244,6 +260,7 @@ layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 0
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/CloakSlot"]
 layout_mode = 0
@@ -262,6 +279,7 @@ layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 10
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/BootsSlot"]
 layout_mode = 0
@@ -280,6 +298,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 script = ExtResource("2_o4cd7")
+DefaltTexture = SubResource("AtlasTexture_esc5x")
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/BeltSlot"]
 layout_mode = 0
@@ -352,12 +371,12 @@ label_settings = ExtResource("3_metwe")
 [node name="VBoxContainerInventory" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
 mouse_filter = 2
 
 [node name="Panel" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory"]
 custom_minimum_size = Vector2(250, 375)
 layout_mode = 2
-size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/Panel"]
@@ -368,30 +387,26 @@ horizontal_alignment = 1
 
 [node name="TabContainer" type="TabContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory"]
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 2
-current_tab = 2
+current_tab = 0
+clip_tabs = false
+tabs_rearrange_group = 0
 
 [node name="Equip" type="TabBar" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer"]
-visible = false
 layout_mode = 2
 mouse_filter = 2
 metadata/_tab_index = 0
 
 [node name="EquipContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.00386697
-anchor_top = 0.032258
-anchor_right = 0.00386697
-anchor_bottom = 0.032258
+layout_mode = 0
+offset_top = 29.0
+offset_bottom = 29.0
 size_flags_horizontal = 6
 size_flags_stretch_ratio = 1.25
 mouse_filter = 2
 theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 22
-metadata/_edit_use_anchors_ = true
 
 [node name="Crafting" type="TabBar" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer"]
 visible = false
@@ -400,16 +415,9 @@ mouse_filter = 2
 metadata/_tab_index = 1
 
 [node name="CraftContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Crafting"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.002849
-anchor_top = 0.0108696
-anchor_right = 0.002849
-anchor_bottom = 0.0108696
-offset_left = 1.31624
-offset_top = 13.2608
-offset_right = 1.31624
-offset_bottom = 13.2608
+layout_mode = 0
+offset_top = 29.0
+offset_bottom = 29.0
 size_flags_horizontal = 6
 size_flags_stretch_ratio = 1.25
 mouse_filter = 2
@@ -418,21 +426,18 @@ theme_override_constants/v_separation = 1
 columns = 22
 
 [node name="QuestItems" type="TabBar" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer"]
+visible = false
 layout_mode = 2
 mouse_filter = 2
 metadata/_tab_index = 2
 
 [node name="QuestItemsContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/QuestItems"]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.002849
-anchor_top = 0.0108696
-anchor_right = 0.002849
-anchor_bottom = 0.0108696
-offset_left = 1.31624
-offset_top = 13.2608
-offset_right = 1.31624
-offset_bottom = 13.2608
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 29.0
+offset_bottom = 29.0
+grow_horizontal = 2
 size_flags_horizontal = 6
 size_flags_stretch_ratio = 1.25
 mouse_filter = 2

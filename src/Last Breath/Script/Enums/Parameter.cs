@@ -2,10 +2,10 @@
 {
     public enum Parameter
     {
-        StrikeDamage = 0,
+        Damage = 0,
         CriticalChance,
         CriticalDamage,
-        AdditionalAttackChance,
+        AdditionalHitChance,
         CurrentHealth,
         MaxHealth,
         Dexterity,
@@ -20,6 +20,7 @@
         MaxReduceDamage,
         Movespeed,
         MaxEvadeChance,
-        Suppress
+        Suppress,
+        AllAttribute
     }
 }

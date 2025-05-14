@@ -36,7 +36,7 @@
             }
 
 
-            if (slot.Item != null)
+            if (slot.CurrentItem != null)
             {
                 int rest = slot.AddItemStacks(item.Quantity);
                 Item duplicate = (Item)item.Duplicate(true);
@@ -53,7 +53,7 @@
         {
             var slot = GetSlotToRemove(itemId);
 
-            if (slot == null || slot.Item == null)
+            if (slot == null || slot.CurrentItem == null)
             {
                 // TODO: Log
                 return;
@@ -65,9 +65,9 @@
             }
         }
 
-        public int GetNumberOfItems(Item item) => Slots.FindAll(slot => slot.Item != null && slot.Item.Id == item.Id).Count;
+        public int GetNumberOfItems(Item item) => Slots.FindAll(slot => slot.CurrentItem != null && slot.CurrentItem.Id == item.Id).Count;
 
-        public List<Item?> GiveAllItems() => [.. Slots.Where(x => x.Item != null).Select(x => x.Item)];
+        public List<Item?> GiveAllItems() => [.. Slots.Where(x => x.CurrentItem != null).Select(x => x.CurrentItem)];
 
         public void TakeAllItems(List<Item?> items)
         {
@@ -76,8 +76,8 @@
         }
 
         public void Clear() => Slots.ForEach(slot => slot.ClearSlot());
-        private InventorySlot? GetSlotToAdd(Item item) => Slots.FirstOrDefault(itemSlot => itemSlot.Item == null || (itemSlot.Item.Id == item.Id && itemSlot.Quantity < item.MaxStackSize));
-        private InventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.Item != null && itemSlot.Item.Id == itemId);
+        private InventorySlot? GetSlotToAdd(Item item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || (itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize));
+        private InventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem.Id == itemId);
         private void OnSlotClicked(Item item, MouseButtonPressed pressed) => SlotClicked?.Invoke(item, pressed, this);
     }
 }

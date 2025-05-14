@@ -10,7 +10,7 @@
         /// <summary>
         /// Value should be 0.1, 0.3 etc
         /// </summary>
-        MultiplicativeSum,
+        Increase,
         /// <summary>
         /// Value should be 1.3, 1.1 etc.
         /// </summary>

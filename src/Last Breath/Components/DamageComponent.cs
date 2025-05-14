@@ -19,6 +19,8 @@ namespace Playground.Components
         // TODO: Rename strategy
         private IDamageStrategy _strategy;
 
+        public event Action<List<Parameter>>? StrategyChanges;
+
         public float Damage
         {
             get => _damage * _rnd.RandfRange(From, To);
@@ -72,20 +74,19 @@ namespace Playground.Components
             _strategy = strategy;
         }
 
-        public event Action? StrategyChanges;
 
         // TODO: on change strategy i need to recalculate modifiers
         public void ChangeStrategy(IDamageStrategy strategy)
         {
             _strategy = strategy;
-            StrategyChanges?.Invoke();
+            StrategyChanges?.Invoke([Parameter.Damage, Parameter.CriticalChance, Parameter.CriticalDamage, Parameter.AdditionalHitChance]);
         }
 
         public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
         {
             switch (parameter)
             {
-                case Parameter.StrikeDamage:
+                case Parameter.Damage:
                     Damage = Calculations.CalculateFloatValue(_strategy.GetDamage(), modifiers);
                     break;
                 case Parameter.CriticalChance:
@@ -94,7 +95,7 @@ namespace Playground.Components
                 case Parameter.CriticalDamage:
                     CriticalDamage = Calculations.CalculateFloatValue(_strategy.GetBaseCriticalDamage(), modifiers);
                     break;
-                case Parameter.AdditionalAttackChance:
+                case Parameter.AdditionalHitChance:
                     AdditionalHit = Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), modifiers), _maxAdditionalHitChance);
                     break;
                 default:

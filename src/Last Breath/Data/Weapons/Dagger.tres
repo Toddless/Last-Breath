@@ -1,28 +1,25 @@
-[gd_resource type="Resource" script_class="ItemResources" load_steps=8 format=3 uid="uid://dnoj2p8uyrmew"]
+[gd_resource type="Resource" script_class="ItemResources" load_steps=7 format=3 uid="uid://dnoj2p8uyrmew"]
 
 [ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_pkycg"]
 [ext_resource type="Script" uid="uid://c02e2cu8t3ncf" path="res://Script/Items/ItemData/ItemResources.cs" id="1_ufj5c"]
+[ext_resource type="Texture2D" uid="uid://dpfytb6fpg1ue" path="res://Assets/Weapon/fantasy_epicweapons_pack1_nobg.png" id="2_spopg"]
 [ext_resource type="Texture2D" uid="uid://b02h28hf5wiqv" path="res://Assets/Fury.bmp" id="2_y5y2y"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_spopg"]
-atlas = ExtResource("2_y5y2y")
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_gcfyt"]
-atlas = ExtResource("2_y5y2y")
+atlas = ExtResource("2_spopg")
+region = Rect2(96, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7sc40"]
 atlas = ExtResource("2_y5y2y")
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_faj6o"]
-atlas = ExtResource("2_y5y2y")
+region = Rect2(80, 24, 32, 32)
 
 [resource]
 script = ExtResource("1_ufj5c")
-Texture = Dictionary[int, Texture2D]({
-0: SubResource("AtlasTexture_spopg"),
-1: SubResource("AtlasTexture_gcfyt"),
-2: SubResource("AtlasTexture_7sc40"),
-3: SubResource("AtlasTexture_faj6o")
+IconTexture = Dictionary[int, Texture2D]({
+2: SubResource("AtlasTexture_7sc40")
+})
+FullTexture = Dictionary[int, Texture2D]({
+2: SubResource("AtlasTexture_gcfyt")
 })
 Name = Dictionary[int, ExtResource("1_pkycg")]({})
 Description = Dictionary[int, ExtResource("1_pkycg")]({})

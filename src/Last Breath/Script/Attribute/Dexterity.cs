@@ -15,7 +15,7 @@
 
             yield return new AttributeEffect
                 (Parameter.CriticalChance,
-                ModifierType.MultiplicativeSum,
+                ModifierType.Increase,
                 0.01f
                 );
 
@@ -26,7 +26,7 @@
               );
 
             yield return new AttributeEffect
-              (Parameter.AdditionalAttackChance,
+              (Parameter.AdditionalHitChance,
               ModifierType.Additive,
               0.02f
               );

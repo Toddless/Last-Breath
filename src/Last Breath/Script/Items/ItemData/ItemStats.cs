@@ -3,7 +3,7 @@
     public class ItemStats
     {
         public int Health { get; set; } = 0;
-        public int Defence { get; set; } = 0;
+        public int Armor { get; set; } = 0;
         public int Evade { get; set; } = 0;
         public int Suppress { get; set; } = 0;
         public int EnergyBarrier { get; set; } = 0;
@@ -17,14 +17,14 @@
         public int Intelligence { get; set; } = 0;
         public int AllAttribute { get; set; } = 0;
         public int Movespeed { get; set; } = 0;
-        public int BaseDamage { get; set; } = 0;
+        public int Damage { get; set; } = 0;
         public float MaxHealth { get; set; } = 0;
         public float MaxReduceDamage { get; set; } = 0;
         public float AdditionalHitChance { get; set; } = 0;
-        public float HealthPercent { get; set; } = 0;
-        public float DefencePercent { get; set; } = 0;
-        public float EnergyBarrierPercent { get; set; } = 0;
-        public float EvadePercent { get; set; } = 0;
+        public float ExtraHealth { get; set; } = 0;
+        public float ExtraArmor { get; set; } = 0;
+        public float ExtraEnergyBarrier { get; set; } = 0;
+        public float ExtraEvade { get; set; } = 0;
         public float MaxEvadeChance { get; set; } = 0;
         public float CritChance { get; set; } = 0;
     }

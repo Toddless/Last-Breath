@@ -11,9 +11,9 @@
     public abstract class GenericObjectsTable<T>
         where T : GenericObject
     {
-        public List<T>? LootDropItems;
+        public List<T> LootDropItems = [];
 
-        public List<ItemCreator>? Factories;
+        public List<ItemCreator> Factories = [];
 
         private readonly RandomNumberGenerator _random = new();
 
@@ -50,29 +50,29 @@
 
         public virtual Item GetRandomItem()
         {
-            float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
-            return Factories![_random!.RandiRange(0, Factories!.Count - 1)]
-                .GenerateItem(LootDropItems!.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Uncommon);
+            float pickedNumber = _random.RandfRange(0, _probabilityTotalWeight);
+            return Factories[_random.RandiRange(0, Factories.Count - 1)]
+                .GenerateItem(LootDropItems.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Uncommon);
         }
 
         public virtual T? GetRarity()
         {
-            float pickedNumber = _random!.RandfRange(0, _probabilityTotalWeight);
-            return LootDropItems!.FirstOrDefault(rarity => pickedNumber >= rarity.ProbabilityRangeFrom && pickedNumber <= rarity.ProbabilityRangeTo);
+            float pickedNumber = _random.RandfRange(0, _probabilityTotalWeight);
+            return LootDropItems.FirstOrDefault(rarity => pickedNumber >= rarity.ProbabilityRangeFrom && pickedNumber <= rarity.ProbabilityRangeTo);
         }
 
         public virtual Item? GetItemWithSelectedRarity(int index)
         {
-            return Factories![_random!.RandiRange(0, Factories.Count - 1)]?.GenerateItem(LootDropItems![index].Rarity);
+            return Factories[_random.RandiRange(0, Factories.Count - 1)].GenerateItem(LootDropItems[index].Rarity);
         }
 
         private void SetFactories()
         {
             Factories =
             [
-                new BowFactory(_random!),
-                new SwordFactory(_random!),
-                new BodyArmorFactory(_random!),
+                new BowFactory(_random),
+                new SwordFactory(_random),
+                new BodyArmorFactory(_random),
             ];
         }
     }

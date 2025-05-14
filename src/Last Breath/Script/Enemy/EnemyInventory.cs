@@ -7,6 +7,6 @@
 
     public class EnemyInventory : Inventory
     {
-        public List<Item> GivePlayerItems() => [.. Slots.Where(x => x.Item != null).Select(x => x.Item!)];
+        public List<Item> GivePlayerItems() => [.. Slots.Where(x => x.CurrentItem != null).Select(x => x.CurrentItem!)];
     }
 }

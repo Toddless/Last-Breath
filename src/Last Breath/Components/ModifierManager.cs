@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Godot;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
 
@@ -35,15 +34,6 @@
                 HandleParameters(source);
         }
 
-        private void HandleParameters(object source)
-        {
-            foreach (var param in GetAffectedParameters(source))
-                RaiseEvent(param);
-        }
-
-        // adding multiple modifiers via foreach generate to many unnecessary calls
-        private void RaiseEvent(Parameter parameter) => ParameterModifiersChanged?.Invoke(parameter, GetCombinedModifiers(parameter));
-
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
         public void AddBattleModifier(IModifier modifier) => AddToCategory(_battleModifiers, modifier);
@@ -72,6 +62,15 @@
 
             return modifiers;
         }
+        public void RaiseEvent(Parameter parameter) => ParameterModifiersChanged?.Invoke(parameter, GetCombinedModifiers(parameter));
+
+        private void HandleParameters(object source)
+        {
+            foreach (var param in GetAffectedParameters(source))
+                RaiseEvent(param);
+        }
+
+        // adding multiple modifiers via foreach generate to many unnecessary calls
 
         private void IgnoreSuppressedModifiers(List<IModifier> modifiers, List<IModifier> permanent)
         {
@@ -115,7 +114,6 @@
             if (!list.Contains(modifier))
             {
                 list.Add(modifier);
-                GD.Print($"Added to list: {modifier.Parameter}");
             }
 
             RaiseEvent(modifier.Parameter);

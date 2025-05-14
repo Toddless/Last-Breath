@@ -24,9 +24,9 @@
 
         public static string CreatePathToDataFile(ItemDataFolder folder, string fileName)
         {
-            var userPath = CreateUserPath(folder, fileName);
-            if (File.Exists(userPath))
-                return userPath;
+            //var userPath = CreateUserPath(folder, fileName);
+            //if (File.Exists(userPath))
+            //    return userPath;
 
             return CreatePath(folder, fileName);
         }

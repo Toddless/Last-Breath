@@ -5,7 +5,7 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public partial class ItemsMediaHandler : Node
+    public partial class ItemsMediaHandler : Node, IItemsMediaHandler
     {
         private bool _loaded = false;
         private readonly Dictionary<BodyArmorType, ArmorMediaData> _bodyArmorData = [];
@@ -133,11 +133,11 @@
         private Dictionary<AttributeType, ItemResources> CreateAttributeItemResource(string itemType, ItemDataFolder folder)
         {
             Dictionary<AttributeType, ItemResources> res = [];
-            foreach (var type in Enum.GetValues<AttributeType>())
+            foreach (var attributeType in Enum.GetValues<AttributeType>())
             {
-                var path = ItemsDataPaths.CreatePathToDataFile(folder, $"{itemType + type}.tres");
+                var path = ItemsDataPaths.CreatePathToDataFile(folder, $"{itemType + attributeType}.tres");
                 if (string.IsNullOrEmpty(path)) continue;
-                res.Add(type, LoadResource(path));
+                res.Add(attributeType, LoadResource(path));
             }
 
             return res;
@@ -149,7 +149,8 @@
             => new()
             {
                 Description = resources.Description.GetValueOrDefault(rarity),
-                Texture = resources.Texture.GetValueOrDefault(rarity),
+                IconTexture = resources.IconTexture.GetValueOrDefault(rarity),
+                FullTexture = resources.FullTexture.GetValueOrDefault(rarity),
                 Name = resources.Name.GetValueOrDefault(rarity),
                 Sound = resources.Sound.GetValueOrDefault(rarity),
             };

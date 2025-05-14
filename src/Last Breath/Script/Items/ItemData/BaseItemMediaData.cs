@@ -17,7 +17,8 @@
             Description = resources?.Description.GetValueOrDefault(rarity),
             Name = resources?.Name.GetValueOrDefault(rarity),
             Sound = resources?.Sound.GetValueOrDefault(rarity),
-            Texture = resources?.Texture.GetValueOrDefault(rarity),
+            IconTexture = resources?.IconTexture.GetValueOrDefault(rarity),
+            FullTexture = resources?.FullTexture.GetValueOrDefault(rarity),
         };
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.Items
 {
     using System;
+    using System.Collections.Generic;
     using Godot;
     using Playground.Localization;
     using Playground.Script.Enums;
@@ -11,19 +12,19 @@
         private string? _id;
         //  [Export] public string? ItemResourcePath;
         [Export] public LocalizedString? ItemName;
-        [Export] public int MaxStackSize;
-        [Export] public Texture2D? Icon;
+        [Export] public int MaxStackSize = 1;
+        [Export] public Texture2D? Icon, FullImage;
         [Export] public GlobalRarity Rarity;
-        [Export] public int Quantity;
+        [Export] public int Quantity = 1;
         [Export] public LocalizedString? Description;
 
         public string Id => _id ??= SetId();
-
-        private string SetId()
+        private static string SetId()
         {
             // TODO: Later item name is LocalizedString, i need to take an en name
-            if (string.IsNullOrEmpty(ItemName?.Text)) return string.Empty;
-            return ItemName.Text.Replace(' ', '_');
+          //  if (string.IsNullOrEmpty(ItemName?.Text)) return string.Empty;
+            //return ItemName.Text.Replace(' ', '_');
+            return Guid.NewGuid().ToString();
         }
 
         public bool Equals(Item other)
@@ -44,9 +45,9 @@
             return Equals((Item)obj);
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(ItemName, Quantity);
-        }
+        public override int GetHashCode()=>HashCode.Combine(ItemName, Quantity);
+
+        // TODO: Format strings
+        public virtual List<string> GetItemStats() => [];
     }
 }

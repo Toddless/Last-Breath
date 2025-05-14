@@ -46,6 +46,10 @@
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
+            var body = new BodyArmor(GlobalRarity.Epic, AttributeType.Dexterity);
+            var dagger = new Dagger(GlobalRarity.Epic);
+            _player.AddItemToInventory(dagger);
+            _player.AddItemToInventory(body);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -116,8 +120,6 @@
             var player = GameManager.Instance.Player;
             if (player != null)
             {
-                player.Health!.MaxHealthChanged += (value) => _playerInventory?.UpdateMaxHealth(Mathf.RoundToInt(value));
-                player.Health.CurrentHealthChanged += (value) => _playerInventory?.UpdateCurrentHealth(Mathf.RoundToInt(value));
                 player.Health.MaxHealthChanged += (value) => _mainUI?.UpdateMaxHealthBar(Mathf.RoundToInt(value));
                 player.Health!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
             }
@@ -193,7 +195,7 @@
             }
             else
             {
-                equipSlot.EquipItem(item);
+                equipSlot.EquipItem(item, _player);
                 inventory.RemoveItem(item.Id);
             }
         }
@@ -201,7 +203,8 @@
         private void HandleItemTransfer(EquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
         {
             var oldEquipedItem = equipSlot.CurrentItem;
-            equipSlot.EquipItem(newItem);
+            equipSlot.UnequipItem();
+            equipSlot.EquipItem(newItem, _player);
             inventory.RemoveItem(newItem.Id);
             // old item != null, we check this in method above
             inventory.AddItem(oldEquipedItem!);

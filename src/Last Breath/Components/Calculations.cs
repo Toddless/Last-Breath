@@ -26,7 +26,7 @@
                     case ModifierType.Additive:
                         value = ModifyValue(value, group);
                         break;
-                    case ModifierType.MultiplicativeSum:
+                    case ModifierType.Increase:
                         value *= factor += group.Sum(x => x.Value);
                         break;
                     case ModifierType.Multiplicative:

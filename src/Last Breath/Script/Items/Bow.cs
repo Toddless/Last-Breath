@@ -2,7 +2,7 @@
 {
     using Playground.Script.Enums;
 
-    public partial class Dagger(GlobalRarity rarity) : WeaponItem(rarity)
+    public partial class Bow(GlobalRarity rarity) : WeaponItem(rarity)
     {
     }
 }

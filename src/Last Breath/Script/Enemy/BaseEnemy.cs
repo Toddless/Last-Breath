@@ -286,8 +286,8 @@ namespace Playground
             return index switch
             {
                 1 => Script.Enums.AttributeType.Dexterity,
-                2 => Script.Enums.AttributeType.Strength,
-                _ => Script.Enums.AttributeType.None,
+                2 => Script.Enums.AttributeType.Strength
+              //  _ => Script.Enums.AttributeType.Intelligence,
             };
         }
 
@@ -300,7 +300,7 @@ namespace Playground
             return id.ToString();
         }
 
-        public async void OnAnimation()
+        public void OnAnimation()
         {
 
         }

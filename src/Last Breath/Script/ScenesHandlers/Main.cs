@@ -45,9 +45,6 @@
             _managerUI.SetEvents();
             ConfigureStateMachine();
             SetEvents();
-            var dagger = new Dagger(Enums.GlobalRarity.Rare);
-
-            var anotherDagger = new Dagger(Enums.GlobalRarity.Epic);
         }
 
         public override void _UnhandledInput(InputEvent @event)

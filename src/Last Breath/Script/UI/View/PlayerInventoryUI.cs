@@ -4,14 +4,12 @@
     using Godot;
     using Godot.Collections;
     using Playground.Script.Enums;
-    using Playground.Script.Helpers;
     using Playground.Script.Inventory;
     using Playground.Script.Items;
 
     public partial class PlayerInventoryUI : Control
     {
         [Export] private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
-        private Label? _currentHealth, _maxHealth, _damage, _criticalChance, _criticalDamage, _dodgeChance, _extraHitChance;
         [Export] private TabBar? _equip, _craft, _quest;
         [Export] private Dictionary<EquipmentPart, EquipmentSlot> _slots = [];
 
@@ -20,15 +18,6 @@
 
         public override void _Ready()
         {
-            _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
-            _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
-            _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
-            _criticalChance = (Label?)NodeFinder.FindBFSCached(this, "CriticalChance");
-            _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
-            _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
-            _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
-
-            NodeFinder.ClearCache();
             SetEvents();
         }
 
@@ -63,23 +52,5 @@
             }
             return slot;
         }
-
-        #region Stats
-
-        public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $"Health: {value}";
-
-        public void UpdateMaxHealth(int value) => _maxHealth!.Text = $"Max Health: {value}";
-
-        public void UpdateDamage(int minDamage, int maxDamage) => _damage!.Text = $"Damage: {minDamage} - {maxDamage}";
-
-        public void UpdateCriticalChance(float criticalChance) => _criticalChance!.Text = $"Critical Strike Chance: {criticalChance * 100}%";
-
-        public void UpdateCriticalDamage(float criticalDamage) => _criticalDamage!.Text = $"Critical Damage: {criticalDamage * 100}%";
-
-        public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $"Dodge Chance: {chance * 100}%";
-
-        public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" Extra Hit Chance {chance * 100}%";
-
-        #endregion
     }
 }
