@@ -16,11 +16,8 @@
 
         public int UpgradeLevel { get; private set; } = 0;
 
-        protected WeaponItem(GlobalRarity rarity)
+        protected WeaponItem(GlobalRarity rarity) : base(rarity, equipmentPart: EquipmentPart.Weapon)
         {
-            Rarity = rarity;
-            EquipmentPart = EquipmentPart.Weapon;
-            LoadData();
         }
 
         public float GetBaseCriticalChance() => BaseCriticalChance;
@@ -34,7 +31,7 @@
             UpdateItem();
         }
 
-        public override List<string> GetItemStats()
+        public override List<string> GetItemStatsAsStrings()
         {
             List<string> list = [];
             StringBuilder sb = new();
@@ -76,6 +73,8 @@
             }
             Icon = mediaData.IconTexture;
             FullImage = mediaData.FullTexture;
+            ItemName = mediaData.Name;
+            Description = mediaData.Description;
         }
     }
 }

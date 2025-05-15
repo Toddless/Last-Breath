@@ -9,14 +9,14 @@
         private const float BaseArmor = 100f;
         private const float BaseEvade = 0f;
         private const float BaseEnergyBarrier = 0f;
-        private const float BaseMaxReduce = 0.7f;
+        private const float BaseMaxReduceDamage = 0.7f;
         private const float BaseMaxEvade = 0.9f;
 
         public float Armor { get; private set; } = BaseArmor;
         public float Evade { get; private set; } = BaseEvade;
         public float EnergyBarrier { get; private set; } = BaseEnergyBarrier;
-        public float MaxReduce { get; private set; } = BaseMaxReduce;
-        public float MaxEvade { get; private set; } = BaseMaxEvade;
+        public float MaxReduceDamage { get; private set; } = BaseMaxReduceDamage;
+        public float MaxEvadeChance { get; private set; } = BaseMaxEvade;
 
         public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
         {
@@ -32,10 +32,10 @@
                     EnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, modifiers);
                     break;
                 case Parameter.MaxReduceDamage:
-                    MaxReduce = Calculations.CalculateFloatValue(BaseMaxReduce, modifiers);
+                    MaxReduceDamage = Calculations.CalculateFloatValue(BaseMaxReduceDamage, modifiers);
                     break;
                 case Parameter.MaxEvadeChance:
-                    MaxEvade = Calculations.CalculateFloatValue(BaseMaxEvade, modifiers);
+                    MaxEvadeChance = Calculations.CalculateFloatValue(BaseMaxEvade, modifiers);
                     break;
                 default:
                     break;

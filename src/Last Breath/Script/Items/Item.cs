@@ -48,6 +48,6 @@
         public override int GetHashCode()=>HashCode.Combine(ItemName, Quantity);
 
         // TODO: Format strings
-        public virtual List<string> GetItemStats() => [];
+        public virtual List<string> GetItemStatsAsStrings() => [];
     }
 }

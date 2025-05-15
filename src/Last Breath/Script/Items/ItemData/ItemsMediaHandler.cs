@@ -12,7 +12,7 @@
         private readonly Dictionary<JewelleryType, JewelleriesMediaData> _jewelleryData = [];
         private readonly Dictionary<WeaponType, ItemResources> _weaponData = [];
 
-        public static ItemsMediaHandler? Inctance { get; private set; } 
+        public static ItemsMediaHandler? Inctance { get; private set; }
 
         public override void _Ready()
         {
@@ -22,7 +22,7 @@
 
         public void LoadData()
         {
-            if(_loaded) return;
+            if (_loaded) return;
             LoadArmorData();
             LoadJewelleriesData();
             LoadWeaponData();
@@ -42,14 +42,14 @@
         public ItemMediaData GetAttributeJewelleryMediaData(JewelleryType type, GlobalRarity rarity, AttributeType attributeType) =>
            CreateMediaData(rarity, GetAttributeItemresources(GetJewelleriesMediaData(type).AttributeItemResources, attributeType));
 
-        public ItemMediaData GetAttributeArmorMediaData(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) =>
-            CreateMediaData(rarity, GetAttributeItemresources(GetArmorMediaData(type).AttributeItemResources, attributeType));
+        public ItemMediaData GetAttributeBodyArmorMediaData(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) =>
+            CreateMediaData(rarity, GetAttributeItemresources(GetBodyArmorMediaData(type).AttributeItemResources, attributeType));
 
         public ItemMediaData GetJewelleryMediaData(JewelleryType type, GlobalRarity rarity) => CreateMediaData(rarity, GetJewelleriesMediaData(type).SimpeItemResources);
 
-        public ItemMediaData GetArmorMediaData(BodyArmorType type, GlobalRarity rarity) => CreateMediaData(rarity, GetArmorMediaData(type).SimpeItemResources);
+        public ItemMediaData GetBodyArmorMediaData(BodyArmorType type, GlobalRarity rarity) => CreateMediaData(rarity, GetBodyArmorMediaData(type).SimpeItemResources);
 
-        private ArmorMediaData GetArmorMediaData(BodyArmorType type)
+        private ArmorMediaData GetBodyArmorMediaData(BodyArmorType type)
         {
             if (!_bodyArmorData.TryGetValue(type, out var armorMediaData))
             {
@@ -136,14 +136,14 @@
             foreach (var attributeType in Enum.GetValues<AttributeType>())
             {
                 var path = ItemsDataPaths.CreatePathToDataFile(folder, $"{itemType + attributeType}.tres");
-                if (string.IsNullOrEmpty(path)) continue;
+                if (string.IsNullOrWhiteSpace(path)) continue;
                 res.Add(attributeType, LoadResource(path));
             }
 
             return res;
         }
 
-        private ItemResources LoadResource(string path) => ResourceLoader.Load<ItemResources>(path);
+        private ItemResources LoadResource(string path) => !string.IsNullOrWhiteSpace(path) ? ResourceLoader.Load<ItemResources>(path) : new();
 
         private ItemMediaData CreateMediaData(GlobalRarity rarity, ItemResources resources)
             => new()

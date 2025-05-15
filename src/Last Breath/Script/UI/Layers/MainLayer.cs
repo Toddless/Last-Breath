@@ -48,8 +48,26 @@
             SetEvents();
             var body = new BodyArmor(GlobalRarity.Epic, AttributeType.Dexterity);
             var dagger = new Dagger(GlobalRarity.Epic);
-            _player.AddItemToInventory(dagger);
+            var dexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
+            var strRing = new Ring(GlobalRarity.Rare, AttributeType.Strength);
+            var amulet = new Amulet(GlobalRarity.Rare);
+            var dexGloves = new Gloves(GlobalRarity.Rare, AttributeType.Dexterity);
+            var dexBoots = new Boots(GlobalRarity.Rare, AttributeType.Dexterity);
+            var dexHelmet = new Helmet(GlobalRarity.Rare, AttributeType.Dexterity);
+            var belt = new Belt(GlobalRarity.Rare);
+            var cloak = new Cloak(GlobalRarity.Rare);
+            var secondDexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
             _player.AddItemToInventory(body);
+            _player.AddItemToInventory(dagger);
+            _player.AddItemToInventory(dexRing);
+            _player.AddItemToInventory(strRing);
+            _player.AddItemToInventory(amulet);
+            _player.AddItemToInventory(dexGloves);
+            _player.AddItemToInventory(dexBoots);
+            _player.AddItemToInventory(dexHelmet);
+            _player.AddItemToInventory(belt);
+            _player.AddItemToInventory(cloak);
+            _player.AddItemToInventory(secondDexRing);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -188,7 +206,14 @@
                 // TODO: Log
                 return;
             }
+
             var equipSlot = _playerInventory.GetEquipmentSlot(item.EquipmentPart);
+            if (equipSlot == null)
+            {
+                // TODO Log
+                return;
+            }
+
             if (equipSlot.CurrentItem != null)
             {
                 HandleItemTransfer(item, equipSlot, inventory);

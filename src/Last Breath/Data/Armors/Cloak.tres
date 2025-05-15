@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemResources" load_steps=5 format=3 uid="uid://dhf38n6anjbty"]
+
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_kl1im"]
+[ext_resource type="Script" uid="uid://c02e2cu8t3ncf" path="res://Script/Items/ItemData/ItemResources.cs" id="2_mk5kt"]
+
+[sub_resource type="Gradient" id="Gradient_kl1im"]
+colors = PackedColorArray(0.752293, 0.213509, 0.513916, 1, 0.615909, 0.203266, 0.41536, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mk5kt"]
+gradient = SubResource("Gradient_kl1im")
+
+[resource]
+script = ExtResource("2_mk5kt")
+IconTexture = Dictionary[int, Texture2D]({
+1: SubResource("GradientTexture1D_mk5kt")
+})
+FullTexture = Dictionary[int, Texture2D]({})
+Name = Dictionary[int, ExtResource("1_kl1im")]({})
+Description = Dictionary[int, ExtResource("1_kl1im")]({})
+Sound = Dictionary[int, AudioStream]({})
+metadata/_custom_type_script = "uid://c02e2cu8t3ncf"

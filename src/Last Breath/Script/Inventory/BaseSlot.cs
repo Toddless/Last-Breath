@@ -26,10 +26,10 @@
 
         protected void OnMouseEnter()
         {
-            if (CurrentItem == null || CurrentItem.GetItemStats().Count < 1) return;
+            if (CurrentItem == null || CurrentItem.GetItemStatsAsStrings().Count < 1) return;
             var description = ItemDescription.InitializeAsPackedScene().Instantiate<ItemDescription>();
             description.GlobalPosition = GetGlobalMousePosition() + new Vector2(50, 10);
-            description.SetStats(CurrentItem.GetItemStats());
+            description.SetStats(CurrentItem.GetItemStatsAsStrings());
             description.SetItemImage(CurrentItem.FullImage);
             description.SetItemDescription(CurrentItem.Description?.Text ?? string.Empty);
             GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(MethodName.AddChild, description);

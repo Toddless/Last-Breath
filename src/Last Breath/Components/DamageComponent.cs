@@ -11,15 +11,15 @@ namespace Playground.Components
     public class DamageComponent
     {
         // Random range for damage
-        private const float From = 0.70f;
-        private const float To = 1.30f;
+        private const float From = 0.9f;
+        private const float To = 1.1f;
         private float _damage, _criticalChance, _criticalDamage, _additionalHit, _maxCriticalChance = 0.75f, _maxAdditionalHitChance = 0.9f;
         private readonly RandomNumberGenerator _rnd = new();
         // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
         // TODO: Rename strategy
         private IDamageStrategy _strategy;
 
-        public event Action<List<Parameter>>? StrategyChanges;
+        public event Action<string, float>? PropertyValueChanges;
 
         public float Damage
         {
@@ -29,6 +29,7 @@ namespace Playground.Components
                 if (ObservableProperty.SetProperty(ref _damage, value))
                 {
                     // TODO: Raise event with new value to show on UI
+                    PropertyValueChanges?.Invoke(nameof(Damage), value);
                 }
             }
         }
@@ -41,6 +42,7 @@ namespace Playground.Components
                 if (ObservableProperty.SetProperty(ref _criticalChance, value))
                 {
                     // TODO: Raise event with new value to show on UI
+                    PropertyValueChanges?.Invoke(nameof(Damage), value);
                 }
             }
         }
@@ -53,6 +55,7 @@ namespace Playground.Components
                 if (ObservableProperty.SetProperty(ref _criticalDamage, value))
                 {
                     // TODO: Raise event with new value to show on UI
+                    PropertyValueChanges?.Invoke(nameof(Damage), value);
                 }
             }
         }
@@ -65,6 +68,7 @@ namespace Playground.Components
                 if (ObservableProperty.SetProperty(ref _additionalHit, value))
                 {
                     // TODO: Raise event with new value to show on UI
+                    PropertyValueChanges?.Invoke(nameof(Damage), value);
                 }
             }
         }
@@ -79,7 +83,6 @@ namespace Playground.Components
         public void ChangeStrategy(IDamageStrategy strategy)
         {
             _strategy = strategy;
-            StrategyChanges?.Invoke([Parameter.Damage, Parameter.CriticalChance, Parameter.CriticalDamage, Parameter.AdditionalHitChance]);
         }
 
         public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)

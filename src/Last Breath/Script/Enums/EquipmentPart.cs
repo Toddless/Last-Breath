@@ -8,9 +8,8 @@
         Boots,
         Helmet,
         Amulet,
-        LeftRing,
-        RightRing,
         Cloak,
-        Weapon
+        Weapon,
+        Ring
     }
 }

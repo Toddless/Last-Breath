@@ -22,6 +22,7 @@
     public partial class Player : CharacterBody2D, ICharacter
     {
         #region Private fields
+        private const int BaseSpeed = 200;
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
         private float _moveProgress = 0f;
         private int _exp, _gold;
@@ -41,8 +42,6 @@
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
-
-        private AnimatedSprite2D _sprite2;
         #endregion
 
         [Signal]
@@ -76,7 +75,7 @@
             }
         }
 
-        public ICharacter Target
+        public ICharacter? Target
         {
             get => _target;
             set
@@ -93,7 +92,7 @@
         [Export]
         public bool FirstSpawn { get; set; } = true;
         [Export]
-        public int Speed { get; set; } = 200;
+        public int Speed { get; private set; } = BaseSpeed;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
         public DefenseComponent Defense => _playerDefense ??= new();
@@ -145,17 +144,21 @@
             _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
-          //  _playerDamage!.StrategyChanges += OnStrategyChanges;
         }
 
-        //private void OnStrategyChanges(List<Parameter> list)
-        //{
-        //    foreach (var param in list)
-        //    {
-        //        _modifierManager.RaiseEvent(param);
-        //    }
-        //}
+        private void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
+        {
+            switch (parameter)
+            {
+                case Parameter.Movespeed:
+                    Speed = Mathf.RoundToInt(Calculations.CalculateFloatValue(BaseSpeed, modifiers));
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public override void _PhysicsProcess(double delta)
         {

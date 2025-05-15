@@ -11,13 +11,14 @@
     public abstract class GenericObjectsTable<T>
         where T : GenericObject
     {
+        private readonly RandomNumberGenerator _random = new();
+
+        private float _probabilityTotalWeight;
+
         public List<T> LootDropItems = [];
 
         public List<ItemCreator> Factories = [];
 
-        private readonly RandomNumberGenerator _random = new();
-
-        private float _probabilityTotalWeight;
 
         public virtual void ValidateTable()
         {

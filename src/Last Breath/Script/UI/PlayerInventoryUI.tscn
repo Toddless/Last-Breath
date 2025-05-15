@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://boa2lmvm2an46"]
+[gd_scene load_steps=7 format=3 uid="uid://boa2lmvm2an46"]
 
 [ext_resource type="Script" uid="uid://drt218ly22vev" path="res://Script/UI/View/PlayerInventoryUI.cs" id="1_4n4hh"]
 [ext_resource type="Script" uid="uid://ka5ngsnrbjq2" path="res://Script/Inventory/EquipmentSlot.cs" id="2_o4cd7"]
 [ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="2_yfe3o"]
 [ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="3_6yjsd"]
-[ext_resource type="LabelSettings" uid="uid://orfhh71cylqw" path="res://Fonts/PlayerParameters.tres" id="3_metwe"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0gy2x"]
 bg_color = Color(0.13, 0.13, 0.13, 1)
@@ -19,13 +18,15 @@ border_blend = true
 atlas = ExtResource("3_6yjsd")
 region = Rect2(16, 16, 32, 32)
 
-[node name="PlayerInventoryUI" type="Control" node_paths=PackedStringArray("_equipInventory", "_craftInventory", "_questItemsInventory", "_equip", "_craft", "_quest", "_slots")]
+[node name="PlayerInventoryUI" type="Control" node_paths=PackedStringArray("_equipInventory", "_craftInventory", "_questItemsInventory", "_equip", "_craft", "_quest", "_ringSlots")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 mouse_filter = 2
 script = ExtResource("1_4n4hh")
 _equipInventory = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip/EquipContainer")
@@ -34,10 +35,7 @@ _questItemsInventory = NodePath("MarginContainer/HBoxContainer/VBoxContainerInve
 _equip = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Equip")
 _craft = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/Crafting")
 _quest = NodePath("MarginContainer/HBoxContainer/VBoxContainerInventory/TabContainer/QuestItems")
-_slots = {
-0: NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/BodyArmorSlot"),
-9: NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/WeaponSlot")
-}
+_ringSlots = [NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/VBoxContainer2/RightRingSlot"), NodePath("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/HBoxContainer3/LeftRingSlot")]
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -51,7 +49,6 @@ theme_override_constants/margin_left = 25
 theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
-metadata/_edit_use_anchors_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -68,13 +65,14 @@ theme_override_constants/separation = 1
 clip_contents = true
 custom_minimum_size = Vector2(550, 0)
 layout_mode = 2
+size_flags_horizontal = 0
 mouse_filter = 2
 theme_override_constants/separation = 15
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(500, 580)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 0
 mouse_filter = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 15
@@ -310,64 +308,6 @@ text = "Belt"
 label_settings = ExtResource("2_yfe3o")
 horizontal_alignment = 1
 
-[node name="PlayerStats" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats"]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-theme_override_constants/separation = 10
-
-[node name="CurrentHealth" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Health : "
-label_settings = ExtResource("3_metwe")
-
-[node name="MaxHealth" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Max Health : "
-label_settings = ExtResource("3_metwe")
-
-[node name="Damage" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Damage : "
-label_settings = ExtResource("3_metwe")
-
-[node name="CriticalChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Critical Strike Chance: "
-label_settings = ExtResource("3_metwe")
-
-[node name="CriticalDamage" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Critical Strike Damage: "
-label_settings = ExtResource("3_metwe")
-
-[node name="DodgeChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Dodge Chance: "
-label_settings = ExtResource("3_metwe")
-
-[node name="ExtraHitChance" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PlayerStats/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Extra Hit Chance: "
-label_settings = ExtResource("3_metwe")
-
 [node name="VBoxContainerInventory" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -379,14 +319,9 @@ custom_minimum_size = Vector2(250, 375)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainerInventory/Panel"]
-layout_mode = 2
-text = "Other things"
-label_settings = ExtResource("2_yfe3o")
-horizontal_alignment = 1
-
 [node name="TabContainer" type="TabContainer" parent="MarginContainer/HBoxContainer/VBoxContainerInventory"]
 layout_mode = 2
+size_flags_vertical = 8
 mouse_filter = 2
 current_tab = 0
 clip_tabs = false
