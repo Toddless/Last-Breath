@@ -1,7 +1,7 @@
 ﻿namespace Playground.Resource
 {
-    using Godot;
     using System.Collections.Generic;
+    using Godot;
 
     public partial class Table<T> : Node
         where T : class

@@ -24,9 +24,10 @@ buses/default_bus_layout="uid://blfs8ca5iilus"
 DiContainer="*res://DIComponents/DiContainer.cs"
 ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
 GameManager="*res://Script/GameManager.cs"
-QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
 QuestsTable="*res://Resources/QuestsTable.cs"
 RewardTable="*res://Resources/RewardTable.cs"
+QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
+ItemsMediaHandler="*res://Script/Items/ItemData/ItemsMediaHandler.cs"
 
 [display]
 

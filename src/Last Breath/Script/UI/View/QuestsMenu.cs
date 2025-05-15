@@ -44,7 +44,7 @@
             switch (quest.Type)
             {
                 case Enums.QuestType.Main:
-                    FindAndRemoveChild(_mainQuests,quest);
+                    FindAndRemoveChild(_mainQuests, quest);
                     break;
                 case Enums.QuestType.Side:
                     FindAndRemoveChild(_sideQuests, quest);

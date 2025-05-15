@@ -8,7 +8,7 @@
     public abstract class EffectBase(Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
         public Enums.Effects Effect { get; } = effect;
-        public IModifier? Modifier { get; protected set; } 
+        public IModifier? Modifier { get; protected set; }
         public int Duration { get; set; } = duration;
         public int Stacks { get; set; } = stacks;
         public bool Permanent { get; } = permanent;
@@ -17,19 +17,19 @@
 
         public virtual void OnApply(ICharacter character)
         {
-            if(Modifier != null)
+            if (Modifier != null)
                 character.Modifiers.AddTemporaryModifier(Modifier);
         }
 
         public virtual void OnRemove(ICharacter character)
         {
-            if(Modifier != null)
+            if (Modifier != null)
                 character.Modifiers.RemoveTemporaryModifier(Modifier);
         }
 
         public virtual void OnTick(ICharacter character)
         {
-            if(!Permanent) Duration--;
+            if (!Permanent) Duration--;
             GD.Print($"Effect: {GetType().Name} Duration: {Duration}");
         }
 

@@ -2,6 +2,7 @@
 {
     public enum Effects
     {
+        None = 0,
         Stun,
         Freeze,
         Blind,

@@ -11,7 +11,7 @@
                   stacks,
                   permanent)
         {
-            Modifier = new MaxHealthModifier(ModifierType.Multiplicative, 1.1f, this ,ModifierPriorities.Buffs);
+            Modifier = new MaxHealthModifier(ModifierType.Multiplicative, 1.1f, this, ModifierPriorities.Buffs);
         }
     }
 }

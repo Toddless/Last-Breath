@@ -93,7 +93,7 @@
                 {
                     foreach (var effect in config.MultiEffects)
                     {
-                        casterTarget.Effects.AddEffects(effect);
+                        casterTarget.Effects.AddTemporaryEffect(effect);
                     }
                 }
             }
@@ -103,7 +103,7 @@
         {
             foreach (var effect in config.TargetEffects)
             {
-                target.Effects.AddEffects(effect);
+                target.Effects.AddTemporaryEffect(effect);
             }
         }
 
@@ -111,7 +111,7 @@
         {
             foreach (var effect in config.SelfTarget)
             {
-                _owner.Effects.AddEffects(effect);
+                _owner.Effects.AddTemporaryEffect(effect);
             }
         }
     }

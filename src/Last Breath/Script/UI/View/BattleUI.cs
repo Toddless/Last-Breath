@@ -99,7 +99,7 @@
 
             var floatingText = new FloatingText();
             var targetRect = target is Player ? _player.GetGlobalRect() : _enemy.GetGlobalRect();
-            Vector2 globalPosition = new(targetRect.Position.X + targetRect.Size.X / 2,targetRect.Position.Y);
+            Vector2 globalPosition = new(targetRect.Position.X + targetRect.Size.X / 2, targetRect.Position.Y);
             Vector2 localPosition = GetGlobalTransform().AffineInverse() * globalPosition;
             floatingText.Position = localPosition;
             this.AddChild(floatingText);

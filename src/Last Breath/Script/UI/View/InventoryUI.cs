@@ -2,7 +2,7 @@
 {
     using System;
     using Godot;
-    using Playground.Components;
+    using Playground.Script.Inventory;
     using Playground.Script.Items;
 
     public partial class InventoryUI : VBoxContainer

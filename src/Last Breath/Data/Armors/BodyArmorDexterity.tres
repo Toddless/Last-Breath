@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemResources" load_steps=5 format=3 uid="uid://dqa6xy7ulpe70"]
+
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_qktpn"]
+[ext_resource type="Texture2D" uid="uid://bura4fj1ws7gm" path="res://Assets/Dirt.png" id="2_wh6q5"]
+[ext_resource type="Script" uid="uid://c02e2cu8t3ncf" path="res://Script/Items/ItemData/ItemResources.cs" id="3_3878l"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qktpn"]
+atlas = ExtResource("2_wh6q5")
+region = Rect2(256, 144, 32, 32)
+
+[resource]
+script = ExtResource("3_3878l")
+IconTexture = Dictionary[int, Texture2D]({
+2: SubResource("AtlasTexture_qktpn")
+})
+FullTexture = Dictionary[int, Texture2D]({})
+Name = Dictionary[int, ExtResource("1_qktpn")]({})
+Description = Dictionary[int, ExtResource("1_qktpn")]({})
+Sound = Dictionary[int, AudioStream]({})
+metadata/_custom_type_script = "uid://c02e2cu8t3ncf"

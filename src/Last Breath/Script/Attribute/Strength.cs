@@ -8,7 +8,7 @@
         private static IEnumerable<AttributeEffect> GetEffects()
         {
             yield return new AttributeEffect
-              (Parameter.StrikeDamage,
+              (Parameter.Damage,
               ModifierType.Additive,
               15f
               );
@@ -21,7 +21,7 @@
 
             yield return new AttributeEffect
                 (Parameter.Armor,
-                ModifierType.MultiplicativeSum,
+                ModifierType.Increase,
                 0.02f
                 );
 

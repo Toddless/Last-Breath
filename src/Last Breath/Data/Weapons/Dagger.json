@@ -1,0 +1,26 @@
+{
+	"Uncommon": {
+		"BaseDamage": 120,
+		"CritChance": 0.6,
+		"CritDamage": 140,
+		"AdditionalHitChance": 0.1
+	},
+	"Rare": {
+		"BaseDamage": 180,
+		"CritChance": 0.6,
+		"CritDamage": 150,
+		"AdditionalHitChance": 0.1
+	},
+	"Epic": {
+		"BaseDamage": 250,
+		"CritChance": 0.7,
+		"CritDamage": 160,
+		"AdditionalHitChance": 0.1
+	},
+	"Legendary": {
+		"BaseDamage": 300,
+		"CritChance": 0.9,
+		"CritDamage": 180,
+		"AdditionalHitChance": 0.1
+	}
+}

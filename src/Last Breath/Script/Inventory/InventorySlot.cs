@@ -1,87 +1,92 @@
-namespace Playground.Script.Inventory
+﻿namespace Playground.Script.Inventory
 {
+    using System;
     using Godot;
+    using Playground.Script.Enums;
+    using Playground.Script.Helpers;
     using Playground.Script.Items;
 
-    public partial class InventorySlot : Button
+    public partial class InventorySlot : BaseSlot<Item>
     {
         private const string UID = "uid://bqlqfsqoepfhs";
         private Label? _quantityLabel;
-        private Item? _item;
         private int _quantity;
 
-        public Item? Item
+        public event Action<Item, MouseButtonPressed>? OnClick;
+
+        public int Quantity
         {
-            get => _item;
-            set => _item = value;
+            get => _quantity;
+            set
+            {
+                if (ObservableProperty.SetProperty(ref _quantity, value))
+                    UpdateQuantity();
+            }
         }
 
         public override void _Ready()
         {
             _quantityLabel = GetNode<Label>("QuantityText");
+            this.MouseEntered += OnMouseEnter;
+            this.MouseExited += OnMouseExit;
+            this.TextureNormal = DefaltTexture;
         }
 
         public override void _GuiInput(InputEvent @event)
         {
-            if(@event is InputEventMouseButton p)
+            if (@event is InputEventMouseButton p && CurrentItem != null)
             {
-                if(p.ButtonIndex == MouseButton.Right && p.Pressed)
-                {
-
-                    GetViewport().SetInputAsHandled();
-                }
+                OnClick?.Invoke(CurrentItem, MouseInputHelper.GetPressedButtons(p));
+                GetViewport().SetInputAsHandled();
             }
         }
 
-        public void SetItem(Item? item)
+        public void AddNewItem(Item item)
         {
-            if (item != null)
-            {
-                Item = item;
-                _quantity += item.Quantity;
-                Icon = item.Icon;
-            }
-            else
-            {
-                Item = null;
-                Icon = null;
-            }
-            UpdateQuantity();
+            CurrentItem = item;
+            Quantity += item.Quantity;
+            this.TextureNormal = item.Icon;
         }
 
-        public void AddItem(Item item)
+        public bool RemoveItemStacks(int amount)
         {
-            _quantity += item.Quantity;
-            UpdateQuantity();
+            int canRemove = Mathf.Min(Quantity, amount);
+            if (amount - canRemove > 0) return false;
+
+            Quantity -= canRemove;
+
+            return true;
         }
 
-        public void RemoveItem(Item item)
+        public int AddItemStacks(int amount)
         {
-            _quantity -= item.Quantity;
-            UpdateQuantity();
+            if (CurrentItem == null) return amount;
 
-            if (_quantity == 0)
-            {
-                SetItem(null);
-            }
+            int availableSpace = CurrentItem.MaxStackSize - Quantity;
+            int addAmount = Mathf.Min(availableSpace, amount);
+            Quantity += addAmount;
+
+            return amount - addAmount;
         }
 
-        public void UpdateQuantity()
+        public void ClearSlot()
         {
-            if (_quantity <= 1)
-                _quantityLabel!.Text = string.Empty;
-            else
-                _quantityLabel!.Text = _quantity.ToString();
-        }
-
-        public void Clear()
-        {
-            this.Item = null;
-            this.Icon = null;
-            this._quantityLabel!.Text = string.Empty;
-            _quantity = 0;
+            CurrentItem = null;
+            this.TextureNormal = DefaltTexture;
+            _quantityLabel!.Text = string.Empty;
+            Quantity = 0;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void UpdateQuantity()
+        {
+            if (Quantity < 1)
+                ClearSlot();
+            else
+                _quantityLabel!.Text = SetQuantity();
+        }
+
+        private string SetQuantity() => Quantity > 1 ? Quantity.ToString() : string.Empty;
     }
 }

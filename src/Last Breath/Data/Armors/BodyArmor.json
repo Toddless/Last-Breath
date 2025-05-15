@@ -1,0 +1,62 @@
+{
+    "Strength": {
+        "Uncommon": {
+            "Health": 200
+        },
+        "Rare": {
+            "Health": 300,
+            "Defence": 320
+        },
+        "Epic": {
+            "Health": 450,
+            "Defence": 400,
+            "MaxHealth": 0.8
+        },
+        "Legendary": {
+            "Health": 700,
+            "Defence": 600,
+            "MaxHealth": 0.8,
+            "MaxReduceDamage": 0.3
+        }
+    },
+    "Dexterity": {
+        "Uncommon": {
+            "Evade": 5
+        },
+        "Rare": {
+            "Health": 300,
+            "Evade": 8
+        },
+        "Epic": {
+            "Health": 450,
+            "Evade": 10,
+            "Suppress": 1
+        },
+        "Legendary": {
+            "Health": 700,
+            "Evade": 12,
+            "Suppress": 1,
+            "AdditionalHitChance": 0.1
+        }
+    },
+    "Intelligence": {
+        "Uncommon": {
+            "EnergyBarrier": 100
+        },
+        "Rare": {
+            "Health": 300,
+            "EnergyBarrier": 100
+        },
+        "Epic": {
+            "Health": 450,
+            "EnergyBarrier": 100,
+            "MaxEnergyBarrier": 10
+        },
+        "Legendary": {
+            "Health": 700,
+            "EnergyBarrier": 100,
+            "MaxEnergyBarrier": 10,
+            "SpelDamage": 15
+        }
+    }
+}

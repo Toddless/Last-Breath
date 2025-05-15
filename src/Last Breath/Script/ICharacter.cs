@@ -18,7 +18,6 @@
 
         void OnTurnEnd();
         void OnFightEnds();
-
         void OnAnimation();
 
         // TODO: Resources class

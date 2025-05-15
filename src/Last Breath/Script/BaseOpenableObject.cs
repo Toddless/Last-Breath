@@ -46,7 +46,7 @@
 
         public override void _ExitTree()
         {
-            if(_area != null)
+            if (_area != null)
             {
                 _area.BodyEntered -= PlayerEnter;
                 _area.BodyExited -= PlayerLeave;

@@ -54,7 +54,7 @@
             firstDialogueNode.Append("FirstMeeting");
             _initialDialogueNodeId = firstDialogueNode.ToString();
         }
-        
+
         private void OnQuestStatusChanged(string questId, QuestStatus status)
         {
             // TODO: what if player can complete multiple quests?
