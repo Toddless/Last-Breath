@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dx2kou0dpsa56" path="res://Script/NPC/Guardian.tscn" id="5_dp5mw"]
 [ext_resource type="Texture2D" uid="uid://d06ag6h6rbej2" path="res://Assets/Retro Chest - SpriteSheet.png" id="6_akxle"]
 [ext_resource type="Script" uid="uid://djtvshat4didc" path="res://Script/BaseOpenableObject.cs" id="6_kcicw"]
-[ext_resource type="Resource" uid="uid://b02oqnnxdhla3" path="res://Resources/Items/Quest Items/ListOfDead.tres" id="7_12qju"]
+[ext_resource type="Resource" uid="uid://bgyt3vacw15ik" path="res://Resources/Items/Quest Items/ListOfDead.tres" id="7_12qju"]
 [ext_resource type="Script" uid="uid://brm4jyg57fhml" path="res://Script/Items/Item.cs" id="7_umaly"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7h3s"]

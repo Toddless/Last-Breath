@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script
 {
-    using Playground.Script.Enemy;
     using System;
+    using Playground.Script.Enemy;
 
     public class EnemyKilledEventArgs(string enemyId, EnemyType enemyType) : EventArgs
     {

@@ -8,16 +8,24 @@
         private static IEnumerable<AttributeEffect> GetEffects()
         {
             yield return new AttributeEffect
-               (Parameter.EnergyBarrier,
-               ModifierType.Additive,
-               0.01f
-               );
+                (Parameter.EnergyBarrier,
+                ModifierType.Additive,
+                10);
 
             yield return new AttributeEffect
-              (Parameter.SpellDamage,
-              ModifierType.Additive,
-              0.2f
-              );
+                (Parameter.SpellDamage,
+                ModifierType.Additive,
+                0.2f);
+
+            yield return new AttributeEffect
+                (Parameter.ResourceRecovery,
+                ModifierType.Additive,
+                0.1f);
+
+            yield return new AttributeEffect
+                (Parameter.Resource,
+                ModifierType.Additive,
+                0.1f);
         }
     }
 }

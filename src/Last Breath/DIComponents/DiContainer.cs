@@ -7,6 +7,7 @@
     using Godot;
     using Microsoft.CodeAnalysis;
     using Microsoft.Extensions.DependencyInjection;
+    using Playground.Script.Items.ItemData;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class DiContainer : Node
@@ -16,16 +17,19 @@
             get; set;
         }
 
-        public static IServiceProvider? ServiceProvider
-        {
-            get;
-            private set;
-        }
+        private static IServiceProvider? s_serviceProvider;
 
         public override void _Ready()
         {
             Configure();
             CollectClassesToInject();
+            GD.Print("DIcontainer");
+        }
+
+        public static T? GetService<T>()
+         where T : class
+        {
+            return s_serviceProvider?.GetService<T>();
         }
 
         public static void InjectDependencies(object instance)
@@ -35,18 +39,12 @@
 
             foreach (var property in getClassToInject.Properties)
             {
-                var dependency = ServiceProvider?.GetService(property.PropertyType);
+                var dependency = s_serviceProvider?.GetService(property.PropertyType);
                 if (dependency != null)
                 {
                     property.SetValue(instance, dependency);
                 }
             }
-        }
-
-        public static T? GetService<T>()
-            where T : class
-        {
-            return ServiceProvider?.GetService<T>();
         }
 
         private static void Configure()
@@ -60,8 +58,14 @@
                 instance.ValidateTable();
                 return instance;
             });
+            provider.AddSingleton<IItemStatsHandler>(service =>
+            {
+                var instance = new ItemsStatsHandler();
+                instance.LoadData();
+                return instance;
+            });
             provider.AddSingleton<RandomNumberGenerator>();
-            ServiceProvider = provider.BuildServiceProvider();
+            s_serviceProvider = provider.BuildServiceProvider();
         }
 
         private static void CollectClassesToInject()

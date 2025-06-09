@@ -1,22 +1,23 @@
 ﻿namespace Playground.Script
 {
     using Godot;
+    using Godot.Collections;
+    using Playground.Localization;
     using Playground.Script.Helpers;
     using Playground.Script.Helpers.Extensions;
     using Playground.Script.ScenesHandlers;
     using Playground.Script.UI;
     using Stateless;
-    using Playground.Localization;
-    using Godot.Collections;
 
     public partial class MainMenu : Control
     {
-        // only for now, later i need other place for this kind of things
+        // only for now, later i need other place for this
         private Dictionary<string, string> _dialoguesPath = new()
         {
             { "res://Resources/Dialogues/GuardianDialogues/guardianDialoguesData.tres", "G:\\Localization\\guardianDialogues.json"},
             {  "res://Resources/Dialogues/PlayerDialogues/playerDialoguesData.tres", "G:\\Localization\\playerDialogues.json"}
         };
+
         private enum State { Main, Options, SaveLoad }
         private enum Trigger { ShowOptions, ShowSaveLoad, Return }
 
@@ -40,7 +41,7 @@
             _saveLoadMenu = GetNode<SaveLoadMenu>(nameof(SaveLoadMenu));
             NodeFinder.ClearCache();
             SetEvents();
-            ScreenResizeExtension.CenterWindow();
+            // ScreenResizeExtension.CenterWindow();
             ConfigureStateMachine();
             // only for now
             LoadDialoguesData();

@@ -4,19 +4,18 @@
     using System.Collections.Generic;
     using Godot;
     using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Helpers;
     using Playground.Script.ScenesHandlers;
 
-    public partial class BattleLayer : ObservableLayer
+    public partial class BattleLayer : CanvasLayer
     {
-        private BattleSceneHandler? _battleSceneHandler;
+        private BattleHandler? _battleSceneHandler;
         [Export] private BattleUI? _battleUI;
 
         public event Action? BattleEnds;
 
         public override void _Ready()
         {
-            _battleSceneHandler = new BattleSceneHandler();
+            _battleSceneHandler = new BattleHandler();
             SetupEvents();
         }
 
@@ -104,7 +103,7 @@
 
         private void SetAbilities(Player player)
         {
-            if(player.Stance == Enums.Stance.None) return;
+            if (player.Stance == Enums.Stance.None) return;
             foreach (var ability in player.Abilities[player.Stance])
             {
                 _battleUI?.SetAbility(ability);
@@ -133,7 +132,7 @@
 
         private void HandleEnemyKilled(ICharacter enemy, ICharacter player)
         {
-            if(enemy is BaseEnemy baseEnemy && player is Player p)
+            if (enemy is BaseEnemy baseEnemy && player is Player p)
             {
                 p.OnEnemyKilled(baseEnemy);
                 p.CanMove = true;

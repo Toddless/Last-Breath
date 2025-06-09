@@ -8,6 +8,7 @@
     {
         private VBoxContainer? _ranks;
         private FractionReputation? _fractionReputation;
+
         public override void _Ready()
         {
             _ranks = (VBoxContainer?)NodeFinder.FindBFSCached(this, "Ranks");

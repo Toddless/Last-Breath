@@ -3,6 +3,7 @@
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
+    using Playground.Script.Items;
     using Playground.Script.NPC;
     using Playground.Script.UI;
     using Playground.Script.UI.Layers;

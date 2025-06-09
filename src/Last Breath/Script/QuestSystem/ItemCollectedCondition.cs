@@ -7,7 +7,7 @@
     public partial class ItemCollectedCondition : Condition
     {
         [Export]
-        public string ItemId {  get; set; }  = string.Empty;
+        public string ItemId { get; set; } = string.Empty;
 
         [Export]
         public int Amount { get; set; } = 1;

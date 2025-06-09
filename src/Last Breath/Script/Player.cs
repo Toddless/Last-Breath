@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
@@ -16,12 +15,14 @@
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Playground.Script.Inventory;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
 
-    public partial class Player : ObservableCharacterBody2D, ICharacter
+    public partial class Player : CharacterBody2D, ICharacter
     {
         #region Private fields
+        private const int BaseSpeed = 200;
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false;
         private float _moveProgress = 0f;
         private int _exp, _gold;
@@ -34,7 +35,6 @@
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
 
         private ResourceComponent? _resourceManager;
-        private IDamageStrategy? _damageStrategy;
         private DefenseComponent? _playerDefense;
         private EffectsManager? _effectsManager;
         private HealthComponent? _playerHealth;
@@ -42,8 +42,6 @@
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
-
-        private AnimatedSprite2D _sprite2;
         #endregion
 
         [Signal]
@@ -77,7 +75,7 @@
             }
         }
 
-        public ICharacter Target
+        public ICharacter? Target
         {
             get => _target;
             set
@@ -94,16 +92,15 @@
         [Export]
         public bool FirstSpawn { get; set; } = true;
         [Export]
-        public int Speed { get; set; } = 200;
+        public int Speed { get; private set; } = BaseSpeed;
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
         public DefenseComponent Defense => _playerDefense ??= new();
         public HealthComponent Health => _playerHealth ??= new();
-        public DamageComponent Damage => _playerDamage ??= new(Strategy);
+        public DamageComponent Damage => _playerDamage ??= new(new UnarmedDamageStrategy());
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
-        public IDamageStrategy Strategy => _damageStrategy ??= new UnarmedDamageStrategy();
         public EffectsManager Effects => _effectsManager ??= new(this);
         public ModifierManager Modifiers => _modifierManager;
         // i think i need some ability component later, because i need a place where player can modifiy, learn or forget abilities
@@ -121,8 +118,7 @@
 
         public override void _Ready()
         {
-            _damageStrategy = new UnarmedDamageStrategy();
-            _playerDamage = new(Strategy);
+            _playerDamage = new(new UnarmedDamageStrategy());
             _effectsManager = new(this);
             _playerHealth = new();
             _playerDefense = new();
@@ -140,7 +136,6 @@
             _playerHealth.HealUpToMax();
             _abilities.Add(Stance.Strength, [new TouchOfGod(this)]);
             _abilities.Add(Stance.Dexterity, [new PrecisionStrike(this)]);
-            GD.Print($"Player health: {_playerHealth.CurrentHealth}");
         }
 
         private void SetEvents()
@@ -149,7 +144,20 @@
             _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
+        }
+
+        private void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
+        {
+            switch (parameter)
+            {
+                case Parameter.Movespeed:
+                    Speed = Mathf.RoundToInt(Calculations.CalculateFloatValue(BaseSpeed, modifiers));
+                    break;
+                default:
+                    break;
+            }
         }
 
         public override void _PhysicsProcess(double delta)
@@ -176,22 +184,22 @@
 
         public void AddItemToInventory(Item item)
         {
-            switch (item.Type)
-            {
-                case ItemType.Equipment:
-                    _equipInventory?.AddItem(item);
-                    break;
-                case ItemType.Crafting:
-                    _craftingInventory?.AddItem(item);
-                    break;
-                case ItemType.Quest:
-                    _questItemsInventory?.AddItem(item);
-                    Progress.OnQuestItemCollected(item);
-                    break;
-                default:
-                    break;
+            if (item is EquipItem)
+                _equipInventory?.AddItem(item);
 
+            // if (item is CraftingItem)
+            // _craftingInventory?.AddItem(item);
+
+            if (item is QuestItem)
+            {
+                _questItemsInventory?.AddItem(item);
+                Progress.OnQuestItemCollected(item);
             }
+        }
+
+        public void OnItemCollect(Item item)
+        {
+            AddItemToInventory(item);
             ItemCollected?.Invoke(item.Id);
         }
 
@@ -204,6 +212,7 @@
         }
 
         public void OnEquipWeapon(IDamageStrategy strategy) => _playerDamage?.ChangeStrategy(strategy);
+        public void OnUnequipWeapon() => _playerDamage?.ChangeStrategy(new UnarmedDamageStrategy());
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
@@ -235,7 +244,7 @@
 
         public void OnFightEnds()
         {
-            Effects.RemoveAllEffects();
+            Effects.RemoveAllTemporaryEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.RemoveAllTemporaryModifiers();
         }
@@ -309,7 +318,7 @@
 
         public void OnAnimation()
         {
-           
+
         }
     }
 }

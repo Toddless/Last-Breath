@@ -17,6 +17,6 @@
         [Export]
         public Array<string> Quests { get; set; } = [];
         [Export]
-        public bool IsDialogMatterForQuest {  get; set; } = false;
+        public bool IsDialogMatterForQuest { get; set; } = false;
     }
 }

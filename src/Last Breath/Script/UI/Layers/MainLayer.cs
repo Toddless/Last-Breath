@@ -4,7 +4,9 @@
     using System.Linq;
     using Godot;
     using Playground.Resource.Quests;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
+    using Playground.Script.Inventory;
     using Playground.Script.Items;
     using Playground.Script.QuestSystem;
     using Playground.Script.UI.View;
@@ -24,8 +26,9 @@
         private MapMenu? _mapUI;
         private MainUI? _mainUI;
         private BaseOpenableObject? _currentOpenedObj;
-        private Action? _inventoryCloseHandler;
         private Player? _player;
+
+        private Action? _inventoryCloseHandler;
 
         public override void _Ready()
         {
@@ -43,6 +46,28 @@
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
+            var body = new BodyArmor(GlobalRarity.Epic, AttributeType.Dexterity);
+            var dagger = new Dagger(GlobalRarity.Epic);
+            var dexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
+            var strRing = new Ring(GlobalRarity.Rare, AttributeType.Strength);
+            var amulet = new Amulet(GlobalRarity.Rare);
+            var dexGloves = new Gloves(GlobalRarity.Rare, AttributeType.Dexterity);
+            var dexBoots = new Boots(GlobalRarity.Rare, AttributeType.Dexterity);
+            var dexHelmet = new Helmet(GlobalRarity.Rare, AttributeType.Dexterity);
+            var belt = new Belt(GlobalRarity.Rare);
+            var cloak = new Cloak(GlobalRarity.Rare);
+            var secondDexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
+            _player.AddItemToInventory(body);
+            _player.AddItemToInventory(dagger);
+            _player.AddItemToInventory(dexRing);
+            _player.AddItemToInventory(strRing);
+            _player.AddItemToInventory(amulet);
+            _player.AddItemToInventory(dexGloves);
+            _player.AddItemToInventory(dexBoots);
+            _player.AddItemToInventory(dexHelmet);
+            _player.AddItemToInventory(belt);
+            _player.AddItemToInventory(cloak);
+            _player.AddItemToInventory(secondDexRing);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -113,8 +138,6 @@
             var player = GameManager.Instance.Player;
             if (player != null)
             {
-                player.Health!.MaxHealthChanged += (value) => _playerInventory?.UpdateMaxHealth(Mathf.RoundToInt(value));
-                player.Health.CurrentHealthChanged += (value) => _playerInventory?.UpdateCurrentHealth(Mathf.RoundToInt(value));
                 player.Health.MaxHealthChanged += (value) => _mainUI?.UpdateMaxHealthBar(Mathf.RoundToInt(value));
                 player.Health!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
             }
@@ -125,6 +148,91 @@
             _mainUI!.Quests += ShowQuests;
             _mainUI!.Map += ShowMap;
             _inventoryUI!.TakeAll += OnInventoryTakeAll;
+            _playerInventory!.InventorySlotClicked += OnInventorySlotClicked;
+            _playerInventory.EquipItemPressed += OnEquipItemPressed;
+        }
+
+        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed)
+        {
+            switch (pressed)
+            {
+                case MouseButtonPressed.RightClick:
+                    HandleItemUnequip(slot);
+                    break;
+                default: break;
+            }
+        }
+
+        private void HandleItemUnequip(EquipmentSlot slot)
+        {
+            if (_playerInventory == null)
+            {
+                // TODO : Log
+                return;
+            }
+            // EquipItemPressed event will fire only if EquipItem not null
+            _player?.AddItemToInventory(slot.CurrentItem!);
+            slot.UnequipItem();
+        }
+
+        private void OnInventorySlotClicked(Item itemClicked, MouseButtonPressed pressed, Inventory inventory)
+        {
+            if (itemClicked is EquipItem item)
+            {
+                HandleEquipmentItemPressed(item, pressed, inventory);
+            }
+        }
+
+        private void HandleEquipmentItemPressed(EquipItem item, MouseButtonPressed pressed, Inventory inventory)
+        {
+            switch (pressed)
+            {
+                case MouseButtonPressed.CtrRightClick:
+                    HandleItemEquipment(item, inventory);
+                    break;
+                case MouseButtonPressed.CtrLeftClick:
+                    // TODO: Action on ctr + left click
+                    break;
+
+                default: break;
+                    // TODO: Other cases
+            }
+        }
+
+        private void HandleItemEquipment(EquipItem item, Inventory inventory)
+        {
+            if (_playerInventory == null)
+            {
+                // TODO: Log
+                return;
+            }
+
+            var equipSlot = _playerInventory.GetEquipmentSlot(item.EquipmentPart);
+            if (equipSlot == null)
+            {
+                // TODO Log
+                return;
+            }
+
+            if (equipSlot.CurrentItem != null)
+            {
+                HandleItemTransfer(item, equipSlot, inventory);
+            }
+            else
+            {
+                equipSlot.EquipItem(item, _player);
+                inventory.RemoveItem(item.Id);
+            }
+        }
+
+        private void HandleItemTransfer(EquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
+        {
+            var oldEquipedItem = equipSlot.CurrentItem;
+            equipSlot.UnequipItem();
+            equipSlot.EquipItem(newItem, _player);
+            inventory.RemoveItem(newItem.Id);
+            // old item != null, we check this in method above
+            inventory.AddItem(oldEquipedItem!);
         }
 
         private void OnQuestCompleted(Quest quest)
@@ -137,7 +245,7 @@
         private void RemoveQuestItems(Quest quest)
         {
             if (quest.QuestObjective == null || quest.QuestObjective.QuestObjectiveType != ObjectiveType.ItemCollection) return;
-            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId);
+            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId, quest.QuestObjective.CurrentAmount);
         }
 
         private void OnInventoryTakeAll()
@@ -199,6 +307,7 @@
                 .Permit(Trigger.ShowQuests, State.Quests)
                 .Permit(Trigger.Close, State.Main);
 
+            // Rename state
             _machine?.Configure(State.Inventory)
                 .OnEntry(() =>
                 {
@@ -243,5 +352,6 @@
             GetViewport().SetInputAsHandled();
             return true;
         }
+
     }
 }

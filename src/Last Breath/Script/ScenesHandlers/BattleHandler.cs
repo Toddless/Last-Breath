@@ -6,7 +6,7 @@
     using Playground.Script.Enums;
     using Stateless;
 
-    public partial class BattleSceneHandler
+    public partial class BattleHandler
     {
         private enum State { Player, Enemy, Awaiting }
         private enum Trigger { PlayerTurn, EnemyTurn, Await }
@@ -26,7 +26,7 @@
         public event Action? PlayerTurnEnds;
         public event Action<int, ICharacter, bool>? DamageDealed;
 
-        public BattleSceneHandler()
+        public BattleHandler()
         {
             ConfigureStateMachine();
         }
@@ -244,7 +244,7 @@
 
         private string GetCharacterName(ICharacter character) => character.GetType().Name;
         private bool IsAdditionalHit(ICharacter? character) => _rnd.Randf() <= character?.Damage.AdditionalHit;
-        private bool IsEvade(ICharacter? character) => _rnd.Randf() <= character?.Defense.CurrentDodge;
+        private bool IsEvade(ICharacter? character) => _rnd.Randf() <= character?.Defense.Evade;
 
         private void CheckBattleEnds()
         {

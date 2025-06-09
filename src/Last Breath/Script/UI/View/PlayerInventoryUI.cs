@@ -1,32 +1,27 @@
 ﻿namespace Playground.Script.UI
 {
+    using System;
     using Godot;
+    using Godot.Collections;
+    using Playground.Script.Enums;
     using Playground.Script.Helpers;
-    using Playground.Components;
+    using Playground.Script.Inventory;
+    using Playground.Script.Items;
 
     public partial class PlayerInventoryUI : Control
     {
-        private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
-        private Label? _currentHealth, _maxHealth, _damage, _criticalChance, _criticalDamage, _dodgeChance, _extraHitChance;
-        private TabBar? _equip, _craft, _quest;
+        [Export] private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
+        [Export] private TabBar? _equip, _craft, _quest;
+        private Dictionary<EquipmentPart, EquipmentSlot> _slots = [];
+        [Export] private Array<EquipmentSlot> _ringSlots = [];
+
+        public event Action<Item, MouseButtonPressed, Inventory>? InventorySlotClicked;
+        public event Action<EquipmentSlot, MouseButtonPressed>? EquipItemPressed;
 
         public override void _Ready()
         {
-            _equip = (TabBar?)NodeFinder.FindBFSCached(this, "Equip");
-            _quest = (TabBar?)NodeFinder.FindBFSCached(this, "QuestItems");
-            _craft = (TabBar?)NodeFinder.FindBFSCached(this, "Crafting");
-            _craftInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "CraftContainer");
-            _equipInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "EquipContainer");
-            _questItemsInventory = (GridContainer?)NodeFinder.FindBFSCached(this, "QuestItemsContainer");
-            _currentHealth = (Label?)NodeFinder.FindBFSCached(this, "CurrentHealth");
-            _maxHealth = (Label?)NodeFinder.FindBFSCached(this, "MaxHealth");
-            _damage = (Label?)NodeFinder.FindBFSCached(this, "Damage");
-            _criticalChance = (Label?)NodeFinder.FindBFSCached(this, "CriticalChance");
-            _criticalDamage = (Label?)NodeFinder.FindBFSCached(this, "CriticalDamage");
-            _dodgeChance = (Label?)NodeFinder.FindBFSCached(this, "DodgeChance");
-            _extraHitChance = (Label?)NodeFinder.FindBFSCached(this, "ExtraHitChance");
-           
-            NodeFinder.ClearCache();
+            FillTheDictionary();
+            SetEvents();
         }
 
         public void InitializeInventories(Inventory equipInventory, Inventory craftingInventory, Inventory questItemsInventory)
@@ -34,24 +29,70 @@
             equipInventory.Initialize(220, _equipInventory!);
             craftingInventory.Initialize(220, _craftInventory!);
             questItemsInventory.Initialize(220, _questItemsInventory!);
+            equipInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+            craftingInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+            questItemsInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
         }
 
-        #region Stats
+        public EquipmentSlot? GetEquipmentSlot(EquipmentPart part)
+        {
+            if (part == EquipmentPart.Ring)
+            {
+                return GetFreeRingSlotOrDefault();
+            }
+            else
+            {
+                _slots.TryGetValue(part, out var slot);
+                if (slot == null)
+                {
+                    //TODO Log
+                }
+                return slot;
+            }
+        }
 
-        public void UpdateCurrentHealth(int value) => _currentHealth!.Text = $"Health: {value}";
+        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed) => EquipItemPressed?.Invoke(slot, pressed);
 
-        public void UpdateMaxHealth(int value) => _maxHealth!.Text = $"Max Health: {value}";
+        private EquipmentSlot GetFreeRingSlotOrDefault() => _ringSlots[0].CurrentItem == null ? _ringSlots[0] : _ringSlots[1];
 
-        public void UpdateDamage(int minDamage, int maxDamage) => _damage!.Text = $"Damage: {minDamage} - {maxDamage}";
+        private void FillTheDictionary()
+        {
+            // Add slot via [Export] not working correctly, dont try this
+            _slots.Add(EquipmentPart.BodyArmor, FindEquipmentSlot("BodyArmorSlot"));
+            _slots.Add(EquipmentPart.Amulet, FindEquipmentSlot("AmuletSlot"));
+            _slots.Add(EquipmentPart.Boots, FindEquipmentSlot("BootsSlot"));
+            _slots.Add(EquipmentPart.Gloves, FindEquipmentSlot("GlovesSlot"));
+            _slots.Add(EquipmentPart.Cloak, FindEquipmentSlot("CloakSlot"));
+            _slots.Add(EquipmentPart.Helmet, FindEquipmentSlot("HelmetSlot"));
+            _slots.Add(EquipmentPart.Belt, FindEquipmentSlot("BeltSlot"));
+            _slots.Add(EquipmentPart.Weapon, FindEquipmentSlot("WeaponSlot"));
+            NodeFinder.ClearCache();
+        }
 
-        public void UpdateCriticalChance(float criticalChance) => _criticalChance!.Text = $"Critical Strike Chance: {criticalChance * 100}%";
+        private EquipmentSlot FindEquipmentSlot(string name)
+        {
+            var slot = (EquipmentSlot?)NodeFinder.FindBFSCached(this, name);
+            if (slot == null)
+            {
+                // TODO Log
+                // can cause item disappearing on equip. Change it later
+                slot = new();
+            }
 
-        public void UpdateCriticalDamage(float criticalDamage) => _criticalDamage!.Text = $"Critical Damage: {criticalDamage * 100}%";
+            return slot;
+        }
 
-        public void UpdateDodgeChance(float chance) => _dodgeChance!.Text = $"Dodge Chance: {chance * 100}%";
+        private void SetEvents()
+        {
+            foreach (var slot in _slots)
+            {
+                slot.Value.EquipItemPressed += OnEquipItemPressed;
+            }
 
-        public void UpdateExtraHitChance(float chance) => _extraHitChance!.Text = $" Extra Hit Chance {chance * 100}%";
-
-        #endregion
+            foreach (var ringSlot in _ringSlots)
+            {
+                ringSlot.EquipItemPressed += OnEquipItemPressed;
+            }
+        }
     }
 }

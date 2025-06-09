@@ -1,22 +1,30 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqlqfsqoepfhs"]
+[gd_scene load_steps=6 format=3 uid="uid://bqlqfsqoepfhs"]
 
 [ext_resource type="Script" uid="uid://xvnepkg3q1bw" path="res://Script/Inventory/InventorySlot.cs" id="1_yg5o5"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ehf1w"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="2_ng85e"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r861c"]
+atlas = ExtResource("2_ng85e")
+region = Rect2(16, 16, 32, 32)
 
 [sub_resource type="LabelSettings" id="LabelSettings_gs3g4"]
 font = ExtResource("2_ehf1w")
 shadow_color = Color(0, 0, 0, 1)
 
-[node name="InventorySlot" type="Button"]
+[node name="InventorySlot" type="TextureButton"]
+clip_contents = true
 custom_minimum_size = Vector2(57, 56)
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 57.0
+offset_bottom = 56.0
 scale = Vector2(1, 1.16)
 focus_mode = 0
 mouse_filter = 1
 button_mask = 3
-expand_icon = true
+ignore_texture_size = true
+stretch_mode = 0
 script = ExtResource("1_yg5o5")
+DefaltTexture = SubResource("AtlasTexture_r861c")
 
 [node name="QuantityText" type="Label" parent="."]
 layout_mode = 0

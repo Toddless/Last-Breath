@@ -31,7 +31,7 @@
         //private float EvaluateAbility(IAbility ability)
         //{
         //    float biggestPriority = 0;
-           
+
         //    return biggestPriority;
         //}
 

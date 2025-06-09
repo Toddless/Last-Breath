@@ -18,7 +18,7 @@
 
         public virtual bool IsEventMatching(object eventData)
         {
-            if(eventData is string obj)
+            if (eventData is string obj)
                 return TargetId == obj;
             return false;
         }

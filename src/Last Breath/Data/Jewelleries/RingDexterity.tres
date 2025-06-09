@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemResources" load_steps=7 format=3 uid="uid://crlg77j56gvkp"]
+
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_v3pjy"]
+[ext_resource type="Texture2D" uid="uid://dta4tcq4t2uko" path="res://Assets/Book.png" id="2_3kl3d"]
+[ext_resource type="Script" uid="uid://c02e2cu8t3ncf" path="res://Script/Items/ItemData/ItemResources.cs" id="2_rmb1t"]
+[ext_resource type="Texture2D" uid="uid://cnw0yv7d47u10" path="res://Assets/Book250.png" id="2_ys7lb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8cfoe"]
+atlas = ExtResource("2_ys7lb")
+region = Rect2(32, 0, 176, 184)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ys7lb"]
+atlas = ExtResource("2_3kl3d")
+region = Rect2(32, 8, 128, 142)
+
+[resource]
+script = ExtResource("2_rmb1t")
+IconTexture = Dictionary[int, Texture2D]({
+1: SubResource("AtlasTexture_ys7lb")
+})
+FullTexture = Dictionary[int, Texture2D]({
+1: SubResource("AtlasTexture_8cfoe")
+})
+Name = Dictionary[int, ExtResource("1_v3pjy")]({})
+Description = Dictionary[int, ExtResource("1_v3pjy")]({})
+Sound = Dictionary[int, AudioStream]({})
+metadata/_custom_type_script = "uid://c02e2cu8t3ncf"
