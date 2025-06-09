@@ -8,14 +8,14 @@
 
     public partial class BattleLayer : CanvasLayer
     {
-        private BattleSceneHandler? _battleSceneHandler;
+        private BattleHandler? _battleSceneHandler;
         [Export] private BattleUI? _battleUI;
 
         public event Action? BattleEnds;
 
         public override void _Ready()
         {
-            _battleSceneHandler = new BattleSceneHandler();
+            _battleSceneHandler = new BattleHandler();
             SetupEvents();
         }
 
