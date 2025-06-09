@@ -57,18 +57,16 @@
             {
                 if (s_parameterMapping.TryGetValue(prop.Name, out var modMapping))
                 {
-                    var value = Convert.ToSingle(prop.GetValue(stats));
+                    float value = Convert.ToSingle(prop.GetValue(stats));
 
                     if (value <= 0) continue;
 
                     modifiers.Add(CreateModifier
-                        (
-                        modMapping.Parameter,
+                        (modMapping.Parameter,
                         modMapping.ModifierType,
                         value,
                         source,
-                        modMapping.Prioritry
-                        ));
+                        modMapping.Prioritry));
                 }
             }
             return modifiers;

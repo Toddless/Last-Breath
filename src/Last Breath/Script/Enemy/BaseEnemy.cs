@@ -159,6 +159,8 @@ namespace Playground
             SetStats();
             // SpawnItems();
             Health?.HealUpToMax();
+
+            // TODO: enemies can be: regular, elite, mini-boss and boss
         }
 
         public IAbility? GetAbility()

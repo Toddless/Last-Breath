@@ -8,28 +8,24 @@
         private static IEnumerable<AttributeEffect> GetEffects()
         {
             yield return new AttributeEffect
-              (Parameter.Damage,
-              ModifierType.Additive,
-              15f
-              );
+                (Parameter.Damage,
+                ModifierType.Additive,
+                15f);
 
             yield return new AttributeEffect
-              (Parameter.Armor,
-              ModifierType.Additive,
-              100f
-              );
+                (Parameter.Armor,
+                ModifierType.Additive,
+                100f);
 
             yield return new AttributeEffect
                 (Parameter.Armor,
                 ModifierType.Increase,
-                0.02f
-                );
+                0.02f);
 
             yield return new AttributeEffect
-              (Parameter.MaxHealth,
-              ModifierType.Additive,
-              10f
-              );
+                (Parameter.MaxHealth,
+                ModifierType.Additive,
+                10f);
         }
     }
 }

@@ -307,6 +307,7 @@
                 .Permit(Trigger.ShowQuests, State.Quests)
                 .Permit(Trigger.Close, State.Main);
 
+            // Rename state
             _machine?.Configure(State.Inventory)
                 .OnEntry(() =>
                 {

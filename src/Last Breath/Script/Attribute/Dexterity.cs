@@ -8,35 +8,24 @@
         private static IEnumerable<AttributeEffect> GetEffects()
         {
             yield return new AttributeEffect
-               (Parameter.CriticalChance,
-               ModifierType.Additive,
-               0.01f
-               );
-
-            yield return new AttributeEffect
                 (Parameter.CriticalChance,
-                ModifierType.Increase,
-                0.01f
-                );
+                ModifierType.Additive,
+                0.01f);
 
             yield return new AttributeEffect
-              (Parameter.CriticalDamage,
-              ModifierType.Additive,
-              0.01f
-              );
+                (Parameter.CriticalDamage,
+                ModifierType.Additive,
+                0.01f);
 
             yield return new AttributeEffect
-              (Parameter.AdditionalHitChance,
-              ModifierType.Additive,
-              0.02f
-              );
+                (Parameter.AdditionalHitChance,
+                ModifierType.Additive,
+                0.02f);
 
             yield return new AttributeEffect
-              (Parameter.Evade,
-              ModifierType.Additive,
-              0.01f
-              );
+                (Parameter.Evade,
+                ModifierType.Additive,
+                0.01f);
         }
-
     }
 }
