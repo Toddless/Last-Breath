@@ -9,12 +9,12 @@
         {
             yield return new AttributeEffect
                 (Parameter.Damage,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 15f);
 
             yield return new AttributeEffect
                 (Parameter.Armor,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 100f);
 
             yield return new AttributeEffect
@@ -24,7 +24,7 @@
 
             yield return new AttributeEffect
                 (Parameter.MaxHealth,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 10f);
         }
     }

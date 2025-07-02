@@ -8,11 +8,9 @@
 
     public class ModifierManager
     {
-        private readonly HashSet<object> _suppressed = [];
         // all modifiers from equipment, passive abilities etc.
         private readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
         // temporary modifiers from abilities, weapon effect etc.
-        // TODO: Separate this, because i will have temporary modifiers not only in battle
         private readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
         private readonly Dictionary<Parameter, List<IModifier>> _battleModifiers = [];
 
@@ -20,19 +18,7 @@
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> BattleModifiers => _battleModifiers;
 
-        public event Action<Parameter, List<IModifier>>? ParameterModifiersChanged;
-
-        public void SuppressSource(object source)
-        {
-            if (_suppressed.Add(source))
-                HandleParameters(source);
-        }
-
-        public void RemoveSuppression(object source)
-        {
-            if (_suppressed.Remove(source))
-                HandleParameters(source);
-        }
+        public event EventHandler<ModifiersChangedEventArgs>? ParameterModifiersChanged;
 
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
@@ -46,23 +32,28 @@
         public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
         public void RemoveBattleModifier(IModifier modifier) => RemoveFromCategory(_battleModifiers, modifier);
 
+        public void RemovePermanentModifierBySource(object source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
+        public void RemoveTemporaryModifierBySource(object source) => RemoveAllFromCategoryBySource(_temporaryModifiers, source);
+        public void RemoveBattleModifierBySource(object source) => RemoveAllFromCategoryBySource(_battleModifiers, source);
+
         public void RemoveAllTemporaryModifiers() => _temporaryModifiers.Clear();
         public void RemoveAllBattleModifiers() => _battleModifiers.Clear();
 
 
-        public List<IModifier> GetCombinedModifiers(Parameter parameter)
+        private List<IModifier> GetCombinedModifiers(Parameter parameter)
         {
             var modifiers = new List<IModifier>();
             if (_permanentModifiers.TryGetValue(parameter, out var permanent))
-                IgnoreSuppressedModifiers(modifiers, permanent);
+                modifiers.AddRange(permanent);
             if (_temporaryModifiers.TryGetValue(parameter, out var temp))
-                IgnoreSuppressedModifiers(modifiers, temp);
+                modifiers.AddRange(temp);
             if (_battleModifiers.TryGetValue(parameter, out var battle))
-                IgnoreSuppressedModifiers(modifiers, battle);
+                modifiers.AddRange(battle);
 
             return modifiers;
         }
-        public void RaiseEvent(Parameter parameter) => ParameterModifiersChanged?.Invoke(parameter, GetCombinedModifiers(parameter));
+
+        private void RaiseEvent(Parameter parameter) => ParameterModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(parameter, GetCombinedModifiers(parameter)));
 
         private void HandleParameters(object source)
         {
@@ -71,16 +62,6 @@
         }
 
         // adding multiple modifiers via foreach generate to many unnecessary calls
-
-        private void IgnoreSuppressedModifiers(List<IModifier> modifiers, List<IModifier> permanent)
-        {
-            foreach (var mod in permanent)
-            {
-                if (_suppressed.Contains(mod.Source))
-                    continue;
-                modifiers.Add(mod);
-            }
-        }
 
         private void UpdateModifier(Dictionary<Parameter, List<IModifier>> category, IModifier newModifier)
         {
@@ -111,10 +92,13 @@
                 list = [];
                 category[modifier.Parameter] = list;
             }
-            if (!list.Contains(modifier))
+
+            if (list.Contains(modifier))
             {
-                list.Add(modifier);
+                //TODO: Log
             }
+
+            list.Add(modifier);
 
             RaiseEvent(modifier.Parameter);
         }
@@ -133,6 +117,17 @@
             }
             RaiseEvent(modifier.Parameter);
         }
+
+        private void RemoveAllFromCategoryBySource(Dictionary<Parameter, List<IModifier>> category, object source)
+        {
+            foreach (var list in category)
+            {
+                if (list.Value.RemoveAll(x => x.Source == source) > 0) RaiseEvent(list.Key);
+            }
+        }
+
+        private IModifier? FindFirstModifierBySource(Dictionary<Parameter, List<IModifier>> collection, object source) => collection.Values.SelectMany(list => list).FirstOrDefault(modifier => modifier.Source == source);
+        private List<IModifier> FindAllModifiersBySource(Dictionary<Parameter, List<IModifier>> collection, object source) => [.. collection.Values.SelectMany(list => list).Where(modifier => modifier.Source == source)];
 
         private IEnumerable<Parameter> GetAffectedParameters(object source)
         {

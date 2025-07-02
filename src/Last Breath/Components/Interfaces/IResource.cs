@@ -5,18 +5,15 @@
 
     public interface IResource
     {
-        Parameter Parameter { get; }
-        ResourceType Type { get; }
+        ResourceType ResourceType { get; }
         float Current { get; }
         float MaximumAmount { get; }
-        float RecoveryAmount { get; set; }
+        float RecoveryAmount { get; }
 
         event Action<float>? CurrentChanges, MaximumChanges;
 
-        float GetBaseRecovery();
-        float GetBaseMaximumAmount();
         void OnSpend(int amount);
-        bool IsEnough(int amountToSpend);
-        void HandleRecoveryEvent(RecoveryEventContext context);
+        void Recover();
+        void OnParameterChanges(object? sender, ModifiersChangedEventArgs args);
     }
 }

@@ -15,7 +15,7 @@
 
         public void LoadData()
         {
-            // for correctly working i need to put jsons with data outside res:// folder (e.ge %APPDATA%/Godot/app_userdata/Game/Data)
+            // For it to work properly, I need to put the JSONs with the data outside the res:// folder.(e.ge %APPDATA%/Godot/app_userdata/Game/Data)
             var userDir = ProjectSettings.GlobalizePath("user://");
             var userDataPath = Path.Combine(userDir, "Data");
 

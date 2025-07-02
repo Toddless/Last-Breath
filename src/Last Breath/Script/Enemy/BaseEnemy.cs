@@ -1,12 +1,16 @@
 namespace Playground
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using Godot;
     using Playground.Components;
+    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
@@ -22,7 +26,6 @@ namespace Playground
         private HealthComponent? _enemyHealth;
         private DamageComponent? _enemyDamage;
         private DefenseComponent? _enemyDefense;
-        private ResourceComponent? _resourceManager;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false, _canMove;
@@ -32,14 +35,14 @@ namespace Playground
         private CollisionShape2D? _enemiesCollisionShape;
         private NavigationAgent2D? _navigationAgent2D;
         private CollisionShape2D? _areaCollisionShape;
-        private RandomNumberGenerator? _rnd;
+        private RandomNumberGenerator _rnd = new();
         private AnimatedSprite2D? _sprite;
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private AttributeType? _enemyAttributeType;
         private GlobalRarity _rarity;
         private EnemyType _enemyType;
-        private Stance _stance;
+        private IStance? _currentStance;
 
         #region UI
         private Node2D? _inventoryNode;
@@ -63,12 +66,6 @@ namespace Playground
             set => _canMove = value;
         }
 
-        public Stance Stance
-        {
-            get => _stance;
-            set => _stance = value;
-        }
-
         public NavigationAgent2D? NavigationAgent2D
         {
             get => _navigationAgent2D;
@@ -80,7 +77,6 @@ namespace Playground
             get => _area;
         }
 
-        [Inject]
         public RandomNumberGenerator? Rnd
         {
             get => _rnd;
@@ -129,9 +125,12 @@ namespace Playground
 
         public ModifierManager Modifiers => _modifierManager;
 
-        public ResourceComponent Resource => _resourceManager ??= new(_stance);
+        public IStance? CurrentStance => _currentStance;
 
-        public event Action<BaseEnemy>? InitializeFight;
+        int ICharacter.Initiative => Rnd.RandiRange(0, 15);
+
+        public event Action<ICharacter>? Dead, InitializeFight;
+        public event Action? AllAttacksFinished;
 
         #endregion
 
@@ -168,15 +167,10 @@ namespace Playground
             return null;
         }
 
-        public void OnTurnEnd()
-        {
-            Effects.UpdateEffects();
-            _resourceManager?.HandleResourceRecoveryEvent(new RecoveryEventContext(this, RecoveryEventType.OnTurnEnd));
-        }
 
         public void OnFightEnds()
         {
-            Effects.RemoveAllTemporaryEffects();
+            Effects.ClearAllTemporaryEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.RemoveAllTemporaryModifiers();
         }
@@ -192,7 +186,7 @@ namespace Playground
 
         protected void SpawnItems()
         {
-            _inventory?.AddItem(LootTable?.GetRandomItem());
+            // _inventory?.AddItem(LootTable?.GetRandomItem());
         }
 
         private void SetStats()
@@ -204,10 +198,9 @@ namespace Playground
             var points = SetAttributesDependsOnType(_enemyAttributeType);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 500, this));
+            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 500, this));
             SetAnimation();
-            _stance = SetStance(_enemyAttributeType);
-            _resourceManager?.SetCurrentResource(_stance);
+            _currentStance = SetStance(_enemyAttributeType);
         }
 
         private void SetEvents()
@@ -216,18 +209,24 @@ namespace Playground
             _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
             _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
+            _enemyHealth.EntityDead += OnEntityDead;
             _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
-        private Stance SetStance(AttributeType? enemyAttributeType)
+        private void OnEntityDead()
+        {
+            // some actions
+
+            // Notify this character dead
+            Dead?.Invoke(this);
+        }
+
+        private IStance SetStance(AttributeType? enemyAttributeType)
         {
             return enemyAttributeType switch
             {
-                Script.Enums.AttributeType.Dexterity => Stance.Dexterity,
-                Script.Enums.AttributeType.Strength => Stance.Strength,
-                Script.Enums.AttributeType.Intelligence => Stance.Intelligence,
-                _ => Stance.None
+                Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                _ => new StrengthStance(this),
             };
         }
 
@@ -278,7 +277,6 @@ namespace Playground
             {
                 Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
                 Script.Enums.AttributeType.Strength => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
@@ -289,7 +287,7 @@ namespace Playground
             {
                 1 => Script.Enums.AttributeType.Dexterity,
                 2 => Script.Enums.AttributeType.Strength
-              //  _ => Script.Enums.AttributeType.Intelligence,
+                //  _ => Script.Enums.AttributeType.Intelligence,
             };
         }
 
@@ -306,5 +304,60 @@ namespace Playground
         {
 
         }
+
+        public void OnTurnStart(Action action)
+        {
+            var handler = BattleHandler.Instance;
+            if (handler != null)
+            {
+                var target = handler.Fighters.FirstOrDefault(x => x is Player);
+                if (target == null)
+                {
+                    return;
+                }
+                CurrentStance?.OnAttack(target);
+            }
+            action.Invoke();
+        }
+
+        public void OnTurnEnd()
+        {
+            //Effects.UpdateEffects();
+        }
+
+        public void RerollInitiative()
+        {
+
+        }
+
+        public void OnReceiveAttack(AttackContext context)
+        {
+            if (_currentStance == null)
+            {
+
+                HandleSkills(context.PassiveSkills);
+                // TODO: Own method
+                var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, this);
+                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+
+                if (damageLeftAfterBarrierabsorption > 0)
+                {
+                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
+                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
+                }
+
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this));
+                return;
+            }
+            _currentStance.OnReceiveAttack(context);
+        }
+
+
+        private void HandleSkills(List<ISkill> passiveSkills)
+        {
+
+        }
+
+        public void AllAttacks() => AllAttacksFinished?.Invoke();
     }
 }

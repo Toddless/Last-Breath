@@ -7,7 +7,7 @@
     {
         public PrecisionEffect(int duration = 3, int stacks = 1, bool permanent = false) : base(effect: Effects.IncreasedAdditionalHit, duration, stacks, permanent)
         {
-            Modifier = new AdditionalHitModifier(ModifierType.Additive, 0.2f, this, ModifierPriorities.Buffs);
+            Modifier = new AdditionalHitModifier(ModifierType.Flat, 0.2f, this, ModifierPriorities.Buffs);
         }
     }
 }

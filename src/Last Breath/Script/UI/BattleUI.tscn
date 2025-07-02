@@ -49,20 +49,20 @@ _playerHealthBar = NodePath("MarginContainer/VBoxContainer/HBoxContainerHealthBa
 _enemyHealthBar = NodePath("MarginContainer/VBoxContainer/HBoxContainerHealthBars/EnemyHealth")
 _playerEffects = NodePath("MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects")
 _enemyEffects = NodePath("MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects")
-_dexterityStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Dexterity")
-_strengthStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Strength")
-_intelligenceStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Intelligence")
-_head = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Head")
-_body = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Body")
-_legs = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Legs")
+_dexterityStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Dexterity")
+_strengthStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Strength")
+_intelligenceStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Intelligence")
+_head = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Head")
+_body = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Body")
+_legs = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Legs")
 _playerResource = NodePath("MarginContainer/VBoxContainer/HBoxContainer/PlayerResource")
 _enemyResource = NodePath("MarginContainer/VBoxContainer/HBoxContainer/EnemyResource")
 _player = NodePath("MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Player")
 _enemy = NodePath("MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Enemy")
 _abilities = NodePath("MarginContainer/AbilityButtons")
-_attackButtons = NodePath("MarginContainer/AttackButtons")
-_stanceContainer = NodePath("MarginContainer/AttackButtons/VBoxContainerStance")
-_bodyContainer = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart")
+_attackButtons = NodePath("MarginContainer/Buttons")
+_stanceContainer = NodePath("MarginContainer/Buttons/VBoxContainerStance")
+_bodyContainer = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 clip_contents = true
@@ -201,19 +201,19 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 texture_normal = SubResource("PlaceholderTexture2D_2f6ns")
 
-[node name="AttackButtons" type="HBoxContainer" parent="MarginContainer"]
+[node name="Buttons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_constants/separation = 15
 
-[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
+[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/Buttons"]
 custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="Dexterity" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Dexterity" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
@@ -222,7 +222,7 @@ keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_ingfk")
 flip_h = true
 
-[node name="Strength" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Strength" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -231,7 +231,7 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Intelligence" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Intelligence" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -240,18 +240,18 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
+[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/Buttons"]
 custom_minimum_size = Vector2(0, 290)
 layout_mode = 2
 
-[node name="Head" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Head" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Body" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Body" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -259,7 +259,7 @@ size_flags_vertical = 6
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Legs" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Legs" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4

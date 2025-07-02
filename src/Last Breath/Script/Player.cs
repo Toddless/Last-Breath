@@ -2,17 +2,17 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Localization;
     using Playground.Resource.Quests;
     using Playground.Script;
-    using Playground.Script.Abilities;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem;
-    using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
     using Playground.Script.Inventory;
@@ -27,14 +27,12 @@
         private float _moveProgress = 0f;
         private int _exp, _gold;
         private ICharacter? _target;
-        private Stance _stance;
+        private IStance? _currentStance;
         private AnimatedSprite2D? _sprite;
         private Vector2 _targetPosition, _startPosition;
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
-        private Dictionary<Stance, List<IAbility>> _abilities = [];
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
-
-        private ResourceComponent? _resourceManager;
+        private DexterityStance? _dexStance;
         private DefenseComponent? _playerDefense;
         private EffectsManager? _effectsManager;
         private HealthComponent? _playerHealth;
@@ -42,6 +40,8 @@
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
+        private readonly List<IStance> _stances = [];
+        private RandomNumberGenerator _rnd = new();
         #endregion
 
         [Signal]
@@ -63,14 +63,14 @@
             set => _canFight = value;
         }
 
-        public Stance Stance
+        public IStance? CurrentStance
         {
-            get => _stance;
+            get => _currentStance;
             set
             {
-                if (ObservableProperty.SetProperty(ref _stance, value))
+                if (ObservableProperty.SetProperty(ref _currentStance, value))
                 {
-                    OnStanceChanges(value);
+
                 }
             }
         }
@@ -104,16 +104,19 @@
         public EffectsManager Effects => _effectsManager ??= new(this);
         public ModifierManager Modifiers => _modifierManager;
         // i think i need some ability component later, because i need a place where player can modifiy, learn or forget abilities
-        public Dictionary<Stance, List<IAbility>> Abilities => _abilities;
 
         // TODO: i need default resource
-        public ResourceComponent Resource => _resourceManager ??= new(_stance);
+        int ICharacter.Initiative => _rnd.RandiRange(0, 15);
         #endregion
 
         #region Events
         public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
         public event Action<EnemyKilledEventArgs>? EnemyKilled;
         public event Action<List<IAbility>>? SetAvailableAbilities;
+        public event Action<ICharacter>? Dead;
+        public event Action? AllAttacksFinished;
+
+        public Action? NextPhase;
         #endregion
 
         public override void _Ready()
@@ -127,37 +130,16 @@
             _equipInventory = new();
             _craftingInventory = new();
             _questItemsInventory = new();
+            _dexStance = new(this);
             LoadDialogues();
             SetEvents();
             GameManager.Instance!.Player = this;
             _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
             _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Additive, 600, this));
+            Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 600, this));
             _playerHealth.HealUpToMax();
-            _abilities.Add(Stance.Strength, [new TouchOfGod(this)]);
-            _abilities.Add(Stance.Dexterity, [new PrecisionStrike(this)]);
-        }
-
-        private void SetEvents()
-        {
-            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Resource.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
-            _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
-        }
-
-        private void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
-        {
-            switch (parameter)
-            {
-                case Parameter.Movespeed:
-                    Speed = Mathf.RoundToInt(Calculations.CalculateFloatValue(BaseSpeed, modifiers));
-                    break;
-                default:
-                    break;
-            }
+            _stances.Add(new DexterityStance(this));
+            _stances.Add(new StrengthStance(this));
         }
 
         public override void _PhysicsProcess(double delta)
@@ -216,6 +198,27 @@
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
+        public void SetDexterityStance()
+        {
+            var stance = _stances.FirstOrDefault(x => x is DexterityStance);
+            if (stance != null)
+            {
+                _currentStance = stance;
+            }
+        }
+
+        public void SetStrengthStance()
+        {
+            var stance = _stances.FirstOrDefault(x => x is StrengthStance);
+
+            if (stance != null)
+            {
+                _currentStance = stance;
+            }
+        }
+
+
+
         public void OnDialogueCompleted(string id)
         {
             Progress.OnDialogueCompleted(id);
@@ -232,43 +235,81 @@
         public void OnTurnEnd()
         {
             Effects.UpdateEffects();
-            _resourceManager?.HandleResourceRecoveryEvent(new RecoveryEventContext(this, RecoveryEventType.OnTurnEnd));
             UpdateAbilityCoodowns();
+        }
+
+        public void OnTurnStart(Action nextTurnPhase)
+        {
+            NextPhase = nextTurnPhase;
         }
 
         public void UpdateAbilityState()
         {
-            if (_stance == Stance.None) return;
             UpdateAbilityStates();
         }
 
         public void OnFightEnds()
         {
-            Effects.RemoveAllTemporaryEffects();
+            Effects.ClearAllTemporaryEffects();
             // TODO: on reset temporary i still might have some effects in effects manager
             Modifiers.RemoveAllTemporaryModifiers();
         }
 
+        public IEnumerable<AttackContext> OnAttack(ICharacter target)
+        {
+            //foreach (var item in _dexStance!.PerformAttack(target))
+            //{
+            //    yield return item;
+            //}
+            return [];
+        }
+
+        private void SetEvents()
+        {
+            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
+            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
+            _playerHealth.EntityDead += OnPlayerDead;
+            _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
+        }
+
+        private void OnPlayerDead()
+        {
+            // play death animation, call death screen
+        }
+
+        private void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        {
+            switch (args.Parameter)
+            {
+                case Parameter.Movespeed:
+                    Speed = Mathf.RoundToInt(Calculations.CalculateFloatValue(BaseSpeed, args.Modifiers));
+                    break;
+                default:
+                    break;
+            }
+        }
 
         private void UpdateTargetForCurrentSetOfAbilities(ICharacter value)
         {
-            if (_stance == Stance.None) return;
-            _abilities[_stance].ForEach(x => x.Target = value);
+            //_abilities[_currentStance].ForEach(x => x.Target = value);
         }
 
         private void UpdateAbilityStates()
         {
-            foreach (var abilityList in _abilities)
-            {
-                abilityList.Value.ForEach(x => x.UpdateState());
-            }
+            //foreach (var abilityList in _abilities)
+            //{
+            //    abilityList.Value.ForEach(x => x.UpdateState());
+            //}
         }
+
         private void UpdateAbilityCoodowns()
         {
-            foreach (var abilityList in _abilities)
-            {
-                abilityList.Value.ForEach(x => x.UpdateCooldown());
-            }
+            //foreach (var abilityList in _abilities)
+            //{
+            //    abilityList.Value.ForEach(x => x.UpdateCooldown());
+            //}
         }
 
         private void AcceptReward(Reward? reward)
@@ -285,12 +326,6 @@
             _gold += reward.Gold;
         }
 
-        private void OnStanceChanges(Stance value)
-        {
-            Resource.SetCurrentResource(value);
-            SetStanceBonuses(value);
-            SetAvailableAbilities?.Invoke(_abilities[value]);
-        }
 
         private void SetStanceBonuses(Stance value)
         {
@@ -320,5 +355,33 @@
         {
 
         }
+
+        public void OnReceiveAttack(AttackContext context)
+        {
+            if(_currentStance == null)
+            {
+                HandleSkills(context.PassiveSkills);
+                // TODO: Own method
+                var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, this);
+                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+
+                if (damageLeftAfterBarrierabsorption > 0)
+                {
+                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
+                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
+                }
+
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this));
+                return;
+            }
+            _currentStance.OnReceiveAttack(context);   
+        }
+
+        private void HandleSkills(List<ISkill> passiveSkills)
+        {
+
+        }
+
+        public void AllAttacks() => AllAttacksFinished?.Invoke();
     }
 }

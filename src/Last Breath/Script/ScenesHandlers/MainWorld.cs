@@ -56,10 +56,10 @@ namespace Playground
             InitializeEnemies();
         }
 
-        public void InitializingFight(BaseEnemy enemy)
+        public void InitializingFight(ICharacter enemy)
         {
             if (_isBattleActive) return;
-            InitializeFight?.Invoke(new BattleContext(enemy, GameManager.Instance.Player!));
+            InitializeFight?.Invoke(new BattleContext([enemy, GameManager.Instance.Player!]));
             _isBattleActive = true;
         }
 

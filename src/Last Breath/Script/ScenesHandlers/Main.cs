@@ -3,7 +3,6 @@
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.Items;
     using Playground.Script.NPC;
     using Playground.Script.UI;
     using Playground.Script.UI.Layers;
@@ -147,7 +146,6 @@
         private void StartFight(BattleContext context) => _managerUI?.OpenBattleUI(context);
         private void OpenMonologue(string firstNode) => _managerUI?.OpenMonologue(firstNode);
         private void OpenDialogue(BaseSpeakingNPC npc) => _managerUI?.OpenDialogue(npc);
-
         private void Unsubscribe()
         {
             if (_mainWorld == null) return;

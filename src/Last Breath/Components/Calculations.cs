@@ -10,11 +10,11 @@
 
     public class Calculations
     {
-        public static float CalculateFloatValue(float value, List<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
+        public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
-        public static float DamageAfterCrit(float damage, ICharacter attacker) => damage *= attacker.Damage.CriticalDamage;
+        public static float DamageAfterCrit(float damage, ICharacter target) => damage *= target.Damage.CriticalDamage;
 
-        public static float DamageAfterArmor(float damage, ICharacter defender) => Mathf.Max(0, damage * (1 - Mathf.Min(defender.Defense.Armor / 1000, defender.Defense.MaxReduceDamage)));
+        public static float DamageAfterArmor(float damage, ICharacter target) => Mathf.Max(0, damage * (1 - Mathf.Min(target.Defense.Armor / 1000, target.Defense.MaxReduceDamage)));
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
         {
@@ -23,7 +23,7 @@
             {
                 switch (group.Key)
                 {
-                    case ModifierType.Additive:
+                    case ModifierType.Flat:
                         value = ModifyValue(value, group);
                         break;
                     case ModifierType.Increase:
@@ -40,7 +40,7 @@
 
         private static float ModifyValue(float value, IGrouping<ModifierType, IModifier> modifiers)
         {
-            foreach (var modifier in modifiers.OrderBy(x => x.Priority))
+            foreach (var modifier in modifiers.OrderByDescending(x => x.Priority))
             {
                 value = modifier.ModifyValue(value);
             }

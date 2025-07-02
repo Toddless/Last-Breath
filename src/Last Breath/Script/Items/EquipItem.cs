@@ -43,7 +43,7 @@
 
         public override List<string> GetItemStatsAsStrings()
         {
-            List<string> list = [];
+            List<string> stats = [];
             foreach (var modifier in BaseModifiers)
             {
                 StringBuilder stringBuilder = new();
@@ -51,9 +51,9 @@
                 stringBuilder.Append(':');
                 stringBuilder.Append(' ');
                 stringBuilder.Append(modifier.Value);
-                list.Add(stringBuilder.ToString());
+                stats.Add(stringBuilder.ToString());
             }
-            return list;
+            return stats;
         }
 
         public virtual void UpgradeItemLevel() { }

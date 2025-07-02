@@ -21,19 +21,16 @@
         [Export] private HBoxContainer? _attackButtons;
         [Export] private VBoxContainer? _stanceContainer, _bodyContainer;
 
-
         public Action? Return;
 
         [Signal]
         public delegate void HeadButtonPressedEventHandler();
-
         [Signal]
         public delegate void DexterityStanceEventHandler();
         [Signal]
         public delegate void StrengthStanceEventHandler();
         [Signal]
         public delegate void IntelligenceStanceEventHandler();
-
         [Signal]
         public delegate void PlayerAreaPressedEventHandler();
         [Signal]
@@ -56,21 +53,17 @@
             _enemy!.Pressed += () => EmitSignal(SignalName.EnemyAreaPressed);
         }
 
-        // TODO: On stance change update Abilities
-        // TODO: Method to set abilities icons
 
         public void SetEnemyHealthBar(float current, float max)
         {
             _enemyHealthBar!.MaxValue = max;
             _enemyHealthBar.Value = current;
-            GD.Print($"Enemy hp set: {_enemyHealthBar!.Value}. Max health: {_enemyHealthBar.MaxValue}");
         }
 
         public void SetPlayerHealthBar(float current, float max)
         {
             _playerHealthBar!.MaxValue = max;
             _playerHealthBar.Value = current;
-            GD.Print($"Player hp set: {_playerHealthBar!.Value}. Max health: {_playerHealthBar.MaxValue}");
         }
 
         public void SetAbility(IAbility ability)
@@ -80,16 +73,26 @@
         }
 
         public void ClearAbilities() => _abilities?.UnbindAbilityButtons();
-        public void HideAttackButtons() => _attackButtons?.Hide();
-        public void ShowAttackButtons() => _attackButtons?.Show();
+        public void HideButtons()
+        {
+            _attackButtons?.Hide();
+            _returnButton?.Hide();
+        }
+        public void ShowButtons()
+        {
+            _attackButtons?.Show();
+            _returnButton?.Show();
+        }
         public void SetPlayerResource(ResourceType type, float current, float max) => _playerResource?.SetNewResource(type, current, max);
         public void SetEnemyResource(ResourceType type, float current, float max) => _enemyResource?.SetNewResource(type, current, max);
 
-        public void OnPlayerCurrenResourceChanges(float obj) => _playerResource!.Value = obj;
+        public void OnPlayerCurrenResourceChanges(float value) => _playerResource!.Value = value;
+        public void OnPlayerMaxResourceChanges(float value) => _playerResource!.MaxValue = value;
         public void OnPlayerCurrentHealthChanged(float newValue) => _playerHealthBar!.Value = newValue;
         public void OnPlayerMaxHealthChanged(float newValue) => _playerHealthBar!.MaxValue = newValue;
 
-        public void OnEnemyCurrentResourceChanges(float obj) => _enemyResource!.Value = obj;
+        public void OnEnemyCurrentResourceChanges(float value) => _enemyResource!.Value = value;
+        public void OnEnemyMaxResourceChanges(float value) => _enemyResource!.MaxValue = value;
         public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
         public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
 

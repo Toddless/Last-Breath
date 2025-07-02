@@ -2,8 +2,8 @@
 {
     public enum BattleResults
     {
-        EnemyWon,
         PlayerWon,
-        PlayerRunAway
+        PlayerDead,
+        PlayerEscaped
     }
 }

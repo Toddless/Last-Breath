@@ -9,22 +9,22 @@
         {
             yield return new AttributeEffect
                 (Parameter.EnergyBarrier,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 10);
 
             yield return new AttributeEffect
                 (Parameter.SpellDamage,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.2f);
 
             yield return new AttributeEffect
                 (Parameter.ResourceRecovery,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.1f);
 
             yield return new AttributeEffect
-                (Parameter.Resource,
-                ModifierType.Additive,
+                (Parameter.ResourceMax,
+                ModifierType.Flat,
                 0.1f);
         }
     }

@@ -37,7 +37,7 @@
 
         public virtual void Activate()
         {
-            _owner.Resource.CurrentResource.OnSpend(Cost);
+           // _owner.Resource.CurrentResource.OnSpend(Cost);
             Cooldown = _baseCooldown;
             AbilityUpdateState?.Invoke();
             var config = ConfigureEffects();
@@ -62,12 +62,12 @@
                 OnCooldown?.Invoke();
                 return false;
             }
-            if (_owner.Resource.CurrentResource.IsEnough(Cost))
-            {
-                // TODO: Give player info what is wrong
-                OnCost?.Invoke();
-                return false;
-            }
+            //if (_owner.Resource.CurrentResource.IsEnough(Cost))
+            //{
+            //    // TODO: Give player info what is wrong
+            //    OnCost?.Invoke();
+            //    return false;
+            //}
             if (ActivateOnlyOnCaster && Target != _owner)
             {
                 // TODO: Give player info what is wrong

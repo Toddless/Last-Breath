@@ -9,7 +9,7 @@
             : base(effect: Effects.None, duration, stacks, permanent)
         {
             // for 3 turns character have 99% chance to evade but only 1 health
-            Modifier = new EvadeModifier(ModifierType.Additive, 0.99f, this);
+            Modifier = new EvadeModifier(ModifierType.Flat, 0.99f, this);
         }
 
         public override void OnApply(ICharacter character)

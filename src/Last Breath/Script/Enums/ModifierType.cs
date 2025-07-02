@@ -6,7 +6,7 @@
         /// <summary>
         /// Raw value
         /// </summary>
-        Additive = 0,
+        Flat = 0,
         /// <summary>
         /// Value should be 0.1, 0.3 etc
         /// </summary>
