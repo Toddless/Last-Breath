@@ -1,10 +1,11 @@
 ﻿namespace Playground.Components
 {
     using System.Collections.Generic;
+    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
 
-    public class StanceActivationEffect
+    public class StanceActivationEffect : IStanceActivationEffect
     {
         private List<IModifier> _modifiers = [];
 

@@ -1,15 +1,12 @@
 ﻿namespace Playground.Components
 {
-    using Godot;
     using Playground.Script;
 
     public class StrengthStance : StanceBase
     {
-        private StanceActivationEffect _effect;
 
-        public StrengthStance(ICharacter owner) : base(owner, new Fury())
+        public StrengthStance(ICharacter owner) : base(owner, new Fury(), effect: new StanceActivationEffect())
         {
-            _effect = new();
         }
 
         protected override void PerformActionWhenAttackReceived(AttackContext context)
@@ -18,14 +15,8 @@
             OnAttack(context.Attacker);
         }
 
-        public override void OnActivate()
-        {
-            _effect.OnActivate(Owner);
-        }
+        public override void OnActivate() => ActivationEffect.OnActivate(Owner);
 
-        public override void OnDeactivate()
-        {
-            _effect.OnDeactivate(Owner);
-        }
+        public override void OnDeactivate() => ActivationEffect.OnDeactivate(Owner);
     }
 }

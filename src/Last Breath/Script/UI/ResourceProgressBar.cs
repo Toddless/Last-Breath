@@ -60,13 +60,6 @@
             };
         }
 
-        public override void _EnterTree()
-        {
-            TextureByResourceType.TryGetValue(ResourceType.Mana, out var texture);
-            _currentType = ResourceType.Mana;
-            TextureProgress = texture;
-        }
-
         private void UpdateTexture(ResourceType type)
         {
             if (TextureByResourceType.TryGetValue(type, out var texture))

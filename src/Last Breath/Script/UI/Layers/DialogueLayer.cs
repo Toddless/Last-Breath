@@ -4,6 +4,7 @@
     using System.Linq;
     using Godot;
     using Godot.Collections;
+    using Playground.Components;
     using Playground.Localization;
     using Playground.Resource;
     using Playground.Resource.Quests;
@@ -275,7 +276,7 @@
 
         private void OnQuitPressed()
         {
-            DialogueEnded?.Invoke();
+            UIEventBus.PublishClose();
             _player!.CanMove = true;
             _machine?.Fire(Trigger.Dialogue);
         }

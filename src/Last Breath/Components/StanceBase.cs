@@ -1,10 +1,10 @@
 ﻿namespace Playground.Components
 {
-    using Godot;
     using System;
-    using Playground.Script;
     using System.Collections.Generic;
+    using Godot;
     using Playground.Components.Interfaces;
+    using Playground.Script;
     using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem;
 
@@ -12,8 +12,8 @@
     {
         private ICharacter _owner;
         private IResource _resource;
+        private IStanceActivationEffect _effect;
         private RandomNumberGenerator _rnd;
-        private Dictionary<ICharacter, AttackContext?> _attackedTargets = [];
         private Queue<AttackContext> _attackQueue = [];
         private int _pendingAttacks = 0;
         private bool _canProceed = true;
@@ -22,7 +22,6 @@
         public IResource Resource
         {
             get => _resource;
-            private set => _resource = value;
         }
 
         protected bool CanProceed
@@ -38,6 +37,9 @@
                 CheckIfAllAttacksHandled();
             }
         }
+
+        protected IStanceActivationEffect ActivationEffect => _effect;
+
         protected int PendingAttacks
         {
             get => _pendingAttacks;
@@ -60,11 +62,12 @@
         protected ICharacter Owner { get => _owner; }
         protected RandomNumberGenerator Rnd { get => _rnd; }
 
-        protected StanceBase(ICharacter owner, IResource resource)
+        protected StanceBase(ICharacter owner, IResource resource, IStanceActivationEffect effect)
         {
             _owner = owner;
             _rnd = new();
             _resource = resource;
+            _effect = effect;
             SetEvents();
         }
 
@@ -77,9 +80,9 @@
 
         public abstract void OnActivate();
         public abstract void OnDeactivate();
-
         public virtual void OnAttack(ICharacter target)
         {
+            if (!CanAttack(target)) return;
             PendingAttacks++;
             AttackContext context = new(Owner, target);
 
@@ -103,81 +106,86 @@
 
             // why subscribe?
             // I need the results to help me decide what to do next
-            context.OnAttackResult += OnReceiveAttackResult;
-            CacheAttackedTarget(context, target);
+            context.OnAttackResult += OnAttackResult;
+            context.OnAttackCanceled += OnAttackCanceled;
             CombatScheduler.Instance?.Schedule(context);
-            //  target.OnReceiveAttack(context);
-            // Player has no stance yet.
             GD.Print($"{GetName()} Created attack context on: {target.GetType().Name}");
         }
 
-        private void CacheAttackedTarget(AttackContext context, ICharacter target)
-        {
-            if (_attackedTargets.TryGetValue(target, out var cont))
-            {
-                _attackedTargets[target] = context;
-            }
-            else
-            {
-                _attackedTargets.Add(target, context);
-            }
-        }
-
+      
         public virtual void OnReceiveAttack(AttackContext context)
         {
             if (CanProceed) HandleReceivedAttack(context);
-            else _attackQueue.Enqueue(context);
+            else
+            {
+                GD.Print("Added to attack queue");
+                _attackQueue.Enqueue(context);
+            }
         }
+
+        protected bool CanAttack(ICharacter target) => target.IsAlive || _owner.IsAlive;
 
         protected virtual void HandleReceivedAttack(AttackContext context)
         {
             CanProceed = false;
-            // This is just a basic example of how this implementation could work.
-
             // TODO: Own method
             if (IsEvade())
             {
-                // TODO: Some skills can ignore evasion.
-                context.PassiveSkills.Clear();
-                context.SetAttackResult(new AttackResult([], Playground.Script.Enums.AttackResults.Evaded, _owner));
-                // TODO: decide counter attack
+                HandleEvade(context);
                 CanProceed = true;
-                PerformActionWhenEvade(context);
-                GD.Print($"{GetName()} evaded attack");
                 return;
             }
 
-            // TODO: Own method
-            var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, Owner);
-            var damageLeftAfterBarrierabsorption = Owner.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+            float damageLeft = GetDamageLeftAfterBarrierAbsorbation(context);
 
-            if (damageLeftAfterBarrierabsorption > 0)
+            if (damageLeft > 0)
             {
-                Owner.Health.TakeDamage(damageLeftAfterBarrierabsorption);
-                GD.Print($"{GetName()} taked damage: {damageLeftAfterBarrierabsorption}");
+                Owner.Health.TakeDamage(damageLeft);
+                GD.Print($"{GetName()} taked damage: {damageLeft}");
             }
 
-            context.SetAttackResult(new AttackResult([], Playground.Script.Enums.AttackResults.Succeed, _owner));
+            context.SetAttackResult(new AttackResult([], Playground.Script.Enums.AttackResults.Succeed, _owner, context));
             PerformActionWhenAttackReceived(context);
             CanProceed = true;
+            GD.Print($"Attacks in queue: {_attackQueue.Count}");
+        }
+
+        private void HandleEvade(AttackContext context)
+        {
+            context.PassiveSkills.Clear();
+            context.SetAttackResult(new AttackResult([], Playground.Script.Enums.AttackResults.Evaded, _owner, context));
+            PerformActionWhenEvade(context);
+            GD.Print($"{GetName()} evaded attack");
+        }
+
+        private float GetDamageLeftAfterBarrierAbsorbation(AttackContext context)
+        {
+            var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, Owner);
+            var damageLeftAfterBarrierabsorption = Owner.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+            return damageLeftAfterBarrierabsorption;
         }
 
         private string GetName() => _owner.GetType().Name;
 
-        protected virtual void OnReceiveAttackResult(AttackResult result)
+        protected virtual void OnAttackResult(AttackResult result)
         {
-            // TODO: Queue 
             // i dont need this context anymore, unsubscribe
-            if (_attackedTargets.TryGetValue(result.Target, out var context) && context != null)
-            {
-                context.OnAttackResult -= OnReceiveAttackResult;
-                _attackedTargets[result.Target] = null;
-            }
-
+            Unsubscribe(result);
             // Handle skills, we getting from attacked target
             HandleSkills(result.PassiveSkills);
-
             // different reactions to attack results
+            HandleResult(result);
+            PendingAttacks--;
+        }
+
+        private void HandleResult(AttackResult result)
+        {
+            if (!result.Target.IsAlive)
+            {
+                GD.Print("Target is dead.");
+                return;
+            }
+
             switch (result.Result)
             {
                 case Playground.Script.Enums.AttackResults.Evaded:
@@ -192,8 +200,21 @@
                 default:
                     break;
             }
-            GD.Print($"Attack on: {result.Target.GetType().Name} was: {result.Result}");
+        }
+
+        private void OnAttackCanceled(AttackContext context)
+        {
+            GD.Print("Unsub from canceled attack");
+            context.OnAttackResult -= OnAttackResult;
+            context.OnAttackCanceled -= OnAttackCanceled;
             PendingAttacks--;
+        }
+
+
+        private void Unsubscribe(AttackResult result)
+        {
+            result.Context.OnAttackResult -= OnAttackResult;
+            result.Context.OnAttackCanceled -= OnAttackCanceled;
         }
 
         protected virtual void PerformActionWhenAttackReceived(AttackContext context)
@@ -205,7 +226,6 @@
         {
 
         }
-
 
         protected virtual void HandleSkills(List<ISkill> passiveSkills)
         {
@@ -227,33 +247,19 @@
             _resource.Recover();
         }
 
-        protected virtual void HandleAttackResult()
-        {
-
-        }
-
         protected bool IsCrit()
         {
-
             return Owner.Damage.IsCrit();
         }
 
         protected bool AdditionalAttack()
         {
-
-
             return Rnd.Randf() <= Owner.Damage.AdditionalHit;
         }
 
         protected bool IsEvade()
         {
             return Rnd.Randf() <= Owner.Defense.Evade;
-        }
-
-        protected float CalculateCriticalDamage(float baseDmg)
-        {
-            baseDmg = Calculations.DamageAfterCrit(baseDmg, Owner);
-            return baseDmg;
         }
     }
 }

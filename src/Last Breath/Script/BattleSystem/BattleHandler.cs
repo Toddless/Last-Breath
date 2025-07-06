@@ -19,12 +19,11 @@
         private StateMachine<State, Trigger>.TriggerWithParameters<BattleResults>? _battleEnds;
         private ICharacter? _currentAttacking;
         private List<ICharacter> _fighters = [];
-        private List<ICharacter> _alreadyDead = [];
         private Queue<ICharacter> _attackQueue = [];
         private CombatScheduler _combatScheduler;
-        public event Action<BattleResults>? BattleEnd;
 
-        public event Action? StartTurn, EndTurn;
+        public event Action<BattleResults>? BattleEnd;
+        public event Action? EnterStartPhase, ExitStartPhase;
 
         public IReadOnlyList<ICharacter> Fighters => _fighters;
         public static BattleHandler? Instance { get; private set; }
@@ -39,12 +38,10 @@
         public void Init(BattleContext context)
         {
             _fighters.AddRange(context.Fighters);
-            // TODO: Rework context
             foreach (var fighter in _fighters)
             {
                 if (fighter is Player player)
                 {
-                    // Handle player 
                     player.Dead += OnPlayerDead;
                     continue;
                 }
@@ -56,7 +53,7 @@
         public void BattleStart()
         {
             SetNextFighter();
-            _machine.Fire(Trigger.NextPhase);
+            NextPhase();
         }
 
         public void PlayerEscapedBattle()
@@ -66,12 +63,10 @@
 
         public void PlayerFailToEscapeBattle()
         {
-            if (_currentAttacking is Player p && _machine.State == State.TurnStartPhase) _machine.Fire(Trigger.NextPhase);
+            if (_currentAttacking is Player p && _machine.State == State.TurnStartPhase) NextPhase();
         }
 
-
         public Type? GetTypeOfCurrentAttacker() => _currentAttacking?.GetType();
-
 
         public void CleanBattleHandler()
         {
@@ -87,11 +82,7 @@
             }
             _attackQueue.Clear();
             _fighters.Clear();
-            _alreadyDead.Clear();
             _currentAttacking = null;
-            BattleEnd = null;
-            StartTurn = null;
-            EndTurn = null;
         }
 
 
@@ -100,21 +91,17 @@
             // Set current character at the end of an queue, if he still alive
             SetCurrentAttackerToEndOfQueue();
             SetNextFighter();
-            _machine.Fire(Trigger.NextPhase);
+            NextPhase();
         }
 
         private void SetCurrentAttackerToEndOfQueue()
         {
-            if (MakeSureFighterAlive(_currentAttacking!))
+            if (_currentAttacking != null && _currentAttacking.IsAlive)
             {
-                GD.Print($"Set to end of queue: {GetName()}");
-                _attackQueue.Enqueue(_currentAttacking!);
+                GD.Print($"Set to end of queue: {_currentAttacking.GetType().Name}");
+                _attackQueue.Enqueue(_currentAttacking);
             }
         }
-
-        private string GetName() => _currentAttacking?.GetType().Name ?? string.Empty;
-
-        private bool MakeSureFighterAlive(ICharacter fighter) => !_alreadyDead.Contains(fighter);
 
         private void SetNextFighter()
         {
@@ -122,10 +109,10 @@
             while (_attackQueue.Count > 1)
             {
                 var nextFighter = _attackQueue.Dequeue();
-                if (MakeSureFighterAlive(nextFighter))
+                if (nextFighter.IsAlive)
                 {
                     _currentAttacking = nextFighter;
-                    GD.Print($"Set next Fighter: {GetName()}");
+                    GD.Print($"Set next Fighter: {_currentAttacking.GetType().Name}");
                     return;
                 }
             }
@@ -148,62 +135,58 @@
         private void OnFighterDeath(ICharacter character)
         {
             CheckIfBattleShouldEnd();
-            _alreadyDead.Add(character);
         }
 
         private void OnPlayerDead(ICharacter character)
         {
             // Handle player dead
-            _alreadyDead.Add(character);
-
+            _combatScheduler.CancelQueue();
             _machine.Fire(_battleEnds, BattleResults.PlayerDead);
         }
 
         private void CheckIfBattleShouldEnd()
         {
-            GD.Print($"End Battle Check. Current Queue: {_attackQueue.Count}");
-            if (_attackQueue.Count < 2)
+            // <2 because it is still players turn, and enemies still in queue
+            if (_currentAttacking is Player && _attackQueue.Count < 2)
             {
-                var character = _attackQueue.Peek();
-                if (character is Player)
-                {
-                    _machine.Fire(_battleEnds, BattleResults.PlayerWon);
-                }
-                else
-                {
-                    _machine.Fire(_battleEnds, BattleResults.PlayerDead);
-                }
+                _combatScheduler.CancelQueue();
+                _machine.Fire(_battleEnds, BattleResults.PlayerWon);
+                GD.Print("Player won");
             }
+
         }
 
         private void EndBattle(BattleResults results)
         {
             BattleEnd?.Invoke(results);
+            _machine.Fire(Trigger.AwaitForBattle);
         }
+
+        private void OnAllAttacksFinished() => NextPhase();
 
         private void ConfigureStateMachine()
         {
             _battleEnds = _machine.SetTriggerParameters<BattleResults>(Trigger.EndBattle);
 
             _machine.Configure(State.AwaitingBattleToStart)
+                .OnEntry(() =>
+                {
+                    GD.Print("Awaiting for battle begins");
+                })
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
-            // Что происходит в начале хода
             _machine.Configure(State.TurnStartPhase)
                 .OnEntry(() =>
                 {
-                    StartTurn?.Invoke();
-                    // TODO: Make sure moving to next phase fast enough
-                    // (is it possible, that current attacking character perform his attack way to fast and battle handler subscribe to event to late?)
-                    GD.Print($"Start phase: {_currentAttacking.GetType().Name}");
+                    EnterStartPhase?.Invoke();
+                    GD.Print($"Start phase: {_currentAttacking?.GetType().Name}");
                     _currentAttacking?.OnTurnStart(NextPhase);
                 })
                 .OnExit(() =>
                 {
                     GD.Print("Exit start phase");
-
+                    ExitStartPhase?.Invoke();
                 })
-                .Permit(Trigger.EndBattle, State.EndBattle)
                 .Permit(Trigger.NextPhase, State.AttackingPhase);
 
             _machine.Configure(State.AttackingPhase)
@@ -225,16 +208,12 @@
             _machine.Configure(State.TurnEndPhase)
                  .OnEntry(() =>
                  {
-                     EndTurn?.Invoke();
                      _currentAttacking?.OnTurnEnd();
                      _machine.Fire(Trigger.NextPhase);
                      GD.Print($"End phase: {_currentAttacking.GetType().Name}");
                  })
-                 .Permit(Trigger.EndBattle, State.EndBattle)
                  .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
 
-
-            // TODO: Make sure current attacker is alive
             _machine.Configure(State.TurnTransitionPhase)
                 .OnEntry(() =>
                 {
@@ -244,10 +223,9 @@
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.EndBattle)
+                .Ignore(Trigger.NextPhase)
                 .OnEntryFrom(_battleEnds, EndBattle)
                 .Permit(Trigger.AwaitForBattle, State.AwaitingBattleToStart);
         }
-
-        private void OnAllAttacksFinished() => _machine.Fire(Trigger.NextPhase);
     }
 }

@@ -15,7 +15,9 @@
         public List<ISkill> PassiveSkills { get; set; } = [];
 
         public event Action<AttackResult>? OnAttackResult;
+        public event Action<AttackContext>? OnAttackCanceled;
 
         public void SetAttackResult(AttackResult result) => OnAttackResult?.Invoke(result);
+        public void AttackCanceled() => OnAttackCanceled?.Invoke(this);
     }
 }

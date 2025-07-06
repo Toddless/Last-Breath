@@ -8,7 +8,6 @@ namespace Playground
     using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem;
@@ -28,7 +27,7 @@ namespace Playground
         private DefenseComponent? _enemyDefense;
         #endregion
 
-        private bool _enemyFight = false, _playerEncounter = false, _canMove;
+        private bool _enemyFight = false, _playerEncounter = false, _canMove, _isAlive = true;
         private int _level;
         private string? _enemyId;
         private IBasedOnRarityLootTable? _lootTable;
@@ -129,6 +128,8 @@ namespace Playground
 
         int ICharacter.Initiative => Rnd.RandiRange(0, 15);
 
+        public bool IsAlive => _isAlive;
+
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
 
@@ -158,21 +159,6 @@ namespace Playground
             SetStats();
             // SpawnItems();
             Health?.HealUpToMax();
-
-            // TODO: enemies can be: regular, elite, mini-boss and boss
-        }
-
-        public IAbility? GetAbility()
-        {
-            return null;
-        }
-
-
-        public void OnFightEnds()
-        {
-            Effects.ClearAllTemporaryEffects();
-            // TODO: on reset temporary i still might have some effects in effects manager
-            Modifiers.RemoveAllTemporaryModifiers();
         }
 
         public void OnGettingKill()
@@ -215,10 +201,10 @@ namespace Playground
 
         private void OnEntityDead()
         {
-            // some actions
-
-            // Notify this character dead
+            CanFight = false;
+            _isAlive = false;
             Dead?.Invoke(this);
+            GD.Print($"Dead: {GetType().Name}");
         }
 
         private IStance SetStance(AttributeType? enemyAttributeType)
@@ -226,6 +212,7 @@ namespace Playground
             return enemyAttributeType switch
             {
                 Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
                 _ => new StrengthStance(this),
             };
         }
@@ -286,8 +273,8 @@ namespace Playground
             return index switch
             {
                 1 => Script.Enums.AttributeType.Dexterity,
-                2 => Script.Enums.AttributeType.Strength
-                //  _ => Script.Enums.AttributeType.Intelligence,
+                2 => Script.Enums.AttributeType.Strength,
+                _ => Script.Enums.AttributeType.Intelligence,
             };
         }
 
@@ -298,11 +285,6 @@ namespace Playground
             id.Append('_');
             id.Append(Fraction.ToString());
             return id.ToString();
-        }
-
-        public void OnAnimation()
-        {
-
         }
 
         public void OnTurnStart(Action action)
@@ -325,11 +307,6 @@ namespace Playground
             //Effects.UpdateEffects();
         }
 
-        public void RerollInitiative()
-        {
-
-        }
-
         public void OnReceiveAttack(AttackContext context)
         {
             if (_currentStance == null)
@@ -346,7 +323,7 @@ namespace Playground
                     GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
                 }
 
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this));
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this, context));
                 return;
             }
             _currentStance.OnReceiveAttack(context);

@@ -99,14 +99,12 @@
         public void OnDamageDealed(int damage, ICharacter target, bool crit)
         {
             // TODO: Remove this from here
-
             var floatingText = new FloatingText();
             var targetRect = target is Player ? _player.GetGlobalRect() : _enemy.GetGlobalRect();
             Vector2 globalPosition = new(targetRect.Position.X + targetRect.Size.X / 2, targetRect.Position.Y);
             Vector2 localPosition = GetGlobalTransform().AffineInverse() * globalPosition;
             floatingText.Position = localPosition;
-            this.AddChild(floatingText);
-
+            AddChild(floatingText);
             floatingText.ShowValue(damage.ToString(), new Vector2(0, -75), 1f, 5f, crit);
         }
     }

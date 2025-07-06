@@ -38,8 +38,8 @@
                 return;
             }
 
-            _battleHandler.StartTurn += OnTurnStart;
-            _battleHandler.EndTurn += OnTurnEnd;
+            _battleHandler.EnterStartPhase += OnEnterStartPhase;
+            _battleHandler.ExitStartPhase += OnExitStartPhase;
             _battleHandler.BattleEnd += OnBattleEnd;
             _battleUI.HeadButtonPressed += OnHeadButtonPressed;
             _battleUI.EnemyAreaPressed += OnEnemyAreaPressed;
@@ -52,15 +52,11 @@
 
         private void OnHeadButtonPressed()
         {
-            var target = _player.Target;
+            var target = _player?.Target;
             if (target is not Player && target != null)
             {
-                // При нажатии я вызвал метод атаки, проатаковал и закончил
-                // перейдя на некст фазу, когда атака уже завершена
-                // на этом моменте FSM входит в фазу проведения атак и никогда ее не покинет,
-                // поскольку атака завершена ДО момента подписки на эвент AllAttacksFinished атакующего
-                _player.CurrentStance?.OnAttack(target);
-                _player.NextPhase?.Invoke();
+                _player?.CurrentStance?.OnAttack(target);
+                _player?.NextPhase?.Invoke();
             }
         }
 
@@ -76,16 +72,21 @@
             _player.Target = _player;
         }
 
-        private void OnTurnEnd()
+        private void OnExitStartPhase()
         {
-            if (IsPlayerTurn())
-                _battleUI?.HideButtons();
+            _battleUI?.HideButtons();
         }
 
-        private void OnTurnStart()
+        private void OnEnterStartPhase()
         {
-            if (IsPlayerTurn())
+            if (!IsPlayerTurn())
+            {
+                _battleUI?.HideButtons();
+            }
+            else
+            {
                 _battleUI?.ShowButtons();
+            }
         }
 
         private bool IsPlayerTurn()
@@ -98,57 +99,47 @@
 
         private void OnBattleEnd(BattleResults results)
         {
-            var fighter = _battleHandler.Fighters.FirstOrDefault(x => x is not Player);
+            // TODO: Rework this. Later here will be multiple enemies
+            var fighter = _battleHandler?.Fighters.FirstOrDefault(x => x is not Player);
             if (fighter != null)
             {
                 UnsubscribeEnemyElements(fighter);
             }
-
-            _battleHandler.CleanBattleHandler();
+            UnsubscribePlayerElements(_player);
+            _battleHandler?.CleanBattleHandler();
+            CallDeferred(nameof(ReturnOnMainUI));
         }
 
-        private void SubscribeNewStance()
-        {
-            _player.CurrentStance!.CurrentResourceChanges += _battleUI!.OnPlayerCurrenResourceChanges;
-            _player.CurrentStance.MaximumResourceChanges += _battleUI.OnPlayerMaxResourceChanges;
-            _battleUI.SetPlayerResource(_player.CurrentStance.Resource.ResourceType, _player.CurrentStance.Resource.Current, _player.CurrentStance.Resource.MaximumAmount);
-        }
+        private void ReturnOnMainUI() => BattleEnds?.Invoke();
 
-        private void UnsubscribeOldStance()
-        {
-            // im sure we have some stance here
-            _player.CurrentStance!.CurrentResourceChanges -= _battleUI!.OnPlayerCurrenResourceChanges;
-            _player.CurrentStance.MaximumResourceChanges -= _battleUI.OnPlayerMaxResourceChanges;
-        }
+
 
         private void OnIntelligenceStance()
         {
-
+            HandleOldStance();
+            _player?.SetIntelligenceStance();
+            SubscribeNewPlayerStance();
         }
 
         private void OnStrengthStance()
         {
             HandleOldStance();
-
-            _player.SetStrengthStance();
-
-            SubscribeNewStance();
+            _player?.SetStrengthStance();
+            SubscribeNewPlayerStance();
         }
 
         private void OnDexterityStance()
         {
             HandleOldStance();
-
-            _player.SetDexterityStance();
-
-            SubscribeNewStance();
+            _player?.SetDexterityStance();
+            SubscribeNewPlayerStance();
         }
 
         private void HandleOldStance()
         {
             if (HaveAnyCurrentStance())
             {
-                UnsubscribeOldStance();
+                UnsubscribeOldPlayerStance();
             }
         }
 
@@ -172,7 +163,6 @@
             _player = GameManager.Instance.Player;
             // for test i have only one scenario, where we have player and one enemy
             // for multiple enemies i need another method and logic for UI
-            // Нужно разместить в UI так что бы гарантировать что персонажи корректно отпишутся от эвентов
             foreach (var fighter in context.Fighters)
             {
                 if (fighter is Player)
@@ -192,6 +182,32 @@
             enemy.CurrentStance.MaximumResourceChanges += _battleUI.OnEnemyMaxResourceChanges;
         }
 
+        private void SubscribePlayerElements(Player player)
+        {
+            _battleUI?.SetPlayerHealthBar(player.Health.CurrentHealth, player.Health.MaxHealth);
+            player.Health.CurrentHealthChanged += _battleUI.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged += _battleUI.OnPlayerMaxHealthChanged;
+        }
+
+        private void SubscribeNewPlayerStance()
+        {
+            if (_player != null)
+            {
+                _player.CurrentStance!.CurrentResourceChanges += _battleUI!.OnPlayerCurrenResourceChanges;
+                _player.CurrentStance.MaximumResourceChanges += _battleUI.OnPlayerMaxResourceChanges;
+                _battleUI.SetPlayerResource(_player.CurrentStance.Resource.ResourceType, _player.CurrentStance.Resource.Current, _player.CurrentStance.Resource.MaximumAmount);
+            }
+        }
+
+        private void UnsubscribeOldPlayerStance()
+        {
+            if (_player != null)
+            {
+                _player.CurrentStance!.CurrentResourceChanges -= _battleUI!.OnPlayerCurrenResourceChanges;
+                _player.CurrentStance.MaximumResourceChanges -= _battleUI.OnPlayerMaxResourceChanges;
+            }
+        }
+
         private void UnsubscribeEnemyElements(ICharacter enemy)
         {
             enemy.Health.CurrentHealthChanged -= _battleUI.OnEnemyCurrentHealthChanged;
@@ -200,11 +216,10 @@
             enemy.CurrentStance.MaximumResourceChanges -= _battleUI.OnEnemyMaxResourceChanges;
         }
 
-        private void SubscribePlayerElements(Player player)
+        private void UnsubscribePlayerElements(Player player)
         {
-            _battleUI?.SetPlayerHealthBar(player.Health.CurrentHealth, player.Health.MaxHealth);
-            player.Health.CurrentHealthChanged += _battleUI.OnPlayerCurrentHealthChanged;
-            player.Health.MaxHealthChanged += _battleUI.OnPlayerMaxHealthChanged;
+            player.Health.CurrentHealthChanged -= _battleUI.OnPlayerCurrentHealthChanged;
+            player.Health.MaxHealthChanged -= _battleUI.OnPlayerMaxHealthChanged;
         }
     }
 }

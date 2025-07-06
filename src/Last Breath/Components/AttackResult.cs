@@ -7,15 +7,17 @@
 
     public class AttackResult
     {
-        public List<ISkill> PassiveSkills { get; set; }
-        public AttackResults Result { get; set; }
-        public ICharacter Target { get; set; }
+        public List<ISkill> PassiveSkills { get; }
+        public AttackResults Result { get; }
+        public ICharacter Target { get; }
+        public AttackContext Context { get; }
 
-        public AttackResult(List<ISkill> skills, AttackResults result, ICharacter target)
+        public AttackResult(List<ISkill> skills, AttackResults result, ICharacter target, AttackContext context)
         {
             PassiveSkills = skills;
             Result = result;
             Target = target;
+            Context = context;
         }
     }
 }

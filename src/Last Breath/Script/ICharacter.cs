@@ -14,19 +14,15 @@
         public IStance? CurrentStance { get; }
         bool CanFight { get; set; }
         bool CanMove { get; set; }
+        bool IsAlive { get; }
         int Initiative { get; }
 
         event Action<ICharacter>? Dead;
         event Action? AllAttacksFinished;
+
         void OnTurnEnd();
         void OnTurnStart(Action nextTurnPhase);
-        void OnFightEnds();
-        void OnAnimation();
         void OnReceiveAttack(AttackContext context);
         void AllAttacks();
-        // TODO: Resources class
-        // i need 3 types, for each stance
-        // each of resource has its own way to recover
-        // but all of them should be recovered at the end of the turn
     }
 }
