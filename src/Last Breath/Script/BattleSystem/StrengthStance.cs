@@ -1,5 +1,6 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
+    using Playground.Components;
     using Playground.Script;
 
     public class StrengthStance : StanceBase

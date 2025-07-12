@@ -6,7 +6,6 @@ namespace Playground
     using System.Text;
     using Godot;
     using Playground.Components;
-    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Abilities.Skills;
@@ -170,6 +169,13 @@ namespace Playground
             Area?.Hide();
         }
 
+        public void TakeDamage(float damage)
+        {
+            // some actions like sound, animation etc.
+
+            Health.TakeDamage(damage);
+        }
+
         protected void SpawnItems()
         {
             // _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -314,7 +320,7 @@ namespace Playground
 
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, this);
+                var reducedByArmorDamage = Calculations.DamageAfterArmor(context, this);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)

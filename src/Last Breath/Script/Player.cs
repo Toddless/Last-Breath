@@ -36,6 +36,7 @@
         private EffectsManager? _effectsManager;
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
+        private ModuleDecoratorManager? _moduleDecoratorManager;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
@@ -130,6 +131,7 @@
             _equipInventory = new();
             _craftingInventory = new();
             _questItemsInventory = new();
+            _moduleDecoratorManager = new(this);
             LoadDialogues();
             SetEvents();
             GameManager.Instance.Player = this;
@@ -251,7 +253,7 @@
             {
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageAfterArmor(context.FinalDamage, this);
+                var reducedByArmorDamage = Calculations.DamageAfterArmor(context, this);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
@@ -268,7 +270,12 @@
 
         public void AllAttacks() => AllAttacksFinished?.Invoke();
 
-     
+        public void TakeDamage(float damage)
+        {
+            // some actions like sound, animation etc.
+
+            Health.TakeDamage(damage);
+        }
 
         private void OnPlayerDead()
         {
@@ -339,7 +346,9 @@
             _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             _playerHealth.EntityDead += OnPlayerDead;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
+            _moduleDecoratorManager.ModuleDecoratorChanges += ;
         }
+
 
         private void LoadDialogues()
         {
@@ -350,5 +359,6 @@
                 _dialogs.Add(item.Key, item.Value);
             }
         }
+
     }
 }

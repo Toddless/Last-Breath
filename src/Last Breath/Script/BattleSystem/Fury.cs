@@ -1,14 +1,16 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
-    public class Mana : BaseResource
+    using Playground.Components;
+
+    public class Fury : BaseResource
     {
         private const float BaseMaximumAmount = 6f;
         private const float BaseRecovery = 1f;
 
-        public Mana() : base
+        public Fury() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Script.Enums.ResourceType.Mana)
+            resourceType: Enums.ResourceType.Fury)
         {
             LoadData();
         }

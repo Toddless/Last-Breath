@@ -1,7 +1,6 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
     using System.Collections.Generic;
-    using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
 

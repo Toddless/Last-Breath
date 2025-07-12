@@ -2,7 +2,7 @@
 {
     using System;
     using Playground.Components;
-    using Playground.Components.Interfaces;
+    using Playground.Script.BattleSystem;
 
     public interface ICharacter
     {
@@ -23,6 +23,7 @@
         void OnTurnEnd();
         void OnTurnStart(Action nextTurnPhase);
         void OnReceiveAttack(AttackContext context);
+        void TakeDamage(float damage);
         void AllAttacks();
     }
 }

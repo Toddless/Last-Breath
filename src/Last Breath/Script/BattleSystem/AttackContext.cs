@@ -1,4 +1,4 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
     using System;
     using System.Collections.Generic;
@@ -10,6 +10,7 @@
         public ICharacter Attacker { get; } = attaker;
         public ICharacter Target { get; } = target;
         public float BaseDamage { get; set; }
+        public float CriticalDamageMultiplier { get; set; }
         public float FinalDamage { get; set; }
         public bool IsCritical { get; set; }
         public List<ISkill> PassiveSkills { get; set; } = [];
@@ -18,6 +19,6 @@
         public event Action<AttackContext>? OnAttackCanceled;
 
         public void SetAttackResult(AttackResult result) => OnAttackResult?.Invoke(result);
-        public void AttackCanceled() => OnAttackCanceled?.Invoke(this);
+        public void CancelAttack() => OnAttackCanceled?.Invoke(this);
     }
 }

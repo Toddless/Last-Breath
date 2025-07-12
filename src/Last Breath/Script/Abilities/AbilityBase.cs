@@ -48,7 +48,6 @@
 
         public void UpdateCooldown()
         {
-            if (Cooldown == 0) return;
             Cooldown--;
             AbilityUpdateState?.Invoke();
             GD.Print($"Cooldown reduced: {Cooldown} for ability {GetType().Name}");
@@ -62,12 +61,7 @@
                 OnCooldown?.Invoke();
                 return false;
             }
-            //if (_owner.Resource.CurrentResource.IsEnough(Cost))
-            //{
-            //    // TODO: Give player info what is wrong
-            //    OnCost?.Invoke();
-            //    return false;
-            //}
+           
             if (ActivateOnlyOnCaster && Target != _owner)
             {
                 // TODO: Give player info what is wrong

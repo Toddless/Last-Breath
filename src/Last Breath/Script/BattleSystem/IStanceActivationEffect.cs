@@ -1,4 +1,4 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace Playground.Script.BattleSystem
 {
     using Playground.Script;
 

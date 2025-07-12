@@ -7,8 +7,7 @@
 
     public abstract class BaseResource : IResource
     {
-        private readonly float _baseRecoveryAmount;
-        private readonly float _baseMaximumAmount;
+        private readonly float _baseRecoveryAmount, _baseMaximumAmount;
         private float _current, _maximum;
 
         protected BaseResource(float recoveryAmount, float maximumAmount, ResourceType resourceType)

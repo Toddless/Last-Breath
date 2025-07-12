@@ -2,7 +2,6 @@
 {
     using System.Linq;
     using Godot;
-    using Playground.Components;
     using Playground.Script.Helpers;
     using Playground.Script.NPC;
     using Playground.Script.UI;

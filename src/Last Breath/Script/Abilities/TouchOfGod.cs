@@ -20,6 +20,7 @@
         {
             SelfTarget = [new RegenerationEffect(), new GoliathEffect(stacks: 5)]
         };
+
         protected override void LoadData() => Icon = ResourceLoader.Load<Texture2D>(TextureUID);
     }
 }

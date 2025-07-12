@@ -1,5 +1,6 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
+    using Playground.Components;
     using Playground.Script;
 
     public class DexterityStance : StanceBase
@@ -11,6 +12,11 @@
         protected override void HandleAttackSucceed(ICharacter target)
         {
             base.HandleAttackSucceed(target);
+        }
+
+        protected override void PerformActionWhenAttackReceived(AttackContext context)
+        {
+            OnAttack(context.Attacker);
         }
 
         public override void OnActivate() => ActivationEffect.OnActivate(Owner);

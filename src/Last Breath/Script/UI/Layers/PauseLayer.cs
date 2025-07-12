@@ -1,7 +1,6 @@
 ﻿namespace Playground.Script.UI
 {
     using Godot;
-    using Playground.Components;
     using Playground.Script.Helpers;
     using Stateless;
 

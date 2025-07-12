@@ -136,8 +136,6 @@ namespace Playground.Components
             }
         }
 
-        public bool IsCrit() => _rnd.Randf() <= CriticalChance;
-
         public void AddOverrideFuncForParameter(Func<float, ModifiersChangedEventArgs, float> newFunc, Parameter parameter)
         {
             if (!_overrideCalculations.TryAdd(parameter, newFunc))

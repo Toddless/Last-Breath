@@ -11,7 +11,7 @@
                 stacks,
                 permanent)
         {
-            Modifier = new EvadeModifier(ModifierType.Multiplicative, 1.1f, this, ModifierPriorities.Debuffs);
+            Modifier = new EvadeModifier(ModifierType.Multiplicative, 0.9f, this, ModifierPriorities.Debuffs);
         }
     }
 }

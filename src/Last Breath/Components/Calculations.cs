@@ -6,15 +6,23 @@
     using Godot;
     using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
 
     public class Calculations
     {
         public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
-        public static float DamageAfterCrit(float damage, ICharacter target) => damage *= target.Damage.CriticalDamage;
+        public static float DamageAfterArmor(AttackContext context, ICharacter target)
+        {
+            var damage = context.BaseDamage;
+            if (context.IsCritical)
+            {
+                damage *= context.CriticalDamageMultiplier;
+            }
 
-        public static float DamageAfterArmor(float damage, ICharacter target) => Mathf.Max(0, damage * (1 - Mathf.Min(target.Defense.Armor / 1000, target.Defense.MaxReduceDamage)));
+            return Mathf.Max(0, damage * (1 - Mathf.Min(target.Defense.Armor / 1000, target.Defense.MaxReduceDamage)));
+        }
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
         {

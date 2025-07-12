@@ -4,12 +4,12 @@
     using System.Linq;
     using Godot;
     using Godot.Collections;
-    using Playground.Components;
     using Playground.Localization;
     using Playground.Resource;
     using Playground.Resource.Quests;
     using Playground.Script.NPC;
     using Playground.Script.QuestSystem;
+    using Playground.Script.UI;
     using Playground.Script.UI.View;
     using Stateless;
 

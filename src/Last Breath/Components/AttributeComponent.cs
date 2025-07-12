@@ -81,6 +81,5 @@
             _strength.AttributeChanged += UpdateModifiers;
             _intelligence.AttributeChanged += UpdateModifiers;
         }
-
     }
 }

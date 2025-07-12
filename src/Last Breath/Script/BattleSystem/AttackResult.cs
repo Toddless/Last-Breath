@@ -1,4 +1,4 @@
-﻿namespace Playground.Components
+﻿namespace Playground.Script.BattleSystem
 {
     using System.Collections.Generic;
     using Playground.Script;

@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Components;
 
     public class CombatScheduler
     {
@@ -57,7 +56,7 @@
                 var context = _attackQueue.First?.Value;
                 if (context == null) break;
                 _attackQueue.RemoveFirst();
-                context.AttackCanceled();
+                context.CancelAttack();
             }
             _canProceed = true;
         }

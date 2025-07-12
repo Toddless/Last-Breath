@@ -2,7 +2,7 @@
 {
     public enum Parameter
     {
-        Damage = 0,
+        Damage = 1,
         CriticalChance,
         MaxCriticalChance,
         CriticalDamage,
