@@ -9,18 +9,16 @@
         {
         }
 
-        protected override void HandleAttackSucceed(ICharacter target)
+        public override void OnActivate()
         {
-            base.HandleAttackSucceed(target);
+            base.OnActivate();
+            ActivationEffect.OnActivate(Owner);
         }
 
-        protected override void PerformActionWhenAttackReceived(AttackContext context)
+        public override void OnDeactivate()
         {
-            OnAttack(context.Attacker);
+            base.OnDeactivate();
+            ActivationEffect.OnDeactivate(Owner);
         }
-
-        public override void OnActivate() => ActivationEffect.OnActivate(Owner);
-
-        public override void OnDeactivate() => ActivationEffect.OnDeactivate(Owner);
     }
 }

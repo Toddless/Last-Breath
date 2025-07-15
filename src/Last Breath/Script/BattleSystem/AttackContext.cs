@@ -9,10 +9,15 @@
     {
         public ICharacter Attacker { get; } = attaker;
         public ICharacter Target { get; } = target;
-        public float BaseDamage { get; set; }
+        public float Damage { get; set; }
         public float CriticalDamageMultiplier { get; set; }
-        public float FinalDamage { get; set; }
+        public float Armor { get; set; }
+        public float MaxReduceDamage { get; set; }
+        public float FinalDamage {  get; set; }
         public bool IsCritical { get; set; }
+        public bool IgnoreEvade { get; set; }
+        public bool IgnoreArmor {  get; set; }
+        public bool IgnoreBarrier { get; set; }
         public List<ISkill> PassiveSkills { get; set; } = [];
 
         public event Action<AttackResult>? OnAttackResult;

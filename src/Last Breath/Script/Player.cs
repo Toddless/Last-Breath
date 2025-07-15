@@ -36,7 +36,7 @@
         private EffectsManager? _effectsManager;
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
-        private ModuleDecoratorManager? _moduleDecoratorManager;
+        private FloatModuleDecoratorManager? _moduleDecoratorManager;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
@@ -205,7 +205,10 @@
         {
             var stance = _stances.FirstOrDefault(x => x is DexterityStance);
             if (stance != null)
+            {
                 _currentStance = stance;
+                _currentStance.OnActivate();
+            }
         }
 
         public void SetStrengthStance()
@@ -213,14 +216,20 @@
             var stance = _stances.FirstOrDefault(x => x is StrengthStance);
 
             if (stance != null)
+            {
                 _currentStance = stance;
+                _currentStance.OnActivate();
+            }
         }
 
         public void SetIntelligenceStance()
         {
             var stance = _stances.FirstOrDefault(y => y is IntelligenceStance);
             if (stance != null)
+            {
                 _currentStance = stance;
+                _currentStance.OnActivate();
+            }
         }
 
         public void OnDialogueCompleted(string id)
@@ -253,7 +262,7 @@
             {
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageAfterArmor(context, this);
+                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
@@ -262,7 +271,7 @@
                     GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
                 }
 
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this, context));
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
                 return;
             }
             _currentStance.OnReceiveAttack(context);
@@ -346,7 +355,6 @@
             _modifierManager.ParameterModifiersChanged += OnParameterChanges;
             _playerHealth.EntityDead += OnPlayerDead;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
-            _moduleDecoratorManager.ModuleDecoratorChanges += ;
         }
 
 

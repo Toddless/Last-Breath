@@ -3,7 +3,7 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class BlockChanceModule : IModule
+    public class BlockChanceModule : IValueModule<float>
     {
         private RandomNumberGenerator _rnd = new();
         public ModuleParameter Parameter => ModuleParameter.BlockChance;

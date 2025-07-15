@@ -3,11 +3,8 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class LuckyCritDecoration : ModuleDecorator
+    public class LuckyCritDecoration(DecoratorPriority priority) : FloatModuleDecorator(moduleParameter: ModuleParameter.CritChance, priority)
     {
-        // The priority depends on where this decorator comes from.
-        public LuckyCritDecoration(DecoratorPriority priority) : base(moduleParameter: ModuleParameter.CritChance, priority) { }
-
         public override float GetValue()
         {
             // call base twice, because we need to get both values modified by another decorators

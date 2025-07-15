@@ -3,7 +3,7 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class EvadeChanceModule : IModule
+    public class EvadeChanceModule : IValueModule<float>
     {
         private readonly RandomNumberGenerator _rnd = new();
         public ModuleParameter Parameter => ModuleParameter.EvadeChance;

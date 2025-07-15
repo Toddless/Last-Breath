@@ -184,7 +184,6 @@
                 })
                 .OnExit(() =>
                 {
-                    GD.Print("Exit start phase");
                     ExitStartPhase?.Invoke();
                 })
                 .Permit(Trigger.NextPhase, State.AttackingPhase);
@@ -192,13 +191,11 @@
             _machine.Configure(State.AttackingPhase)
                 .OnEntry(() =>
                 {
-                    GD.Print("Enter attacking phase");
                     _combatScheduler.AllContexHandled += OnAllAttacksFinished;
                     _combatScheduler.RunQueue();
                 })
                 .OnExit(() =>
                 {
-                    GD.Print("Exit attacking phase");
                     _combatScheduler.AllContexHandled -= OnAllAttacksFinished;
                 })
                 .Permit(Trigger.EndBattle, State.EndBattle)

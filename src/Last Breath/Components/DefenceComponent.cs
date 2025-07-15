@@ -47,6 +47,7 @@
 
             float absorbed = Mathf.Min(EnergyBarrier, amount);
 
+            // TODO: Raise event
             EnergyBarrier -= absorbed;
 
             return amount - absorbed;

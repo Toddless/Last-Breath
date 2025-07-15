@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
@@ -13,15 +12,17 @@
     {
         public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
-        public static float DamageAfterArmor(AttackContext context, ICharacter target)
+        public static float DamageReduceByArmor(AttackContext context)
         {
-            var damage = context.BaseDamage;
+            var damage = context.Damage;
             if (context.IsCritical)
             {
                 damage *= context.CriticalDamageMultiplier;
             }
 
-            return Mathf.Max(0, damage * (1 - Mathf.Min(target.Defense.Armor / 1000, target.Defense.MaxReduceDamage)));
+            if(context.IgnoreArmor) return damage;
+
+            return Mathf.Max(0, damage * (1 - Mathf.Min(context.Armor / 1000, context.MaxReduceDamage)));
         }
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)

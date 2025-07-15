@@ -8,7 +8,16 @@
         {
         }
 
-        public override void OnActivate() => ActivationEffect.OnActivate(Owner);
-        public override void OnDeactivate() => ActivationEffect.OnDeactivate(Owner);
+        public override void OnActivate()
+        {
+            base.OnActivate();
+            ActivationEffect.OnActivate(Owner);
+        }
+
+        public override void OnDeactivate()
+        {
+            base.OnDeactivate();
+            ActivationEffect.OnDeactivate(Owner);
+        }
     }
 }

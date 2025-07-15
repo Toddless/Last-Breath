@@ -2,11 +2,11 @@
 {
     using Playground.Script.Enums;
 
-    public interface IModule
+    public interface IValueModule<T>
     {
         public ModuleParameter Parameter { get; }
         public DecoratorPriority Priority {  get; }
 
-        float GetValue();
+        T GetValue();
     }
 }

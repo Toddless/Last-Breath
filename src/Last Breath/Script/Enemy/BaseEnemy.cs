@@ -193,6 +193,7 @@ namespace Playground
             _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 500, this));
             SetAnimation();
             _currentStance = SetStance(_enemyAttributeType);
+            _currentStance.OnActivate();
         }
 
         private void SetEvents()
@@ -219,7 +220,8 @@ namespace Playground
             {
                 Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
                 Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                _ => new StrengthStance(this),
+                Script.Enums.AttributeType.Strength => new StrengthStance(this),
+                _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
             };
         }
 
@@ -320,7 +322,7 @@ namespace Playground
 
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageAfterArmor(context, this);
+                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
@@ -329,7 +331,7 @@ namespace Playground
                     GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
                 }
 
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, this, context));
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
                 return;
             }
             _currentStance.OnReceiveAttack(context);

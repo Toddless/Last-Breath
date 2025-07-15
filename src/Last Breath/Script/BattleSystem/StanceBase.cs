@@ -1,23 +1,25 @@
 ﻿namespace Playground.Script.BattleSystem
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Godot;
-    using Playground.Components;
-    using Playground.Components.Interfaces;
+    using System;
+    using System.Linq;
     using Playground.Script;
+    using Playground.Components;
+    using Playground.Script.Enums;
+    using System.Collections.Generic;
+    using Playground.Components.Interfaces;
     using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
 
     public abstract class StanceBase : IStance
     {
-        private Queue<AttackContext> _attackQueue = [];
+        private readonly Queue<AttackContext> _attackQueue = [];
         private int _pendingAttacks = 0;
         private bool _canProceed = true;
 
-        private Dictionary<ModuleParameter, IModule> _modules { get; set; } = [];
+        private Dictionary<ModuleParameter, IValueModule<float>> _floatModules { get; set; } = [];
+        private Dictionary<ActionModuleType, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
+
         protected bool CanProceed
         {
             get => _canProceed;
@@ -38,11 +40,14 @@
                 CheckIfAllAttacksHandled();
             }
         }
+        protected IValueModule<float> this[ModuleParameter parameter] => _floatModules[parameter];
+        protected IActionModule<ICharacter> this[ActionModuleType type] => _characterActionModules[type];
         protected IStanceActivationEffect ActivationEffect { get; }
         protected ICharacter Owner { get; }
-        protected IModule this[ModuleParameter parameter] => _modules[parameter];
-        protected ModuleDecoratorManager DecoratorManager { get; }
+
         public IResource Resource { get; }
+        public FloatModuleDecoratorManager FloatDecoratorManager { get; }
+        public ActionModuleDecoratorManager ActionDecoratorManager { get; }
 
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
@@ -51,18 +56,20 @@
             Owner = owner;
             Resource = resource;
             ActivationEffect = effect;
-            DecoratorManager = new(Owner);
+            FloatDecoratorManager = new(Owner);
+            ActionDecoratorManager = new(Owner);
+            SetModules();
         }
 
         public virtual void OnActivate()
         {
-            SetModules();
+            // TODO: Am i getting updated module befor subscription??
             SubscribeEvents();
         }
 
         public virtual void OnDeactivate()
         {
-            UnSubscribeEvents();
+            UnsubscribeEvents();
         }
 
         public virtual void OnAttack(ICharacter target)
@@ -72,7 +79,7 @@
 
             AttackContext context = new(Owner, target)
             {
-                BaseDamage = this[ModuleParameter.Damage].GetValue(),
+                Damage = this[ModuleParameter.Damage].GetValue(),
                 IsCritical = IsCrit(),
                 CriticalDamageMultiplier = this[ModuleParameter.CritDamage].GetValue(),
             };
@@ -85,7 +92,6 @@
             context.OnAttackResult += OnAttackResult;
             context.OnAttackCanceled += OnAttackCanceled;
             CombatScheduler.Instance?.Schedule(context);
-            GD.Print($"{GetName()} Created attack context on: {target.GetType().Name}");
         }
 
         public virtual void OnReceiveAttack(AttackContext context)
@@ -98,19 +104,25 @@
             }
         }
 
+        public bool IsChainAttack() => this[ModuleParameter.AdditionalAttackChance].GetValue() <= Owner.Damage.AdditionalHit;
+
         protected bool CanAttack(ICharacter target) => target.IsAlive && Owner.IsAlive;
 
         protected virtual void HandleReceivedAttack(AttackContext context)
         {
             CanProceed = false;
-            if (IsEvade())
+            if (!context.IgnoreEvade && IsEvade())
             {
-                HandleEvade(context);
+                HandleEvadeReceivedAttack(context);
                 CanProceed = true;
                 return;
             }
 
-            float damageLeft = GetDamageLeftAfterBarrierAbsorbation(context);
+            context.Armor = this[ModuleParameter.Armor].GetValue();
+            context.MaxReduceDamage = this[ModuleParameter.MaxReduceDamage].GetValue();
+            context.FinalDamage = Calculations.DamageReduceByArmor(context);
+
+            float damageLeft = DamageLeftAfterBarrierAbsorbation(context);
 
             if (damageLeft > 0)
             {
@@ -118,10 +130,10 @@
                 GD.Print($"{GetName()} taked damage: {damageLeft}");
             }
 
-            context.SetAttackResult(new AttackResult([], AttackResults.Succeed, Owner, context));
-            PerformActionWhenAttackReceived(context);
+            context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
             CanProceed = true;
         }
+
 
         protected virtual void OnAttackResult(AttackResult result)
         {
@@ -155,88 +167,52 @@
 
         }
 
-        protected virtual void HandleAttackBlocked(ICharacter target)
-        {
-
-        }
-
-        protected virtual void HandleAttackEvaded(ICharacter target)
-        {
-
-        }
-
-        protected virtual void HandleAttackSucceed(ICharacter target) => Resource.Recover();
-
-        protected bool IsCrit() => this[ModuleParameter.CritChance].GetValue() <= Owner.Damage.CriticalChance;
-
-        protected bool IsEvade() => this[ModuleParameter.EvadeChance].GetValue() <= Owner.Defense.Evade;
-
         protected virtual void SubscribeEvents()
         {
             Resource.CurrentChanges += OnCurrentResourceChanges;
             Resource.MaximumChanges += OnMaximumResourceChanges;
             Owner.Modifiers.ParameterModifiersChanged += Resource.OnParameterChanges;
-            DecoratorManager.ModuleDecoratorChanges += OnModuleDecoratorChanges;
+            FloatDecoratorManager.ModuleDecoratorChanges += OnFloatModuleDecoratorChanges;
+            ActionDecoratorManager.ModuleDecoratorChanges += OnCharacterActionModuleDecoratorChanges;
         }
 
-        private void SetModules()
-        {
-            _modules = Enum.GetValues<ModuleParameter>()
-                .ToDictionary(
-                param => param,
-                DecoratorManager.GetModule);
-        }
+        protected bool IsCrit() => this[ModuleParameter.CritChance].GetValue() <= Owner.Damage.CriticalChance;
+        protected bool IsEvade() => this[ModuleParameter.EvadeChance].GetValue() <= Owner.Defense.Evade;
 
-        private void UnSubscribeEvents()
-        {
-            Resource.CurrentChanges -= OnCurrentResourceChanges;
-            Resource.MaximumChanges -= OnMaximumResourceChanges;
-            Owner.Modifiers.ParameterModifiersChanged -= Resource.OnParameterChanges;
-            DecoratorManager.ModuleDecoratorChanges -= OnModuleDecoratorChanges;
-
-            foreach (var attack in _attackQueue)
-            {
-                attack.OnAttackResult -= OnAttackResult;
-                attack.OnAttackCanceled -= OnAttackCanceled;
-            }
-        }
-
-        private void OnModuleDecoratorChanges(ModuleParameter parameter, IModule module) => _modules[parameter] = module;
-        private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
-        private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
-
-        private void HandleEvade(AttackContext context)
+        private void HandleEvadeReceivedAttack(AttackContext context)
         {
             context.PassiveSkills.Clear();
-            context.SetAttackResult(new AttackResult([], AttackResults.Evaded, Owner, context));
-            PerformActionWhenEvade(context);
+            context.SetAttackResult(new AttackResult([], AttackResults.Evaded, context));
             GD.Print($"{GetName()} evaded attack");
         }
 
-        // TODO: Remove this from here 
-        private float GetDamageLeftAfterBarrierAbsorbation(AttackContext context)
+        private float DamageLeftAfterBarrierAbsorbation(AttackContext context)
         {
-            var reducedByArmorDamage = Calculations.DamageAfterArmor(context, Owner);
-            // Move this to ICHaracter method instead DefenceComponent method??
-            var damageLeftAfterBarrierabsorption = Owner.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
-            return damageLeftAfterBarrierabsorption;
+            // TODO: module?
+            if (context.IgnoreBarrier) return context.FinalDamage;
+            return Owner.Defense.BarrierAbsorbDamage(context.FinalDamage);
+        }
+
+        private void CheckIfAllAttacksHandled()
+        {
+            if (CanProceed && PendingAttacks == 0 && _attackQueue.Count == 0)
+                Owner.AllAttacks();
         }
 
         private void HandleResult(AttackResult result)
         {
-            if (!result.Target.IsAlive)
-                return;
+            var target = result.Context.Target;
 
             switch (result.Result)
             {
                 case AttackResults.Evaded:
-                    HandleAttackEvaded(result.Target);
+                    this[ActionModuleType.EvadeAction].PerformModuleAction(target);
                     break;
                 case AttackResults.Blocked:
-                    HandleAttackBlocked(result.Target);
+                    this[ActionModuleType.BlockAction].PerformModuleAction(target);
                     break;
                 case AttackResults.Succeed:
-                    HandleAttackSucceed(result.Target);
+                    this[ActionModuleType.SucceedAction].PerformModuleAction(target);
                     break;
                 default:
                     break;
@@ -265,10 +241,29 @@
             result.Context.OnAttackCanceled -= OnAttackCanceled;
         }
 
-        private void CheckIfAllAttacksHandled()
+        private void UnsubscribeEvents()
         {
-            if (CanProceed && PendingAttacks == 0 && _attackQueue.Count == 0)
-                Owner.AllAttacks();
+            Resource.CurrentChanges -= OnCurrentResourceChanges;
+            Resource.MaximumChanges -= OnMaximumResourceChanges;
+            Owner.Modifiers.ParameterModifiersChanged -= Resource.OnParameterChanges;
+            FloatDecoratorManager.ModuleDecoratorChanges -= OnFloatModuleDecoratorChanges;
+            ActionDecoratorManager.ModuleDecoratorChanges -= OnCharacterActionModuleDecoratorChanges;
+
+            foreach (var attack in _attackQueue)
+            {
+                attack.OnAttackResult -= OnAttackResult;
+                attack.OnAttackCanceled -= OnAttackCanceled;
+            }
+        }
+
+        private void OnFloatModuleDecoratorChanges(ModuleParameter parameter, IValueModule<float> module) => _floatModules[parameter] = module;
+        private void OnCharacterActionModuleDecoratorChanges(ActionModuleType type, IActionModule<ICharacter> module) => _characterActionModules[type] = module;
+        private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
+        private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
+        private void SetModules()
+        {
+            _floatModules = Enum.GetValues<ModuleParameter>().ToDictionary(param => param, FloatDecoratorManager.GetModule);
+            _characterActionModules = Enum.GetValues<ActionModuleType>().ToDictionary(param => param, ActionDecoratorManager.GetModule);
         }
     }
 }

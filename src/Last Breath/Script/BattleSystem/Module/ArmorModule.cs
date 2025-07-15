@@ -2,18 +2,18 @@
 {
     using Playground.Script.Enums;
 
-    public class DamageModule : IValueModule<float>
+    public class ArmorModule : IValueModule<float>
     {
         private readonly ICharacter _owner;
-        public ModuleParameter Parameter => ModuleParameter.Damage;
+        public ModuleParameter Parameter => ModuleParameter.Armor;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public DamageModule(ICharacter owner)
+        public ArmorModule(ICharacter owner)
         {
             _owner = owner;
         }
 
-        public float GetValue() => _owner.Damage.Damage;
+        public float GetValue() => _owner.Defense.Armor;
     }
 }

@@ -2,7 +2,7 @@
 {
     using Playground.Script.Enums;
 
-    public class CritDamageModule : IModule
+    public class CritDamageModule : IValueModule<float>
     {
         private ICharacter _owner;
         public ModuleParameter Parameter => ModuleParameter.CritDamage;

@@ -8,5 +8,7 @@
         AdditionalAttackChance,
         CritDamage,
         Damage,
+        Armor,
+        MaxReduceDamage,
     }
 }

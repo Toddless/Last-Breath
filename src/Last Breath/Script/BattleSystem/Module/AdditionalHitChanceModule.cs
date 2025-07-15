@@ -3,7 +3,7 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class AdditionalHitChanceModule : IModule
+    public class AdditionalHitChanceModule : IValueModule<float>
     {
         private readonly RandomNumberGenerator _rnd = new();
         public ModuleParameter Parameter => ModuleParameter.AdditionalAttackChance;
