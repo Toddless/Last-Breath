@@ -6,6 +6,7 @@
     public class TouchOfGod : AbilityBase
     {
         private const string TextureUID = "uid://drp7ikoc6v028";
+
         public TouchOfGod(ICharacter owner)
             : base(owner,
                 cooldown: 6,

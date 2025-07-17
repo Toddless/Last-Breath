@@ -1,7 +1,7 @@
 ﻿namespace Playground.Script.BattleSystem
 {
     using System.Collections.Generic;
-    using Playground.Script.Abilities.Skills;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Enums;
 
     public class AttackResult

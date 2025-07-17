@@ -15,7 +15,6 @@
     using Playground.Script.QuestSystem;
     using Playground.Script.BattleSystem;
     using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Skills;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Abilities.Interfaces;
 
@@ -260,7 +259,7 @@
         {
             if (_currentStance == null)
             {
-                HandleSkills(context.PassiveSkills);
+              //  HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);

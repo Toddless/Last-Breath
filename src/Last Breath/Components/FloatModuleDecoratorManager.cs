@@ -11,6 +11,7 @@
     public class FloatModuleDecoratorManager
     {
         private readonly Dictionary<ModuleParameter, List<FloatModuleDecorator>> _moduleDecorators;
+        private readonly Dictionary<ModuleParameter, IValueModule<float>> _cache = [];
         private readonly AdditionalHitChanceModule _additionalHitChanceModule;
         private readonly BlockChanceModule _blockChanceModule;
         private readonly EvadeChanceModule _evadeChanceModule;
@@ -40,14 +41,16 @@
 
         public IValueModule<float> GetModule(ModuleParameter parameter)
         {
-            var tmpModule = GetBaseModule(parameter);
+            if(_cache.TryGetValue(parameter, out var value)) return value;
 
+            var tmpModule = GetBaseModule(parameter);
             // Strong decorators should be placed at the end of a chain.
             foreach (var module in _moduleDecorators[parameter])
             {
                 module.ChainModule(tmpModule);
                 tmpModule = module;
             }
+            _cache[parameter] = tmpModule;
             return tmpModule;
         }
 
@@ -99,7 +102,11 @@
             };
         }
 
-        private void RaiseModuleDecoratorChanges(ModuleParameter parameter) => ModuleDecoratorChanges?.Invoke(parameter, GetModule(parameter));
+        private void RaiseModuleDecoratorChanges(ModuleParameter parameter)
+        {
+            _cache.Remove(parameter);
+            ModuleDecoratorChanges?.Invoke(parameter, GetModule(parameter));
+        }
         private static bool AlreadyHaveThisTypeOfDecorator(IEnumerable<FloatModuleDecorator> decorators, FloatModuleDecorator decorator) => decorators.Any(x => x.GetType() == decorator.GetType());
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace Playground.Components
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Playground.Script;
-    using Playground.Script.BattleSystem.Decorators;
-    using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
+    using System.Collections.Generic;
+    using Playground.Script.BattleSystem.Module;
+    using Playground.Script.BattleSystem.Decorators;
 
     public class ActionModuleDecoratorManager 
     {

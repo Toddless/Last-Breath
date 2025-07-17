@@ -8,8 +8,8 @@
     using Playground.Script.Enums;
     using System.Collections.Generic;
     using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Skills;
     using Playground.Script.BattleSystem.Module;
+    using Playground.Script.Abilities.Interfaces;
 
     public abstract class StanceBase : IStance
     {
@@ -65,11 +65,13 @@
         {
             // TODO: Am i getting updated module befor subscription??
             SubscribeEvents();
+            ActivationEffect.OnActivate(Owner);
         }
 
         public virtual void OnDeactivate()
         {
             UnsubscribeEvents();
+            ActivationEffect.OnDeactivate(Owner);
         }
 
         public virtual void OnAttack(ICharacter target)

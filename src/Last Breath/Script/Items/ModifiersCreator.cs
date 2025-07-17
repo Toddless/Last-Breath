@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
     using Playground.Script.Items.ItemData;
 
     public class ModifiersCreator
@@ -95,7 +96,7 @@
                 Parameter.Damage => new DamageModifier(modifierType, value, source, priority),
                 Parameter.MaxHealth => new MaxHealthModifier(modifierType, value, source, priority),
                 Parameter.CriticalChance => new CriticalChanceModifier(modifierType, value, source, priority),
-                _ => new MaxHealthModifier(ModifierType.Flat, 0.1f, source, priority),
+                _ => throw new ArgumentOutOfRangeException(nameof(modifierType)),
             };
         }
     }

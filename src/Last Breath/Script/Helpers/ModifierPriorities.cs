@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Enums
+﻿namespace Playground.Script.Helpers
 {
     public static class ModifierPriorities
     {
