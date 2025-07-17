@@ -144,3 +144,5 @@ paket-files/
 /src/Last Breath/NewFolder/TestAbility.cs
 /src/Last Breath/Components/MessageBus.cs
 /src/Last Breath/Properties/launchSettings.json
+/src/Last Breath/Script/Abilities/Skills/Piercing.cs
+/src/Last Breath/Script/StateMachine/EnemyMoves.cs
