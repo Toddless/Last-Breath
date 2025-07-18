@@ -7,6 +7,7 @@ namespace Playground
     using Godot;
     using Playground.Components;
     using Playground.Script;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.BattleSystem;
     using Playground.Script.Enemy;
@@ -23,6 +24,7 @@ namespace Playground
         private HealthComponent? _enemyHealth;
         private DamageComponent? _enemyDamage;
         private DefenseComponent? _enemyDefense;
+        private SkillsComponent? _enemySkills;
         #endregion
 
         private bool _enemyFight = false, _playerEncounter = false, _canMove, _isAlive = true;
@@ -128,6 +130,8 @@ namespace Playground
 
         public bool IsAlive => _isAlive;
 
+        public SkillsComponent Skills => _enemySkills ??= new(this);
+
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
 
@@ -138,6 +142,7 @@ namespace Playground
             _effectsManager = new(this);
             _enemyHealth = new();
             _enemyDefense = new();
+            _enemySkills = new(this);
             // later i need strategy for enemies
             _enemyDamage = new(new UnarmedDamageStrategy());
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");

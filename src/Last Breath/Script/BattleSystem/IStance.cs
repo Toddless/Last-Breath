@@ -4,13 +4,16 @@
     using System;
     using Playground.Script;
     using Playground.Components;
+    using Playground.Script.Enums;
+    using Playground.Script.BattleSystem.Module;
+    using Playground.Script.BattleSystem.Decorators;
 
     public interface IStance
     {
         IResource Resource { get; }
-        StatModuleDecoratorManager StatDecoratorManager { get; }
-        ActionModuleDecoratorManager ActionDecoratorManager { get; }
-        SkillModuleDecoratorManager SkillDecoratorManager { get; }
+        ModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
+        ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
+        ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
         void OnAttack(ICharacter target);

@@ -5,11 +5,11 @@
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
 
-    public abstract class SkillModuleDecorator(SkillModule type, DecoratorPriority priority) : ISkillModule
+    public abstract class SkillModuleDecorator(SkillType type, DecoratorPriority priority) : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {
         private ISkillModule? _module;
 
-        public SkillModule ModuleType { get; } = type;
+        public SkillType Type { get; } = type;
 
         public DecoratorPriority Priority { get; } = priority;
 

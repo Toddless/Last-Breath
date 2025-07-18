@@ -2,10 +2,12 @@
 {
     using Playground.Script.Enums;
 
-    public interface IModuleDecorator<TModule>
+    public interface IModuleDecorator<TKey, TModule>
+        where TKey : notnull
     {
+        TKey Type { get; }
         DecoratorPriority Priority { get; }
 
-        void ChainModule(TModule module);
+        void ChainModule(TModule inner);
     }
 }

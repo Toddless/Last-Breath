@@ -8,6 +8,7 @@
     using Playground.Components.Interfaces;
     using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.BattleSystem.Decorators;
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
 
@@ -18,15 +19,13 @@
         private bool _canProceed = true;
 
         private Dictionary<StatModule, IStatModule> _statModules { get; set; } = [];
-        private Dictionary<SkillModule, ISkillModule> _skillModules { get; set; } = [];
+        private Dictionary<SkillType, ISkillModule> _skillModules { get; set; } = [];
         private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
 
         protected IStatModule this[StatModule type] => _statModules[type];
-        protected ISkillModule this[SkillModule type] => _skillModules[type];
+        protected ISkillModule this[SkillType type] => _skillModules[type];
         protected IActionModule<ICharacter> this[ActionModule type] => _characterActionModules[type];
-        public StatModuleDecoratorManager StatDecoratorManager { get; }
-        public ActionModuleDecoratorManager ActionDecoratorManager { get; }
-        public SkillModuleDecoratorManager SkillDecoratorManager { get; }
+
         protected IStanceActivationEffect ActivationEffect { get; }
         protected ICharacter Owner { get; }
         protected bool CanProceed
@@ -51,6 +50,11 @@
         }
 
         public IResource Resource { get; }
+        public ModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
+
+        public ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
+
+        public ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
@@ -59,9 +63,30 @@
             Owner = owner;
             Resource = resource;
             ActivationEffect = effect;
-            StatDecoratorManager = new(Owner);
-            ActionDecoratorManager = new(Owner);
-            SkillDecoratorManager = new(Owner);
+            // TODO: Rework this part later.
+            StatDecoratorManager = new(new Dictionary<StatModule, IStatModule>
+            {
+                [StatModule.AdditionalAttackChance] = new AdditionalHitChanceModule(),
+                [StatModule.BlockChance] = new BlockChanceModule(),
+                [StatModule.CritChance] = new CritChanceModule(),
+                [StatModule.EvadeChance] = new EvadeChanceModule(),
+                [StatModule.Damage] = new DamageModule(Owner),
+                [StatModule.Armor] = new ArmorModule(Owner),
+                [StatModule.MaxReduceDamage] = new MaxReduceDamageModule(Owner),
+                [StatModule.CritDamage] = new CritDamageModule(Owner),
+            });
+            ActionDecoratorManager = new(new Dictionary<ActionModule, IActionModule<ICharacter>>
+            {
+                [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
+                [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
+                [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
+            });
+            SkillDecoratorManager = new(new Dictionary<SkillType, ISkillModule>
+            {
+                [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
+                [SkillType.OnAttack] = new OnAttackSkillModule(Owner),
+                [SkillType.AlwaysActive] = new AlwaysActiveSkillModule(Owner),
+            });
             SetModules();
         }
 
@@ -88,7 +113,7 @@
                 Damage = this[StatModule.Damage].GetValue(),
                 IsCritical = IsCrit(),
                 CriticalDamageMultiplier = this[StatModule.CritDamage].GetValue(),
-                PassiveSkills = this[SkillModule.OnAttack].GetSkills(),
+                PassiveSkills = this[SkillType.OnAttack].GetSkills(),
             };
 
             // create list with skills applied on attack
@@ -156,7 +181,7 @@
 
         protected void ApplyPreAttackSkills(AttackContext context)
         {
-            var skills = this[SkillModule.PreAttack].GetSkills();
+            var skills = this[SkillType.PreAttack].GetSkills();
 
             foreach (var skill in skills.OfType<IPreAttackSkill>())
             {
@@ -270,14 +295,14 @@
 
         private void OnStatModuleDecoratorChanges(StatModule parameter, IStatModule module) => _statModules[parameter] = module;
         private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<ICharacter> module) => _characterActionModules[type] = module;
-        private void OnSkillModuleDecoratorChanges(SkillModule type, ISkillModule module) => _skillModules[type] = module;
+        private void OnSkillModuleDecoratorChanges(SkillType type, ISkillModule module) => _skillModules[type] = module;
         private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
         private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
         private void SetModules()
         {
             _statModules = Enum.GetValues<StatModule>().ToDictionary(param => param, StatDecoratorManager.GetModule);
             _characterActionModules = Enum.GetValues<ActionModule>().ToDictionary(param => param, ActionDecoratorManager.GetModule);
-            _skillModules = Enum.GetValues<SkillModule>().ToDictionary(param => param, SkillDecoratorManager.GetModule);
+            _skillModules = Enum.GetValues<SkillType>().ToDictionary(param => param, SkillDecoratorManager.GetModule);
         }
     }
 }

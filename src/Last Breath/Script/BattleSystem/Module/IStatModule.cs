@@ -4,7 +4,7 @@
 
     public interface IStatModule
     {
-        StatModule ModuleType { get; }
+        StatModule Type { get; }
         DecoratorPriority Priority { get; }
 
         float GetValue();

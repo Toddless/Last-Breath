@@ -6,7 +6,7 @@
     public class BlockChanceModule : IStatModule
     {
         private RandomNumberGenerator _rnd = new();
-        public StatModule ModuleType => StatModule.BlockChance;
+        public StatModule Type => StatModule.BlockChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

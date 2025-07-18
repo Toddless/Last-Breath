@@ -4,7 +4,7 @@
 
     public interface IActionModule<T>
     {
-        ActionModule ModuleType { get; }
+        ActionModule Type { get; }
         DecoratorPriority Priority { get; }
 
         void PerformModuleAction(T parameter);

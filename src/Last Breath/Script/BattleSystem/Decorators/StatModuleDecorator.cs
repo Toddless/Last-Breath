@@ -3,17 +3,17 @@
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
 
-    public abstract class StatModuleDecorator : IStatModule
+    public abstract class StatModuleDecorator : IStatModule, IModuleDecorator<StatModule, IStatModule>
     {
         private IStatModule? _module;
 
         public StatModuleDecorator(StatModule statModule, DecoratorPriority priority)
         {
-            ModuleType = statModule;
+            Type = statModule;
             Priority = priority;
         }
 
-        public StatModule ModuleType { get; }
+        public StatModule Type { get; }
 
         public DecoratorPriority Priority { get; }
 

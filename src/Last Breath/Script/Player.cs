@@ -36,7 +36,6 @@
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
         private SkillsComponent? _playerSkills;
-        private StatModuleDecoratorManager? _moduleDecoratorManager;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
@@ -133,7 +132,6 @@
             _equipInventory = new();
             _craftingInventory = new();
             _questItemsInventory = new();
-            _moduleDecoratorManager = new(this);
             _playerSkills = new(this);
             LoadDialogues();
             SetEvents();
