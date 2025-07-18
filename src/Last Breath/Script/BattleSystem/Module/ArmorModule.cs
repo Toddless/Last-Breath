@@ -2,10 +2,10 @@
 {
     using Playground.Script.Enums;
 
-    public class ArmorModule : IValueModule<float>
+    public class ArmorModule : IStatModule
     {
         private readonly ICharacter _owner;
-        public ModuleParameter Parameter => ModuleParameter.Armor;
+        public StatModule ModuleType => StatModule.Armor;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

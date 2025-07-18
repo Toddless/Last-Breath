@@ -1,15 +1,15 @@
 ﻿namespace Playground.Script.BattleSystem
 {
-    using Godot;
     using System;
-    using System.Linq;
-    using Playground.Script;
-    using Playground.Components;
-    using Playground.Script.Enums;
     using System.Collections.Generic;
+    using System.Linq;
+    using Godot;
+    using Playground.Components;
     using Playground.Components.Interfaces;
-    using Playground.Script.BattleSystem.Module;
+    using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.BattleSystem.Module;
+    using Playground.Script.Enums;
 
     public abstract class StanceBase : IStance
     {
@@ -17,9 +17,18 @@
         private int _pendingAttacks = 0;
         private bool _canProceed = true;
 
-        private Dictionary<ModuleParameter, IValueModule<float>> _floatModules { get; set; } = [];
-        private Dictionary<ActionModuleType, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
+        private Dictionary<StatModule, IStatModule> _statModules { get; set; } = [];
+        private Dictionary<SkillModule, ISkillModule> _skillModules { get; set; } = [];
+        private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
 
+        protected IStatModule this[StatModule type] => _statModules[type];
+        protected ISkillModule this[SkillModule type] => _skillModules[type];
+        protected IActionModule<ICharacter> this[ActionModule type] => _characterActionModules[type];
+        public StatModuleDecoratorManager StatDecoratorManager { get; }
+        public ActionModuleDecoratorManager ActionDecoratorManager { get; }
+        public SkillModuleDecoratorManager SkillDecoratorManager { get; }
+        protected IStanceActivationEffect ActivationEffect { get; }
+        protected ICharacter Owner { get; }
         protected bool CanProceed
         {
             get => _canProceed;
@@ -40,14 +49,8 @@
                 CheckIfAllAttacksHandled();
             }
         }
-        protected IValueModule<float> this[ModuleParameter parameter] => _floatModules[parameter];
-        protected IActionModule<ICharacter> this[ActionModuleType type] => _characterActionModules[type];
-        protected IStanceActivationEffect ActivationEffect { get; }
-        protected ICharacter Owner { get; }
 
         public IResource Resource { get; }
-        public FloatModuleDecoratorManager FloatDecoratorManager { get; }
-        public ActionModuleDecoratorManager ActionDecoratorManager { get; }
 
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
@@ -56,8 +59,9 @@
             Owner = owner;
             Resource = resource;
             ActivationEffect = effect;
-            FloatDecoratorManager = new(Owner);
+            StatDecoratorManager = new(Owner);
             ActionDecoratorManager = new(Owner);
+            SkillDecoratorManager = new(Owner);
             SetModules();
         }
 
@@ -81,13 +85,14 @@
 
             AttackContext context = new(Owner, target)
             {
-                Damage = this[ModuleParameter.Damage].GetValue(),
+                Damage = this[StatModule.Damage].GetValue(),
                 IsCritical = IsCrit(),
-                CriticalDamageMultiplier = this[ModuleParameter.CritDamage].GetValue(),
+                CriticalDamageMultiplier = this[StatModule.CritDamage].GetValue(),
+                PassiveSkills = this[SkillModule.OnAttack].GetSkills(),
             };
 
             // create list with skills applied on attack
-            ApplySkillsOnAttack(context);
+            ApplyPreAttackSkills(context);
 
             // why subscribe?
             // I need the result to decide what to do next
@@ -106,7 +111,7 @@
             }
         }
 
-        public bool IsChainAttack() => this[ModuleParameter.AdditionalAttackChance].GetValue() <= Owner.Damage.AdditionalHit;
+        public bool IsChainAttack() => this[StatModule.AdditionalAttackChance].GetValue() <= Owner.Damage.AdditionalHit;
 
         protected bool CanAttack(ICharacter target) => target.IsAlive && Owner.IsAlive;
 
@@ -120,8 +125,8 @@
                 return;
             }
 
-            context.Armor = this[ModuleParameter.Armor].GetValue();
-            context.MaxReduceDamage = this[ModuleParameter.MaxReduceDamage].GetValue();
+            context.Armor = this[StatModule.Armor].GetValue();
+            context.MaxReduceDamage = this[StatModule.MaxReduceDamage].GetValue();
             context.FinalDamage = Calculations.DamageReduceByArmor(context);
 
             float damageLeft = DamageLeftAfterBarrierAbsorbation(context);
@@ -131,6 +136,7 @@
                 Owner.TakeDamage(damageLeft);
                 GD.Print($"{GetName()} taked damage: {damageLeft}");
             }
+            HandleSkills(context.PassiveSkills);
 
             context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
             CanProceed = true;
@@ -148,10 +154,14 @@
             PendingAttacks--;
         }
 
-        protected virtual void ApplySkillsOnAttack(AttackContext context)
+        protected void ApplyPreAttackSkills(AttackContext context)
         {
-            List<ISkill> onAttackSkills = [];
-            context.PassiveSkills = onAttackSkills;
+            var skills = this[SkillModule.PreAttack].GetSkills();
+
+            foreach (var skill in skills.OfType<IPreAttackSkill>())
+            {
+                skill.Activate(context);
+            }
         }
 
         protected virtual void PerformActionWhenAttackReceived(AttackContext context)
@@ -174,18 +184,17 @@
             Resource.CurrentChanges += OnCurrentResourceChanges;
             Resource.MaximumChanges += OnMaximumResourceChanges;
             Owner.Modifiers.ParameterModifiersChanged += Resource.OnParameterChanges;
-            FloatDecoratorManager.ModuleDecoratorChanges += OnFloatModuleDecoratorChanges;
+            StatDecoratorManager.ModuleDecoratorChanges += OnStatModuleDecoratorChanges;
             ActionDecoratorManager.ModuleDecoratorChanges += OnCharacterActionModuleDecoratorChanges;
+            SkillDecoratorManager.ModuleDecoratorChanges += OnSkillModuleDecoratorChanges;
         }
 
-        protected bool IsCrit() => this[ModuleParameter.CritChance].GetValue() <= Owner.Damage.CriticalChance;
-        protected bool IsEvade() => this[ModuleParameter.EvadeChance].GetValue() <= Owner.Defense.Evade;
+        protected bool IsCrit() => this[StatModule.CritChance].GetValue() <= Owner.Damage.CriticalChance;
+        protected bool IsEvade() => this[StatModule.EvadeChance].GetValue() <= Owner.Defense.Evade;
 
         private void HandleEvadeReceivedAttack(AttackContext context)
         {
-            context.PassiveSkills.Clear();
             context.SetAttackResult(new AttackResult([], AttackResults.Evaded, context));
-            GD.Print($"{GetName()} evaded attack");
         }
 
         private float DamageLeftAfterBarrierAbsorbation(AttackContext context)
@@ -208,13 +217,13 @@
             switch (result.Result)
             {
                 case AttackResults.Evaded:
-                    this[ActionModuleType.EvadeAction].PerformModuleAction(target);
+                    this[ActionModule.EvadeAction].PerformModuleAction(target);
                     break;
                 case AttackResults.Blocked:
-                    this[ActionModuleType.BlockAction].PerformModuleAction(target);
+                    this[ActionModule.BlockAction].PerformModuleAction(target);
                     break;
                 case AttackResults.Succeed:
-                    this[ActionModuleType.SucceedAction].PerformModuleAction(target);
+                    this[ActionModule.SucceedAction].PerformModuleAction(target);
                     break;
                 default:
                     break;
@@ -248,8 +257,9 @@
             Resource.CurrentChanges -= OnCurrentResourceChanges;
             Resource.MaximumChanges -= OnMaximumResourceChanges;
             Owner.Modifiers.ParameterModifiersChanged -= Resource.OnParameterChanges;
-            FloatDecoratorManager.ModuleDecoratorChanges -= OnFloatModuleDecoratorChanges;
+            StatDecoratorManager.ModuleDecoratorChanges -= OnStatModuleDecoratorChanges;
             ActionDecoratorManager.ModuleDecoratorChanges -= OnCharacterActionModuleDecoratorChanges;
+            SkillDecoratorManager.ModuleDecoratorChanges -= OnSkillModuleDecoratorChanges;
 
             foreach (var attack in _attackQueue)
             {
@@ -258,14 +268,16 @@
             }
         }
 
-        private void OnFloatModuleDecoratorChanges(ModuleParameter parameter, IValueModule<float> module) => _floatModules[parameter] = module;
-        private void OnCharacterActionModuleDecoratorChanges(ActionModuleType type, IActionModule<ICharacter> module) => _characterActionModules[type] = module;
+        private void OnStatModuleDecoratorChanges(StatModule parameter, IStatModule module) => _statModules[parameter] = module;
+        private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<ICharacter> module) => _characterActionModules[type] = module;
+        private void OnSkillModuleDecoratorChanges(SkillModule type, ISkillModule module) => _skillModules[type] = module;
         private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
         private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
         private void SetModules()
         {
-            _floatModules = Enum.GetValues<ModuleParameter>().ToDictionary(param => param, FloatDecoratorManager.GetModule);
-            _characterActionModules = Enum.GetValues<ActionModuleType>().ToDictionary(param => param, ActionDecoratorManager.GetModule);
+            _statModules = Enum.GetValues<StatModule>().ToDictionary(param => param, StatDecoratorManager.GetModule);
+            _characterActionModules = Enum.GetValues<ActionModule>().ToDictionary(param => param, ActionDecoratorManager.GetModule);
+            _skillModules = Enum.GetValues<SkillModule>().ToDictionary(param => param, SkillDecoratorManager.GetModule);
         }
     }
 }

@@ -3,10 +3,10 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class CritChanceModule : IValueModule<float>
+    public class CritChanceModule : IStatModule
     {
         private readonly RandomNumberGenerator _rnd = new();
-        public ModuleParameter Parameter => ModuleParameter.CritChance;
+        public StatModule ModuleType => StatModule.CritChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

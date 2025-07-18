@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Enums
 {
-    public enum ActionModuleType
+    public enum ActionModule
     {
         EvadeAction,
         BlockAction,

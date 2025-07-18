@@ -35,7 +35,8 @@
         private EffectsManager? _effectsManager;
         private HealthComponent? _playerHealth;
         private DamageComponent? _playerDamage;
-        private FloatModuleDecoratorManager? _moduleDecoratorManager;
+        private SkillsComponent? _playerSkills;
+        private StatModuleDecoratorManager? _moduleDecoratorManager;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
@@ -107,6 +108,8 @@
         int ICharacter.Initiative => _rnd.RandiRange(0, 15);
 
         public bool IsAlive => _isAlive;
+
+        public SkillsComponent Skills => _playerSkills ??= new(this);
         #endregion
 
         #region Events
@@ -131,6 +134,7 @@
             _craftingInventory = new();
             _questItemsInventory = new();
             _moduleDecoratorManager = new(this);
+            _playerSkills = new(this);
             LoadDialogues();
             SetEvents();
             GameManager.Instance.Player = this;

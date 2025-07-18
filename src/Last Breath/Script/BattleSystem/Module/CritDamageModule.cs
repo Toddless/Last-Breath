@@ -2,10 +2,10 @@
 {
     using Playground.Script.Enums;
 
-    public class CritDamageModule : IValueModule<float>
+    public class CritDamageModule : IStatModule
     {
-        private ICharacter _owner;
-        public ModuleParameter Parameter => ModuleParameter.CritDamage;
+        private readonly ICharacter _owner;
+        public StatModule ModuleType => StatModule.CritDamage;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

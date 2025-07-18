@@ -8,8 +8,9 @@
     public interface IStance
     {
         IResource Resource { get; }
-        FloatModuleDecoratorManager FloatDecoratorManager { get; }
+        StatModuleDecoratorManager StatDecoratorManager { get; }
         ActionModuleDecoratorManager ActionDecoratorManager { get; }
+        SkillModuleDecoratorManager SkillDecoratorManager { get; }
 
         event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
         void OnAttack(ICharacter target);

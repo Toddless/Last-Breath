@@ -5,7 +5,7 @@
     public class HandleAttackEvadeModule(ICharacter owner) : IActionModule<ICharacter>
     {
         private readonly ICharacter _owner = owner;
-        public ActionModuleType ModuleType => ActionModuleType.EvadeAction;
+        public ActionModule ModuleType => ActionModule.EvadeAction;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

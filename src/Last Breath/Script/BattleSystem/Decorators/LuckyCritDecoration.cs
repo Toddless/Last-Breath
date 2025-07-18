@@ -3,7 +3,7 @@
     using Godot;
     using Playground.Script.Enums;
 
-    public class LuckyCritDecoration(DecoratorPriority priority) : FloatModuleDecorator(moduleParameter: ModuleParameter.CritChance, priority)
+    public class LuckyCritDecoration(DecoratorPriority priority) : StatModuleDecorator(statModule: StatModule.CritChance, priority)
     {
         public override float GetValue()
         {

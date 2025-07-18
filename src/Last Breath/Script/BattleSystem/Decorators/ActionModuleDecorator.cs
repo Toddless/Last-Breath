@@ -3,11 +3,11 @@
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
 
-    public abstract class ActionModuleDecorator(ActionModuleType type, DecoratorPriority priority) : IActionModule<ICharacter>
+    public abstract class ActionModuleDecorator(ActionModule type, DecoratorPriority priority) : IActionModule<ICharacter>
     {
         private IActionModule<ICharacter>? _module;
 
-        public ActionModuleType ModuleType { get; } = type;
+        public ActionModule ModuleType { get; } = type;
 
         public DecoratorPriority Priority { get; } = priority;
 

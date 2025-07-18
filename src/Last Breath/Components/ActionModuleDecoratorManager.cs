@@ -8,37 +8,37 @@
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.BattleSystem.Decorators;
 
-    public class ActionModuleDecoratorManager 
+    public class ActionModuleDecoratorManager : BaseModuleManager<ActionModule, IActionModule<ICharacter>>
     {
-        private readonly Dictionary<ActionModuleType, List<ActionModuleDecorator>> _moduleDecorators;
-        private readonly HandleAttackBlockedModule _blockedModule;
-        private readonly HandleAttackEvadeModule _evadeModule;
-        private readonly HandleAttackSucceedModule _succeedModule;
-        private readonly ICharacter _owner;
+        private readonly Dictionary<ActionModule, List<ActionModuleDecorator>> _moduleDecorators;
+        private readonly Dictionary<ActionModule, IActionModule<ICharacter>> _baseModule;
 
-        public event Action<ActionModuleType, IActionModule<ICharacter>>? ModuleDecoratorChanges;
-
-        public ActionModuleDecoratorManager(ICharacter owner)
+        public ActionModuleDecoratorManager(ICharacter owner): base([], owner)
         {
             // TODO: Same code twice. I'll change it later.
-            _owner = owner;
-            _moduleDecorators = Enum.GetValues<ActionModuleType>().ToDictionary(type => type, _ => new List<ActionModuleDecorator>());
-            _blockedModule = new(_owner);
-            _evadeModule = new(_owner);
-            _succeedModule = new(_owner);
+            _moduleDecorators = Enum.GetValues<ActionModule>().ToDictionary(type => type, _ => new List<ActionModuleDecorator>());
+            // TODO: Factory
+            _baseModule = new Dictionary<ActionModule, IActionModule<ICharacter>>
+            {
+                [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
+                [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
+                [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
+            };
         }
 
-        public IActionModule<ICharacter> GetModule(ActionModuleType type)
+        public override IActionModule<ICharacter> GetModule(ActionModule type)
         {
-            var tempModule = GetBaseModule(type);
+            if (Cache.TryGetValue(type, out var value)) return value;
+
+            var tmpModule = GetBaseModule(type);
 
             foreach (var module in _moduleDecorators[type])
             {
-                module.ChainModule(tempModule);
-                tempModule = module;
+                module.ChainModule(tmpModule);
+                tmpModule = module;
             }
-
-            return tempModule;
+            Cache[type] = tmpModule;
+            return tmpModule;
         }
 
         public void AddDecoratorToModule(ActionModuleDecorator decorator)
@@ -68,19 +68,8 @@
                 RaiseModuleDecoratorChanges(decorator.ModuleType);
         }
 
+        protected override IActionModule<ICharacter> GetBaseModule(ActionModule type) => _baseModule[type];
 
-        private IActionModule<ICharacter> GetBaseModule(ActionModuleType type)
-        {
-            return type switch
-            {
-                ActionModuleType.EvadeAction => _evadeModule,
-                ActionModuleType.BlockAction => _blockedModule,
-                ActionModuleType.SucceedAction => _succeedModule,
-                _ => throw new ArgumentOutOfRangeException(nameof(type)),
-            };
-        }
-
-        private void RaiseModuleDecoratorChanges(ActionModuleType type) => ModuleDecoratorChanges?.Invoke(type, GetModule(type));
         private bool AlreadyHaveThisTypeOfDecorator(IEnumerable<ActionModuleDecorator> decorators, ActionModuleDecorator decorator) => decorators.Any(x => x.GetType() == decorator.GetType());
     }
 }

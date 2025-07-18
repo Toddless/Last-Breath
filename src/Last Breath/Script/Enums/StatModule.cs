@@ -1,6 +1,6 @@
 ﻿namespace Playground.Script.Enums
 {
-    public enum ModuleParameter
+    public enum StatModule
     {
         CritChance = 1,
         EvadeChance,
@@ -9,6 +9,6 @@
         CritDamage,
         Damage,
         Armor,
-        MaxReduceDamage,
-    }
+        MaxReduceDamage
+    } 
 }

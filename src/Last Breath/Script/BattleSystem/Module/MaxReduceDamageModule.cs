@@ -2,10 +2,10 @@
 {
     using Playground.Script.Enums;
 
-    public class MaxReduceDamageModule : IValueModule<float>
+    public class MaxReduceDamageModule : IStatModule
     {
         private readonly ICharacter _owner;
-        public ModuleParameter Parameter => ModuleParameter.MaxReduceDamage;
+        public StatModule ModuleType => StatModule.MaxReduceDamage;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

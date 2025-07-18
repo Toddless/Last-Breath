@@ -2,7 +2,7 @@
 {
     using Playground.Script.Enums;
 
-    public class ChainAttackOnSucceedDecorator(DecoratorPriority priority, ICharacter owner) : ActionModuleDecorator(type: ActionModuleType.SucceedAction, priority)
+    public class ChainAttackOnSucceedDecorator(DecoratorPriority priority, ICharacter owner) : ActionModuleDecorator(type: ActionModule.SucceedAction, priority)
     {
         private readonly ICharacter _owner = owner;
 

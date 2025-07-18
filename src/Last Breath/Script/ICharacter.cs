@@ -6,11 +6,13 @@
 
     public interface ICharacter
     {
-        public HealthComponent Health { get; }
-        public DamageComponent Damage { get; }
-        public DefenseComponent Defense { get; }
-        public EffectsManager Effects { get; }
-        public ModifierManager Modifiers { get; }
+        HealthComponent Health { get; }
+        DamageComponent Damage { get; }
+        DefenseComponent Defense { get; }
+        EffectsManager Effects { get; }
+        ModifierManager Modifiers { get; }
+        SkillsComponent Skills { get; }
+
         public IStance? CurrentStance { get; }
         bool CanFight { get; set; }
         bool CanMove { get; set; }
