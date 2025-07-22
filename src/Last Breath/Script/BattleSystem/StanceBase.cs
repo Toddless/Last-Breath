@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Script;
@@ -21,7 +20,7 @@
         private Dictionary<StatModule, IStatModule> _statModules { get; set; } = [];
         private Dictionary<SkillType, ISkillModule> _skillModules { get; set; } = [];
         private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
-
+        private StanceSkillComponent? _skillComponent;
         protected IStatModule this[StatModule type] => _statModules[type];
         protected ISkillModule this[SkillType type] => _skillModules[type];
         protected IActionModule<ICharacter> this[ActionModule type] => _characterActionModules[type];
@@ -49,6 +48,12 @@
             }
         }
 
+        public StanceSkillComponent StanceSkillManager
+        {
+            get => _skillComponent ??= new(this);
+            protected set => _skillComponent = value;
+        }
+
         public IResource Resource { get; }
         public ModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
 
@@ -56,13 +61,16 @@
 
         public ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
+        public Stance StanceType { get; }
+     
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
-        protected StanceBase(ICharacter owner, IResource resource, IStanceActivationEffect effect)
+        protected StanceBase(ICharacter owner, IResource resource, IStanceActivationEffect effect, Stance stanceType)
         {
             Owner = owner;
             Resource = resource;
             ActivationEffect = effect;
+            StanceType = stanceType;
             // TODO: Rework this part later.
             StatDecoratorManager = new(new Dictionary<StatModule, IStatModule>
             {
@@ -75,12 +83,14 @@
                 [StatModule.MaxReduceDamage] = new MaxReduceDamageModule(Owner),
                 [StatModule.CritDamage] = new CritDamageModule(Owner),
             });
+
             ActionDecoratorManager = new(new Dictionary<ActionModule, IActionModule<ICharacter>>
             {
                 [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
                 [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
                 [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
             });
+
             SkillDecoratorManager = new(new Dictionary<SkillType, ISkillModule>
             {
                 [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
@@ -131,7 +141,6 @@
             if (CanProceed) HandleReceivedAttack(context);
             else
             {
-                GD.Print("Added to attack queue");
                 _attackQueue.Enqueue(context);
             }
         }
@@ -150,23 +159,16 @@
                 return;
             }
 
+            HandleSkills(context.PassiveSkills);
             context.Armor = this[StatModule.Armor].GetValue();
             context.MaxReduceDamage = this[StatModule.MaxReduceDamage].GetValue();
             context.FinalDamage = Calculations.DamageReduceByArmor(context);
 
-            float damageLeft = DamageLeftAfterBarrierAbsorbation(context);
-
-            if (damageLeft > 0)
-            {
-                Owner.TakeDamage(damageLeft);
-                GD.Print($"{GetName()} taked damage: {damageLeft}");
-            }
-            HandleSkills(context.PassiveSkills);
+            Owner.TakeDamage(context.FinalDamage, context.IsCritical);
 
             context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
             CanProceed = true;
         }
-
 
         protected virtual void OnAttackResult(AttackResult result)
         {
@@ -187,16 +189,6 @@
             {
                 skill.Activate(context);
             }
-        }
-
-        protected virtual void PerformActionWhenAttackReceived(AttackContext context)
-        {
-
-        }
-
-        protected virtual void PerformActionWhenEvade(AttackContext context)
-        {
-
         }
 
         protected virtual void HandleSkills(List<ISkill> passiveSkills)
@@ -220,13 +212,6 @@
         private void HandleEvadeReceivedAttack(AttackContext context)
         {
             context.SetAttackResult(new AttackResult([], AttackResults.Evaded, context));
-        }
-
-        private float DamageLeftAfterBarrierAbsorbation(AttackContext context)
-        {
-            // TODO: module?
-            if (context.IgnoreBarrier) return context.FinalDamage;
-            return Owner.Defense.BarrierAbsorbDamage(context.FinalDamage);
         }
 
         private void CheckIfAllAttacksHandled()
@@ -261,8 +246,6 @@
                 HandleReceivedAttack(_attackQueue.Dequeue());
             CheckIfAllAttacksHandled();
         }
-
-        private string GetName() => Owner.GetType().Name;
 
         private void OnAttackCanceled(AttackContext context)
         {

@@ -21,11 +21,12 @@
 
         event Action<ICharacter>? Dead;
         event Action? AllAttacksFinished;
+        event Action<DamageTakenEventArgs>? DamageTaken;
 
         void OnTurnEnd();
         void OnTurnStart(Action nextTurnPhase);
         void OnReceiveAttack(AttackContext context);
-        void TakeDamage(float damage);
+        void TakeDamage(float damage, bool isCrit = false);
         void AllAttacks();
     }
 }

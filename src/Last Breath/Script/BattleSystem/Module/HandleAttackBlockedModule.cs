@@ -11,7 +11,7 @@
 
         public void PerformModuleAction(ICharacter target)
         {
-
+            _owner.CurrentStance?.Resource.Recover();
         }
     }
 }

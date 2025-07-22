@@ -180,6 +180,7 @@
             enemy.Health.MaxHealthChanged += _battleUI.OnEnemyMaxHealthChanged;
             enemy.CurrentStance!.CurrentResourceChanges += _battleUI!.OnEnemyCurrentResourceChanges;
             enemy.CurrentStance.MaximumResourceChanges += _battleUI.OnEnemyMaxResourceChanges;
+            enemy.DamageTaken += OnDamageTaken;
         }
 
         private void SubscribePlayerElements(Player player)
@@ -187,7 +188,10 @@
             _battleUI?.SetPlayerHealthBar(player.Health.CurrentHealth, player.Health.MaxHealth);
             player.Health.CurrentHealthChanged += _battleUI.OnPlayerCurrentHealthChanged;
             player.Health.MaxHealthChanged += _battleUI.OnPlayerMaxHealthChanged;
+            player.DamageTaken += OnDamageTaken;
         }
+
+        private void OnDamageTaken(DamageTakenEventArgs args) => _battleUI?.OnDamageTaken(Mathf.RoundToInt(args.Damage), args.Character, args.IsCrit);
 
         private void SubscribeNewPlayerStance()
         {
@@ -214,12 +218,14 @@
             enemy.Health.MaxHealthChanged -= _battleUI.OnEnemyMaxHealthChanged;
             enemy.CurrentStance!.CurrentResourceChanges -= _battleUI!.OnEnemyCurrentResourceChanges;
             enemy.CurrentStance.MaximumResourceChanges -= _battleUI.OnEnemyMaxResourceChanges;
+            enemy.DamageTaken -= OnDamageTaken;
         }
 
         private void UnsubscribePlayerElements(Player player)
         {
             player.Health.CurrentHealthChanged -= _battleUI.OnPlayerCurrentHealthChanged;
             player.Health.MaxHealthChanged -= _battleUI.OnPlayerMaxHealthChanged;
+            player.DamageTaken -= OnDamageTaken;
         }
     }
 }

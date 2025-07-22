@@ -1,29 +1,13 @@
 ﻿namespace Playground.Script.BattleSystem
 {
     using Playground.Script;
+    using Playground.Script.Enums;
 
     public class StrengthStance : StanceBase
     {
-        public StrengthStance(ICharacter owner) : base(owner, new Fury(), effect: new StanceActivationEffect())
+        public StrengthStance(ICharacter owner) : base(owner, new Fury(), effect: new StanceActivationEffect(), Stance.Strength)
         {
-        }
-
-        protected override void PerformActionWhenAttackReceived(AttackContext context)
-        {
-            base.PerformActionWhenAttackReceived(context);
-            OnAttack(context.Attacker);
-        }
-
-        public override void OnActivate()
-        {
-            base.OnActivate();
-            ActivationEffect.OnActivate(Owner);
-        }
-
-        public override void OnDeactivate()
-        {
-            base.OnDeactivate();
-            ActivationEffect.OnDeactivate(Owner);
+            StanceSkillManager = new(this);
         }
     }
 }

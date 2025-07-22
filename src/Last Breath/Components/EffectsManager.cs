@@ -1,6 +1,5 @@
 ﻿namespace Playground.Components
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Playground.Script;
@@ -53,7 +52,7 @@
 
         public void ClearAllTemporaryEffects() => _temporaryEffects.Clear();
 
-        public bool IsEffectApplied(Type effect) => GetCombinedEffects().Any(x => x.GetType() == effect);
+        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x=>x.Effect == effect);
 
         private void AddEffects(IEffect effect, List<IEffect> list)
         {

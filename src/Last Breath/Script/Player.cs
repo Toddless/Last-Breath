@@ -1,22 +1,22 @@
 ﻿namespace Playground
 {
-    using Godot;
     using System;
-    using System.Linq;
-    using Playground.Script;
-    using Playground.Components;
-    using Playground.Localization;
-    using Playground.Script.Enums;
-    using Playground.Script.Items;
-    using Playground.Script.Helpers;
-    using Playground.Resource.Quests;
     using System.Collections.Generic;
-    using Playground.Script.Inventory;
-    using Playground.Script.QuestSystem;
-    using Playground.Script.BattleSystem;
+    using System.Linq;
+    using Godot;
+    using Playground.Components;
     using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
+    using Playground.Localization;
+    using Playground.Resource.Quests;
+    using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.BattleSystem;
+    using Playground.Script.Enums;
+    using Playground.Script.Helpers;
+    using Playground.Script.Inventory;
+    using Playground.Script.Items;
+    using Playground.Script.QuestSystem;
 
     public partial class Player : CharacterBody2D, ICharacter
     {
@@ -39,15 +39,9 @@
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
-        private readonly List<IStance> _stances = [];
+        private readonly Dictionary<Stance, IStance> _stances = [];
         private RandomNumberGenerator _rnd = new();
         #endregion
-
-        [Signal]
-        public delegate void PlayerEnterTheBattleEventHandler();
-
-        [Signal]
-        public delegate void PlayerExitedTheBattleEventHandler();
 
         #region Properties
         public bool CanMove
@@ -111,14 +105,20 @@
         public SkillsComponent Skills => _playerSkills ??= new(this);
         #endregion
 
-        #region Events
+        #region Events and Signals
         public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
         public event Action<EnemyKilledEventArgs>? EnemyKilled;
         public event Action<List<IAbility>>? SetAvailableAbilities;
         public event Action<ICharacter>? Dead;
         public event Action? AllAttacksFinished;
-
+        public event Action<DamageTakenEventArgs>? DamageTaken;
         public Action? NextPhase;
+
+        [Signal]
+        public delegate void PlayerEnterTheBattleEventHandler();
+
+        [Signal]
+        public delegate void PlayerExitedTheBattleEventHandler();
         #endregion
 
         public override void _Ready()
@@ -141,9 +141,9 @@
             Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 800, this));
             Modifiers.AddPermanentModifier(new DamageModifier(ModifierType.Flat, 150, this));
             _playerHealth.HealUpToMax();
-            _stances.Add(new DexterityStance(this));
-            _stances.Add(new StrengthStance(this));
-            _stances.Add(new IntelligenceStance(this));
+            _stances.Add(Stance.Dexterity, new DexterityStance(this));
+            _stances.Add(Stance.Strength, new StrengthStance(this));
+            _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
         }
 
         public override void _PhysicsProcess(double delta)
@@ -204,33 +204,21 @@
 
         public void SetDexterityStance()
         {
-            var stance = _stances.FirstOrDefault(x => x is DexterityStance);
-            if (stance != null)
-            {
-                _currentStance = stance;
-                _currentStance.OnActivate();
-            }
+            _currentStance = _stances[Stance.Dexterity];
+            _currentStance.OnActivate();
         }
 
         public void SetStrengthStance()
         {
-            var stance = _stances.FirstOrDefault(x => x is StrengthStance);
 
-            if (stance != null)
-            {
-                _currentStance = stance;
-                _currentStance.OnActivate();
-            }
+            _currentStance = _stances[Stance.Strength];
+            _currentStance.OnActivate();
         }
 
         public void SetIntelligenceStance()
         {
-            var stance = _stances.FirstOrDefault(y => y is IntelligenceStance);
-            if (stance != null)
-            {
-                _currentStance = stance;
-                _currentStance.OnActivate();
-            }
+            _currentStance = _stances[Stance.Intelligence];
+            _currentStance.OnActivate();
         }
 
         public void OnDialogueCompleted(string id)
@@ -255,13 +243,15 @@
         public void OnTurnStart(Action nextTurnPhase)
         {
             NextPhase = nextTurnPhase;
+
+            if (Effects.IsEffectApplied(Script.Enums.Effects.Stun | Script.Enums.Effects.Paralysis)) NextPhase.Invoke();
         }
 
         public void OnReceiveAttack(AttackContext context)
         {
             if (_currentStance == null)
             {
-              //  HandleSkills(context.PassiveSkills);
+                HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
                 var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
@@ -269,7 +259,6 @@
                 if (damageLeftAfterBarrierabsorption > 0)
                 {
                     this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
-                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
                 }
 
                 context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
@@ -280,11 +269,12 @@
 
         public void AllAttacks() => AllAttacksFinished?.Invoke();
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, bool isCrit = false)
         {
             // some actions like sound, animation etc.
-
             Health.TakeDamage(damage);
+
+            DamageTaken?.Invoke(new(damage, isCrit, this));
         }
 
         private void OnPlayerDead()

@@ -22,7 +22,7 @@
 
             if (typeof(TKey).IsEnum)
             {
-                _decorators = Enum.GetValues(typeof(TKey)).Cast<TKey>().ToDictionary(x => x, _ => new List<TDecorator>());
+                _decorators = Enum.GetValues(typeof(TKey)).Cast<TKey>().ToDictionary(key => key, _ => new List<TDecorator>());
             }
             else
             {
@@ -57,8 +57,7 @@
             // Check if this type of decorator already exists
             if (list.Any(d => d.GetType() == decorator.GetType())) return;
 
-
-            var idx = list.FindIndex(x => x.Priority > decorator.Priority);
+            var idx = list.FindIndex(oldDecorator => oldDecorator.Priority > decorator.Priority);
             if (idx < 0) list.Add(decorator);
             else list.Insert(idx, decorator);
 

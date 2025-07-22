@@ -9,7 +9,7 @@
         private const float BaseEvade = 0f;
         private const float BaseEnergyBarrier = 0f;
         private const float BaseMaxReduceDamage = 0.7f;
-        private const float BaseMaxEvade = 0.9f;
+        private const float BaseMaxEvade = 0.75f;
 
         public float Armor { get; private set; } = BaseArmor;
         public float Evade { get; private set; } = BaseEvade;

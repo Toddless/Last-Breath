@@ -96,7 +96,7 @@
         public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
         public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
 
-        public void OnDamageDealed(int damage, ICharacter target, bool crit)
+        public void OnDamageTaken(int damage, ICharacter target, bool crit)
         {
             // TODO: Remove this from here
             var floatingText = new FloatingText();

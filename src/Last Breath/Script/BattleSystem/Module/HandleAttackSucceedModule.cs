@@ -9,7 +9,7 @@
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public void PerformModuleAction(ICharacter parameter)
+        public void PerformModuleAction(ICharacter target)
         {
             _owner.CurrentStance?.Resource.Recover();
         }

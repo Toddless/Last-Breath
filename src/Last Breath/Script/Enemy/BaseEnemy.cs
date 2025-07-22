@@ -134,6 +134,7 @@ namespace Playground
 
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
+        public event Action<DamageTakenEventArgs> DamageTaken;
 
         #endregion
 
@@ -173,17 +174,67 @@ namespace Playground
             Area?.Hide();
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, bool isCrit = false)
         {
-            // some actions like sound, animation etc.
 
             Health.TakeDamage(damage);
+
+            DamageTaken?.Invoke(new(damage, isCrit, this));
         }
+
+        public void OnTurnStart(Action action)
+        {
+            var handler = BattleHandler.Instance;
+            if (handler != null)
+            {
+                var target = handler.Fighters.FirstOrDefault(x => x is Player);
+                if (target == null)
+                {
+                    return;
+                }
+                CurrentStance?.OnAttack(target);
+            }
+            action.Invoke();
+        }
+
+        public void OnTurnEnd()
+        {
+            //Effects.UpdateEffects();
+        }
+
+        public void OnReceiveAttack(AttackContext context)
+        {
+            if (_currentStance == null)
+            {
+
+                HandleSkills(context.PassiveSkills);
+                // TODO: Own method
+                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
+                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+
+                if (damageLeftAfterBarrierabsorption > 0)
+                {
+                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
+                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
+                }
+
+                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
+                return;
+            }
+            _currentStance.OnReceiveAttack(context);
+        }
+        public void AllAttacks() => AllAttacksFinished?.Invoke();
 
         protected void SpawnItems()
         {
             // _inventory?.AddItem(LootTable?.GetRandomItem());
         }
+
+        private void HandleSkills(List<ISkill> passiveSkills)
+        {
+
+        }
+
 
         private void SetStats()
         {
@@ -298,55 +349,5 @@ namespace Playground
             id.Append(Fraction.ToString());
             return id.ToString();
         }
-
-        public void OnTurnStart(Action action)
-        {
-            var handler = BattleHandler.Instance;
-            if (handler != null)
-            {
-                var target = handler.Fighters.FirstOrDefault(x => x is Player);
-                if (target == null)
-                {
-                    return;
-                }
-                CurrentStance?.OnAttack(target);
-            }
-            action.Invoke();
-        }
-
-        public void OnTurnEnd()
-        {
-            //Effects.UpdateEffects();
-        }
-
-        public void OnReceiveAttack(AttackContext context)
-        {
-            if (_currentStance == null)
-            {
-
-                HandleSkills(context.PassiveSkills);
-                // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
-
-                if (damageLeftAfterBarrierabsorption > 0)
-                {
-                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
-                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
-                }
-
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
-                return;
-            }
-            _currentStance.OnReceiveAttack(context);
-        }
-
-
-        private void HandleSkills(List<ISkill> passiveSkills)
-        {
-
-        }
-
-        public void AllAttacks() => AllAttacksFinished?.Invoke();
     }
 }
