@@ -52,12 +52,12 @@
         }
 
         /// <summary>
-        /// Activate passive skill that works on earning.
+        /// Activate permanent passive skill.
         /// </summary>
         /// <param name="skill"></param>
         protected abstract void ActivateSkill(T skill);
         /// <summary>
-        /// Deactivate passive skill that works on eraning.
+        /// Deactivate permanent passive skill.
         /// </summary>
         /// <param name="skill"></param>
         protected abstract void DeactivateSkill(T skill);

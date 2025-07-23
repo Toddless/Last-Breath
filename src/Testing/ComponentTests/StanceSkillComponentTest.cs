@@ -18,6 +18,7 @@
 
             var stanceSkill = new Mock<IStanceSkill>();
             stanceSkill.Setup(x => x.RequiredStance).Returns(Playground.Script.Enums.Stance.Dexterity);
+            stanceSkill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.AlwaysActive);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {
                 isActivated = true;
@@ -40,6 +41,7 @@
             var stanceObject = stance.Object;
 
             var stanceSkill = new Mock<IStanceSkill>();
+            stanceSkill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.AlwaysActive);
             stanceSkill.Setup(x => x.RequiredStance).Returns(Playground.Script.Enums.Stance.Strength);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {

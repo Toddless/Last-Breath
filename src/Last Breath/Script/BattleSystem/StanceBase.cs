@@ -21,12 +21,14 @@
         private Dictionary<SkillType, ISkillModule> _skillModules { get; set; } = [];
         private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
         private StanceSkillComponent? _skillComponent;
+
         protected IStatModule this[StatModule type] => _statModules[type];
         protected ISkillModule this[SkillType type] => _skillModules[type];
         protected IActionModule<ICharacter> this[ActionModule type] => _characterActionModules[type];
 
         protected IStanceActivationEffect ActivationEffect { get; }
         protected ICharacter Owner { get; }
+
         protected bool CanProceed
         {
             get => _canProceed;
@@ -37,7 +39,6 @@
                     FlushQueue();
             }
         }
-
         protected int PendingAttacks
         {
             get => _pendingAttacks;
@@ -51,14 +52,14 @@
         public StanceSkillComponent StanceSkillManager
         {
             get => _skillComponent ??= new(this);
+            // Why protectet set? To be able to set this component within child class
             protected set => _skillComponent = value;
         }
 
         public IResource Resource { get; }
+
         public ModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
-
         public ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
-
         public ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public Stance StanceType { get; }

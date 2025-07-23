@@ -50,7 +50,10 @@ namespace Playground
         private EnemyInventory? _inventory;
         #endregion
 
+
         #region Properties
+        protected SkillsComponent Skills => _enemySkills ??= new(this);
+
         public EnemyType EnemyType => _enemyType;
         public AttributeType? AttributeType => _enemyAttributeType;
         public bool CanFight
@@ -76,7 +79,7 @@ namespace Playground
             get => _area;
         }
 
-        public RandomNumberGenerator? Rnd
+        public RandomNumberGenerator Rnd
         {
             get => _rnd;
             set => _rnd = value;
@@ -124,17 +127,16 @@ namespace Playground
 
         public ModifierManager Modifiers => _modifierManager;
 
-        public IStance? CurrentStance => _currentStance;
+        public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
 
         int ICharacter.Initiative => Rnd.RandiRange(0, 15);
 
         public bool IsAlive => _isAlive;
 
-        public SkillsComponent Skills => _enemySkills ??= new(this);
 
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
-        public event Action<DamageTakenEventArgs> DamageTaken;
+        public event Action<DamageTakenEventArgs>? DamageTaken;
 
         #endregion
 
@@ -225,6 +227,18 @@ namespace Playground
         }
         public void AllAttacks() => AllAttacksFinished?.Invoke();
 
+        public void AddSkill(ISkill skill)
+        {
+            // NPC should only get abilities that work
+            if (skill is IStanceSkill stanceSkill)
+            {
+                if (CurrentStance.StanceType == stanceSkill.RequiredStance)
+                    CurrentStance.StanceSkillManager.AddSkill(stanceSkill);
+            }
+            else
+                Skills.AddSkill(skill);
+        }
+
         protected void SpawnItems()
         {
             // _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -243,8 +257,9 @@ namespace Playground
             Rarity = EnemyRarity();
             _level = Rnd.RandiRange(1, 300);
             var points = SetAttributesDependsOnType(_enemyAttributeType);
-            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
-            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
+            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, points.Dexterity);
+            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, points.Strength);
+            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Intelligence, points.Intelligence);
             _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 500, this));
             SetAnimation();
             _currentStance = SetStance(_enemyAttributeType);
@@ -254,10 +269,10 @@ namespace Playground
         private void SetEvents()
         {
             _area!.BodyEntered += PlayerEntered;
-            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
-            _enemyHealth.EntityDead += OnEntityDead;
+            Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
+            Health.EntityDead += OnEntityDead;
             _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
@@ -320,13 +335,14 @@ namespace Playground
         {
             var totalAttributes = _level + ((int)_rarity * (int)_rarity);
 
-            int dominantAttribute = (int)(totalAttributes * 0.8f);
-            int secondaryAttribute = (int)(totalAttributes * 0.1f);
+            var dominantAttribute = Mathf.RoundToInt(totalAttributes * 0.8f);
+            var secondaryAttribute = Mathf.RoundToInt(totalAttributes * 0.1f);
 
             return enemyType switch
             {
                 Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Strength => (dominantAttribute + 15, secondaryAttribute, secondaryAttribute),
+                Script.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
+                Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
@@ -21,7 +20,7 @@
     public partial class Player : CharacterBody2D, ICharacter
     {
         #region Private fields
-        private const int BaseSpeed = 1200;
+        private const int BaseSpeed = 600;
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false, _isAlive = true;
         private float _moveProgress = 0f;
         private int _exp, _gold;
@@ -44,6 +43,8 @@
         #endregion
 
         #region Properties
+        protected SkillsComponent Skills => _playerSkills ??= new(this);
+        protected IStance this[Stance stance] => _stances[stance];
         public bool CanMove
         {
             get => _canMove;
@@ -81,7 +82,6 @@
             }
         }
 
-
         [Export]
         public bool FirstSpawn { get; set; } = true;
         [Export]
@@ -96,13 +96,14 @@
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
         public EffectsManager Effects => _effectsManager ??= new(this);
         public ModifierManager Modifiers => _modifierManager;
-        // i think i need some ability component later, because i need a place where player can modifiy, learn or forget abilities
 
         int ICharacter.Initiative => _rnd.RandiRange(0, 15);
 
-        public bool IsAlive => _isAlive;
-
-        public SkillsComponent Skills => _playerSkills ??= new(this);
+        public bool IsAlive
+        {
+            get => _isAlive;
+            protected set => _isAlive = value;
+        }
         #endregion
 
         #region Events and Signals
@@ -135,15 +136,15 @@
             _playerSkills = new(this);
             LoadDialogues();
             SetEvents();
-            GameManager.Instance.Player = this;
             _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
             _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
             Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 800, this));
             Modifiers.AddPermanentModifier(new DamageModifier(ModifierType.Flat, 150, this));
-            _playerHealth.HealUpToMax();
+            Health.HealUpToMax();
             _stances.Add(Stance.Dexterity, new DexterityStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
+            GameManager.Instance.Player = this;
         }
 
         public override void _PhysicsProcess(double delta)
@@ -210,7 +211,6 @@
 
         public void SetStrengthStance()
         {
-
             _currentStance = _stances[Stance.Strength];
             _currentStance.OnActivate();
         }
@@ -269,6 +269,13 @@
 
         public void AllAttacks() => AllAttacksFinished?.Invoke();
 
+        public void AddSkill(ISkill skill)
+        {
+            if (skill is IStanceSkill stanceSkill) AddToStance(stanceSkill);
+            else Skills.AddSkill(skill);
+        }
+
+
         public void TakeDamage(float damage, bool isCrit = false)
         {
             // some actions like sound, animation etc.
@@ -277,13 +284,13 @@
             DamageTaken?.Invoke(new(damage, isCrit, this));
         }
 
+        private void AddToStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillManager.AddSkill(stanceSkill);
+
         private void OnPlayerDead()
         {
             Dead?.Invoke(this);
             CanFight = false;
-            _isAlive = false;
-            // play death animation, call death screen
-            GD.Print($"Dead: {GetType().Name}");
+            IsAlive = false;
         }
 
         private void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
@@ -340,11 +347,11 @@
 
         private void SetEvents()
         {
-            _modifierManager.ParameterModifiersChanged += Damage.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Health.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += Defense.OnParameterChanges;
-            _modifierManager.ParameterModifiersChanged += OnParameterChanges;
-            _playerHealth.EntityDead += OnPlayerDead;
+            Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += OnParameterChanges;
+            Health.EntityDead += OnPlayerDead;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 

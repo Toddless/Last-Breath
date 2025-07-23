@@ -2,6 +2,7 @@
 {
     using System;
     using Playground.Components;
+    using Playground.Script.Abilities.Interfaces;
     using Playground.Script.BattleSystem;
 
     public interface ICharacter
@@ -11,7 +12,6 @@
         DefenseComponent Defense { get; }
         EffectsManager Effects { get; }
         ModifierManager Modifiers { get; }
-        SkillsComponent Skills { get; }
 
         public IStance? CurrentStance { get; }
         bool CanFight { get; set; }
@@ -24,6 +24,7 @@
         event Action<DamageTakenEventArgs>? DamageTaken;
 
         void OnTurnEnd();
+        void AddSkill(ISkill skill);
         void OnTurnStart(Action nextTurnPhase);
         void OnReceiveAttack(AttackContext context);
         void TakeDamage(float damage, bool isCrit = false);

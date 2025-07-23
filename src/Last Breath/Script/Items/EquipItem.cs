@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Godot;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
@@ -12,8 +11,6 @@
     {
         protected const float From = 0.8f;
         protected const float To = 1.2f;
-
-        protected RandomNumberGenerator Rnd = new();
 
         protected List<IModifier> BaseModifiers = [];
         protected List<IEffect> Effects = [];

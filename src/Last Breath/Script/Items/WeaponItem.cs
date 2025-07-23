@@ -9,6 +9,7 @@
 
     public abstract partial class WeaponItem : EquipItem, IDamageStrategy
     {
+        protected RandomNumberGenerator Rnd = new();
         protected float BaseAdditionalHitChance { get; private set; }
         protected float BaseCriticalChance { get; private set; }
         protected float BaseCritDamage { get; private set; }
