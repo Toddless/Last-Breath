@@ -55,7 +55,7 @@
             }
 
             // Check if this type of decorator already exists
-            if (list.Any(d => d.GetType() == decorator.GetType())) return;
+            if (list.Any(d => d.GetType() == decorator.GetType() && d.Priority == decorator.Priority)) return;
 
             var idx = list.FindIndex(oldDecorator => oldDecorator.Priority > decorator.Priority);
             if (idx < 0) list.Add(decorator);

@@ -3,12 +3,13 @@
     using Playground.Script.BattleSystem.Module;
     using Playground.Script.Enums;
 
-    public class StatModuleTest(float value) : IStatModule
+    public class CritModuleTest : IStatModule
     {
-        private float _value = value;
-        public StatModule Type => StatModule.Damage;
+        private readonly Random _random = new();
+        public StatModule Type => StatModule.CritChance;
+
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public float GetValue() => _value;
+        public float GetValue() => (float)_random.NextDouble();
     }
 }

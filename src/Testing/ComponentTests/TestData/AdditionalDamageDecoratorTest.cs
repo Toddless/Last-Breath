@@ -3,7 +3,7 @@
     using Playground.Script.BattleSystem.Decorators;
     using Playground.Script.Enums;
 
-    public class ModuleDecoratorTest(StatModule statModule, float value) : StatModuleDecorator(statModule, priority: DecoratorPriority.Strong)
+    public class AdditionalDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(type: StatModule.Damage, priority)
     {
         private readonly float _value = value;
 
