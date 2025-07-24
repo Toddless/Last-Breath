@@ -365,5 +365,7 @@ namespace Playground
             id.Append(Fraction.ToString());
             return id.ToString();
         }
+
+        public List<ISkill> GetSkills(SkillType type) => throw new NotImplementedException();
     }
 }

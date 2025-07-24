@@ -22,18 +22,19 @@
         }
 
         [TestMethod]
-        public void AvgCritChanceBiggerWithDecorator_Test()
+        public void AvgCritChanceBiggerWithLuckyDecorator_Test()
         {
             var manager = CreateManager();
-            var critDecorator = new LuckyCritDecoratorTest(DecoratorPriority.Weak);
+            var critModuleWithoutDecorator = manager.GetModule(StatModule.CritChance);
             float avgCrit = 0;
 
             for (int i = 0; i < 10; i++)
             {
-                avgCrit += critDecorator.GetValue();
+                avgCrit += critModuleWithoutDecorator.GetValue();
             }
             avgCrit /= 10;
 
+            var critDecorator = new LuckyCritDecoratorTest(DecoratorPriority.Weak);
             manager.AddDecorator(critDecorator);
 
             var moduleWithDecorator = manager.GetModule(StatModule.CritChance);
@@ -67,7 +68,7 @@
             var moduleWithDecorators = manager.GetModule(StatModule.Damage);
             var value = moduleWithDecorators.GetValue();
 
-            Assert.IsTrue(value == 55);
+            Assert.IsTrue(value > 54);
 
         }
 

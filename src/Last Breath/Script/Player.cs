@@ -366,5 +366,6 @@
             }
         }
 
+        public List<ISkill> GetSkills(SkillType type) => throw new NotImplementedException();
     }
 }

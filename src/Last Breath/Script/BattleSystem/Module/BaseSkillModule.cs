@@ -9,6 +9,6 @@
         protected readonly ICharacter Owner = owner;
         public SkillType Type { get; } = type;
         public DecoratorPriority Priority { get; } = priority;
-        public virtual List<ISkill> GetSkills() => Owner.Skills.GetSkills(Type);
+        public virtual List<ISkill> GetSkills() => Owner.GetSkills(Type);
     }
 }
