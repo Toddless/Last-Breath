@@ -13,6 +13,7 @@ namespace Playground
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using static System.Net.Mime.MediaTypeNames;
 
     [Inject]
     public partial class BaseEnemy : CharacterBody2D, ICharacter
@@ -136,7 +137,7 @@ namespace Playground
 
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
-        public event Action<DamageTakenEventArgs>? DamageTaken;
+        public event Action<OnGettingAttackEventArgs>? GettingAttack;
 
         #endregion
 
@@ -178,10 +179,9 @@ namespace Playground
 
         public void TakeDamage(float damage, bool isCrit = false)
         {
-
             Health.TakeDamage(damage);
-
-            DamageTaken?.Invoke(new(damage, isCrit, this));
+            GD.Print($"{this.Name} taked: {damage} damage");
+            GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
         }
 
         public void OnTurnStart(Action action)
@@ -198,6 +198,9 @@ namespace Playground
             }
             action.Invoke();
         }
+
+        public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
+        public void OnBlockAttack() => GettingAttack?.Invoke(new(this, AttackResults.Blocked));
 
         public void OnTurnEnd()
         {
@@ -229,7 +232,7 @@ namespace Playground
 
         public void AddSkill(ISkill skill)
         {
-            // NPC should only get abilities that work
+            // NPC should only get abilities that work with in their main stance
             if (skill is IStanceSkill stanceSkill)
             {
                 if (CurrentStance.StanceType == stanceSkill.RequiredStance)
@@ -238,6 +241,18 @@ namespace Playground
             else
                 Skills.AddSkill(skill);
         }
+
+        public void RemoveSkill(ISkill skill)
+        {
+            if (skill is IStanceSkill stanceSkill)
+            {
+                if (CurrentStance.StanceType == stanceSkill.RequiredStance)
+                    CurrentStance.StanceSkillManager.RemoveSkill(stanceSkill);
+            }
+            else Skills.RemoveSkill(skill);
+        }
+
+        public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
 
         protected void SpawnItems()
         {
@@ -365,7 +380,5 @@ namespace Playground
             id.Append(Fraction.ToString());
             return id.ToString();
         }
-
-        public List<ISkill> GetSkills(SkillType type) => throw new NotImplementedException();
     }
 }

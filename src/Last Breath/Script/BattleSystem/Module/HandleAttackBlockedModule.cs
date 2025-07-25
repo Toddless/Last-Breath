@@ -5,7 +5,7 @@
     public class HandleAttackBlockedModule(ICharacter owner) : IActionModule<ICharacter>
     {
         private readonly ICharacter _owner = owner;
-        public ActionModule Type => ActionModule.BlockAction;
+        public ActionModule SkillType => ActionModule.BlockAction;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

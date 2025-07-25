@@ -48,32 +48,32 @@
 
         public void AddDecorator(TDecorator decorator)
         {
-            if (!_decorators.TryGetValue(decorator.Type, out var list))
+            if (!_decorators.TryGetValue(decorator.SkillType, out var list))
             {
                 list = [];
-                _decorators[decorator.Type] = list;
+                _decorators[decorator.SkillType] = list;
             }
 
-            // Check if this type of decorator already exists
-            if (list.Any(d => d.GetType() == decorator.GetType() && d.Priority == decorator.Priority)) return;
+            // Check if this type of decorator already in list
+            if (list.Any(x => x.Id == decorator.Id)) return;
 
             var idx = list.FindIndex(oldDecorator => oldDecorator.Priority > decorator.Priority);
             if (idx < 0) list.Add(decorator);
             else list.Insert(idx, decorator);
 
-            RaiseModuleDecoratorChanges(decorator.Type);
+            RaiseModuleDecoratorChanges(decorator.SkillType);
         }
 
         public void RemoveDecorator(TDecorator decorator)
         {
             // just in case
-            if (!_decorators.TryGetValue(decorator.Type, out var decorators))
+            if (!_decorators.TryGetValue(decorator.SkillType, out var decorators))
             {
                 // TODO: Log
                 return;
             }
             if (decorators.Remove(decorator))
-                RaiseModuleDecoratorChanges(decorator.Type);
+                RaiseModuleDecoratorChanges(decorator.SkillType);
         }
 
 

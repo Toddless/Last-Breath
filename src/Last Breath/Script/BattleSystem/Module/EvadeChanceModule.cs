@@ -6,7 +6,7 @@
     public class EvadeChanceModule : IStatModule
     {
         private readonly RandomNumberGenerator _rnd = new();
-        public StatModule Type => StatModule.EvadeChance;
+        public StatModule SkillType => StatModule.EvadeChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

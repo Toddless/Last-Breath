@@ -6,7 +6,7 @@
     public class DamageModuleTest(float value) : IStatModule
     {
         private float _value = value;
-        public StatModule Type => StatModule.Damage;
+        public StatModule SkillType => StatModule.Damage;
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => _value;

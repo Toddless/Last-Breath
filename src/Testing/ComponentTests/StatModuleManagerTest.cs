@@ -72,15 +72,31 @@
 
         }
 
-        private ModuleManager<StatModule, IStatModule, StatModuleDecorator> CreateManager()
+        [TestMethod]
+        public void TryToRemoveWrongDecorator_Test()
         {
-            var baseModule = new Dictionary<StatModule, IStatModule>
-            {
-                [StatModule.Damage] = new DamageModuleTest(BaseValue),
-                [StatModule.CritChance] = new CritModuleTest()
-            };
+            var manager = CreateManager();
+            bool activated = false;
 
-            return new ModuleManager<StatModule, IStatModule, StatModuleDecorator>(baseModule);
+            var decorator = new AdditionalDamageDecoratorTest(DecoratorPriority.Weak, 15);
+            manager.AddDecorator(decorator);
+
+            var secondDecorator = new AdditionalDamageDecoratorTest(DecoratorPriority.Strong, 25);
+            manager.ModuleDecoratorChanges += OnModuleChanges;
+            manager.RemoveDecorator(secondDecorator);
+
+            void OnModuleChanges(StatModule stat, IStatModule module)
+            {
+                activated = true;
+            }
+
+            Assert.IsFalse(activated);
         }
+
+        private ModuleManager<StatModule, IStatModule, StatModuleDecorator> CreateManager() => new(new Dictionary<StatModule, IStatModule>
+        {
+            [StatModule.Damage] = new DamageModuleTest(BaseValue),
+            [StatModule.CritChance] = new CritModuleTest()
+        });
     }
 }

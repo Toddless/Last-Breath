@@ -5,7 +5,7 @@
     public class HandleAttackSucceedModule(ICharacter owner) : IActionModule<ICharacter>
     {
         private readonly ICharacter _owner = owner;
-        public ActionModule Type => ActionModule.SucceedAction;
+        public ActionModule SkillType => ActionModule.SucceedAction;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

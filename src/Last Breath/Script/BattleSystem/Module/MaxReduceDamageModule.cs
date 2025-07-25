@@ -5,7 +5,7 @@
     public class MaxReduceDamageModule : IStatModule
     {
         private readonly ICharacter _owner;
-        public StatModule Type => StatModule.MaxReduceDamage;
+        public StatModule SkillType => StatModule.MaxReduceDamage;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

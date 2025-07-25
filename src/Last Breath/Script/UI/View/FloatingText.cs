@@ -8,7 +8,7 @@
 
         public async void ShowValue(string value, Vector2 travel, float duration, float spread, bool crit = false)
         {
-            this.Text = value;
+            Text = value;
             PivotOffset = Size / 2;
             float angle = _rnd.RandfRange(-spread / 2, spread / 2);
             var movement = travel.Rotated(angle);
@@ -24,7 +24,7 @@
 
             tween.Play();
             await ToSignal(tween, "finished");
-            this.QueueFree();
+            QueueFree();
         }
     }
 }

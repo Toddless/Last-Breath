@@ -1,8 +1,7 @@
 ﻿namespace Playground.Script.Abilities.Interfaces
 {
-    public interface ITargetSkill : ISkill
+    public interface IOnGettingAttackSkill : ISkill
     {
         void Activate(ICharacter target);
-        void Deactivate(ICharacter target);
     }
 }

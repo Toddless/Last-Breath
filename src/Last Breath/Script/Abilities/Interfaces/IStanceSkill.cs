@@ -7,7 +7,6 @@
     {
         Stance RequiredStance { get; }
         void Activate(IStance stance);
-
         void Deactivate(IStance stance);
     }
 }

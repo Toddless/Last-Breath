@@ -6,7 +6,7 @@
     public class AdditionalHitChanceModule : IStatModule
     {
         private readonly RandomNumberGenerator _rnd = new();
-        public StatModule Type => StatModule.AdditionalAttackChance;
+        public StatModule SkillType => StatModule.AdditionalAttackChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

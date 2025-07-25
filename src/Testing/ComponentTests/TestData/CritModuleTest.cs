@@ -6,7 +6,7 @@
     public class CritModuleTest : IStatModule
     {
         private readonly Random _random = new();
-        public StatModule Type => StatModule.CritChance;
+        public StatModule SkillType => StatModule.CritChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

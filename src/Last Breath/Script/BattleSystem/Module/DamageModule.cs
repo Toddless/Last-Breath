@@ -5,7 +5,7 @@
     public class DamageModule : IStatModule
     {
         private readonly ICharacter _owner;
-        public StatModule Type => StatModule.Damage;
+        public StatModule SkillType => StatModule.Damage;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

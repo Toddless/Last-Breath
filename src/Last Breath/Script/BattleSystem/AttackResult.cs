@@ -4,17 +4,10 @@
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Enums;
 
-    public class AttackResult
+    public class AttackResult(List<ISkill> skills, AttackResults result, AttackContext context)
     {
-        public List<ISkill> PassiveSkills { get; }
-        public AttackResults Result { get; }
-        public AttackContext Context { get; }
-
-        public AttackResult(List<ISkill> skills, AttackResults result, AttackContext context)
-        {
-            PassiveSkills = skills;
-            Result = result;
-            Context = context;
-        }
+        public List<ISkill> PassiveSkills { get; } = skills;
+        public AttackResults Result { get; } = result;
+        public AttackContext Context { get; } = context;
     }
 }

@@ -62,6 +62,6 @@
         /// <param name="skill"></param>
         protected abstract void DeactivateSkill(T skill);
 
-        protected bool AlreadyHaveThisSkill(List<T> skills, T skill) => skills.Any(x => x.Type == skill.Type);
+        protected bool AlreadyHaveThisSkill(List<T> skills, T newSkill) => skills.Any(skill => skill.Id == newSkill.Id);
     }
 }

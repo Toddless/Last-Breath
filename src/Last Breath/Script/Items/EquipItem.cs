@@ -33,9 +33,12 @@
 
         public virtual void OnUnequip()
         {
-            BaseModifiers.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
-            Effects.ForEach(Owner.Effects.RemoveEffect);
-            Owner = null;
+            if (Owner != null)
+            {
+                BaseModifiers.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
+                Effects.ForEach(Owner.Effects.RemoveEffect);
+                Owner = null;
+            }
         }
 
         public override List<string> GetItemStatsAsStrings()
@@ -58,30 +61,24 @@
         protected virtual void LoadData()
         {
             var itemStats = GetItemStats();
-            if (itemStats == null)
+            if (itemStats != null)
             {
-                // TODO Log
-                return;
+                BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
+
+                LoadMediaData();
             }
-
-            BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
-
-            LoadMediaData();
         }
 
         private void LoadMediaData()
         {
             var mediaData = GetItemMediaData();
-            if (mediaData == null)
+            if (mediaData != null)
             {
-                // TODO Log
-                return;
+                Icon = mediaData.IconTexture;
+                Description = mediaData.Description;
+                ItemName = mediaData.Name;
+                FullImage = mediaData.FullTexture;
             }
-
-            Icon = mediaData.IconTexture;
-            Description = mediaData.Description;
-            ItemName = mediaData.Name;
-            FullImage = mediaData.FullTexture;
         }
 
         protected virtual void SetEffects() { }

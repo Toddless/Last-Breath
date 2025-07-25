@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Godot;
     using Playground.Components;
     using Playground.Components.Interfaces;
     using Playground.Script;
@@ -52,7 +53,6 @@
         public StanceSkillComponent StanceSkillManager
         {
             get => _skillComponent ??= new(this);
-            // Why protectet set? To be able to set this component within child class
             protected set => _skillComponent = value;
         }
 
@@ -63,7 +63,7 @@
         public ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public Stance StanceType { get; }
-     
+
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
         protected StanceBase(ICharacter owner, IResource resource, IStanceActivationEffect effect, Stance stanceType)
@@ -97,13 +97,15 @@
                 [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
                 [SkillType.OnAttack] = new OnAttackSkillModule(Owner),
                 [SkillType.AlwaysActive] = new AlwaysActiveSkillModule(Owner),
+                [SkillType.GettingAttack] = new GettingAttackSkillModule(Owner),
             });
             SetModules();
         }
 
         public virtual void OnActivate()
         {
-            // TODO: Am i getting updated module befor subscription??
+            // I have set the modules again so that I have all the updated modules.
+            SetModules();
             SubscribeEvents();
             ActivationEffect.OnActivate(Owner);
         }
@@ -146,7 +148,7 @@
             }
         }
 
-        public bool IsChainAttack() => this[StatModule.AdditionalAttackChance].GetValue() <= Owner.Damage.AdditionalHit;
+        public bool IsChainAttack() => Mathf.Min(this[StatModule.AdditionalAttackChance].GetValue(), Owner.Damage.MaxAdditionalHit) <= Owner.Damage.AdditionalHit;
 
         protected bool CanAttack(ICharacter target) => target.IsAlive && Owner.IsAlive;
 
@@ -160,23 +162,23 @@
                 return;
             }
 
-            HandleSkills(context.PassiveSkills);
             context.Armor = this[StatModule.Armor].GetValue();
             context.MaxReduceDamage = this[StatModule.MaxReduceDamage].GetValue();
             context.FinalDamage = Calculations.DamageReduceByArmor(context);
-
             Owner.TakeDamage(context.FinalDamage, context.IsCritical);
 
-            context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
+            HandleOnAttackSkills(context.PassiveSkills);
+            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Succeed, context));
             CanProceed = true;
         }
+
 
         protected virtual void OnAttackResult(AttackResult result)
         {
             // i dont need this context anymore, unsubscribe
             Unsubscribe(result);
-            // Handle skills, we getting from attacked target
-            HandleSkills(result.PassiveSkills);
+            // Handle skills, we may getting from attacked target
+            HandleOnGettingAttackSkills(result.PassiveSkills);
             // different reactions to attack results
             HandleResult(result);
             PendingAttacks--;
@@ -192,9 +194,20 @@
             }
         }
 
-        protected virtual void HandleSkills(List<ISkill> passiveSkills)
+        protected virtual void HandleOnAttackSkills(List<ISkill> passiveSkills)
         {
+            foreach (var skill in passiveSkills.OfType<IOnAttackSkill>())
+            {
+                skill.Activate(Owner);
+            }
+        }
 
+        protected virtual void HandleOnGettingAttackSkills(List<ISkill> passiveSkills)
+        {
+            foreach (var skill in passiveSkills.OfType<IOnGettingAttackSkill>())
+            {
+                skill.Activate(Owner);
+            }
         }
 
         protected virtual void SubscribeEvents()
@@ -207,12 +220,13 @@
             SkillDecoratorManager.ModuleDecoratorChanges += OnSkillModuleDecoratorChanges;
         }
 
-        protected bool IsCrit() => this[StatModule.CritChance].GetValue() <= Owner.Damage.CriticalChance;
-        protected bool IsEvade() => this[StatModule.EvadeChance].GetValue() <= Owner.Defense.Evade;
+        protected bool IsCrit() => Mathf.Min(this[StatModule.CritChance].GetValue(), Owner.Damage.MaxCriticalChance) <= Owner.Damage.CriticalChance;
+        protected bool IsEvade() => Mathf.Min(this[StatModule.EvadeChance].GetValue(), Owner.Defense.MaxEvadeChance) <= Owner.Defense.Evade;
 
         private void HandleEvadeReceivedAttack(AttackContext context)
         {
-            context.SetAttackResult(new AttackResult([], AttackResults.Evaded, context));
+            Owner.OnEvadeAttack();
+            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Evaded, context));
         }
 
         private void CheckIfAllAttacksHandled()

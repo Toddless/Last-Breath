@@ -4,7 +4,7 @@
 
     public interface IStatModule
     {
-        StatModule Type { get; }
+        StatModule SkillType { get; }
         DecoratorPriority Priority { get; }
 
         float GetValue();

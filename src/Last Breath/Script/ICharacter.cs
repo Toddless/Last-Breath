@@ -23,14 +23,17 @@
 
         event Action<ICharacter>? Dead;
         event Action? AllAttacksFinished;
-        event Action<DamageTakenEventArgs>? DamageTaken;
+        event Action<OnGettingAttackEventArgs>? GettingAttack;
 
         void OnTurnEnd();
         void AddSkill(ISkill skill);
+        void RemoveSkill(ISkill skill);
         List<ISkill> GetSkills(SkillType type);
         void OnTurnStart(Action nextTurnPhase);
         void OnReceiveAttack(AttackContext context);
         void TakeDamage(float damage, bool isCrit = false);
         void AllAttacks();
+        void OnEvadeAttack();
+        void OnBlockAttack();
     }
 }

@@ -186,6 +186,7 @@
                 {
                     ExitStartPhase?.Invoke();
                 })
+                .Permit(Trigger.EndBattle, State.EndBattle)
                 .Permit(Trigger.NextPhase, State.AttackingPhase);
 
             _machine.Configure(State.AttackingPhase)
@@ -207,8 +208,9 @@
                  {
                      _currentAttacking?.OnTurnEnd();
                      _machine.Fire(Trigger.NextPhase);
-                     GD.Print($"End phase: {_currentAttacking.GetType().Name}");
+                     GD.Print($"End phase: {_currentAttacking?.GetType().Name}");
                  })
+                 .Permit(Trigger.EndBattle, State.EndBattle)
                  .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
 
             _machine.Configure(State.TurnTransitionPhase)

@@ -9,11 +9,6 @@
     [TestClass]
     public class StanceTest
     {
-        public void FirstTest()
-        {
-            var stance = CreateDexterity();
-        }
-
 
         private DexterityStanceTest CreateDexterity()
         {

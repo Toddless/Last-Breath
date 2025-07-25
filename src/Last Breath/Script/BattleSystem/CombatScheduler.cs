@@ -6,8 +6,8 @@
 
     public class CombatScheduler
     {
-        private LinkedList<AttackContext> _attackQueue = new();
-        private bool _canProceed = true, _inProcess = false;
+        private readonly LinkedList<AttackContext> _attackQueue = new();
+        private bool _inProcess = false, _isCancelled = false;
         public event Action? AllContexHandled;
 
         public static CombatScheduler? Instance { get; private set; }
@@ -28,17 +28,17 @@
 
         public void RunQueue()
         {
-            while (_attackQueue.Count > 0 && _canProceed)
+            _inProcess = true;
+            while (_attackQueue.Count > 0 && !_isCancelled)
             {
-                _inProcess = true;
                 var context = _attackQueue.First?.Value;
                 if (context == null) break;
                 _attackQueue.RemoveFirst();
                 GD.Print($"Processing context. Target: {context.Target.GetType().Name}, Attacker: {context.Attacker.GetType().Name}");
                 context.Target.OnReceiveAttack(context);
-                _inProcess = false;
                 GD.Print($"Attack contextes left: {_attackQueue.Count}");
             }
+            _inProcess = false;
             CheckQueueLeft();
         }
 
@@ -50,7 +50,7 @@
 
         public void CancelQueue()
         {
-            _canProceed = false;
+            _isCancelled = true;
             while (_attackQueue.Count > 0)
             {
                 var context = _attackQueue.First?.Value;
@@ -58,8 +58,8 @@
                 _attackQueue.RemoveFirst();
                 context.CancelAttack();
             }
-            _canProceed = true;
+            _isCancelled = false;
+            CheckQueueLeft();
         }
-
     }
 }

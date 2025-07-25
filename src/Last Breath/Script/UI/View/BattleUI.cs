@@ -2,8 +2,8 @@
 {
     using System;
     using Godot;
-    using Playground.Script;
     using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
     using Playground.Script.UI;
     using Playground.Script.UI.View;
@@ -96,16 +96,27 @@
         public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
         public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
 
-        public void OnDamageTaken(int damage, ICharacter target, bool crit)
+        public void OnGettingAttack(OnGettingAttackEventArgs args)
         {
             // TODO: Remove this from here
             var floatingText = new FloatingText();
-            var targetRect = target is Player ? _player.GetGlobalRect() : _enemy.GetGlobalRect();
+            var targetRect = args.Character is Player ? _player.GetGlobalRect() : _enemy.GetGlobalRect();
             Vector2 globalPosition = new(targetRect.Position.X + targetRect.Size.X / 2, targetRect.Position.Y);
             Vector2 localPosition = GetGlobalTransform().AffineInverse() * globalPosition;
             floatingText.Position = localPosition;
             AddChild(floatingText);
-            floatingText.ShowValue(damage.ToString(), new Vector2(0, -75), 1f, 5f, crit);
+            switch (args.Result)
+            {
+                case AttackResults.Evaded:
+                    floatingText.ShowValue("Evade!", new Vector2(0, -75), 1f, 5f);
+                    break;
+                case AttackResults.Blocked:
+                    floatingText.ShowValue("Blocked!", new Vector2(0, -75), 1f, 5f);
+                    break;
+                case AttackResults.Succeed:
+                    floatingText.ShowValue(Mathf.RoundToInt(args.Damage).ToString(), new Vector2(0, -75), 1f, 5f, args.IsCrit);
+                    break;
+            }
         }
     }
 }

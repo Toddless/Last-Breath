@@ -3,22 +3,23 @@
     using Moq;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.BattleSystem;
+    using Playground.Script.Enums;
 
     [TestClass]
     public class StanceSkillComponentTest
     {
         [TestMethod]
-        public void StanceSkillActivated_Test()
+        public void RequirementsMetStanceSkillShouldBeActivated_Test()
         {
             bool isActivated = false;
 
             var stance = new Mock<IStance>();
-            stance.Setup(x => x.StanceType).Returns(Playground.Script.Enums.Stance.Dexterity);
+            stance.Setup(x => x.StanceType).Returns(Stance.Dexterity);
             var stanceObject = stance.Object;
 
             var stanceSkill = new Mock<IStanceSkill>();
-            stanceSkill.Setup(x => x.RequiredStance).Returns(Playground.Script.Enums.Stance.Dexterity);
-            stanceSkill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.AlwaysActive);
+            stanceSkill.Setup(x => x.RequiredStance).Returns(Stance.Dexterity);
+            stanceSkill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {
                 isActivated = true;
@@ -32,17 +33,17 @@
         }
 
         [TestMethod]
-        public void StanceSkillNotActivated_Test()
+        public void RequirementsNotMetStanceSkillShouldBeNotActivated_Test()
         {
             bool isActivated = false;
 
             var stance = new Mock<IStance>();
-            stance.Setup(x => x.StanceType).Returns(Playground.Script.Enums.Stance.Dexterity);
+            stance.Setup(x => x.StanceType).Returns(Stance.Dexterity);
             var stanceObject = stance.Object;
 
             var stanceSkill = new Mock<IStanceSkill>();
-            stanceSkill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.AlwaysActive);
-            stanceSkill.Setup(x => x.RequiredStance).Returns(Playground.Script.Enums.Stance.Strength);
+            stanceSkill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
+            stanceSkill.Setup(x => x.RequiredStance).Returns(Stance.Strength);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {
                 isActivated = true;

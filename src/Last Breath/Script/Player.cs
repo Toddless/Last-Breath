@@ -112,7 +112,7 @@
         public event Action<List<IAbility>>? SetAvailableAbilities;
         public event Action<ICharacter>? Dead;
         public event Action? AllAttacksFinished;
-        public event Action<DamageTakenEventArgs>? DamageTaken;
+        public event Action<OnGettingAttackEventArgs>? GettingAttack;
         public Action? NextPhase;
 
         [Signal]
@@ -138,8 +138,8 @@
             SetEvents();
             _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
             _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
-            Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 800, this));
-            Modifiers.AddPermanentModifier(new DamageModifier(ModifierType.Flat, 150, this));
+            Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 10000, this));
+            Modifiers.AddPermanentModifier(new DamageModifier(ModifierType.Flat, 500, this));
             Health.HealUpToMax();
             _stances.Add(Stance.Dexterity, new DexterityStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
@@ -254,20 +254,23 @@
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+                var damageLeftAfterBarrierabsorption = Defense.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
                 {
-                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
+                    Health.TakeDamage(damageLeftAfterBarrierabsorption);
                 }
 
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
+                context.SetAttackResult(new AttackResult(Skills.GetSkills(SkillType.GettingAttack), AttackResults.Succeed, context));
                 return;
             }
             _currentStance.OnReceiveAttack(context);
         }
 
         public void AllAttacks() => AllAttacksFinished?.Invoke();
+        public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
+        public void OnBlockAttack() => GettingAttack?.Invoke(new(this, AttackResults.Blocked));
+        public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
 
         public void AddSkill(ISkill skill)
         {
@@ -275,15 +278,21 @@
             else Skills.AddSkill(skill);
         }
 
+        public void RemoveSkill(ISkill skill)
+        {
+            if (skill is IStanceSkill stanceSkill) RemoveFromStance(stanceSkill);
+            else Skills.RemoveSkill(skill);
+        }
 
         public void TakeDamage(float damage, bool isCrit = false)
         {
             // some actions like sound, animation etc.
             Health.TakeDamage(damage);
-
-            DamageTaken?.Invoke(new(damage, isCrit, this));
+            GD.Print($"{this.Name} taked: {damage} damage");
+            GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
         }
 
+        private void RemoveFromStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillManager.RemoveSkill(stanceSkill);
         private void AddToStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillManager.AddSkill(stanceSkill);
 
         private void OnPlayerDead()
@@ -366,6 +375,5 @@
             }
         }
 
-        public List<ISkill> GetSkills(SkillType type) => throw new NotImplementedException();
     }
 }
