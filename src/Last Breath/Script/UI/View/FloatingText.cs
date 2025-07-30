@@ -2,6 +2,7 @@
 {
     using Godot;
 
+    // Rework this part
     public partial class FloatingText : Label
     {
         private readonly RandomNumberGenerator _rnd = new();

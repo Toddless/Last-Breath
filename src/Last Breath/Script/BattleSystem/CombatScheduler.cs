@@ -2,13 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using Godot;
 
     public class CombatScheduler
     {
         private readonly LinkedList<AttackContext> _attackQueue = new();
         private bool _inProcess = false, _isCancelled = false;
-        public event Action? AllContexHandled;
+        public event Action? AllContextsHandled;
 
         public static CombatScheduler? Instance { get; private set; }
 
@@ -23,7 +22,6 @@
                 _attackQueue.AddFirst(context);
             else
                 _attackQueue.AddLast(context);
-            GD.Print($"Added new context to Queue. Target: {context.Target.GetType().Name}, Attacker: {context.Attacker.GetType().Name}");
         }
 
         public void RunQueue()
@@ -34,9 +32,7 @@
                 var context = _attackQueue.First?.Value;
                 if (context == null) break;
                 _attackQueue.RemoveFirst();
-                GD.Print($"Processing context. Target: {context.Target.GetType().Name}, Attacker: {context.Attacker.GetType().Name}");
                 context.Target.OnReceiveAttack(context);
-                GD.Print($"Attack contextes left: {_attackQueue.Count}");
             }
             _inProcess = false;
             CheckQueueLeft();
@@ -45,7 +41,7 @@
         private void CheckQueueLeft()
         {
             if (_attackQueue.Count == 0)
-                AllContexHandled?.Invoke();
+                AllContextsHandled?.Invoke();
         }
 
         public void CancelQueue()

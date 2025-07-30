@@ -6,6 +6,7 @@
     using Playground.Script.ScenesHandlers;
     using System.Linq;
     using Playground.Script.BattleSystem;
+    using Playground.Script.Helpers.Extensions;
 
     public partial class BattleLayer : CanvasLayer
     {
@@ -38,8 +39,9 @@
                 return;
             }
 
-            _battleHandler.EnterStartPhase += OnEnterStartPhase;
-            _battleHandler.ExitStartPhase += OnExitStartPhase;
+            _battleHandler.StartTurn += OnTurnStart;
+            _battleHandler.OnEnterStartPhase += OnEnterStartPhase;
+            _battleHandler.OnExitStartPhase += OnExitStartPhase;
             _battleHandler.BattleEnd += OnBattleEnd;
             _battleUI.HeadButtonPressed += OnHeadButtonPressed;
             _battleUI.EnemyAreaPressed += OnEnemyAreaPressed;
@@ -50,13 +52,29 @@
             _battleUI.IntelligenceStance += OnIntelligenceStance;
         }
 
+        private async void OnTurnStart(ICharacter character)
+        {
+            var notifierScene = TurnNotifier.InitializeAsPackedScene();
+            var notifier = notifierScene.Instantiate<TurnNotifier>();
+            AddChild(notifier);
+            notifier.ShowMessage(character);
+
+            if (character is not Player)
+            {
+                await ToSignal(notifier, SignalNameExtension.Completed);
+                if (_battleHandler != null)
+                    character.OnTurnStart();
+            }
+        }
+
+        // Only for test
         private void OnHeadButtonPressed()
         {
             var target = _player?.Target;
             if (target is not Player && target != null)
             {
                 _player?.CurrentStance?.OnAttack(target);
-                _player?.NextPhase?.Invoke();
+                UIEventBus.PublishNextPhase();
             }
         }
 
@@ -111,8 +129,6 @@
         }
 
         private void ReturnOnMainUI() => BattleEnds?.Invoke();
-
-
 
         private void OnIntelligenceStance()
         {

@@ -16,6 +16,7 @@
         ModifierManager Modifiers { get; }
 
         public IStance? CurrentStance { get; }
+        string CharacterName { get; }
         bool CanFight { get; set; }
         bool CanMove { get; set; }
         bool IsAlive { get; }
@@ -29,7 +30,7 @@
         void AddSkill(ISkill skill);
         void RemoveSkill(ISkill skill);
         List<ISkill> GetSkills(SkillType type);
-        void OnTurnStart(Action nextTurnPhase);
+        void OnTurnStart();
         void OnReceiveAttack(AttackContext context);
         void TakeDamage(float damage, bool isCrit = false);
         void AllAttacks();

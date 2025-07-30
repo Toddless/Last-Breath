@@ -3,7 +3,6 @@ namespace Playground
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using Godot;
     using Playground.Components;
     using Playground.Script;
@@ -13,7 +12,7 @@ namespace Playground
     using Playground.Script.Enemy;
     using Playground.Script.Enums;
     using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using static System.Net.Mime.MediaTypeNames;
+    using Playground.Script.UI;
 
     [Inject]
     public partial class BaseEnemy : CharacterBody2D, ICharacter
@@ -57,6 +56,7 @@ namespace Playground
 
         public EnemyType EnemyType => _enemyType;
         public AttributeType? AttributeType => _enemyAttributeType;
+        public string CharacterName { get; private set; } = "Enemy";
         public bool CanFight
         {
             get => _enemyFight;
@@ -184,7 +184,7 @@ namespace Playground
             GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
         }
 
-        public void OnTurnStart(Action action)
+        public void OnTurnStart()
         {
             var handler = BattleHandler.Instance;
             if (handler != null)
@@ -196,7 +196,7 @@ namespace Playground
                 }
                 CurrentStance?.OnAttack(target);
             }
-            action.Invoke();
+            UIEventBus.PublishNextPhase();
         }
 
         public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
@@ -372,13 +372,6 @@ namespace Playground
             };
         }
 
-        private string SetId()
-        {
-            var id = new StringBuilder();
-            id.Append(NpcName);
-            id.Append('_');
-            id.Append(Fraction.ToString());
-            return id.ToString();
-        }
+        private string SetId() => $"{NpcName}_{Fraction}";
     }
 }

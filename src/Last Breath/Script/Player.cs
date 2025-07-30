@@ -86,6 +86,7 @@
         public bool FirstSpawn { get; set; } = true;
         [Export]
         public int Speed { get; private set; } = BaseSpeed;
+        public string CharacterName { get; private set; } = "Player";
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
         public DefenseComponent Defense => _playerDefense ??= new();
@@ -113,7 +114,6 @@
         public event Action<ICharacter>? Dead;
         public event Action? AllAttacksFinished;
         public event Action<OnGettingAttackEventArgs>? GettingAttack;
-        public Action? NextPhase;
 
         [Signal]
         public delegate void PlayerEnterTheBattleEventHandler();
@@ -240,11 +240,8 @@
             UpdateAbilityCoodowns();
         }
 
-        public void OnTurnStart(Action nextTurnPhase)
+        public void OnTurnStart()
         {
-            NextPhase = nextTurnPhase;
-
-            if (Effects.IsEffectApplied(Script.Enums.Effects.Stun | Script.Enums.Effects.Paralysis)) NextPhase.Invoke();
         }
 
         public void OnReceiveAttack(AttackContext context)
@@ -288,7 +285,7 @@
         {
             // some actions like sound, animation etc.
             Health.TakeDamage(damage);
-            GD.Print($"{this.Name} taked: {damage} damage");
+            GD.Print($"{this.CharacterName} taked: {damage} damage");
             GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
         }
 
