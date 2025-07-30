@@ -1,8 +1,9 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
+    using System.Collections.Generic;
+
     public interface IBattleContext
     {
-        ICharacter Opponent { get; }
-        ICharacter Player { get; }
+        List<ICharacter> Fighters { get; }
     }
 }

@@ -1,9 +1,7 @@
 ﻿namespace Playground.Components
 {
     using System;
-    using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
     using Playground.Script.Helpers;
 
@@ -14,24 +12,28 @@
         private float _maxHealth;
 
         public event Action<float>? CurrentHealthChanged, MaxHealthChanged;
+        public event Action? EntityDead;
 
         public float CurrentHealth
         {
             get => MathF.Max(0, _currentHealth);
             set
             {
-                if (ObservableProperty.SetProperty(ref _currentHealth, value))
-                {
-                    CurrentHealthChanged?.Invoke(_currentHealth);
-                }
+                if (ObservableProperty.SetProperty(ref _currentHealth, value)) CurrentHealthChanged?.Invoke(CurrentHealth);
+                if (_currentHealth <= 0) EntityDead?.Invoke();
             }
         }
 
-        public float MaxHealth => Mathf.RoundToInt(_maxHealth);
+        public float MaxHealth
+        {
+            get => Mathf.RoundToInt(_maxHealth);
+            private set => _maxHealth = value;
+        }
+
 
         public HealthComponent()
         {
-            _currentHealth = _maxHealth;
+            CurrentHealth = MaxHealth;
         }
 
         // TODO: action or signal for hp == 0
@@ -41,18 +43,20 @@
 
         public void HealUpToMax() => CurrentHealth = MaxHealth;
 
-        public void OnParameterChanges(Parameter parameter, List<IModifier> modifiers)
+        public void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
         {
-            if (parameter != Parameter.MaxHealth)
+            if (args.Parameter != Parameter.MaxHealth)
                 return;
-            var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, modifiers);
-            if (MathF.Abs(newMaxHealth - _maxHealth) > float.Epsilon)
+            var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, args.Modifiers);
+            if (MathF.Abs(newMaxHealth - MaxHealth) > float.Epsilon)
             {
-                _maxHealth = newMaxHealth;
+                MaxHealth = newMaxHealth;
                 MaxHealthChanged?.Invoke(_maxHealth);
                 if (CurrentHealth > MaxHealth)
                     CurrentHealth = MaxHealth;
             }
         }
+
+        public float CurrentHealthPercent() => CurrentHealth / MaxHealth;
     }
 }

@@ -13,7 +13,7 @@
         public int Stacks { get; set; } = stacks;
         public bool Permanent { get; } = permanent;
 
-        public bool Expired => !Permanent && Duration <= 0;
+        public bool Expired => !Permanent && Duration < 1;
 
         public virtual void OnApply(ICharacter character)
         {

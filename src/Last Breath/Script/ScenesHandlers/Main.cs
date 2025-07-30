@@ -3,7 +3,6 @@
     using System.Linq;
     using Godot;
     using Playground.Script.Helpers;
-    using Playground.Script.Items;
     using Playground.Script.NPC;
     using Playground.Script.UI;
     using Playground.Script.UI.Layers;
@@ -39,8 +38,6 @@
                 GetNode<DevLayer>(nameof(DevLayer)),
 #endif
                 GetNode<DialogueLayer>(nameof(DialogueLayer)));
-            _managerUI.SetResume(FireResume);
-            _managerUI.SetClose(Close);
             _managerUI.ConfigureStateMachine();
             _managerUI.SetEvents();
             ConfigureStateMachine();
@@ -107,6 +104,9 @@
             {
                 obj.OpenObject += ObjectOpen;
             }
+
+            UIEventBus.Close += FireClose;
+            UIEventBus.Resume += FireResume;
         }
 
         private void ConfigureStateMachine()
@@ -142,12 +142,11 @@
         }
 
         private void FireResume() => _machine?.Fire(Trigger.Resume);
-        private void Close() => _machine?.Fire(Trigger.Close);
+        private void FireClose() => _machine?.Fire(Trigger.Close);
         private void ObjectOpen(BaseOpenableObject obj) => _managerUI?.OpenInventory(obj);
         private void StartFight(BattleContext context) => _managerUI?.OpenBattleUI(context);
         private void OpenMonologue(string firstNode) => _managerUI?.OpenMonologue(firstNode);
         private void OpenDialogue(BaseSpeakingNPC npc) => _managerUI?.OpenDialogue(npc);
-
         private void Unsubscribe()
         {
             if (_mainWorld == null) return;

@@ -1,6 +1,5 @@
 ﻿namespace Playground.Script.UI
 {
-    using System;
     using Godot;
     using Playground.Script.Helpers;
     using Stateless;
@@ -16,8 +15,6 @@
         private OptionsMenu? _options;
         private SaveLoadMenu? _saveLoad;
         private AudioStreamPlayer? _musicPlayer;
-
-        public Action? Resume;
 
         public override void _Ready()
         {
@@ -59,7 +56,7 @@
 
         private void SetEvents()
         {
-            _menu!.Continue += () => Resume?.Invoke();
+            _menu!.Continue += UIEventBus.PublishResume;
             _menu.SaveLoad += () => _machine?.Fire(Trigger.ToSaveLoad);
             _menu.Options += () => _machine?.Fire(Trigger.ToOptions);
             _menu.MainMenu += () => GetTree().ChangeSceneToPacked(MainMenu.InitializeAsPackedScene());

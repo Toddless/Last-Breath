@@ -9,22 +9,22 @@
         {
             yield return new AttributeEffect
                 (Parameter.CriticalChance,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.01f);
 
             yield return new AttributeEffect
                 (Parameter.CriticalDamage,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.01f);
 
             yield return new AttributeEffect
                 (Parameter.AdditionalHitChance,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.02f);
 
             yield return new AttributeEffect
                 (Parameter.Evade,
-                ModifierType.Additive,
+                ModifierType.Flat,
                 0.01f);
         }
     }

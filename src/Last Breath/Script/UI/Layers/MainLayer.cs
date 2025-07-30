@@ -81,10 +81,7 @@
             }
         }
 
-        public void ShowCharacter() => _machine?.Fire(Trigger.ShowCharacter);
-        public void ShowPlayerInventory() => _machine?.Fire(Trigger.ShowPlayerInventory);
-        public void ShowQuests() => _machine?.Fire(Trigger.ShowQuests);
-        public void ShowMap() => _machine?.Fire(Trigger.ShowMap);
+
 
         public void OpenInventory(BaseOpenableObject obj)
         {
@@ -143,10 +140,10 @@
             }
             _questManager!.QuestAccepted += _questsUI!.AddQuests;
             _questManager.QuestCompleted += OnQuestCompleted;
-            _mainUI!.Character += ShowCharacter;
-            _mainUI!.Inventory += ShowPlayerInventory;
-            _mainUI!.Quests += ShowQuests;
-            _mainUI!.Map += ShowMap;
+            _mainUI!.Character += () => _machine?.Fire(Trigger.ShowCharacter);
+            _mainUI!.Inventory += () => _machine?.Fire(Trigger.ShowPlayerInventory);
+            _mainUI!.Quests += () => _machine?.Fire(Trigger.ShowQuests);
+            _mainUI!.Map += () => _machine?.Fire(Trigger.ShowMap);
             _inventoryUI!.TakeAll += OnInventoryTakeAll;
             _playerInventory!.InventorySlotClicked += OnInventorySlotClicked;
             _playerInventory.EquipItemPressed += OnEquipItemPressed;
@@ -268,7 +265,8 @@
         private void ConfigureMachine()
         {
             _machine?.Configure(State.Main)
-                .OnEntry(HideAll)
+                .OnEntry(ShowMainHideAll)
+                .OnExit(() => _mainUI?.Hide())
                 .Permit(Trigger.ShowCharacter, State.Character)
                 .Permit(Trigger.ShowPlayerInventory, State.PlayerInventory)
                 .Permit(Trigger.ShowQuests, State.Quests)
@@ -329,8 +327,9 @@
             _inventoryUI?.Clear();
         }
 
-        private void HideAll()
+        private void ShowMainHideAll()
         {
+            _mainUI?.Show();
             _characterUI?.Hide();
             _playerInventory?.Hide();
             _questsUI?.Hide();
@@ -352,6 +351,5 @@
             GetViewport().SetInputAsHandled();
             return true;
         }
-
     }
 }

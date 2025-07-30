@@ -1,9 +1,9 @@
 ﻿namespace Playground.Script.ScenesHandlers
 {
-    public class BattleContext(ICharacter opponent, ICharacter player) : IBattleContext
-    {
-        public ICharacter Opponent { get; private set; } = opponent;
+    using System.Collections.Generic;
 
-        public ICharacter Player { get; private set; } = player;
+    public class BattleContext(List<ICharacter> opponents) : IBattleContext
+    {
+        public List<ICharacter> Fighters { get; private set; } = opponents;
     }
 }

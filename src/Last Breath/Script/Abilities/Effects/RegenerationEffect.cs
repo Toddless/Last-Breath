@@ -2,6 +2,7 @@
 {
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
     public class RegenerationEffect : EffectBase
     {
@@ -10,7 +11,7 @@
                 stacks,
                 permanent)
         {
-            Modifier = new CurrentHealthModifier(ModifierType.Additive, 80, this, ModifierPriorities.Buffs);
+            Modifier = new CurrentHealthModifier(ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
         }
 
         public override void OnTick(ICharacter character)

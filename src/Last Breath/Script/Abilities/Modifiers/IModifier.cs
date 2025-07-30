@@ -1,6 +1,7 @@
 ﻿namespace Playground.Script.Abilities.Modifiers
 {
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
     public interface IModifier
     {
@@ -13,7 +14,7 @@
         float Value { get; set; }
         object Source { get; }
         /// <summary>
-        /// Call this method only for <see cref="ModifierType.Additive"/> and <see cref="ModifierType.Multiplicative"/>. For <see cref="ModifierType.Increase"/> just use Linq.Sum
+        /// Call this method only for <see cref="ModifierType.Flat"/> and <see cref="ModifierType.Multiplicative"/>. For <see cref="ModifierType.Increase"/> just use Linq.Sum
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>

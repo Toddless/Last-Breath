@@ -13,5 +13,6 @@
         public static readonly string NPCsQuests = "uid://cal2dmcbd722k";
         public static readonly string QuestOption = "uid://d01ts4xanfyuv";
         public static readonly string ItemDescription = "uid://c3nlyaormf73w";
+        public static readonly string TurnNotifier = "uid://b0s0mdo0r753n";
     }
 }

@@ -45,24 +45,24 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 script = ExtResource("1_xg6rw")
 _returnButton = NodePath("MarginContainer/VBoxContainer/ReturnButton")
-_playerHealthBar = NodePath("MarginContainer/VBoxContainer/HBoxContainerHealthBars/PlayerHealth")
-_enemyHealthBar = NodePath("MarginContainer/VBoxContainer/HBoxContainerHealthBars/EnemyHealth")
-_playerEffects = NodePath("MarginContainer/VBoxContainer/HBoxContainerStatusEffects/PlayerEffects")
-_enemyEffects = NodePath("MarginContainer/VBoxContainer/HBoxContainerStatusEffects/EnemyEffects")
-_dexterityStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Dexterity")
-_strengthStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Strength")
-_intelligenceStance = NodePath("MarginContainer/AttackButtons/VBoxContainerStance/Intelligence")
-_head = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Head")
-_body = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Body")
-_legs = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart/Legs")
-_playerResource = NodePath("MarginContainer/VBoxContainer/HBoxContainer/PlayerResource")
-_enemyResource = NodePath("MarginContainer/VBoxContainer/HBoxContainer/EnemyResource")
+_playerHealthBar = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars/PlayerHealth")
+_enemyHealthBar = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars/EnemyHealth")
+_playerEffects = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerStatusEffects/PlayerEffects")
+_enemyEffects = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerStatusEffects/EnemyEffects")
+_dexterityStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Dexterity")
+_strengthStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Strength")
+_intelligenceStance = NodePath("MarginContainer/Buttons/VBoxContainerStance/Intelligence")
+_head = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Head")
+_body = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Body")
+_legs = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart/Legs")
+_playerResource = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainer/PlayerResource")
+_enemyResource = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainer/EnemyResource")
 _player = NodePath("MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Player")
 _enemy = NodePath("MarginContainer/VBoxContainerOpponents/MarginContainer/HBoxContainer/Enemy")
 _abilities = NodePath("MarginContainer/AbilityButtons")
-_attackButtons = NodePath("MarginContainer/AttackButtons")
-_stanceContainer = NodePath("MarginContainer/AttackButtons/VBoxContainerStance")
-_bodyContainer = NodePath("MarginContainer/AttackButtons/VBoxContainerBodyPart")
+_attackButtons = NodePath("MarginContainer/Buttons")
+_stanceContainer = NodePath("MarginContainer/Buttons/VBoxContainerStance")
+_bodyContainer = NodePath("MarginContainer/Buttons/VBoxContainerBodyPart")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 clip_contents = true
@@ -81,12 +81,15 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_nwaqx")
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HBoxContainerHealthBars" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HealthEffectsResources" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainerHealthBars" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="PlayerHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+[node name="PlayerHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_vertical = 4
@@ -96,7 +99,7 @@ nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
 texture_progress = SubResource("AtlasTexture_l5ci7")
 
-[node name="EnemyHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainerHealthBars"]
+[node name="EnemyHealth" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -108,10 +111,10 @@ nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
 texture_progress = SubResource("AtlasTexture_l5ci7")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources"]
 layout_mode = 2
 
-[node name="PlayerResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="PlayerResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainer"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_vertical = 4
@@ -128,7 +131,7 @@ TextureByResourceType = Dictionary[int, Texture2D]({
 2: ExtResource("8_506f5")
 })
 
-[node name="EnemyResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="EnemyResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainer"]
 custom_minimum_size = Vector2(285, 35)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -146,10 +149,10 @@ TextureByResourceType = Dictionary[int, Texture2D]({
 2: ExtResource("8_506f5")
 })
 
-[node name="HBoxContainerStatusEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainerStatusEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources"]
 layout_mode = 2
 
-[node name="PlayerEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects"]
+[node name="PlayerEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerStatusEffects"]
 custom_minimum_size = Vector2(190, 50)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -158,7 +161,7 @@ theme_override_constants/h_separation = 1
 theme_override_constants/v_separation = 1
 columns = 11
 
-[node name="EnemyEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HBoxContainerStatusEffects"]
+[node name="EnemyEffects" type="GridContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerStatusEffects"]
 custom_minimum_size = Vector2(190, 50)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -201,19 +204,19 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 texture_normal = SubResource("PlaceholderTexture2D_2f6ns")
 
-[node name="AttackButtons" type="HBoxContainer" parent="MarginContainer"]
+[node name="Buttons" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 6
 theme_override_constants/separation = 15
 
-[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
+[node name="VBoxContainerStance" type="VBoxContainer" parent="MarginContainer/Buttons"]
 custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 15
 
-[node name="Dexterity" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Dexterity" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
@@ -222,7 +225,7 @@ keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_ingfk")
 flip_h = true
 
-[node name="Strength" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Strength" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -231,7 +234,7 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Intelligence" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerStance"]
+[node name="Intelligence" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerStance"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -240,18 +243,18 @@ toggle_mode = true
 keep_pressed_outside = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/AttackButtons"]
+[node name="VBoxContainerBodyPart" type="VBoxContainer" parent="MarginContainer/Buttons"]
 custom_minimum_size = Vector2(0, 290)
 layout_mode = 2
 
-[node name="Head" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Head" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 2
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Body" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Body" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -259,7 +262,7 @@ size_flags_vertical = 6
 toggle_mode = true
 texture_normal = SubResource("PlaceholderTexture2D_215ms")
 
-[node name="Legs" type="TextureButton" parent="MarginContainer/AttackButtons/VBoxContainerBodyPart"]
+[node name="Legs" type="TextureButton" parent="MarginContainer/Buttons/VBoxContainerBodyPart"]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 size_flags_horizontal = 4

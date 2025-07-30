@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Godot;
     using Playground.Script.Abilities.Interfaces;
     using Playground.Script.Abilities.Modifiers;
     using Playground.Script.Enums;
@@ -12,8 +11,6 @@
     {
         protected const float From = 0.8f;
         protected const float To = 1.2f;
-
-        protected RandomNumberGenerator Rnd = new();
 
         protected List<IModifier> BaseModifiers = [];
         protected List<IEffect> Effects = [];
@@ -36,14 +33,17 @@
 
         public virtual void OnUnequip()
         {
-            BaseModifiers.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
-            Effects.ForEach(Owner.Effects.RemoveEffect);
-            Owner = null;
+            if (Owner != null)
+            {
+                BaseModifiers.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
+                Effects.ForEach(Owner.Effects.RemoveEffect);
+                Owner = null;
+            }
         }
 
         public override List<string> GetItemStatsAsStrings()
         {
-            List<string> list = [];
+            List<string> stats = [];
             foreach (var modifier in BaseModifiers)
             {
                 StringBuilder stringBuilder = new();
@@ -51,9 +51,9 @@
                 stringBuilder.Append(':');
                 stringBuilder.Append(' ');
                 stringBuilder.Append(modifier.Value);
-                list.Add(stringBuilder.ToString());
+                stats.Add(stringBuilder.ToString());
             }
-            return list;
+            return stats;
         }
 
         public virtual void UpgradeItemLevel() { }
@@ -61,30 +61,24 @@
         protected virtual void LoadData()
         {
             var itemStats = GetItemStats();
-            if (itemStats == null)
+            if (itemStats != null)
             {
-                // TODO Log
-                return;
+                BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
+
+                LoadMediaData();
             }
-
-            BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
-
-            LoadMediaData();
         }
 
         private void LoadMediaData()
         {
             var mediaData = GetItemMediaData();
-            if (mediaData == null)
+            if (mediaData != null)
             {
-                // TODO Log
-                return;
+                Icon = mediaData.IconTexture;
+                Description = mediaData.Description;
+                ItemName = mediaData.Name;
+                FullImage = mediaData.FullTexture;
             }
-
-            Icon = mediaData.IconTexture;
-            Description = mediaData.Description;
-            ItemName = mediaData.Name;
-            FullImage = mediaData.FullTexture;
         }
 
         protected virtual void SetEffects() { }

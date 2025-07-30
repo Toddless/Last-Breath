@@ -2,17 +2,16 @@
 {
     public enum ModifierType
     {
-        // order is matter!!!
         /// <summary>
-        /// Raw value
+        /// Raw value. Example: +300 HP, +15 Def etc.
         /// </summary>
-        Additive = 0,
+        Flat = 0,
         /// <summary>
-        /// Value should be 0.1, 0.3 etc
+        /// Percent value. Values should be 0.1, 0.3 etc
         /// </summary>
         Increase,
         /// <summary>
-        /// Value should be 1.3, 1.1 etc.
+        /// Percent values should be 1.3, 1.1 etc.
         /// </summary>
         Multiplicative
     }

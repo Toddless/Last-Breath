@@ -1,6 +1,5 @@
 ﻿namespace Playground.Components
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Playground.Script;
@@ -9,8 +8,9 @@
 
     public class EffectsManager(ICharacter owner)
     {
-        // TODO: Decide: All effects are temporary and should be removed after fight ends or some of them can be permanent
+        // all effects from equip, passive skills etc.
         private readonly List<IEffect> _permanentEffects = [];
+        // temporary effects will be getting only in figth
         private readonly List<IEffect> _temporaryEffects = [];
         private readonly ICharacter _owner = owner;
 
@@ -20,18 +20,18 @@
 
         public void RemoveEffect(IEffect effect)
         {
-            if (!GetCombinedEffects().Contains(effect))
+            var allEffects = GetCombinedEffects();
+            if (!allEffects.Contains(effect))
             {
-                // log
+                // TODO: log
                 return;
             }
             effect.OnRemove(_owner);
-            GetCombinedEffects().Remove(effect);
+            allEffects.Remove(effect);
         }
 
         public void UpdateEffects()
         {
-            // ToArray preventing Collection Modified exception
             foreach (var effect in GetCombinedEffects())
             {
                 effect.OnTick(_owner);
@@ -50,8 +50,9 @@
             }
         }
 
-        public void RemoveAllTemporaryEffects() => _temporaryEffects.ForEach(RemoveEffect);
-        public bool IsEffectApplied(Type effect) => GetCombinedEffects().Any(x => x.GetType() == effect);
+        public void ClearAllTemporaryEffects() => _temporaryEffects.Clear();
+
+        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x=>x.Effect == effect);
 
         private void AddEffects(IEffect effect, List<IEffect> list)
         {

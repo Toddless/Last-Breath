@@ -30,7 +30,6 @@ script = ExtResource("1_dp7k8")
 
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
-FirstSpawn = false
 
 [node name="MainLayer" type="CanvasLayer" parent="."]
 process_mode = 1

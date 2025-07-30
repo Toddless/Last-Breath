@@ -2,7 +2,7 @@
 {
     using Playground.Script.Enums;
 
-    public class ModifierBase(Parameter parameter, ModifierType type, float value, object source, int priority = 0) : IModifier
+    public abstract class ModifierBase(Parameter parameter, ModifierType type, float value, object source, int priority = 0) : IModifier
     {
         public Parameter Parameter { get; } = parameter;
 

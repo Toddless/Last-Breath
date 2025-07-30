@@ -139,8 +139,3 @@ paket-files/
 /src/Last Breath/Assets
 /src/Testing/bin
 /src/Testing/obj
-/src/Last Breath/NewFolder/AbilitiesContext.cs
-/src/Last Breath/NewFolder/IAbilityStrategy.cs
-/src/Last Breath/NewFolder/TestAbility.cs
-/src/Last Breath/Components/MessageBus.cs
-/src/Last Breath/Properties/launchSettings.json

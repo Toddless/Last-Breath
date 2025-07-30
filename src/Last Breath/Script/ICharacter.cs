@@ -1,28 +1,40 @@
 ﻿namespace Playground.Script
 {
+    using System;
+    using System.Collections.Generic;
     using Playground.Components;
+    using Playground.Script.Abilities.Interfaces;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
 
     public interface ICharacter
     {
-        public HealthComponent Health { get; }
-        public DamageComponent Damage { get; }
-        public DefenseComponent Defense { get; }
-        public EffectsManager Effects { get; }
-        public ModifierManager Modifiers { get; }
-        public ResourceComponent Resource { get; }
-        Stance Stance { get; set; }
+        HealthComponent Health { get; }
+        DamageComponent Damage { get; }
+        DefenseComponent Defense { get; }
+        EffectsManager Effects { get; }
+        ModifierManager Modifiers { get; }
+
+        public IStance? CurrentStance { get; }
+        string CharacterName { get; }
         bool CanFight { get; set; }
         bool CanMove { get; set; }
+        bool IsAlive { get; }
+        int Initiative { get; }
 
+        event Action<ICharacter>? Dead;
+        event Action? AllAttacksFinished;
+        event Action<OnGettingAttackEventArgs>? GettingAttack;
 
         void OnTurnEnd();
-        void OnFightEnds();
-        void OnAnimation();
-
-        // TODO: Resources class
-        // i need 3 types, for each stance
-        // each of resource has its own way to recover
-        // but all of them should be recovered at the end of the turn
+        void AddSkill(ISkill skill);
+        void RemoveSkill(ISkill skill);
+        List<ISkill> GetSkills(SkillType type);
+        void OnTurnStart();
+        void OnReceiveAttack(AttackContext context);
+        void TakeDamage(float damage, bool isCrit = false);
+        void AllAttacks();
+        void OnEvadeAttack();
+        void OnBlockAttack();
     }
 }

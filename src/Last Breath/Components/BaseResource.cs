@@ -1,66 +1,86 @@
 ﻿namespace Playground.Components
 {
     using System;
-    using Godot;
     using Playground.Components.Interfaces;
     using Playground.Script.Enums;
+    using Playground.Script.Helpers;
 
-    public class BaseResource : IResource
+    public abstract class BaseResource : IResource
     {
-        private readonly float _baseRecoveryAmount;
-        private readonly float _baseMaximumAmount;
-        private readonly IRecoveryRule _recoveryRule;
-        public BaseResource(Parameter parameter, ResourceType type, float recoveryAmount, float maximumAmount, IRecoveryRule rule)
+        private readonly float _baseRecoveryAmount, _baseMaximumAmount;
+        private float _current, _maximum;
+
+        protected BaseResource(float recoveryAmount, float maximumAmount, ResourceType resourceType)
         {
             _baseRecoveryAmount = recoveryAmount;
             _baseMaximumAmount = maximumAmount;
-            Parameter = parameter;
-            Type = type;
-            _recoveryRule = rule;
-            UpdateResources();
+            MaximumAmount = _baseMaximumAmount;
+            RecoveryAmount = _baseRecoveryAmount;
+            ResourceType = resourceType;
+
         }
 
         public event Action<float>? CurrentChanges, MaximumChanges;
 
-        public Parameter Parameter { get; }
-        public ResourceType Type { get; }
-        public float Current { get; private set; }
-        public float RecoveryAmount { get; set; }
-        public float MaximumAmount { get; set; }
+        public float RecoveryAmount { get; private set; }
 
-        public void HandleRecoveryEvent(RecoveryEventContext context)
+        public float Current
         {
-            if (_recoveryRule.ShouldRecover(context))
+            get => _current;
+            set
             {
-                GD.Print($"ShouldRecover return true: {context.Type}");
-                Recover();
+                if (ObservableProperty.SetProperty(ref _current, value))
+                    CurrentChanges?.Invoke(value);
+            }
+        }
+        public float MaximumAmount
+        {
+            get => _maximum;
+            set
+            {
+                if (ObservableProperty.SetProperty(ref _maximum, value))
+                    MaximumChanges?.Invoke(value);
             }
         }
 
-        public bool IsEnough(int amountToSpend) => Current <= amountToSpend;
+        public ResourceType ResourceType { get; }
 
         public void OnSpend(int amount)
         {
-            Current -= amount;
-            CurrentChanges?.Invoke(amount);
+            // Raise event if not enough?? Return false or some kind of results?
+            if (IsEnough(amount))
+            {
+                Current -= amount;
+            }
         }
 
-        public float GetBaseRecovery() => _baseRecoveryAmount;
-        public float GetBaseMaximumAmount() => _baseMaximumAmount;
-
-        private void UpdateResources()
-        {
-            MaximumAmount = _baseMaximumAmount;
-            RecoveryAmount = _baseRecoveryAmount;
-        }
-
-        private void Recover()
+        public void Recover()
         {
             Current += RecoveryAmount;
             if (Current > MaximumAmount)
                 Current = MaximumAmount;
-            GD.Print($"Resource: {GetType().Name} recovered: {RecoveryAmount}");
-            CurrentChanges?.Invoke(Current);
         }
+
+        public virtual void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        {
+            switch (args.Parameter)
+            {
+                case Parameter.ResourceMax:
+                    MaximumAmount = Calculations.CalculateFloatValue(_baseMaximumAmount, args.Modifiers);
+                    break;
+                case Parameter.ResourceRecovery:
+                    RecoveryAmount = Calculations.CalculateFloatValue(_baseRecoveryAmount, args.Modifiers);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        protected virtual void LoadData()
+        {
+
+        }
+
+        private bool IsEnough(int amountToSpend) => Current <= amountToSpend;
     }
 }

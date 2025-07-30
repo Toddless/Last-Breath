@@ -2,10 +2,12 @@
 {
     public enum Parameter
     {
-        Damage = 0,
+        Damage = 1,
         CriticalChance,
+        MaxCriticalChance,
         CriticalDamage,
         AdditionalHitChance,
+        MaxAdditionalHitChance,
         CurrentHealth,
         MaxHealth,
         Dexterity,
@@ -15,7 +17,7 @@
         Evade,
         EnergyBarrier,
         SpellDamage,
-        Resource,
+        ResourceMax,
         ResourceRecovery,
         MaxReduceDamage,
         Movespeed,

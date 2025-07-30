@@ -9,6 +9,7 @@
     using Playground.Resource.Quests;
     using Playground.Script.NPC;
     using Playground.Script.QuestSystem;
+    using Playground.Script.UI;
     using Playground.Script.UI.View;
     using Stateless;
 
@@ -275,7 +276,7 @@
 
         private void OnQuitPressed()
         {
-            DialogueEnded?.Invoke();
+            UIEventBus.PublishClose();
             _player!.CanMove = true;
             _machine?.Fire(Trigger.Dialogue);
         }

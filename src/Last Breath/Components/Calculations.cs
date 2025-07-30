@@ -4,17 +4,26 @@
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script;
     using Playground.Script.Abilities.Modifiers;
+    using Playground.Script.BattleSystem;
     using Playground.Script.Enums;
 
     public class Calculations
     {
-        public static float CalculateFloatValue(float value, List<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
+        public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
-        public static float DamageAfterCrit(float damage, ICharacter attacker) => damage *= attacker.Damage.CriticalDamage;
+        public static float DamageReduceByArmor(AttackContext context)
+        {
+            var damage = context.Damage;
+            if (context.IsCritical)
+            {
+                damage *= context.CriticalDamageMultiplier;
+            }
 
-        public static float DamageAfterArmor(float damage, ICharacter defender) => Mathf.Max(0, damage * (1 - Mathf.Min(defender.Defense.Armor / 1000, defender.Defense.MaxReduceDamage)));
+            if(context.IgnoreArmor) return damage;
+
+            return Mathf.Max(0, damage * (1 - Mathf.Min(context.Armor / 1000, context.MaxReduceDamage)));
+        }
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
         {
@@ -23,7 +32,7 @@
             {
                 switch (group.Key)
                 {
-                    case ModifierType.Additive:
+                    case ModifierType.Flat:
                         value = ModifyValue(value, group);
                         break;
                     case ModifierType.Increase:
@@ -40,7 +49,7 @@
 
         private static float ModifyValue(float value, IGrouping<ModifierType, IModifier> modifiers)
         {
-            foreach (var modifier in modifiers.OrderBy(x => x.Priority))
+            foreach (var modifier in modifiers.OrderByDescending(x => x.Priority))
             {
                 value = modifier.ModifyValue(value);
             }

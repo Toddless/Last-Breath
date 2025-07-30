@@ -32,7 +32,7 @@
             description.SetStats(CurrentItem.GetItemStatsAsStrings());
             description.SetItemImage(CurrentItem.FullImage);
             description.SetItemDescription(CurrentItem.Description?.Text ?? string.Empty);
-            GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(MethodName.AddChild, description);
+            GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(Node.MethodName.AddChild, description);
             ItemDescription = description;
         }
     }
