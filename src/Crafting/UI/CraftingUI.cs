@@ -1,4 +1,4 @@
-﻿namespace Crafting.Scripts
+﻿namespace Crafting.UI
 {
     using Godot;
 

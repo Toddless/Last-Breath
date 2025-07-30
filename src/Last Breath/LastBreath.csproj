@@ -19,4 +19,7 @@
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crafting\Crafting.csproj"/>
+  </ItemGroup>
 </Project>
