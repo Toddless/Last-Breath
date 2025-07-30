@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.BattleSystem.Decorators
+﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public interface IModuleDecorator<TKey, TModule>
         where TKey : notnull

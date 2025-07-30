@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Script;
+    using LastBreath.Script;
 
     public interface IStanceActivationEffect
     {

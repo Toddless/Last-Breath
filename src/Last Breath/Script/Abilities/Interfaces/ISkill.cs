@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
+    using LastBreath.Localization;
 
     public interface ISkill
     {

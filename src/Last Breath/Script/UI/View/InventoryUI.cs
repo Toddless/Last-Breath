@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using System;
     using Godot;
-    using Playground.Script.Inventory;
-    using Playground.Script.Items;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.Items;
 
     public partial class InventoryUI : VBoxContainer
     {

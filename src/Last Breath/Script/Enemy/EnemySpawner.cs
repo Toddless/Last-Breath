@@ -1,11 +1,11 @@
-namespace Playground.Script.Enemy
+namespace LastBreath.Script.Enemy
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Linq;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     // TODO: Need to rework this
     public partial class EnemySpawner : Node, IEnemySpawner

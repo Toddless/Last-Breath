@@ -1,15 +1,15 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System;
     using System.Linq;
     using Godot;
-    using Playground.Resource.Quests;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Inventory;
-    using Playground.Script.Items;
-    using Playground.Script.QuestSystem;
-    using Playground.Script.UI.View;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.UI.View;
     using Stateless;
 
     public partial class MainLayer : CanvasLayer

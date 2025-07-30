@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public class OnGettingAttackEventArgs(ICharacter character, AttackResults result, float damage = default, bool isCrit = false)
     {

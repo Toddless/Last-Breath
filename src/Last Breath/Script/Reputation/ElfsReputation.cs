@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Reputation
+﻿namespace LastBreath.Script.Reputation
 {
     public class ElfsReputation : BaseReputation
     {

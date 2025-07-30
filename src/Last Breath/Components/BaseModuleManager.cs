@@ -1,8 +1,8 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script;
+    using LastBreath.Script;
 
     public abstract class BaseModuleManager<TKey, TModule>(Dictionary<TKey, TModule> cache, ICharacter owner)
         where TKey : notnull

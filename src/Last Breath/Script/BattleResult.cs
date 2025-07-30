@@ -1,6 +1,6 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public class BattleResult(ICharacter player, ICharacter enemy, BattleResults result)
     {

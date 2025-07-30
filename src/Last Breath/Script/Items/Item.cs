@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
+    using LastBreath.Localization;
 
     [GlobalClass]
     public partial class Item : Resource

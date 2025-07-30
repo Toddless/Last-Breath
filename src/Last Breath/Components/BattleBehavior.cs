@@ -1,8 +1,8 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System.Collections.Generic;
-    using Playground.Components.Interfaces;
-    using Playground.Script.ScenesHandlers;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.ScenesHandlers;
 
     // TODO: Rework
     public class BattleBehavior

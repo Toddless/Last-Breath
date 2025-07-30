@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public class HandleAttackEvadeModule(ICharacter owner) : IActionModule<ICharacter>
     {

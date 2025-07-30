@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using System.IO;
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class ItemsDataPaths
     {

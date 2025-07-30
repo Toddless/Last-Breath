@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Inventory
+﻿namespace LastBreath.Script.Inventory
 {
     public interface IEquipable
     {

@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.BattleSystem.Decorators
+﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
 
     public class ImmuneToSkillDecorator(SkillType type, DecoratorPriority priority, Type skill) : SkillModuleDecorator(type, priority)
     {

@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     using Godot;
-    using Playground.Components;
+    using LastBreath.Components;
 
     [GlobalClass]
     public partial class QuestCompletedCondition : Condition

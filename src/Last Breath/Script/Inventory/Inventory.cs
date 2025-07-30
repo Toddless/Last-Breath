@@ -1,11 +1,11 @@
-﻿namespace Playground.Script.Inventory
+﻿namespace LastBreath.Script.Inventory
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Items;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items;
 
     public class Inventory
     {
@@ -76,7 +76,7 @@
         }
 
         public void Clear() => Slots.ForEach(slot => slot.ClearSlot());
-        private InventorySlot? GetSlotToAdd(Item item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || (itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize));
+        private InventorySlot? GetSlotToAdd(Item item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize);
         private InventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem.Id == itemId);
         private void OnSlotClicked(Item item, MouseButtonPressed pressed) => SlotClicked?.Invoke(item, pressed, this);
     }

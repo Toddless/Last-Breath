@@ -1,14 +1,15 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Playground;
-    using Playground.Script;
-    using Playground.Script.Enums;
-    using Playground.Script.ScenesHandlers;
-    using Playground.Script.UI;
     using Stateless;
+    using LastBreath;
+    using System.Linq;
+    using LastBreath.Script;
+    using LastBreath.Script.UI;
+    using LastBreath.Script.Enums;
+    using System.Collections.Generic;
+    using LastBreath.Script.ScenesHandlers;
 
     public class BattleHandler
     {
@@ -112,7 +113,7 @@
                 if (nextFighter.IsAlive)
                 {
                     _currentAttacking = nextFighter;
-                    break;
+                    return;
                 }
             }
             // no characters allive except one => battle ends (but probably we should end the battle way ealier)
@@ -147,6 +148,8 @@
             // <2 because it is still players turn, and enemies still in queue
             if (_currentAttacking is Player && _attackQueue.Count < 2)
             {
+                GD.Print($"Attack queue:{_attackQueue.Count}");
+                GD.Print("Check if battle should end is true");
                 _combatScheduler.CancelQueue();
                 _machine.Fire(_battleEnds, BattleResults.PlayerWon);
             }
@@ -166,12 +169,14 @@
             _battleEnds = _machine.SetTriggerParameters<BattleResults>(Trigger.EndBattle);
 
             _machine.Configure(State.AwaitingBattleToStart)
+                .OnExit(()=> GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.TurnStartPhase)
                 .OnEntry(TurnStart)
                 .OnExit(() =>
                 {
+                    GD.Print($"Leaving state: {_machine.State}");
                     OnExitStartPhase?.Invoke();
                 })
                 .Permit(Trigger.EndBattle, State.EndBattle)
@@ -185,6 +190,7 @@
                 })
                 .OnExit(() =>
                 {
+                    GD.Print($"Leaving state: {_machine.State}");
                     _combatScheduler.AllContextsHandled -= OnAllContextsHandled;
                 })
                 .Permit(Trigger.EndBattle, State.EndBattle)
@@ -193,16 +199,19 @@
 
             _machine.Configure(State.TurnEndPhase)
                  .OnEntry(TurnEnds)
+                 .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                  .Permit(Trigger.EndBattle, State.EndBattle)
                  .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
 
             _machine.Configure(State.TurnTransitionPhase)
                 .OnEntry(PerformTurnTransition)
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.EndBattle)
                 .Ignore(Trigger.NextPhase)
                 .OnEntryFrom(_battleEnds, EndBattle)
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.AwaitForBattle, State.AwaitingBattleToStart);
         }
 

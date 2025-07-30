@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Playground.DebugTools;
+    using LastBreath.DebugTools;
 
     public partial class DevLayer : CanvasLayer
     {

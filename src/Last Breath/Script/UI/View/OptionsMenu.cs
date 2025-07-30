@@ -1,7 +1,7 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public partial class OptionsMenu : Control
     {

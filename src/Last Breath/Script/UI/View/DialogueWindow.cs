@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using Godot;
     using Godot.Collections;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public partial class DialogueWindow : Control
     {

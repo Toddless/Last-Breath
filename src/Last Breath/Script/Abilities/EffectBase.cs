@@ -1,9 +1,10 @@
-﻿namespace Playground.Script.Abilities
+﻿namespace LastBreath.Script.Abilities
 {
     using System;
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Modifiers;
 
     public abstract class EffectBase(Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {

@@ -1,10 +1,11 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Resource.Quests;
+    using LastBreath.Script;
+    using LastBreath.Resource.Quests;
 
     public partial class QuestManager : Node
     {

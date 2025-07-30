@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using Godot;
     using Godot.Collections;
-    using Playground.Localization;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
+    using LastBreath.Localization;
 
     [GlobalClass]
     public partial class ItemResources : Resource

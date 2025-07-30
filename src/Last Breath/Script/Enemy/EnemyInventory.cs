@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.Enemy
+﻿namespace LastBreath.Script.Enemy
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.Inventory;
-    using Playground.Script.Items;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.Items;
 
     public class EnemyInventory : Inventory
     {

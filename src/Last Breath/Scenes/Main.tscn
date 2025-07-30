@@ -53,6 +53,24 @@ visible = false
 [node name="Inventory" parent="MainLayer" instance=ExtResource("11_jyqft")]
 visible = false
 
+[node name="Close2" type="Button" parent="MainLayer/Inventory"]
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 0
+text = "Close"
+
+[node name="GridContainer2" type="GridContainer" parent="MainLayer/Inventory"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 5
+
+[node name="TakeAll2" type="Button" parent="MainLayer/Inventory"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+text = "Take all"
+
 [node name="PauseLayer" type="CanvasLayer" parent="."]
 process_mode = 1
 visible = false

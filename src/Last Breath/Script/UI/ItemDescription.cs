@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public partial class ItemDescription : MarginContainer
     {

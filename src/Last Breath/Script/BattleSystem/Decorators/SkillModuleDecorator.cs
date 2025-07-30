@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.BattleSystem.Decorators
+﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.BattleSystem.Module;
+    using LastBreath.Script.Enums;
 
     public abstract class SkillModuleDecorator : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {

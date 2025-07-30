@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using System;
     using Godot;
-    using Playground.Resource.Quests;
-    using Playground.Script.Helpers;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Resource.Quests;
 
     public partial class QuestOption : Button
     {

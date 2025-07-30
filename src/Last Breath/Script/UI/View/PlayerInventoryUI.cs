@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System;
     using Godot;
     using Godot.Collections;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Inventory;
-    using Playground.Script.Items;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.Items;
 
     public partial class PlayerInventoryUI : Control
     {

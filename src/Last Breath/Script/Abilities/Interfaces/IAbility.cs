@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using System;
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public interface IAbility
     {

@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.UI.View;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.UI.View;
 
     public partial class CharacterMenu : Control
     {

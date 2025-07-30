@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.Items.Factories
+﻿namespace LastBreath.Script.Items.Factories
 {
     using System;
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items;
 
     public class BodyArmorFactory : ItemCreator
     {

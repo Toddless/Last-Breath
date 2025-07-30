@@ -1,11 +1,11 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Items.ItemData;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Items.ItemData;
 
     public class ModifiersCreator
     {

@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Abilities.Modifiers
+﻿namespace LastBreath.Script.Abilities.Modifiers
 {
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
 
     public interface IModifier
     {

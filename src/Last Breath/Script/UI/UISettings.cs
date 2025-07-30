@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System;
     using Godot;
     using Godot.Collections;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public class UISettings : ISettings
     {

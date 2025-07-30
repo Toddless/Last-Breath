@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.NPC
+﻿namespace LastBreath.Script.NPC
 {
     using Godot;
 

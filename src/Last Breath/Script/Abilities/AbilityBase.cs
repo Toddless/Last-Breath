@@ -1,10 +1,11 @@
-﻿namespace Playground.Script.Abilities
+﻿namespace LastBreath.Script.Abilities
 {
     using System;
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
 
     public abstract class AbilityBase(ICharacter owner, int cooldown, int cost, ResourceType type, bool activateOnlyOnCaster) : IAbility
     {

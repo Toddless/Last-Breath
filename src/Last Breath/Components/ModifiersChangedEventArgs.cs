@@ -1,9 +1,9 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Script.Abilities.Modifiers;
     using System.Collections.Generic;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Enums;
 
     public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifier> modifiers) : EventArgs
     {

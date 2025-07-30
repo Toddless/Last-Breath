@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using Godot;
 

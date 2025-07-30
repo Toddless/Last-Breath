@@ -1,7 +1,7 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public class DefenseComponent
     {

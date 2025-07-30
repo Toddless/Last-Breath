@@ -1,7 +1,8 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace LastBreath.Components.Interfaces
 {
     using System;
-    using Playground.Script.Enums;
+    using LastBreath.Components;
+    using LastBreath.Script.Enums;
 
     public interface IResource
     {

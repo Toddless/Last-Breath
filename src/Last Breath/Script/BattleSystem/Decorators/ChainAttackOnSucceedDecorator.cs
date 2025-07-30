@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.BattleSystem.Decorators
+﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public class ChainAttackOnSucceedDecorator(DecoratorPriority priority, ICharacter owner) : ActionModuleDecorator(type: ActionModule.SucceedAction, priority)
     {

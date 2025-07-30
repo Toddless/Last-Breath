@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.LootGenerator
+﻿namespace LastBreath.Script.LootGenerator
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class GenericObject
     {

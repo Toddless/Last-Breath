@@ -1,4 +1,4 @@
-﻿namespace Playground.DebugTools
+﻿namespace LastBreath.DebugTools
 {
     using System;
     using Godot;

@@ -1,7 +1,7 @@
-﻿namespace PlaygroundTest.ComponentTests.TestData
+﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
+    using LastBreath.Script.BattleSystem.Module;
+    using LastBreath.Script.Enums;
 
     public class DamageModuleTest(float value) : IStatModule
     {

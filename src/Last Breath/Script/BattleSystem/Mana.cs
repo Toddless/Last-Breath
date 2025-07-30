@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components;
+    using LastBreath.Components;
 
     public class Mana : BaseResource
     {

@@ -1,9 +1,9 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.BattleSystem.Decorators;
+    using LastBreath.Script.BattleSystem.Decorators;
 
     public class ModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull

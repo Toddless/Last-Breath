@@ -1,11 +1,11 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using Godot;
+    using LastBreath.Script.Enums;
     using Newtonsoft.Json;
-    using Playground.Script.Enums;
 
     public class ItemsStatsHandler : IItemStatsHandler
     {

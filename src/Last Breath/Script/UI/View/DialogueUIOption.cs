@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using System;
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Localization;
 
     public partial class DialogueUIOption : HBoxContainer
     {

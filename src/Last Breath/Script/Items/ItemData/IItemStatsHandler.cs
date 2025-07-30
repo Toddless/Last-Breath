@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public interface IItemStatsHandler
     {

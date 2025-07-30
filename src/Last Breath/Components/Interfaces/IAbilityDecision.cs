@@ -1,6 +1,6 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace LastBreath.Components.Interfaces
 {
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public interface IAbilityDecision
     {

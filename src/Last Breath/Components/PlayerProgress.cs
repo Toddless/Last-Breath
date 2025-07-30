@@ -1,7 +1,7 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System.Collections.Generic;
-    using Playground.Script.Items;
+    using LastBreath.Script.Items;
 
     public class PlayerProgress
     {

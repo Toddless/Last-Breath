@@ -1,8 +1,8 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public partial class ConfigFileHandler : Node
     {

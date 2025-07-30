@@ -1,7 +1,8 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script;
+    using LastBreath.Script.Helpers;
 
     public partial class TurnNotifier : Panel
     {

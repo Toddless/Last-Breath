@@ -1,10 +1,10 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Attribute;
-    using Playground.Script.Enums;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Attribute;
+    using LastBreath.Script.Enums;
 
     public class AttributeComponent
     {

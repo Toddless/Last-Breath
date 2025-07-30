@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Enums
+﻿namespace LastBreath.Script.Enums
 {
     public enum SoundBus
     {

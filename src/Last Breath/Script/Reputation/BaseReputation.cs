@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.Reputation
+﻿namespace LastBreath.Script.Reputation
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class BaseReputation(int defaultReputation)
     {

@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class ItemCreator
     {

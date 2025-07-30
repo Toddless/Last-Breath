@@ -1,12 +1,12 @@
-﻿namespace Playground
+﻿namespace LastBreath
 {
     using System;
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
-    using Playground.Script.UI;
-    using Playground.Script.UI.View;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.UI;
+    using LastBreath.Script.UI.View;
 
     public partial class BattleUI : Control
     {

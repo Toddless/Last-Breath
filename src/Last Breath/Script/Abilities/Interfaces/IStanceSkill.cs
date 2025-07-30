@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
 
     public interface IStanceSkill : ISkill
     {

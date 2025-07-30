@@ -1,10 +1,11 @@
-﻿namespace Playground.Script.Abilities.Skills
+﻿namespace LastBreath.Script.Abilities.Skills
 {
     using System;
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
+    using LastBreath.Localization;
 
     [GlobalClass]
     public partial class ExecutionSkill : Resource, IOnAttackSkill

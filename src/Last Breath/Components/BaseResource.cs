@@ -1,9 +1,9 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
 
     public abstract class BaseResource : IResource
     {

@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components.Interfaces;
     using System;
-    using Playground.Script;
-    using Playground.Components;
-    using Playground.Script.Enums;
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.BattleSystem.Decorators;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Components;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.BattleSystem.Module;
+    using LastBreath.Script.BattleSystem.Decorators;
 
     public interface IStance
     {

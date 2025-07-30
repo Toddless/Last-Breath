@@ -1,9 +1,10 @@
-﻿namespace PlaygroundTest.ComponentTests
+﻿namespace LastBreathTest.ComponentTests
 {
+    using LastBreath.Components;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
     using Moq;
-    using Playground.Components;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
 
     [TestClass]
     public class SkillComponentTest
@@ -14,7 +15,7 @@
             bool activated = false;
             var character = new Mock<ICharacter>().Object;
             var skill = new Mock<ITargetSkill>();
-            skill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.AlwaysActive);
+            skill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
             skill.Setup(x => x.Activate(character)).Callback(new InvocationAction(invocation =>
             {
                 activated = true;
@@ -34,7 +35,7 @@
             var character = new Mock<ICharacter>().Object;
 
             var skill = new Mock<ITargetSkill>();
-            skill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.PreAttack);
+            skill.Setup(x => x.Type).Returns(SkillType.PreAttack);
             skill.Setup(x => x.Activate(character)).Callback(new InvocationAction(invocation =>
             {
                 activated = true;
@@ -51,13 +52,13 @@
         {
             var character = new Mock<ICharacter>().Object;
             var skill = new Mock<ISkill>();
-            skill.Setup(x => x.Type).Returns(Playground.Script.Enums.SkillType.PreAttack);
+            skill.Setup(x => x.Type).Returns(SkillType.PreAttack);
 
             var skillComp = new SkillsComponent(character);
             skillComp.AddSkill(skill.Object);
             skillComp.AddSkill(skill.Object);
 
-            var count = skillComp.GetSkills(Playground.Script.Enums.SkillType.PreAttack).Count;
+            var count = skillComp.GetSkills(SkillType.PreAttack).Count;
 
             Assert.IsTrue(count == 1);
         }

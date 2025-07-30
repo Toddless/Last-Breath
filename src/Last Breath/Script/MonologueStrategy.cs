@@ -1,8 +1,8 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System.Collections.Generic;
-    using Playground.Localization;
-    using Playground.Script.UI.View;
+    using LastBreath.Localization;
+    using LastBreath.Script.UI.View;
 
     public class MonologueStrategy(Player player, DialogueWindow window) : IDialogueStrategy
     {

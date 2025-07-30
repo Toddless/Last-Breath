@@ -1,12 +1,13 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
     using System;
-    using Playground.Script.Enums;
-    using Playground.Script.ScenesHandlers;
     using System.Linq;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Helpers.Extensions;
+    using LastBreath.Script;
+    using LastBreath.Script.Helpers.Extensions;
+    using LastBreath.Script.ScenesHandlers;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
 
     public partial class BattleLayer : CanvasLayer
     {
@@ -62,8 +63,7 @@
             if (character is not Player)
             {
                 await ToSignal(notifier, SignalNameExtension.Completed);
-                if (_battleHandler != null)
-                    character.OnTurnStart();
+                character.OnTurnStart();
             }
         }
 

@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public partial class ItemsMediaHandler : Node, IItemsMediaHandler
     {

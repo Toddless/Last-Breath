@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.ScenesHandlers
+﻿namespace LastBreath.Script.ScenesHandlers
 {
     using System.Linq;
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.NPC;
-    using Playground.Script.UI;
-    using Playground.Script.UI.Layers;
-    using Playground.Script.UI.View;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.UI;
+    using LastBreath.Script.UI.View;
+    using LastBreath.Script.NPC;
+    using LastBreath.Script.UI.Layers;
     using Stateless;
 
     public partial class Main : Node2D

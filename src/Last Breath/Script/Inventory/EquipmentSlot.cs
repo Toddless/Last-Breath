@@ -1,10 +1,11 @@
-﻿namespace Playground.Script.Inventory
+﻿namespace LastBreath.Script.Inventory
 {
     using System;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Items;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Items;
 
     public partial class EquipmentSlot : BaseSlot<EquipItem>
     {

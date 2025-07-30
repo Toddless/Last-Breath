@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components;
-    using Playground.Script;
-    using Playground.Script.Enums;
+    using LastBreath.Components;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public class DexterityStance : StanceBase
     {

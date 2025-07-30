@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Abilities.Modifiers
+﻿namespace LastBreath.Script.Abilities.Modifiers
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class ModifierBase(Parameter parameter, ModifierType type, float value, object source, int priority = 0) : IModifier
     {

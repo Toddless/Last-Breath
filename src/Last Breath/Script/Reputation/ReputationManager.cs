@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Reputation
+﻿namespace LastBreath.Script.Reputation
 {
     using System.Collections.Generic;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public class ReputationManager(int elfRep, int dwarfsRep, int humanReps)
     {

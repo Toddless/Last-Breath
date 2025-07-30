@@ -1,14 +1,14 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using Godot;
+    using LastBreath.Script.Items.ItemData;
+    using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Microsoft.CodeAnalysis;
     using Microsoft.Extensions.DependencyInjection;
-    using Playground.Script.Items.ItemData;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
 
     public partial class DiContainer : Node
     {

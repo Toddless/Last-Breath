@@ -1,21 +1,21 @@
-﻿namespace Playground
+﻿namespace LastBreath
 {
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Components;
-    using Playground.Components.Interfaces;
-    using Playground.Localization;
-    using Playground.Resource.Quests;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Inventory;
-    using Playground.Script.Items;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Components;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Localization;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.QuestSystem;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

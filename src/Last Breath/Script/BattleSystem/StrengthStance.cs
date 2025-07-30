@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Script;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Enums;
 
     public class StrengthStance : StanceBase
     {

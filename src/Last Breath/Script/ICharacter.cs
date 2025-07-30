@@ -1,11 +1,11 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Components;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
+    using LastBreath.Components;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
 
     public interface ICharacter
     {

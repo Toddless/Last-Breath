@@ -1,7 +1,8 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Components;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
 
     public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>()
     {
@@ -19,13 +20,13 @@
 
         protected override void ActivateSkill(IStanceSkill skill)
         {
-            if (skill.Type != Enums.SkillType.AlwaysActive) return;
+            if (skill.Type != SkillType.AlwaysActive) return;
             skill.Activate(_stance);
         }
 
         protected override void DeactivateSkill(IStanceSkill skill)
         {
-            if (skill.Type != Enums.SkillType.AlwaysActive) return;
+            if (skill.Type != SkillType.AlwaysActive) return;
             skill.Deactivate(_stance);
         }
     }

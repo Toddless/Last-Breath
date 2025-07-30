@@ -1,6 +1,5 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
-
     public class ComboPoints : BaseResource
     {
         private const float BaseMaximumAmount = 6f;

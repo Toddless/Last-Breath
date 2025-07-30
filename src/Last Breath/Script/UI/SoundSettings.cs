@@ -1,9 +1,9 @@
-namespace Playground.Script.UI
+namespace LastBreath.Script.UI
 {
     using System;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
 
     public class SoundSettings : ISettings
     {

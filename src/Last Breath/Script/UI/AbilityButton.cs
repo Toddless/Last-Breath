@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public partial class AbilityButton : TextureButton
     {

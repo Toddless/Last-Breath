@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.Inventory
+﻿namespace LastBreath.Script.Inventory
 {
     using Godot;
-    using Playground.Script.Items;
-    using Playground.Script.UI;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.UI;
 
     public abstract partial class BaseSlot<T> : TextureButton
         where T : Item

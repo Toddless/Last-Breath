@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public class BlockChanceModule : IStatModule
     {

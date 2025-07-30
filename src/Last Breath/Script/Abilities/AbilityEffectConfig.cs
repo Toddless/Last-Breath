@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.Abilities
+﻿namespace LastBreath.Script.Abilities
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public class AbilityEffectConfig
     {

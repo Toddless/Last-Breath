@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public interface IActionModule<T>
     {

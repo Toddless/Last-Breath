@@ -1,12 +1,12 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using Godot;
     using Godot.Collections;
-    using Playground.Localization;
-    using Playground.Script.Helpers;
-    using Playground.Script.Helpers.Extensions;
-    using Playground.Script.ScenesHandlers;
-    using Playground.Script.UI;
+    using LastBreath.Localization;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Helpers.Extensions;
+    using LastBreath.Script.ScenesHandlers;
+    using LastBreath.Script.UI;
     using Stateless;
 
     public partial class MainMenu : Control

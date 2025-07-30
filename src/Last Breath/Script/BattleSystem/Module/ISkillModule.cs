@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using System.Collections.Generic;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
 
     public interface ISkillModule
     {

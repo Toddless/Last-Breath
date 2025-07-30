@@ -1,8 +1,8 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace LastBreath.Components.Interfaces
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script.Items;
+    using LastBreath.Script.Items;
 
     public interface IInventory
     {

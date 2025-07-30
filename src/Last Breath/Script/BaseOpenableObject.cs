@@ -1,9 +1,9 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System;
     using Godot;
     using Godot.Collections;
-    using Playground.Script.Items;
+    using LastBreath.Script.Items;
     using Stateless;
 
     public partial class BaseOpenableObject : StaticBody2D

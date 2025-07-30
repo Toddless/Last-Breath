@@ -1,16 +1,16 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Components;
-    using Playground.Components.Interfaces;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.BattleSystem.Decorators;
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
+    using LastBreath.Components;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.BattleSystem.Decorators;
+    using LastBreath.Script.BattleSystem.Module;
+    using LastBreath.Script.Enums;
 
     public abstract class StanceBase : IStance
     {

@@ -1,11 +1,12 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using System.Collections.Generic;
     using System.Text;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
-    using Playground.Script.Items.ItemData;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items.ItemData;
 
     public partial class EquipItem : Item
     {

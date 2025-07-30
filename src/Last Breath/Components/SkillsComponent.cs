@@ -1,8 +1,8 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
 
     public class SkillsComponent(ICharacter owner) : BaseSkillComponent<ISkill>()
     {

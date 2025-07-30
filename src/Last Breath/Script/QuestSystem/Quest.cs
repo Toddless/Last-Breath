@@ -1,11 +1,11 @@
-﻿namespace Playground.Resource.Quests
+﻿namespace LastBreath.Resource.Quests
 {
     using System;
     using Godot;
     using Godot.Collections;
-    using Playground.Localization;
-    using Playground.Script.Enums;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Localization;
 
     [GlobalClass]
     public partial class Quest : Resource

@@ -1,11 +1,11 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using System.Collections.Generic;
     using System.Text;
     using Godot;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Items.ItemData;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items.ItemData;
 
     public abstract partial class WeaponItem : EquipItem, IDamageStrategy
     {

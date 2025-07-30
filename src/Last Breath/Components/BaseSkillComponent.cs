@@ -1,10 +1,10 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Enums;
 
     public abstract class BaseSkillComponent<T>
         where T : ISkill

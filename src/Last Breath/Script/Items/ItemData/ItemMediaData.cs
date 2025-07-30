@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using Godot;
-    using Playground.Localization;
+    using LastBreath.Localization;
 
     public class ItemMediaData
     {

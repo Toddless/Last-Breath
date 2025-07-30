@@ -1,4 +1,4 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace LastBreath.Components.Interfaces
 {
     public interface IDamageStrategy
     {

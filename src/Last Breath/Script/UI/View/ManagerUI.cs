@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI.View
+﻿namespace LastBreath.Script.UI.View
 {
     using System;
-    using Playground.Script.NPC;
-    using Playground.Script.ScenesHandlers;
-    using Playground.Script.UI.Layers;
+    using LastBreath.Script.ScenesHandlers;
+    using LastBreath.Script.NPC;
+    using LastBreath.Script.UI.Layers;
     using Stateless;
 
     public class ManagerUI(MainLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer, DialogueLayer dialog)

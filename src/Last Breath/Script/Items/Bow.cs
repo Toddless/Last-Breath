@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public partial class Bow(GlobalRarity rarity) : WeaponItem(rarity)
     {

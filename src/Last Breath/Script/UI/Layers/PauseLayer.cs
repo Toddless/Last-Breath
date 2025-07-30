@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
     using Stateless;
 
     public partial class PauseLayer : CanvasLayer

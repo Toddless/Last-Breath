@@ -1,12 +1,12 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
 
     public class Calculations
     {

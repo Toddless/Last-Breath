@@ -1,16 +1,17 @@
-﻿namespace Playground.Script.UI.Layers
+﻿namespace LastBreath.Script.UI.Layers
 {
     using System;
     using System.Linq;
     using Godot;
     using Godot.Collections;
-    using Playground.Localization;
-    using Playground.Resource;
-    using Playground.Resource.Quests;
-    using Playground.Script.NPC;
-    using Playground.Script.QuestSystem;
-    using Playground.Script.UI;
-    using Playground.Script.UI.View;
+    using LastBreath.Script;
+    using LastBreath.Script.UI;
+    using LastBreath.Localization;
+    using LastBreath.Resource;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.NPC;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Script.UI.View;
     using Stateless;
 
     public partial class DialogueLayer : CanvasLayer

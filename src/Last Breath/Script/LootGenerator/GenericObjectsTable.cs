@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.LootGenerator
+﻿namespace LastBreath.Script.LootGenerator
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Items;
-    using Playground.Script.Items.Factories;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.Items.Factories;
 
     public abstract class GenericObjectsTable<T>
         where T : GenericObject

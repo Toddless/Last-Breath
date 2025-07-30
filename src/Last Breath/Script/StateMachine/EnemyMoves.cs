@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.StateMachine
+﻿namespace LastBreath.Script.StateMachine
 {
 
     public partial class EnemyMoves

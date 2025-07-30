@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public class AttackContext(ICharacter attaker, ICharacter target)
     {

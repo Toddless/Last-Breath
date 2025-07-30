@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
-    using Playground.Script;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Enums;
 
     public interface IEffect
     {

@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     using Godot;
     using Godot.Collections;
-    using Playground.Script.Items;
+    using LastBreath.Script.Items;
 
     [GlobalClass]
     public partial class Reward : Resource

@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
-    using Playground.Script.BattleSystem;
+    using LastBreath.Script.BattleSystem;
 
     public interface IPreAttackSkill : ISkill
     {

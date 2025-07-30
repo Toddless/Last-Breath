@@ -1,9 +1,9 @@
-﻿namespace Playground.DebugTools
+﻿namespace LastBreath.DebugTools
 {
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script;
+    using LastBreath.Script;
 
     public partial class DevTools : Control
     {

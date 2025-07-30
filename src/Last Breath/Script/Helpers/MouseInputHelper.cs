@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Helpers
+﻿namespace LastBreath.Script.Helpers
 {
     using Godot;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public class MouseInputHelper
     {

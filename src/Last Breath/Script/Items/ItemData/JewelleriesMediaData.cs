@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     public class JewelleriesMediaData : BaseItemMediaData
     {

@@ -1,7 +1,7 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
     using System;
-    using Playground.Script.Enemy;
+    using LastBreath.Script.Enemy;
 
     public class EnemyKilledEventArgs(string enemyId, EnemyType enemyType) : EventArgs
     {

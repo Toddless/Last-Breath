@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     public interface ISettings
     {

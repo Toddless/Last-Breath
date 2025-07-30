@@ -1,6 +1,6 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
-    using Playground.Localization;
+    using LastBreath.Localization;
 
     public interface IDialogueStrategy
     {

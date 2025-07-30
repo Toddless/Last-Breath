@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Enemy
+﻿namespace LastBreath.Script.Enemy
 {
     using System.Collections.Generic;
     using Godot;

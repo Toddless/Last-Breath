@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Items.ItemData
+﻿namespace LastBreath.Script.Items.ItemData
 {
     using System.Collections.Generic;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
 
     public abstract class BaseData<T>
         where T : class, new()

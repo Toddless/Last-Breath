@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.BattleSystem.Decorators
+﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
     using System;
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
+    using LastBreath.Script;
+    using LastBreath.Script.BattleSystem.Module;
+    using LastBreath.Script.Enums;
 
     public abstract class ActionModuleDecorator : IActionModule<ICharacter>, IModuleDecorator<ActionModule, IActionModule<ICharacter>>
     {

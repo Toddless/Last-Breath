@@ -1,8 +1,8 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
     using System.Collections.Generic;
-    using Playground.Script;
-    using Playground.Script.Abilities.Modifiers;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Modifiers;
 
     public class StanceActivationEffect : IStanceActivationEffect
     {

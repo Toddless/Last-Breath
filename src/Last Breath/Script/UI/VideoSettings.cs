@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System;
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.Helpers.Extensions;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Helpers.Extensions;
 
     public class VideoSettings : ISettings
     {

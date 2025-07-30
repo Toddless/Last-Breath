@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Enemy
+﻿namespace LastBreath.Script.Enemy
 {
     public enum EnemyType
     {

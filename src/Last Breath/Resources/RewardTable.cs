@@ -1,8 +1,8 @@
-﻿namespace Playground.Resource
+﻿namespace LastBreath.Resource
 {
     using Godot;
-    using Playground.Script.Helpers;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.QuestSystem;
 
     public partial class RewardTable : Table<Reward>
     {

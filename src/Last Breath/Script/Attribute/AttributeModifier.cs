@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Attribute
+﻿namespace LastBreath.Script.Attribute
 {
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.Enums;
 
     public class AttributeModifier(Parameter param, float value, ModifierType type, object source, int priority = 0) : IModifier
     {

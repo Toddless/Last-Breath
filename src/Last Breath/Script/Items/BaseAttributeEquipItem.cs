@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
-    using Playground.Script.Enums;
-    using Playground.Script.Items.ItemData;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Items.ItemData;
 
     public partial class BaseAttributeEquipItem : EquipItem
     {

@@ -1,9 +1,9 @@
-﻿namespace PlaygroundTest.ComponentTests
+﻿namespace LastBreathTest.ComponentTests
 {
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enums;
     using Moq;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
 
     [TestClass]
     public class StanceSkillComponentTest

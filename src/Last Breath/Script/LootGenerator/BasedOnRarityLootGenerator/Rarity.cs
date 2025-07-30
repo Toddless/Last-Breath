@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
+﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.LootGenerator;
 
     public class Rarity : GenericObject
     {

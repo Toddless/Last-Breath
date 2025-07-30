@@ -1,10 +1,11 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System.Linq;
     using Godot;
-    using Playground.Resource.Quests;
-    using Playground.Script.Helpers;
-    using Playground.Script.UI.View;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.UI.View;
 
     public partial class QuestsMenu : Control
     {
@@ -30,10 +31,10 @@
             questOption.QuestDetails += OnQuestDetails;
             switch (quest.Type)
             {
-                case Enums.QuestType.Main:
+                case QuestType.Main:
                     _mainQuests?.AddChild(questOption);
                     break;
-                case Enums.QuestType.Side:
+                case QuestType.Side:
                     _sideQuests?.AddChild(questOption);
                     break;
             }
@@ -43,10 +44,10 @@
         {
             switch (quest.Type)
             {
-                case Enums.QuestType.Main:
+                case QuestType.Main:
                     FindAndRemoveChild(_mainQuests, quest);
                     break;
-                case Enums.QuestType.Side:
+                case QuestType.Side:
                     FindAndRemoveChild(_sideQuests, quest);
                     break;
             }

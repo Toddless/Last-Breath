@@ -1,8 +1,8 @@
-﻿namespace Playground.Script
+﻿namespace LastBreath.Script
 {
-    using Playground.Localization;
-    using Playground.Script.NPC;
-    using Playground.Script.UI.View;
+    using LastBreath.Localization;
+    using LastBreath.Script.NPC;
+    using LastBreath.Script.UI.View;
 
     public class OneToOneDialogueStrategy(BaseSpeakingNPC speakingNPC, Player player, DialogueWindow dialogueWindow) : IDialogueStrategy
     {

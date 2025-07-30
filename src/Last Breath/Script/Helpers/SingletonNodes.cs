@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Helpers
+﻿namespace LastBreath.Script.Helpers
 {
     public static class SingletonNodes
     {

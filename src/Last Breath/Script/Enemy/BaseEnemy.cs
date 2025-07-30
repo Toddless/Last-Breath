@@ -1,18 +1,18 @@
-namespace Playground
+namespace LastBreath
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Components;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enemy;
-    using Playground.Script.Enums;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.UI;
+    using LastBreath.Components;
+    using LastBreath.Script;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Modifiers;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Enemy;
+    using LastBreath.Script.Enums;
+    using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using LastBreath.Script.UI;
 
     [Inject]
     public partial class BaseEnemy : CharacterBody2D, ICharacter
@@ -303,9 +303,9 @@ namespace Playground
         {
             return enemyAttributeType switch
             {
-                Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
-                Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                Script.Enums.AttributeType.Strength => new StrengthStance(this),
+                LastBreath.Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                LastBreath.Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
+                LastBreath.Script.Enums.AttributeType.Strength => new StrengthStance(this),
                 _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
             };
         }
@@ -355,9 +355,9 @@ namespace Playground
 
             return enemyType switch
             {
-                Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                LastBreath.Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                LastBreath.Script.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
+                LastBreath.Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
@@ -366,9 +366,9 @@ namespace Playground
         {
             return index switch
             {
-                1 => Script.Enums.AttributeType.Dexterity,
-                2 => Script.Enums.AttributeType.Strength,
-                _ => Script.Enums.AttributeType.Intelligence,
+                1 => LastBreath.Script.Enums.AttributeType.Dexterity,
+                2 => LastBreath.Script.Enums.AttributeType.Strength,
+                _ => LastBreath.Script.Enums.AttributeType.Intelligence,
             };
         }
 

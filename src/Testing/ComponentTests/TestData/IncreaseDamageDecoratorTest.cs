@@ -1,7 +1,7 @@
-﻿namespace PlaygroundTest.ComponentTests.TestData
+﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Playground.Script.BattleSystem.Decorators;
-    using Playground.Script.Enums;
+    using LastBreath.Script.BattleSystem.Decorators;
+    using LastBreath.Script.Enums;
 
     public class IncreaseDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(type: StatModule.Damage, priority)
     {
