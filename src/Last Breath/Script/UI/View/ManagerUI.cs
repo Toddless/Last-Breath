@@ -6,7 +6,7 @@
     using LastBreath.Script.UI.Layers;
     using Stateless;
 
-    public class ManagerUI(MainLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DevLayer? devLayer, DialogueLayer dialog)
+    public class ManagerUI(MainLayer mainUI, PauseLayer pauseUI, BattleLayer battleUI, DialogueLayer dialog)
     {
         private enum State { MainUI, PauseUI, BattleUI, DialogUI, DevTools }
         private enum Trigger { ShowPauseUI, ShowBattleUI, ShowMainUI, ShowDialogUI, ShowDevTools }
@@ -15,7 +15,6 @@
         private readonly MainLayer _mainLayer = mainUI;
         private readonly PauseLayer _pauseLayer = pauseUI;
         private readonly BattleLayer _battleLayer = battleUI;
-        private readonly DevLayer? _devLayer = devLayer;
         private readonly DialogueLayer _dialogLayer = dialog;
 
         public event Action? ExitedBattle, ExitedPause, ExitedDialogue;
@@ -41,13 +40,6 @@
             _dialogLayer.InitializeDialogue(npc);
             _machine.Fire(Trigger.ShowDialogUI);
         }
-
-        #region Dev
-#if DEBUG
-        public void ShowDevTools() => _devLayer?.Show();
-        public void HideDevTools() => _devLayer?.Hide();
-#endif
-        #endregion
 
         public void SetEvents()
         {
@@ -113,7 +105,6 @@
             _mainLayer.SetProcessUnhandledInput(true);
             _pauseLayer.Hide();
             _battleLayer.Hide();
-            _devLayer?.Hide();
             _dialogLayer?.Hide();
         }
     }

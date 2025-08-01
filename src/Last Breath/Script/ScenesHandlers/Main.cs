@@ -11,9 +11,6 @@
 
     public partial class Main : Node2D
     {
-#if DEBUG
-        private bool _devOpened = false;
-#endif
         private enum State { Play, Paused, Dialog, Monologue }
         private enum Trigger { Resume, Pause, Dialog, Monologue, Close }
 
@@ -32,11 +29,6 @@
             _managerUI = new(GetNode<MainLayer>(nameof(MainLayer)),
                 GetNode<PauseLayer>(nameof(PauseLayer)),
                 GetNode<BattleLayer>(nameof(BattleLayer)),
-#if !DEBUG
-                null,
-#else
-                GetNode<DevLayer>(nameof(DevLayer)),
-#endif
                 GetNode<DialogueLayer>(nameof(DialogueLayer)));
             _managerUI.ConfigureStateMachine();
             _managerUI.SetEvents();
@@ -68,21 +60,6 @@
                     GetViewport().SetInputAsHandled();
                 }
             }
-#if DEBUG
-            if (@event.IsActionPressed(Settings.Dev))
-            {
-                if (!_devOpened)
-                {
-                    _managerUI?.ShowDevTools();
-                    _devOpened = true;
-                }
-                else
-                {
-                    _managerUI?.HideDevTools();
-                    _devOpened = false;
-                }
-            }
-#endif
         }
 
         public override void _ExitTree()

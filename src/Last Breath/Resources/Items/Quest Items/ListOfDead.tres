@@ -14,9 +14,9 @@ region = Rect2(16, 32, 96, 72)
 
 [resource]
 script = ExtResource("2_ftup6")
-MaxStackSize = 1
-Icon = SubResource("AtlasTexture_klwss")
-Rarity = 2
-Quantity = 1
 Description = SubResource("Resource_k0ugo")
+Rarity = 2
+Icon = SubResource("AtlasTexture_klwss")
+Quantity = 1
+MaxStackSize = 1
 metadata/_custom_type_script = "uid://curr877vpisc3"
