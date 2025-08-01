@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Items
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public partial class Helmet : BaseAttributeEquipItem
     {

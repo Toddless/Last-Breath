@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Components.Interfaces
 {
     using System;
+    using Contracts.Enums;
     using LastBreath.Components;
-    using LastBreath.Script.Enums;
 
     public interface IResource
     {

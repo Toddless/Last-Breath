@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Text;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Components.Interfaces;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Items.ItemData;
 
     public abstract partial class WeaponItem : EquipItem, IDamageStrategy

@@ -1,5 +1,7 @@
 ﻿namespace LastBreath.Components
 {
+    using Contracts.Enums;
+
     public class ComboPoints : BaseResource
     {
         private const float BaseMaximumAmount = 6f;
@@ -8,7 +10,7 @@
         public ComboPoints() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Script.Enums.ResourceType.Combopoints)
+            resourceType: ResourceType.Combopoints)
         {
             LoadData();
         }

@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
     using System.Collections.Generic;
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public static class ConvertGlobalRarity
     {

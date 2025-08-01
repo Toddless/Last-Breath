@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
     using LastBreath.Script.LootGenerator;
 
     public class Rarity : GenericObject

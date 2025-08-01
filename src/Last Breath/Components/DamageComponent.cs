@@ -2,9 +2,9 @@ namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Components.Interfaces;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
 
     public class DamageComponent

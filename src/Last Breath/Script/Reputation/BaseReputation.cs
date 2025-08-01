@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public abstract class BaseReputation(int defaultReputation)
     {

@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
+    using Contracts.Enums;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public class HandleAttackSucceedModule(ICharacter owner) : IActionModule<ICharacter>
     {

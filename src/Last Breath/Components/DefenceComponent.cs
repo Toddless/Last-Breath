@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Components
 {
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public class DefenseComponent
     {

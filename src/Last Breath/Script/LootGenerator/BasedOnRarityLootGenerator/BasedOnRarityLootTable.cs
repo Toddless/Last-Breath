@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    using LastBreath.Script.Enums;
     using LastBreath.Script.LootGenerator;
     using LastBreath.Script.Items;
+    using Contracts.Enums;
 
     public class BasedOnRarityLootTable : GenericObjectsTable<Rarity>, IBasedOnRarityLootTable
     {

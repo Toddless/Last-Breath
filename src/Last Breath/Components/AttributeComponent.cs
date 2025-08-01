@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Components
 {
     using System;
+    using Contracts.Enums;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.Attribute;
-    using LastBreath.Script.Enums;
 
     public class AttributeComponent
     {

@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public partial class ItemsMediaHandler : Node, IItemsMediaHandler
     {

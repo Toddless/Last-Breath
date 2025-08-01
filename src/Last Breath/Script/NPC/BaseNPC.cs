@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.NPC
 {
     using System.Linq;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public partial class BaseNPC : CharacterBody2D
     {

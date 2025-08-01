@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Components.Interfaces;
@@ -10,7 +11,6 @@
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem.Decorators;
     using LastBreath.Script.BattleSystem.Module;
-    using LastBreath.Script.Enums;
 
     public abstract class StanceBase : IStance
     {

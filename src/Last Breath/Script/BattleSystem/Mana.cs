@@ -1,5 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Contracts.Enums;
     using LastBreath.Components;
 
     public class Mana : BaseResource
@@ -10,7 +11,7 @@
         public Mana() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Enums.ResourceType.Mana)
+            resourceType: ResourceType.Mana)
         {
             LoadData();
         }

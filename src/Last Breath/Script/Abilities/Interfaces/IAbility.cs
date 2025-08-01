@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using System;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public interface IAbility
     {

@@ -9,13 +9,13 @@
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
     using LastBreath.Localization;
     using LastBreath.Resource.Quests;
     using LastBreath.Script.Items;
     using LastBreath.Script.QuestSystem;
+    using Contracts.Enums;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

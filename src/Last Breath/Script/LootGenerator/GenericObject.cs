@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.LootGenerator
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public abstract class GenericObject
     {

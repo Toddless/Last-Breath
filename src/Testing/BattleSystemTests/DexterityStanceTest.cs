@@ -1,9 +1,9 @@
 ﻿namespace LastBreathTest.BattleSystemTests
 {
+    using Contracts.Enums;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script;
     using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Enums;
 
     public class DexterityStanceTest : StanceBase
     {

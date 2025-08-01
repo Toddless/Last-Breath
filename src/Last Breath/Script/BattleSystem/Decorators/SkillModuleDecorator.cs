@@ -2,9 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using Contracts.Enums;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem.Module;
-    using LastBreath.Script.Enums;
 
     public abstract class SkillModuleDecorator : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {

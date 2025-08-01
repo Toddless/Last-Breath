@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Items;
     using LastBreath.Script.Items.Factories;
 

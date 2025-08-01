@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Enums;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Enums;
 
     public class ImmuneToSkillTypeDecorator(SkillType type) : SkillModuleDecorator(type, priority: DecoratorPriority.Strong)
     {

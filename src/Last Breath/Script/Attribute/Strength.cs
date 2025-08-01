@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Attribute
 {
     using System.Collections.Generic;
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public class Strength() : AttributeBase(GetEffects())
     {

@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using Contracts.Enums;
     using LastBreath.Script.Abilities.Modifiers;
-    using LastBreath.Script.Enums;
 
     public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifier> modifiers) : EventArgs
     {

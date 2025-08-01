@@ -1,5 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Contracts.Enums;
     using LastBreath.Components;
 
     public class Fury : BaseResource
@@ -10,7 +11,7 @@
         public Fury() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Enums.ResourceType.Fury)
+            resourceType: ResourceType.Fury)
         {
             LoadData();
         }

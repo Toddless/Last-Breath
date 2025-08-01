@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
+    using Contracts.Enums;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public class ChainAttackOnSucceedDecorator(DecoratorPriority priority, ICharacter owner) : ActionModuleDecorator(type: ActionModule.SucceedAction, priority)
     {

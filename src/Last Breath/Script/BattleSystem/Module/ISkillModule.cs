@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using System.Collections.Generic;
+    using Contracts.Enums;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Enums;
 
     public interface ISkillModule
     {

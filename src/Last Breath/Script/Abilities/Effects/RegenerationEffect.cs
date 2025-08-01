@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.Abilities.Effects
 {
+    using Contracts.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities;
     using LastBreath.Script.Abilities.Modifiers;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
 
     public class RegenerationEffect : EffectBase

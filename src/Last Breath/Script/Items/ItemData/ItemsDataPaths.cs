@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Items.ItemData
 {
     using System.IO;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public abstract class ItemsDataPaths
     {

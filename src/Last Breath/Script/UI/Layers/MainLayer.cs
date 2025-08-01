@@ -3,7 +3,6 @@
     using System;
     using System.Linq;
     using Godot;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
     using LastBreath.Script.QuestSystem;
@@ -11,6 +10,7 @@
     using LastBreath.Script.Items;
     using LastBreath.Script.UI.View;
     using Stateless;
+    using Contracts.Enums;
 
     public partial class MainLayer : CanvasLayer
     {

@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Enums
+﻿namespace Contracts.Enums
 {
     public enum JewelleryType
     {

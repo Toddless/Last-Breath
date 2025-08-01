@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Items.Factories
 {
     using System;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Items;
 
     public class BodyArmorFactory : ItemCreator

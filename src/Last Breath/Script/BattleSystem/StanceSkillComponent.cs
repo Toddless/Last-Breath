@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Contracts.Enums;
     using LastBreath.Components;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Enums;
 
     public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>()
     {

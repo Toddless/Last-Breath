@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public class CritChanceModule : IStatModule
     {

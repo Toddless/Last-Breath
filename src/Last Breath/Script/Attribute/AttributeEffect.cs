@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Attribute
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public class AttributeEffect(Parameter parameter, ModifierType type, float valuePerPoint, int priority = 0)
     {

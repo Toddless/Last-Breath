@@ -1,8 +1,8 @@
 namespace LastBreath.Script.UI
 {
     using System;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
 
     public class SoundSettings : ISettings

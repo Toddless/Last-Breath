@@ -1,10 +1,10 @@
 ﻿namespace LastBreath
 {
     using System;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.UI;
     using LastBreath.Script.UI.View;
 

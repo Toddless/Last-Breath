@@ -3,6 +3,7 @@ namespace LastBreath
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Script;
@@ -10,7 +11,6 @@ namespace LastBreath
     using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Enemy;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using LastBreath.Script.UI;
 
@@ -303,9 +303,9 @@ namespace LastBreath
         {
             return enemyAttributeType switch
             {
-                LastBreath.Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
-                LastBreath.Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                LastBreath.Script.Enums.AttributeType.Strength => new StrengthStance(this),
+                Contracts.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                Contracts.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
+                Contracts.Enums.AttributeType.Strength => new StrengthStance(this),
                 _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
             };
         }
@@ -355,9 +355,9 @@ namespace LastBreath
 
             return enemyType switch
             {
-                LastBreath.Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                LastBreath.Script.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
-                LastBreath.Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                Contracts.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                Contracts.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
+                Contracts.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
@@ -366,9 +366,9 @@ namespace LastBreath
         {
             return index switch
             {
-                1 => LastBreath.Script.Enums.AttributeType.Dexterity,
-                2 => LastBreath.Script.Enums.AttributeType.Strength,
-                _ => LastBreath.Script.Enums.AttributeType.Intelligence,
+                1 => Contracts.Enums.AttributeType.Dexterity,
+                2 => Contracts.Enums.AttributeType.Strength,
+                _ => Contracts.Enums.AttributeType.Intelligence,
             };
         }
 

@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Contracts.Enums;
     using LastBreath.Components;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public class DexterityStance : StanceBase
     {

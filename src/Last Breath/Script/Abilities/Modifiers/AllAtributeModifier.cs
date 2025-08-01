@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Abilities.Modifiers
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public class AllAtributeModifier : ModifierBase
     {

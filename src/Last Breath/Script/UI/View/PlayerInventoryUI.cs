@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.UI
 {
     using System;
+    using Contracts.Enums;
     using Godot;
     using Godot.Collections;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
     using LastBreath.Script.Items;

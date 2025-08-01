@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
+    using Contracts.Enums;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public class PreAttackSkillModule(ICharacter owner) : BaseSkillModule(owner, SkillType.PreAttack, DecoratorPriority.Base)
     {

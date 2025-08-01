@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Items
 {
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
 
     public abstract class ItemCreator
     {

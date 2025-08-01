@@ -2,10 +2,10 @@
 {
     using System.Collections.Generic;
     using System.Text;
+    using Contracts.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Abilities.Modifiers;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Items.ItemData;
 
     public partial class EquipItem : Item

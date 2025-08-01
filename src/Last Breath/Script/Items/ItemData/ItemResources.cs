@@ -2,8 +2,8 @@
 {
     using Godot;
     using Godot.Collections;
-    using LastBreath.Script.Enums;
     using LastBreath.Localization;
+    using Contracts.Enums;
 
     [GlobalClass]
     public partial class ItemResources : Resource

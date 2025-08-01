@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Items.ItemData
 {
-    using LastBreath.Script.Enums;
+    using Contracts.Enums;
 
     public interface IItemsMediaHandler
     {

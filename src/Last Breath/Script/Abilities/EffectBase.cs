@@ -6,9 +6,9 @@
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Abilities.Modifiers;
 
-    public abstract class EffectBase(Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
+    public abstract class EffectBase(Contracts.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
-        public Enums.Effects Effect { get; } = effect;
+        public Contracts.Enums.Effects Effect { get; } = effect;
         public IModifier? Modifier { get; protected set; }
         public int Duration { get; set; } = duration;
         public int Stacks { get; set; } = stacks;

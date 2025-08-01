@@ -4,8 +4,8 @@
     using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Enums;
     using LastBreath.Localization;
+    using Contracts.Enums;
 
     [GlobalClass]
     public partial class ExecutionSkill : Resource, IOnAttackSkill

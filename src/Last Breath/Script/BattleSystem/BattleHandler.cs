@@ -7,9 +7,9 @@
     using System.Linq;
     using LastBreath.Script;
     using LastBreath.Script.UI;
-    using LastBreath.Script.Enums;
     using System.Collections.Generic;
     using LastBreath.Script.ScenesHandlers;
+    using Contracts.Enums;
 
     public class BattleHandler
     {

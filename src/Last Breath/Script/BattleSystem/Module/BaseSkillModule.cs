@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using System.Collections.Generic;
+    using Contracts.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Enums;
 
     public abstract class BaseSkillModule(ICharacter owner, SkillType type, DecoratorPriority priority) : ISkillModule
     {

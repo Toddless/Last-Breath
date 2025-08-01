@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
     using System;
+    using Contracts.Enums;
     using LastBreath.Script.BattleSystem.Module;
-    using LastBreath.Script.Enums;
 
     public abstract class StatModuleDecorator : IStatModule, IModuleDecorator<StatModule, IStatModule>
     {

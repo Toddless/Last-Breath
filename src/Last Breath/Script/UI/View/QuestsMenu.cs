@@ -2,10 +2,10 @@
 {
     using System.Linq;
     using Godot;
-    using LastBreath.Script.Enums;
     using LastBreath.Script.Helpers;
     using LastBreath.Resource.Quests;
     using LastBreath.Script.UI.View;
+    using Contracts.Enums;
 
     public partial class QuestsMenu : Control
     {

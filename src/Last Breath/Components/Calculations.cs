@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Enums;
     using Godot;
     using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Enums;
 
     public class Calculations
     {

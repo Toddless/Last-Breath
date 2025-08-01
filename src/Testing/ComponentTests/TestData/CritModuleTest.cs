@@ -1,7 +1,7 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
+    using Contracts.Enums;
     using LastBreath.Script.BattleSystem.Module;
-    using LastBreath.Script.Enums;
 
     public class CritModuleTest : IStatModule
     {

@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Contracts.Enums;
     using LastBreath.Script;
-    using LastBreath.Script.Enums;
 
     public class OnGettingAttackEventArgs(ICharacter character, AttackResults result, float damage = default, bool isCrit = false)
     {

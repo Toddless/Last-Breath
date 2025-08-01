@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using Contracts.Enums;
     using Godot;
-    using LastBreath.Script.Enums;
     using Newtonsoft.Json;
 
     public class ItemsStatsHandler : IItemStatsHandler

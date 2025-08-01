@@ -7,7 +7,7 @@
     {
         public override void _EnterTree()
         {
-            GD.Print("Crafting plugin entered");
+            GD.Print("Crafting plugin working");
         }
     }
 }

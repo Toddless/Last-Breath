@@ -1,8 +1,8 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
+    using Contracts.Enums;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Enums;
     using Moq;
 
     [TestClass]
