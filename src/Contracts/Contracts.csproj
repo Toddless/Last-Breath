@@ -5,6 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    <Folder Include="Interfaces\" />
   </ItemGroup>
 </Project>

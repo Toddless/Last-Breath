@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b8kvrf84y88d0"]
+[gd_scene format=3 uid="uid://iif75nev2q13"]
 
 [node name="CraftingUI" type="Panel"]
 anchors_preset = 15
