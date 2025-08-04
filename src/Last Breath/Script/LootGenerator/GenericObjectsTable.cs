@@ -53,7 +53,7 @@
         {
             float pickedNumber = _random.RandfRange(1, _probabilityTotalWeight);
             return Factories[_random.RandiRange(0, Factories.Count - 1)]
-                .GenerateItem(LootDropItems.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Uncommon);
+                .GenerateItem(LootDropItems.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? Rarity.Uncommon);
         }
 
         public virtual T? GetRarity()

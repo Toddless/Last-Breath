@@ -2,27 +2,31 @@
 {
     using System.Collections.Generic;
     using System.Text;
+    using Contracts.Data;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.Items.ItemData;
 
-    public partial class EquipItem : Item
+    public partial class EquipItem : Item, IEquipItem
     {
         protected const float From = 0.8f;
         protected const float To = 1.2f;
 
         protected List<IModifier> BaseModifiers = [];
         protected List<IEffect> Effects = [];
+
         public ICharacter? Owner { get; private set; }
         public EquipmentPart EquipmentPart { get; protected set; }
+        public AttributeType AttributeType { get; protected set; } = AttributeType.None;
+        public IReadOnlyList<IModifier> Modifiers => BaseModifiers;
 
-        public EquipItem(GlobalRarity rarity, EquipmentPart equipmentPart)
+        public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type)
         {
             Rarity = rarity;
             EquipmentPart = equipmentPart;
-            LoadData();
+            AttributeType = type;
         }
 
         public virtual void OnEquip(ICharacter owner)
@@ -58,46 +62,25 @@
         }
 
         public virtual void UpgradeItemLevel() { }
+
         protected virtual void UpdateItem() { }
         protected virtual void LoadData()
         {
-            var itemStats = GetItemStats();
+            var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats>>()?.GetItemData(this);
             if (itemStats != null)
             {
                 BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
-
-                LoadMediaData();
             }
-        }
-
-        private void LoadMediaData()
-        {
-            var mediaData = GetItemMediaData();
+            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(this);
             if (mediaData != null)
             {
                 Icon = mediaData.IconTexture;
-                Description = mediaData.Description;
+                SetNewDescription(mediaData.Description);
                 ItemName = mediaData.Name;
                 FullImage = mediaData.FullTexture;
             }
         }
 
         protected virtual void SetEffects() { }
-
-        protected virtual ItemStats? GetItemStats() => EquipmentPart switch
-        {
-            EquipmentPart.Cloak => DiContainer.GetService<IItemStatsHandler>()?.GetBodyArmorStats(BodyArmorType.Cloak, Rarity),
-            EquipmentPart.Amulet => DiContainer.GetService<IItemStatsHandler>()?.GetJewelleryStats(JewelleryType.Amulet, Rarity),
-            EquipmentPart.Belt => DiContainer.GetService<IItemStatsHandler>()?.GetJewelleryStats(JewelleryType.Belt, Rarity),
-            _ => null
-        };
-
-        protected virtual ItemMediaData? GetItemMediaData() => EquipmentPart switch
-        {
-            EquipmentPart.Cloak => ItemsMediaHandler.Inctance?.GetBodyArmorMediaData(BodyArmorType.Cloak, Rarity),
-            EquipmentPart.Amulet => ItemsMediaHandler.Inctance?.GetJewelleryMediaData(JewelleryType.Amulet, Rarity),
-            EquipmentPart.Belt => ItemsMediaHandler.Inctance?.GetJewelleryMediaData(JewelleryType.Belt, Rarity),
-            _ => null
-        };
     }
 }

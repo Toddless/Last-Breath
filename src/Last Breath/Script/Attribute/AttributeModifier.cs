@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Attribute
 {
     using Contracts.Enums;
-    using LastBreath.Script.Abilities.Modifiers;
+    using Contracts.Interfaces;
 
     public class AttributeModifier(Parameter param, float value, ModifierType type, object source, int priority = 0) : IModifier
     {

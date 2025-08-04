@@ -2,11 +2,12 @@
 {
     using Contracts.Enums;
 
-    public partial class Helmet : BaseAttributeEquipItem
+    public partial class Helmet : EquipItem
     {
-        public Helmet(GlobalRarity rarity, AttributeType attributeType)
-            : base(rarity, attributeType, equipmentPart: EquipmentPart.Helmet)
+        public Helmet(Rarity rarity, AttributeType attributeType)
+            : base(rarity, equipmentPart: EquipmentPart.Helmet, attributeType)
         {
+            LoadData();
         }
     }
 }

@@ -12,6 +12,6 @@
 
         public float ProbabilityRangeTo;
 
-        public GlobalRarity Rarity;
+        public Rarity Rarity;
     }
 }

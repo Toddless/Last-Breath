@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Script.Inventory
 {
+    using Contracts.Interfaces;
     using Godot;
-    using LastBreath.Script.Items;
     using LastBreath.Script.UI;
 
     public abstract partial class BaseSlot<T> : TextureButton
-        where T : Item
+        where T : class, IItem
     {
         private const string MainLayer = "Main/MainLayer";
         protected ItemDescription? ItemDescription;
@@ -31,7 +31,7 @@
             description.GlobalPosition = GetGlobalMousePosition() + new Vector2(50, 10);
             description.SetStats(CurrentItem.GetItemStatsAsStrings());
             description.SetItemImage(CurrentItem.FullImage);
-            description.SetItemDescription(CurrentItem.Description?.Text ?? string.Empty);
+            description.SetItemDescription(CurrentItem.Description);
             GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(Node.MethodName.AddChild, description);
             ItemDescription = description;
         }

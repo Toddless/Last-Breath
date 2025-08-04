@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="ItemResources" load_steps=5 format=3 uid="uid://nya1jwjmeu4v"]
 
-[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_e3biu"]
 [ext_resource type="Script" uid="uid://c02e2cu8t3ncf" path="res://Script/Items/ItemData/ItemResources.cs" id="2_c3sfs"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_aipql"]
 
 [sub_resource type="Gradient" id="Gradient_e3biu"]
 offsets = PackedFloat32Array(0, 0)
@@ -16,7 +17,7 @@ IconTexture = Dictionary[int, Texture2D]({
 1: SubResource("GradientTexture1D_c3sfs")
 })
 FullTexture = Dictionary[int, Texture2D]({})
-Name = Dictionary[int, ExtResource("1_e3biu")]({})
-Description = Dictionary[int, ExtResource("1_e3biu")]({})
+Name = Dictionary[int, SubResource("CSharpScript_aipql")]({})
+Description = Dictionary[int, SubResource("CSharpScript_aipql")]({})
 Sound = Dictionary[int, AudioStream]({})
 metadata/_custom_type_script = "uid://c02e2cu8t3ncf"

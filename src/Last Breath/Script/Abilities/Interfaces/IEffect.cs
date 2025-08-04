@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using LastBreath.Script;
-    using LastBreath.Script.Abilities.Modifiers;
 
     public interface IEffect
     {

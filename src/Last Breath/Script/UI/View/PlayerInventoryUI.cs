@@ -2,11 +2,11 @@
 {
     using System;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
     using Godot.Collections;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
-    using LastBreath.Script.Items;
 
     public partial class PlayerInventoryUI : Control
     {
@@ -15,8 +15,8 @@
         private Dictionary<EquipmentPart, EquipmentSlot> _slots = [];
         [Export] private Array<EquipmentSlot> _ringSlots = [];
 
-        public event Action<Item, MouseButtonPressed, Inventory>? InventorySlotClicked;
-        public event Action<EquipmentSlot, MouseButtonPressed>? EquipItemPressed;
+        public event Action<IItem, MouseButtonPressed, Inventory>? InventorySlotClicked;
+        public event Action<EquipmentSlot, MouseButtonPressed>? EquipmentSlotPressed;
 
         public override void _Ready()
         {
@@ -29,9 +29,9 @@
             equipInventory.Initialize(220, _equipInventory!);
             craftingInventory.Initialize(220, _craftInventory!);
             questItemsInventory.Initialize(220, _questItemsInventory!);
-            equipInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
-            craftingInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
-            questItemsInventory.SlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+            equipInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+            craftingInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+            questItemsInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
         }
 
         public EquipmentSlot? GetEquipmentSlot(EquipmentPart part)
@@ -51,7 +51,7 @@
             }
         }
 
-        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed) => EquipItemPressed?.Invoke(slot, pressed);
+        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed) => EquipmentSlotPressed?.Invoke(slot, pressed);
 
         private EquipmentSlot GetFreeRingSlotOrDefault() => _ringSlots[0].CurrentItem == null ? _ringSlots[0] : _ringSlots[1];
 

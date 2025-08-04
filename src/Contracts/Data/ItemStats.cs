@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Items.ItemData
+﻿namespace Contracts.Data
 {
     public class ItemStats
     {

@@ -2,7 +2,6 @@
 {
     using LastBreath.Script.LootGenerator;
     using LastBreath.Script.Items;
-    using Contracts.Enums;
 
     public class BasedOnRarityLootTable : GenericObjectsTable<Rarity>, IBasedOnRarityLootTable
     {
@@ -10,10 +9,10 @@
         {
             LootDropItems =
             [
-                new Rarity(GlobalRarity.Uncommon),
-                new Rarity(GlobalRarity.Rare),
-                new Rarity(GlobalRarity.Epic),
-                new Rarity(GlobalRarity.Legendary),
+                new Rarity(Contracts.Enums.Rarity.Uncommon),
+                new Rarity(Contracts.Enums.Rarity.Rare),
+                new Rarity(Contracts.Enums.Rarity.Epic),
+                new Rarity(Contracts.Enums.Rarity.Legendary),
             ];
         }
 

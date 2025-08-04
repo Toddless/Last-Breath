@@ -2,8 +2,8 @@
 {
     using System;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using LastBreath.Components.Interfaces;
-    using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.Attribute;
 
     public class AttributeComponent

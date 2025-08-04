@@ -2,11 +2,12 @@
 {
     using Contracts.Enums;
 
-    public partial class Ring : BaseAttributeEquipItem
+    public partial class Ring : EquipItem
     {
-        public Ring(GlobalRarity rarity, AttributeType attributeType)
-            : base(rarity, attributeType, equipmentPart: EquipmentPart.Ring)
+        public Ring(Rarity rarity, AttributeType attributeType)
+            : base(rarity, equipmentPart: EquipmentPart.Ring, attributeType)
         {
+            LoadData();
         }
     }
 }

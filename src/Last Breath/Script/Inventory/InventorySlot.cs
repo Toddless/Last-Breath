@@ -2,17 +2,17 @@
 {
     using System;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
     using LastBreath.Script.Helpers;
-    using LastBreath.Script.Items;
 
-    public partial class InventorySlot : BaseSlot<Item>
+    public partial class InventorySlot : BaseSlot<IItem>
     {
         private const string UID = "uid://bqlqfsqoepfhs";
-        private Label? _quantityLabel;
+        [Export] private Label? _quantityLabel;
         private int _quantity;
 
-        public event Action<Item, MouseButtonPressed>? OnClick;
+        public event Action<IItem, MouseButtonPressed>? OnItemClicked;
 
         public int Quantity
         {
@@ -26,7 +26,6 @@
 
         public override void _Ready()
         {
-            _quantityLabel = GetNode<Label>("QuantityText");
             this.MouseEntered += OnMouseEnter;
             this.MouseExited += OnMouseExit;
             this.TextureNormal = DefaltTexture;
@@ -36,12 +35,12 @@
         {
             if (@event is InputEventMouseButton p && CurrentItem != null)
             {
-                OnClick?.Invoke(CurrentItem, MouseInputHelper.GetPressedButtons(p));
+                OnItemClicked?.Invoke(CurrentItem, MouseInputHelper.GetPressedButtons(p));
                 GetViewport().SetInputAsHandled();
             }
         }
 
-        public void AddNewItem(Item item)
+        public void AddNewItem(IItem item)
         {
             CurrentItem = item;
             Quantity += item.Quantity;

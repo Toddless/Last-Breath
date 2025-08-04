@@ -39,7 +39,7 @@ namespace LastBreath
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private AttributeType? _enemyAttributeType;
-        private GlobalRarity _rarity;
+        private Contracts.Enums.Rarity _rarity;
         private EnemyType _enemyType;
         private IStance? _currentStance;
 
@@ -91,7 +91,7 @@ namespace LastBreath
             get => _respawnPosition;
         }
 
-        public GlobalRarity Rarity
+        public Contracts.Enums.Rarity Rarity
         {
             get => _rarity;
             set => _rarity = value;
@@ -310,25 +310,25 @@ namespace LastBreath
             };
         }
 
-        private GlobalRarity EnemyRarity()
+        private Contracts.Enums.Rarity EnemyRarity()
         {
-            return GlobalRarity.Uncommon;
+            return Contracts.Enums.Rarity.Uncommon;
         }
 
         private void SetAnimation()
         {
             switch (Rarity)
             {
-                case GlobalRarity.Rare:
+                case Contracts.Enums.Rarity.Rare:
                     _sprite!.Play("Bat_Rare");
                     break;
-                case GlobalRarity.Epic:
+                case Contracts.Enums.Rarity.Epic:
                     _sprite!.Play("Bat_Epic");
                     break;
-                case GlobalRarity.Legendary:
+                case Contracts.Enums.Rarity.Legendary:
                     _sprite!.Play("Bat_Legend");
                     break;
-                case GlobalRarity.Mythic:
+                case Contracts.Enums.Rarity.Mythic:
                     _sprite!.Play("Bat_Myth");
                     break;
                 default:

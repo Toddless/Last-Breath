@@ -9,5 +9,10 @@
         {
             GD.Print("Crafting plugin working");
         }
+
+        public override void _ExitTree()
+        {
+            GD.Print("Crafting leaving tree");
+        }
     }
 }

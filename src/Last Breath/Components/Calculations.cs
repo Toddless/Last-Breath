@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
-    using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
 
     public class Calculations

@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Contracts.Data;
     using Godot;
     using LastBreath.Script.Items.ItemData;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
@@ -23,7 +24,6 @@
         {
             Configure();
             CollectClassesToInject();
-            GD.Print("DIcontainer");
         }
 
         public static T? GetService<T>()
@@ -58,9 +58,15 @@
                 instance.ValidateTable();
                 return instance;
             });
-            provider.AddSingleton<IItemStatsHandler>(service =>
+            provider.AddSingleton<IItemDataProvider<ItemStats>>(service =>
             {
-                var instance = new ItemsStatsHandler();
+                var instance = new ItemsStatsProvider();
+                instance.LoadData();
+                return instance;
+            });
+            provider.AddSingleton<IItemDataProvider<ItemMediaData>>(service =>
+            {
+                var instance = new ItemsMediaProvider();
                 instance.LoadData();
                 return instance;
             });

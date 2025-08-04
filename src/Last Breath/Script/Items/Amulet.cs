@@ -4,9 +4,10 @@
 
     public partial class Amulet : EquipItem
     {
-        public Amulet(GlobalRarity rarity)
-            : base(rarity, equipmentPart: EquipmentPart.Amulet)
+        public Amulet(Rarity rarity)
+            : base(rarity, equipmentPart: EquipmentPart.Amulet, type: AttributeType.None)
         {
+            LoadData();
         }
     }
 }

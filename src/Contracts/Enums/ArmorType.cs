@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Enums
 {
-    public enum BodyArmorType
+    public enum ArmorType
     {
         Gloves,
         Boots,

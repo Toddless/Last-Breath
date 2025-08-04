@@ -1,20 +1,20 @@
 {
-    "Uncommon": {
-        "Resource": 15
-    },
-    "Rare": {
-        "Resource": 15,
-        "ResourceRecovery": 120
-    },
-    "Epic": {
-        "Resource": 15,
-        "ResourceRecovery": 120,
-        "AllAttribute": 10
-    },
-    "Legendary": {
-        "Resource": 15,
-        "ResourceRecovery": 120,
-        "AllAttribute": 15,
-        "CritChance": 0.1
-    }
+	"Uncommon": {
+		"Resource": 15
+	},
+	"Rare": {
+		"Resource": 15,
+		"ResourceRecovery": 120
+	},
+	"Epic": {
+		"Resource": 15,
+		"ResourceRecovery": 120,
+		"AllAttribute": 10
+	},
+	"Legendary": {
+		"Resource": 15,
+		"ResourceRecovery": 120,
+		"AllAttribute": 15,
+		"CritChance": 0.1
+	}
 }

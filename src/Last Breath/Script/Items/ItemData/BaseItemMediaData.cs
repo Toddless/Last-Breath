@@ -8,11 +8,11 @@
         public Dictionary<AttributeType, ItemResources> AttributeItemResources = [];
         public ItemResources SimpeItemResources { get; set; } = new();
 
-        public ItemMediaData GetAttributeMediadata(AttributeType type, GlobalRarity rarity) => CreateMediaData(AttributeItemResources.GetValueOrDefault(type), rarity);
+        public ItemMediaData GetAttributeMediadata(AttributeType type, Rarity rarity) => CreateMediaData(AttributeItemResources.GetValueOrDefault(type), rarity);
 
-        public ItemMediaData GetItemMediaData(GlobalRarity rarity) => CreateMediaData(SimpeItemResources, rarity);
+        public ItemMediaData GetItemMediaData(Rarity rarity) => CreateMediaData(SimpeItemResources, rarity);
 
-        private ItemMediaData CreateMediaData(ItemResources? resources, GlobalRarity rarity) => new()
+        private ItemMediaData CreateMediaData(ItemResources? resources, Rarity rarity) => new()
         {
             Description = resources?.Description.GetValueOrDefault(rarity),
             Name = resources?.Name.GetValueOrDefault(rarity),

@@ -2,7 +2,11 @@
 {
     using Contracts.Enums;
 
-    public partial class Dagger(GlobalRarity rarity) : WeaponItem(rarity)
+    public partial class Dagger : WeaponItem
     {
+        public Dagger(Rarity rarity) : base(rarity, WeaponType.Dagger)
+        {
+            LoadData();
+        }
     }
 }

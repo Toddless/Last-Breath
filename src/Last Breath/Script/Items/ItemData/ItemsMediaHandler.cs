@@ -2,54 +2,65 @@
 {
     using System;
     using System.Collections.Generic;
+    using Contracts.Data;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
 
-    public partial class ItemsMediaHandler : Node, IItemsMediaHandler
+    public class ItemsMediaProvider : IItemDataProvider<ItemMediaData>
     {
-        private bool _loaded = false;
-        private readonly Dictionary<BodyArmorType, ArmorMediaData> _bodyArmorData = [];
+        private readonly Dictionary<ArmorType, ArmorMediaData> _bodyArmorData = [];
         private readonly Dictionary<JewelleryType, JewelleriesMediaData> _jewelleryData = [];
         private readonly Dictionary<WeaponType, ItemResources> _weaponData = [];
 
-        public static ItemsMediaHandler? Inctance { get; private set; }
-
-        public override void _Ready()
-        {
-            LoadData();
-            Inctance = this;
-        }
-
         public void LoadData()
         {
-            if (_loaded) return;
             LoadArmorData();
             LoadJewelleriesData();
             LoadWeaponData();
-            _loaded = true;
         }
 
-        public ItemMediaData GetWeaponMediaData(WeaponType type, GlobalRarity rarity)
+        public ItemMediaData GetItemData(IEquipItem item)
         {
-            if (!_weaponData.TryGetValue(type, out var resource))
+            var itemRarity = item.Rarity;
+            var itemAttributeType = item.AttributeType;
+            return item.EquipmentPart switch
+            {
+                EquipmentPart.BodyArmor => GetAttributeArmorMediaData(ArmorType.BodyArmor, itemRarity, itemAttributeType),
+                EquipmentPart.Gloves => GetAttributeArmorMediaData(ArmorType.Gloves, itemRarity, itemAttributeType),
+                EquipmentPart.Boots => GetAttributeArmorMediaData(ArmorType.Boots, itemRarity, itemAttributeType),
+                EquipmentPart.Helmet => GetAttributeArmorMediaData(ArmorType.Helmet, itemRarity, itemAttributeType),
+                EquipmentPart.Amulet => GetJewelleryMediaData(JewelleryType.Amulet, itemRarity),
+                EquipmentPart.Cloak => GetArmorMediaData(ArmorType.Cloak, itemRarity),
+                EquipmentPart.Belt => GetJewelleryMediaData(JewelleryType.Belt, itemRarity),
+                EquipmentPart.Weapon => GetWeaponMediaData(item),
+                EquipmentPart.Ring => GetAttributeJewelleryMediaData(JewelleryType.Ring, itemRarity, itemAttributeType),
+                _ => throw new ArgumentOutOfRangeException(nameof(item))
+            };
+        }
+
+        private ItemMediaData GetWeaponMediaData(IEquipItem item)
+        {
+            var weaponItem = (IWeaponItem)item;
+            if (!_weaponData.TryGetValue(weaponItem.WeaponType, out var resource))
             {
                 resource = new();
             }
 
-            return CreateMediaData(rarity, resource);
+            return CreateMediaData(weaponItem.Rarity, resource);
         }
 
-        public ItemMediaData GetAttributeJewelleryMediaData(JewelleryType type, GlobalRarity rarity, AttributeType attributeType) =>
+        private ItemMediaData GetAttributeJewelleryMediaData(JewelleryType type, Rarity rarity, AttributeType attributeType) =>
            CreateMediaData(rarity, GetAttributeItemresources(GetJewelleriesMediaData(type).AttributeItemResources, attributeType));
 
-        public ItemMediaData GetAttributeBodyArmorMediaData(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) =>
+        private ItemMediaData GetAttributeArmorMediaData(ArmorType type, Rarity rarity, AttributeType attributeType) =>
             CreateMediaData(rarity, GetAttributeItemresources(GetBodyArmorMediaData(type).AttributeItemResources, attributeType));
 
-        public ItemMediaData GetJewelleryMediaData(JewelleryType type, GlobalRarity rarity) => CreateMediaData(rarity, GetJewelleriesMediaData(type).SimpeItemResources);
+        private ItemMediaData GetJewelleryMediaData(JewelleryType type, Rarity rarity) => CreateMediaData(rarity, GetJewelleriesMediaData(type).SimpeItemResources);
 
-        public ItemMediaData GetBodyArmorMediaData(BodyArmorType type, GlobalRarity rarity) => CreateMediaData(rarity, GetBodyArmorMediaData(type).SimpeItemResources);
+        private ItemMediaData GetArmorMediaData(ArmorType type, Rarity rarity) => CreateMediaData(rarity, GetBodyArmorMediaData(type).SimpeItemResources);
 
-        private ArmorMediaData GetBodyArmorMediaData(BodyArmorType type)
+        private ArmorMediaData GetBodyArmorMediaData(ArmorType type)
         {
             if (!_bodyArmorData.TryGetValue(type, out var armorMediaData))
             {
@@ -94,18 +105,18 @@
 
         private void LoadArmorData()
         {
-            foreach (var type in Enum.GetValues<BodyArmorType>())
+            foreach (var type in Enum.GetValues<ArmorType>())
             {
                 _bodyArmorData.Add(type, CreateArmorMediaData(type));
             }
         }
 
-        private ArmorMediaData CreateArmorMediaData(BodyArmorType type)
+        private ArmorMediaData CreateArmorMediaData(ArmorType type)
         {
             var armorMediaData = new ArmorMediaData();
             switch (type)
             {
-                case BodyArmorType.Cloak:
+                case ArmorType.Cloak:
                     armorMediaData.SimpeItemResources = LoadResource(ItemsDataPaths.CreateArmorDataPath($"{type}.tres"));
                     return armorMediaData;
                 default:
@@ -145,7 +156,7 @@
 
         private ItemResources LoadResource(string path) => !string.IsNullOrWhiteSpace(path) ? ResourceLoader.Load<ItemResources>(path) : new();
 
-        private ItemMediaData CreateMediaData(GlobalRarity rarity, ItemResources resources)
+        private ItemMediaData CreateMediaData(Rarity rarity, ItemResources resources)
             => new()
             {
                 Description = resources.Description.GetValueOrDefault(rarity),

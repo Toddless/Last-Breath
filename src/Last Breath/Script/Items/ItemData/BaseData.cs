@@ -6,12 +6,12 @@
     public abstract class BaseData<T>
         where T : class, new()
     {
-        public Dictionary<GlobalRarity, T> SimpleData = [];
-        public Dictionary<AttributeType, Dictionary<GlobalRarity, T>> AttributeData = [];
+        public Dictionary<Rarity, T> SimpleData = [];
+        public Dictionary<AttributeType, Dictionary<Rarity, T>> AttributeData = [];
 
-        public T GetSimpleData(GlobalRarity rarity) => GetValuesFromDictionary(rarity, SimpleData);
+        public T GetSimpleData(Rarity rarity) => GetValuesFromDictionary(rarity, SimpleData);
 
-        public T GetAttributeData(AttributeType type, GlobalRarity rarity)
+        public T GetAttributeData(AttributeType type, Rarity rarity)
         {
             if (!AttributeData.TryGetValue(type, out var dictionary))
             {
@@ -21,7 +21,7 @@
             return GetValuesFromDictionary(rarity, dictionary);
         }
 
-        private T GetValuesFromDictionary(GlobalRarity rarity, Dictionary<GlobalRarity, T> dictionary)
+        private T GetValuesFromDictionary(Rarity rarity, Dictionary<Rarity, T> dictionary)
         {
             if (!dictionary.TryGetValue(rarity, out var stats))
             {

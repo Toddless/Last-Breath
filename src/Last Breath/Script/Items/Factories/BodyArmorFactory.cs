@@ -13,7 +13,7 @@
             Rnd = random;
         }
 
-        public override EquipItem? GenerateItem(GlobalRarity rarity)
+        public override EquipItem? GenerateItem(Rarity rarity)
         {
             return rarity switch
             {

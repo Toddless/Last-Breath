@@ -11,6 +11,7 @@
     using LastBreath.Script.UI.View;
     using Stateless;
     using Contracts.Enums;
+    using Contracts.Interfaces;
 
     public partial class MainLayer : CanvasLayer
     {
@@ -46,17 +47,16 @@
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
-            var body = new BodyArmor(GlobalRarity.Epic, AttributeType.Dexterity);
-            var dagger = new Dagger(GlobalRarity.Epic);
-            var dexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
-            var strRing = new Ring(GlobalRarity.Rare, AttributeType.Strength);
-            var amulet = new Amulet(GlobalRarity.Rare);
-            var dexGloves = new Gloves(GlobalRarity.Rare, AttributeType.Dexterity);
-            var dexBoots = new Boots(GlobalRarity.Rare, AttributeType.Dexterity);
-            var dexHelmet = new Helmet(GlobalRarity.Rare, AttributeType.Dexterity);
-            var belt = new Belt(GlobalRarity.Rare);
-            var cloak = new Cloak(GlobalRarity.Rare);
-            var secondDexRing = new Ring(GlobalRarity.Rare, AttributeType.Dexterity);
+            var body = new BodyArmor(Rarity.Epic, AttributeType.Dexterity);
+            var dagger = new Dagger(Rarity.Epic);
+            var dexRing = new Ring(Rarity.Rare, AttributeType.Dexterity);
+            var strRing = new Ring(Rarity.Rare, AttributeType.Strength);
+            var amulet = new Amulet(Rarity.Rare);
+            var dexGloves = new Gloves(Rarity.Rare, AttributeType.Dexterity);
+            var dexBoots = new Boots(Rarity.Rare, AttributeType.Dexterity);
+            var dexHelmet = new Helmet(Rarity.Rare, AttributeType.Dexterity);
+            var belt = new Belt(Rarity.Rare);
+            var cloak = new Cloak(Rarity.Rare);
             _player.AddItemToInventory(body);
             _player.AddItemToInventory(dagger);
             _player.AddItemToInventory(dexRing);
@@ -67,7 +67,6 @@
             _player.AddItemToInventory(dexHelmet);
             _player.AddItemToInventory(belt);
             _player.AddItemToInventory(cloak);
-            _player.AddItemToInventory(secondDexRing);
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -80,8 +79,6 @@
                 break;
             }
         }
-
-
 
         public void OpenInventory(BaseOpenableObject obj)
         {
@@ -104,13 +101,6 @@
             _machine?.Fire(Trigger.ShowInventory);
         }
 
-        // Close object if player leaves without pressing Close or TakeAll button
-        private void ObjectClosing()
-        {
-            _inventoryUI?.Hide();
-            FireClose();
-        }
-
         public void UpdateItems()
         {
             if (_currentOpenedObj == null) return;
@@ -118,6 +108,13 @@
             {
                 _inventoryUI?.AddItem(item);
             }
+        }
+
+        // Close object if player leaves without pressing Close or TakeAll button
+        private void ObjectClosing()
+        {
+            _inventoryUI?.Hide();
+            FireClose();
         }
 
         private void FireClose() => _machine?.Fire(Trigger.Close);
@@ -146,7 +143,7 @@
             _mainUI!.Map += () => _machine?.Fire(Trigger.ShowMap);
             _inventoryUI!.TakeAll += OnInventoryTakeAll;
             _playerInventory!.InventorySlotClicked += OnInventorySlotClicked;
-            _playerInventory.EquipItemPressed += OnEquipItemPressed;
+            _playerInventory.EquipmentSlotPressed += OnEquipItemPressed;
         }
 
         private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed)
@@ -156,7 +153,8 @@
                 case MouseButtonPressed.RightClick:
                     HandleItemUnequip(slot);
                     break;
-                default: break;
+                default:
+                    break;
             }
         }
 
@@ -172,15 +170,15 @@
             slot.UnequipItem();
         }
 
-        private void OnInventorySlotClicked(Item itemClicked, MouseButtonPressed pressed, Inventory inventory)
+        private void OnInventorySlotClicked(IItem itemClicked, MouseButtonPressed buttonPressed, Inventory inventory)
         {
-            if (itemClicked is EquipItem item)
+            if (itemClicked is IEquipItem item)
             {
-                HandleEquipmentItemPressed(item, pressed, inventory);
+                HandleEquipmentItemPressed(item, buttonPressed, inventory);
             }
         }
 
-        private void HandleEquipmentItemPressed(EquipItem item, MouseButtonPressed pressed, Inventory inventory)
+        private void HandleEquipmentItemPressed(IEquipItem item, MouseButtonPressed pressed, Inventory inventory)
         {
             switch (pressed)
             {
@@ -196,7 +194,7 @@
             }
         }
 
-        private void HandleItemEquipment(EquipItem item, Inventory inventory)
+        private void HandleItemEquipment(IEquipItem item, Inventory inventory)
         {
             if (_playerInventory == null)
             {
@@ -217,16 +215,16 @@
             }
             else
             {
-                equipSlot.EquipItem(item, _player);
+                equipSlot.EquipItem((EquipItem)item, _player);
                 inventory.RemoveItem(item.Id);
             }
         }
 
-        private void HandleItemTransfer(EquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
+        private void HandleItemTransfer(IEquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
         {
             var oldEquipedItem = equipSlot.CurrentItem;
             equipSlot.UnequipItem();
-            equipSlot.EquipItem(newItem, _player);
+            equipSlot.EquipItem((EquipItem)newItem, _player);
             inventory.RemoveItem(newItem.Id);
             // old item != null, we check this in method above
             inventory.AddItem(oldEquipedItem!);

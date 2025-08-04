@@ -2,11 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Contracts.Interfaces;
     using LastBreath.Script.Inventory;
-    using LastBreath.Script.Items;
 
     public class EnemyInventory : Inventory
     {
-        public List<Item> GivePlayerItems() => [.. Slots.Where(x => x.CurrentItem != null).Select(x => x.CurrentItem!)];
+        public List<IItem> GivePlayerItems() => [.. Slots.Where(x => x.CurrentItem != null).Select(x => x.CurrentItem!)];
     }
 }

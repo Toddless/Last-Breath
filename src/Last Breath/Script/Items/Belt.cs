@@ -4,9 +4,10 @@
 
     public partial class Belt : EquipItem
     {
-        public Belt(GlobalRarity rarity)
-            : base(rarity, equipmentPart: EquipmentPart.Belt)
+        public Belt(Rarity rarity)
+            : base(rarity, equipmentPart: EquipmentPart.Belt, type: AttributeType.None)
         {
+            LoadData();
         }
     }
 }

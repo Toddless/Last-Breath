@@ -12,7 +12,7 @@ region = Rect2(16, 16, 32, 32)
 font = ExtResource("2_ehf1w")
 shadow_color = Color(0, 0, 0, 1)
 
-[node name="InventorySlot" type="TextureButton"]
+[node name="InventorySlot" type="TextureButton" node_paths=PackedStringArray("_quantityLabel")]
 clip_contents = true
 custom_minimum_size = Vector2(57, 56)
 offset_right = 57.0
@@ -24,6 +24,7 @@ button_mask = 3
 ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("1_yg5o5")
+_quantityLabel = NodePath("QuantityText")
 DefaltTexture = SubResource("AtlasTexture_r861c")
 
 [node name="QuantityText" type="Label" parent="."]

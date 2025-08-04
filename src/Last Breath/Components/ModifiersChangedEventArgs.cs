@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Contracts.Enums;
-    using LastBreath.Script.Abilities.Modifiers;
+    using Contracts.Interfaces;
 
     public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifier> modifiers) : EventArgs
     {

@@ -13,14 +13,14 @@
             Rnd = random;
         }
 
-        public override EquipItem GenerateItem(GlobalRarity globalRarity)
+        public override EquipItem GenerateItem(Rarity globalRarity)
         {
             return globalRarity switch
             {
-                GlobalRarity.Rare => new Bow(GlobalRarity.Rare),
-                GlobalRarity.Epic => new Bow(GlobalRarity.Epic),
-                GlobalRarity.Legendary => new Bow(GlobalRarity.Legendary),
-                _ => new Bow(GlobalRarity.Uncommon),
+                Rarity.Rare => new Bow(Rarity.Rare),
+                Rarity.Epic => new Bow(Rarity.Epic),
+                Rarity.Legendary => new Bow(Rarity.Legendary),
+                _ => new Bow(Rarity.Uncommon),
             };
         }
     }

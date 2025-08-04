@@ -3,15 +3,18 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using Contracts.Data;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
     using Newtonsoft.Json;
 
-    public class ItemsStatsHandler : IItemStatsHandler
+    // TODO: this class need more attention
+    public class ItemsStatsProvider : IItemDataProvider<ItemStats>
     {
         private readonly Dictionary<WeaponType, WeaponStatsData> _weaponStats = [];
         private readonly Dictionary<JewelleryType, JewelleriesStatsData> _jewelleriesStats = [];
-        private readonly Dictionary<BodyArmorType, ArmorStatsData> _bodyArmorStats = [];
+        private readonly Dictionary<ArmorType, ArmorStatsData> _bodyArmorStats = [];
 
         public void LoadData()
         {
@@ -30,25 +33,46 @@
             LoadArmorData();
         }
 
-        public ItemStats GetWeaponStats(WeaponType type, GlobalRarity rarity)
+        public ItemStats GetItemData(IEquipItem item)
         {
-            if (!_weaponStats.TryGetValue(type, out var data))
+            var itemRarity = item.Rarity;
+            var itemAttributeType = item.AttributeType;
+
+            return item.EquipmentPart switch
+            {
+                EquipmentPart.BodyArmor => GetAttributeArmorStats(ArmorType.BodyArmor, itemRarity, itemAttributeType),
+                EquipmentPart.Belt => GetJewelleryStats(JewelleryType.Belt, itemRarity),
+                EquipmentPart.Gloves => GetAttributeArmorStats(ArmorType.Gloves, itemRarity, itemAttributeType),
+                EquipmentPart.Boots => GetAttributeArmorStats(ArmorType.Boots, itemRarity, itemAttributeType),
+                EquipmentPart.Helmet => GetAttributeArmorStats(ArmorType.Helmet, itemRarity, itemAttributeType),
+                EquipmentPart.Amulet => GetJewelleryStats(JewelleryType.Amulet, itemRarity),
+                EquipmentPart.Cloak => GetArmorStats(ArmorType.Cloak, itemRarity),
+                EquipmentPart.Weapon => GetWeaponStats(item),
+                EquipmentPart.Ring => GetAttributeJewelleryStats(JewelleryType.Ring, itemRarity, itemAttributeType),
+                _ => throw new ArgumentOutOfRangeException(nameof(item))
+            };
+        }
+
+        private ItemStats GetWeaponStats(IEquipItem item)
+        {
+            var weaponItem = (IWeaponItem)item;
+            if (!_weaponStats.TryGetValue(weaponItem.WeaponType, out var data))
             {
                 data = new();
             }
 
-            return data.GetSimpleData(rarity);
+            return data.GetSimpleData(weaponItem.Rarity);
         }
 
-        public ItemStats GetAttributeJewelleryStats(JewelleryType type, GlobalRarity rarity, AttributeType attributeType) => GetJewelleriesData(type).GetAttributeData(attributeType, rarity);
+        private ItemStats GetAttributeJewelleryStats(JewelleryType type, Rarity rarity, AttributeType attributeType) => GetJewelleriesData(type).GetAttributeData(attributeType, rarity);
 
-        public ItemStats GetAttributeBodyArmorStats(BodyArmorType type, GlobalRarity rarity, AttributeType attributeType) => GetArmorData(type).GetAttributeData(attributeType, rarity);
+        private ItemStats GetAttributeArmorStats(ArmorType type, Rarity rarity, AttributeType attributeType) => GetArmorData(type).GetAttributeData(attributeType, rarity);
 
-        public ItemStats GetJewelleryStats(JewelleryType type, GlobalRarity rarity) => GetJewelleriesData(type).GetSimpleData(rarity);
+        private ItemStats GetJewelleryStats(JewelleryType type, Rarity rarity) => GetJewelleriesData(type).GetSimpleData(rarity);
 
-        public ItemStats GetBodyArmorStats(BodyArmorType type, GlobalRarity rarity) => GetArmorData(type).GetSimpleData(rarity);
+        private ItemStats GetArmorStats(ArmorType type, Rarity rarity) => GetArmorData(type).GetSimpleData(rarity);
 
-        private ArmorStatsData GetArmorData(BodyArmorType type)
+        private ArmorStatsData GetArmorData(ArmorType type)
         {
             if (!_bodyArmorStats.TryGetValue(type, out var data))
             {
@@ -83,7 +107,7 @@
 
         private void LoadArmorData()
         {
-            foreach (var type in Enum.GetValues<BodyArmorType>())
+            foreach (var type in Enum.GetValues<ArmorType>())
             {
                 var json = ItemsDataPaths.GetArmorDataFromJsonFile($"{type}.json");
                 if (string.IsNullOrWhiteSpace(json))
@@ -109,12 +133,12 @@
             }
         }
 
-        private ArmorStatsData CreateArmorData(BodyArmorType type, string json)
+        private ArmorStatsData CreateArmorData(ArmorType type, string json)
         {
             ArmorStatsData armorData = new();
             switch (type)
             {
-                case BodyArmorType.Cloak:
+                case ArmorType.Cloak:
                     armorData.SimpleData = DeserializeItemStats(json);
                     return armorData;
                 default:
@@ -138,11 +162,11 @@
             }
         }
 
-        private static Dictionary<AttributeType, Dictionary<GlobalRarity, ItemStats>> DeserializeAttributeStats(string json)
-            => JsonConvert.DeserializeObject<Dictionary<AttributeType, Dictionary<GlobalRarity, ItemStats>>>(json) ?? [];
+        private static Dictionary<AttributeType, Dictionary<Rarity, ItemStats>> DeserializeAttributeStats(string json)
+            => JsonConvert.DeserializeObject<Dictionary<AttributeType, Dictionary<Rarity, ItemStats>>>(json) ?? [];
 
-        private static Dictionary<GlobalRarity, ItemStats> DeserializeItemStats(string json)
-            => JsonConvert.DeserializeObject<Dictionary<GlobalRarity, ItemStats>>(json) ?? [];
+        private static Dictionary<Rarity, ItemStats> DeserializeItemStats(string json)
+            => JsonConvert.DeserializeObject<Dictionary<Rarity, ItemStats>>(json) ?? [];
 
         private void CopyDirectory(string srcDir, string userDataPath)
         {

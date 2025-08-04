@@ -16,6 +16,7 @@
     using LastBreath.Script.Items;
     using LastBreath.Script.QuestSystem;
     using Contracts.Enums;
+    using Contracts.Interfaces;
 
     public partial class Player : CharacterBody2D, ICharacter
     {
@@ -169,9 +170,9 @@
             MoveAndSlide();
         }
 
-        public void AddItemToInventory(Item item)
+        public void AddItemToInventory(IItem item)
         {
-            if (item is EquipItem)
+            if (item is IEquipItem)
                 _equipInventory?.AddItem(item);
 
             // if (item is CraftingItem)
@@ -184,7 +185,7 @@
             }
         }
 
-        public void OnItemCollect(Item item)
+        public void OnItemCollect(IItem item)
         {
             AddItemToInventory(item);
             ItemCollected?.Invoke(item.Id);

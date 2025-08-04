@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using Godot;
-    using LastBreath.Localization;
     using Contracts.Enums;
+    using LastBreath.Localization;
 
     public interface ISkill
     {

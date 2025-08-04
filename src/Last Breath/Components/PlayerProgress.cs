@@ -1,6 +1,7 @@
 ﻿namespace LastBreath.Components
 {
     using System.Collections.Generic;
+    using Contracts.Interfaces;
     using LastBreath.Script.Items;
 
     public class PlayerProgress
@@ -21,7 +22,7 @@
         /// Collecting quest items
         /// </summary>
         /// <param name="item"></param>
-        public void OnQuestItemCollected(Item item)
+        public void OnQuestItemCollected(IItem item)
         {
             if (item is not QuestItem) return;
 

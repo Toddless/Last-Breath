@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueData" load_steps=84 format=3 uid="uid://cndb6lemqe2pi"]
+[gd_resource type="Resource" script_class="DialogueData" load_steps=54 format=3 uid="uid://cndb6lemqe2pi"]
 
 [ext_resource type="Script" uid="uid://uywgsrrxxqx1" path="res://Localization/DialogueNode.cs" id="1_iatya"]
 [ext_resource type="Script" uid="uid://cyvkrnhly51mt" path="res://Localization/DialogueOption.cs" id="2_tpjgm"]
@@ -34,46 +34,18 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_up6wm"]
-script = ExtResource("3_w8bc5")
-Key = "dialogAwakingText1"
-
-[sub_resource type="Resource" id="Resource_1dn2k"]
-script = ExtResource("3_w8bc5")
-Key = "dialogAwakingText2"
-
-[sub_resource type="Resource" id="Resource_vvj5i"]
-script = ExtResource("3_w8bc5")
-Key = "dialogAwakingText3"
-
-[sub_resource type="Resource" id="Resource_4oeq5"]
-script = ExtResource("3_w8bc5")
-Key = "dialogAwakingText4"
-
-[sub_resource type="Resource" id="Resource_45276"]
-script = ExtResource("3_w8bc5")
-Key = "dialogAwakingText5"
-
 [sub_resource type="Resource" id="Resource_daill"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_up6wm"), SubResource("Resource_1dn2k"), SubResource("Resource_vvj5i"), SubResource("Resource_4oeq5"), SubResource("Resource_45276")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_e3isw"), SubResource("Resource_3u2db")])
 DialogueId = "Awaking"
 ReturnToPrevious = false
 Quests = Array[String]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_jg5o1"]
-script = ExtResource("3_w8bc5")
-Key = "dialogBadNewsText1"
-
-[sub_resource type="Resource" id="Resource_3e5wk"]
-script = ExtResource("3_w8bc5")
-Key = "dialogBadNewsText2"
-
 [sub_resource type="Resource" id="Resource_8t6ug"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_jg5o1"), SubResource("Resource_3e5wk")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([])
 DialogueId = "BadNews"
 ReturnToPrevious = true
@@ -94,46 +66,18 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_avnep"]
-script = ExtResource("3_w8bc5")
-Key = "dialogConclusionsText1"
-
-[sub_resource type="Resource" id="Resource_8t45e"]
-script = ExtResource("3_w8bc5")
-Key = "dialogConclusionsText2"
-
 [sub_resource type="Resource" id="Resource_qaj4c"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_avnep"), SubResource("Resource_8t45e")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_i1kqb")])
 DialogueId = "Conclusions"
 ReturnToPrevious = false
 Quests = Array[String](["Side_Battle_Skills", "Side_First_Equip", "Side_Who_Am_I", "Side_I_Need_Food"])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_3axq3"]
-script = ExtResource("3_w8bc5")
-Key = "dialogDeathMemoryText1"
-
-[sub_resource type="Resource" id="Resource_f2p0n"]
-script = ExtResource("3_w8bc5")
-Key = "dialogDeathMemoryText2"
-
-[sub_resource type="Resource" id="Resource_dtdum"]
-script = ExtResource("3_w8bc5")
-Key = "dialogDeathMemoryText3"
-
-[sub_resource type="Resource" id="Resource_bouuy"]
-script = ExtResource("3_w8bc5")
-Key = "dialogDeathMemoryText4"
-
-[sub_resource type="Resource" id="Resource_8ncme"]
-script = ExtResource("3_w8bc5")
-Key = "dialogDeathMemoryText5"
-
 [sub_resource type="Resource" id="Resource_mw2bj"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_3axq3"), SubResource("Resource_f2p0n"), SubResource("Resource_dtdum"), SubResource("Resource_bouuy"), SubResource("Resource_8ncme")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([])
 DialogueId = "DeathMemory"
 ReturnToPrevious = true
@@ -182,26 +126,18 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_kakbb"]
-script = ExtResource("3_w8bc5")
-Key = "dialogEvaluateSituationText1"
-
 [sub_resource type="Resource" id="Resource_vppgv"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_kakbb")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_mmp5y"), SubResource("Resource_enn76"), SubResource("Resource_ykdp5")])
 DialogueId = "EvaluateSituation"
 ReturnToPrevious = false
 Quests = Array[String]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_heljl"]
-script = ExtResource("3_w8bc5")
-Key = "dialogGoodNewsText1"
-
 [sub_resource type="Resource" id="Resource_uc7k7"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_heljl")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([])
 DialogueId = "GoodNews"
 ReturnToPrevious = true
@@ -222,26 +158,18 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_gtke7"]
-script = ExtResource("3_w8bc5")
-Key = "dialogInspectText1"
-
 [sub_resource type="Resource" id="Resource_mrouv"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_gtke7")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_lku7e")])
 DialogueId = "Inspect"
 ReturnToPrevious = false
 Quests = Array[String]([])
 IsDialogMatterForQuest = false
 
-[sub_resource type="Resource" id="Resource_5eqjd"]
-script = ExtResource("3_w8bc5")
-Key = "dialogInspectBodyText1"
-
 [sub_resource type="Resource" id="Resource_8neco"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_5eqjd")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([])
 DialogueId = "InspectBody"
 ReturnToPrevious = true
@@ -262,29 +190,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_oxeyk"]
-script = ExtResource("3_w8bc5")
-Key = "dialogListenToTheFeelingsText1"
-
-[sub_resource type="Resource" id="Resource_hg575"]
-script = ExtResource("3_w8bc5")
-Key = "dialogListenToTheFeelingsText2"
-
-[sub_resource type="Resource" id="Resource_1n13p"]
-script = ExtResource("3_w8bc5")
-Key = "dialogListenToTheFeelingsText3"
-
-[sub_resource type="Resource" id="Resource_ou8sw"]
-script = ExtResource("3_w8bc5")
-Key = "dialogListenToTheFeelingsText4"
-
-[sub_resource type="Resource" id="Resource_8b7k5"]
-script = ExtResource("3_w8bc5")
-Key = "dialogListenToTheFeelingsText5"
-
 [sub_resource type="Resource" id="Resource_t7ee7"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_oxeyk"), SubResource("Resource_hg575"), SubResource("Resource_1n13p"), SubResource("Resource_ou8sw"), SubResource("Resource_8b7k5")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_2ec1l")])
 DialogueId = "ListenToTheFeelings"
 ReturnToPrevious = false
@@ -305,13 +213,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_kg8xa"]
-script = ExtResource("3_w8bc5")
-Key = "dialogPickUpItemText1"
-
 [sub_resource type="Resource" id="Resource_3q007"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_kg8xa")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_8vnor")])
 DialogueId = "PickUpItem"
 ReturnToPrevious = false
@@ -350,13 +254,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_4tu6f"]
-script = ExtResource("3_w8bc5")
-Key = "dialogPlayerMerchantLieText1"
-
 [sub_resource type="Resource" id="Resource_hgsub"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_4tu6f")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_jkjd2")])
 DialogueId = "PlayerMerchantLie"
 ReturnToPrevious = false
@@ -386,13 +286,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_kad7s"]
-script = ExtResource("3_w8bc5")
-Key = "dialogPlayerPartialLieText1"
-
 [sub_resource type="Resource" id="Resource_5pqgm"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_kad7s")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_rl8yn")])
 DialogueId = "PlayerPartialLie"
 ReturnToPrevious = false
@@ -413,13 +309,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_wc27n"]
-script = ExtResource("3_w8bc5")
-Key = "dialogThanksAndEndText1"
-
 [sub_resource type="Resource" id="Resource_0so5s"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_wc27n")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_hotpd")])
 DialogueId = "ThanksAndEnd"
 ReturnToPrevious = false
@@ -454,17 +346,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_5x8q5"]
-script = ExtResource("3_w8bc5")
-Key = "dialogTryToMoveText1"
-
-[sub_resource type="Resource" id="Resource_s3f5m"]
-script = ExtResource("3_w8bc5")
-Key = "dialogTryToMoveText2"
-
 [sub_resource type="Resource" id="Resource_7qogx"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_5x8q5"), SubResource("Resource_s3f5m")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_1k8vq"), SubResource("Resource_etn2p")])
 DialogueId = "TryToMove"
 ReturnToPrevious = false
@@ -485,13 +369,9 @@ Conditions = Array[ExtResource("3_tpjgm")]([])
 AllConditionsMustMet = false
 MinimumConditionsRequirement = 0
 
-[sub_resource type="Resource" id="Resource_hnh6i"]
-script = ExtResource("3_w8bc5")
-Key = "dialogTryToSitDownText1"
-
 [sub_resource type="Resource" id="Resource_keprd"]
 script = ExtResource("1_iatya")
-Texts = Array[ExtResource("3_w8bc5")]([SubResource("Resource_hnh6i")])
+Texts = Array[ExtResource("3_w8bc5")]([])
 Options = Array[ExtResource("2_tpjgm")]([SubResource("Resource_sd1oy")])
 DialogueId = "TryToSitDown"
 ReturnToPrevious = false

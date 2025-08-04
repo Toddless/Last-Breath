@@ -4,7 +4,7 @@
     using Godot;
     using LastBreath.Script.Helpers;
 
-    public partial class ItemDescription : MarginContainer
+    public partial class ItemDescription : Panel
     {
         [Export] private TextureRect? _itemImage;
         [Export] private VBoxContainer? _statsBox, _descriptionBox;

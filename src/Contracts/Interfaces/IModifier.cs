@@ -1,7 +1,6 @@
-﻿namespace LastBreath.Script.Abilities.Modifiers
+﻿namespace Contracts.Interfaces
 {
     using Contracts.Enums;
-    using LastBreath.Script.Helpers;
 
     public interface IModifier
     {

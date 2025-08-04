@@ -13,14 +13,14 @@
             Rnd = random;
         }
 
-        public override EquipItem GenerateItem(GlobalRarity rarity)
+        public override EquipItem GenerateItem(Rarity rarity)
         {
             return rarity switch
             {
-                GlobalRarity.Rare => new Sword(GlobalRarity.Rare),
-                GlobalRarity.Epic => new Sword(GlobalRarity.Epic),
-                GlobalRarity.Legendary => new Sword(GlobalRarity.Legendary),
-                _ => new Sword(GlobalRarity.Uncommon),
+                Rarity.Rare => new Sword(Rarity.Rare),
+                Rarity.Epic => new Sword(Rarity.Epic),
+                Rarity.Legendary => new Sword(Rarity.Legendary),
+                _ => new Sword(Rarity.Uncommon),
             };
         }
     }

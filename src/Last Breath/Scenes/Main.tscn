@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=20 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" uid="uid://hl7koqv3auw2" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
@@ -17,8 +17,6 @@
 [ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
 [ext_resource type="PackedScene" uid="uid://dolelj83vd4cv" path="res://Script/UI/Inventory.tscn" id="11_jyqft"]
 [ext_resource type="Script" uid="uid://dv52xthi2iu6h" path="res://Script/UI/Layers/BattleLayer.cs" id="16_vnox3"]
-[ext_resource type="Script" uid="uid://ck1m7101hqevv" path="res://DebugTools/DevLayer.cs" id="18_lw5ck"]
-[ext_resource type="PackedScene" uid="uid://belchp2lhqykb" path="res://DebugTools/DevTools.tscn" id="19_yuu34"]
 [ext_resource type="Script" uid="uid://bt4bcaxsbsu8l" path="res://Script/UI/Layers/DialogueLayer.cs" id="21_nfb6a"]
 [ext_resource type="PackedScene" uid="uid://eh2wvi8x5l80" path="res://Script/UI/DialogueWindow.tscn" id="21_rf13s"]
 
@@ -97,12 +95,6 @@ script = ExtResource("16_vnox3")
 _battleUI = NodePath("BattleUI")
 
 [node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]
-
-[node name="DevLayer" type="CanvasLayer" parent="."]
-visible = false
-script = ExtResource("18_lw5ck")
-
-[node name="DevTools" parent="DevLayer" instance=ExtResource("19_yuu34")]
 
 [node name="DialogueLayer" type="CanvasLayer" parent="."]
 visible = false

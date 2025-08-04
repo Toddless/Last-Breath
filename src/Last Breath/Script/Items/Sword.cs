@@ -2,7 +2,7 @@
 {
     using Contracts.Enums;
 
-    public partial class Sword(GlobalRarity rarity) : WeaponItem(rarity)
+    public partial class Sword(Rarity rarity) : WeaponItem(rarity, WeaponType.Sword)
     {
     }
 }

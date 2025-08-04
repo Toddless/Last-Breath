@@ -2,12 +2,14 @@
 {
     using System.Collections.Generic;
     using System.Text;
+    using Contracts.Data;
     using Contracts.Enums;
+    using Contracts.Interfaces;
     using Godot;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Items.ItemData;
 
-    public abstract partial class WeaponItem : EquipItem, IDamageStrategy
+    public abstract partial class WeaponItem : EquipItem, IDamageStrategy, IWeaponItem
     {
         protected RandomNumberGenerator Rnd = new();
         protected float BaseAdditionalHitChance { get; private set; }
@@ -17,8 +19,12 @@
 
         public int UpgradeLevel { get; private set; } = 0;
 
-        protected WeaponItem(GlobalRarity rarity) : base(rarity, equipmentPart: EquipmentPart.Weapon)
+        public WeaponType WeaponType { get; private set; }
+
+        protected WeaponItem(Rarity rarity, WeaponType weaponType) : base(rarity, equipmentPart: EquipmentPart.Weapon, type: AttributeType.None)
         {
+            WeaponType = weaponType;
+            LoadData();
         }
 
         public float GetBaseCriticalChance() => BaseCriticalChance;
@@ -55,7 +61,7 @@
 
         protected override void LoadData()
         {
-            var data = DiContainer.GetService<IItemStatsHandler>()?.GetWeaponStats(WeaponType.Dagger, Rarity);
+            var data = DiContainer.GetService<IItemDataProvider<ItemStats>>()?.GetItemData(this);
             if (data == null)
             {
                 // TODO Log
@@ -66,7 +72,7 @@
             BaseCritDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.CritDamage));
             BaseDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.Damage));
 
-            var mediaData = ItemsMediaHandler.Inctance?.GetWeaponMediaData(WeaponType.Dagger, Rarity);
+            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(this);
             if (mediaData == null)
             {
                 //TODO Log
@@ -75,7 +81,7 @@
             Icon = mediaData.IconTexture;
             FullImage = mediaData.FullTexture;
             ItemName = mediaData.Name;
-            Description = mediaData.Description;
+            SetNewDescription(mediaData.Description);
         }
     }
 }
