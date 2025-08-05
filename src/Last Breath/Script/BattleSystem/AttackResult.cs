@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script.Abilities.Interfaces;
 
     public class AttackResult(List<ISkill> skills, AttackResults result, AttackContext context)

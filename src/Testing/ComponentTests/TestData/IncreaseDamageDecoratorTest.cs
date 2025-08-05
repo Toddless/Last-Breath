@@ -1,6 +1,6 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script.BattleSystem.Decorators;
 
     public class IncreaseDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(type: StatModule.Damage, priority)

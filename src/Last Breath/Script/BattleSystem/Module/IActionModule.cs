@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public interface IActionModule<T>
     {

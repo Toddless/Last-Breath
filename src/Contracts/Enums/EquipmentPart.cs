@@ -1,4 +1,4 @@
-﻿namespace Contracts.Enums
+﻿namespace Core.Enums
 {
     public enum EquipmentPart
     {

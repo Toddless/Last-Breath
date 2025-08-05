@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Helpers
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
 
     public class MouseInputHelper

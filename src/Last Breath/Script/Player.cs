@@ -15,8 +15,8 @@
     using LastBreath.Resource.Quests;
     using LastBreath.Script.Items;
     using LastBreath.Script.QuestSystem;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Enums;
+    using Core.Interfaces;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

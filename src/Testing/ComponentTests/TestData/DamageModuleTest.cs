@@ -1,6 +1,6 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script.BattleSystem.Module;
 
     public class DamageModuleTest(float value) : IStatModule

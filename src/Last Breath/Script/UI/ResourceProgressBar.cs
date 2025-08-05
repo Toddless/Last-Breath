@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.UI
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
 
     public partial class ResourceProgressBar : TextureProgressBar

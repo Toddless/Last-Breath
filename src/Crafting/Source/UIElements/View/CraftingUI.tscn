@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://iif75nev2q13"]
 
-[ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://addons/Crafting/UIElements/CraftingUI.cs" id="1_ykvyl"]
+[ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://Source/UIElements/CraftingUI.cs" id="1_ykvyl"]
 
 [node name="CraftingUI" type="Panel"]
 anchors_preset = 15

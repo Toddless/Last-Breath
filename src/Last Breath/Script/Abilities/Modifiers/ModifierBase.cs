@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Abilities.Modifiers
 {
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Enums;
+    using Core.Interfaces;
 
     public abstract class ModifierBase(Parameter parameter, ModifierType type, float value, object source, int priority = 0) : IModifier
     {

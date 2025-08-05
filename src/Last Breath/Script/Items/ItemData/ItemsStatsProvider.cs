@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using Contracts.Data;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using Godot;
     using Newtonsoft.Json;
 
@@ -22,8 +22,11 @@
             var userDir = ProjectSettings.GlobalizePath("user://");
             var userDataPath = Path.Combine(userDir, "Data");
 
-            if (!Directory.Exists(userDataPath))
+            if (Directory.Exists(userDataPath))
             {
+                // TODO: Change it later
+                // for now recreate each time (i need new data)
+                Directory.Delete(userDataPath, true);
                 Directory.CreateDirectory(userDataPath);
                 CopyDirectory(ProjectSettings.GlobalizePath("res://Data"), userDataPath);
             }

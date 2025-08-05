@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Inventory
 {
     using System;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Enums;
+    using Core.Interfaces;
     using Godot;
     using LastBreath.Script.Helpers;
 

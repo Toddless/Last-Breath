@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
 
     public class UnluckyCritDecoration(DecoratorPriority priority) : StatModuleDecorator(type: StatModule.CritChance, priority)

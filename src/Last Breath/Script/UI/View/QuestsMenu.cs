@@ -5,7 +5,7 @@
     using LastBreath.Script.Helpers;
     using LastBreath.Resource.Quests;
     using LastBreath.Script.UI.View;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public partial class QuestsMenu : Control
     {

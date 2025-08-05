@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
     using System;
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script;
     using LastBreath.Script.BattleSystem.Module;
 

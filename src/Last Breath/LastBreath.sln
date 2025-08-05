@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LastBreathTest", "..\Testin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crafting", "..\Crafting\Crafting.csproj", "{C51AE8DA-DA34-4105-2218-997C275142B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "..\Contracts\Contracts.csproj", "{4562C17C-F86F-4D5F-A8D5-6579A3C56489}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\Contracts\Core.csproj", "{4562C17C-F86F-4D5F-A8D5-6579A3C56489}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,9 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using Contracts.Data;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using Godot;
 
     public class ItemsMediaProvider : IItemDataProvider<ItemMediaData>

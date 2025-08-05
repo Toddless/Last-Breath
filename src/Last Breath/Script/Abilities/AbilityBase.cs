@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Abilities
 {
     using System;
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;

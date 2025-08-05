@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Contracts.Data;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Items.ItemData;
@@ -75,9 +75,9 @@
             if (mediaData != null)
             {
                 Icon = mediaData.IconTexture;
-                SetNewDescription(mediaData.Description);
-                ItemName = mediaData.Name;
                 FullImage = mediaData.FullTexture;
+                SetDescription(mediaData.Description);
+                SetName(mediaData.Name);
             }
         }
 

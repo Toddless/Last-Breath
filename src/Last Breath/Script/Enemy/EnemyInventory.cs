@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Contracts.Interfaces;
+    using Core.Interfaces;
     using LastBreath.Script.Inventory;
 
     public class EnemyInventory : Inventory

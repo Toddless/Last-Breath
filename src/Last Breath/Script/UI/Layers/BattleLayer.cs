@@ -7,7 +7,7 @@
     using LastBreath.Script.Helpers.Extensions;
     using LastBreath.Script.ScenesHandlers;
     using LastBreath.Script.BattleSystem;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public partial class BattleLayer : CanvasLayer
     {

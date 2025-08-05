@@ -1,6 +1,6 @@
-﻿namespace Contracts.Data
+﻿namespace Core.Data
 {
-    using Contracts.Interfaces;
+    using Core.Interfaces;
 
     public interface IItemDataProvider<T>
         where T : class

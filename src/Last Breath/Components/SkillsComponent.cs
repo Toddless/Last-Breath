@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Components
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
 

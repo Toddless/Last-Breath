@@ -1,4 +1,4 @@
-﻿namespace Contracts.Data
+﻿namespace Core.Data
 {
     public class ItemStats
     {

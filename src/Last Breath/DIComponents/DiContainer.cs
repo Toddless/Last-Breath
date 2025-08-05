@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Contracts.Data;
+    using Core.Data;
     using Godot;
     using LastBreath.Script.Items.ItemData;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;

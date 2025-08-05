@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Components
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
 
     public class DefenseComponent

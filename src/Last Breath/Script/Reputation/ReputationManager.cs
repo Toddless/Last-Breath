@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Reputation
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public class ReputationManager(int elfRep, int dwarfsRep, int humanReps)
     {

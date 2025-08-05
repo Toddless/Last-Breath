@@ -1,6 +1,6 @@
-﻿namespace Contracts.Interfaces
+﻿namespace Core.Interfaces
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public interface IWeaponItem : IEquipItem
     {

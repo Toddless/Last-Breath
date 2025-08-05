@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
 

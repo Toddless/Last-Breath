@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Components;
     using LastBreath.Script;
 

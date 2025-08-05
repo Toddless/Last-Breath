@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Components;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;

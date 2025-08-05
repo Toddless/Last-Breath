@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Components
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public class ComboPoints : BaseResource
     {

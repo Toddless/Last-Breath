@@ -6,7 +6,7 @@
     using LastBreath.Components;
     using LastBreath.Script.BattleSystem.Module;
     using LastBreath.Script.BattleSystem.Decorators;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public interface IStance
     {

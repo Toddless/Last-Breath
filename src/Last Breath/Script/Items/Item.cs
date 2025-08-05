@@ -3,16 +3,16 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Contracts.Interfaces;
-    using Contracts.Enums;
     using LastBreath.Localization;
+    using Core.Enums;
+    using Core.Interfaces;
 
     [GlobalClass]
     public partial class Item : Resource, IItem
     {
         private string? _id;
-        [Export]
-        private LocalizedString? _description;
+        [Export] private LocalizedString? _description;
+        [Export] private LocalizedString? _name;
 
         [Export]
         public Rarity Rarity { get; set; }
@@ -24,19 +24,19 @@
         public int Quantity { get; set; } = 1;
         [Export]
         public int MaxStackSize { get; set; } = 1;
-        [Export]
-        public LocalizedString? ItemName { get; set; }
+
+        public string Name => _name?.Text ?? string.Empty;
         public string Description => _description?.Text ?? string.Empty;
         public string Id => _id ??= SetId();
 
 
         public bool Equals(Item other)
         {
-            if (other == null || ItemName == null)
+            if (other == null || _name == null)
             {
                 return false;
             }
-            return ItemName.Equals(other.ItemName) && Quantity == other.Quantity;
+            return _name.Equals(other._name) && Quantity == other.Quantity;
         }
 
         public override bool Equals(object? obj)
@@ -48,12 +48,13 @@
             return Equals((Item)obj);
         }
 
-        public override int GetHashCode() => HashCode.Combine(ItemName, Quantity);
+        public override int GetHashCode() => HashCode.Combine(_name, Quantity);
 
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];
-        public void SetNewDescription(LocalizedString? description) => _description = description;
+        public void SetDescription(LocalizedString? description) => _description = description;
         public virtual IItem CopyItem(bool subresources = false) => (IItem)Duplicate(subresources);
+        public void SetName(LocalizedString? name) => _name = name;
         private string SetId() => $"{this.GetType().Name}_{Rarity}";
     }
 }

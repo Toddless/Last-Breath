@@ -1,20 +1,20 @@
 {
-    "Uncommon": {
-        "HealthPercent": 0.5
-    },
-    "Rare": {
-        "HealthPercent": 0.10,
-        "DefencePercent": 0.10
-    },
-    "Epic": {
-        "HealthPercent": 0.15,
-        "DefencePercent": 0.15,
-        "EvadePercent" : 0.15
-    },
-    "Legendary": {
-        "HealthPercent": 0.20,
-        "DefencePercent": 0.20,
-        "EvadePercent": 0.20,
-        "EnergyBarrierPercent": 0.20
-    }
+	"Uncommon": {
+		"ExtraHealth": 1.5
+	},
+	"Rare": {
+		"ExtraHealth": 1.10,
+		"ExtraArmor": 1.10
+	},
+	"Epic": {
+		"ExtraHealth": 1.15,
+		"ExtraArmor": 1.15,
+		"ExtraEvade" : 1.15
+	},
+	"Legendary": {
+		"ExtraHealth": 1.20,
+		"ExtraArmor": 1.20,
+		"ExtraEvade": 1.20,
+		"ExtraEnergyBarrier": 1.20
+	}
 }

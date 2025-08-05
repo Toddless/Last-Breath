@@ -3,7 +3,7 @@ namespace LastBreath
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Script;
@@ -39,7 +39,7 @@ namespace LastBreath
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private AttributeType? _enemyAttributeType;
-        private Contracts.Enums.Rarity _rarity;
+        private Core.Enums.Rarity _rarity;
         private EnemyType _enemyType;
         private IStance? _currentStance;
 
@@ -91,7 +91,7 @@ namespace LastBreath
             get => _respawnPosition;
         }
 
-        public Contracts.Enums.Rarity Rarity
+        public Core.Enums.Rarity Rarity
         {
             get => _rarity;
             set => _rarity = value;
@@ -303,32 +303,32 @@ namespace LastBreath
         {
             return enemyAttributeType switch
             {
-                Contracts.Enums.AttributeType.Dexterity => new DexterityStance(this),
-                Contracts.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                Contracts.Enums.AttributeType.Strength => new StrengthStance(this),
+                Core.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                Core.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
+                Core.Enums.AttributeType.Strength => new StrengthStance(this),
                 _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
             };
         }
 
-        private Contracts.Enums.Rarity EnemyRarity()
+        private Core.Enums.Rarity EnemyRarity()
         {
-            return Contracts.Enums.Rarity.Uncommon;
+            return Core.Enums.Rarity.Uncommon;
         }
 
         private void SetAnimation()
         {
             switch (Rarity)
             {
-                case Contracts.Enums.Rarity.Rare:
+                case Core.Enums.Rarity.Rare:
                     _sprite!.Play("Bat_Rare");
                     break;
-                case Contracts.Enums.Rarity.Epic:
+                case Core.Enums.Rarity.Epic:
                     _sprite!.Play("Bat_Epic");
                     break;
-                case Contracts.Enums.Rarity.Legendary:
+                case Core.Enums.Rarity.Legendary:
                     _sprite!.Play("Bat_Legend");
                     break;
-                case Contracts.Enums.Rarity.Mythic:
+                case Core.Enums.Rarity.Mythic:
                     _sprite!.Play("Bat_Myth");
                     break;
                 default:
@@ -355,9 +355,9 @@ namespace LastBreath
 
             return enemyType switch
             {
-                Contracts.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                Contracts.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
-                Contracts.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                Core.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                Core.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
+                Core.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
@@ -366,9 +366,9 @@ namespace LastBreath
         {
             return index switch
             {
-                1 => Contracts.Enums.AttributeType.Dexterity,
-                2 => Contracts.Enums.AttributeType.Strength,
-                _ => Contracts.Enums.AttributeType.Intelligence,
+                1 => Core.Enums.AttributeType.Dexterity,
+                2 => Core.Enums.AttributeType.Strength,
+                _ => Core.Enums.AttributeType.Intelligence,
             };
         }
 

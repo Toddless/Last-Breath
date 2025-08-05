@@ -4,8 +4,8 @@
     using Godot;
     using Godot.Collections;
     using LastBreath.Script.QuestSystem;
-    using Contracts.Enums;
     using LastBreath.Localization;
+    using Core.Enums;
 
     [GlobalClass]
     public partial class Quest : Resource

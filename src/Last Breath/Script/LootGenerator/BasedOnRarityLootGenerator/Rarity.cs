@@ -4,7 +4,7 @@
 
     public class Rarity : GenericObject
     {
-        public Rarity(Contracts.Enums.Rarity rarity)
+        public Rarity(Core.Enums.Rarity rarity)
         {
             Rarity = rarity;
             ProbabilityWeight = ConvertGlobalRarity.rarityWeights[rarity];

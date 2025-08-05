@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Abilities.Interfaces
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Script.BattleSystem;
 
     public interface IStanceSkill : ISkill

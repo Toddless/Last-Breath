@@ -1,7 +1,7 @@
-﻿namespace Contracts.Interfaces
+﻿namespace Core.Interfaces
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
 
     public interface IItem
@@ -13,8 +13,9 @@
         Texture2D? FullImage {  get; }
         Rarity Rarity { get; }
         string Description { get; }
-
-        IItem CopyItem(bool subresources = false);
+        string Name { get; }
         List<string> GetItemStatsAsStrings();
+
+        IItem Copy(bool subresources = false);
     }
 }

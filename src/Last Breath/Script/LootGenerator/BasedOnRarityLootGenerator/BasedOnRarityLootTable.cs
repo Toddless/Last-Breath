@@ -9,10 +9,10 @@
         {
             LootDropItems =
             [
-                new Rarity(Contracts.Enums.Rarity.Uncommon),
-                new Rarity(Contracts.Enums.Rarity.Rare),
-                new Rarity(Contracts.Enums.Rarity.Epic),
-                new Rarity(Contracts.Enums.Rarity.Legendary),
+                new Rarity(Core.Enums.Rarity.Uncommon),
+                new Rarity(Core.Enums.Rarity.Rare),
+                new Rarity(Core.Enums.Rarity.Epic),
+                new Rarity(Core.Enums.Rarity.Legendary),
             ];
         }
 

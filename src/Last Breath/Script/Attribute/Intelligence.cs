@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Attribute
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public class Intelligence() : AttributeBase(GetEffects())
     {

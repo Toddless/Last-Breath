@@ -2,9 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using Contracts.Data;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.Helpers;
 

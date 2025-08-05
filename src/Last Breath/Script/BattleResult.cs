@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public class BattleResult(ICharacter player, ICharacter enemy, BattleResults result)
     {

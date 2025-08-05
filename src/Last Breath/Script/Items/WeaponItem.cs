@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Contracts.Data;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using Godot;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Items.ItemData;
@@ -80,8 +80,8 @@
             }
             Icon = mediaData.IconTexture;
             FullImage = mediaData.FullTexture;
-            ItemName = mediaData.Name;
-            SetNewDescription(mediaData.Description);
+            SetDescription(mediaData.Description);
+            SetName(mediaData.Name);
         }
     }
 }

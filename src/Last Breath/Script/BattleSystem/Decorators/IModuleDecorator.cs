@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public interface IModuleDecorator<TKey, TModule>
         where TKey : notnull

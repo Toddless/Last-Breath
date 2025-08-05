@@ -1,7 +1,7 @@
-﻿namespace Contracts.Interfaces
+﻿namespace Core.Interfaces
 {
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
 
     public interface IEquipItem : IItem
     {

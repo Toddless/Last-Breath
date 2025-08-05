@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Inventory
 {
-    using Contracts.Interfaces;
+    using Core.Interfaces;
     using Godot;
     using LastBreath.Script.UI;
 
@@ -13,7 +13,6 @@
         [Export] protected Texture2D? DefaltTexture;
 
         public T? CurrentItem { get; protected set; }
-
 
         protected void OnMouseExit()
         {

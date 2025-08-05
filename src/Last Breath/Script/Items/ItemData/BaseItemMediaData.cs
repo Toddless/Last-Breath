@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Items.ItemData
 {
-    using Contracts.Enums;
+    using Core.Enums;
     using System.Collections.Generic;
 
     public abstract class BaseItemMediaData

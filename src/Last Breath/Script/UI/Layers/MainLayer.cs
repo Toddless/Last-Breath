@@ -10,8 +10,8 @@
     using LastBreath.Script.Items;
     using LastBreath.Script.UI.View;
     using Stateless;
-    using Contracts.Enums;
-    using Contracts.Interfaces;
+    using Core.Enums;
+    using Core.Interfaces;
 
     public partial class MainLayer : CanvasLayer
     {

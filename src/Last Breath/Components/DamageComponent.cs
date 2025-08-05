@@ -2,7 +2,7 @@ namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
-    using Contracts.Enums;
+    using Core.Enums;
     using Godot;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Helpers;

@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Components
 {
     using System;
-    using Contracts.Enums;
+    using Core.Enums;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Helpers;
 

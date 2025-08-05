@@ -1,14 +1,14 @@
 ﻿namespace LastBreath.Script.Abilities
 {
     using System;
-    using Contracts.Interfaces;
+    using Core.Interfaces;
     using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
 
-    public abstract class EffectBase(Contracts.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
+    public abstract class EffectBase(Core.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
-        public Contracts.Enums.Effects Effect { get; } = effect;
+        public Core.Enums.Effects Effect { get; } = effect;
         public IModifier? Modifier { get; protected set; }
         public int Duration { get; set; } = duration;
         public int Stacks { get; set; } = stacks;

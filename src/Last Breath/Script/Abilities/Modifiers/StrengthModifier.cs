@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Abilities.Modifiers
 {
-    using Contracts.Enums;
+    using Core.Enums;
 
     public class StrengthModifier : ModifierBase
     {
