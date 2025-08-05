@@ -41,7 +41,7 @@
                 int rest = slot.AddItemStacks(item.Quantity);
                 if (rest > 0)
                 {
-                    var duplicate = item.CopyItem(true);
+                    var duplicate = item.Copy(true);
                     duplicate.Quantity = rest;
                     AddItem(duplicate);
                 }

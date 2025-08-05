@@ -7,7 +7,7 @@
     using Core.Interfaces;
     using Godot;
 
-    public class ItemsMediaProvider : IItemDataProvider<ItemMediaData>
+    public class ItemsMediaProvider : IItemDataProvider<ItemMediaData, IEquipItem>
     {
         private readonly Dictionary<ArmorType, ArmorMediaData> _bodyArmorData = [];
         private readonly Dictionary<JewelleryType, JewelleriesMediaData> _jewelleryData = [];

@@ -61,7 +61,7 @@
 
         protected override void LoadData()
         {
-            var data = DiContainer.GetService<IItemDataProvider<ItemStats>>()?.GetItemData(this);
+            var data = DiContainer.GetService<IItemDataProvider<ItemStats, IEquipItem>>()?.GetItemData(this);
             if (data == null)
             {
                 // TODO Log
@@ -72,7 +72,7 @@
             BaseCritDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.CritDamage));
             BaseDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.Damage));
 
-            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(this);
+            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData, IEquipItem>>()?.GetItemData(this);
             if (mediaData == null)
             {
                 //TODO Log

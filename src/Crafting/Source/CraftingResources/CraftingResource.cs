@@ -11,11 +11,12 @@
         private string? _id;
         [Export] private LocalizedString? _name;
         [Export] private LocalizedString? _description;
-
+        [Export] private Texture2D? _icon;
+        [Export] private Texture2D? _fullImage;
         [Export] public ResourceType Type { get; private set; }
         [Export] public Core.Enums.Rarity Rarity { get; private set; } = Core.Enums.Rarity.Rare;
-        [Export] public Texture2D? Icon { get; private set; }
-        [Export] public Texture2D? FullImage { get; private set; }
+        public Texture2D? Icon => _icon;
+        public Texture2D? FullImage => _fullImage;
         /// <summary>
         /// Default value = 1;
         /// </summary>
@@ -30,12 +31,11 @@
         /// </summary>
         public int Quantity { get; set; } = 1;
 
-
         public List<string> GetItemStatsAsStrings() => [];
         public IItem Copy(bool subresources = false) => Clone(subresources);
         ICraftingResource ICraftingResource.Copy(bool subresources) => Clone(subresources);
 
-        private string SetId() => $"{Name}_{Type}_{Quality}";
+        private string SetId() => $"{_name?.Key}_{Quality}";
 
         private CraftingResource Clone(bool subresources)
         => (CraftingResource)Duplicate(subresources);

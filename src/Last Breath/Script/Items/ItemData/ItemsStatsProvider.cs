@@ -10,7 +10,7 @@
     using Newtonsoft.Json;
 
     // TODO: this class need more attention
-    public class ItemsStatsProvider : IItemDataProvider<ItemStats>
+    public class ItemsStatsProvider : IItemDataProvider<ItemStats, IEquipItem>
     {
         private readonly Dictionary<WeaponType, WeaponStatsData> _weaponStats = [];
         private readonly Dictionary<JewelleryType, JewelleriesStatsData> _jewelleriesStats = [];

@@ -15,7 +15,7 @@
         [Export] private LocalizedString? _name;
 
         [Export]
-        public Rarity Rarity { get; set; }
+        public Rarity Rarity { get; set; } = Rarity.Rare;
         [Export]
         public Texture2D? Icon { get; set; }
         [Export]
@@ -53,8 +53,10 @@
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];
         public void SetDescription(LocalizedString? description) => _description = description;
-        public virtual IItem CopyItem(bool subresources = false) => (IItem)Duplicate(subresources);
+        public IItem Copy(bool subresources = false) => (IItem)Duplicate(subresources);
         public void SetName(LocalizedString? name) => _name = name;
-        private string SetId() => $"{this.GetType().Name}_{Rarity}";
+
+        // All semantics are already established within the key, so we use the key as an ID.
+        private string SetId() => $"{_name?.Key}";
     }
 }

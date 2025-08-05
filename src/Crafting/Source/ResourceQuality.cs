@@ -4,6 +4,7 @@
     {
         LowGrade,
         Common,
-        HighClass
+        HighClass,
+        Excellent
     }
 }

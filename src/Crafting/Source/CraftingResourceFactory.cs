@@ -2,22 +2,22 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using Crafting.Source.CraftingResources;
     using Godot;
 
-    public static class CraftingResourceFactory
+    public class CraftingResourceFactory
     {
-        private static readonly Dictionary<ResourceType, ICraftingResource> s_craftingResources = [];
+        private const string DataPath = "Source/CraftingResources";
 
-        static CraftingResourceFactory()
+        private readonly Dictionary<ResourceType, ICraftingResource> _craftingResources = [];
+        public CraftingResourceFactory()
         {
             LoadResources();
         }
-
-
-        public static ICraftingResource? CreateResource(ResourceType type, float quality, int quantity = 1)
+        public ICraftingResource? CreateResource(ResourceType type, float quality, int quantity = 1)
         {
-            if (!s_craftingResources.TryGetValue(type, out var resource))
+            if (!_craftingResources.TryGetValue(type, out var resource))
             {
                 GD.PushError("Resource not found: {0}", type);
             }
@@ -29,27 +29,44 @@
             }
             if (instance != null)
             {
+                var resourceQuality = DefineResourceQuality(quality);
                 instance.Quantity = quantity;
-                instance.Quality = DefineResourceQuality(quality);
+                instance.Quality = resourceQuality;
+                // I need get this data from somewhere
+                // something like: 
+                // var resourceData = GetResourceData(resourceQuality);
+                //  instance.Icon = resourceData.Icon;
+                //  instance.FullImage = resourceData.FullImage;
             }
 
             return instance;
         }
 
-        private static void LoadResources()
+        private void LoadResources()
         {
+            var userDir = ProjectSettings.GlobalizePath("res://");
+            var userDataPath = Path.Combine(userDir, DataPath);
+
+            if (Directory.Exists(userDataPath))
+            {
+                // TODO: Change it later
+                // for now recreate each time (i need new data)
+               // Directory.Delete(userDataPath, true);
+                Directory.CreateDirectory(userDataPath);
+            }
             foreach (var resourceType in Enum.GetValues<ResourceType>())
             {
                 var resource = ResourceLoader.Load<CraftingResource>($"res://Source/CraftingResources/{resourceType}.tres");
-                s_craftingResources[resourceType] = resource;
+                _craftingResources[resourceType] = resource;
             }
         }
 
         private static ResourceQuality DefineResourceQuality(float quality) => quality switch
         {
             < 50 => ResourceQuality.LowGrade,
-            < 85 => ResourceQuality.Common,
-            _ => ResourceQuality.HighClass,
+            < 65 => ResourceQuality.Common,
+            < 95 => ResourceQuality.HighClass,
+            _ => ResourceQuality.Excellent,
         };
     }
 }

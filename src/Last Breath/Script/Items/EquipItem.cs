@@ -62,16 +62,16 @@
         }
 
         public virtual void UpgradeItemLevel() { }
-
         protected virtual void UpdateItem() { }
+
         protected virtual void LoadData()
         {
-            var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats>>()?.GetItemData(this);
+            var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats, IEquipItem>>()?.GetItemData(this);
             if (itemStats != null)
             {
                 BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
             }
-            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(this);
+            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData, IEquipItem>>()?.GetItemData(this);
             if (mediaData != null)
             {
                 Icon = mediaData.IconTexture;

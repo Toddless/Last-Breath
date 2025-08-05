@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using Core.Data;
+    using Core.Interfaces;
     using Godot;
     using LastBreath.Script.Items.ItemData;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
@@ -58,13 +59,13 @@
                 instance.ValidateTable();
                 return instance;
             });
-            provider.AddSingleton<IItemDataProvider<ItemStats>>(service =>
+            provider.AddSingleton<IItemDataProvider<ItemStats, IEquipItem>>(service =>
             {
                 var instance = new ItemsStatsProvider();
                 instance.LoadData();
                 return instance;
             });
-            provider.AddSingleton<IItemDataProvider<ItemMediaData>>(service =>
+            provider.AddSingleton<IItemDataProvider<ItemMediaData, IEquipItem>>(service =>
             {
                 var instance = new ItemsMediaProvider();
                 instance.LoadData();
