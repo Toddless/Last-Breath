@@ -7,6 +7,7 @@
     <UserSecretsId>0132e77a-2c43-41e0-acc0-5791c77b2d87</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Addons\" />
     <Folder Include="Scenes\" />
   </ItemGroup>
   <ItemGroup>

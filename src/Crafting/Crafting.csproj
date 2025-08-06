@@ -5,9 +5,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <Compile Remove="Source\Enums\**" />
+    <EmbeddedResource Remove="Source\Enums\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Source\Enums\" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>
