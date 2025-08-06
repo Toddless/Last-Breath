@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Modifiers;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Attribute;
 

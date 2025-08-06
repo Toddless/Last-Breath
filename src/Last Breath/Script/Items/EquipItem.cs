@@ -4,7 +4,8 @@
     using System.Text;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Items.ItemData;

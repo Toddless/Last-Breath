@@ -5,7 +5,7 @@
     using Godot;
     using LastBreath.Localization;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
 
     [GlobalClass]
     public partial class Item : Resource, IItem

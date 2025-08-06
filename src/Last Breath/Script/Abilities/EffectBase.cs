@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.Abilities
 {
     using System;
-    using Core.Interfaces;
+    using Core.Modifiers;
     using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;

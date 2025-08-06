@@ -4,7 +4,7 @@
     using System.Text;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Items.ItemData;

@@ -4,11 +4,11 @@ namespace LastBreath
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Modifiers;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Enemy;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;

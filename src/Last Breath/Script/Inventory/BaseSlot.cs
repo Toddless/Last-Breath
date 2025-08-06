@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Inventory
 {
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.UI;
 

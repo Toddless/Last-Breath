@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
 
     public class Inventory

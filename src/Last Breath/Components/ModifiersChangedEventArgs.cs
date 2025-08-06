@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Modifiers;
 
     public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifier> modifiers) : EventArgs
     {

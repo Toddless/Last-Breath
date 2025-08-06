@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using Core.Data;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.Items.ItemData;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;

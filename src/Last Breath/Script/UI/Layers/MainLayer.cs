@@ -11,7 +11,7 @@
     using LastBreath.Script.UI.View;
     using Stateless;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
 
     public partial class MainLayer : CanvasLayer
     {

@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using Core.Enums;
+    using Core.Interfaces.CraftingResources;
     using Crafting.Source.CraftingResources;
     using Godot;
 
@@ -10,12 +12,14 @@
     {
         private const string DataPath = "Source/CraftingResources";
 
-        private readonly Dictionary<ResourceType, ICraftingResource> _craftingResources = [];
+        private readonly Dictionary<ResourceCategory, ICraftingResource> _craftingResources = [];
+
         public CraftingResourceFactory()
         {
             LoadResources();
         }
-        public ICraftingResource? CreateResource(ResourceType type, float quality, int quantity = 1)
+
+        public ICraftingResource? CreateResource(ResourceCategory type, float quality, int quantity = 1)
         {
             if (!_craftingResources.TryGetValue(type, out var resource))
             {
@@ -29,14 +33,7 @@
             }
             if (instance != null)
             {
-                var resourceQuality = DefineResourceQuality(quality);
                 instance.Quantity = quantity;
-                instance.Quality = resourceQuality;
-                // I need get this data from somewhere
-                // something like: 
-                // var resourceData = GetResourceData(resourceQuality);
-                //  instance.Icon = resourceData.Icon;
-                //  instance.FullImage = resourceData.FullImage;
             }
 
             return instance;
@@ -51,10 +48,10 @@
             {
                 // TODO: Change it later
                 // for now recreate each time (i need new data)
-               // Directory.Delete(userDataPath, true);
+               // Directory.Delete(userDataPath);
                 Directory.CreateDirectory(userDataPath);
             }
-            foreach (var resourceType in Enum.GetValues<ResourceType>())
+            foreach (var resourceType in Enum.GetValues<ResourceCategory>())
             {
                 var resource = ResourceLoader.Load<CraftingResource>($"res://Source/CraftingResources/{resourceType}.tres");
                 _craftingResources[resourceType] = resource;

@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
 
     public class ItemsMediaProvider : IItemDataProvider<ItemMediaData, IEquipItem>

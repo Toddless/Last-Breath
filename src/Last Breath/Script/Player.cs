@@ -7,7 +7,6 @@
     using LastBreath.Components.Interfaces;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Abilities.Modifiers;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
@@ -16,7 +15,8 @@
     using LastBreath.Script.Items;
     using LastBreath.Script.QuestSystem;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Modifiers;
+    using Core.Interfaces.Items;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

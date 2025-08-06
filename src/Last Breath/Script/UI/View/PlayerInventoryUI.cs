@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Godot;
     using Godot.Collections;
     using LastBreath.Script.Helpers;
