@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Core.Data;
     using Core.Enums;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Components.Interfaces;

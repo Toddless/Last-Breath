@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Core.Data;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.Items.ItemData;

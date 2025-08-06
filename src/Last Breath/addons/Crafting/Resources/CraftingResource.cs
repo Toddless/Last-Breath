@@ -1,10 +1,10 @@
-﻿namespace Crafting.Source.CraftingResources
+﻿namespace LastBreath.Addons.Crafting
 {
     using Godot;
     using System.Collections.Generic;
-    using Crafting.Source.Localization;
     using Core.Interfaces.Items;
-    using Core.Interfaces.CraftingResources;
+    using LastBreath.Localization;
+    using Core.Interfaces.Crafting;
 
     [GlobalClass]
     public partial class CraftingResource : Resource, ICraftingResource, IItem
@@ -20,9 +20,8 @@
         /// Default value = 1;
         /// </summary>
         [Export] public int MaxStackSize { get; set; } = 1;
-
-        public Texture2D? Icon { get; set; }
-        public Texture2D? FullImage { get; set; }
+        [Export] public Texture2D? Icon { get; set; }
+        [Export] public Texture2D? FullImage { get; set; }
 
         public string Name => _name?.Text ?? string.Empty;
         public string Description => _description?.Text ?? string.Empty;

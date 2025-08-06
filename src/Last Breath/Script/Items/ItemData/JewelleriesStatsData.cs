@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.Items.ItemData
 {
-    using Core.Data;
+    using Core.Interfaces.Data;
 
     public class JewelleriesStatsData : BaseData<ItemStats>
     {

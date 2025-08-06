@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="CraftingResource" load_steps=13 format=3 uid="uid://b3thkifmqo21t"]
+
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_16v5q"]
+[ext_resource type="Script" uid="uid://bu7cs1ihrco3g" path="res://addons/Crafting/Resources/MaterialModifiers.cs" id="2_unr5j"]
+[ext_resource type="Script" uid="uid://dg20ma8ca63q6" path="res://addons/Crafting/Resources/ResourceMaterialType.cs" id="3_dv7ms"]
+[ext_resource type="Script" uid="uid://de62ounj0fv8p" path="res://addons/Crafting/Resources/CraftingResource.cs" id="4_q6gkt"]
+
+[sub_resource type="Gradient" id="Gradient_3rvk6"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.0789657, 0.259483, 0.449226, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2ifrh"]
+gradient = SubResource("Gradient_3rvk6")
+
+[sub_resource type="Resource" id="Resource_0e204"]
+script = ExtResource("1_16v5q")
+Key = "DwarfsSteel_Descriprion"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[sub_resource type="Resource" id="Resource_pvhm6"]
+script = ExtResource("2_unr5j")
+Parameter = 12
+ModifierType = 2
+Value = 1.3
+metadata/_custom_type_script = "uid://bu7cs1ihrco3g"
+
+[sub_resource type="Resource" id="Resource_5o2po"]
+script = ExtResource("2_unr5j")
+Parameter = 8
+ModifierType = 2
+Value = 1.3
+metadata/_custom_type_script = "uid://bu7cs1ihrco3g"
+
+[sub_resource type="Resource" id="Resource_ig4e4"]
+script = ExtResource("2_unr5j")
+Parameter = 1
+ModifierType = 2
+Value = 1.3
+metadata/_custom_type_script = "uid://bu7cs1ihrco3g"
+
+[sub_resource type="Resource" id="Resource_l6m66"]
+script = ExtResource("3_dv7ms")
+_modifiers = Array[Object]([SubResource("Resource_pvhm6"), SubResource("Resource_5o2po"), SubResource("Resource_ig4e4")])
+Category = 1
+metadata/_custom_type_script = "uid://dg20ma8ca63q6"
+
+[sub_resource type="Resource" id="Resource_bsab2"]
+script = ExtResource("1_16v5q")
+Key = "DwarfsSteel"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[resource]
+script = ExtResource("4_q6gkt")
+_name = SubResource("Resource_bsab2")
+_description = SubResource("Resource_0e204")
+_materialType = SubResource("Resource_l6m66")
+Rarity = 1
+MaxStackSize = 9999
+Icon = SubResource("GradientTexture1D_2ifrh")
+metadata/_custom_type_script = "uid://de62ounj0fv8p"

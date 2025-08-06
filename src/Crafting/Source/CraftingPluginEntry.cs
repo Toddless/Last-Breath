@@ -1,4 +1,4 @@
-﻿namespace Crafting
+﻿namespace Crafting.Source
 {
     using Godot;
 

@@ -1,4 +1,4 @@
-﻿namespace Core.Data
+﻿namespace Core.Interfaces.Data
 {
     public interface IItemDataProvider<T, U>
         where T : class

@@ -1,7 +1,7 @@
-﻿namespace Crafting.Source.CraftingResources
+﻿namespace LastBreath.Addons.Crafting
 {
     using Core.Enums;
-    using Core.Interfaces.CraftingResources;
+    using Core.Interfaces.Crafting;
     using Godot;
 
     [GlobalClass]
