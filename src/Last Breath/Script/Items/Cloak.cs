@@ -7,7 +7,6 @@
         public Cloak(Rarity rarity)
             : base(rarity, EquipmentPart.Cloak, type: AttributeType.None)
         {
-            LoadData();
         }
     }
 }

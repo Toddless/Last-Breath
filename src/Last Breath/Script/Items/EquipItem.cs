@@ -26,15 +26,25 @@
         // if i create equip item as resource in editor, where i get modifiers from?
         public IReadOnlyList<IModifier> Modifiers => BaseModifiers;
 
+        /// <summary>
+        /// Default constructor to instantiate this from Resource
+        /// </summary>
         public EquipItem()
         {
         }
 
+        /// <summary>
+        /// Constructro to create items via code. 
+        /// </summary>
+        /// <param name="rarity"></param>
+        /// <param name="equipmentPart"></param>
+        /// <param name="type"></param>
         public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type)
         {
             Rarity = rarity;
             EquipmentPart = equipmentPart;
             AttributeType = type;
+            SetId();
         }
 
         public virtual void OnEquip(ICharacter owner)
@@ -72,13 +82,7 @@
         public virtual void UpgradeItemLevel() { }
         protected virtual void UpdateItem() { }
 
-        protected override string SetId()
-        {
-            if (AttributeType != AttributeType.None) return $"{GetType().Name}_{AttributeType}_{Rarity}";
-            return base.SetId();
-        }
-
-        protected virtual void LoadData()
+        protected override void LoadData()
         {
             var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats, IEquipItem>>()?.GetItemData(this);
             if (itemStats != null)
@@ -90,11 +94,25 @@
             {
                 Icon = mediaData.IconTexture;
                 FullImage = mediaData.FullTexture;
-                SetDescription(mediaData.Description);
-                SetName(mediaData.Name);
             }
         }
 
         protected virtual void SetEffects() { }
+
+        private void SetId()
+        {
+            if (string.IsNullOrWhiteSpace(Id))
+            {
+                if (AttributeType != AttributeType.None)
+                {
+                    Id = $"{GetType().Name}_{AttributeType}_{Rarity}";
+                }
+                else
+                {
+                    Id = $"{GetType().Name}_{Rarity}";
+                }
+            }
+        }
+
     }
 }

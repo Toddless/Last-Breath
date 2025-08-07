@@ -7,7 +7,6 @@
         public Amulet(Rarity rarity)
             : base(rarity, equipmentPart: EquipmentPart.Amulet, type: AttributeType.None)
         {
-            LoadData();
         }
     }
 }

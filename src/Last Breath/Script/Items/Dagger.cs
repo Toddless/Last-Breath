@@ -6,7 +6,6 @@
     {
         public Dagger(Rarity rarity) : base(rarity, WeaponType.Dagger)
         {
-            LoadData();
         }
     }
 }

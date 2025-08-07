@@ -7,7 +7,6 @@
         public Belt(Rarity rarity)
             : base(rarity, equipmentPart: EquipmentPart.Belt, type: AttributeType.None)
         {
-            LoadData();
         }
     }
 }

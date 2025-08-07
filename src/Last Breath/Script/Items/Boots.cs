@@ -7,7 +7,6 @@
         public Boots(Rarity rarity, AttributeType attributeType)
             : base(rarity, EquipmentPart.Boots, attributeType)
         {
-            LoadData();
         }
     }
 }

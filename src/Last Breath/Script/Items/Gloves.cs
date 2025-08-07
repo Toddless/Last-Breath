@@ -7,7 +7,6 @@
         public Gloves(Rarity rarity, AttributeType attributeType)
             : base(rarity, equipmentPart: EquipmentPart.Gloves, attributeType)
         {
-            LoadData();
         }
     }
 }

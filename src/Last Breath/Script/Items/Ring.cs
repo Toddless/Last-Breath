@@ -7,7 +7,6 @@
         public Ring(Rarity rarity, AttributeType attributeType)
             : base(rarity, equipmentPart: EquipmentPart.Ring, attributeType)
         {
-            LoadData();
         }
     }
 }

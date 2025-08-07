@@ -24,7 +24,6 @@
         protected WeaponItem(Rarity rarity, WeaponType weaponType) : base(rarity, equipmentPart: EquipmentPart.Weapon, type: AttributeType.None)
         {
             WeaponType = weaponType;
-            LoadData();
         }
 
         public float GetBaseCriticalChance() => BaseCriticalChance;
@@ -80,8 +79,6 @@
             }
             Icon = mediaData.IconTexture;
             FullImage = mediaData.FullTexture;
-            SetDescription(mediaData.Description);
-            SetName(mediaData.Name);
         }
     }
 }

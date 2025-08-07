@@ -3,17 +3,23 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using LastBreath.Localization;
     using Core.Enums;
     using Core.Interfaces.Items;
 
     [GlobalClass]
     public partial class Item : Resource, IItem
     {
-        private string? _id;
-        [Export] private LocalizedString? _description;
-        [Export] private LocalizedString? _name;
-
+        private string _id = string.Empty;
+        [Export]
+        public string Id
+        {
+            get => _id;
+            protected set
+            {
+                _id = value;
+                LoadData();
+            }
+        }
         [Export]
         public Rarity Rarity { get; set; } = Rarity.Rare;
         [Export]
@@ -25,18 +31,18 @@
         [Export]
         public int MaxStackSize { get; set; } = 1;
 
-        public string Name => _name?.Text ?? string.Empty;
-        public string Description => _description?.Text ?? string.Empty;
-        public string Id => _id ??= SetId();
+        public string Name => GetLocalizedName();
+
+        public string Description => GetLocalizedDescription();
 
 
         public bool Equals(Item other)
         {
-            if (other == null || _name == null)
+            if (other == null || string.IsNullOrEmpty(Name))
             {
                 return false;
             }
-            return _name.Equals(other._name) && Quantity == other.Quantity;
+            return Name.Equals(other.Name) && Quantity == other.Quantity;
         }
 
         public override bool Equals(object? obj)
@@ -48,19 +54,16 @@
             return Equals((Item)obj);
         }
 
-        public override int GetHashCode() => HashCode.Combine(_name, Quantity);
+        public override int GetHashCode() => HashCode.Combine(Name, Quantity);
 
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];
-        public void SetDescription(LocalizedString? description) => _description = description;
         public IItem Copy(bool subresources = false) => (IItem)Duplicate(subresources);
-        public void SetName(LocalizedString? name) => _name = name;
-
-        // All semantics are already established within the key, so we use the key as an ID.
-        protected virtual string SetId()
+        protected virtual void LoadData()
         {
-            if (_name == null) return $"{GetType().Name}_{Rarity}";
-            return $"{_name?.Key}";
+
         }
+        private string GetLocalizedName() => TranslationServer.Translate(Id);
+        private string GetLocalizedDescription() => TranslationServer.Translate(Id + "_Description");
     }
 }
