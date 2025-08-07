@@ -1,17 +1,17 @@
 {
-	"Uncommon": {
+	"Amulet_Uncommon": {
 		"Resource": 15
 	},
-	"Rare": {
+	"Amulet_Rare": {
 		"Resource": 15,
 		"ResourceRecovery": 120
 	},
-	"Epic": {
+	"Amulet_Epic": {
 		"Resource": 15,
 		"ResourceRecovery": 120,
 		"AllAttribute": 10
 	},
-	"Legendary": {
+	"Amulet_Legendary": {
 		"Resource": 15,
 		"ResourceRecovery": 120,
 		"AllAttribute": 15,

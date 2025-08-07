@@ -12,164 +12,52 @@
     // TODO: this class need more attention
     public class ItemsStatsProvider : IItemDataProvider<ItemStats, IEquipItem>
     {
-        private readonly Dictionary<WeaponType, WeaponStatsData> _weaponStats = [];
-        private readonly Dictionary<JewelleryType, JewelleriesStatsData> _jewelleriesStats = [];
-        private readonly Dictionary<ArmorType, ArmorStatsData> _bodyArmorStats = [];
-
+        private readonly Dictionary<EquipmentPart, Dictionary<string, ItemStats>> _itemData = [];
         public void LoadData()
         {
             // For it to work properly, I need to put the JSONs with the data outside the res:// folder.(e.ge %APPDATA%/Godot/app_userdata/Game/Data)
             var userDir = ProjectSettings.GlobalizePath("user://");
             var userDataPath = Path.Combine(userDir, "Data");
 
-            if (!Directory.Exists(userDataPath))
+            if (Directory.Exists(userDataPath))
             {
                 // TODO: Change it later
                 // for now recreate each time (i need new data)
-                //Directory.Delete(userDataPath, true);
+                Directory.Delete(userDataPath, true);
                 Directory.CreateDirectory(userDataPath);
                 CopyDirectory(ProjectSettings.GlobalizePath("res://Data"), userDataPath);
             }
-
-            LoadJewelleryData();
-            LoadWeaponData();
-            LoadArmorData();
+            LoadItemData();
         }
 
         public ItemStats GetItemData(IEquipItem item)
         {
-            var itemRarity = item.Rarity;
-            var itemAttributeType = item.AttributeType;
-
-            return item.EquipmentPart switch
+            if (!_itemData.TryGetValue(item.EquipmentPart, out var dict))
             {
-                EquipmentPart.BodyArmor => GetAttributeArmorStats(ArmorType.BodyArmor, itemRarity, itemAttributeType),
-                EquipmentPart.Belt => GetJewelleryStats(JewelleryType.Belt, itemRarity),
-                EquipmentPart.Gloves => GetAttributeArmorStats(ArmorType.Gloves, itemRarity, itemAttributeType),
-                EquipmentPart.Boots => GetAttributeArmorStats(ArmorType.Boots, itemRarity, itemAttributeType),
-                EquipmentPart.Helmet => GetAttributeArmorStats(ArmorType.Helmet, itemRarity, itemAttributeType),
-                EquipmentPart.Amulet => GetJewelleryStats(JewelleryType.Amulet, itemRarity),
-                EquipmentPart.Cloak => GetArmorStats(ArmorType.Cloak, itemRarity),
-                EquipmentPart.Weapon => GetWeaponStats(item),
-                EquipmentPart.Ring => GetAttributeJewelleryStats(JewelleryType.Ring, itemRarity, itemAttributeType),
-                _ => throw new ArgumentOutOfRangeException(nameof(item))
-            };
-        }
-
-        private ItemStats GetWeaponStats(IEquipItem item)
-        {
-            var weaponItem = (IWeaponItem)item;
-            if (!_weaponStats.TryGetValue(weaponItem.WeaponType, out var data))
-            {
-                data = new();
+                // TODO: Log
+                dict = [];
             }
 
-            return data.GetSimpleData(weaponItem.Rarity);
-        }
-
-        private ItemStats GetAttributeJewelleryStats(JewelleryType type, Rarity rarity, AttributeType attributeType) => GetJewelleriesData(type).GetAttributeData(attributeType, rarity);
-
-        private ItemStats GetAttributeArmorStats(ArmorType type, Rarity rarity, AttributeType attributeType) => GetArmorData(type).GetAttributeData(attributeType, rarity);
-
-        private ItemStats GetJewelleryStats(JewelleryType type, Rarity rarity) => GetJewelleriesData(type).GetSimpleData(rarity);
-
-        private ItemStats GetArmorStats(ArmorType type, Rarity rarity) => GetArmorData(type).GetSimpleData(rarity);
-
-        private ArmorStatsData GetArmorData(ArmorType type)
-        {
-            if (!_bodyArmorStats.TryGetValue(type, out var data))
+            if (!dict.TryGetValue(item.Id, out var stats))
             {
-                data = new();
+                // TODO: Log
+                stats = new ItemStats();
             }
-            return data;
+            return stats;
         }
 
-        private JewelleriesStatsData GetJewelleriesData(JewelleryType type)
+        private void LoadItemData()
         {
-            if (!_jewelleriesStats.TryGetValue(type, out var data))
+            foreach (var type in Enum.GetValues<EquipmentPart>())
             {
-                data = new();
-            }
-            return data;
-        }
-
-        private void LoadWeaponData()
-        {
-            foreach (var type in Enum.GetValues<WeaponType>())
-            {
-                var json = ItemsDataPaths.GetWeaponDataFromJsonFile($"{type}.json");
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    // TODO: Log
-                    continue;
-                }
-                WeaponStatsData weaponData = new() { SimpleData = DeserializeItemStats(json) };
-                _weaponStats.Add(type, weaponData);
+                var json = ItemsDataPaths.GetDataFromJsonFile(ItemDataFolder.Jsons, $"{type}.json");
+                if (string.IsNullOrEmpty(json)) continue;
+                var result = DeserializeData(json);
+                _itemData.Add(type, result);
             }
         }
 
-        private void LoadArmorData()
-        {
-            foreach (var type in Enum.GetValues<ArmorType>())
-            {
-                var json = ItemsDataPaths.GetArmorDataFromJsonFile($"{type}.json");
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    // TODO: Log
-                    continue;
-                }
-                _bodyArmorStats.Add(type, CreateArmorData(type, json));
-            }
-        }
-
-        private void LoadJewelleryData()
-        {
-            foreach (var type in Enum.GetValues<JewelleryType>())
-            {
-                var json = ItemsDataPaths.GetJewelleriesDataFromJsonFile($"{type}.json");
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    // TODO: Log
-                    continue;
-                }
-                _jewelleriesStats.Add(type, CreateJewelleriesData(type, json));
-            }
-        }
-
-        private ArmorStatsData CreateArmorData(ArmorType type, string json)
-        {
-            ArmorStatsData armorData = new();
-            switch (type)
-            {
-                case ArmorType.Cloak:
-                    armorData.SimpleData = DeserializeItemStats(json);
-                    return armorData;
-                default:
-                    armorData.AttributeData = DeserializeAttributeStats(json);
-                    return armorData;
-
-            }
-        }
-
-        private JewelleriesStatsData CreateJewelleriesData(JewelleryType type, string json)
-        {
-            JewelleriesStatsData jewelleriesData = new();
-            switch (type)
-            {
-                case JewelleryType.Ring:
-                    jewelleriesData.AttributeData = DeserializeAttributeStats(json);
-                    return jewelleriesData;
-                default:
-                    jewelleriesData.SimpleData = DeserializeItemStats(json);
-                    return jewelleriesData;
-            }
-        }
-
-        private static Dictionary<AttributeType, Dictionary<Rarity, ItemStats>> DeserializeAttributeStats(string json)
-            => JsonConvert.DeserializeObject<Dictionary<AttributeType, Dictionary<Rarity, ItemStats>>>(json) ?? [];
-
-        private static Dictionary<Rarity, ItemStats> DeserializeItemStats(string json)
-            => JsonConvert.DeserializeObject<Dictionary<Rarity, ItemStats>>(json) ?? [];
+        private static Dictionary<string, ItemStats> DeserializeData(string json) => JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(json) ?? [];
 
         private void CopyDirectory(string srcDir, string userDataPath)
         {

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EquipItem" load_steps=6 format=3 uid="uid://74x3vgs2vs4r"]
+
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_fd2nk"]
+[ext_resource type="Script" uid="uid://wyqiek1tmeve" path="res://Script/Items/EquipItem.cs" id="1_ryilx"]
+
+[sub_resource type="Gradient" id="Gradient_lf7fv"]
+colors = PackedColorArray(1, 0, 0, 1, 0, 0.0431373, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_4djru"]
+gradient = SubResource("Gradient_lf7fv")
+
+[sub_resource type="Resource" id="Resource_sd875"]
+script = ExtResource("1_fd2nk")
+Key = "Test_Item"
+metadata/_custom_type_script = "uid://uct5wx6u2cu4"
+
+[resource]
+script = ExtResource("1_ryilx")
+EquipmentPart = 2
+AttributeType = 0
+_name = SubResource("Resource_sd875")
+Rarity = 1
+Icon = SubResource("GradientTexture1D_4djru")
+Quantity = 1
+MaxStackSize = 1
+metadata/_custom_type_script = "uid://wyqiek1tmeve"

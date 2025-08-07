@@ -65,8 +65,15 @@
             _player.AddItemToInventory(dexGloves);
             _player.AddItemToInventory(dexBoots);
             _player.AddItemToInventory(dexHelmet);
-            _player.AddItemToInventory(belt);
             _player.AddItemToInventory(cloak);
+            _player.AddItemToInventory(new Belt(Rarity.Uncommon));
+            _player.AddItemToInventory(belt);
+            _player.AddItemToInventory(new Belt(Rarity.Epic));
+            _player.AddItemToInventory(new Belt(Rarity.Legendary));
+
+            var item = ResourceLoader.Load<IEquipItem>("uid://74x3vgs2vs4r");
+            _player.AddItemToInventory(item);
+
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -172,6 +179,8 @@
 
         private void OnInventorySlotClicked(IItem itemClicked, MouseButtonPressed buttonPressed, Inventory inventory)
         {
+            // Item can be correct equiped only if they have IDs.
+            // Strange behavior? Check items id
             if (itemClicked is IEquipItem item)
             {
                 HandleEquipmentItemPressed(item, buttonPressed, inventory);

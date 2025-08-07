@@ -57,6 +57,10 @@
         public void SetName(LocalizedString? name) => _name = name;
 
         // All semantics are already established within the key, so we use the key as an ID.
-        private string SetId() => $"{_name?.Key}";
+        protected virtual string SetId()
+        {
+            if (_name == null) return $"{GetType().Name}_{Rarity}";
+            return $"{_name?.Key}";
+        }
     }
 }

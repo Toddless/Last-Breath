@@ -1,0 +1,56 @@
+{
+	"Ring_Strength_Uncommon": {
+		"Strength": 5
+	},
+	"Ring_Strength_Rare": {
+		"Strength": 8,
+		"Defence": 100
+	},
+	"Ring_Strength_Epic": {
+		"Strength": 10,
+		"Defence": 100,
+		"Health": 150
+	},
+	"Ring_Strength_Legendary": {
+		"Strength": 15,
+		"Defence": 100,
+		"Health": 200,
+		"BaseDamage": 20
+	},
+	"Ring_Dexterity_Uncommon": {
+		"Dexterity": 5
+	},
+	"Ring_Dexterity_Rare": {
+		"Dexterity": 8,
+		"Evade": 120
+	},
+	"Ring_Dexterity_Epic": {
+		"Dexterity": 10,
+		"Evade": 120,
+		"AdditionalHitChance": 0.02
+	},
+	"Ring_Dexterity_Legendary": {
+		"Dexterity": 15,
+		"Evade": 120,
+		"AdditionalHitChance": 0.04,
+		"CritDamage": 20
+	},
+	"Ring_Intelligence_Uncommon": {
+		"Intelligence": 5
+	},
+	"Ring_Intelligence_Rare": {
+		"Intelligence": 8,
+		"EnergyBarriere": 100
+	},
+	"Ring_Intelligence_Epic": {
+		"Intelligence": 10,
+		"EnergyBarriere": 100,
+		"EnergyRecovery": 1
+	},
+	"Ring_Intelligence_Legendary": {
+		"Intelligence": 15,
+		"EnergyBarriere": 100,
+		"EnergyRecovery": 1,
+		"SpellDamage": 15
+	}
+}

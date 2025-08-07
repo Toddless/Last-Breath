@@ -6,10 +6,12 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Modifiers;
+    using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Items.ItemData;
 
+    [GlobalClass]
     public partial class EquipItem : Item, IEquipItem
     {
         protected const float From = 0.8f;
@@ -17,11 +19,16 @@
 
         protected List<IModifier> BaseModifiers = [];
         protected List<IEffect> Effects = [];
+        [Export] public EquipmentPart EquipmentPart { get; protected set; }
+        [Export] public AttributeType AttributeType { get; protected set; } = AttributeType.None;
 
         public ICharacter? Owner { get; private set; }
-        public EquipmentPart EquipmentPart { get; protected set; }
-        public AttributeType AttributeType { get; protected set; } = AttributeType.None;
+        // if i create equip item as resource in editor, where i get modifiers from?
         public IReadOnlyList<IModifier> Modifiers => BaseModifiers;
+
+        public EquipItem()
+        {
+        }
 
         public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type)
         {
@@ -64,6 +71,12 @@
 
         public virtual void UpgradeItemLevel() { }
         protected virtual void UpdateItem() { }
+
+        protected override string SetId()
+        {
+            if (AttributeType != AttributeType.None) return $"{GetType().Name}_{AttributeType}_{Rarity}";
+            return base.SetId();
+        }
 
         protected virtual void LoadData()
         {

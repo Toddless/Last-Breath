@@ -1,0 +1,20 @@
+{
+	"Cloak_Uncommon": {
+		"ExtraHealth": 1.10
+	},
+	"Cloak_Rare": {
+		"ExtraHealth": 1.10,
+		"ExtraArmor": 1.10
+	},
+	"Cloak_Epic": {
+		"ExtraHealth": 1.10,
+		"ExtraArmor": 1.10,
+		"ExtraEnergyBarrier": 1.10
+	},
+	"Cloak_Legendary": {
+		"ExtraHealth": 1.10,
+		"ExtraArmor": 1.10,
+		"ExtraEnergyBarrier": 1.10,
+		"ExtraEvade": 1.10
+	}
+}

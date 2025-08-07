@@ -9,6 +9,7 @@
 
     public class ItemsMediaProvider : IItemDataProvider<ItemMediaData, IEquipItem>
     {
+        // Generic data
         private readonly Dictionary<ArmorType, ArmorMediaData> _bodyArmorData = [];
         private readonly Dictionary<JewelleryType, JewelleriesMediaData> _jewelleryData = [];
         private readonly Dictionary<WeaponType, ItemResources> _weaponData = [];
@@ -91,7 +92,7 @@
         {
             foreach (var type in Enum.GetValues<WeaponType>())
             {
-                _weaponData.Add(type, LoadResource(ItemsDataPaths.CreateWeaponDataPath($"{type}.tres")));
+                _weaponData.Add(type, LoadResource(ItemsDataPaths.CreatePath(ItemDataFolder.GenericWeapons,$"{type}.tres")));
             }
         }
 
@@ -117,10 +118,10 @@
             switch (type)
             {
                 case ArmorType.Cloak:
-                    armorMediaData.SimpeItemResources = LoadResource(ItemsDataPaths.CreateArmorDataPath($"{type}.tres"));
+                    armorMediaData.SimpeItemResources = LoadResource(ItemsDataPaths.CreatePath(ItemDataFolder.GenericArmors, $"{type}.tres"));
                     return armorMediaData;
                 default:
-                    armorMediaData.AttributeItemResources = CreateAttributeItemResource(type.ToString(), ItemDataFolder.Armors);
+                    armorMediaData.AttributeItemResources = CreateAttributeItemResource(type.ToString(), ItemDataFolder.GenericArmors);
                     return armorMediaData;
 
             }
@@ -133,10 +134,10 @@
             switch (type)
             {
                 case JewelleryType.Ring:
-                    jewelleriesMediaData.AttributeItemResources = CreateAttributeItemResource(type.ToString(), ItemDataFolder.Jewelleries);
+                    jewelleriesMediaData.AttributeItemResources = CreateAttributeItemResource(type.ToString(), ItemDataFolder.GenericJewelleries);
                     return jewelleriesMediaData;
                 default:
-                    jewelleriesMediaData.SimpeItemResources = LoadResource(ItemsDataPaths.CreateJewelleryDataPath($"{type}.tres"));
+                    jewelleriesMediaData.SimpeItemResources = LoadResource(ItemsDataPaths.CreatePath(ItemDataFolder.GenericJewelleries, $"{type}.tres"));
                     return jewelleriesMediaData;
             }
         }
@@ -146,7 +147,8 @@
             Dictionary<AttributeType, ItemResources> res = [];
             foreach (var attributeType in Enum.GetValues<AttributeType>())
             {
-                var path = ItemsDataPaths.CreatePathToDataFile(folder, $"{itemType + attributeType}.tres");
+                if(attributeType == AttributeType.None) continue;
+                var path = ItemsDataPaths.CreatePath(folder, $"{itemType + attributeType}.tres");
                 if (string.IsNullOrWhiteSpace(path)) continue;
                 res.Add(attributeType, LoadResource(path));
             }

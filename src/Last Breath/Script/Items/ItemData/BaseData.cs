@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Core.Enums;
 
-    public abstract class BaseData<T>
+    public class BaseData<T>
         where T : class, new()
     {
         public Dictionary<Rarity, T> SimpleData = [];

@@ -33,7 +33,7 @@
                 switch (group.Key)
                 {
                     case ModifierType.Flat:
-                        value = ModifyValue(value, group);
+                        value += group.Sum(x=>x.Value);
                         break;
                     case ModifierType.Increase:
                         value *= factor += group.Sum(x => x.Value);
@@ -51,7 +51,7 @@
         {
             foreach (var modifier in modifiers.OrderByDescending(x => x.Priority))
             {
-                value = modifier.ModifyValue(value);
+                value *= modifier.Value;
             }
             return value;
         }

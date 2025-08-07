@@ -1,17 +1,17 @@
 {
-	"Uncommon": {
+	"Belt_Uncommon": {
 		"ExtraHealth": 1.5
 	},
-	"Rare": {
+	"Belt_Rare": {
 		"ExtraHealth": 1.10,
 		"ExtraArmor": 1.10
 	},
-	"Epic": {
+	"Belt_Epic": {
 		"ExtraHealth": 1.15,
 		"ExtraArmor": 1.15,
-		"ExtraEvade" : 1.15
+		"ExtraEvade": 1.15
 	},
-	"Legendary": {
+	"Belt_Legendary": {
 		"ExtraHealth": 1.20,
 		"ExtraArmor": 1.20,
 		"ExtraEvade": 1.20,

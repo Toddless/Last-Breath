@@ -1,0 +1,56 @@
+{
+	"Helmet_Strength_Uncommon": {
+		"Defence": 200.0
+	},
+	"Helmet_Strength_Rare": {
+		"Health": 100.0,
+		"Defence": 200.0
+	},
+	"Helmet_Strength_Epic": {
+		"Health": 100.0,
+		"Defence": 200.0,
+		"Damage": 15.0
+	},
+	"Helmet_Strength_Legendary": {
+		"Health": 100.0,
+		"Defence": 200.0,
+		"Damage": 15.0,
+		"MaxHealth": 0.1
+	},
+	"Helmet_Dexterity_Uncommon": {
+		"Evade": 200.0
+	},
+	"Helmet_Dexterity_Rare": {
+		"Health": 100.0,
+		"Evade": 200.0
+	},
+	"Helmet_Dexterity_Epic": {
+		"Health": 100.0,
+		"Evade": 200.0,
+		"CritChance": 0.1
+	},
+	"Helmet_Dexterity_Legendary": {
+		"Health": 100.0,
+		"Evade": 200.0,
+		"CritChance": 0.1,
+		"AdditionalHitChance": 0.3
+	},
+	"Helmet_Intelligence_Uncommon": {
+		"EnergyBarrier": 100.0
+	},
+	"Helmet_Intelligence_Rare": {
+		"Health": 100.0,
+		"EnergyBarrier": 100.0
+	},
+	"Helmet_Intelligence_Epic": {
+		"Health": 100.0,
+		"EnergyBarrier": 100.0,
+		"ResourceRecovery": 1.0
+	},
+	"Helmet_Intelligence_Legendary": {
+		"Health": 100.0,
+		"EnergyBarrier": 100.0,
+		"ResourceRecovery": 1.0,
+		"MaxResource": 15.0
+	}
+}

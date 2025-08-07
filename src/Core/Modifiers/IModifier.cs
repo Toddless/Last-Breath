@@ -17,6 +17,5 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        float ModifyValue(float value);
     }
 }
