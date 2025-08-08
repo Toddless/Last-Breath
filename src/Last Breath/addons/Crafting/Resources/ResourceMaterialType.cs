@@ -6,14 +6,24 @@
     using Core.Interfaces.Crafting;
     using Godot;
     using Godot.Collections;
-    using LastBreath.Localization;
 
+    [Tool]
     [GlobalClass]
     public partial class ResourceMaterialType : Resource, IResourceMaterialType
     {
+        private string _id = string.Empty;
+        private IReadOnlyList<IMaterialModifiers>? _cached;
         [Export] private Array<MaterialModifiers>? _modifiers;
-        [Export] private LocalizedString? _materialName;
-        public string MaterialName => _materialName?.Text ?? string.Empty;
+
+        [Export]
+        public string Id
+        {
+            get => _id;
+            set => _id = value;
+        }
+
+        public string MaterialName => GetLocalizedMaterialName();
+
         /// <summary>
         /// Category define base modifiers pool
         /// </summary>
@@ -22,7 +32,9 @@
         /// <summary>
         /// Additional modifiers
         /// </summary>
-        public IReadOnlyList<IMaterialModifiers>? Modifiers => _modifiers?.Cast<IMaterialModifiers>().ToList();
+        public IReadOnlyList<IMaterialModifiers>? Modifiers => _cached ??= _modifiers?.Cast<IMaterialModifiers>().ToList();
         public float Quality { get; set; }
+
+        private string GetLocalizedMaterialName() => TranslationServer.Translate(Id);
     }
 }

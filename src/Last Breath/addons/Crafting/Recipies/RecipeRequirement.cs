@@ -2,15 +2,19 @@
 {
     using Godot;
     using Core.Interfaces.Crafting;
-    using LastBreath.Addons.Crafting;
-    using Core.Enums;
 
     [GlobalClass]
     public partial class RecipeRequirement : Resource, IRecipeRequirement
     {
-        [Export] private CraftingResource? _resource;
-        [Export] public int Quantity { get; private set; }
-        [Export] public ResourceCategory Category { get; private set; }
-        public ICraftingResource? Resource => _resource;
+        [Export] public int Amount { get; set; } = 1;
+        [Export] public string CraftingResourceId { get; private set; } = string.Empty;
+
+        public bool Matches(ICraftingResource resource)
+        {
+            if (!string.IsNullOrWhiteSpace(CraftingResourceId) && resource.Id == CraftingResourceId) return true;
+            if (resource.Quantity >= Amount) return true;
+            return false;
+        }
+
     }
 }

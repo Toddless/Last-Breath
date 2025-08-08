@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TagRegistry" load_steps=2 format=3 uid="uid://bmmr7qhqvhlqs"]
+
+[ext_resource type="Script" uid="uid://c65qu4e82b6jp" path="res://addons/Tools/TagGenerator/TagRegistry.cs" id="1_br55o"]
+
+[resource]
+script = ExtResource("1_br55o")
+AllTags = PackedStringArray("adamantine", "amethyst", "binding_agent", "bloodstone", "bronze_ingot", "catalyst", "chitin", "cloth", "cold_iron", "common", "copper_ingot", "crafting_fuel", "cured_leather", "cursed", "diamond", "dragon_hide", "emerald", "enchanted", "epic", "essence_air", "essence_arcane", "essence_death", "essence_earth", "essence_fire", "essence_life", "essence_light", "essence_shadow", "essence_void", "essence_water", "fur", "gold_ingot", "ingot", "iron_ingot", "leather", "legendary", "linen", "mithril", "moonstone", "mythic", "opal", "ore", "ore_iron", "plate", "rare", "raw", "raw_hide", "refined", "reinforced_leather", "ruby", "sapphire", "silk", "silver_ingot", "soul_fragment", "steel_ingot", "tool_part", "topaz", "uncommon", "velvet", "wool")
+metadata/_custom_type_script = "uid://c65qu4e82b6jp"

@@ -6,8 +6,8 @@
     public interface IResourceMaterialType
     {
         ResourceCategory Category { get; }
-        string MaterialName { get; }
         IReadOnlyList<IMaterialModifiers>? Modifiers { get; }
+        string MaterialName { get; }
         float Quality { get; set; }
     }
 }

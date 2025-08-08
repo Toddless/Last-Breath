@@ -2,7 +2,9 @@
 {
     public interface IRecipeRequirement
     {
-        int Quantity { get; }
-        ICraftingResource? Resource { get; }
+        int Amount { get; }
+        string CraftingResourceId { get; }
+
+        bool Matches(ICraftingResource resource);
     }
 }

@@ -2,6 +2,7 @@
 {
     using Godot;
     using Godot.Collections;
+    using LastBreath.addons.Tools.TagGenerator;
     using LastBreath.Localization;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Helpers.Extensions;
@@ -45,6 +46,9 @@
             ConfigureStateMachine();
             // only for now
             LoadDialoguesData();
+            var x = new GenerateTags();
+            x._Run();
+
         }
 
         private void LoadDialoguesData()

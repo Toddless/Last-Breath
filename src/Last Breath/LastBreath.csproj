@@ -10,6 +10,7 @@
     <Compile Remove="addons\Crafting\Source\CraftingRecipe.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="addons\Tools\ResourceValidatorPlugin\" />
     <Folder Include="Scenes\" />
   </ItemGroup>
   <ItemGroup>

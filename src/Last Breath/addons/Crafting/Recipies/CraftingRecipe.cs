@@ -1,21 +1,25 @@
 ﻿namespace LastBreath.Addons.Crafting.Recipies
 {
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
     using Godot;
     using Godot.Collections;
+    using Core.Interfaces.Crafting;
     using LastBreath.addons.Crafting.Recipies;
-    using LastBreath.Script.Items;
 
     [GlobalClass]
-    public partial class CraftingRecipe : Resource
+    public partial class CraftingRecipe : Resource, ICraftingRecipe
     {
         [Export] private Array<RecipeRequirement> _mainResources = [];
         [Export] private Array<RecipeRequirement> _optionalResources = [];
-        [Export] private Item? _item;
-        public IItem? Item => _item;
+        [Export] public string Id = string.Empty;
+        [Export] public string ResultItemId = string.Empty;
+
+        public string Name => GetLocalizedName();
+        public string Description => GetLocalizedDescription();
 
         public System.Collections.Generic.List<IRecipeRequirement> MainResource => [.. _mainResources];
         public System.Collections.Generic.List<IRecipeRequirement> OptionalResources => [.. _optionalResources];
+
+        private string GetLocalizedName() => TranslationServer.Translate(Id);
+        private string GetLocalizedDescription() => TranslationServer.Translate(Id + $"_{nameof(Description)}");
     }
 }

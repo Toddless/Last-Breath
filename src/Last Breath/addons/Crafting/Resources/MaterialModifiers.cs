@@ -4,6 +4,7 @@
     using Core.Interfaces.Crafting;
     using Godot;
 
+    [Tool]
     [GlobalClass]
     public partial class MaterialModifiers : Resource, IMaterialModifiers
     {

@@ -1,6 +1,5 @@
-[gd_resource type="Resource" script_class="CraftingResource" load_steps=13 format=3 uid="uid://5xq4lop3tqj"]
+[gd_resource type="Resource" script_class="CraftingResource" load_steps=10 format=3 uid="uid://5xq4lop3tqj"]
 
-[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="1_h6lmn"]
 [ext_resource type="Script" uid="uid://de62ounj0fv8p" path="res://addons/Crafting/Resources/CraftingResource.cs" id="1_ttvk8"]
 [ext_resource type="Script" uid="uid://bu7cs1ihrco3g" path="res://addons/Crafting/Resources/MaterialModifiers.cs" id="2_bnvyx"]
 [ext_resource type="Script" uid="uid://dg20ma8ca63q6" path="res://addons/Crafting/Resources/ResourceMaterialType.cs" id="3_dr24t"]
@@ -11,11 +10,6 @@ colors = PackedColorArray(0.609764, 0.161021, 0.0367596, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_bnvyx"]
 gradient = SubResource("Gradient_h6lmn")
-
-[sub_resource type="Resource" id="Resource_vgxlk"]
-script = ExtResource("1_h6lmn")
-Key = "HumanFabric_Description"
-metadata/_custom_type_script = "uid://uct5wx6u2cu4"
 
 [sub_resource type="Resource" id="Resource_tf4kf"]
 script = ExtResource("2_bnvyx")
@@ -41,20 +35,16 @@ metadata/_custom_type_script = "uid://bu7cs1ihrco3g"
 [sub_resource type="Resource" id="Resource_kbwix"]
 script = ExtResource("3_dr24t")
 _modifiers = Array[Object]([SubResource("Resource_tf4kf"), SubResource("Resource_1m81f"), SubResource("Resource_tc2ty")])
+Id = ""
 Category = 0
 metadata/_custom_type_script = "uid://dg20ma8ca63q6"
 
-[sub_resource type="Resource" id="Resource_7iw86"]
-script = ExtResource("1_h6lmn")
-Key = "HumanFabric"
-metadata/_custom_type_script = "uid://uct5wx6u2cu4"
-
 [resource]
 script = ExtResource("1_ttvk8")
-_name = SubResource("Resource_7iw86")
-_description = SubResource("Resource_vgxlk")
 _materialType = SubResource("Resource_kbwix")
 Rarity = 1
 MaxStackSize = 9999
 Icon = SubResource("GradientTexture1D_bnvyx")
+Tags = PackedStringArray()
+Id = "Human_Fabric"
 metadata/_custom_type_script = "uid://de62ounj0fv8p"

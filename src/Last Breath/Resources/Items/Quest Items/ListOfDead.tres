@@ -9,6 +9,7 @@ region = Rect2(16, 32, 96, 72)
 
 [resource]
 script = ExtResource("2_ftup6")
+Id = ""
 Rarity = 2
 Icon = SubResource("AtlasTexture_klwss")
 Quantity = 1

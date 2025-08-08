@@ -11,6 +11,7 @@
         IResourceMaterialType? MaterialType { get; }
         Texture2D? Icon { get; set; }
         Texture2D? FullImage { get; set; }
+        string Id { get; set; }
 
         ICraftingResource Copy(bool subresources = false);
     }
