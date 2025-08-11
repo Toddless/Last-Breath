@@ -1,9 +1,7 @@
 ﻿#if TOOLS
 namespace LastBreath.addons.Tools.TagGenerator
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Godot;
     using Godot.Collections;
 
@@ -12,7 +10,7 @@ namespace LastBreath.addons.Tools.TagGenerator
     {
         private HBoxContainer _mainBox;
         private Label _label;
-        private Button _openBtn;
+        private Button _editBtn;
 
         private PopupPanel _popup;
         private VBoxContainer _popupVBox;
@@ -22,24 +20,15 @@ namespace LastBreath.addons.Tools.TagGenerator
         private Button _cancelBtn;
 
         private string _registryDir = string.Empty;
-        private RegistryData? _cachedRegistryData = null;
-        private struct RegistryData
-        {
-            public System.Collections.Generic.Dictionary<string, string> IdToDisplay;
-            public System.Collections.Generic.Dictionary<string, List<string>> ChildrenById;
-            public List<string> Roots;
-            public Func<string, string> GetParent;
-        }
 
         public TagEditorProperty()
         {
             _mainBox = new HBoxContainer();
             _label = new Label() { Text = "Tags" };
-            _openBtn = new Button() { Text = "Edit" };
-            _openBtn.Pressed += OnOpenPressed;
-
+            _editBtn = new Button() { Text = "Edit" };
+            _editBtn.Pressed += OnEditPressed;
             _mainBox.AddChild(_label);
-            _mainBox.AddChild(_openBtn);
+            _mainBox.AddChild(_editBtn);
             AddChild(_mainBox);
 
             _popup = new PopupPanel();
@@ -90,7 +79,7 @@ namespace LastBreath.addons.Tools.TagGenerator
             SelectCurrentValues();
         }
 
-        private void OnOpenPressed()
+        private void OnEditPressed()
         {
             BuildTreeFromRegistry();
             SelectCurrentValues();
@@ -152,195 +141,43 @@ namespace LastBreath.addons.Tools.TagGenerator
         {
             _tree.Clear();
 
-            var data = _cachedRegistryData ?? LoadRegistryData(_registryDir);
-
-            var idToDisplay = data.IdToDisplay;
-            var childrenById = data.ChildrenById;
-            var roots = data.Roots;
-
+            var reg = ResourceLoader.Load<TagRegistry>(_registryDir);
             var rootItem = _tree.CreateItem();
 
-            var itemMap = new System.Collections.Generic.Dictionary<string, TreeItem>();
-            var creating = new HashSet<string>();
+            var created = new System.Collections.Generic.Dictionary<string, TreeItem>();
 
-            TreeItem? CreateOrGetItem(string id)
+            TreeItem? CreateNode(string id, TreeItem parent)
             {
                 if (string.IsNullOrEmpty(id)) return null;
-                if (itemMap.TryGetValue(id, out var existing)) return existing;
-                if (creating.Contains(id)) return null;
-                creating.Add(id);
+                if (created.TryGetValue(id, out var exist)) return exist;
 
-                string parent = data.GetParent.Invoke(id);
+                var treeItem = _tree.CreateItem(parent);
+                var def = reg.GetDefinition(id);
+                treeItem.SetEditable(0, true);
+                treeItem.SetCellMode(0, TreeItem.TreeCellMode.Check);
+                treeItem.SetText(0, def?.DisplayName ?? id);
+                treeItem.SetMetadata(0, id);
 
-                TreeItem parentItem = rootItem;
-                if (!string.IsNullOrEmpty(parent))
-                {
-                    var pi = CreateOrGetItem(parent);
-                    if (pi != null)
-                        parentItem = pi;
-                }
+                created[id] = treeItem;
 
-                var it = _tree.CreateItem(parentItem);
+                foreach (var child in reg.GetChildren(id))
+                    CreateNode(child, treeItem);
 
-                var display = idToDisplay.TryGetValue(id, out string? value) ? value : id;
-                it.SetEditable(0, true);
-                it.SetCellMode(0, TreeItem.TreeCellMode.Check);
-                it.SetText(0, display);
-                it.SetMetadata(0, id);
-                itemMap[id] = it;
-                creating.Remove(id);
-                return it;
+                return treeItem;
             }
 
-            foreach (var rootId in roots)
+            // Create roots
+            foreach (var id in reg.GetAllIds())
             {
-                CreateOrGetItem(rootId);
-                void EnsureChildren(string parentId)
-                {
-                    if (!childrenById.TryGetValue(parentId, out var list)) return;
-                    foreach (var child in list)
-                    {
-                        CreateOrGetItem(child);
-                        EnsureChildren(child);
-                    }
-                }
-                EnsureChildren(rootId);
+                if (string.IsNullOrWhiteSpace(reg.GetParent(id))) CreateNode(id, rootItem);
             }
 
-            if (roots.Count == 0)
+            // no roots? Create flat list
+            if (_tree.GetRoot().GetFirstChild() == null)
             {
-                foreach (var id in idToDisplay.Keys)
-                {
-                    if (!itemMap.ContainsKey(id))
-                        CreateOrGetItem(id);
-                }
+                foreach (var id in reg.GetAllIds())
+                    CreateNode(id, rootItem);
             }
-        }
-
-
-        private RegistryData LoadRegistryData(string registryDir)
-        {
-            var idToDisplay = new System.Collections.Generic.Dictionary<string, string>();
-            var childrenById = new System.Collections.Generic.Dictionary<string, List<string>>();
-            var parentById = new System.Collections.Generic.Dictionary<string, string?>(); 
-            var roots = new List<string>();
-
-            var dir = DirAccess.Open(registryDir);
-            if (dir == null)
-            {
-                GD.PrintErr($"Directory not found: {registryDir}");
-                return new RegistryData
-                {
-                    IdToDisplay = idToDisplay,
-                    ChildrenById = childrenById,
-                    Roots = roots,
-                    GetParent = s => parentById.TryGetValue(s, out var p) ? p ?? string.Empty : string.Empty,
-                };
-            }
-
-            dir.ListDirBegin();
-            while (true)
-            {
-                var file = dir.GetNext();
-                if (string.IsNullOrWhiteSpace(file)) break;
-                if (file.StartsWith('.')) continue;
-                if (!(file.EndsWith(".tres") || file.EndsWith(".res"))) continue;
-
-                var full = $"{registryDir.TrimEnd('/')}/{file}";
-                var res = ResourceLoader.Load(full);
-                if (res == null)
-                {
-                    GD.PrintErr("Tag resource not loaded");
-                    continue;
-                }
-
-                if (res is TagRegistry reg)
-                {
-                    // Tags
-                    if (reg.AllTags.Length > 0)
-                    {
-                        foreach (var tag in reg.AllTags)
-                        {
-                            if (tag == null) continue;
-                            var id = TagUtils.Normalize(tag.Id);
-                            if (string.IsNullOrEmpty(id)) continue;
-                            if (!idToDisplay.ContainsKey(id))
-                                idToDisplay[id] = string.IsNullOrEmpty(tag.DisplayName) ? tag.Id : tag.DisplayName;
-                        }
-                    }
-
-                    // Hierarchies
-                    if (reg.Hierarchies.Length > 0)
-                    {
-                        foreach (var raw in reg.Hierarchies)
-                        {
-                            if (string.IsNullOrWhiteSpace(raw)) continue;
-                            var parts = raw.Split(['/', '\\', '>', '.'], StringSplitOptions.RemoveEmptyEntries)
-                                           .Select(s => s.Trim())
-                                           .Where(s => s.Length > 0)
-                                           .ToArray();
-
-                            if (parts.Length == 0) continue;
-
-                            string? prevId = null;
-                            for (int i = 0; i < parts.Length; i++)
-                            {
-                                var seg = parts[i];
-                                var id = TagUtils.Normalize(seg);
-                                if (!idToDisplay.ContainsKey(id))
-                                    idToDisplay[id] = seg;
-
-                                if (prevId == null)
-                                {
-                                    // root candidate
-                                    if (!roots.Contains(id))
-                                        roots.Add(id);
-                                    // ensure maps exist
-                                    if (!childrenById.ContainsKey(id))
-                                        childrenById[id] = [];
-                                    if (!parentById.ContainsKey(id))
-                                        parentById[id] = null;
-                                }
-                                else
-                                {
-                                    if (!childrenById.ContainsKey(prevId))
-                                        childrenById[prevId] = [];
-                                    if (!childrenById[prevId].Contains(id))
-                                        childrenById[prevId].Add(id);
-
-                                    parentById[id] = prevId;
-
-                                    if (!childrenById.ContainsKey(id))
-                                        childrenById[id] = [];
-                                }
-
-                                prevId = id;
-                            }
-                        }
-                    }
-
-                }
-            }
-            dir.ListDirEnd();
-
-            var realRoots = new List<string>();
-            foreach (var r in roots)
-            {
-                if (!parentById.ContainsKey(r) || string.IsNullOrEmpty(parentById[r]))
-                    realRoots.Add(r);
-            }
-            if (realRoots.Count == 0)
-            {
-                realRoots = [.. idToDisplay.Keys];
-            }
-
-            return new RegistryData
-            {
-                IdToDisplay = idToDisplay,
-                ChildrenById = childrenById,
-                Roots = realRoots,
-                GetParent = s => parentById.TryGetValue(s, out var p) ? p ?? string.Empty : string.Empty,
-            };
         }
 
         private void SelectCurrentValues()

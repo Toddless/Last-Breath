@@ -49,86 +49,9 @@
             return parent;
         }
 
-        public string[] GetAncestors(string id)
-        {
-            EnsureBuilt();
-            var res = new List<string>();
-            var cur = TagUtils.Normalize(id);
-            while (!string.IsNullOrEmpty(cur))
-            {
-                if (!_parentById.TryGetValue(cur, out var parent) || string.IsNullOrEmpty(parent)) break;
-                res.Add(parent);
-                cur = parent;
-            }
-            return [.. res];
-        }
-
-        public string[] GetDescendants(string id)
-        {
-            EnsureBuilt();
-            var res = new List<string>();
-            var key = TagUtils.Normalize(id);
-            if (string.IsNullOrEmpty(key)) return [.. res];
-
-            void dfs(string k)
-            {
-                if (!_childById.TryGetValue(k, out var children)) return;
-                foreach (var child in children)
-                {
-                    if (!res.Contains(child))
-                    {
-                        res.Add(child);
-                        dfs(child);
-                    }
-                }
-            }
-
-            dfs(key);
-            return [.. res];
-        }
-
-        public string[] GetPath(string id)
-        {
-            EnsureBuilt();
-            var stack = new Stack<string>();
-            var cur = TagUtils.Normalize(id);
-            if (string.IsNullOrEmpty(cur)) return [];
-            stack.Push(cur);
-            while (_parentById.TryGetValue(cur, out var parent) && !string.IsNullOrEmpty(parent))
-            {
-                stack.Push(parent);
-                cur = parent;
-            }
-            return [.. stack.Reverse()];
-        }
-
-        public void SyncMissingDefinitions(bool saveResource = false)
-        {
-            EnsureBuilt();
-            var missings = _defById.Values.Where(d => d != null && !AllTags.Any(t => TagUtils.Normalize(t.Id) == TagUtils.Normalize(d.Id))).ToArray();
-            if (missings.Length == 0) return;
-
-            var list = new List<TagDefinition>(AllTags ?? []);
-            foreach (var miss in missings)
-            {
-                if (!list.Any(x => TagUtils.Normalize(x.Id) == TagUtils.Normalize(miss.Id)))
-                {
-                    list.Add(miss);
-                }
-            }
-
-            AllTags = [.. list];
-
-            if (saveResource && ResourceSaver.Save(this) != Error.Ok)
-            {
-                GD.PrintErr("Failed to save TagRegistry after syncing definitions");
-            }
-        }
-
-
         private void EnsureBuilt()
         {
-            if (_built) return;
+            if (_built && _defById.Count > 0) return;
 
             foreach (var tag in AllTags)
             {
@@ -183,6 +106,7 @@
                     prev = id;
                 }
             }
+
             var keys = _defById.Keys.ToArray();
 
             foreach (var key in keys)

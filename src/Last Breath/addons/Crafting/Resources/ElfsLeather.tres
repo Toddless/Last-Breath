@@ -45,6 +45,6 @@ _materialType = SubResource("Resource_qx5qm")
 Rarity = 1
 MaxStackSize = 9999
 Icon = SubResource("GradientTexture1D_q6dtb")
-Tags = PackedStringArray("gem", "moonstone", "emerald", "ruby", "chitin")
+Tags = PackedStringArray()
 Id = "Elfs_Leather"
 metadata/_custom_type_script = "uid://de62ounj0fv8p"

@@ -8,9 +8,5 @@
     {
         [Export] public string Id {  get; set; } = string.Empty;
         [Export] public string DisplayName {  get; set; } = string.Empty;
-
-        public string NormalizedId => TagUtils.Normalize(Id);
-
-        public string EffectiveDisplay => string.IsNullOrEmpty(DisplayName) ? Id : DisplayName;
     }
 }

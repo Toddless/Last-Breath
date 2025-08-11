@@ -7,7 +7,7 @@ namespace LastBreath.addons.Tools.TagGenerator
     [Tool]
     public partial class TagInspectorPlugin : EditorInspectorPlugin
     {
-        private readonly string _defaultDir = "res://addons/Tools/TagGenerator/";
+        private const string PathToFile = "res://addons/Tools/TagGenerator/TagRegistry.tres";
 
         public override bool _CanHandle(GodotObject @object) => true;
 
@@ -17,7 +17,7 @@ namespace LastBreath.addons.Tools.TagGenerator
             if (propName == "Tags")
             {
                 var editor = new TagEditorProperty();
-                editor.SetRegistryDir(_defaultDir);
+                editor.SetRegistryDir(PathToFile);
                 AddPropertyEditor(name, editor);
                 return true;
             }

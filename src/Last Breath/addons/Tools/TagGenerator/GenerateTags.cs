@@ -8,7 +8,7 @@ namespace LastBreath.addons.Tools.TagGenerator
 	public partial class GenerateTags : EditorScript
 	{
 		private const string InputPath = "res://addons/Tools/TagGenerator/AllTags.json";
-		private const string OutputPath = "res://addons/Tools/TagGenerator/tag_registry.tres";
+		private const string OutputPath = "res://addons/Tools/TagGenerator/TagRegistry.tres";
 
 		public override void _Run()
 		{
