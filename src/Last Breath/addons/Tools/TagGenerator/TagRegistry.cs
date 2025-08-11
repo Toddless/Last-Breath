@@ -1,15 +1,15 @@
 ﻿namespace LastBreath.addons.Tools.TagGenerator
 {
-    using System.Collections.Generic;
     using System.Linq;
     using Godot;
+    using Godot.Collections;
 
     [Tool]
     [GlobalClass]
     public partial class TagRegistry : Resource
     {
         private Dictionary<string, TagDefinition> _defById = [];
-        private Dictionary<string, List<string>> _childById = [];
+        private Dictionary<string, Array<string>> _childById = [];
         private Dictionary<string, string?> _parentById = [];
         private bool _built = false;
 
@@ -26,6 +26,7 @@
 
         public string[] GetAllIds()
         {
+            GD.Print($"Def: {_defById.Count}, Child: {_childById.Count}, Parents: {_parentById.Count}, Built: {_built}");
             EnsureBuilt();
             return [.. _defById.Keys];
         }
@@ -51,7 +52,7 @@
 
         private void EnsureBuilt()
         {
-            if (_built && _defById.Count > 0) return;
+            if (_built ) return;
 
             foreach (var tag in AllTags)
             {
