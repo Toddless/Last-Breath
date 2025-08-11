@@ -12,6 +12,7 @@
     using Stateless;
     using Core.Enums;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Inventory;
 
     public partial class MainLayer : CanvasLayer
     {
@@ -177,7 +178,7 @@
             slot.UnequipItem();
         }
 
-        private void OnInventorySlotClicked(IItem itemClicked, MouseButtonPressed buttonPressed, Inventory inventory)
+        private void OnInventorySlotClicked(IItem itemClicked, MouseButtonPressed buttonPressed, IInventory inventory)
         {
             // Item can be correct equiped only if they have IDs.
             // Strange behavior? Check items id
@@ -187,7 +188,7 @@
             }
         }
 
-        private void HandleEquipmentItemPressed(IEquipItem item, MouseButtonPressed pressed, Inventory inventory)
+        private void HandleEquipmentItemPressed(IEquipItem item, MouseButtonPressed pressed, IInventory inventory)
         {
             switch (pressed)
             {
@@ -203,7 +204,7 @@
             }
         }
 
-        private void HandleItemEquipment(IEquipItem item, Inventory inventory)
+        private void HandleItemEquipment(IEquipItem item, IInventory inventory)
         {
             if (_playerInventory == null)
             {
@@ -229,7 +230,7 @@
             }
         }
 
-        private void HandleItemTransfer(IEquipItem newItem, EquipmentSlot equipSlot, Inventory inventory)
+        private void HandleItemTransfer(IEquipItem newItem, EquipmentSlot equipSlot, IInventory inventory)
         {
             var oldEquipedItem = equipSlot.CurrentItem;
             equipSlot.UnequipItem();

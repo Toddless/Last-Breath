@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://bdbu5rteprfeh"
 [resource]
 script = ExtResource("2_8fjbs")
 _mainResources = Array[ExtResource("1_uch8n")]([SubResource("Resource_uch8n"), SubResource("Resource_8fjbs"), SubResource("Resource_wkwfe")])
-_optionalResources = Array[ExtResource("1_uch8n")]([])
+_optionalResources = []
 Id = "Test_recipe"
 ResultItemId = "Test_Item"
 metadata/_custom_type_script = "uid://dpl6o1aht58o8"

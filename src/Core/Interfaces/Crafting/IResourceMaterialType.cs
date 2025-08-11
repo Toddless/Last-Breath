@@ -9,5 +9,6 @@
         IReadOnlyList<IMaterialModifiers>? Modifiers { get; }
         string MaterialName { get; }
         float Quality { get; set; }
+        string Id { get; set; }
     }
 }

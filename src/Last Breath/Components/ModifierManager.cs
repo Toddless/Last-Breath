@@ -62,7 +62,6 @@
         }
 
         // adding multiple modifiers via foreach generate to many unnecessary calls
-
         private void UpdateModifier(Dictionary<Parameter, List<IModifier>> category, IModifier newModifier)
         {
             if (!category.TryGetValue(newModifier.Parameter, out var list))

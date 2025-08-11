@@ -2,11 +2,12 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.Helpers;
 
-    public partial class InventorySlot : BaseSlot<IItem>
+    public partial class InventorySlot : BaseSlot<IItem>, IInventorySlot
     {
         private const string UID = "uid://bqlqfsqoepfhs";
         [Export] private Label? _quantityLabel;

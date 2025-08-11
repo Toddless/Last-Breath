@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfcjlq0wdh2j0"]
+
+[ext_resource type="Script" uid="uid://c85pqhtr8dyi6" path="res://Source/UIElements/Layers/CraftingLayer.cs" id="1_g0b00"]
+[ext_resource type="PackedScene" uid="uid://iif75nev2q13" path="res://Source/UIElements/View/CraftingUI.tscn" id="2_0bxqo"]
+
+[node name="CraftingLayer" type="CanvasLayer"]
+script = ExtResource("1_g0b00")
+
+[node name="CraftingUI" parent="." instance=ExtResource("2_0bxqo")]

@@ -13,17 +13,17 @@
     public class ItemsStatsProvider : IItemDataProvider<ItemStats, IEquipItem>
     {
         private readonly Dictionary<EquipmentPart, Dictionary<string, ItemStats>> _itemData = [];
+
         public void LoadData()
         {
             // For it to work properly, I need to put the JSONs with the data outside the res:// folder.(e.ge %APPDATA%/Godot/app_userdata/Game/Data)
             var userDir = ProjectSettings.GlobalizePath("user://");
             var userDataPath = Path.Combine(userDir, "Data");
 
-            if (Directory.Exists(userDataPath))
+            if (!Directory.Exists(userDataPath))
             {
                 // TODO: Change it later
                 // for now recreate each time (i need new data)
-                Directory.Delete(userDataPath, true);
                 Directory.CreateDirectory(userDataPath);
                 CopyDirectory(ProjectSettings.GlobalizePath("res://Data"), userDataPath);
             }

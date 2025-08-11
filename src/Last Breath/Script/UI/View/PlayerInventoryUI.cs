@@ -2,6 +2,7 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Godot;
     using Godot.Collections;
@@ -15,7 +16,7 @@
         private Dictionary<EquipmentPart, EquipmentSlot> _slots = [];
         [Export] private Array<EquipmentSlot> _ringSlots = [];
 
-        public event Action<IItem, MouseButtonPressed, Inventory>? InventorySlotClicked;
+        public event Action<IItem, MouseButtonPressed, IInventory>? InventorySlotClicked;
         public event Action<EquipmentSlot, MouseButtonPressed>? EquipmentSlotPressed;
 
         public override void _Ready()

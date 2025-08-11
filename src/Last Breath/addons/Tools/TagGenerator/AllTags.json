@@ -1,0 +1,53 @@
+{
+    "Common": {
+        "Rarity": [
+            "Uncommon",
+            "Rare",
+            "Epic",
+            "Legendary",
+            "Mythic"
+        ]
+    },
+    "Crafting": {
+        "Fabric": [
+            "Silk",
+            "Velvet",
+            "Wool"
+        ],
+        "Steel": [
+            "Copper",
+            "Bronze",
+            "Adamantine",
+            "Mythril"
+        ],
+        "Leather": [
+            "Fur",
+            "Chitin"
+        ],
+        "Gem": [
+            "Ruby",
+            "Sapphire",
+            "Emerald",
+            "Topaz",
+            "Diamond",
+            "Amethyst",
+            "Moonstone",
+            "Opal",
+            "Bloodstone"
+        ]
+    },
+    "Equipment": {
+        "Weapon": [
+            "Dagger",
+            "Sword",
+            "Axe",
+            "Wand",
+            "Staff"
+        ],
+        "Armor": [
+            "Heavy",
+            "Light",
+            "Cloth"
+        ]
+    }
+}

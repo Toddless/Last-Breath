@@ -4,8 +4,12 @@ namespace Crafting.Source.UIElements
 
     public partial class CraftingUI : Panel
     {
+        [Export] private Tree? _recipeTree;
+
         public override void _Ready()
         {
+            _recipeTree?.Clear();
+
         }
     }
 }

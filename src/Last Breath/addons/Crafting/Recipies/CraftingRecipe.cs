@@ -1,9 +1,8 @@
-﻿namespace LastBreath.Addons.Crafting.Recipies
+﻿namespace LastBreath.addons.Crafting.Recipies
 {
     using Godot;
     using Godot.Collections;
     using Core.Interfaces.Crafting;
-    using LastBreath.addons.Crafting.Recipies;
 
     [GlobalClass]
     public partial class CraftingRecipe : Resource, ICraftingRecipe

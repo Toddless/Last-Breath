@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Script.Inventory
 {
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.UI;
 
-    public abstract partial class BaseSlot<T> : TextureButton
-        where T : class, IItem
+    public abstract partial class BaseSlot<T> : TextureButton, IBaseSlot<T> where T : class, IItem
     {
         private const string MainLayer = "Main/MainLayer";
         protected ItemDescription? ItemDescription;

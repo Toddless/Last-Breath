@@ -4,12 +4,13 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Godot;
 
-    public class Inventory
+    public class Inventory : IInventory
     {
-        public event Action<IItem, MouseButtonPressed, Inventory>? ItemSlotClicked;
+        public event Action<IItem, MouseButtonPressed, IInventory>? ItemSlotClicked;
         public event Action? InventoryFull, NotEnougthItems;
 
         protected List<InventorySlot> Slots { get; } = [];

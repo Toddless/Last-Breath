@@ -1,11 +1,195 @@
 ﻿namespace LastBreath.addons.Tools.TagGenerator
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Godot;
 
     [Tool]
     [GlobalClass]
     public partial class TagRegistry : Resource
     {
-        [Export] public string[] AllTags { get; set; } = [];
+        private Dictionary<string, TagDefinition> _defById = [];
+        private Dictionary<string, List<string>> _childById = [];
+        private Dictionary<string, string?> _parentById = [];
+        private bool _built = false;
+
+        [Export] public TagDefinition[] AllTags { get; set; } = [];
+        [Export] public string[] Hierarchies { get; set; } = [];
+
+        public TagDefinition? GetDefinition(string id)
+        {
+            EnsureBuilt();
+            if (string.IsNullOrEmpty(id)) return null;
+            _defById.TryGetValue(TagUtils.Normalize(id), out var td);
+            return td;
+        }
+
+        public string[] GetAllIds()
+        {
+            EnsureBuilt();
+            return [.. _defById.Keys];
+        }
+
+        public string[] GetChildren(string id)
+        {
+            EnsureBuilt();
+            if (string.IsNullOrEmpty(id)) return [];
+            var key = TagUtils.Normalize(id);
+            if (_childById.TryGetValue(key, out var list))
+                return [.. list];
+
+            return [];
+        }
+
+        public string? GetParent(string id)
+        {
+            EnsureBuilt();
+            if (string.IsNullOrEmpty(id)) return null;
+            _parentById.TryGetValue(TagUtils.Normalize(id), out var parent);
+            return parent;
+        }
+
+        public string[] GetAncestors(string id)
+        {
+            EnsureBuilt();
+            var res = new List<string>();
+            var cur = TagUtils.Normalize(id);
+            while (!string.IsNullOrEmpty(cur))
+            {
+                if (!_parentById.TryGetValue(cur, out var parent) || string.IsNullOrEmpty(parent)) break;
+                res.Add(parent);
+                cur = parent;
+            }
+            return [.. res];
+        }
+
+        public string[] GetDescendants(string id)
+        {
+            EnsureBuilt();
+            var res = new List<string>();
+            var key = TagUtils.Normalize(id);
+            if (string.IsNullOrEmpty(key)) return [.. res];
+
+            void dfs(string k)
+            {
+                if (!_childById.TryGetValue(k, out var children)) return;
+                foreach (var child in children)
+                {
+                    if (!res.Contains(child))
+                    {
+                        res.Add(child);
+                        dfs(child);
+                    }
+                }
+            }
+
+            dfs(key);
+            return [.. res];
+        }
+
+        public string[] GetPath(string id)
+        {
+            EnsureBuilt();
+            var stack = new Stack<string>();
+            var cur = TagUtils.Normalize(id);
+            if (string.IsNullOrEmpty(cur)) return [];
+            stack.Push(cur);
+            while (_parentById.TryGetValue(cur, out var parent) && !string.IsNullOrEmpty(parent))
+            {
+                stack.Push(parent);
+                cur = parent;
+            }
+            return [.. stack.Reverse()];
+        }
+
+        public void SyncMissingDefinitions(bool saveResource = false)
+        {
+            EnsureBuilt();
+            var missings = _defById.Values.Where(d => d != null && !AllTags.Any(t => TagUtils.Normalize(t.Id) == TagUtils.Normalize(d.Id))).ToArray();
+            if (missings.Length == 0) return;
+
+            var list = new List<TagDefinition>(AllTags ?? []);
+            foreach (var miss in missings)
+            {
+                if (!list.Any(x => TagUtils.Normalize(x.Id) == TagUtils.Normalize(miss.Id)))
+                {
+                    list.Add(miss);
+                }
+            }
+
+            AllTags = [.. list];
+
+            if (saveResource && ResourceSaver.Save(this) != Error.Ok)
+            {
+                GD.PrintErr("Failed to save TagRegistry after syncing definitions");
+            }
+        }
+
+
+        private void EnsureBuilt()
+        {
+            if (_built) return;
+
+            foreach (var tag in AllTags)
+            {
+                // not sure about it
+                if (tag == null) continue;
+                var key = TagUtils.Normalize(tag.Id);
+                if (string.IsNullOrWhiteSpace(key)) continue;
+                if (!_defById.ContainsKey(key))
+                    _defById[key] = tag;
+                if (!_childById.ContainsKey(key))
+                    _childById[key] = [];
+            }
+
+            foreach (var raw in Hierarchies)
+            {
+                if (string.IsNullOrWhiteSpace(raw)) continue;
+
+                var parts = raw.Split(['/', '\\', '>', '.'], System.StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .Where(s => s.Length > 0)
+                    .ToArray();
+
+                if (parts.Length == 0) continue;
+
+                string? prev = null;
+
+                foreach (var part in parts)
+                {
+                    var id = TagUtils.Normalize(part);
+                    if (string.IsNullOrEmpty(id)) continue;
+
+                    if (!_childById.ContainsKey(id))
+                        _childById[id] = [];
+                    if (!_defById.ContainsKey(id))
+                    {
+                        var td = new TagDefinition { Id = id, DisplayName = part };
+                        _defById[id] = td;
+                    }
+
+                    if (prev != null)
+                    {
+                        if (!_childById[prev].Contains(id))
+                            _childById[prev].Add(id);
+                        _parentById[id] = prev;
+                    }
+                    else
+                    {
+                        if (!_parentById.ContainsKey(id))
+                            _parentById[id] = null;
+                    }
+
+                    prev = id;
+                }
+            }
+            var keys = _defById.Keys.ToArray();
+
+            foreach (var key in keys)
+                if (!_childById.ContainsKey(key))
+                    _childById[key] = [];
+
+            _built = true;
+        }
     }
 }
