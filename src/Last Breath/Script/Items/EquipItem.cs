@@ -11,6 +11,7 @@
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.Items.ItemData;
 
+    [Tool]
     [GlobalClass]
     public partial class EquipItem : Item, IEquipItem
     {
@@ -23,7 +24,6 @@
         [Export] public AttributeType AttributeType { get; protected set; } = AttributeType.None;
 
         public ICharacter? Owner { get; private set; }
-        // if i create equip item as resource in editor, where i get modifiers from?
         public IReadOnlyList<IModifier> Modifiers => BaseModifiers;
 
         /// <summary>

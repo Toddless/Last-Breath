@@ -3,7 +3,6 @@
     using Godot;
     using System;
     using System.Linq;
-    using Core.Constants;
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
@@ -21,7 +20,7 @@
         [Export] public int MaxStackSize { get; set; } = 9999;
         [Export] public Texture2D? Icon { get; set; }
         [Export] public Texture2D? FullImage { get; set; }
-        // TODO: Tags need more attention
+        // TODO: I need to add basic tags for items created with code
         [Export] public string[] Tags = [];
 
         [Export]
@@ -44,20 +43,6 @@
         public List<string> GetItemStatsAsStrings() => [];
         public IItem Copy(bool subresources = false) => Clone(subresources);
         ICraftingResource ICraftingResource.Copy(bool subresources) => Clone(subresources);
-
-        public void SyncRarityTag()
-        {
-            var tag = TagConstants.RarityToTag(Rarity);
-            var tagList = Tags.Select(TagConstants.Normalize).ToList();
-
-            foreach (var t in TagConstants.AllRarityTags)
-                tagList.Remove(t);
-
-            if (!tagList.Contains(tag))
-                tagList.Add(tag);
-
-            Tags = [.. tagList];
-        }
 
         private CraftingResource Clone(bool subresources)
         => (CraftingResource)Duplicate(subresources);

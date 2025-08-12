@@ -17,4 +17,5 @@ Rarity = 1
 Icon = SubResource("GradientTexture1D_4djru")
 Quantity = 1
 MaxStackSize = 1
+Tags = PackedStringArray("fabric", "velvet", "legendary")
 metadata/_custom_type_script = "uid://wyqiek1tmeve"

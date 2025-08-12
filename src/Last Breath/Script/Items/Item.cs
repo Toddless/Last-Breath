@@ -6,6 +6,7 @@
     using Core.Enums;
     using Core.Interfaces.Items;
 
+    [Tool]
     [GlobalClass]
     public partial class Item : Resource, IItem
     {
@@ -20,16 +21,12 @@
                 LoadData();
             }
         }
-        [Export]
-        public Rarity Rarity { get; set; } = Rarity.Rare;
-        [Export]
-        public Texture2D? Icon { get; set; }
-        [Export]
-        public Texture2D? FullImage { get; set; }
-        [Export]
-        public int Quantity { get; set; } = 1;
-        [Export]
-        public int MaxStackSize { get; set; } = 1;
+        [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
+        [Export] public Texture2D? Icon { get; set; }
+        [Export] public Texture2D? FullImage { get; set; }
+        [Export] public int Quantity { get; set; } = 1;
+        [Export] public int MaxStackSize { get; set; } = 1;
+        [Export] public string[] Tags = [];
 
         public string Name => GetLocalizedName();
 

@@ -4,6 +4,7 @@
     using Godot.Collections;
     using Core.Interfaces.Crafting;
 
+    [Tool]
     [GlobalClass]
     public partial class CraftingRecipe : Resource, ICraftingRecipe
     {
@@ -11,7 +12,7 @@
         [Export] private Array<RecipeRequirement> _optionalResources = [];
         [Export] public string Id = string.Empty;
         [Export] public string ResultItemId = string.Empty;
-
+        [Export] public string[] Tags = [];
         public string Name => GetLocalizedName();
         public string Description => GetLocalizedDescription();
 

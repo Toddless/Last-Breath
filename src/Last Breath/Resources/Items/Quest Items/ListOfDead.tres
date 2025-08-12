@@ -14,4 +14,5 @@ Rarity = 2
 Icon = SubResource("AtlasTexture_klwss")
 Quantity = 1
 MaxStackSize = 1
+Tags = PackedStringArray()
 metadata/_custom_type_script = "uid://curr877vpisc3"

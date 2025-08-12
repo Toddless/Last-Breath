@@ -6,6 +6,6 @@
 script = ExtResource("4_q6gkt")
 Rarity = 1
 MaxStackSize = 9999
-Tags = PackedStringArray()
+Tags = PackedStringArray("crafting")
 Id = "Dwarf_Steel"
 metadata/_custom_type_script = "uid://de62ounj0fv8p"

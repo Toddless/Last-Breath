@@ -45,6 +45,6 @@ _materialType = SubResource("Resource_kbwix")
 Rarity = 1
 MaxStackSize = 9999
 Icon = SubResource("GradientTexture1D_bnvyx")
-Tags = PackedStringArray("legendary", "epic", "uncommon")
+Tags = PackedStringArray("wand", "dagger", "bloodstone")
 Id = "Human_Fabric"
 metadata/_custom_type_script = "uid://de62ounj0fv8p"

@@ -9,7 +9,7 @@ namespace LastBreath.addons.Tools.TagGenerator
     {
         private const string PathToFile = "res://addons/Tools/TagGenerator/TagRegistry.tres";
 
-        public override bool _CanHandle(GodotObject @object) => true;
+        public override bool _CanHandle(GodotObject @object) => @object.IsClass(nameof(Resource));
 
         public override bool _ParseProperty(GodotObject @object, Variant.Type type, string name, PropertyHint hintType, string hintString, PropertyUsageFlags usageFlags, bool wide)
         {

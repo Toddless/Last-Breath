@@ -8,16 +8,12 @@ namespace LastBreath.addons.Tools.TagGenerator
     [Tool]
     public partial class TagEditorProperty : EditorProperty
     {
-        private HBoxContainer _mainBox;
         private Label _label;
-        private Button _editBtn;
-
         private PopupPanel _popup;
         private VBoxContainer _popupVBox;
         private Tree _tree;
-        private HBoxContainer _buttonsBox;
-        private Button _applyBtn;
-        private Button _cancelBtn;
+        private HBoxContainer _mainBox, _buttonsBox;
+        private Button _applyBtn, _cancelBtn, _editBtn;
 
         private string _registryDir = string.Empty;
 
@@ -26,13 +22,9 @@ namespace LastBreath.addons.Tools.TagGenerator
             _mainBox = new HBoxContainer();
             _label = new Label() { Text = "Tags" };
             _editBtn = new Button() { Text = "Edit" };
-            _editBtn.Pressed += OnEditPressed;
-            _mainBox.AddChild(_label);
-            _mainBox.AddChild(_editBtn);
-            AddChild(_mainBox);
-
+            _applyBtn = new Button() { Text = "Apply" };
+            _cancelBtn = new Button() { Text = "Cancel" };
             _popup = new PopupPanel();
-
             _popupVBox = new VBoxContainer
             {
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -46,21 +38,21 @@ namespace LastBreath.addons.Tools.TagGenerator
                 SizeFlagsVertical = SizeFlags.ExpandFill,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
             };
-            _popupVBox.AddChild(_tree);
-
-            _applyBtn = new Button() { Text = "Apply" };
-            _cancelBtn = new Button() { Text = "Cancel" };
-            _applyBtn.Pressed += OnApplyPressed;
-            _cancelBtn.Pressed += () => _popup.Hide();
-
             _buttonsBox = new HBoxContainer();
+            var popupVBox = new VBoxContainer();
+
+            _editBtn.Pressed += OnEditPressed;
+            _applyBtn.Pressed += OnApplyPressed;
+            _cancelBtn.Pressed += OnCancelPressed;
+
+            _mainBox.AddChild(_label);
+            _mainBox.AddChild(_editBtn);
+            AddChild(_mainBox);
+            _popupVBox.AddChild(_tree);
             _buttonsBox.AddChild(_applyBtn);
             _buttonsBox.AddChild(_cancelBtn);
-
-            var popupVBox = new VBoxContainer();
             popupVBox.AddChild(_popupVBox);
             popupVBox.AddChild(_buttonsBox);
-
             _popup.AddChild(popupVBox);
             AddChild(_popup);
         }
@@ -86,6 +78,8 @@ namespace LastBreath.addons.Tools.TagGenerator
             _popup.PopupCentered(new Vector2I(500, 420));
         }
 
+        private void OnCancelPressed() => _popup.Hide();
+
         private void OnApplyPressed()
         {
             var selected = new Array<string>();
@@ -95,20 +89,21 @@ namespace LastBreath.addons.Tools.TagGenerator
             if (root != null)
             {
                 var stack = new Stack<TreeItem>();
-                var child = root.GetFirstChild();
-                while (child != null)
+                var parents = root.GetFirstChild();
+
+                while (parents != null)
                 {
-                    stack.Push(child);
-                    child = child.GetNext();
+                    stack.Push(parents);
+                    parents = parents.GetNext();
                 }
 
                 while (stack.Count > 0)
                 {
-                    var treeItem = stack.Pop();
+                    var child = stack.Pop();
 
-                    if (treeItem.IsChecked(0))
+                    if (child.IsChecked(0))
                     {
-                        var meta = treeItem.GetMetadata(0);
+                        var meta = child.GetMetadata(0);
                         if (meta.VariantType == Variant.Type.String)
                         {
                             var dataAsString = meta.AsString() ?? string.Empty;
@@ -116,11 +111,11 @@ namespace LastBreath.addons.Tools.TagGenerator
                         }
                     }
 
-                    var treeChild = treeItem.GetFirstChild();
-                    while (treeChild != null)
+                    var leaf = child.GetFirstChild();
+                    while (leaf != null)
                     {
-                        stack.Push(treeChild);
-                        treeChild = treeChild.GetNext();
+                        stack.Push(leaf);
+                        leaf = leaf.GetNext();
                     }
                 }
             }
@@ -192,17 +187,8 @@ namespace LastBreath.addons.Tools.TagGenerator
 
             try
             {
-
-                if (val.VariantType == Variant.Type.Array)
-                {
-                    foreach (var v in val.AsGodotArray<string>())
-                        if (!string.IsNullOrEmpty(v)) current.Add(v);
-                }
-                else
-                {
-                    foreach (var s in val.AsStringArray())
-                        if (!string.IsNullOrEmpty(s)) current.Add(s);
-                }
+                foreach (var v in val.AsGodotArray<string>())
+                    if (!string.IsNullOrWhiteSpace(v)) current.Add(v);
             }
             catch
             {
@@ -210,7 +196,7 @@ namespace LastBreath.addons.Tools.TagGenerator
                 {
                     if (v.VariantType == Variant.Type.Nil) continue;
                     var asString = v.AsString() ?? string.Empty;
-                    if (!string.IsNullOrEmpty(asString)) current.Add(asString);
+                    if (!string.IsNullOrWhiteSpace(asString)) current.Add(asString);
                 }
             }
 
@@ -218,23 +204,27 @@ namespace LastBreath.addons.Tools.TagGenerator
             if (root == null) return;
 
             var stack = new Stack<TreeItem>();
-            var it = root.GetFirstChild();
-            while (it != null)
+            var treeItem = root.GetFirstChild();
+
+            // fill up stack
+            while (treeItem != null)
             {
-                stack.Push(it);
-                it = it.GetNext();
+                stack.Push(treeItem);
+                treeItem = treeItem.GetNext();
             }
 
             while (stack.Count > 0)
             {
                 var item = stack.Pop();
                 var meta = item.GetMetadata(0);
-                var id = meta.VariantType != Variant.Type.Nil ? meta.ToString() : item.GetText(0);
-                if (!string.IsNullOrEmpty(id) && current.Contains(id))
+                var id = meta.AsString();
+                // Check the box if the tag was already in the tag list.
+                if (!string.IsNullOrWhiteSpace(id) && current.Contains(id))
                     item.SetChecked(0, true);
                 else
                     item.SetChecked(0, false);
 
+                // now fill up stack with child items 
                 var child = item.GetFirstChild();
                 while (child != null)
                 {

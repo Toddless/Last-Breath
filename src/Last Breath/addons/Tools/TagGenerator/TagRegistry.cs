@@ -26,7 +26,6 @@
 
         public string[] GetAllIds()
         {
-            GD.Print($"Def: {_defById.Count}, Child: {_childById.Count}, Parents: {_parentById.Count}, Built: {_built}");
             EnsureBuilt();
             return [.. _defById.Keys];
         }
