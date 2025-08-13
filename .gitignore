@@ -140,3 +140,4 @@ paket-files/
 /src/Testing/bin
 /src/Testing/obj
 /src/Crafting/TestResources
+/src/Core/FilePaths.cs

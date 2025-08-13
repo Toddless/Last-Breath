@@ -28,18 +28,18 @@
         [Export] public int MaxStackSize { get; set; } = 1;
         [Export] public string[] Tags = [];
 
-        public string Name => GetLocalizedName();
+        public string DisplayName => GetLocalizedName();
 
         public string Description => GetLocalizedDescription();
 
 
         public bool Equals(Item other)
         {
-            if (other == null || string.IsNullOrEmpty(Name))
+            if (other == null || string.IsNullOrEmpty(DisplayName))
             {
                 return false;
             }
-            return Name.Equals(other.Name) && Quantity == other.Quantity;
+            return DisplayName.Equals(other.DisplayName) && Quantity == other.Quantity;
         }
 
         public override bool Equals(object? obj)
@@ -51,7 +51,7 @@
             return Equals((Item)obj);
         }
 
-        public override int GetHashCode() => HashCode.Combine(Name, Quantity);
+        public override int GetHashCode() => HashCode.Combine(DisplayName, Quantity);
 
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];

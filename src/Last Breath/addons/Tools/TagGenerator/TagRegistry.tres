@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TagRegistry" load_steps=44 format=3 uid="uid://b8lqk5dfnyts4"]
+[gd_resource type="Resource" script_class="TagRegistry" load_steps=61 format=3 uid="uid://c6xyrs2lnqq8o"]
 
 [ext_resource type="Script" uid="uid://bhuk2jtajeayh" path="res://addons/Tools/TagGenerator/TagDefinition.cs" id="1_pq6l1"]
 [ext_resource type="Script" uid="uid://chgscbku3e2te" path="res://addons/Tools/TagGenerator/TagRegistry.cs" id="2_t87hv"]
@@ -65,150 +65,235 @@ DisplayName = "Wool"
 
 [sub_resource type="Resource" id="Resource_i2m6v"]
 script = ExtResource("1_pq6l1")
-Id = "steel"
-DisplayName = "Steel"
+Id = "linen"
+DisplayName = "Linen"
 
 [sub_resource type="Resource" id="Resource_ewx2r"]
 script = ExtResource("1_pq6l1")
-Id = "copper"
-DisplayName = "Copper"
+Id = "steel"
+DisplayName = "Steel"
 
 [sub_resource type="Resource" id="Resource_rqj8s"]
+script = ExtResource("1_pq6l1")
+Id = "iron"
+DisplayName = "Iron"
+
+[sub_resource type="Resource" id="Resource_1y4io"]
 script = ExtResource("1_pq6l1")
 Id = "bronze"
 DisplayName = "Bronze"
 
-[sub_resource type="Resource" id="Resource_1y4io"]
+[sub_resource type="Resource" id="Resource_d6gvm"]
+script = ExtResource("1_pq6l1")
+Id = "copper"
+DisplayName = "Copper"
+
+[sub_resource type="Resource" id="Resource_1ficq"]
+script = ExtResource("1_pq6l1")
+Id = "gold"
+DisplayName = "Gold"
+
+[sub_resource type="Resource" id="Resource_kbqgk"]
 script = ExtResource("1_pq6l1")
 Id = "adamantine"
 DisplayName = "Adamantine"
 
-[sub_resource type="Resource" id="Resource_d6gvm"]
+[sub_resource type="Resource" id="Resource_xesaf"]
 script = ExtResource("1_pq6l1")
 Id = "mythril"
 DisplayName = "Mythril"
 
-[sub_resource type="Resource" id="Resource_1ficq"]
+[sub_resource type="Resource" id="Resource_ke5sm"]
 script = ExtResource("1_pq6l1")
 Id = "leather"
 DisplayName = "Leather"
 
-[sub_resource type="Resource" id="Resource_kbqgk"]
+[sub_resource type="Resource" id="Resource_h2etp"]
 script = ExtResource("1_pq6l1")
 Id = "fur"
 DisplayName = "Fur"
 
-[sub_resource type="Resource" id="Resource_xesaf"]
+[sub_resource type="Resource" id="Resource_o8rb2"]
 script = ExtResource("1_pq6l1")
 Id = "chitin"
 DisplayName = "Chitin"
 
-[sub_resource type="Resource" id="Resource_ke5sm"]
+[sub_resource type="Resource" id="Resource_ivyej"]
 script = ExtResource("1_pq6l1")
 Id = "gem"
 DisplayName = "Gem"
 
-[sub_resource type="Resource" id="Resource_h2etp"]
+[sub_resource type="Resource" id="Resource_fjyea"]
 script = ExtResource("1_pq6l1")
 Id = "ruby"
 DisplayName = "Ruby"
 
-[sub_resource type="Resource" id="Resource_o8rb2"]
+[sub_resource type="Resource" id="Resource_xdt15"]
 script = ExtResource("1_pq6l1")
 Id = "sapphire"
 DisplayName = "Sapphire"
 
-[sub_resource type="Resource" id="Resource_ivyej"]
+[sub_resource type="Resource" id="Resource_5nhpn"]
 script = ExtResource("1_pq6l1")
 Id = "emerald"
 DisplayName = "Emerald"
 
-[sub_resource type="Resource" id="Resource_fjyea"]
+[sub_resource type="Resource" id="Resource_rnbp5"]
 script = ExtResource("1_pq6l1")
 Id = "topaz"
 DisplayName = "Topaz"
 
-[sub_resource type="Resource" id="Resource_xdt15"]
+[sub_resource type="Resource" id="Resource_3ijhc"]
 script = ExtResource("1_pq6l1")
 Id = "diamond"
 DisplayName = "Diamond"
 
-[sub_resource type="Resource" id="Resource_5nhpn"]
+[sub_resource type="Resource" id="Resource_bt6ib"]
 script = ExtResource("1_pq6l1")
 Id = "amethyst"
 DisplayName = "Amethyst"
 
-[sub_resource type="Resource" id="Resource_rnbp5"]
+[sub_resource type="Resource" id="Resource_6wc3c"]
 script = ExtResource("1_pq6l1")
 Id = "moonstone"
 DisplayName = "Moonstone"
 
-[sub_resource type="Resource" id="Resource_3ijhc"]
+[sub_resource type="Resource" id="Resource_cv1tm"]
 script = ExtResource("1_pq6l1")
 Id = "opal"
 DisplayName = "Opal"
 
-[sub_resource type="Resource" id="Resource_bt6ib"]
+[sub_resource type="Resource" id="Resource_c8u0u"]
 script = ExtResource("1_pq6l1")
 Id = "bloodstone"
 DisplayName = "Bloodstone"
 
-[sub_resource type="Resource" id="Resource_6wc3c"]
+[sub_resource type="Resource" id="Resource_hnhw6"]
+script = ExtResource("1_pq6l1")
+Id = "essence"
+DisplayName = "Essence"
+
+[sub_resource type="Resource" id="Resource_swc4t"]
+script = ExtResource("1_pq6l1")
+Id = "lesser"
+DisplayName = "Lesser"
+
+[sub_resource type="Resource" id="Resource_nk4ds"]
+script = ExtResource("1_pq6l1")
+Id = "greater"
+DisplayName = "Greater"
+
+[sub_resource type="Resource" id="Resource_ncd5d"]
+script = ExtResource("1_pq6l1")
+Id = "existence"
+DisplayName = "Existence"
+
+[sub_resource type="Resource" id="Resource_4r28q"]
+script = ExtResource("1_pq6l1")
+Id = "decease"
+DisplayName = "Decease"
+
+[sub_resource type="Resource" id="Resource_3d2c7"]
 script = ExtResource("1_pq6l1")
 Id = "equipment"
 DisplayName = "Equipment"
 
-[sub_resource type="Resource" id="Resource_cv1tm"]
+[sub_resource type="Resource" id="Resource_i8etj"]
 script = ExtResource("1_pq6l1")
 Id = "weapon"
 DisplayName = "Weapon"
 
-[sub_resource type="Resource" id="Resource_c8u0u"]
+[sub_resource type="Resource" id="Resource_h51ni"]
 script = ExtResource("1_pq6l1")
 Id = "dagger"
 DisplayName = "Dagger"
 
-[sub_resource type="Resource" id="Resource_hnhw6"]
+[sub_resource type="Resource" id="Resource_6bxff"]
 script = ExtResource("1_pq6l1")
 Id = "sword"
 DisplayName = "Sword"
 
-[sub_resource type="Resource" id="Resource_swc4t"]
+[sub_resource type="Resource" id="Resource_fuhpw"]
 script = ExtResource("1_pq6l1")
 Id = "axe"
 DisplayName = "Axe"
 
-[sub_resource type="Resource" id="Resource_nk4ds"]
+[sub_resource type="Resource" id="Resource_qew3y"]
 script = ExtResource("1_pq6l1")
 Id = "wand"
 DisplayName = "Wand"
 
-[sub_resource type="Resource" id="Resource_ncd5d"]
+[sub_resource type="Resource" id="Resource_fx1py"]
 script = ExtResource("1_pq6l1")
 Id = "staff"
 DisplayName = "Staff"
 
-[sub_resource type="Resource" id="Resource_4r28q"]
+[sub_resource type="Resource" id="Resource_o2ui8"]
 script = ExtResource("1_pq6l1")
-Id = "armor"
-DisplayName = "Armor"
+Id = "category"
+DisplayName = "Category"
 
-[sub_resource type="Resource" id="Resource_3d2c7"]
+[sub_resource type="Resource" id="Resource_v6u6g"]
 script = ExtResource("1_pq6l1")
 Id = "heavy"
 DisplayName = "Heavy"
 
-[sub_resource type="Resource" id="Resource_i8etj"]
+[sub_resource type="Resource" id="Resource_r08om"]
 script = ExtResource("1_pq6l1")
 Id = "light"
 DisplayName = "Light"
 
-[sub_resource type="Resource" id="Resource_h51ni"]
+[sub_resource type="Resource" id="Resource_uu32x"]
 script = ExtResource("1_pq6l1")
 Id = "cloth"
 DisplayName = "Cloth"
 
+[sub_resource type="Resource" id="Resource_7afaq"]
+script = ExtResource("1_pq6l1")
+Id = "type"
+DisplayName = "Type"
+
+[sub_resource type="Resource" id="Resource_lixjm"]
+script = ExtResource("1_pq6l1")
+Id = "boots"
+DisplayName = "Boots"
+
+[sub_resource type="Resource" id="Resource_02etj"]
+script = ExtResource("1_pq6l1")
+Id = "gloves"
+DisplayName = "Gloves"
+
+[sub_resource type="Resource" id="Resource_ay5ix"]
+script = ExtResource("1_pq6l1")
+Id = "helmet"
+DisplayName = "Helmet"
+
+[sub_resource type="Resource" id="Resource_iiwyp"]
+script = ExtResource("1_pq6l1")
+Id = "belt"
+DisplayName = "Belt"
+
+[sub_resource type="Resource" id="Resource_afyuj"]
+script = ExtResource("1_pq6l1")
+Id = "bodyarmor"
+DisplayName = "BodyArmor"
+
+[sub_resource type="Resource" id="Resource_soefy"]
+script = ExtResource("1_pq6l1")
+Id = "cloak"
+DisplayName = "Cloak"
+
+[sub_resource type="Resource" id="Resource_xeryc"]
+script = ExtResource("1_pq6l1")
+Id = "ring"
+DisplayName = "Ring"
+
+[sub_resource type="Resource" id="Resource_kncef"]
+script = ExtResource("1_pq6l1")
+Id = "amulet"
+DisplayName = "Amulet"
+
 [resource]
 script = ExtResource("2_t87hv")
-AllTags = [SubResource("Resource_4rym1"), SubResource("Resource_244qh"), SubResource("Resource_4bp1b"), SubResource("Resource_ma5vj"), SubResource("Resource_8ka3w"), SubResource("Resource_j1uwy"), SubResource("Resource_50tkw"), SubResource("Resource_p8el4"), SubResource("Resource_ulwta"), SubResource("Resource_uveww"), SubResource("Resource_mpr7m"), SubResource("Resource_n6rf7"), SubResource("Resource_i2m6v"), SubResource("Resource_ewx2r"), SubResource("Resource_rqj8s"), SubResource("Resource_1y4io"), SubResource("Resource_d6gvm"), SubResource("Resource_1ficq"), SubResource("Resource_kbqgk"), SubResource("Resource_xesaf"), SubResource("Resource_ke5sm"), SubResource("Resource_h2etp"), SubResource("Resource_o8rb2"), SubResource("Resource_ivyej"), SubResource("Resource_fjyea"), SubResource("Resource_xdt15"), SubResource("Resource_5nhpn"), SubResource("Resource_rnbp5"), SubResource("Resource_3ijhc"), SubResource("Resource_bt6ib"), SubResource("Resource_6wc3c"), SubResource("Resource_cv1tm"), SubResource("Resource_c8u0u"), SubResource("Resource_hnhw6"), SubResource("Resource_swc4t"), SubResource("Resource_nk4ds"), SubResource("Resource_ncd5d"), SubResource("Resource_4r28q"), SubResource("Resource_3d2c7"), SubResource("Resource_i8etj"), SubResource("Resource_h51ni")]
-Hierarchies = PackedStringArray("Common/Rarity/Uncommon", "Common/Rarity/Rare", "Common/Rarity/Epic", "Common/Rarity/Legendary", "Common/Rarity/Mythic", "Crafting/Fabric/Silk", "Crafting/Fabric/Velvet", "Crafting/Fabric/Wool", "Crafting/Steel/Copper", "Crafting/Steel/Bronze", "Crafting/Steel/Adamantine", "Crafting/Steel/Mythril", "Crafting/Leather/Fur", "Crafting/Leather/Chitin", "Crafting/Gem/Ruby", "Crafting/Gem/Sapphire", "Crafting/Gem/Emerald", "Crafting/Gem/Topaz", "Crafting/Gem/Diamond", "Crafting/Gem/Amethyst", "Crafting/Gem/Moonstone", "Crafting/Gem/Opal", "Crafting/Gem/Bloodstone", "Equipment/Weapon/Dagger", "Equipment/Weapon/Sword", "Equipment/Weapon/Axe", "Equipment/Weapon/Wand", "Equipment/Weapon/Staff", "Equipment/Armor/Heavy", "Equipment/Armor/Light", "Equipment/Armor/Cloth")
+AllTags = [SubResource("Resource_4rym1"), SubResource("Resource_244qh"), SubResource("Resource_4bp1b"), SubResource("Resource_ma5vj"), SubResource("Resource_8ka3w"), SubResource("Resource_j1uwy"), SubResource("Resource_50tkw"), SubResource("Resource_p8el4"), SubResource("Resource_ulwta"), SubResource("Resource_uveww"), SubResource("Resource_mpr7m"), SubResource("Resource_n6rf7"), SubResource("Resource_i2m6v"), SubResource("Resource_ewx2r"), SubResource("Resource_rqj8s"), SubResource("Resource_1y4io"), SubResource("Resource_d6gvm"), SubResource("Resource_1ficq"), SubResource("Resource_kbqgk"), SubResource("Resource_xesaf"), SubResource("Resource_ke5sm"), SubResource("Resource_h2etp"), SubResource("Resource_o8rb2"), SubResource("Resource_ivyej"), SubResource("Resource_fjyea"), SubResource("Resource_xdt15"), SubResource("Resource_5nhpn"), SubResource("Resource_rnbp5"), SubResource("Resource_3ijhc"), SubResource("Resource_bt6ib"), SubResource("Resource_6wc3c"), SubResource("Resource_cv1tm"), SubResource("Resource_c8u0u"), SubResource("Resource_hnhw6"), SubResource("Resource_swc4t"), SubResource("Resource_nk4ds"), SubResource("Resource_ncd5d"), SubResource("Resource_4r28q"), SubResource("Resource_3d2c7"), SubResource("Resource_i8etj"), SubResource("Resource_h51ni"), SubResource("Resource_6bxff"), SubResource("Resource_fuhpw"), SubResource("Resource_qew3y"), SubResource("Resource_fx1py"), SubResource("Resource_o2ui8"), SubResource("Resource_v6u6g"), SubResource("Resource_r08om"), SubResource("Resource_uu32x"), SubResource("Resource_7afaq"), SubResource("Resource_lixjm"), SubResource("Resource_02etj"), SubResource("Resource_ay5ix"), SubResource("Resource_iiwyp"), SubResource("Resource_afyuj"), SubResource("Resource_soefy"), SubResource("Resource_xeryc"), SubResource("Resource_kncef")]
+Hierarchies = PackedStringArray("Common/Rarity/Uncommon", "Common/Rarity/Rare", "Common/Rarity/Epic", "Common/Rarity/Legendary", "Common/Rarity/Mythic", "Crafting/Fabric/Silk", "Crafting/Fabric/Velvet", "Crafting/Fabric/Wool", "Crafting/Fabric/Linen", "Crafting/Steel/Iron", "Crafting/Steel/Bronze", "Crafting/Steel/Copper", "Crafting/Steel/Gold", "Crafting/Steel/Adamantine", "Crafting/Steel/Mythril", "Crafting/Leather/Fur", "Crafting/Leather/Chitin", "Crafting/Gem/Ruby", "Crafting/Gem/Sapphire", "Crafting/Gem/Emerald", "Crafting/Gem/Topaz", "Crafting/Gem/Diamond", "Crafting/Gem/Amethyst", "Crafting/Gem/Moonstone", "Crafting/Gem/Opal", "Crafting/Gem/Bloodstone", "Crafting/Essence/Lesser", "Crafting/Essence/Greater", "Crafting/Essence/Existence", "Crafting/Essence/Decease", "Equipment/Weapon/Dagger", "Equipment/Weapon/Sword", "Equipment/Weapon/Axe", "Equipment/Weapon/Wand", "Equipment/Weapon/Staff", "Equipment/Category/Heavy", "Equipment/Category/Light", "Equipment/Category/Cloth", "Equipment/Type/Boots", "Equipment/Type/Gloves", "Equipment/Type/Helmet", "Equipment/Type/Belt", "Equipment/Type/BodyArmor", "Equipment/Type/Cloak", "Equipment/Type/Ring", "Equipment/Type/Amulet")

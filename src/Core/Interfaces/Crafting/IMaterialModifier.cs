@@ -2,7 +2,7 @@
 {
     using Core.Enums;
 
-    public interface IMaterialModifiers
+    public interface IMaterialModifier
     {
         ModifierType ModifierType { get; set; }
         Parameter Parameter { get; set; }

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using Core.Interfaces.Crafting;
     using Godot;
 
@@ -55,7 +54,7 @@
                     if (loaded is ICraftingResource craftRes)
                     {
                         if (string.IsNullOrEmpty(craftRes.Id))
-                            craftRes.Id = Path.GetFileNameWithoutExtension(file);
+                            //craftRes.Id = Path.GetFileNameWithoutExtension(file);
 
                         if (_resources.ContainsKey(craftRes.Id))
                             GD.PrintErr($"CraftingResourceManager: Duplicate resource id '{craftRes.Id}' skipping {fullPath}");

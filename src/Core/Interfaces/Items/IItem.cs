@@ -13,7 +13,7 @@
         Texture2D? FullImage {  get; }
         Rarity Rarity { get; }
         string Description { get; }
-        string Name { get; }
+        string DisplayName { get; }
         List<string> GetItemStatsAsStrings();
 
         IItem Copy(bool subresources = false);

@@ -12,11 +12,14 @@
         "Fabric": [
             "Silk",
             "Velvet",
-            "Wool"
+            "Wool",
+            "Linen"
         ],
         "Steel": [
-            "Copper",
+            "Iron",
             "Bronze",
+            "Copper",
+            "Gold",
             "Adamantine",
             "Mythril"
         ],
@@ -34,6 +37,12 @@
             "Moonstone",
             "Opal",
             "Bloodstone"
+        ],
+        "Essence": [
+            "Lesser",
+            "Greater",
+            "Existence",
+            "Decease"
         ]
     },
     "Equipment": {
@@ -44,10 +53,20 @@
             "Wand",
             "Staff"
         ],
-        "Armor": [
+        "Category": [
             "Heavy",
             "Light",
             "Cloth"
+        ],
+        "Type": [
+            "Boots",
+            "Gloves",
+            "Helmet",
+            "Belt",
+            "BodyArmor",
+            "Cloak",
+            "Ring",
+            "Amulet"
         ]
     }
 }

@@ -2,13 +2,14 @@ namespace LastBreath.addons.Tools.TagGenerator
 {
 	using System.Collections.Generic;
 	using System.Linq;
+	using Core;
 	using Godot;
 
 	[Tool]
 	public partial class GenerateTags : EditorScript
 	{
-		private const string InputPath = "res://addons/Tools/TagGenerator/AllTags.json";
-		private const string OutputPath = "res://addons/Tools/TagGenerator/TagRegistry.tres";
+		private const string InputPath = FilePaths.TagJsonPath;
+		private const string OutputPath = FilePaths.TagResourceOutputPath;
 
 		public override void _Run()
 		{

@@ -6,7 +6,7 @@
 
     [Tool]
     [GlobalClass]
-    public partial class MaterialModifiers : Resource, IMaterialModifiers
+    public partial class MaterialModifier : Resource, IMaterialModifier
     {
         [Export] public Parameter Parameter { get; set; }
         [Export] public ModifierType ModifierType { get; set; }

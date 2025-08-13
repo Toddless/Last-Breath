@@ -12,7 +12,7 @@
     public partial class CraftingResource : Resource, ICraftingResource, IItem
     {
         private string _id = string.Empty;
-        [Export] private ResourceMaterialType? _materialType;
+        [Export] private MaterialType? _materialType;
         [Export] public Core.Enums.Rarity Rarity { get; private set; } = Core.Enums.Rarity.Rare;
         /// <summary>
         /// Default value = 1;
@@ -21,7 +21,7 @@
         [Export] public Texture2D? Icon { get; set; }
         [Export] public Texture2D? FullImage { get; set; }
         // TODO: I need to add basic tags for items created with code
-        [Export] public string[] Tags = [];
+        [Export] public string[] Tags { get; private set; } = [];
 
         [Export]
         public string Id
@@ -30,9 +30,9 @@
             set => _id = value;
         }
 
-        public IResourceMaterialType? MaterialType => _materialType;
+        public IMaterialType? MaterialType => _materialType;
 
-        public string Name => GetLocalizedName();
+        public string DisplayName => GetLocalizedName();
         public string Description => GetLocalizedDescription();
 
         /// <summary>
