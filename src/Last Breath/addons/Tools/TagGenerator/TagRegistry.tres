@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="TagRegistry" load_steps=61 format=3 uid="uid://c6xyrs2lnqq8o"]
+[gd_resource type="Resource" script_class="TagRegistry" load_steps=61 format=3]
 
-[ext_resource type="Script" uid="uid://bhuk2jtajeayh" path="res://addons/Tools/TagGenerator/TagDefinition.cs" id="1_pq6l1"]
-[ext_resource type="Script" uid="uid://chgscbku3e2te" path="res://addons/Tools/TagGenerator/TagRegistry.cs" id="2_t87hv"]
+[ext_resource type="Script" path="res://addons/Tools/TagGenerator/TagDefinition.cs" id="1_pq6l1"]
+[ext_resource type="Script" path="res://addons/Tools/TagGenerator/TagRegistry.cs" id="2_t87hv"]
 
 [sub_resource type="Resource" id="Resource_4rym1"]
 script = ExtResource("1_pq6l1")

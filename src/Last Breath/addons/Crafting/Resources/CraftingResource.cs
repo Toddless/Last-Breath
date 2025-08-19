@@ -6,6 +6,7 @@
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using LastBreath.Addons.Crafting.Resources.Materials;
 
     [Tool]
     [GlobalClass]
@@ -29,7 +30,7 @@
             get => _id;
             set => _id = value;
         }
-
+        public float Quality { get; set; } = 1;
         public IMaterialType? MaterialType => _materialType;
 
         public string DisplayName => GetLocalizedName();
@@ -42,11 +43,11 @@
 
         public List<string> GetItemStatsAsStrings() => [];
         public IItem Copy(bool subresources = false) => Clone(subresources);
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         ICraftingResource ICraftingResource.Copy(bool subresources) => Clone(subresources);
 
         private CraftingResource Clone(bool subresources)
         => (CraftingResource)Duplicate(subresources);
-        private bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         private string GetLocalizedName() => TranslationServer.Translate(Id);
         private string GetLocalizedDescription() => TranslationServer.Translate(Id + "_Description");
     }

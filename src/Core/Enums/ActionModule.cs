@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ActionModule
+    public enum ActionModule : byte
     {
         EvadeAction,
         BlockAction,

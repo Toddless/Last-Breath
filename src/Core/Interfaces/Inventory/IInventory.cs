@@ -14,6 +14,9 @@
 
         void AddItem(IItem item);
         void Clear();
+        //void AddStacksToItem(string id, int amount);
+        //void RemoveStacksFromItem(string id, int amount);
+        IItem? GetItemById(string id);
         int GetNumberOfItems(IItem item);
         List<IItem?> GiveAllItems();
         void Initialize(int size, GridContainer container);

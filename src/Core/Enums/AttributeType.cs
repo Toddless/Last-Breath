@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum AttributeType
+    public enum AttributeType : byte
     {
         None = 0,
         Dexterity,

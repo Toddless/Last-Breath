@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ModifierType
+    public enum ModifierType : byte
     {
         /// <summary>
         /// Raw value. Example: +300 HP, +15 Def etc.

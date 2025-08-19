@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://c85pqhtr8dyi6" path="res://Source/UIElements/Layers/CraftingLayer.cs" id="1_g0b00"]
 [ext_resource type="PackedScene" uid="uid://iif75nev2q13" path="res://Source/UIElements/View/CraftingUI.tscn" id="2_0bxqo"]
 
-[node name="CraftingLayer" type="CanvasLayer"]
+[node name="CraftingLayer" type="CanvasLayer" node_paths=PackedStringArray("_craftingUI")]
 script = ExtResource("1_g0b00")
+_craftingUI = NodePath("CraftingUI")
 
 [node name="CraftingUI" parent="." instance=ExtResource("2_0bxqo")]

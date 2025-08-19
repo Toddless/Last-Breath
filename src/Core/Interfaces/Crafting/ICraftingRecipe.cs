@@ -4,8 +4,10 @@
 
     public interface ICraftingRecipe
     {
+        string Id { get; }
         string Description { get; }
         string Name { get; }
+        string[] Tags { get; }
         List<IRecipeRequirement> MainResource { get; }
         List<IRecipeRequirement> OptionalResources { get; }
     }

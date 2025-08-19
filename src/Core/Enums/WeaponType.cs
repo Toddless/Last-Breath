@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum WeaponType
+    public enum WeaponType : byte
     {
         Dagger,
         Sword,

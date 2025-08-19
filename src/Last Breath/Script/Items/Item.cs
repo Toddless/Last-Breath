@@ -5,6 +5,7 @@
     using Godot;
     using Core.Enums;
     using Core.Interfaces.Items;
+    using System.Linq;
 
     [Tool]
     [GlobalClass]
@@ -56,6 +57,7 @@
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];
         public IItem Copy(bool subresources = false) => (IItem)Duplicate(subresources);
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         protected virtual void LoadData()
         {
 

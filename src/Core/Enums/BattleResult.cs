@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum BattleResults
+    public enum BattleResults : byte
     {
         PlayerWon,
         PlayerDead,

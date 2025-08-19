@@ -7,7 +7,6 @@
     public interface IItem
     {
         string Id { get; }
-        int Quantity { get; set; }
         int MaxStackSize { get; }
         Texture2D? Icon { get; }
         Texture2D? FullImage {  get; }
@@ -16,6 +15,7 @@
         string DisplayName { get; }
         List<string> GetItemStatsAsStrings();
 
+        bool HasTag(string tag);
         IItem Copy(bool subresources = false);
     }
 }

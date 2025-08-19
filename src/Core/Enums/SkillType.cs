@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum SkillType
+    public enum SkillType : byte
     {
         /// <summary>
         /// Skill type that modifies the attack context

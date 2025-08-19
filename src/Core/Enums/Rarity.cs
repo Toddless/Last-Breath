@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum Rarity
+    public enum Rarity : byte
     {
         Uncommon,
         Rare,

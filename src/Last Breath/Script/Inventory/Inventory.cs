@@ -26,6 +26,12 @@
             }
         }
 
+
+        public IItem? GetItemById(string id)
+        {
+            return Slots.Find(x => x.CurrentItem?.Id == id)?.CurrentItem;
+        }
+
         public void AddItem(IItem item)
         {
             var slot = GetSlotToAdd(item);
@@ -39,13 +45,13 @@
 
             if (slot.CurrentItem != null)
             {
-                int rest = slot.AddItemStacks(item.Quantity);
-                if (rest > 0)
-                {
-                    var duplicate = item.Copy(true);
-                    duplicate.Quantity = rest;
-                    AddItem(duplicate);
-                }
+                //int rest = slot.AddItemStacks(item.Quantity);
+                //if (rest > 0)
+                //{
+                //    var duplicate = item.Copy(true);
+                //    duplicate.Quantity = rest;
+                //    AddItem(duplicate);
+                //}
             }
             else
             {

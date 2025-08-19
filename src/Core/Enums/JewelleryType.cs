@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum JewelleryType
+    public enum JewelleryType : byte
     {
         Ring,
         Amulet,

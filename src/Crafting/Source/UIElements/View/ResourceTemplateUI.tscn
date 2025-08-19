@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://naq3akxs2d3o"]
+
+[ext_resource type="Script" uid="uid://kfep81oklvw2" path="res://Source/UIElements/ResourceTemplateUI.cs" id="1_iejr5"]
+
+[node name="ResourceTemplate" type="MarginContainer" node_paths=PackedStringArray("_text", "_icon")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+script = ExtResource("1_iejr5")
+_text = NodePath("HBoxContainer/Label")
+_icon = NodePath("HBoxContainer/TextureRect")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+expand_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(180, 50)
+layout_mode = 2
+text = "current/needed"

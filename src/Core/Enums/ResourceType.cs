@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ResourceType
+    public enum ResourceType : byte
     {
         Mana,
         Combopoints,

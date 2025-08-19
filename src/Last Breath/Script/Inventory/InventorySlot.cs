@@ -43,8 +43,8 @@
 
         public void AddNewItem(IItem item)
         {
+            Quantity++;
             CurrentItem = item;
-            Quantity += item.Quantity;
             this.TextureNormal = item.Icon;
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ItemDataFolder
+    public enum ItemDataFolder : byte
     {
         Jsons,
         GenericWeapons,

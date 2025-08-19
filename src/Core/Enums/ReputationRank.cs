@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ReputationRank
+    public enum ReputationRank : byte
     {
         None = 0,
         Hate,

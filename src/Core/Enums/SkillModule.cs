@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum SkillModule
+    public enum SkillModule : byte
     {
        PreAttack,
        OnAttack,

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ResourceQuality
+    public enum ResourceQuality : byte
     {
         LowGrade,
         Common,

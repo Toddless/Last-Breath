@@ -2,13 +2,18 @@
 
 [ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://Source/UIElements/CraftingUI.cs" id="1_ykvyl"]
 
-[node name="CraftingUI" type="Panel"]
+[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ykvyl")
+_recipeTree = NodePath("HBoxContainer/Panel/MarginContainer/RecipeTree")
+_possibleModifiersList = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers/ItemList")
+_main = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2/ScrollContainer/HBoxContainer")
+_optional = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer/Resources")
+metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -53,7 +58,7 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.75
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -61,47 +66,88 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
 
-[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer"]
+[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 15
-
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer/Panel/MarginContainer"]
-layout_mode = 2
-text = "Item to craft?"
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer2/Panel"]
+[node name="MainResources" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 15
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/VBoxContainer/HBoxContainer2/Panel/MarginContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2"]
 layout_mode = 2
-text = "Crafting resources for item??"
+size_flags_horizontal = 4
+text = "Main resources"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2/ScrollContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Optional" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Optional resources"
+
+[node name="Resources" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 1
+
+[node name="Modifiers" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Possible modifiers"
+
+[node name="ItemList" type="ItemList" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 0
 
 [node name="Panel2" type="Panel" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -114,8 +160,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 15
-
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel2/MarginContainer"]
-layout_mode = 2
-text = "Crafting inventory??"
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum ArmorType
+    public enum ArmorType : byte
     {
         Gloves,
         Boots,

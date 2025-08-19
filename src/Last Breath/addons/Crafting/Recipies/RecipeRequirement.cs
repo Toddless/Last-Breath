@@ -3,6 +3,7 @@
     using Godot;
     using Core.Interfaces.Crafting;
 
+    [Tool]
     [GlobalClass]
     public partial class RecipeRequirement : Resource, IRecipeRequirement
     {
@@ -12,9 +13,8 @@
         public bool Matches(ICraftingResource resource)
         {
             if (!string.IsNullOrWhiteSpace(CraftingResourceId) && resource.Id == CraftingResourceId) return true;
-            if (resource.Quantity >= Amount) return true;
+            if(Amount >= resource.Quality) return true;
             return false;
         }
-
     }
 }

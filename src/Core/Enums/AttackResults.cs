@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-   public enum AttackResults
+   public enum AttackResults : byte
     {
         Evaded,
         Blocked,

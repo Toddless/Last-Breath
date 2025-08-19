@@ -31,6 +31,7 @@ z_index = 1
 
 [node name="MainLayer" type="CanvasLayer" parent="."]
 process_mode = 1
+follow_viewport_enabled = true
 script = ExtResource("5_bee3c")
 
 [node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
@@ -51,27 +52,10 @@ visible = false
 [node name="Inventory" parent="MainLayer" instance=ExtResource("11_jyqft")]
 visible = false
 
-[node name="Close2" type="Button" parent="MainLayer/Inventory"]
-layout_mode = 2
-size_flags_horizontal = 8
-focus_mode = 0
-text = "Close"
-
-[node name="GridContainer2" type="GridContainer" parent="MainLayer/Inventory"]
-layout_mode = 2
-size_flags_vertical = 3
-columns = 5
-
-[node name="TakeAll2" type="Button" parent="MainLayer/Inventory"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_mode = 0
-text = "Take all"
-
 [node name="PauseLayer" type="CanvasLayer" parent="."]
 process_mode = 1
 visible = false
+follow_viewport_enabled = true
 script = ExtResource("5_bjedh")
 
 [node name="PauseMenu" parent="PauseLayer" instance=ExtResource("5_17akd")]
@@ -91,6 +75,7 @@ parameters/looping = true
 [node name="BattleLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("_battleUI")]
 process_mode = 1
 visible = false
+follow_viewport_enabled = true
 script = ExtResource("16_vnox3")
 _battleUI = NodePath("BattleUI")
 
@@ -98,6 +83,7 @@ _battleUI = NodePath("BattleUI")
 
 [node name="DialogueLayer" type="CanvasLayer" parent="."]
 visible = false
+follow_viewport_enabled = true
 script = ExtResource("21_nfb6a")
 
 [node name="DialogueWindow" parent="DialogueLayer" instance=ExtResource("21_rf13s")]

@@ -1,15 +1,14 @@
 ﻿namespace LastBreath.Script.Items
 {
-    using System.Collections.Generic;
-    using System.Text;
+    using Godot;
     using Core.Enums;
+    using Core.Modifiers;
+    using LastBreath.Script;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Core.Modifiers;
-    using Godot;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
+    using System.Collections.Generic;
     using LastBreath.Script.Items.ItemData;
+    using LastBreath.Script.Abilities.Interfaces;
 
     [Tool]
     [GlobalClass]
@@ -18,13 +17,14 @@
         protected const float From = 0.8f;
         protected const float To = 1.2f;
 
-        protected List<IModifier> BaseModifiers = [];
+        protected List<IModifier> BaseMods = [];
+        protected List<IModifier> AdditionalMods = [];
         protected List<IEffect> Effects = [];
         [Export] public EquipmentPart EquipmentPart { get; protected set; }
         [Export] public AttributeType AttributeType { get; protected set; } = AttributeType.None;
-
         public ICharacter? Owner { get; private set; }
-        public IReadOnlyList<IModifier> Modifiers => BaseModifiers;
+        public IReadOnlyList<IModifier> BaseModifiers => BaseMods;
+        public IReadOnlyList<IModifier> AdditionalModifiers => AdditionalMods;
 
         /// <summary>
         /// Default constructor to instantiate this from Resource
@@ -50,7 +50,7 @@
         public virtual void OnEquip(ICharacter owner)
         {
             Owner = owner;
-            BaseModifiers.ForEach(Owner.Modifiers.AddTemporaryModifier);
+            BaseMods.ForEach(Owner.Modifiers.AddTemporaryModifier);
             Effects.ForEach(Owner.Effects.AddTemporaryEffect);
         }
 
@@ -58,7 +58,7 @@
         {
             if (Owner != null)
             {
-                BaseModifiers.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
+                BaseMods.ForEach(Owner.Modifiers.RemoveTemporaryModifier);
                 Effects.ForEach(Owner.Effects.RemoveEffect);
                 Owner = null;
             }
@@ -67,15 +67,16 @@
         public override List<string> GetItemStatsAsStrings()
         {
             List<string> stats = [];
-            foreach (var modifier in BaseModifiers)
+            foreach (var modifier in BaseMods)
             {
-                StringBuilder stringBuilder = new();
-                stringBuilder.Append(modifier.Parameter);
-                stringBuilder.Append(':');
-                stringBuilder.Append(' ');
-                stringBuilder.Append(modifier.Value);
-                stats.Add(stringBuilder.ToString());
+                stats.Add($"{modifier.Parameter} : {modifier.Value}");
             }
+
+            foreach (var modifier in AdditionalMods)
+            {
+                stats.Add($"{modifier.Parameter} : {modifier.Value}");
+            }
+
             return stats;
         }
 
@@ -87,7 +88,7 @@
             var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats, IEquipItem>>()?.GetItemData(this);
             if (itemStats != null)
             {
-                BaseModifiers = ModifiersCreator.ItemStatsToModifier(itemStats, this);
+                BaseMods = ModifiersCreator.ItemStatsToModifier(itemStats, this);
             }
             var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData, IEquipItem>>()?.GetItemData(this);
             if (mediaData != null)

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum QuestType
+    public enum QuestType : byte
     {
         None = 0,
         Main,

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum MouseButtonPressed
+    public enum MouseButtonPressed : byte
     {
         None = 0,
         RightClick,

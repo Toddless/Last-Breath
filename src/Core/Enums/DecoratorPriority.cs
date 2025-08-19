@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum DecoratorPriority
+    public enum DecoratorPriority : byte
     {
         /// <summary>
         /// Decorators cannot be the base. The base is only for the main module with the base logic.

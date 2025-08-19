@@ -68,7 +68,7 @@ namespace LastBreath.addons.Tools.TagGenerator
 			sb.AppendLine($"\t}}");
 			sb.AppendLine();
 			sb.AppendLine($"\tpublic static IReadOnlyCollection<string> GetAll() => AllTags;");
-			sb.AppendLine("}");
+			sb.AppendLine("\t}");
 			sb.AppendLine("}"); // end class
 
 			// Ensure folder exists and write file

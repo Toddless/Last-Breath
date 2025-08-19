@@ -20,7 +20,7 @@
         public ICraftingResource? GetResource(string resourceId)
         {
             if (_resources.TryGetValue(resourceId, out var res))
-                return res.Copy(true);
+                return res;
             return null;
         }
 
@@ -51,23 +51,13 @@
 
                     var fullPath = $"{_pathToResources}/{file}";
                     var loaded = ResourceLoader.Load(fullPath);
-                    if (loaded is ICraftingResource craftRes)
-                    {
-                        if (string.IsNullOrEmpty(craftRes.Id))
-                            //craftRes.Id = Path.GetFileNameWithoutExtension(file);
+                    if (loaded is not ICraftingResource resource)
+                        continue;
 
-                        if (_resources.ContainsKey(craftRes.Id))
-                            GD.PrintErr($"CraftingResourceManager: Duplicate resource id '{craftRes.Id}' skipping {fullPath}");
-                        else
-                        {
-                            _resources[craftRes.Id] = craftRes;
-                            GD.Print($"Loaded crafting resource prototype '{craftRes.Id}' from {fullPath}");
-                        }
-                    }
+                    if (_resources.ContainsKey(resource.Id))
+                        GD.PrintErr($"CraftingResourceManager: Duplicate resource id '{resource.Id}' skipping {fullPath}");
                     else
-                    {
-                        GD.Print($"CraftingResourceManager: Skipping {fullPath} - it does not implement ICraftingResource");
-                    }
+                        _resources[resource.Id] = resource;
                 }
             }
             finally

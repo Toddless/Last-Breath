@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Addons.Crafting
+﻿namespace LastBreath.Addons.Crafting.Resources.Materials
 {
     using Core.Enums;
     using Core.Interfaces.Crafting;

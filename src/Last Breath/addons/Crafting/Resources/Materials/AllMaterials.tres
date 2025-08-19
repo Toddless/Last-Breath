@@ -1,32 +1,11 @@
-[gd_resource type="Resource" script_class="Materials" load_steps=7 format=3 uid="uid://blmiha5clm4va"]
+[gd_resource type="Resource" script_class="Materials" load_steps=4 format=3 uid="uid://blmiha5clm4va"]
 
-[ext_resource type="Script" uid="uid://be5p484lyr8fw" path="res://addons/Crafting/Resources/MaterialType.cs" id="1_u81f0"]
-[ext_resource type="Script" uid="uid://bm6kjwati4jya" path="res://addons/Crafting/Resources/MaterialModifier.cs" id="2_hiw0b"]
+[ext_resource type="Script" uid="uid://bgf587opwoqde" path="res://addons/Crafting/Resources/Materials/MaterialCategory.cs" id="1_hqg8h"]
+[ext_resource type="Script" uid="uid://bf2f58wpftx33" path="res://addons/Crafting/Resources/Materials/MaterialType.cs" id="2_hiw0b"]
 [ext_resource type="Script" uid="uid://qn8m0j2rxbc3" path="res://addons/Crafting/Resources/Materials/Materials.cs" id="2_hqg8h"]
-
-[sub_resource type="Resource" id="Resource_wxfr3"]
-script = ExtResource("2_hiw0b")
-Parameter = 12
-ModifierType = 2
-Value = 1.2
-metadata/_custom_type_script = "uid://bm6kjwati4jya"
-
-[sub_resource type="Resource" id="Resource_7ap4d"]
-script = ExtResource("2_hiw0b")
-Parameter = 2
-ModifierType = 2
-Value = 1.1
-metadata/_custom_type_script = "uid://bm6kjwati4jya"
-
-[sub_resource type="Resource" id="Resource_tdn5g"]
-script = ExtResource("1_u81f0")
-_modifiers = Array[ExtResource("2_hiw0b")]([SubResource("Resource_wxfr3"), SubResource("Resource_7ap4d")])
-Id = "Material_Steel_Mythril"
-Tags = PackedStringArray("crafting", "steel", "mythril", "rarity", "legendary")
-Category = 1
-metadata/_custom_type_script = "uid://be5p484lyr8fw"
 
 [resource]
 script = ExtResource("2_hqg8h")
-AllMaterials = Array[ExtResource("1_u81f0")]([SubResource("Resource_tdn5g")])
+AllMaterialTypes = Array[ExtResource("2_hiw0b")]([])
+AllCategories = Array[ExtResource("1_hqg8h")]([])
 metadata/_custom_type_script = "uid://qn8m0j2rxbc3"

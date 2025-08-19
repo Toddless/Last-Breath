@@ -26,10 +26,10 @@
         {
             if (item is not QuestItem) return;
 
-            if (!QuestItems.TryAdd(item.Id, item.Quantity))
-            {
-                // log
-            }
+            //if (!QuestItems.TryAdd(item.Id, item.Quantity))
+            //{
+            //    // log
+            //}
 
         }
 

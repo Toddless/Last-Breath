@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum MaterialCategory
+    public enum MaterialCategory : byte
     {
         Fabric,
         Steel,

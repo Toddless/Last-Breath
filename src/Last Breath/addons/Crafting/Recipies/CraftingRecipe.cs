@@ -10,9 +10,9 @@
     {
         [Export] private Array<RecipeRequirement> _mainResources = [];
         [Export] private Array<RecipeRequirement> _optionalResources = [];
-        [Export] public string Id = string.Empty;
+        [Export] public string Id { get; private set; } = string.Empty;
         [Export] public string ResultItemId = string.Empty;
-        [Export] public string[] Tags = [];
+        [Export] public string[] Tags { get; private set; } = [];
         public string Name => GetLocalizedName();
         public string Description => GetLocalizedDescription();
 

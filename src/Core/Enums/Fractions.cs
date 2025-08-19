@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum Fractions
+    public enum Fractions : byte
     {
         None = 0,
         Elf,

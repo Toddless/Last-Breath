@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum EquipmentPart
+    public enum EquipmentPart : byte
     {
         BodyArmor,
         Belt,
