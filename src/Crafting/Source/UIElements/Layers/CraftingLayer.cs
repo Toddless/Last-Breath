@@ -1,6 +1,7 @@
 namespace Crafting.Source.UIElements.Layers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Constants;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
@@ -9,7 +10,11 @@ namespace Crafting.Source.UIElements.Layers
 
     public partial class CraftingLayer : CanvasLayer
     {
-        private readonly List<ICraftingResource> _takenResources = [];
+        private readonly HashSet<IMaterialModifier> _mainModifiers = [];
+        private readonly HashSet<IMaterialModifier> _optionalModifiers = [];
+
+        private readonly List<ICraftingResource> _takenOptionalResources = [];
+        private ICraftingRecipe? _currentSelectedRecipe;
         private ResourceManager? _resourceManager;
         private RecipeManager? _recipeManager;
         private Inventory? _craftingInventory;
@@ -26,34 +31,58 @@ namespace Crafting.Source.UIElements.Layers
             using (var rnd = new RandomNumberGenerator())
                 foreach (var resource in _resourceManager.GetAllResources())
                 {
-                    _craftingInventory.AddItem((IItem)resource, rnd.RandiRange(2, 100));
+                    var from = rnd.RandiRange(1, 15);
+                    var to = rnd.RandiRange(15, 100);
+                    var amount = rnd.RandiRange(from, to);
+                    _craftingInventory.AddItem((IItem)resource, amount);
                 }
 
-            var res = _resourceManager?.GetResource("Crafting_Resource_Deer_Leather") as IItem;
-            if (res != null)
-            {
-                _craftingInventory.AddItem(res, 1000);
-            }
             VisibilityChanged += OnVisibilityChanges;
-            if (_craftingUI != null) _craftingUI.RecipeSelected += OnRecipeSelected;
+            if (_craftingUI != null)
+            {
+                _craftingUI.RecipeSelected += OnRecipeSelected;
+                _craftingUI.ItemCreated += OnItemCreatePressed;
+            }
 
             for (int i = 0; i < 3; i++)
             {
                 var opt = OptionalResource.Initialize().Instantiate<OptionalResource>();
-                opt.ResourceAdded += resource =>
-                {
-                    _takenResources.Add(resource);
-                    _craftingUI?.OnResourceAdded(resource);
-                };
                 opt.ResourceRemoved += resource =>
                 {
-                    _takenResources.RemoveAll(res => res.Id == resource.Id);
-                    _craftingUI?.OnResourceRemoved(resource);
+                    _takenOptionalResources.RemoveAll(res => res.Id == resource.Id);
+                    OnResourceRemoved(resource);
                 };
                 opt.AddPressed += () => OnAddPressed(opt);
                 _craftingUI?.AddOptionalResource(opt);
             }
+            Hide();
+        }
 
+        // if we can press this button => we have enough resources
+        private void OnItemCreatePressed()
+        {
+            ConsumeResourcesFromInventory();
+            ClearUI();
+            ShowCurrentRecipe();
+        }
+
+        private void ConsumeResourcesFromInventory()
+        {
+            foreach (var optResource in _takenOptionalResources)
+            {
+                _craftingInventory?.RemoveItem(optResource.Id);
+            }
+            _craftingUI?.ConsumeOptionalResource();
+
+            foreach (var mainRes in _currentSelectedRecipe?.MainResource ?? [])
+            {
+                _craftingInventory?.RemoveItem(mainRes.CraftingResourceId, mainRes.Amount);
+            }
+        }
+
+        private void ClearUI()
+        {
+            _craftingUI?.ClearOptionalResources();
         }
 
         private void OnAddPressed(OptionalResource opt)
@@ -68,16 +97,14 @@ namespace Crafting.Source.UIElements.Layers
             }
 
             var craftingItems = CraftingItems.Initialize().Instantiate<CraftingItems>();
-            craftingItems.Setup(available, _takenResources, selected =>
+            craftingItems.Setup(available, _takenOptionalResources, selected =>
             {
-                opt.AddCraftingResource(selected);
-                _takenResources.Add(selected);
+                opt.AddCraftingResource(selected, GetResourceAmountFromInventory(selected.Id));
+                _takenOptionalResources.Add(selected);
+                OnResourceAdded(selected);
                 craftingItems.QueueFree();
-            }, () =>
-            {
-                craftingItems?.QueueFree();
-            });
-
+            },
+            craftingItems.QueueFree);
             AddChild(craftingItems);
         }
 
@@ -100,28 +127,72 @@ namespace Crafting.Source.UIElements.Layers
 
         private void OnRecipeSelected(string id)
         {
+            _mainModifiers.Clear();
             var recipe = _recipeManager?.GetRecipe(id);
-            var mainRes = GetRecipeRequiredResources(recipe?.MainResource ?? []);
-            if (recipe != null) _craftingUI?.ShowRecipe(recipe, mainRes);
+            _currentSelectedRecipe = recipe;
+            ShowCurrentRecipe();
         }
 
-
-        private IReadOnlyDictionary<ICraftingResource, int> GetRecipeRequiredResources(List<IRecipeRequirement> list)
+        private void ShowCurrentRecipe()
         {
-            var resources = new Dictionary<ICraftingResource, int>();
-            foreach (var item in list)
-            {
-                var res = _resourceManager?.GetResource(item.CraftingResourceId);
-                if (res == null) continue;
-                // TODO: Instead amount i need to get info from player inventory
-                var inInventory = _craftingInventory?.GetItemSlotById(item.CraftingResourceId);
-                if (inInventory == null)
-                    resources.Add(res, 0);
-                else
-                    resources.Add(res, inInventory.Quantity);
-            }
+            var mainResources = PrepareRecipeToShow(_currentSelectedRecipe?.MainResource ?? []);
+            _craftingUI?.ShowRecipe(mainResources);
+            _craftingUI?.ShowModifiers(ConcatModifierSets());
+            var allResourcesEnough = mainResources.Values.All(x => x.have >= x.need);
+            if (mainResources.Count == 0) allResourcesEnough = false;
+            _craftingUI?.SetCreateButtonState(allResourcesEnough);
+        }
 
-            return resources;
+        private int GetResourceAmountFromInventory(string resourceId)
+        {
+            var item = _craftingInventory?.GetItemSlotById(resourceId);
+            if (item == null) return 0;
+            else return item.Quantity;
+        }
+
+        private HashSet<IMaterialModifier> ConcatModifierSets() => [.. _mainModifiers, .. _optionalModifiers];
+
+        private IReadOnlyDictionary<ICraftingResource, (int have, int need)> PrepareRecipeToShow(List<IRecipeRequirement> recipeRequirements)
+        {
+            var resourcesInInventory = new Dictionary<ICraftingResource, (int having, int needed)>();
+            foreach (var requirement in recipeRequirements)
+            {
+                var requiredResourceId = requirement.CraftingResourceId;
+                var resource = _resourceManager?.GetResource(requiredResourceId);
+                if (resource == null) continue;
+                resourcesInInventory.Add(resource, (GetResourceAmountFromInventory(requiredResourceId), requirement.Amount));
+                AddModifiersToSet(_mainModifiers, resource.MaterialType?.Modifiers ?? []);
+            }
+            return resourcesInInventory;
+        }
+
+        private void OnResourceAdded(ICraftingResource resource)
+        {
+            AddModifiersToSet(_optionalModifiers, resource.MaterialType?.Modifiers ?? []);
+            _craftingUI?.ShowModifiers(ConcatModifierSets());
+        }
+
+        private void OnResourceRemoved(ICraftingResource resource)
+        {
+            RemoveModifiersFromSet(_optionalModifiers, resource.MaterialType?.Modifiers ?? []);
+            _craftingUI?.ShowModifiers(ConcatModifierSets());
+        }
+
+        private void AddModifiersToSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
+        {
+            foreach (var modifier in modifiers)
+            {
+                if (set.Contains(modifier)) continue;
+                set.Add(modifier);
+            }
+        }
+
+        private void RemoveModifiersFromSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
+        {
+            foreach (var modifier in modifiers)
+            {
+                set.Remove(modifier);
+            }
         }
     }
 }

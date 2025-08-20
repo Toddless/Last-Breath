@@ -3,13 +3,14 @@
 [ext_resource type="Script" uid="uid://bp7l7o48j0r6h" path="res://Source/UIElements/OptionalResource.cs" id="1_ib3ki"]
 
 [node name="OptionalResource" type="Panel" node_paths=PackedStringArray("_add", "_remove", "_container")]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+custom_minimum_size = Vector2(0, 58)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 script = ExtResource("1_ib3ki")
 _add = NodePath("HBoxContainer/Buttons/Add")
 _remove = NodePath("HBoxContainer/Buttons/Remove")
@@ -25,16 +26,23 @@ grow_vertical = 2
 
 [node name="Template" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
 
 [node name="Buttons" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 10
+size_flags_stretch_ratio = 0.0
 
 [node name="Add" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(35, 0)
 layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
 text = "+"
 
 [node name="Remove" type="Button" parent="HBoxContainer/Buttons"]
+custom_minimum_size = Vector2(35, 0)
 layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
 text = "-
 "

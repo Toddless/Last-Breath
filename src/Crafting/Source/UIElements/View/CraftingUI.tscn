@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://Source/UIElements/CraftingUI.cs" id="1_ykvyl"]
 
-[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional")]
+[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional", "_create")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,6 +13,7 @@ _recipeTree = NodePath("HBoxContainer/Panel/MarginContainer/RecipeTree")
 _possibleModifiersList = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers/ItemList")
 _main = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2/ScrollContainer/HBoxContainer")
 _optional = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer/Resources")
+_create = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer/Panel/Button")
 metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -45,6 +46,7 @@ theme_override_constants/margin_bottom = 25
 
 [node name="RecipeTree" type="Tree" parent="HBoxContainer/Panel/MarginContainer"]
 layout_mode = 2
+focus_mode = 0
 hide_root = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
@@ -74,6 +76,21 @@ size_flags_stretch_ratio = 0.4
 [node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = -8.0
+offset_right = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+focus_mode = 0
+text = "Create"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
@@ -148,6 +165,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 focus_mode = 0
+allow_search = false
 
 [node name="Panel2" type="Panel" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Crafting;
     using Godot;
 
@@ -30,6 +31,15 @@
             _items?.AddItem(resource.DisplayName, resource.Icon, selectable);
         }
 
+        public override void _ExitTree()
+        {
+            if (_add != null) _add.Pressed -= OnAddPressed;
+            if (_cancel != null) _cancel.Pressed -= OnCancelPressed;
+            _resources.Clear();
+            _onCancel = null;
+            _onSelect = null;
+        }
+
         private void OnCancelPressed() => _onCancel?.Invoke();
 
         private void OnAddPressed()
@@ -37,16 +47,10 @@
             if (_items == null) return;
             var selected = _items.GetSelectedItems();
             if (selected.Length == 0) return;
-
             var idx = selected[0];
-
             if (idx < 0 || idx >= _resources.Count) return;
 
-            var resource = _resources[idx];
-
-            if (_items.IsItemDisabled(idx)) return;
-
-            _onSelect?.Invoke(resource);
+            _onSelect?.Invoke(_resources[idx]);
         }
 
         public void Setup(IEnumerable<ICraftingResource> resources,
@@ -63,22 +67,13 @@
             UpdateDisabled(disabledResources);
         }
 
-
         private void UpdateDisabled(IEnumerable<ICraftingResource> disabled)
         {
             for (int i = 0; i < _resources.Count; i++)
-                _items?.SetItemDisabled(i, false);
-
-
-            foreach (var dis in disabled)
             {
-                for (int i = 0; i < _resources.Count; i++)
+                if (disabled.Contains(_resources[i]))
                 {
-                    if (_resources[i].Id == dis.Id)
-                    {
-                        _items?.SetItemDisabled(i, true);
-                        break;
-                    }
+                    _items?.SetItemDisabled(i, true);
                 }
             }
         }

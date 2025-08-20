@@ -1,20 +1,17 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Crafting;
     using Godot;
 
     public partial class CraftingUI : Panel
     {
-        private readonly HashSet<IMaterialModifier> _mainModifiers = [];
-        private readonly HashSet<IMaterialModifier> _optionalModifiers = [];
+        private List<OptionalResource> _optionalResources = [];
         [Export] private Tree? _recipeTree;
         [Export] private ItemList? _possibleModifiersList;
         [Export] private VBoxContainer? _main, _optional;
-        private Action? _removeModifiersFromCacheCallBack;
+        [Export] private Button? _create;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ItemCreatedEventHandler();
@@ -22,48 +19,43 @@
         public override void _Ready()
         {
             _recipeTree?.Clear();
-            if (_recipeTree != null)
+            if (_recipeTree != null) _recipeTree.ItemSelected += OnItemSelected;
+            if (_create != null)
             {
-                _recipeTree.ItemSelected += OnItemSelected;
+                _create.Disabled = true;
+                _create.Visible = false;
+                _create.Pressed += () => EmitSignal(SignalName.ItemCreated);
+            }
+            
+        }
+
+        public void AddOptionalResource(OptionalResource optional)
+        {
+            _optional?.AddChild(optional);
+            _optionalResources.Add(optional);
+        }
+
+        public void ConsumeOptionalResource() => _optionalResources.ForEach(x => x.ConsumeResource());
+
+        public void ClearOptionalResources()
+        {
+            foreach (var opt in _optionalResources)
+            {
+                if (opt.CanClear()) opt.RemoveCraftingResource();
             }
         }
 
-        public void AddOptionalResource(OptionalResource optional) => _optional?.AddChild(optional);
-
-        public void OnResourceAdded(ICraftingResource resource)
+        public void ClearPossibleModifiers() => _possibleModifiersList?.Clear();
+        public void ShowRecipe(IReadOnlyDictionary<ICraftingResource, (int have, int need)> resources)
         {
-            AddModifiersToSet(_optionalModifiers, resource.MaterialType?.Modifiers ?? []);
-            UpdateModifiers();
-        }
-
-        public void OnResourceRemoved(ICraftingResource resource)
-        {
-            RemoveModifiersFromSet(_optionalModifiers, resource.MaterialType?.Modifiers ?? []);
-            UpdateModifiers();
-        }
-
-        public void ShowRecipe(ICraftingRecipe recipe, IReadOnlyDictionary<ICraftingResource, int> mainRes)
-        {
-            _removeModifiersFromCacheCallBack?.Invoke();
-            _removeModifiersFromCacheCallBack = null;
-            _possibleModifiersList?.Clear();
             ClearResources(_main);
-            foreach (var item in mainRes)
+            foreach (var resource in resources)
             {
                 var template = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-                template.SetText(item.Key.DisplayName, recipe.MainResource.Find(x => x.CraftingResourceId == item.Key.Id)?.Amount ?? 0, item.Value);
-                if (item.Key.Icon != null)
-                    template.SetIcon(item.Key.Icon);
+                template.SetText(resource.Key.DisplayName, resource.Value.have, resource.Value.need);
+                if (resource.Key.Icon != null) template.SetIcon(resource.Key.Icon);
                 _main?.AddChild(template);
-                AddModifiersToSet(_mainModifiers,item.Key.MaterialType?.Modifiers ?? []);
             }
-
-            _removeModifiersFromCacheCallBack = () =>
-            {
-                foreach (var res in mainRes.Keys)
-                    RemoveModifiersFromSet(_mainModifiers, res.MaterialType?.Modifiers ?? []);
-            };
-            UpdateModifiers();
         }
 
         public void CreatingRecipeTree(IReadOnlyDictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>>? recipes)
@@ -93,10 +85,19 @@
 
         public void DestroingRecipeTree() => _recipeTree?.Clear();
 
+        public void SetCreateButtonState(bool canUse)
+        {
+            if (_create != null)
+            {
+                _create.Disabled = !canUse;
+                _create.Visible = canUse;
+            }
+        }
+
         private void ClearResources(VBoxContainer? container)
         {
-            foreach (var chil in container?.GetChildren() ?? [])
-                chil.QueueFree();
+            foreach (var child in container?.GetChildren() ?? [])
+                child.QueueFree();
         }
 
         private void OnItemSelected()
@@ -106,31 +107,13 @@
             EmitSignal(SignalName.RecipeSelected, selected.GetMetadata(0));
         }
 
-        private void AddModifiersToSet(HashSet<IMaterialModifier> set ,IReadOnlyList<IMaterialModifier> modifiers)
+        public void ShowModifiers(HashSet<IMaterialModifier> modifiers)
         {
+            _possibleModifiersList?.Clear();
             foreach (var modifier in modifiers)
             {
-                if (set.Contains(modifier)) continue;
-                set.Add(modifier);
-            }
-        }
-
-        private void RemoveModifiersFromSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
-        {
-            foreach (var modifier in modifiers)
-            {
-                set.Remove(modifier);
-            }
-        }
-
-        private void UpdateModifiers()
-        {
-            if (_possibleModifiersList == null) return;
-            _possibleModifiersList.Clear();
-            var modifiers = _mainModifiers.Concat(_optionalModifiers).ToHashSet();
-            foreach (var modifier in modifiers)
-            {
-                _possibleModifiersList!.AddItem($"{modifier.Parameter} : {modifier.Value}");
+                // TODO: Localization, formatting
+                _possibleModifiersList?.AddItem($"{modifier.Parameter} : {modifier.Value}");
             }
         }
     }
