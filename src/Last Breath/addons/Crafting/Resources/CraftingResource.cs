@@ -42,12 +42,13 @@
         public int Quantity { get; set; } = 1;
 
         public List<string> GetItemStatsAsStrings() => [];
-        public IItem Copy(bool subresources = false) => Clone(subresources);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
-        ICraftingResource ICraftingResource.Copy(bool subresources) => Clone(subresources);
+        public T Copy<T>(bool subresources = false)
+        {
+            var duplicate = (ICraftingResource)Duplicate(subresources);
+            return (T)duplicate;
+        }
 
-        private CraftingResource Clone(bool subresources)
-        => (CraftingResource)Duplicate(subresources);
         private string GetLocalizedName() => TranslationServer.Translate(Id);
         private string GetLocalizedDescription() => TranslationServer.Translate(Id + "_Description");
     }

@@ -2,10 +2,12 @@
 {
     using Godot;
 
-    public class ItemMediaData
+    [Tool]
+    [GlobalClass]
+    public partial class ItemMediaData : Resource
     {
-        public Texture2D? IconTexture { get; set; }
-        public Texture2D? FullTexture { get; set; }
-        public AudioStream? Sound { get; set; }
+        [Export] public Texture2D? IconTexture { get; set; }
+        [Export] public Texture2D? FullTexture { get; set; }
+        [Export] public AudioStream? Sound { get; set; }
     }
 }

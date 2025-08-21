@@ -1,10 +1,9 @@
 ﻿namespace Core.Interfaces.Data
 {
-    public interface IItemDataProvider<T, U>
+    public interface IItemDataProvider<T>
         where T : class
-        where U : class
     {
         public void LoadData();
-        T GetItemData(U item);
+        T GetItemData(string id);
     }
 }

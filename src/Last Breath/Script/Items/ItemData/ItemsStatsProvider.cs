@@ -3,16 +3,16 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using Core.Enums;
+    using System.Linq;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Items;
     using Godot;
     using Newtonsoft.Json;
 
     // TODO: this class need more attention
-    public class ItemsStatsProvider : IItemDataProvider<ItemStats, IEquipItem>
+    public class ItemsStatsProvider : IItemDataProvider<ItemStats>
     {
-        private readonly Dictionary<EquipmentPart, Dictionary<string, ItemStats>> _itemData = [];
+        private const string PathToData = "res://Data/Jsons/";
+        private Dictionary<string, ItemStats> _itemStatsData = [];
 
         public void LoadData()
         {
@@ -30,15 +30,9 @@
             LoadItemData();
         }
 
-        public ItemStats GetItemData(IEquipItem item)
+        public ItemStats GetItemData(string id)
         {
-            if (!_itemData.TryGetValue(item.EquipmentPart, out var dict))
-            {
-                // TODO: Log
-                dict = [];
-            }
-
-            if (!dict.TryGetValue(item.Id, out var stats))
+            if (!_itemStatsData.TryGetValue(id, out var stats))
             {
                 // TODO: Log
                 stats = new ItemStats();
@@ -48,12 +42,28 @@
 
         private void LoadItemData()
         {
-            foreach (var type in Enum.GetValues<EquipmentPart>())
+            using var dir = DirAccess.Open(PathToData);
+            if(dir == null)
             {
-                var json = ItemsDataPaths.GetDataFromJsonFile(ItemDataFolder.Jsons, $"{type}.json");
-                if (string.IsNullOrEmpty(json)) continue;
-                var result = DeserializeData(json);
-                _itemData.Add(type, result);
+                // TODO : log
+                return;
+            }
+            dir.ListDirBegin();
+            try
+            {
+                string file;
+                while((file = dir.GetNext())!= "")
+                {
+                    if (!file.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) continue;
+                    var fullPath = Path.Combine(PathToData, file);
+                    var data = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
+                    var dict = DeserializeData(data);
+                    _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(x => x.Key, x => x.Value);
+                }
+            }
+            finally
+            {
+                dir.ListDirEnd();
             }
         }
 

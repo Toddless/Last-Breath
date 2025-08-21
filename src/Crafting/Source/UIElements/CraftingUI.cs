@@ -41,7 +41,11 @@
         {
             foreach (var opt in _optionalResources)
             {
-                if (opt.CanClear()) opt.RemoveCraftingResource();
+                if (opt.CanClear())
+                {
+                    GD.Print("Resource ready to clear");
+                    opt.RemoveCraftingResource();
+                }
             }
         }
 

@@ -16,6 +16,6 @@
 
 
         bool HasTag(string id);
-        ICraftingResource Copy(bool subresources = false);
+        T Copy<T>(bool subresources = false);
     }
 }

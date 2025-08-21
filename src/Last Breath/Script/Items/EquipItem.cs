@@ -85,12 +85,12 @@
 
         protected override void LoadData()
         {
-            var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats, IEquipItem>>()?.GetItemData(this);
+            var itemStats = DiContainer.GetService<IItemDataProvider<ItemStats>>()?.GetItemData(Id);
             if (itemStats != null)
             {
                 BaseMods = ModifiersCreator.ItemStatsToModifier(itemStats, this);
             }
-            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData, IEquipItem>>()?.GetItemData(this);
+            var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(Id);
             if (mediaData != null)
             {
                 Icon = mediaData.IconTexture;

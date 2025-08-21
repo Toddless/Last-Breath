@@ -17,7 +17,7 @@
         [Signal] public delegate void AddPressedEventHandler();
         [Signal] public delegate void RemovePressedEventHandler();
 
-        public event Action<ICraftingResource>? ResourceAdded, ResourceRemoved;
+        public event Action<ICraftingResource>? ResourceRemoved;
 
         public override void _Ready()
         {
@@ -38,7 +38,6 @@
                 templ.SetText(displayName, amountHave, amountNeed);
             };
             _container?.AddChild(templ);
-            ResourceAdded?.Invoke(_resource);
             _amountHave = amountHave;
         }
 

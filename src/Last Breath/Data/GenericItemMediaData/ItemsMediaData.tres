@@ -1,0 +1,69 @@
+[gd_resource type="Resource" script_class="GenericItemsMediaData" load_steps=17 format=3 uid="uid://diuawde0vbkyw"]
+
+[ext_resource type="Script" uid="uid://d82usjq22ohe" path="res://Script/Items/ItemData/ItemMediaData.cs" id="1_y57x4"]
+[ext_resource type="Script" uid="uid://cnwulcg2s3lvh" path="res://Script/Items/ItemData/GenericItemsMediaData.cs" id="2_qfgif"]
+
+[sub_resource type="Gradient" id="Gradient_y57x4"]
+colors = PackedColorArray(0.873497, 0.31262, 0.385587, 1, 1, 0, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_qfgif"]
+gradient = SubResource("Gradient_y57x4")
+
+[sub_resource type="Resource" id="Resource_snrr3"]
+script = ExtResource("1_y57x4")
+IconTexture = SubResource("GradientTexture1D_qfgif")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[sub_resource type="Gradient" id="Gradient_snrr3"]
+colors = PackedColorArray(0.160966, 0.12383, 0.319761, 1, 0.924396, 0.402631, 0.76616, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5hrkr"]
+gradient = SubResource("Gradient_snrr3")
+
+[sub_resource type="Resource" id="Resource_5hrkr"]
+script = ExtResource("1_y57x4")
+IconTexture = SubResource("GradientTexture1D_5hrkr")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[sub_resource type="Resource" id="Resource_qfgif"]
+script = ExtResource("1_y57x4")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[sub_resource type="Resource" id="Resource_y57x4"]
+script = ExtResource("1_y57x4")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[sub_resource type="Gradient" id="Gradient_qfgif"]
+offsets = PackedFloat32Array(0, 0.50219, 1)
+colors = PackedColorArray(0.304201, 0.396208, 0.80612, 1, 0.158884, 0.0740359, 0.963771, 1, 0.12549, 0, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_snrr3"]
+gradient = SubResource("Gradient_qfgif")
+
+[sub_resource type="Resource" id="Resource_11uqc"]
+script = ExtResource("1_y57x4")
+IconTexture = SubResource("GradientTexture1D_snrr3")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[sub_resource type="Gradient" id="Gradient_5hrkr"]
+colors = PackedColorArray(1, 0, 0.941176, 1, 1, 0.0392157, 0.0862745, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_11uqc"]
+gradient = SubResource("Gradient_5hrkr")
+
+[sub_resource type="Resource" id="Resource_fawk6"]
+script = ExtResource("1_y57x4")
+IconTexture = SubResource("GradientTexture1D_11uqc")
+metadata/_custom_type_script = "uid://d82usjq22ohe"
+
+[resource]
+script = ExtResource("2_qfgif")
+ItemMediaData = Dictionary[String, ExtResource("1_y57x4")]({
+"Amulet_Epic": SubResource("Resource_snrr3"),
+"Amulet_Legendary": SubResource("Resource_5hrkr"),
+"Amulet_Rare": SubResource("Resource_qfgif"),
+"Amulet_Uncommon": SubResource("Resource_y57x4"),
+"Belt_Rare": SubResource("Resource_11uqc"),
+"BodyArmor_Dexterity_Epic": SubResource("Resource_fawk6")
+})
+metadata/_custom_type_script = "uid://cnwulcg2s3lvh"

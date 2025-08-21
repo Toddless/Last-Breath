@@ -16,6 +16,6 @@
         List<string> GetItemStatsAsStrings();
 
         bool HasTag(string tag);
-        IItem Copy(bool subresources = false);
+        T Copy<T>(bool subresources = false);
     }
 }

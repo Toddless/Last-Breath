@@ -7,14 +7,14 @@
     using Core.Interfaces.Crafting;
     using Godot;
 
-    public class RecipeManager
+    public class CraftingRecipeProvider
     {
         private readonly string _pathToRecipes;
         private Dictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>> _recipes;
 
         public IReadOnlyDictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>> Recipes => _recipes;
 
-        public RecipeManager(string pathToRecipes)
+        public CraftingRecipeProvider(string pathToRecipes)
         {
             _pathToRecipes = pathToRecipes;
             _recipes = Enum.GetValues<EquipmentPart>().ToDictionary(key => key, _ => new Dictionary<string, ICraftingRecipe>());

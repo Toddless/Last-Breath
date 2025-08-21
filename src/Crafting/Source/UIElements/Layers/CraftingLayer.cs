@@ -15,8 +15,9 @@ namespace Crafting.Source.UIElements.Layers
 
         private readonly List<ICraftingResource> _takenOptionalResources = [];
         private ICraftingRecipe? _currentSelectedRecipe;
-        private ResourceManager? _resourceManager;
-        private RecipeManager? _recipeManager;
+        private CraftingResourceProvider? _resourceManager;
+        private CraftingRecipeProvider? _recipeManager;
+        private ItemProvider? _itemProvider;
         private Inventory? _craftingInventory;
         [Export] private CraftingUI? _craftingUI;
 
@@ -24,8 +25,10 @@ namespace Crafting.Source.UIElements.Layers
         {
             _resourceManager = new("res://TestResources/RecipeAndResources/Resources/");
             _recipeManager = new("res://TestResources/RecipeAndResources/Recipes/");
+            _itemProvider = new("res://TestResources/RecipeAndResources/Items/");
             _recipeManager.InitializeRecipes();
             _resourceManager.InitializeResources();
+            _itemProvider.Initialize();
             _craftingInventory = new Inventory();
             _craftingInventory.Initialize(30);
             using (var rnd = new RandomNumberGenerator())

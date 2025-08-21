@@ -56,7 +56,12 @@
 
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];
-        public IItem Copy(bool subresources = false) => (IItem)Duplicate(subresources);
+        public T Copy<T>(bool subresources = false)
+        {
+            var duplicate = (IItem)Duplicate(subresources);
+            return (T)duplicate;
+        }
+
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         protected virtual void LoadData()
         {

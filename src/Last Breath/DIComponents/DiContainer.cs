@@ -59,13 +59,13 @@
                 instance.ValidateTable();
                 return instance;
             });
-            provider.AddSingleton<IItemDataProvider<ItemStats, IEquipItem>>(service =>
+            provider.AddSingleton<IItemDataProvider<ItemStats>>(service =>
             {
                 var instance = new ItemsStatsProvider();
                 instance.LoadData();
                 return instance;
             });
-            provider.AddSingleton<IItemDataProvider<ItemMediaData, IEquipItem>>(service =>
+            provider.AddSingleton<IItemDataProvider<ItemMediaData>>(service =>
             {
                 var instance = new ItemsMediaProvider();
                 instance.LoadData();
