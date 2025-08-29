@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://Source/UIElements/CraftingUI.cs" id="1_ykvyl"]
 
-[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional", "_create")]
+[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional", "_create", "_iconRect", "_itemBaseStatsContainer", "_itemName")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -11,9 +11,12 @@ grow_vertical = 2
 script = ExtResource("1_ykvyl")
 _recipeTree = NodePath("HBoxContainer/Panel/MarginContainer/RecipeTree")
 _possibleModifiersList = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers/ItemList")
-_main = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2/ScrollContainer/HBoxContainer")
-_optional = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer/Resources")
-_create = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer/Panel/Button")
+_main = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources/HBoxContainer2/ScrollContainer/HBoxContainer")
+_optional = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/Optional/VBoxContainer/Resources")
+_create = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Button")
+_iconRect = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/HBoxContainer/TextureRect")
+_itemBaseStatsContainer = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer")
+_itemName = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/Label")
 metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -68,40 +71,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.4
+size_flags_stretch_ratio = 0.8
 
-[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/HBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -4.0
-offset_top = -8.0
-offset_right = 4.0
-grow_horizontal = 2
-grow_vertical = 0
-focus_mode = 0
-text = "Create"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MainResources" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+size_flags_stretch_ratio = 0.9
 
-[node name="HBoxContainer2" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -109,27 +91,108 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Item name"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.7
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/HBoxContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+expand_mode = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/HBoxContainer"]
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/HBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+
+[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.25
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Description"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 8
+focus_mode = 0
+disabled = true
+text = "Create"
+
+[node name="CraftingResources" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.7
+
+[node name="MainResources" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Main resources"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources/HBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/MainResources/HBoxContainer2/ScrollContainer"]
+[node name="HBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources/HBoxContainer2/ScrollContainer"]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Optional" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer"]
+[node name="Optional" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/Optional"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -137,13 +200,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/Optional/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Optional resources"
 
-[node name="Resources" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer/Optional/VBoxContainer"]
+[node name="Resources" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/Optional/VBoxContainer"]
 clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -152,7 +215,7 @@ theme_override_constants/separation = 1
 [node name="Modifiers" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.4
+size_flags_stretch_ratio = 0.65
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers"]
 layout_mode = 2

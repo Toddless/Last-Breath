@@ -11,6 +11,8 @@
         public EquipmentPart EquipmentPart { get; }
         public AttributeType AttributeType { get; }
 
+        void SetBaseModifiers(IEnumerable<IModifier> modifiers);
+        void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
         void OnUnequip();
     }
 }

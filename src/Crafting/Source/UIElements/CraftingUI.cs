@@ -5,13 +5,16 @@
     using Core.Interfaces.Crafting;
     using Godot;
 
-    public partial class CraftingUI : Panel
+    public partial class CraftingUI : Control
     {
         private List<OptionalResource> _optionalResources = [];
         [Export] private Tree? _recipeTree;
         [Export] private ItemList? _possibleModifiersList;
         [Export] private VBoxContainer? _main, _optional;
         [Export] private Button? _create;
+        [Export] private TextureRect? _iconRect;
+        [Export] private VBoxContainer? _itemBaseStatsContainer;
+        [Export] private Label? _itemName;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ItemCreatedEventHandler();
@@ -23,42 +26,7 @@
             if (_create != null)
             {
                 _create.Disabled = true;
-                _create.Visible = false;
                 _create.Pressed += () => EmitSignal(SignalName.ItemCreated);
-            }
-            
-        }
-
-        public void AddOptionalResource(OptionalResource optional)
-        {
-            _optional?.AddChild(optional);
-            _optionalResources.Add(optional);
-        }
-
-        public void ConsumeOptionalResource() => _optionalResources.ForEach(x => x.ConsumeResource());
-
-        public void ClearOptionalResources()
-        {
-            foreach (var opt in _optionalResources)
-            {
-                if (opt.CanClear())
-                {
-                    GD.Print("Resource ready to clear");
-                    opt.RemoveCraftingResource();
-                }
-            }
-        }
-
-        public void ClearPossibleModifiers() => _possibleModifiersList?.Clear();
-        public void ShowRecipe(IReadOnlyDictionary<ICraftingResource, (int have, int need)> resources)
-        {
-            ClearResources(_main);
-            foreach (var resource in resources)
-            {
-                var template = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-                template.SetText(resource.Key.DisplayName, resource.Value.have, resource.Value.need);
-                if (resource.Key.Icon != null) template.SetIcon(resource.Key.Icon);
-                _main?.AddChild(template);
             }
         }
 
@@ -87,21 +55,72 @@
             }
         }
 
-        public void DestroingRecipeTree() => _recipeTree?.Clear();
-
-        public void SetCreateButtonState(bool canUse)
+        public void AddOptionalResource(OptionalResource optional)
         {
-            if (_create != null)
+            _optional?.AddChild(optional);
+            _optionalResources.Add(optional);
+        }
+        public void AddBaseStatLabel(Label label) => _itemBaseStatsContainer?.AddChild(label);
+
+        public void ConsumeOptionalResource() => _optionalResources.ForEach(x => x.ConsumeResource());
+
+        public void ShowRecipe(IEnumerable<ResourceTemplateUI> resources)
+        {
+            // TODO: Remember weights
+            ClearResources(_main);
+            foreach (var resource in resources)
+                _main?.AddChild(resource);
+        }
+
+        public void ShowModifiers(IEnumerable<string> formatted)
+        {
+            _possibleModifiersList?.Clear();
+            foreach (var text in formatted)
             {
-                _create.Disabled = !canUse;
-                _create.Visible = canUse;
+                // TODO: Localization, formatting
+                _possibleModifiersList?.AddItem(text);
             }
         }
 
+
+        public void SetCreateButtonState(bool canUse)
+        {
+            if (_create != null) _create.Disabled = !canUse;
+        }
+
+        public void SetItemIcon(Texture2D icon)
+        {
+            if (_iconRect != null) _iconRect.Texture = icon;
+        }
+
+        public void ClearUI()
+        {
+            ClearResources(_main);
+            ClearOptionalResources();
+            ClearItemIcon();
+            DestroyRecipeTree();
+            _possibleModifiersList?.Clear();
+        }
+
+        public void ClearOptionalResources()
+        {
+            foreach (var opt in _optionalResources)
+                if (opt.CanClear()) opt.RemoveCraftingResource();
+        }
+
+        public void ClearPossibleModifiers() => _possibleModifiersList?.Clear();
+
+        public void ClearItemIcon()
+        {
+            if (_iconRect != null) _iconRect.Texture = default;
+        }
+
+        public void DestroyRecipeTree() => _recipeTree?.Clear();
+
         private void ClearResources(VBoxContainer? container)
         {
-            foreach (var child in container?.GetChildren() ?? [])
-                child.QueueFree();
+            foreach (var child in container?.GetChildren() ?? []) child.QueueFree();
+            foreach (var text in _itemBaseStatsContainer?.GetChildren() ?? []) text.QueueFree();
         }
 
         private void OnItemSelected()
@@ -109,16 +128,6 @@
             var selected = _recipeTree?.GetSelected();
             if (selected == null) return;
             EmitSignal(SignalName.RecipeSelected, selected.GetMetadata(0));
-        }
-
-        public void ShowModifiers(HashSet<IMaterialModifier> modifiers)
-        {
-            _possibleModifiersList?.Clear();
-            foreach (var modifier in modifiers)
-            {
-                // TODO: Localization, formatting
-                _possibleModifiersList?.AddItem($"{modifier.Parameter} : {modifier.Value}");
-            }
         }
     }
 }

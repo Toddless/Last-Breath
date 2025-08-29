@@ -11,7 +11,7 @@
 
         #region Weak or Regular Essences
         public int Movespeed { get; set; } = 0;
-        public int CritDamage { get; set; } = 0;
+        public int CriticalDamage { get; set; } = 0;
         public float Health { get; set; } = 0;
         public float Armor { get; set; } = 0;
         public float Suppress { get; set; } = 0;
@@ -19,7 +19,7 @@
         public float SpellDamage { get; set; } = 0;
         public float Resource { get; set; } = 0;
         public float ResourceRecovery { get; set; } = 0;
-        public float CritChance { get; set; } = 0;
+        public float CriticalChance { get; set; } = 0;
         public float Damage { get; set; } = 0;
         public float Evade { get; set; } = 0;
         public float AdditionalHitChance { get; set; } = 0;

@@ -25,7 +25,6 @@
         [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
         [Export] public Texture2D? Icon { get; set; }
         [Export] public Texture2D? FullImage { get; set; }
-        [Export] public int Quantity { get; set; } = 1;
         [Export] public int MaxStackSize { get; set; } = 1;
         [Export] public string[] Tags = [];
 
@@ -33,6 +32,25 @@
 
         public string Description => GetLocalizedDescription();
 
+        public Item()
+        {
+
+        }
+
+        public Item(string id,
+            Rarity rarity,
+            Texture2D icon,
+            Texture2D fullImage,
+            int maxStackSize,
+            string[] tags)
+        {
+            Id = id;
+            Rarity = rarity;
+            Icon = icon;
+            FullImage = fullImage;
+            MaxStackSize = maxStackSize;
+            Tags = tags;
+        }
 
         public bool Equals(Item other)
         {
@@ -40,7 +58,7 @@
             {
                 return false;
             }
-            return DisplayName.Equals(other.DisplayName) && Quantity == other.Quantity;
+            return Id.Equals(other.Id) && MaxStackSize == other.MaxStackSize;
         }
 
         public override bool Equals(object? obj)
@@ -52,7 +70,7 @@
             return Equals((Item)obj);
         }
 
-        public override int GetHashCode() => HashCode.Combine(DisplayName, Quantity);
+        public override int GetHashCode() => HashCode.Combine(Id);
 
         // TODO: Format strings
         public virtual List<string> GetItemStatsAsStrings() => [];

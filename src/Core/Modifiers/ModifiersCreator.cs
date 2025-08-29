@@ -17,7 +17,7 @@
             ["Suppress"] = new(Parameter.Suppress, ModifierType.Flat),
             ["Resource"] = new(Parameter.ResourceMax, ModifierType.Flat),
             ["ResourceRecovery"] = new(Parameter.ResourceRecovery, ModifierType.Flat),
-            ["CritDamage"] = new(Parameter.CriticalDamage, ModifierType.Flat),
+            ["CriticalDamage"] = new(Parameter.CriticalDamage, ModifierType.Flat),
             ["Dexterity"] = new(Parameter.Dexterity, ModifierType.Flat),
             ["Strength"] = new(Parameter.Strength, ModifierType.Flat),
             ["Intelligence"] = new(Parameter.Intelligence, ModifierType.Flat),
@@ -28,7 +28,7 @@
             ["SpellDamage"] = new(Parameter.SpellDamage, ModifierType.Flat),
             ["Damage"] = new(Parameter.Damage, ModifierType.Flat),
             ["Health"] = new(Parameter.MaxHealth, ModifierType.Flat),
-            ["CritChance"] = new(Parameter.CriticalChance, ModifierType.Flat),
+            ["CriticalChance"] = new(Parameter.CriticalChance, ModifierType.Flat),
             ["Evade"] = new(Parameter.Evade, ModifierType.Flat),
             ["ArmorPercent"] = new(Parameter.Armor, ModifierType.Increase),
             ["EvadePercent"] = new(Parameter.Evade, ModifierType.Increase),
@@ -71,7 +71,7 @@
             return modifiers;
         }
 
-        public static IModifier CreateModifier(Parameter parameter, ModifierType modifierType, float value, object source, int priority)
+        public static IModifier CreateModifier(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
         {
             return parameter switch
             {

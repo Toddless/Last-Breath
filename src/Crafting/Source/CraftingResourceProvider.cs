@@ -1,6 +1,5 @@
 ﻿namespace Crafting.Source
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using Core.Interfaces.Crafting;
@@ -16,9 +15,6 @@
             _pathToResources = pathToResources;
         }
 
-        public void AddResource(ICraftingResource resource) => _resources.Add(resource.Id, resource);
-
-        // last ref here
         public ICraftingResource? GetResource(string resourceId)
         {
             if (_resources.TryGetValue(resourceId, out var res))
@@ -27,8 +23,6 @@
         }
 
         public IEnumerable<ICraftingResource> GetAllResources() => [.. _resources.Values];
-
-        public bool HasResource(string id) => _resources.ContainsKey(id);
 
         public void InitializeResources()
         {

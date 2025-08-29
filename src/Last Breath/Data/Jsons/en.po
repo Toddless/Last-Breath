@@ -1,0 +1,153 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+# ------------------------------
+# Parameters
+# ------------------------------
+
+#. Player damage stat
+msgid "Damage"
+msgstr "Damage"
+
+#. Player critical chance
+msgid "CriticalChance"
+msgstr "Critical Hit Chance"
+
+#. Maximum possible critical chance
+msgid "MaxCriticalChance"
+msgstr "Max. Critical Hit Chance"
+
+#. Critical damage multiplier
+msgid "CriticalDamage"
+msgstr "Critical Damage Multiplier"
+
+#. Additional hit chance
+msgid "AdditionalHitChance"
+msgstr "Additional Hit Chance"
+
+#. Maximum additional hit chance
+msgid "MaxAdditionalHitChance"
+msgstr "Max. Additional Hit Chance"
+
+#. Current health value
+msgid "CurrentHealth"
+msgstr "Current Health"
+
+#. Maximum health
+msgid "MaxHealth"
+msgstr "Max. Health"
+
+#. Dexterity attribute
+msgid "Dexterity"
+msgstr "Dexterity"
+
+#. Strength attribute
+msgid "Strength"
+msgstr "Strength"
+
+#. Intelligence attribute
+msgid "Intelligence"
+msgstr "Intelligence"
+
+#. Armor stat
+msgid "Armor"
+msgstr "Armor"
+
+#. Evasion stat
+msgid "Evade"
+msgstr "Evade"
+
+#. Magical barrier
+msgid "EnergyBarrier"
+msgstr "Energy Barrier"
+
+#. Spell damage stat
+msgid "SpellDamage"
+msgstr "Spell Damage"
+
+#. Maximum resource (mana, energy etc.)
+msgid "ResourceMax"
+msgstr "Max. Resource"
+
+#. Resource recovery per turn
+msgid "ResourceRecovery"
+msgstr "Resource Recovery"
+
+#. Maximum damage reduction cap
+msgid "MaxReduceDamage"
+msgstr "Max. Damage Reduction"
+
+#. Movement speed
+msgid "Movespeed"
+msgstr "Movespeed"
+
+#. Maximum evade chance
+msgid "MaxEvadeChance"
+msgstr "Max. Evade Chance"
+
+#. Suppression stat
+msgid "Suppress"
+msgstr "Suppress"
+
+#. All attributes (universal modifier)
+msgid "AllAttribute"
+msgstr "All Attributes"
+
+# ------------------------------
+# Modifier Types
+# ------------------------------
+
+#. Flat modifier: +300 HP, +15 Def, etc.
+msgid "Flat"
+msgstr "Flat"
+
+#. Increase modifier: percent values like 0.1, 0.3
+msgid "Increase"
+msgstr "Increase"
+
+#. Multiplicative modifier: values like 1.3, 1.1
+msgid "Multiplicative"
+msgstr "Multiplicative"
+
+# ------------------------------
+# Modifier Format String
+# ------------------------------
+
+#. Template for showing modifiers: {0} = parameter, {1} = value
+msgid "modifier.format"
+msgstr "{0}: {1}"
+
+# -----------------------------
+# Item stats
+# -----------------------------
+
+# Extra Health
+msgid "ExtraHealth"
+msgstr "Extra Health"
+
+# Extra Armor
+msgid "ExtraArmor"
+msgstr "Extra Armor"
+
+# Extra Energy Barrier
+msgid "ExtraEnergyBarrier"
+msgstr "Extra Energy Barrier"
+
+# Extra Evade
+msgid "ExtraEvade"
+msgstr "Extra Evade"
+
+# Extra Damage
+msgid "ExtraDamage"
+msgstr "Extra Damage"
+
+# Extra Suppress
+msgid "ExtraSuppress"
+msgstr "Extra Suppress"
+
+# Extra Spell Damage
+msgid "ExtraSpellDamage"
+msgstr "Extra Spell Damage"

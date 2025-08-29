@@ -14,15 +14,15 @@
         [Export] private Button? _add, _remove;
         [Export] private HBoxContainer? _container;
         private Action<string, int>? _resourceConsumed;
+
         [Signal] public delegate void AddPressedEventHandler();
-        [Signal] public delegate void RemovePressedEventHandler();
 
         public event Action<ICraftingResource>? ResourceRemoved;
 
         public override void _Ready()
         {
-            _add!.Pressed += () => EmitSignal(SignalName.AddPressed);
-            _remove!.Pressed += RemoveCraftingResource;
+            if (_add != null) _add.Pressed += OnAddPressed;
+            if (_remove != null) _remove.Pressed += RemoveCraftingResource;
         }
 
         public void AddCraftingResource(ICraftingResource resource, int amountHave, int amountNeed = 1)
@@ -66,5 +66,14 @@
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        public override void _ExitTree()
+        {
+            if (Engine.IsEditorHint()) return;
+            if (_add != null) _add.Pressed -= OnAddPressed;
+            if (_remove != null) _remove.Pressed -= RemoveCraftingResource;
+        }
+
+        private void OnAddPressed() => EmitSignal(SignalName.AddPressed);
     }
 }

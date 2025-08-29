@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://iif75nev2q13" path="res://Source/UIElements/View/CraftingUI.tscn" id="2_0bxqo"]
 
 [node name="CraftingLayer" type="CanvasLayer" node_paths=PackedStringArray("_craftingUI")]
+visible = false
 script = ExtResource("1_g0b00")
 _craftingUI = NodePath("CraftingUI")
 

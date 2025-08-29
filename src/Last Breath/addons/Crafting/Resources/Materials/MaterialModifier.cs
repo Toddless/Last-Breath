@@ -11,5 +11,8 @@
         [Export] public Parameter Parameter { get; set; }
         [Export] public ModifierType ModifierType { get; set; }
         [Export] public float Value { get; set; }
+        [Export] public float Weight { get; set; }
+
+        public bool IsSame(IMaterialModifier other) => Parameter == other.Parameter && ModifierType == other.ModifierType && Value == other.Value;
     }
 }

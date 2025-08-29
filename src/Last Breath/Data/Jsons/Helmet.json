@@ -27,12 +27,12 @@
 	"Helmet_Dexterity_Epic": {
 		"Health": 100.0,
 		"Evade": 200.0,
-		"CritChance": 0.1
+		"CriticalChance": 0.1
 	},
 	"Helmet_Dexterity_Legendary": {
 		"Health": 100.0,
 		"Evade": 200.0,
-		"CritChance": 0.1,
+		"CriticalChance": 0.1,
 		"AdditionalHitChance": 0.3
 	},
 	"Helmet_Intelligence_Uncommon": {

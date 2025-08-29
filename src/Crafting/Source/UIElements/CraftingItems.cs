@@ -19,8 +19,8 @@
 
         public override void _Ready()
         {
-            _add.Pressed += OnAddPressed;
-            _cancel.Pressed += OnCancelPressed;
+            if (_add != null) _add.Pressed += OnAddPressed;
+            if (_cancel != null) _cancel.Pressed += OnCancelPressed;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -33,6 +33,7 @@
 
         public override void _ExitTree()
         {
+            if (Engine.IsEditorHint()) return;
             if (_add != null) _add.Pressed -= OnAddPressed;
             if (_cancel != null) _cancel.Pressed -= OnCancelPressed;
             _resources.Clear();

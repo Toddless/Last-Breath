@@ -66,9 +66,9 @@
                 // TODO Log
                 return;
             }
-            BaseCriticalChance = Mathf.Max(0, Rnd.RandfRange(From, To) * data.CritChance);
+            BaseCriticalChance = Mathf.Max(0, Rnd.RandfRange(From, To) * data.CriticalChance);
             BaseAdditionalHitChance = Mathf.Max(0, Rnd.RandfRange(From, To) * data.AdditionalHitChance);
-            BaseCritDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.CritDamage));
+            BaseCritDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.CriticalDamage));
             BaseDamage = Mathf.Max(0, Mathf.RoundToInt(Rnd.RandfRange(From, To) * data.Damage));
 
             var mediaData = DiContainer.GetService<IItemDataProvider<ItemMediaData>>()?.GetItemData(Id);

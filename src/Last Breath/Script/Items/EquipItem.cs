@@ -39,7 +39,7 @@
         /// <param name="rarity"></param>
         /// <param name="equipmentPart"></param>
         /// <param name="type"></param>
-        public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type)
+        public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type) 
         {
             Rarity = rarity;
             EquipmentPart = equipmentPart;
@@ -115,5 +115,7 @@
             }
         }
 
+        public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
+        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
     }
 }

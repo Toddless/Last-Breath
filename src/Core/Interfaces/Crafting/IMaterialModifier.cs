@@ -4,8 +4,11 @@
 
     public interface IMaterialModifier
     {
-        ModifierType ModifierType { get; set; }
-        Parameter Parameter { get; set; }
-        float Value { get; set; }
+        ModifierType ModifierType { get; }
+        Parameter Parameter { get; }
+        float Value { get; }
+        float Weight { get; }
+
+        bool IsSame(IMaterialModifier other);
     }
 }

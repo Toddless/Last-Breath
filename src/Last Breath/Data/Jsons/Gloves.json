@@ -9,13 +9,13 @@
 	"Gloves_Dexterity_Epic": {
 		"Health": 450,
 		"Evade": 400,
-		"CritChance": 0.5
+		"CriticalChance": 0.5
 	},
 	"Gloves_Dexterity_Legendary": {
 		"Health": 450,
 		"Evade": 600,
-		"CritChance": 0.8,
-		"CritDamage": 15
+		"CriticalChance": 0.8,
+		"CriticalDamage": 15
 	},
 	"Gloves_Strength_Uncommon": {
 		"Health": 200
@@ -55,6 +55,6 @@
 	},
 	"Test_Item":{
 		 "Health": 450,
-		 "CritChance": 0.5
+		 "CriticalChance": 0.5
 	}
 }

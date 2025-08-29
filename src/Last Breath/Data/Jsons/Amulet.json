@@ -15,6 +15,6 @@
 		"Resource": 15,
 		"ResourceRecovery": 120,
 		"AllAttribute": 15,
-		"CritChance": 0.1
+		"CriticalChance": 0.1
 	}
 }

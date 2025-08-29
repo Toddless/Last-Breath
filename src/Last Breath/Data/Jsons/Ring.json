@@ -33,7 +33,7 @@
 		"Dexterity": 15,
 		"Evade": 120,
 		"AdditionalHitChance": 0.04,
-		"CritDamage": 20
+		"CriticalDamage": 20
 	},
 	"Ring_Intelligence_Uncommon": {
 		"Intelligence": 5
