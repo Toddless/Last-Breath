@@ -2,8 +2,9 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Skills;
     using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
 
     public abstract class BaseSkillModule(ICharacter owner, SkillType type, DecoratorPriority priority) : ISkillModule
     {

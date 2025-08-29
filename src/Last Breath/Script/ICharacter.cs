@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Interfaces.Skills;
     using LastBreath.Components;
-    using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;
 
     public interface ICharacter

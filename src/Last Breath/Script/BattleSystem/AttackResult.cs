@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
-    using LastBreath.Script.Abilities.Interfaces;
+    using Core.Interfaces.Skills;
 
     public class AttackResult(List<ISkill> skills, AttackResults result, AttackContext context)
     {

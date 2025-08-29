@@ -1,7 +1,5 @@
 ﻿namespace LastBreath.Script.Items
 {
-    using System.Collections.Generic;
-    using System.Text;
     using Core.Enums;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
@@ -35,18 +33,6 @@
         {
             UpgradeLevel++;
             UpdateItem();
-        }
-
-        public override List<string> GetItemStatsAsStrings()
-        {
-            List<string> list = [];
-            StringBuilder sb = new();
-            sb.AppendLine($"Critical Chance: {Mathf.RoundToInt(BaseCriticalChance * 10)}%");
-            sb.AppendLine($"Critical Damage: {BaseCritDamage}%");
-            sb.AppendLine($"Additional Hit Chance: {Mathf.RoundToInt(BaseAdditionalHitChance * 10)}%");
-            sb.AppendLine($"Damage: {BaseDamage}");
-            list.Add(sb.ToString());
-            return list;
         }
 
         protected override void UpdateItem()

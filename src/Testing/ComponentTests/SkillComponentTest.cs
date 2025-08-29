@@ -1,6 +1,7 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
     using Core.Enums;
+    using Core.Interfaces.Skills;
     using LastBreath.Components;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;

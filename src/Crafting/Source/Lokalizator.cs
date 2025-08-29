@@ -22,7 +22,6 @@
                     return s_modifierFormatter.FormatMaterialModifier(material);
                 case var _ when obj is IModifier modifier:
                     return s_modifierFormatter.FormatModifier(modifier);
-
                 default:
                     break;
             }
@@ -31,8 +30,6 @@
         }
 
         public static string FormatItemStats(string prop, float value) => s_modifierFormatter.FormatItemStats(prop, value); 
-
-
-        private static string Lokalize(string id) => TranslationServer.Translate(id);
+        public static string Lokalize(string id) => TranslationServer.Translate(id);
     }
 }

@@ -12,6 +12,10 @@ msgstr ""
 msgid "Damage"
 msgstr "Урон"
 
+#. Player health stat
+msgid "Health"
+msgstr "Здоровье"
+
 #. Player critical chance
 msgid "CriticalChance"
 msgstr "Шанс критического удара"

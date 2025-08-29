@@ -25,14 +25,16 @@
 
         protected void OnMouseEnter()
         {
-            if (CurrentItem == null || CurrentItem.GetItemStatsAsStrings().Count < 1) return;
-            var description = ItemDescription.InitializeAsPackedScene().Instantiate<ItemDescription>();
-            description.GlobalPosition = GetGlobalMousePosition() + new Vector2(50, 10);
-            description.SetStats(CurrentItem.GetItemStatsAsStrings());
-            description.SetItemImage(CurrentItem.FullImage);
-            description.SetItemDescription(CurrentItem.Description);
-            GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(Node.MethodName.AddChild, description);
-            ItemDescription = description;
+            // TODO: Rework this later
+            //if (CurrentItem == null) return;
+            //var description = ItemDescription.InitializeAsPackedScene().Instantiate<ItemDescription>();
+            //description.GlobalPosition = GetGlobalMousePosition() + new Vector2(50, 10);
+
+            //description.SetStats([]);
+            //description.SetItemImage(CurrentItem.FullImage);
+            //description.SetItemDescription(CurrentItem.Description);
+            //GetTree().Root.GetNode<CanvasLayer>(MainLayer).CallDeferred(Node.MethodName.AddChild, description);
+            //ItemDescription = description;
         }
     }
 }

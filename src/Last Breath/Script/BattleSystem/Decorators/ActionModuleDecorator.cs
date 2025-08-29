@@ -2,8 +2,9 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Battle.Module;
     using LastBreath.Script;
-    using LastBreath.Script.BattleSystem.Module;
 
     public abstract class ActionModuleDecorator : IActionModule<ICharacter>, IModuleDecorator<ActionModule, IActionModule<ICharacter>>
     {

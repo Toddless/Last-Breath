@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.BattleSystem.Decorators
+﻿namespace Core.Interfaces.Battle.Decorator
 {
     using Core.Enums;
 

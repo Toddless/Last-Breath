@@ -4,6 +4,7 @@ namespace LastBreath
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Skills;
     using Core.Modifiers;
     using Godot;
     using LastBreath.Components;

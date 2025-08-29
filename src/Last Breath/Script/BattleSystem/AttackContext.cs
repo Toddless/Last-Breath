@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Interfaces.Skills;
     using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
 
     public class AttackContext(ICharacter attaker, ICharacter target)
     {

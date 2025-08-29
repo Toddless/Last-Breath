@@ -17,6 +17,7 @@
     using Core.Enums;
     using Core.Modifiers;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Skills;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

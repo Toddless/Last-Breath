@@ -11,13 +11,14 @@
         [Export] private Tree? _recipeTree;
         [Export] private ItemList? _possibleModifiersList;
         [Export] private VBoxContainer? _main, _optional;
-        [Export] private Button? _create;
+        [Export] private Button? _create, _changeLanguage;
         [Export] private TextureRect? _iconRect;
         [Export] private VBoxContainer? _itemBaseStatsContainer;
-        [Export] private Label? _itemName;
+        [Export] private RichTextLabel? _description;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ItemCreatedEventHandler();
+        [Signal] public delegate void ChangeLanguageEventHandler();
 
         public override void _Ready()
         {
@@ -27,6 +28,11 @@
             {
                 _create.Disabled = true;
                 _create.Pressed += () => EmitSignal(SignalName.ItemCreated);
+            }
+
+            if (_changeLanguage != null)
+            {
+                _changeLanguage.Pressed += () => EmitSignal(SignalName.ChangeLanguage);
             }
         }
 
@@ -48,8 +54,8 @@
                 foreach (var res in part.Value)
                 {
                     var recipe = _recipeTree.CreateItem(category);
-                    recipe.SetText(0, res.Value.Name);
-                    recipe.SetMetadata(0, res.Value.Id);
+                    recipe.SetText(0, Lokalizator.Lokalize(res.Key));
+                    recipe.SetMetadata(0, res.Key);
                     recipe.SetSelectable(0, true);
                 }
             }
@@ -76,12 +82,13 @@
         {
             _possibleModifiersList?.Clear();
             foreach (var text in formatted)
-            {
-                // TODO: Localization, formatting
                 _possibleModifiersList?.AddItem(text);
-            }
         }
 
+        public void SetItemDescription(string text)
+        {
+            if (_description != null) _description.Text = text;
+        }
 
         public void SetCreateButtonState(bool canUse)
         {
@@ -100,6 +107,7 @@
             ClearItemIcon();
             DestroyRecipeTree();
             _possibleModifiersList?.Clear();
+            ClearDescription();
         }
 
         public void ClearOptionalResources()
@@ -109,6 +117,11 @@
         }
 
         public void ClearPossibleModifiers() => _possibleModifiersList?.Clear();
+
+        public void ClearDescription()
+        {
+            if(_description != null) _description.Text = string.Empty;
+        }
 
         public void ClearItemIcon()
         {

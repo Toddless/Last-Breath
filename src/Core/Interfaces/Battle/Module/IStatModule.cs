@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.BattleSystem.Module
+﻿namespace Core.Interfaces.Battle.Module
 {
     using Core.Enums;
 

@@ -1,7 +1,6 @@
 ﻿namespace LastBreath.Script.Items
 {
     using System;
-    using System.Collections.Generic;
     using Godot;
     using Core.Enums;
     using Core.Interfaces.Items;
@@ -72,8 +71,6 @@
 
         public override int GetHashCode() => HashCode.Combine(Id);
 
-        // TODO: Format strings
-        public virtual List<string> GetItemStatsAsStrings() => [];
         public T Copy<T>(bool subresources = false)
         {
             var duplicate = (IItem)Duplicate(subresources);

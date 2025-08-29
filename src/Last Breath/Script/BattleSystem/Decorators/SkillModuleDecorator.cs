@@ -3,8 +3,9 @@
     using System;
     using System.Collections.Generic;
     using Core.Enums;
-    using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.BattleSystem.Module;
+    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Skills;
 
     public abstract class SkillModuleDecorator : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {

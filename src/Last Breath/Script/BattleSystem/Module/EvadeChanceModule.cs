@@ -1,6 +1,7 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Core.Enums;
+    using Core.Interfaces.Battle.Module;
     using Godot;
 
     public class EvadeChanceModule : IStatModule

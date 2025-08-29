@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using LastBreath.Script.Items.ItemData;
     using LastBreath.Script.Abilities.Interfaces;
+    using Core.Interfaces.Skills;
 
     [Tool]
     [GlobalClass]
@@ -25,6 +26,7 @@
         public ICharacter? Owner { get; private set; }
         public IReadOnlyList<IModifier> BaseModifiers => BaseMods;
         public IReadOnlyList<IModifier> AdditionalModifiers => AdditionalMods;
+        public ISkill? Skill { get; private set; }
 
         /// <summary>
         /// Default constructor to instantiate this from Resource
@@ -39,11 +41,12 @@
         /// <param name="rarity"></param>
         /// <param name="equipmentPart"></param>
         /// <param name="type"></param>
-        public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type) 
+        public EquipItem(Rarity rarity, EquipmentPart equipmentPart, AttributeType type, ISkill? skill = default) 
         {
             Rarity = rarity;
             EquipmentPart = equipmentPart;
             AttributeType = type;
+            Skill = skill;
             SetId();
         }
 
@@ -62,22 +65,6 @@
                 Effects.ForEach(Owner.Effects.RemoveEffect);
                 Owner = null;
             }
-        }
-
-        public override List<string> GetItemStatsAsStrings()
-        {
-            List<string> stats = [];
-            foreach (var modifier in BaseMods)
-            {
-                stats.Add($"{modifier.Parameter} : {modifier.Value}");
-            }
-
-            foreach (var modifier in AdditionalMods)
-            {
-                stats.Add($"{modifier.Parameter} : {modifier.Value}");
-            }
-
-            return stats;
         }
 
         public virtual void UpgradeItemLevel() { }
@@ -115,7 +102,13 @@
             }
         }
 
-        public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
-        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
+        public void SetBaseModifiers(IEnumerable<IModifier> modifiers)
+        {
+
+        }
+        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers)
+        {
+
+        }
     }
 }

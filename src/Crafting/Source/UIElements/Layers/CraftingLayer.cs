@@ -51,6 +51,7 @@
             {
                 _craftingUI.RecipeSelected += OnRecipeSelected;
                 _craftingUI.ItemCreated += OnItemCreatePressed;
+                _craftingUI.ChangeLanguage += OnLaguageChanged;
             }
 
             for (int i = 0; i < 3; i++)
@@ -62,6 +63,13 @@
             }
             Hide();
 
+        }
+
+        private void OnLaguageChanged()
+        {
+            var currentLang = TranslationServer.GetLocale();
+            if (currentLang == "en_GB") TranslationServer.SetLocale("ru");
+            else TranslationServer.SetLocale("en_GB");
         }
 
         public override void _Input(InputEvent @event)
@@ -191,12 +199,14 @@
         {
             // TODO: remember about generic items. they have special icon,
             // usual items have no optional resources, have no modifiers
+            var itemId = _currentSelectedRecipe?.ResultItemId ?? string.Empty;
             var templates = CreateResourceTemplates(_currentSelectedRecipe?.MainResource ?? []);
-            var icon = _dataProvider?.GetItemImage(_currentSelectedRecipe?.ResultItemId ?? string.Empty);
+            var icon = _dataProvider?.GetItemImage(itemId);
             _craftingUI?.ShowRecipe(templates.Keys);
             _craftingUI?.ShowModifiers(FormattedModifiers());
             ShowItemStats();
             if (icon != null) _craftingUI?.SetItemIcon(icon);
+            _craftingUI?.SetItemDescription(Lokalizator.Lokalize(itemId + "_Description"));
             var allResourcesEnough = templates.Values.All(x => x.have >= x.need);
             if (templates.Count == 0) allResourcesEnough = false;
             _craftingUI?.SetCreateButtonState(allResourcesEnough);

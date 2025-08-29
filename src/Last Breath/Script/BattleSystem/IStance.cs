@@ -4,9 +4,9 @@
     using LastBreath.Components.Interfaces;
     using LastBreath.Script;
     using LastBreath.Components;
-    using LastBreath.Script.BattleSystem.Module;
     using LastBreath.Script.BattleSystem.Decorators;
     using Core.Enums;
+    using Core.Interfaces.Battle.Module;
 
     public interface IStance
     {

@@ -1,6 +1,5 @@
 ﻿namespace Core.Interfaces.Items
 {
-    using System.Collections.Generic;
     using Core.Enums;
     using Godot;
 
@@ -13,8 +12,6 @@
         Rarity Rarity { get; }
         string Description { get; }
         string DisplayName { get; }
-        List<string> GetItemStatsAsStrings();
-
         bool HasTag(string tag);
         T Copy<T>(bool subresources = false);
     }

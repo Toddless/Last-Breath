@@ -4,7 +4,6 @@
     using Godot;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Localization;
     using Core.Enums;
 
     [GlobalClass]
@@ -15,10 +14,6 @@
         public string Id => _id.Value;
         public SkillType Type => SkillType.OnAttack;
         public bool IsEvadable => false;
-
-        [Export] public LocalizedString? Description { get; set; }
-
-        [Export] public Texture2D? Icon { get; set; }
 
         public ExecutionSkill()
         {

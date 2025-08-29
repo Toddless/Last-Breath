@@ -2,7 +2,8 @@
 {
     using System;
     using Core.Enums;
-    using LastBreath.Script.BattleSystem.Module;
+    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Battle.Module;
 
     public abstract class StatModuleDecorator : IStatModule, IModuleDecorator<StatModule, IStatModule>
     {

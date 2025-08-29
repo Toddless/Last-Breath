@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Skills;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Components.Interfaces;

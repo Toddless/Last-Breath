@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using LastBreath.Script.BattleSystem.Decorators;
+    using Core.Interfaces.Battle.Decorator;
 
     public class ModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull
