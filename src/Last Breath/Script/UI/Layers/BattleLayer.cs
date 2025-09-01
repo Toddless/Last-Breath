@@ -8,6 +8,7 @@
     using LastBreath.Script.ScenesHandlers;
     using LastBreath.Script.BattleSystem;
     using Core.Enums;
+    using Utilities;
 
     public partial class BattleLayer : CanvasLayer
     {
@@ -34,9 +35,14 @@
 
         private void SetupEvents()
         {
-            if (_battleHandler == null || _battleUI == null)
+            if (_battleHandler == null )
             {
-                // TODO: Log
+                Logger.LogNull(nameof(_battleHandler), this);
+                return;
+            }
+            if(_battleUI == null)
+            {
+                Logger.LogNull(nameof(_battleUI), this);
                 return;
             }
 

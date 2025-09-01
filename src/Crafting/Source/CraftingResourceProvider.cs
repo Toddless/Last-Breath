@@ -4,6 +4,7 @@
     using System.IO;
     using Core.Interfaces.Crafting;
     using Godot;
+    using Utilities;
 
     public class CraftingResourceProvider
     {
@@ -17,9 +18,12 @@
 
         public ICraftingResource? GetResource(string resourceId)
         {
-            if (_resources.TryGetValue(resourceId, out var res))
-                return res.Copy<ICraftingResource>(true);
-            return null;
+            if (!_resources.TryGetValue(resourceId, out var res))
+            {
+                Logger.LogNotFound(resourceId, this);
+                return null;
+            }
+            return res.Copy<ICraftingResource>(true);
         }
 
         public IEnumerable<ICraftingResource> GetAllResources() => [.. _resources.Values];

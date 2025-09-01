@@ -13,6 +13,7 @@
     using Core.Enums;
     using Core.Interfaces.Items;
     using Core.Interfaces.Inventory;
+    using Utilities;
 
     public partial class MainLayer : CanvasLayer
     {
@@ -208,14 +209,14 @@
         {
             if (_playerInventory == null)
             {
-                // TODO: Log
+                Logger.LogNull(nameof(_playerInventory),this);
                 return;
             }
 
             var equipSlot = _playerInventory.GetEquipmentSlot(item.EquipmentPart);
             if (equipSlot == null)
             {
-                // TODO Log
+                Logger.LogError($"Inventory has no slot for {item.EquipmentPart}", this);
                 return;
             }
 

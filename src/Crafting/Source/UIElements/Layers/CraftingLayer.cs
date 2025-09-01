@@ -63,7 +63,6 @@
                 _craftingUI?.AddOptionalResource(opt);
             }
             Hide();
-            Logger.LogInfo("Testing logger. Info is saved");
         }
 
         private void OnLaguageChanged()
@@ -86,7 +85,11 @@
         private void OnItemCreatePressed()
         {
             // we should have all data at this point, but just in case
-            if (_currentSelectedRecipe == null) return;
+            if (_currentSelectedRecipe == null)
+            {
+                Logger.LogNull(nameof(_currentSelectedRecipe), this);
+                return;
+            }
 
             // What if i need to create item instead of EquipItem??
             CreateItem(_currentSelectedRecipe);

@@ -7,6 +7,7 @@
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Godot;
+    using Utilities;
 
     public class Inventory : IInventory
     {
@@ -37,7 +38,7 @@
             var slot = GetSlotToAdd(item);
             if (slot == null)
             {
-                // TODO: Log
+                Logger.LogInfo("Cannot find slot without item", this);
                 InventoryFull?.Invoke();
                 return;
             }
@@ -63,9 +64,14 @@
         {
             var slot = GetSlotToRemove(itemId);
 
-            if (slot == null || slot.CurrentItem == null)
+            if (slot == null)
             {
-                // TODO: Log
+                Logger.LogNull(itemId, this);
+                return;
+            }
+            if (slot.CurrentItem == null)
+            {
+                Logger.LogNull($"Slot with item: {itemId} was found, but item", this);
                 return;
             }
 

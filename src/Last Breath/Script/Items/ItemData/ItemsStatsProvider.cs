@@ -7,6 +7,7 @@
     using Core.Interfaces.Data;
     using Godot;
     using Newtonsoft.Json;
+    using Utilities;
 
     // TODO: this class need more attention
     public class ItemsStatsProvider : IItemDataProvider<ItemStats>
@@ -34,7 +35,7 @@
         {
             if (!_itemStatsData.TryGetValue(id, out var stats))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 stats = new ItemStats();
             }
             return stats;
@@ -45,7 +46,7 @@
             using var dir = DirAccess.Open(PathToData);
             if(dir == null)
             {
-                // TODO : log
+                Logger.LogError($"Cannot open directory. Path: {PathToData}", this);
                 return;
             }
             dir.ListDirBegin();
@@ -60,7 +61,11 @@
                     var dict = DeserializeData(data);
                     _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(x => x.Key, x => x.Value);
                 }
+            }catch(Exception ex)
+            {
+                Logger.LogException("Failed to load data", ex, this);
             }
+
             finally
             {
                 dir.ListDirEnd();

@@ -4,6 +4,7 @@
     using Core.Interfaces.Data;
     using Godot;
     using Godot.Collections;
+    using Utilities;
 
     public class ItemsMediaProvider : IItemDataProvider<ItemMediaData>
     {
@@ -24,9 +25,9 @@
 
         public ItemMediaData GetItemData(string id)
         {
-            if (!_mediaData.TryGetValue(id, out var data))
+            if (!_mediaData.TryGetValue(id, out ItemMediaData? data))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 return new();
             }
             return data;

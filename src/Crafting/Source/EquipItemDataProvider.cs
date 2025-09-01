@@ -8,6 +8,7 @@
     using Core.Interfaces.Items;
     using Godot;
     using Newtonsoft.Json;
+    using Utilities;
 
     public class EquipItemDataProvider
     {
@@ -28,7 +29,7 @@
         {
             if (!_itemData.TryGetValue(id, out var item))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 return null;
             }
             return item.Copy<IEquipItem>(true);
@@ -38,7 +39,7 @@
         {
             if (!_itemData.TryGetValue(id, out var item))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 return null;
             }
 
@@ -49,7 +50,7 @@
         {
             if (!_itemStatsData.TryGetValue(id, out var item))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 return [];
             }
             return ConvertItemStats(item);
@@ -59,7 +60,7 @@
         {
             if (!_itemStatsData.TryGetValue(id, out var data))
             {
-                // TODO: Log
+                Logger.LogNotFound(id, this);
                 data = new ItemStats();
             }
             return data;
@@ -79,7 +80,7 @@
             using var dir = DirAccess.Open(_pathToEquipItemData);
             if (dir == null)
             {
-                // TODO: log
+                Logger.LogNull(nameof(dir), this);
                 return;
             }
             dir.ListDirBegin();
@@ -95,6 +96,11 @@
                     var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(data);
                     if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
                 }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Data loading failed.", ex, this);
             }
             finally
             {

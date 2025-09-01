@@ -8,6 +8,7 @@
     using Core.Interfaces.Items;
     using Core.Modifiers;
     using Godot;
+    using Utilities;
 
     public class ItemCreator
     {
@@ -90,7 +91,7 @@
             var dataProvider = EquipItemDataProvider.Instance;
             if (dataProvider == null)
             {
-                // TODO: Log
+                Logger.LogNull(nameof(EquipItemDataProvider), this);
                 return null;
             }
 
@@ -98,7 +99,7 @@
 
             if (item == null)
             {
-                // TODO: Log
+                Logger.LogNull(itemId, this);
                 return null;
             }
 
@@ -134,7 +135,7 @@
                 amountModifiers--;
             }
             // TODO : Change to get random effect/ability
-          
+
             List<IModifier> mods = [];
             foreach (var mod in takenMods)
                 mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.Value, item));
@@ -147,7 +148,7 @@
 
         private void AddAnyNotTakenMod(HashSet<IMaterialModifier> takenMods, List<WeightedMaterialModifier> modifiers)
         {
-            // TODO: Log
+            Logger.LogInfo("Attemp limit was reached. Added first not taken modifier.", this);
             foreach (var mod in modifiers)
             {
                 if (!takenMods.Contains(mod.Modifier))

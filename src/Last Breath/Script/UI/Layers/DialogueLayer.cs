@@ -13,6 +13,7 @@
     using LastBreath.Script.QuestSystem;
     using LastBreath.Script.UI.View;
     using Stateless;
+    using Utilities;
 
     public partial class DialogueLayer : CanvasLayer
     {
@@ -251,7 +252,7 @@
             if (_speaking == null) return;
             if (!_speaking.CompletedQuests.Remove(questToHandle.Id))
             {
-                // TODO: Log
+                Logger.LogNotFound(questToHandle.Id, this);               
             }
             _questToHandle = null;
         }

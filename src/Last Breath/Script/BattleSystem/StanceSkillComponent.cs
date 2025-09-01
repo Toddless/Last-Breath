@@ -3,6 +3,7 @@
     using Core.Enums;
     using LastBreath.Components;
     using LastBreath.Script.Abilities.Interfaces;
+    using Utilities;
 
     public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>()
     {
@@ -12,7 +13,7 @@
         {
             if (skill.RequiredStance != _stance.StanceType)
             {
-                //TODO: Log
+                Logger.LogInfo($"Trying to add {skill.Id} to stance {_stance.StanceType}", this);
                 return;
             }
             base.AddSkill(skill);

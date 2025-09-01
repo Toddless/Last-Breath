@@ -4,6 +4,7 @@
     using Core.Enums;
     using Core.Interfaces.Crafting;
     using Godot;
+    using Utilities;
 
     public partial class CraftingUI : Control
     {
@@ -38,9 +39,15 @@
 
         public void CreatingRecipeTree(IReadOnlyDictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>>? recipes)
         {
-            if (_recipeTree == null || recipes == null)
+            if (_recipeTree == null)
             {
-                // TODO: Log
+                Logger.LogNull(nameof(_recipeTree), this);
+                return;
+            }
+
+            if (recipes == null)
+            {
+                Logger.LogNull(nameof(recipes), this);
                 return;
             }
             var treeRoot = _recipeTree.CreateItem();
@@ -120,7 +127,7 @@
 
         public void ClearDescription()
         {
-            if(_description != null) _description.Text = string.Empty;
+            if (_description != null) _description.Text = string.Empty;
         }
 
         public void ClearItemIcon()

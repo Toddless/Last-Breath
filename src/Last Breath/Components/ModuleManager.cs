@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces.Battle.Decorator;
+    using Utilities;
 
     public class ModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull
@@ -50,6 +51,7 @@
         {
             if (!_decorators.TryGetValue(decorator.SkillType, out var list))
             {
+                Logger.LogNotFound($"List for {decorator.SkillType}", this);
                 list = [];
                 _decorators[decorator.SkillType] = list;
             }
@@ -69,7 +71,7 @@
             // just in case
             if (!_decorators.TryGetValue(decorator.SkillType, out var decorators))
             {
-                // TODO: Log
+                Logger.LogNotFound("Trying to remove from non-existent list", this);
                 return;
             }
             if (decorators.Remove(decorator))

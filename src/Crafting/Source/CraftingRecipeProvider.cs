@@ -6,6 +6,7 @@
     using Core.Enums;
     using Core.Interfaces.Crafting;
     using Godot;
+    using Utilities;
 
     public class CraftingRecipeProvider
     {
@@ -28,16 +29,16 @@
                 if (dict.Value.TryGetValue(id, out var recipe))
                     return recipe;
             }
+            Logger.LogNotFound(id, this);
             return null;
         }
 
         public void InitializeRecipes()
         {
-            //bla bla bla, find all recipes in folder within given path
             using var dir = DirAccess.Open(_pathToRecipes);
             if (dir == null)
             {
-                GD.PrintErr($"Could not open folder '{_pathToRecipes}'");
+                Logger.LogNull(_pathToRecipes, this);
                 return;
             }
 
@@ -55,11 +56,14 @@
                     var recipe = ResourceLoader.Load<ICraftingRecipe>(path);
                     if (!TryAddrecipe(recipe))
                     {
-                        // TODO: log
-                        GD.Print($"Failed to add recipe: {recipe.Id}");
+                        Logger.LogError($"Failed to add recipe: {recipe.Id}", this);
                         continue;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Data loading failed.", ex, this);
             }
             finally
             {

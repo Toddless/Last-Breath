@@ -5,6 +5,7 @@
     using System.Linq;
     using Core.Enums;
     using Core.Modifiers;
+    using Utilities;
 
     public class ModifierManager
     {
@@ -66,14 +67,14 @@
         {
             if (!category.TryGetValue(newModifier.Parameter, out var list))
             {
-                //TODO: Log
+                Logger.LogNotFound($"List for {newModifier.Parameter}", this);
                 list = [];
                 category[newModifier.Parameter] = list;
             }
             var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.Type == newModifier.Type);
             if (existingModifier == null)
             {
-                // TODO: Log
+                Logger.LogNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.Type}", this);
                 list.Add(newModifier);
             }
             else
@@ -88,13 +89,14 @@
         {
             if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
             {
+                Logger.LogNotFound($"List for: {modifier.Parameter}", this);
                 list = [];
                 category[modifier.Parameter] = list;
             }
 
             if (list.Contains(modifier))
             {
-                //TODO: Log
+                Logger.LogError("Trying to add a modifier that already exists in the list", this);
             }
 
             list.Add(modifier);
@@ -106,7 +108,7 @@
         {
             if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
             {
-                // log
+                Logger.LogError("Trying to remove a modifier from non-existent list", this);
                 return;
             }
             list.Remove(modifier);

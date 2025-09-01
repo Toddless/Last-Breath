@@ -5,6 +5,7 @@
     using Core.Enums;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
+    using Utilities;
 
     public class EffectsManager(ICharacter owner)
     {
@@ -23,7 +24,7 @@
             var allEffects = GetCombinedEffects();
             if (!allEffects.Contains(effect))
             {
-                // TODO: log
+                Logger.LogError($"Trying to remove an effect that doesn't exist in the list.", this);
                 return;
             }
             effect.OnRemove(_owner);
@@ -52,7 +53,7 @@
 
         public void ClearAllTemporaryEffects() => _temporaryEffects.Clear();
 
-        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x=>x.Effect == effect);
+        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x => x.Effect == effect);
 
         private void AddEffects(IEffect effect, List<IEffect> list)
         {
