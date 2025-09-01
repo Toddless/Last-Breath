@@ -11,7 +11,6 @@
 
     public class ItemCreator
     {
-        // TODO: Modifier weights, handling same modifiers (parameter/value pairs)
         private record FilteredMaterialModifier(IMaterialModifier Modifier, float Weight);
         private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To);
         private float _maxWeight;
@@ -67,8 +66,7 @@
                 .GroupBy(mod => new { mod.ModifierType, mod.Parameter, mod.Value })
                 .Select(group =>
                 {
-                    var first = group.First();
-                    return new FilteredMaterialModifier(first, group.Sum(c => c.Weight));
+                    return new FilteredMaterialModifier(group.First(), group.Sum(c => c.Weight));
                 }).ToList();
         }
 
@@ -81,7 +79,6 @@
             {
                 currentMaxWeight += modifier.Weight;
                 weights.Add(new(modifier.Modifier, from, currentMaxWeight));
-                //    GD.Print($"Weight defined. From: {from}, To: {currentMaxWeight} for mode: {modifier.Modifier.Parameter}, {modifier.Modifier.ModifierType}, {modifier.Modifier.Value}");
                 from = currentMaxWeight;
             }
             _maxWeight = currentMaxWeight;
@@ -114,14 +111,19 @@
             using var rnd = new RandomNumberGenerator();
             rnd.Randomize();
             const int maxAttemps = 15;
+
             while (amountModifiers > 0)
             {
                 TakeMode(maxAttemps);
                 void TakeMode(int attemp)
                 {
+                    if (attemp <= 0)
+                    {
+                        AddAnyNotTakenMod(takenMods, modifiers);
+                        return;
+                    }
                     attemp--;
                     var rNumb = rnd.RandfRange(0, _maxWeight);
-                    // GD.Print($"Attemp: {attemp}, Number: {rNumb}");
                     var mod = modifiers.FirstOrDefault(x => rNumb >= x.From && rNumb <= x.To)?.Modifier;
                     if (mod != null)
                     {
@@ -131,14 +133,8 @@
                 }
                 amountModifiers--;
             }
-
             // TODO : Change to get random effect/ability
-
-
-            //foreach (var takenMod in takenMods)
-            //{
-            //    GD.Print($"Taken mod - Parameter: {takenMod.Parameter}, Type: {takenMod.Type}, Value: {takenMod.Value}");
-            //}
+          
             List<IModifier> mods = [];
             foreach (var mod in takenMods)
                 mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.Value, item));
@@ -147,6 +143,19 @@
 
             _maxWeight = 0;
             return item;
+        }
+
+        private void AddAnyNotTakenMod(HashSet<IMaterialModifier> takenMods, List<WeightedMaterialModifier> modifiers)
+        {
+            // TODO: Log
+            foreach (var mod in modifiers)
+            {
+                if (!takenMods.Contains(mod.Modifier))
+                {
+                    takenMods.Add(mod.Modifier);
+                    break;
+                }
+            }
         }
     }
 }

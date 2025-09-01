@@ -54,7 +54,7 @@
                 foreach (var res in part.Value)
                 {
                     var recipe = _recipeTree.CreateItem(category);
-                    recipe.SetText(0, Lokalizator.Lokalize(res.Key));
+                    recipe.SetText(0, Lokalizator.LokalizedName(res.Key));
                     recipe.SetMetadata(0, res.Key);
                     recipe.SetSelectable(0, true);
                 }

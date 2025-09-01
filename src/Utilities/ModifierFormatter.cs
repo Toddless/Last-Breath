@@ -1,4 +1,4 @@
-﻿namespace Core.Utility
+﻿namespace Utilities
 {
     using System;
     using Core.Enums;
@@ -7,16 +7,17 @@
 
     public class ModifierFormatter(Func<string, string> localize)
     {
+        // _localize here is public static string GetLokalizedName(string id) => TranslationServer.Translate(id); from lokalizator
         private readonly Func<string, string> _localize = localize;
 
         public string FormatMaterialModifier(IMaterialModifier modifier)
         {
-            return string.Format(GetTemplate(), _localize.Invoke($"{modifier.Parameter}"), GetValueStringModifierType(modifier.ModifierType, modifier.Value));
+            return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.ModifierType, modifier.Parameter)), GetValueStringModifierType(modifier.ModifierType, modifier.Value));
         }
 
         public string FormatModifier(IModifier modifier)
         {
-            return string.Format(GetTemplate(), _localize.Invoke($"{modifier.Parameter}"), GetValueStringModifierType(modifier.Type, modifier.Value));
+            return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.Type, modifier.Parameter)), GetValueStringModifierType(modifier.Type, modifier.Value));
         }
 
         public string FormatItemStats(string propertyName, float value)
@@ -31,7 +32,7 @@
             // Rework this later, if multiplier will be bigger than x4
             return true switch
             {
-                bool _ when value > 0 && value < 1 => FormatPercent(value),
+                bool _ when value < 1 => FormatPercent(value),
                 bool _ when value > 1 && value < 4 => FormatMultiplier(value),
                 bool _ when value > 5 => FormatFlat(value),
                 _ => FallbackFormat(value)
@@ -60,6 +61,26 @@
         {
             if (MathF.Abs(value) > 0 && MathF.Abs(value) < 1) return FormatPercent(value);
             return FormatFlat(value);
+        }
+
+        private string CombineParameterWithType(ModifierType type, Parameter parameter)
+        {
+            // TODO: should multiplicative be called "Extra"?
+            return type switch
+            {
+                ModifierType.Multiplicative => parameter switch
+                {
+                    Parameter.Damage => $"Extra{parameter}",
+                    Parameter.Armor => $"Extra{parameter}",
+                    Parameter.Evade => $"Extra{parameter}",
+                    Parameter.EnergyBarrier => $"Extra{parameter}",
+                    Parameter.Suppress => $"Extra{parameter}",
+                    Parameter.SpellDamage => $"Extra{parameter}",
+                    Parameter.MaxHealth => "ExtraHealth",
+                    _ => $"{parameter}"
+                },
+                _ => $"{parameter}"
+            };
         }
     }
 }

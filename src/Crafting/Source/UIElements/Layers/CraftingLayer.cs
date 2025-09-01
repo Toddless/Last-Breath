@@ -8,6 +8,7 @@
     using Core.Interfaces.Items;
     using Crafting.TestResources.Inventory;
     using Godot;
+    using Utilities;
 
     public partial class CraftingLayer : CanvasLayer
     {
@@ -62,7 +63,7 @@
                 _craftingUI?.AddOptionalResource(opt);
             }
             Hide();
-
+            Logger.LogInfo("Testing logger. Info is saved");
         }
 
         private void OnLaguageChanged()
@@ -206,7 +207,7 @@
             _craftingUI?.ShowModifiers(FormattedModifiers());
             ShowItemStats();
             if (icon != null) _craftingUI?.SetItemIcon(icon);
-            _craftingUI?.SetItemDescription(Lokalizator.Lokalize(itemId + "_Description"));
+            _craftingUI?.SetItemDescription(Lokalizator.LokalizeDescription(itemId));
             var allResourcesEnough = templates.Values.All(x => x.have >= x.need);
             if (templates.Count == 0) allResourcesEnough = false;
             _craftingUI?.SetCreateButtonState(allResourcesEnough);

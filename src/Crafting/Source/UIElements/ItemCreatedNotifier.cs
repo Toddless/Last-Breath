@@ -18,10 +18,15 @@
             if (_okButton != null) _okButton.Pressed += OnButtonPressed;
         }
 
-        private void OnButtonPressed()
+
+        public override void _Input(InputEvent @event)
         {
-            EmitSignal(SignalName.OkButtonPressed);
-            this.QueueFree();
+            if (@event.IsActionPressed("ui_accept"))
+            {
+                EmitSignal(SignalName.OkButtonPressed);
+                GetViewport().SetInputAsHandled();
+                QueueFree();
+            }
         }
 
         public void SetImage(Texture2D icon)
@@ -32,5 +37,12 @@
         public void SetText(Label label) => _statContainer?.AddChild(label);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void OnButtonPressed()
+        {
+            EmitSignal(SignalName.OkButtonPressed);
+            this.QueueFree();
+        }
+
     }
 }

@@ -1,0 +1,1 @@
+2025-09-01 09:52:48.102 +02:00 [INF] Testing logger. Info is saved
