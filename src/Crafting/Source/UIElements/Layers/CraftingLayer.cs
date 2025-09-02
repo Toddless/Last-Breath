@@ -1,14 +1,16 @@
 ﻿namespace Crafting.Source.UIElements.Layers
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Utilities;
     using System.Linq;
     using Core.Constants;
-    using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Inventory;
+    using System.Collections.Generic;
     using Crafting.TestResources.Inventory;
-    using Godot;
-    using Utilities;
+    using Core.Interfaces;
 
     public partial class CraftingLayer : CanvasLayer
     {
@@ -23,7 +25,8 @@
         private CraftingResourceProvider? _resourceManager;
         private CraftingRecipeProvider? _recipeManager;
         private ItemCreator? _itemCreator;
-        private Inventory? _craftingInventory;
+        private IInventory? _craftingInventory;
+        private ICharacter? _player;
         [Export] private CraftingUI? _craftingUI;
 
         public override void _Ready()
@@ -32,20 +35,17 @@
             _resourceManager = new("res://TestResources/RecipeAndResources/Resources/");
             _recipeManager = new("res://TestResources/RecipeAndResources/Recipes/");
             _dataProvider = new("res://TestResources/RecipeAndResources/Items/");
-            _craftingInventory = new Inventory();
+            var inventory = new Inventory();
+            inventory.Initialize(30);
+            _craftingInventory = inventory;
             _itemCreator = new ItemCreator();
             _dataProvider.LoadData();
             _recipeManager.InitializeRecipes();
             _resourceManager.InitializeResources();
-            _craftingInventory.Initialize(30);
             using (var rnd = new RandomNumberGenerator())
                 foreach (var resource in _resourceManager.GetAllResources())
-                {
-                    //var from = rnd.RandiRange(1, 15);
-                    //var to = rnd.RandiRange(15, 100);
-                    //var amount = rnd.RandiRange(from, to);
                     _craftingInventory.AddItem((IItem)resource, 100);
-                }
+
             // it is work only if we have separate inventories (for resources, equip, etc)
             VisibilityChanged += OnVisibilityChanges;
             if (_craftingUI != null)
@@ -63,13 +63,6 @@
                 _craftingUI?.AddOptionalResource(opt);
             }
             Hide();
-        }
-
-        private void OnLaguageChanged()
-        {
-            var currentLang = TranslationServer.GetLocale();
-            if (currentLang == "en_GB") TranslationServer.SetLocale("ru");
-            else TranslationServer.SetLocale("en_GB");
         }
 
         public override void _Input(InputEvent @event)
@@ -92,14 +85,17 @@
             }
 
             // What if i need to create item instead of EquipItem??
-            CreateItem(_currentSelectedRecipe);
+            if (!CreateItem(_currentSelectedRecipe))
+            {
+                // TODO: Raise event "Item creation failed"
+                return;
+            }
 
             ConsumeResourcesFromInventory();
-            ClearUI();
             ShowCurrentRecipe();
         }
 
-        private void CreateItem(ICraftingRecipe recipe)
+        private bool CreateItem(ICraftingRecipe recipe)
         {
             IItem? item = null;
             switch (true)
@@ -115,10 +111,23 @@
                     break;
             }
 
+            if (item == null)
+            {
+                Logger.LogError($"Failed to create item: {recipe.ResultItemId}. Recipe: {recipe.Id}", this);
+                return false;
+            }
+
             var notifier = ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
-            notifier.SetImage(item?.FullImage ?? item?.Icon!);
+            notifier.SetImage(item.FullImage ?? item.Icon);
+            // TODO: Should not be here
             if (item is IEquipItem equipItem)
             {
+                var baseStats = new Label
+                {
+                    Text = Lokalizator.Lokalize("BaseStats")
+                };
+                notifier.SetText(baseStats);
+
                 foreach (var baseStat in equipItem.BaseModifiers)
                 {
                     var label = new Label
@@ -130,7 +139,7 @@
 
                 var additional = new Label
                 {
-                    Text = $"Additional Stats"
+                    Text = Lokalizator.Lokalize("RandomStats")
                 };
                 notifier.SetText(additional);
 
@@ -144,7 +153,10 @@
                 }
             }
 
+            _player?.AddItemToInventory(item);
+
             CallDeferred(MethodName.AddChild, notifier);
+            return true;
         }
 
         private void ConsumeResourcesFromInventory()
@@ -159,44 +171,6 @@
             {
                 _craftingInventory?.RemoveItem(mainRes.CraftingResourceId, mainRes.Amount);
             }
-        }
-
-        private void ClearUI()
-        {
-            _craftingUI?.ClearOptionalResources();
-        }
-
-        private void OnAddPressed(OptionalResource opt)
-        {
-            var itemSlots = _craftingInventory?.GetAllItemSlotsWithTag(TagConstants.Essence);
-
-            var available = new List<ICraftingResource>();
-            foreach (var slot in itemSlots ?? [])
-            {
-                if (slot.CurrentItem is ICraftingResource resource)
-                    available.Add(resource);
-            }
-
-            var craftingItems = CraftingItems.Initialize().Instantiate<CraftingItems>();
-            craftingItems.Setup(available, _takenOptionalResources, selected =>
-            {
-                opt.AddCraftingResource(selected, GetResourceAmountFromInventory(selected.Id));
-                _takenOptionalResources.Add(selected);
-                OnResourceAdded(selected);
-                craftingItems.QueueFree();
-            },
-            craftingItems.QueueFree);
-            AddChild(craftingItems);
-        }
-
-        private void OnRecipeSelected(string id)
-        {
-            _mainModifiers.Clear();
-            _mainResources.Clear();
-            _craftingUI?.ClearItemIcon();
-            var recipe = _recipeManager?.GetRecipe(id);
-            _currentSelectedRecipe = recipe;
-            ShowCurrentRecipe();
         }
 
         private void ShowCurrentRecipe()
@@ -259,7 +233,7 @@
 
         private int GetResourceAmountFromInventory(string resourceId)
         {
-            var item = _craftingInventory?.GetItemSlotById(resourceId);
+            var item = _craftingInventory?.GetSlotWithItemOrNull(resourceId);
             if (item == null) return 0;
             return item.Quantity;
         }
@@ -279,6 +253,57 @@
             _craftingUI?.ShowModifiers(FormattedModifiers());
         }
 
+        private void OnAddPressed(OptionalResource opt)
+        {
+            var itemSlots = _craftingInventory?.GetAllSlotsWithItemsWithTag(TagConstants.Essence);
+
+            var available = new List<ICraftingResource>();
+            foreach (var slot in itemSlots ?? [])
+            {
+                if (slot.CurrentItem is ICraftingResource resource)
+                    available.Add(resource);
+            }
+
+            var craftingItems = CraftingItems.Initialize().Instantiate<CraftingItems>();
+            craftingItems.Setup(available, _takenOptionalResources, selected =>
+            {
+                opt.AddCraftingResource(selected, GetResourceAmountFromInventory(selected.Id));
+                _takenOptionalResources.Add(selected);
+                OnResourceAdded(selected);
+                craftingItems.QueueFree();
+            },
+            craftingItems.QueueFree);
+            AddChild(craftingItems);
+        }
+
+        private void OnLaguageChanged()
+        {
+            var currentLang = TranslationServer.GetLocale();
+            if (currentLang == "en_GB") TranslationServer.SetLocale("ru");
+            else TranslationServer.SetLocale("en_GB");
+        }
+
+        private void OnRecipeSelected(string id)
+        {
+            _mainModifiers.Clear();
+            _mainResources.Clear();
+            _craftingUI?.ClearItemIcon();
+            var recipe = _recipeManager?.GetRecipe(id);
+            _currentSelectedRecipe = recipe;
+            ShowCurrentRecipe();
+        }
+
+        private void OnVisibilityChanges()
+        {
+            if (Visible)
+                _craftingUI?.CreatingRecipeTree(_recipeManager?.Recipes);
+            else
+            {
+                _currentSelectedRecipe = null;
+                _craftingUI?.ClearUI();
+            }
+        }
+
         private void AddModifiersToSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
         {
             foreach (var modifier in modifiers)
@@ -294,14 +319,6 @@
             {
                 set.Remove(modifier);
             }
-        }
-
-        private void OnVisibilityChanges()
-        {
-            if (Visible)
-                _craftingUI?.CreatingRecipeTree(_recipeManager?.Recipes);
-            else
-                _craftingUI?.ClearUI();
         }
 
         private IEnumerable<string> FormattedModifiers()

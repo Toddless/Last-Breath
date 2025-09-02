@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Core.Interfaces;
+    using Core.Interfaces.Battle;
 
     public class BattleContext(List<ICharacter> opponents) : IBattleContext
     {

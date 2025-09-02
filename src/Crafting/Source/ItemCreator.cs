@@ -42,7 +42,7 @@
             // for creating basic items i need a new item provider
             return null;
         }
-
+    
         private Rarity GetRarity(byte idx)
         {
             var rarity = Enum.GetValues<Rarity>().GetValue(idx);
@@ -149,7 +149,6 @@
             }
 
             // TODO : Change to get random effect/ability
-
             var skill = GetRandomSkill();
             if (skill != null) item.SetSkill(skill);
 

@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.ScenesHandlers
+﻿namespace Core.Interfaces.Battle
 {
     using System.Collections.Generic;
     using Core.Interfaces;

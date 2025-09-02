@@ -7,6 +7,7 @@ namespace LastBreath
     using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
     using Core.Modifiers;
     using Godot;
@@ -253,6 +254,11 @@ namespace LastBreath
 
         public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
 
+        public void AddItemToInventory(IItem item)
+        {
+
+        }
+
         protected void SpawnItems()
         {
             // _inventory?.AddItem(LootTable?.GetRandomItem());
@@ -372,5 +378,6 @@ namespace LastBreath
         }
 
         private string SetId() => $"{NpcName}_{Fraction}";
+      
     }
 }

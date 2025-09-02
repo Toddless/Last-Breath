@@ -13,8 +13,9 @@
     {
         public event Action<IItem, MouseButtonPressed, IInventory>? ItemSlotClicked;
         public event Action? InventoryFull, NotEnougthItems;
+        public event Action<string, int>? ItemAmountChanges;
 
-        protected List<InventorySlot> Slots { get; } = [];
+        protected List<IInventorySlot> Slots { get; } = [];
 
         public void Initialize(int size, GridContainer container)
         {
@@ -28,12 +29,11 @@
         }
 
 
-        public IItem? GetItemById(string id)
-        {
-            return Slots.Find(x => x.CurrentItem?.Id == id)?.CurrentItem;
-        }
+        public IInventorySlot? GetSlotWithItemOrNull(string id) => Slots.FirstOrDefault(x => x.CurrentItem?.Id == id);
 
-        public void AddItem(IItem item)
+        public List<IInventorySlot> GetAllSlotsWithItemsWithTag(string tag) => Slots.FindAll(x => x.CurrentItem != null && x.CurrentItem.HasTag(tag));
+
+        public void AddItem(IItem item, int amount = 1)
         {
             var slot = GetSlotToAdd(item);
             if (slot == null)
@@ -46,17 +46,13 @@
 
             if (slot.CurrentItem != null)
             {
-                //int rest = slot.AddItemStacks(item.Quantity);
-                //if (rest > 0)
-                //{
-                //    var duplicate = item.Copy(true);
-                //    duplicate.Quantity = rest;
-                //    AddItem(duplicate);
-                //}
+                int rest = slot.AddItemStacks(amount);
+                if (rest > 0)
+                    AddItem(item, rest);
             }
             else
             {
-                slot.AddNewItem(item);
+                slot.AddNewItem(item, amount);
             }
         }
 
@@ -79,21 +75,16 @@
             {
                 NotEnougthItems?.Invoke();
             }
+            else
+            {
+                ItemAmountChanges?.Invoke(itemId, slot.Quantity);
+            }
         }
 
-        public int GetNumberOfItems(IItem item) => Slots.FindAll(slot => slot.CurrentItem != null && slot.CurrentItem.Id == item.Id).Count;
-
-        public List<IItem?> GiveAllItems() => [.. Slots.Where(x => x.CurrentItem != null).Select(x => x.CurrentItem)];
-
-        public void TakeAllItems(List<IItem?> items)
-        {
-            if (items.Count > 0)
-                items.ForEach(AddItem!);
-        }
 
         public void Clear() => Slots.ForEach(slot => slot.ClearSlot());
-        private InventorySlot? GetSlotToAdd(IItem item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize);
-        private InventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem.Id == itemId);
+        private IInventorySlot? GetSlotToAdd(IItem item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize);
+        private IInventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem.Id == itemId);
         private void OnItemSlotClicked(IItem item, MouseButtonPressed pressed) => ItemSlotClicked?.Invoke(item, pressed, this);
     }
 }

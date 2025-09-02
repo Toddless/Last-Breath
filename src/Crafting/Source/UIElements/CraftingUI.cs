@@ -56,12 +56,12 @@
             {
                 var category = _recipeTree.CreateItem(treeRoot);
                 // for now enum as category name, think about localization later
-                category.SetText(0, part.Key.ToString());
+                category.SetText(0, Lokalizator.Lokalize(part.Key.ToString()));
                 category.SetSelectable(0, false);
                 foreach (var res in part.Value)
                 {
                     var recipe = _recipeTree.CreateItem(category);
-                    recipe.SetText(0, Lokalizator.LokalizedName(res.Key));
+                    recipe.SetText(0, Lokalizator.Lokalize(res.Key));
                     recipe.SetMetadata(0, res.Key);
                     recipe.SetSelectable(0, true);
                 }
@@ -73,9 +73,17 @@
             _optional?.AddChild(optional);
             _optionalResources.Add(optional);
         }
+
         public void AddBaseStatLabel(Label label) => _itemBaseStatsContainer?.AddChild(label);
 
-        public void ConsumeOptionalResource() => _optionalResources.ForEach(x => x.ConsumeResource());
+        public void ConsumeOptionalResource()
+        {
+            foreach (var resource in _optionalResources)
+            {
+                resource.ConsumeResource();
+                if (resource.CanClear()) resource.RemoveCraftingResource();
+            }
+        }
 
         public void ShowRecipe(IEnumerable<ResourceTemplateUI> resources)
         {
@@ -113,15 +121,12 @@
             ClearOptionalResources();
             ClearItemIcon();
             DestroyRecipeTree();
+            SetCreateButtonState(false);
             _possibleModifiersList?.Clear();
             ClearDescription();
         }
 
-        public void ClearOptionalResources()
-        {
-            foreach (var opt in _optionalResources)
-                if (opt.CanClear()) opt.RemoveCraftingResource();
-        }
+        public void ClearOptionalResources() => _optionalResources.ForEach(x => x.RemoveCraftingResource());
 
         public void ClearPossibleModifiers() => _possibleModifiersList?.Clear();
 

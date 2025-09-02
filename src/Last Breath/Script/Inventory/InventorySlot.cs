@@ -41,10 +41,10 @@
             }
         }
 
-        public void AddNewItem(IItem item)
+        public void AddNewItem(IItem item, int amount = 1)
         {
-            Quantity++;
             CurrentItem = item;
+            Quantity += amount;
             this.TextureNormal = item.Icon;
         }
 

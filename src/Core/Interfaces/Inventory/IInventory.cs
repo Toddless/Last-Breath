@@ -4,23 +4,17 @@
     using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Items;
-    using Godot;
 
     public interface IInventory
     {
-        event Action? InventoryFull;
         event Action<IItem, MouseButtonPressed, IInventory>? ItemSlotClicked;
-        event Action? NotEnougthItems;
+        event Action? InventoryFull, NotEnougthItems;
+        event Action<string, int>? ItemAmountChanges;
 
-        void AddItem(IItem item);
-        void Clear();
-        //void AddStacksToItem(string id, int amount);
-        //void RemoveStacksFromItem(string id, int amount);
-        IItem? GetItemById(string id);
-        int GetNumberOfItems(IItem item);
-        List<IItem?> GiveAllItems();
-        void Initialize(int size, GridContainer container);
+        IInventorySlot? GetSlotWithItemOrNull(string id);
+        List<IInventorySlot> GetAllSlotsWithItemsWithTag(string tag);
+        void AddItem(IItem item, int amount = 1);
         void RemoveItem(string itemId, int amount = 1);
-        void TakeAllItems(List<IItem?> items);
+        void Clear();
     }
 }

@@ -33,6 +33,8 @@
             return null;
         }
 
+      //  public bool ItemExistsWithinRecipe(string itemId) => _recipes.Any(outer => outer.Value.Any(inner => inner.Value.ResultItemId == itemId));
+
         public void InitializeRecipes()
         {
             using var dir = DirAccess.Open(_pathToRecipes);

@@ -3,17 +3,16 @@
     using System;
     using Core.Enums;
     using Core.Interfaces.Items;
-    using Godot;
 
     public interface IInventorySlot
     {
         int Quantity { get; set; }
+        IItem? CurrentItem { get; }
 
         event Action<IItem, MouseButtonPressed>? OnItemClicked;
 
-        static abstract PackedScene Initialize();
         int AddItemStacks(int amount);
-        void AddNewItem(IItem item);
+        void AddNewItem(IItem item, int amount = 1);
         void ClearSlot();
         bool RemoveItemStacks(int amount);
     }

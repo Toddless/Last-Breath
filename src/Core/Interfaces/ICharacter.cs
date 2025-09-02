@@ -5,6 +5,7 @@
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
 
     public interface ICharacter
@@ -27,6 +28,7 @@
         event Action<IOnGettingAttackEventArgs>? GettingAttack;
 
         void OnTurnEnd();
+        void AddItemToInventory(IItem item);
         void AddSkill(ISkill skill);
         void RemoveSkill(ISkill skill);
         List<ISkill> GetSkills(SkillType type);

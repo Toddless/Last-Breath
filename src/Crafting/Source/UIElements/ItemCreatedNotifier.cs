@@ -29,9 +29,9 @@
             }
         }
 
-        public void SetImage(Texture2D icon)
+        public void SetImage(Texture2D? icon)
         {
-            if(_itemImage != null) _itemImage.Texture = icon;
+            if(_itemImage != null && icon != null) _itemImage.Texture = icon;
         }
 
         public void SetText(Label label) => _statContainer?.AddChild(label);

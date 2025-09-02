@@ -11,7 +11,7 @@
 
         static Lokalizator()
         {
-            s_modifierFormatter = new ModifierFormatter(LokalizedName);
+            s_modifierFormatter = new ModifierFormatter(Lokalize);
         }
 
         public static string Format<T>(T obj)
@@ -30,7 +30,7 @@
         }
 
         public static string FormatItemStats(string prop, float value) => s_modifierFormatter.FormatItemStats(prop, value); 
-        public static string LokalizedName(string id) => TranslationServer.Translate(id);
+        public static string Lokalize(string id) => TranslationServer.Translate(id);
         public static string LokalizeDescription(string id) => TranslationServer.Translate(id + "_Description");
     }
 }
