@@ -1,8 +1,9 @@
 ﻿namespace LastBreathTest.BattleSystemTests
 {
     using Core.Enums;
-    using LastBreath.Components.Interfaces;
-    using LastBreath.Script;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
     using LastBreath.Script.BattleSystem;
 
     public class DexterityStanceTest : StanceBase

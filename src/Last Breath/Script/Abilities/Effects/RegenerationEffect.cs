@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.Script.Abilities.Effects
 {
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Modifiers;
-    using LastBreath.Script;
     using LastBreath.Script.Abilities;
     using LastBreath.Script.Helpers;
 

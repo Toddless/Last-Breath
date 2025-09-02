@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using LastBreath.Script;
+    using Core.Interfaces;
 
     public abstract class BaseModuleManager<TKey, TModule>(Dictionary<TKey, TModule> cache, ICharacter owner)
         where TKey : notnull

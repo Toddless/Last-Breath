@@ -8,8 +8,9 @@
     using Core.Interfaces.Items;
     using System.Collections.Generic;
     using LastBreath.Script.Items.ItemData;
-    using LastBreath.Script.Abilities.Interfaces;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces;
 
     [Tool]
     [GlobalClass]
@@ -102,6 +103,7 @@
             }
         }
 
+        
         public void SetBaseModifiers(IEnumerable<IModifier> modifiers)
         {
 
@@ -110,5 +112,7 @@
         {
 
         }
+
+        public void SetSkill(ISkill skill) => throw new System.NotImplementedException();
     }
 }

@@ -5,11 +5,11 @@
     using Stateless;
     using LastBreath;
     using System.Linq;
-    using LastBreath.Script;
     using LastBreath.Script.UI;
     using System.Collections.Generic;
     using LastBreath.Script.ScenesHandlers;
     using Core.Enums;
+    using Core.Interfaces;
 
     public class BattleHandler
     {

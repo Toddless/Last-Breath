@@ -2,12 +2,13 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Skills;
 
-    public class AttackResult(List<ISkill> skills, AttackResults result, AttackContext context)
+    public class AttackResult(List<ISkill> skills, AttackResults result, IAttackContext context) : IAttackResult
     {
         public List<ISkill> PassiveSkills { get; } = skills;
         public AttackResults Result { get; } = result;
-        public AttackContext Context { get; } = context;
+        public IAttackContext Context { get; } = context;
     }
 }

@@ -4,26 +4,26 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Battle.Decorator;
     using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Skills;
     using Godot;
     using LastBreath.Components;
-    using LastBreath.Components.Interfaces;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.BattleSystem.Decorators;
     using LastBreath.Script.BattleSystem.Module;
 
     public abstract class StanceBase : IStance
     {
-        private readonly Queue<AttackContext> _attackQueue = [];
+        private readonly Queue<IAttackContext> _attackQueue = [];
         private int _pendingAttacks = 0;
         private bool _canProceed = true;
 
         private Dictionary<StatModule, IStatModule> _statModules { get; set; } = [];
         private Dictionary<SkillType, ISkillModule> _skillModules { get; set; } = [];
         private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
-        private StanceSkillComponent? _skillComponent;
+        private IStanceSkillComponent? _skillComponent;
 
         protected IStatModule this[StatModule type] => _statModules[type];
         protected ISkillModule this[SkillType type] => _skillModules[type];
@@ -52,17 +52,17 @@
             }
         }
 
-        public StanceSkillComponent StanceSkillManager
+        public IStanceSkillComponent StanceSkillComponent
         {
-            get => _skillComponent ??= new(this);
+            get => _skillComponent ??= new StanceSkillComponent(this);
             protected set => _skillComponent = value;
         }
 
         public IResource Resource { get; }
 
-        public ModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
-        public ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
-        public ModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
+        public IModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
+        public IModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
+        public IModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public Stance StanceType { get; }
 
@@ -75,7 +75,7 @@
             ActivationEffect = effect;
             StanceType = stanceType;
             // TODO: Rework this part later.
-            StatDecoratorManager = new(new Dictionary<StatModule, IStatModule>
+            StatDecoratorManager = new ModuleManager<StatModule, IStatModule, StatModuleDecorator>(new Dictionary<StatModule, IStatModule>
             {
                 [StatModule.AdditionalAttackChance] = new AdditionalHitChanceModule(),
                 [StatModule.BlockChance] = new BlockChanceModule(),
@@ -87,14 +87,14 @@
                 [StatModule.CritDamage] = new CritDamageModule(Owner),
             });
 
-            ActionDecoratorManager = new(new Dictionary<ActionModule, IActionModule<ICharacter>>
+            ActionDecoratorManager = new ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator>(new Dictionary<ActionModule, IActionModule<ICharacter>>
             {
                 [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
                 [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
                 [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
             });
 
-            SkillDecoratorManager = new(new Dictionary<SkillType, ISkillModule>
+            SkillDecoratorManager = new ModuleManager<SkillType, ISkillModule, SkillModuleDecorator>(new Dictionary<SkillType, ISkillModule>
             {
                 [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
                 [SkillType.OnAttack] = new OnAttackSkillModule(Owner),
@@ -141,7 +141,7 @@
             CombatScheduler.Instance?.Schedule(context);
         }
 
-        public virtual void OnReceiveAttack(AttackContext context)
+        public virtual void OnReceiveAttack(IAttackContext context)
         {
             if (CanProceed) HandleReceivedAttack(context);
             else
@@ -154,7 +154,7 @@
 
         protected bool CanAttack(ICharacter target) => target.IsAlive && Owner.IsAlive;
 
-        protected virtual void HandleReceivedAttack(AttackContext context)
+        protected virtual void HandleReceivedAttack(IAttackContext context)
         {
             CanProceed = false;
             if (!context.IgnoreEvade && IsEvade())
@@ -175,7 +175,7 @@
         }
 
 
-        protected virtual void OnAttackResult(AttackResult result)
+        protected virtual void OnAttackResult(IAttackResult result)
         {
             // i dont need this context anymore, unsubscribe
             Unsubscribe(result);
@@ -186,7 +186,7 @@
             PendingAttacks--;
         }
 
-        protected void ApplyPreAttackSkills(AttackContext context)
+        protected void ApplyPreAttackSkills(IAttackContext context)
         {
             var skills = this[SkillType.PreAttack].GetSkills();
 
@@ -225,7 +225,7 @@
         protected bool IsCrit() => Mathf.Min(this[StatModule.CritChance].GetValue(), Owner.Damage.MaxCriticalChance) <= Owner.Damage.CriticalChance;
         protected bool IsEvade() => Mathf.Min(this[StatModule.EvadeChance].GetValue(), Owner.Defense.MaxEvadeChance) <= Owner.Defense.Evade;
 
-        private void HandleEvadeReceivedAttack(AttackContext context)
+        private void HandleEvadeReceivedAttack(IAttackContext context)
         {
             Owner.OnEvadeAttack();
             context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Evaded, context));
@@ -237,7 +237,7 @@
                 Owner.AllAttacks();
         }
 
-        private void HandleResult(AttackResult result)
+        private void HandleResult(IAttackResult result)
         {
             var target = result.Context.Target;
 
@@ -264,14 +264,14 @@
             CheckIfAllAttacksHandled();
         }
 
-        private void OnAttackCanceled(AttackContext context)
+        private void OnAttackCanceled(IAttackContext context)
         {
             context.OnAttackResult -= OnAttackResult;
             context.OnAttackCanceled -= OnAttackCanceled;
             PendingAttacks--;
         }
 
-        private void Unsubscribe(AttackResult result)
+        private void Unsubscribe(IAttackResult result)
         {
             result.Context.OnAttackResult -= OnAttackResult;
             result.Context.OnAttackCanceled -= OnAttackCanceled;

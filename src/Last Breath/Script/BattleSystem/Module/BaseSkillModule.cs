@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Battle.Module;
     using Core.Interfaces.Skills;
-    using LastBreath.Script;
 
     public abstract class BaseSkillModule(ICharacter owner, SkillType type, DecoratorPriority priority) : ISkillModule
     {
@@ -19,7 +19,7 @@
 
             skillList.AddRange(Owner.GetSkills(SkillType));
 
-            var stanceSkills = Owner.CurrentStance?.StanceSkillManager.GetSkills(SkillType);
+            var stanceSkills = Owner.CurrentStance?.StanceSkillComponent.GetSkills(SkillType);
             if (stanceSkills != null && stanceSkills.Count > 0)
                 skillList.AddRange(stanceSkills);
 

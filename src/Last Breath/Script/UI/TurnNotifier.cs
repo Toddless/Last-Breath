@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.UI
 {
+    using Core.Interfaces;
     using Godot;
-    using LastBreath.Script;
     using LastBreath.Script.Helpers;
 
     public partial class TurnNotifier : Panel

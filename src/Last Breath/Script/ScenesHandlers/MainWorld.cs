@@ -10,6 +10,7 @@ namespace LastBreath
     using LastBreath.Script.ScenesHandlers;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.NPC;
+    using Core.Interfaces;
 
     public partial class MainWorld : ObservableNode2D
     {

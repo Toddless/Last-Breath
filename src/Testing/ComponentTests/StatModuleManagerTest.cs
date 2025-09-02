@@ -1,9 +1,9 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
     using Core.Enums;
+    using Core.Interfaces.Battle.Decorator;
     using Core.Interfaces.Battle.Module;
     using LastBreath.Components;
-    using LastBreath.Script.BattleSystem.Decorators;
     using LastBreathTest.ComponentTests.TestData;
 
     [TestClass]

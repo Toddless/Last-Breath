@@ -3,11 +3,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
     using Utilities;
 
-    public class EffectsManager(ICharacter owner)
+    public class EffectsManager(ICharacter owner) : IEffectsManager
     {
         // all effects from equip, passive skills etc.
         private readonly List<IEffect> _permanentEffects = [];

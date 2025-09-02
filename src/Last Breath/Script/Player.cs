@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using Godot;
     using LastBreath.Components;
-    using LastBreath.Components.Interfaces;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;
@@ -18,6 +17,9 @@
     using Core.Modifiers;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using Core.Interfaces;
 
     public partial class Player : CharacterBody2D, ICharacter
     {
@@ -32,10 +34,10 @@
         private Vector2 _targetPosition, _startPosition;
         private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
-        private DefenseComponent? _playerDefense;
-        private EffectsManager? _effectsManager;
-        private HealthComponent? _playerHealth;
-        private DamageComponent? _playerDamage;
+        private IDefenseComponent? _playerDefense;
+        private IEffectsManager? _effectsManager;
+        private IHealthComponent? _playerHealth;
+        private IDamageComponent? _playerDamage;
         private SkillsComponent? _playerSkills;
         private readonly ModifierManager _modifierManager = new();
         private readonly AttributeComponent _attribute = new();
@@ -91,14 +93,14 @@
         public string CharacterName { get; private set; } = "Player";
         public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
-        public DefenseComponent Defense => _playerDefense ??= new();
-        public HealthComponent Health => _playerHealth ??= new();
-        public DamageComponent Damage => _playerDamage ??= new(new UnarmedDamageStrategy());
+        public IDefenseComponent Defense => _playerDefense ??= new DefenseComponent();
+        public IHealthComponent Health => _playerHealth ??= new HealthComponent();
+        public IDamageComponent Damage => _playerDamage ??= new DamageComponent(new UnarmedDamageStrategy());
         public Inventory EquipInventory => _equipInventory ??= new();
         public Inventory CraftingInventory => _craftingInventory ??= new();
         public Inventory QuestItemsInventory => _questItemsInventory ??= new();
-        public EffectsManager Effects => _effectsManager ??= new(this);
-        public ModifierManager Modifiers => _modifierManager;
+        public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
+        public IModifierManager Modifiers => _modifierManager;
 
         int ICharacter.Initiative => _rnd.RandiRange(0, 15);
 
@@ -115,7 +117,7 @@
         public event Action<List<IAbility>>? SetAvailableAbilities;
         public event Action<ICharacter>? Dead;
         public event Action? AllAttacksFinished;
-        public event Action<OnGettingAttackEventArgs>? GettingAttack;
+        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
 
         [Signal]
         public delegate void PlayerEnterTheBattleEventHandler();
@@ -126,10 +128,10 @@
 
         public override void _Ready()
         {
-            _playerDamage = new(new UnarmedDamageStrategy());
-            _effectsManager = new(this);
-            _playerHealth = new();
-            _playerDefense = new();
+            _playerDamage = new DamageComponent(new UnarmedDamageStrategy());
+            _effectsManager = new EffectsManager(this);
+            _playerHealth = new HealthComponent();
+            _playerDefense = new DefenseComponent();
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
             _equipInventory = new();
@@ -246,7 +248,7 @@
         {
         }
 
-        public void OnReceiveAttack(AttackContext context)
+        public void OnReceiveAttack(IAttackContext context)
         {
             if (_currentStance == null)
             {
@@ -267,8 +269,8 @@
         }
 
         public void AllAttacks() => AllAttacksFinished?.Invoke();
-        public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
-        public void OnBlockAttack() => GettingAttack?.Invoke(new(this, AttackResults.Blocked));
+        public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
+        public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
         public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
 
         public void AddSkill(ISkill skill)
@@ -288,11 +290,11 @@
             // some actions like sound, animation etc.
             Health.TakeDamage(damage);
             GD.Print($"{this.CharacterName} taked: {damage} damage");
-            GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
+            GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
         }
 
-        private void RemoveFromStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillManager.RemoveSkill(stanceSkill);
-        private void AddToStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillManager.AddSkill(stanceSkill);
+        private void RemoveFromStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillComponent.RemoveSkill(stanceSkill);
+        private void AddToStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillComponent.AddSkill(stanceSkill);
 
         private void OnPlayerDead()
         {
@@ -301,7 +303,7 @@
             IsAlive = false;
         }
 
-        private void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        private void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             switch (args.Parameter)
             {

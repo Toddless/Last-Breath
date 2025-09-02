@@ -4,15 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Battle;
     using Core.Modifiers;
     using Godot;
-    using LastBreath.Script.BattleSystem;
 
     public class Calculations
     {
         public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
-        public static float DamageReduceByArmor(AttackContext context)
+        public static float DamageReduceByArmor(IAttackContext context)
         {
             var damage = context.Damage;
             if (context.IsCritical)

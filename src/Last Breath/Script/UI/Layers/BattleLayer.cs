@@ -9,6 +9,8 @@
     using LastBreath.Script.BattleSystem;
     using Core.Enums;
     using Utilities;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
 
     public partial class BattleLayer : CanvasLayer
     {
@@ -213,7 +215,7 @@
             player.GettingAttack += OnDamageTaken;
         }
 
-        private void OnDamageTaken(OnGettingAttackEventArgs args) => _battleUI?.OnGettingAttack(args);
+        private void OnDamageTaken(IOnGettingAttackEventArgs args) => _battleUI?.OnGettingAttack(args);
 
         private void SubscribeNewPlayerStance()
         {

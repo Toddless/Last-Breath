@@ -1,8 +1,9 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using System.Collections.Generic;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
     using Core.Modifiers;
-    using LastBreath.Script;
 
     public class StanceActivationEffect : IStanceActivationEffect
     {

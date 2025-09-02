@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
 
     public class AbilityEffectConfig
     {

@@ -2,9 +2,9 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces.Battle;
     using Godot;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.BattleSystem;
     using LastBreath.Script.UI;
     using LastBreath.Script.UI.View;
 
@@ -96,7 +96,7 @@
         public void OnEnemyCurrentHealthChanged(float newValue) => _enemyHealthBar!.Value = newValue;
         public void OnEnemyMaxHealthChanged(float newValue) => _enemyHealthBar!.MaxValue = newValue;
 
-        public void OnGettingAttack(OnGettingAttackEventArgs args)
+        public void OnGettingAttack(IOnGettingAttackEventArgs args)
         {
             // TODO: Rework and remove this from here
             var floatingText = new FloatingText();

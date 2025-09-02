@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Battle.Decorator;
     using Core.Interfaces.Skills;
 
     public class ImmuneToSkillTypeDecorator(SkillType type) : SkillModuleDecorator(type, priority: DecoratorPriority.Strong)

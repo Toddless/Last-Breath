@@ -4,9 +4,10 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Components;
     using Utilities;
 
-    public class ModuleManager<TKey, TModule, TDecorator>
+    public class ModuleManager<TKey, TModule, TDecorator> : IModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull
         where TModule : class
         where TDecorator : TModule, IModuleDecorator<TKey, TModule>

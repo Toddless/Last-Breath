@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using Core.Enums;
+    using Core.Interfaces.Battle;
     using LastBreath.Components;
-    using LastBreath.Script.Abilities.Interfaces;
     using Utilities;
 
-    public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>()
+    public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>(), IStanceSkillComponent
     {
         private readonly IStance _stance = stance;
 

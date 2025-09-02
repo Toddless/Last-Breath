@@ -2,8 +2,8 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces;
     using Godot;
-    using LastBreath.Script;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Items;
 

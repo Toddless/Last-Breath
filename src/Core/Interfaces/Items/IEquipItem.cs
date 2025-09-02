@@ -15,6 +15,7 @@
 
         void SetBaseModifiers(IEnumerable<IModifier> modifiers);
         void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
+        void SetSkill(ISkill skill);
         void OnUnequip();
     }
 }

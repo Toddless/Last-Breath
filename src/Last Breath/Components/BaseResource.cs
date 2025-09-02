@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using LastBreath.Components.Interfaces;
+    using Core.Interfaces.Components;
     using LastBreath.Script.Helpers;
 
     public abstract class BaseResource : IResource
@@ -61,7 +61,7 @@
                 Current = MaximumAmount;
         }
 
-        public virtual void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public virtual void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             switch (args.Parameter)
             {

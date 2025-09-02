@@ -1,9 +1,10 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using Core.Enums;
-    using LastBreath.Script;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
 
-    public class OnGettingAttackEventArgs(ICharacter character, AttackResults result, float damage = default, bool isCrit = false)
+    public class OnGettingAttackEventArgs(ICharacter character, AttackResults result, float damage = default, bool isCrit = false) : IOnGettingAttackEventArgs
     {
         public float Damage { get; } = damage;
         public bool IsCrit { get; } = isCrit;

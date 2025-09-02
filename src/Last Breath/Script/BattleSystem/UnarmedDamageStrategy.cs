@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
-    using LastBreath.Components.Interfaces;
+    using Core.Interfaces.Components;
 
     public class UnarmedDamageStrategy : IDamageStrategy
     {

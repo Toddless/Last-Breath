@@ -2,10 +2,11 @@
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces.Components;
     using Godot;
     using LastBreath.Script.Helpers;
 
-    public class HealthComponent
+    public class HealthComponent : IHealthComponent
     {
         private const float BaseHealth = 100;
         private float _currentHealth;
@@ -43,7 +44,7 @@
 
         public void HealUpToMax() => CurrentHealth = MaxHealth;
 
-        public void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             if (args.Parameter != Parameter.MaxHealth)
                 return;

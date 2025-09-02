@@ -1,9 +1,9 @@
 ﻿namespace LastBreathTest.BattleSystemTests
 {
     using Core.Enums;
-    using LastBreath.Components.Interfaces;
-    using LastBreath.Script;
-    using LastBreath.Script.BattleSystem;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
     using Moq;
 
     [TestClass]

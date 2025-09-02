@@ -2,9 +2,9 @@
 {
     using System;
     using Godot;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
     using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Skills;
 
     [GlobalClass]
     public partial class ExecutionSkill : Resource, IOnAttackSkill

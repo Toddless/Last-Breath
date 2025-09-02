@@ -4,10 +4,11 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Components;
     using Core.Modifiers;
     using Utilities;
 
-    public class ModifierManager
+    public class ModifierManager : IModifierManager
     {
         // all modifiers from equipment, passive abilities etc.
         private readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
@@ -19,7 +20,7 @@
         public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
         public IReadOnlyDictionary<Parameter, List<IModifier>> BattleModifiers => _battleModifiers;
 
-        public event EventHandler<ModifiersChangedEventArgs>? ParameterModifiersChanged;
+        public event EventHandler<IModifiersChangedEventArgs>? ParameterModifiersChanged;
 
         public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);

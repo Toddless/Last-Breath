@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Script.Abilities
 {
     using System;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
     using Core.Modifiers;
     using Godot;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
 
     public abstract class EffectBase(Core.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {

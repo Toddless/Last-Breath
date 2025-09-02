@@ -1,7 +1,7 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using LastBreath.Script.BattleSystem.Decorators;
+    using Core.Interfaces.Battle.Decorator;
 
     public class AdditionalDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(type: StatModule.Damage, priority)
     {

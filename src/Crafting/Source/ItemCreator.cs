@@ -6,6 +6,7 @@
     using Core.Enums;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Skills;
     using Core.Modifiers;
     using Godot;
     using Utilities;
@@ -14,7 +15,7 @@
     {
         private record FilteredMaterialModifier(IMaterialModifier Modifier, float Weight);
         private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To);
-        private float _maxWeight;
+        private float _totalWeight;
 
         public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources)
         {
@@ -45,14 +46,22 @@
         private Rarity GetRarity(byte idx)
         {
             var rarity = Enum.GetValues<Rarity>().GetValue(idx);
-            if (rarity == null) return Rarity.Uncommon;
+            if (rarity == null)
+            {
+                Logger.LogInfo($"Trying to get Rarity with index: {idx} failed.", this);
+                return Rarity.Uncommon;
+            }
             return (Rarity)rarity;
         }
 
         private AttributeType GetAttribute(byte idx)
         {
             var attribute = Enum.GetValues<AttributeType>().GetValue(idx);
-            if (attribute == null) return AttributeType.Dexterity;
+            if (attribute == null)
+            {
+                Logger.LogInfo($"Trying to get Attribute type with index: {idx} failed.", this);
+                return AttributeType.Dexterity;
+            }
 
             return (AttributeType)attribute;
         }
@@ -80,9 +89,11 @@
             {
                 currentMaxWeight += modifier.Weight;
                 weights.Add(new(modifier.Modifier, from, currentMaxWeight));
+                DebugLogger.LogDebug($"Modifier: {modifier.Modifier.Parameter}, {modifier.Modifier.ModifierType}, {modifier.Modifier.Value} was weighted: From: {from}, To: {currentMaxWeight}", this);
                 from = currentMaxWeight;
             }
-            _maxWeight = currentMaxWeight;
+            _totalWeight = currentMaxWeight;
+            DebugLogger.LogDebug($"Total modifier weights: {_totalWeight}", this);
             return weights;
         }
 
@@ -124,27 +135,46 @@
                         return;
                     }
                     attemp--;
-                    var rNumb = rnd.RandfRange(0, _maxWeight);
+                    var rNumb = rnd.RandfRange(0, _totalWeight);
+                    DebugLogger.LogDebug($"Attemps left: {attemp}, random number: {rNumb}", this);
                     var mod = modifiers.FirstOrDefault(x => rNumb >= x.From && rNumb <= x.To)?.Modifier;
                     if (mod != null)
                     {
                         if (!takenMods.Add(mod))
                             TakeMode(attemp);
+                        else DebugLogger.LogDebug($"Modifier: {mod.Parameter}, {mod.ModifierType}, {mod.Value} was added to item {item.Id}", this);
                     }
                 }
                 amountModifiers--;
             }
+
             // TODO : Change to get random effect/ability
+
+            var skill = GetRandomSkill();
+            if (skill != null) item.SetSkill(skill);
 
             List<IModifier> mods = [];
             foreach (var mod in takenMods)
+            {
+                DebugLogger.LogDebug($"Create modifier: {mod.Parameter}, {mod.ModifierType}, {mod.Value}", this);
                 mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.Value, item));
+            }
 
             item.SetAdditionalModifiers(mods);
 
-            _maxWeight = 0;
+            _totalWeight = 0;
             return item;
         }
+
+        // TODO: An item can have skill or effect? Or both?
+        private ISkill? GetRandomSkill()
+        {
+            // TODO: Later i need to find way to inject SkillProvider to get some skill
+            // TODO: Random skill not guaranteed.
+            return null;
+        }
+
+        // TODO: GetRandomEffect()
 
         private void AddAnyNotTakenMod(HashSet<IMaterialModifier> takenMods, List<WeightedMaterialModifier> modifiers)
         {

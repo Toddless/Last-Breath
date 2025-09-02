@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Script.ScenesHandlers
 {
     using System.Collections.Generic;
-    using LastBreath.Script;
+    using Core.Interfaces;
 
     public interface IBattleContext
     {

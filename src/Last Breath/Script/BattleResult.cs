@@ -1,6 +1,7 @@
 ﻿namespace LastBreath.Script
 {
     using Core.Enums;
+    using Core.Interfaces;
 
     public class BattleResult(ICharacter player, ICharacter enemy, BattleResults result)
     {

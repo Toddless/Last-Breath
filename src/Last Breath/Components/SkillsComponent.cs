@@ -1,9 +1,8 @@
 ﻿namespace LastBreath.Components
 {
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Skills;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
 
     public class SkillsComponent(ICharacter owner) : BaseSkillComponent<ISkill>()
     {

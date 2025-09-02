@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Script.Items
 {
     using Core.Enums;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Godot;
-    using LastBreath.Components.Interfaces;
     using LastBreath.Script.Items.ItemData;
 
     public abstract partial class WeaponItem : EquipItem, IDamageStrategy, IWeaponItem

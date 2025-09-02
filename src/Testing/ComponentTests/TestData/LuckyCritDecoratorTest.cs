@@ -1,7 +1,7 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using LastBreath.Script.BattleSystem.Decorators;
+    using Core.Interfaces.Battle.Decorator;
 
     public class LuckyCritDecoratorTest(DecoratorPriority priority) : StatModuleDecorator(type: StatModule.CritChance, priority)
     {

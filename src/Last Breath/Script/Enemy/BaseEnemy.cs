@@ -4,12 +4,14 @@ namespace LastBreath
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Skills;
     using Core.Modifiers;
     using Godot;
     using LastBreath.Components;
     using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Enemy;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
@@ -20,11 +22,11 @@ namespace LastBreath
     {
         #region Components
         private readonly AttributeComponent _enemyAttribute = new();
-        private readonly ModifierManager _modifierManager = new();
-        private EffectsManager? _effectsManager;
-        private HealthComponent? _enemyHealth;
-        private DamageComponent? _enemyDamage;
-        private DefenseComponent? _enemyDefense;
+        private readonly IModifierManager _modifierManager = new ModifierManager();
+        private IEffectsManager? _effectsManager;
+        private IHealthComponent? _enemyHealth;
+        private IDamageComponent? _enemyDamage;
+        private IDefenseComponent? _enemyDefense;
         private SkillsComponent? _enemySkills;
         #endregion
 
@@ -119,15 +121,11 @@ namespace LastBreath
 
         public string EnemyId => _enemyId ??= SetId();
 
-        public DamageComponent Damage => _enemyDamage ??= new(new UnarmedDamageStrategy());
-
-        public HealthComponent Health => _enemyHealth ??= new();
-
-        public DefenseComponent Defense => _enemyDefense ??= new();
-
-        public EffectsManager Effects => _effectsManager ??= new(this);
-
-        public ModifierManager Modifiers => _modifierManager;
+        public IDamageComponent Damage => _enemyDamage ??= new DamageComponent(new UnarmedDamageStrategy());
+        public IHealthComponent Health => _enemyHealth ??= new HealthComponent();
+        public IDefenseComponent Defense => _enemyDefense ??= new DefenseComponent();
+        public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
+        public IModifierManager Modifiers => _modifierManager;
 
         public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
 
@@ -138,18 +136,18 @@ namespace LastBreath
 
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
-        public event Action<OnGettingAttackEventArgs>? GettingAttack;
+        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
 
         #endregion
 
         public override void _Ready()
         {
-            _effectsManager = new(this);
-            _enemyHealth = new();
-            _enemyDefense = new();
+            _effectsManager = new EffectsManager(this);
+            _enemyHealth = new HealthComponent();
+            _enemyDefense = new DefenseComponent();
             _enemySkills = new(this);
             // later i need strategy for enemies
-            _enemyDamage = new(new UnarmedDamageStrategy());
+            _enemyDamage = new DamageComponent(new UnarmedDamageStrategy());
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
@@ -182,7 +180,7 @@ namespace LastBreath
         {
             Health.TakeDamage(damage);
             GD.Print($"{this.Name} taked: {damage} damage");
-            GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
+            GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
         }
 
         public void OnTurnStart()
@@ -200,15 +198,15 @@ namespace LastBreath
             UIEventBus.PublishNextPhase();
         }
 
-        public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
-        public void OnBlockAttack() => GettingAttack?.Invoke(new(this, AttackResults.Blocked));
+        public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
+        public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
 
         public void OnTurnEnd()
         {
             //Effects.UpdateEffects();
         }
 
-        public void OnReceiveAttack(AttackContext context)
+        public void OnReceiveAttack(IAttackContext context)
         {
             if (_currentStance == null)
             {
@@ -237,7 +235,7 @@ namespace LastBreath
             if (skill is IStanceSkill stanceSkill)
             {
                 if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillManager.AddSkill(stanceSkill);
+                    CurrentStance.StanceSkillComponent.AddSkill(stanceSkill);
             }
             else
                 Skills.AddSkill(skill);
@@ -248,7 +246,7 @@ namespace LastBreath
             if (skill is IStanceSkill stanceSkill)
             {
                 if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillManager.RemoveSkill(stanceSkill);
+                    CurrentStance.StanceSkillComponent.RemoveSkill(stanceSkill);
             }
             else Skills.RemoveSkill(skill);
         }
