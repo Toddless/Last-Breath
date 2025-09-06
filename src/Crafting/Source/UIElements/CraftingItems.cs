@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Crafting;
     using Godot;
 
     [Tool]
@@ -13,8 +12,8 @@
         private const string UID = "uid://dot5loe7a27rt";
         [Export] private ItemList? _items;
         [Export] private Button? _add, _cancel;
-        private List<ICraftingResource> _resources = [];
-        private Action<ICraftingResource>? _onSelect;
+        private List<string> _resources = [];
+        private Action<string>? _onSelect;
         private Action? _onCancel;
 
         public override void _Ready()
@@ -25,10 +24,12 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public void AddItem(ICraftingResource resource, bool selectable = true)
+        public void AddItem(string resourceId, bool selectable = true)
         {
-            _resources.Add(resource);
-            _items?.AddItem(resource.DisplayName, resource.Icon, selectable);
+            _resources.Add(resourceId);
+            var displayName = CraftingResourceProvider.Instance?.GetResourceName(resourceId);
+            var icon = CraftingResourceProvider.Instance?.GetResourceIcon(resourceId);
+            _items?.AddItem(displayName, icon, selectable);
         }
 
         public override void _ExitTree()
@@ -54,9 +55,9 @@
             _onSelect?.Invoke(_resources[idx]);
         }
 
-        public void Setup(IEnumerable<ICraftingResource> resources,
-            IEnumerable<ICraftingResource> disabledResources,
-            Action<ICraftingResource> onSelect,
+        public void Setup(IEnumerable<string> resources,
+            IEnumerable<string> disabledResources,
+            Action<string> onSelect,
             Action onCancel)
         {
             _onSelect = onSelect;
@@ -68,7 +69,7 @@
             UpdateDisabled(disabledResources);
         }
 
-        private void UpdateDisabled(IEnumerable<ICraftingResource> disabled)
+        private void UpdateDisabled(IEnumerable<string> disabled)
         {
             for (int i = 0; i < _resources.Count; i++)
             {

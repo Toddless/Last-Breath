@@ -7,7 +7,7 @@
         string Id { get; }
         string ResultItemId {  get; }
         string Description { get; }
-        string Name { get; }
+        string DisplayName { get; }
         string[] Tags { get; }
         List<IRecipeRequirement> MainResource { get; }
     }

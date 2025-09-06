@@ -3,17 +3,16 @@
     using System;
     using Core.Enums;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Script.Helpers;
 
-    public partial class InventorySlot : BaseSlot<IItem>, IInventorySlot
+    public partial class InventorySlot : Slot, IInventorySlot
     {
         private const string UID = "uid://bqlqfsqoepfhs";
         [Export] private Label? _quantityLabel;
         private int _quantity;
 
-        public event Action<IItem, MouseButtonPressed>? OnItemClicked;
+        public event Action<string, MouseButtonPressed>? OnItemClicked;
 
         public int Quantity
         {
@@ -41,11 +40,10 @@
             }
         }
 
-        public void AddNewItem(IItem item, int amount = 1)
+        public void SetItem(string itemId, int amount = 1)
         {
-            CurrentItem = item;
+            CurrentItem = itemId;
             Quantity += amount;
-            this.TextureNormal = item.Icon;
         }
 
         public bool RemoveItemStacks(int amount)
@@ -62,14 +60,14 @@
         {
             if (CurrentItem == null) return amount;
 
-            int availableSpace = CurrentItem.MaxStackSize - Quantity;
-            int addAmount = Mathf.Min(availableSpace, amount);
-            Quantity += addAmount;
+            //int availableSpace = CurrentItem.MaxStackSize - Quantity;
+            //int addAmount = Mathf.Min(availableSpace, amount);
+            //Quantity += addAmount;
 
-            return amount - addAmount;
+            return amount;
         }
 
-        public void ClearSlot()
+        public void ClearSlot(bool isDeleted = false)
         {
             CurrentItem = null;
             this.TextureNormal = DefaltTexture;
@@ -88,5 +86,7 @@
         }
 
         private string SetQuantity() => Quantity > 1 ? Quantity.ToString() : string.Empty;
+      //  public void SetItem(string item, int amount = 1) => throw new NotImplementedException();
+        public bool ItemHasTag(string tag) => throw new NotImplementedException();
     }
 }

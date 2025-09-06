@@ -9,9 +9,9 @@
     using Godot;
     using Utilities;
 
-    public class Inventory : IInventory
+    public class Inventory 
     {
-        public event Action<IItem, MouseButtonPressed, IInventory>? ItemSlotClicked;
+        public event Action<string, MouseButtonPressed, IInventory>? ItemSlotClicked;
         public event Action? InventoryFull, NotEnougthItems;
         public event Action<string, int>? ItemAmountChanges;
 
@@ -23,15 +23,15 @@
             {
                 InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
                 container.AddChild(inventorySlot);
-                inventorySlot.OnItemClicked += OnItemSlotClicked;
+                //inventorySlot.OnItemClicked += OnItemSlotClicked;
                 Slots.Add(inventorySlot);
             }
         }
 
 
-        public IInventorySlot? GetSlotWithItemOrNull(string id) => Slots.FirstOrDefault(x => x.CurrentItem?.Id == id);
+        public IInventorySlot? GetSlotWithItemOrNull(string id) => Slots.FirstOrDefault(x => x.CurrentItem == id);
 
-        public List<IInventorySlot> GetAllSlotsWithItemsWithTag(string tag) => Slots.FindAll(x => x.CurrentItem != null && x.CurrentItem.HasTag(tag));
+        public List<IInventorySlot> GetAllSlotsWithItemsWithTag(string tag) => Slots.FindAll(x => x.CurrentItem != null && x.ItemHasTag(tag));
 
         public void AddItem(IItem item, int amount = 1)
         {
@@ -52,7 +52,7 @@
             }
             else
             {
-                slot.AddNewItem(item, amount);
+                slot.SetItem(item.Id, amount);
             }
         }
 
@@ -83,8 +83,8 @@
 
 
         public void Clear() => Slots.ForEach(slot => slot.ClearSlot());
-        private IInventorySlot? GetSlotToAdd(IItem item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem.Id == item.Id && itemSlot.Quantity < item.MaxStackSize);
-        private IInventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem.Id == itemId);
-        private void OnItemSlotClicked(IItem item, MouseButtonPressed pressed) => ItemSlotClicked?.Invoke(item, pressed, this);
+        private IInventorySlot? GetSlotToAdd(IItem item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem == item.Id && itemSlot.Quantity < item.MaxStackSize);
+        private IInventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem == itemId);
+       // private void OnItemSlotClicked(IItem item, MouseButtonPressed pressed) => ItemSlotClicked?.Invoke(item.Id, pressed, this);
     }
 }

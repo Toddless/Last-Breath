@@ -7,7 +7,7 @@
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Items;
 
-    public partial class EquipmentSlot : BaseSlot<EquipItem>
+    public partial class EquipmentSlot : Slot
     {
         public event Action<EquipmentSlot, MouseButtonPressed>? EquipItemPressed;
 
@@ -32,17 +32,17 @@
 
         public void EquipItem(EquipItem item, ICharacter owner)
         {
-            CurrentItem = item;
-            if (CurrentItem is WeaponItem w && owner is Player p) p.OnEquipWeapon(w);
-            CurrentItem.OnEquip(owner);
-            TextureNormal = item.Icon;
+            //CurrentItem = item;
+            //if (CurrentItem is WeaponItem w && owner is Player p) p.OnEquipWeapon(w);
+            //CurrentItem.OnEquip(owner);
+            //TextureNormal = item.Icon;
         }
 
         public void UnequipItem()
         {
-            CurrentItem?.OnUnequip();
-            CurrentItem = null;
-            TextureNormal = DefaltTexture;
+            //CurrentItem?.OnUnequip();
+            //CurrentItem = null;
+            //TextureNormal = DefaltTexture;
         }
     }
 }

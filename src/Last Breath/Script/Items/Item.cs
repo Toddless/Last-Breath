@@ -27,6 +27,7 @@
         [Export] public int MaxStackSize { get; set; } = 1;
         [Export] public string[] Tags = [];
 
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string DisplayName => GetLocalizedName();
 
         public string Description => GetLocalizedDescription();

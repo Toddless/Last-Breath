@@ -15,6 +15,8 @@
 
         public IReadOnlyDictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>> Recipes => _recipes;
 
+        public CraftingRecipeProvider? Instance => this;
+
         public CraftingRecipeProvider(string pathToRecipes)
         {
             _pathToRecipes = pathToRecipes;
@@ -56,11 +58,6 @@
 
                     var path = $"{_pathToRecipes}/{file}";
                     var recipe = ResourceLoader.Load<ICraftingRecipe>(path);
-                    if (!TryAddrecipe(recipe))
-                    {
-                        Logger.LogError($"Failed to add recipe: {recipe.Id}", this);
-                        continue;
-                    }
                 }
             }
             catch (Exception ex)
@@ -73,17 +70,6 @@
             }
         }
 
-        private bool TryAddrecipe(ICraftingRecipe recipe)
-        {
-            foreach (var part in Enum.GetValues<EquipmentPart>())
-            {
-                if (recipe.Tags.Contains(part.ToString()))
-                {
-                    if (!_recipes[part].TryAdd(recipe.Id, recipe)) return false;
-                    return true;
-                }
-            }
-            return false;
-        }
+       
     }
 }

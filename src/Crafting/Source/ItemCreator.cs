@@ -1,15 +1,16 @@
 ﻿namespace Crafting.Source
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using Utilities;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
+    using System.Linq;
+    using Core.Modifiers;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
-    using Core.Modifiers;
-    using Godot;
-    using Utilities;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
+    using Core.Interfaces;
 
     public class ItemCreator
     {
@@ -17,20 +18,16 @@
         private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To);
         private float _totalWeight;
 
-        public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources)
+        public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)
         {
             var modifiers = CalculateWeights(CombineModifiers(mainResources, optionalResources));
             return Create(recipe.ResultItemId, modifiers);
         }
 
-        public IEquipItem? CreateGenericItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources)
+        public IEquipItem? CreateGenericItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)
         {
-            using var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            //                          нужно как то влиять на эти значения, чтоб мы могли повышать шанс на более редкий предмет
-            var rarity = GetRarity((byte)rnd.RandiRange(0, 3));
-            //                          Должны ли мы как то влиять на данное значение??
-            var attribute = GetAttribute((byte)rnd.RandiRange(1, 3));
+            var rarity = GetRarity(player);
+            var attribute = GetAttribute(player);
             var itemId = $"{recipe.ResultItemId}_{attribute}_{rarity}";
             var modifiers = CalculateWeights(CombineModifiers(mainResources, optionalResources));
             var item = Create(itemId, modifiers);
@@ -42,28 +39,30 @@
             // for creating basic items i need a new item provider
             return null;
         }
-    
-        private Rarity GetRarity(byte idx)
+
+        private Rarity GetRarity(ICharacter? player = default)
         {
-            var rarity = Enum.GetValues<Rarity>().GetValue(idx);
-            if (rarity == null)
-            {
-                Logger.LogInfo($"Trying to get Rarity with index: {idx} failed.", this);
-                return Rarity.Uncommon;
-            }
-            return (Rarity)rarity;
+            if (player == null) return GetRandomValueFallBack<Rarity>();
+            // TODO: Later add call to players skill to get Rarity
+            return Rarity.Rare;
         }
 
-        private AttributeType GetAttribute(byte idx)
+        private AttributeType GetAttribute(ICharacter? player = default)
         {
-            var attribute = Enum.GetValues<AttributeType>().GetValue(idx);
-            if (attribute == null)
-            {
-                Logger.LogInfo($"Trying to get Attribute type with index: {idx} failed.", this);
-                return AttributeType.Dexterity;
-            }
+            // TODO: Sometime i can get from this call AttributeType.None.
+            if (player == null) return GetRandomValueFallBack<AttributeType>();
+            // TODO: Later add call to players skill to get attribute
+            return AttributeType.Dexterity;
+        }
 
-            return (AttributeType)attribute;
+        private T GetRandomValueFallBack<T>()
+            where T : struct, Enum
+        {
+            using var rnd = new RandomNumberGenerator();
+            rnd.Randomize();
+            var values = Enum.GetValues<T>();
+            var idx = (byte)rnd.RandiRange(0, values.Length - 1);
+            return values[idx];
         }
 
         private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
@@ -89,28 +88,26 @@
             {
                 currentMaxWeight += modifier.Weight;
                 weights.Add(new(modifier.Modifier, from, currentMaxWeight));
-                DebugLogger.LogDebug($"Modifier: {modifier.Modifier.Parameter}, {modifier.Modifier.ModifierType}, {modifier.Modifier.Value} was weighted: From: {from}, To: {currentMaxWeight}", this);
                 from = currentMaxWeight;
             }
             _totalWeight = currentMaxWeight;
-            DebugLogger.LogDebug($"Total modifier weights: {_totalWeight}", this);
             return weights;
         }
 
         private IEquipItem? Create(string itemId, List<WeightedMaterialModifier> modifiers)
         {
-            var dataProvider = EquipItemDataProvider.Instance;
+            var dataProvider = ItemDataProvider.Instance;
             if (dataProvider == null)
             {
-                Logger.LogNull(nameof(EquipItemDataProvider), this);
+                Logger.LogNull(nameof(ItemDataProvider), this);
                 return null;
             }
 
-            var item = dataProvider.GetItem(itemId);
+            var item = (IEquipItem?)dataProvider.GetItem(itemId);
 
             if (item == null)
             {
-                Logger.LogNull(itemId, this);
+                Logger.LogNotFound($"Item with id: {itemId}", this);
                 return null;
             }
 
@@ -136,13 +133,11 @@
                     }
                     attemp--;
                     var rNumb = rnd.RandfRange(0, _totalWeight);
-                    DebugLogger.LogDebug($"Attemps left: {attemp}, random number: {rNumb}", this);
                     var mod = modifiers.FirstOrDefault(x => rNumb >= x.From && rNumb <= x.To)?.Modifier;
                     if (mod != null)
                     {
                         if (!takenMods.Add(mod))
                             TakeMode(attemp);
-                        else DebugLogger.LogDebug($"Modifier: {mod.Parameter}, {mod.ModifierType}, {mod.Value} was added to item {item.Id}", this);
                     }
                 }
                 amountModifiers--;
@@ -155,7 +150,6 @@
             List<IModifier> mods = [];
             foreach (var mod in takenMods)
             {
-                DebugLogger.LogDebug($"Create modifier: {mod.Parameter}, {mod.ModifierType}, {mod.Value}", this);
                 mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.Value, item));
             }
 

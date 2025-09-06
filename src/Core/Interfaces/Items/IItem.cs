@@ -6,6 +6,7 @@
     public interface IItem
     {
         string Id { get; }
+        string InstanceId { get; }
         int MaxStackSize { get; }
         Texture2D? Icon { get; }
         Texture2D? FullImage {  get; }

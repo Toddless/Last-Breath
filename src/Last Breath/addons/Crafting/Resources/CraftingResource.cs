@@ -41,6 +41,8 @@
         /// </summary>
         public int Quantity { get; set; } = 1;
 
+        public string InstanceId => throw new NotImplementedException();
+
         public List<string> GetItemStatsAsStrings() => [];
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         public T Copy<T>(bool subresources = false)

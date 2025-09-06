@@ -175,7 +175,7 @@
                 return;
             }
             // EquipItemPressed event will fire only if EquipItem not null
-            _player?.AddItemToInventory(slot.CurrentItem!);
+          //  _player?.AddItemToInventory(slot.CurrentItem!);
             slot.UnequipItem();
         }
 
@@ -238,7 +238,7 @@
             equipSlot.EquipItem((EquipItem)newItem, _player);
             inventory.RemoveItem(newItem.Id);
             // old item != null, we check this in method above
-            inventory.AddItem(oldEquipedItem!);
+         //   inventory.AddItem(oldEquipedItem!);
         }
 
         private void OnQuestCompleted(Quest quest)

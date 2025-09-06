@@ -1,14 +1,18 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Crafting;
+    using Crafting.TestResources.Inventory;
     using Godot;
     using Utilities;
 
     public partial class CraftingUI : Control
     {
         private List<OptionalResource> _optionalResources = [];
+        private Dictionary<Categories, TreeItem> _categories = [];
         [Export] private Tree? _recipeTree;
         [Export] private ItemList? _possibleModifiersList;
         [Export] private VBoxContainer? _main, _optional;
@@ -16,6 +20,7 @@
         [Export] private TextureRect? _iconRect;
         [Export] private VBoxContainer? _itemBaseStatsContainer;
         [Export] private RichTextLabel? _description;
+        [Export] private GridContainer? _inventoryGrid;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ItemCreatedEventHandler();
@@ -37,7 +42,12 @@
             }
         }
 
-        public void CreatingRecipeTree(IReadOnlyDictionary<EquipmentPart, Dictionary<string, ICraftingRecipe>>? recipes)
+        public void InitializeInventory(ItemInventory inventory)
+        {
+            inventory.Initialize(216, _inventoryGrid);
+        }
+
+        public void CreatingRecipeTree(IEnumerable<ICraftingRecipe>? recipes)
         {
             if (_recipeTree == null)
             {
@@ -50,22 +60,26 @@
                 Logger.LogNull(nameof(recipes), this);
                 return;
             }
+
             var treeRoot = _recipeTree.CreateItem();
 
-            foreach (var part in recipes)
+            foreach (var cat in Enum.GetValues<Categories>())
             {
                 var category = _recipeTree.CreateItem(treeRoot);
-                // for now enum as category name, think about localization later
-                category.SetText(0, Lokalizator.Lokalize(part.Key.ToString()));
+                category.SetText(0, Lokalizator.Lokalize(cat.ToString()));
                 category.SetSelectable(0, false);
-                foreach (var res in part.Value)
-                {
-                    var recipe = _recipeTree.CreateItem(category);
-                    recipe.SetText(0, Lokalizator.Lokalize(res.Key));
-                    recipe.SetMetadata(0, res.Key);
-                    recipe.SetSelectable(0, true);
-                }
+                _categories[cat] = category;
             }
+
+            foreach (var res in recipes)
+            {
+                var category = _categories.Keys.FirstOrDefault(x => res.Tags.Contains(x.ToString()));
+                var recipe = _recipeTree.CreateItem(_categories[category]);
+                recipe.SetText(0, Lokalizator.Lokalize(res.Id));
+                recipe.SetMetadata(0, res.Id);
+                recipe.SetSelectable(0, true);
+            }
+
         }
 
         public void AddOptionalResource(OptionalResource optional)

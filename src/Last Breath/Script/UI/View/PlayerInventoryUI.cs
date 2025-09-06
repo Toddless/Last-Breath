@@ -30,9 +30,9 @@
             equipInventory.Initialize(220, _equipInventory!);
             craftingInventory.Initialize(220, _craftInventory!);
             questItemsInventory.Initialize(220, _questItemsInventory!);
-            equipInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
-            craftingInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
-            questItemsInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+          //  equipInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+           // craftingInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
+           // questItemsInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
         }
 
         public EquipmentSlot? GetEquipmentSlot(EquipmentPart part)

@@ -1,7 +1,6 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System;
-    using Core.Interfaces.Crafting;
     using Godot;
 
     [Tool]
@@ -9,7 +8,7 @@
     public partial class OptionalResource : Node
     {
         private const string UID = "uid://cldhk7d6f2k2p";
-        private ICraftingResource? _resource;
+        private string? _resource;
         private int _amountHave;
         [Export] private Button? _add, _remove;
         [Export] private HBoxContainer? _container;
@@ -17,7 +16,7 @@
 
         [Signal] public delegate void AddPressedEventHandler();
 
-        public event Action<ICraftingResource>? ResourceRemoved;
+        public event Action<string>? ResourceRemoved;
 
         public override void _Ready()
         {
@@ -25,14 +24,15 @@
             if (_remove != null) _remove.Pressed += RemoveCraftingResource;
         }
 
-        public void AddCraftingResource(ICraftingResource resource, int amountHave, int amountNeed = 1)
+        public void AddCraftingResource(string resource, int amountHave, int amountNeed = 1)
         {
             // only one resource can be added
             if (_resource != null) RemoveCraftingResource();
             _resource = resource;
             var templ = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-            if (_resource.Icon != null) templ.SetIcon(_resource.Icon);
-            templ.SetText(_resource.DisplayName, amountHave, amountNeed);
+            var resourceIcon = CraftingResourceProvider.Instance?.GetResourceIcon(resource);
+            if (resourceIcon != null) templ.SetIcon(resourceIcon);
+            templ.SetText(CraftingResourceProvider.Instance?.GetResourceName(resource) ?? string.Empty, amountHave, amountNeed);
             _resourceConsumed += (displayName, amountHave) =>
             {
                 templ.SetText(displayName, amountHave, amountNeed);
@@ -46,7 +46,8 @@
             if (_resource != null)
             {
                 _amountHave--;
-                _resourceConsumed?.Invoke(_resource.DisplayName, _amountHave);
+                var displayName = CraftingResourceProvider.Instance?.GetResourceName(_resource) ?? string.Empty;
+                _resourceConsumed?.Invoke(displayName, _amountHave);
             }
         }
 

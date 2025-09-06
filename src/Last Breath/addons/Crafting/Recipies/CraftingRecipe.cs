@@ -12,7 +12,7 @@
         [Export] public string Id { get; private set; } = string.Empty;
         [Export] public string ResultItemId { get; private set; } = string.Empty;
         [Export] public string[] Tags { get; private set; } = [];
-        public string Name => GetLocalizedName();
+        public string DisplayName => GetLocalizedName();
         public string Description => GetLocalizedDescription();
 
         public System.Collections.Generic.List<IRecipeRequirement> MainResource => [.. _mainResources];

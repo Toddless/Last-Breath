@@ -1,12 +1,12 @@
 ﻿namespace Core.Interfaces
 {
     using System;
-    using System.Collections.Generic;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
 
     public interface ICharacter
     {

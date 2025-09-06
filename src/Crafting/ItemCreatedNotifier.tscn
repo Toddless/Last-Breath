@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dupl70ajxafcv" path="res://Source/UIElements/ItemCreatedNotifier.cs" id="1_uub7b"]
 
-[node name="ItemCreatedNotifier" type="ColorRect" node_paths=PackedStringArray("_itemImage", "_statContainer", "_okButton")]
+[node name="ItemCreatedNotifier" type="ColorRect" node_paths=PackedStringArray("_itemImage", "_statContainer", "_okButton", "_destroyButton")]
 custom_minimum_size = Vector2(350, 500)
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,8 @@ color = Color(0.0941176, 0, 0, 0)
 script = ExtResource("1_uub7b")
 _itemImage = NodePath("Panel/MarginContainer/VBoxContainer/VBoxContainer/TextureRect")
 _statContainer = NodePath("Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer")
-_okButton = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/Button")
+_okButton = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/Ok")
+_destroyButton = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/Destroy")
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(350, 500)
@@ -60,10 +61,20 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_stretch_ratio = 0.1
+theme_override_constants/separation = 5
 
-[node name="Button" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Ok" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
 text = "Ok"
+
+[node name="Destroy" type="Button" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Destroy"
