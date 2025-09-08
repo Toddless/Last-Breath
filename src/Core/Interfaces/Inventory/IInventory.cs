@@ -16,5 +16,6 @@
         void AddItem(IItem item, int amount = 1);
         void RemoveItem(string itemId, int amount = 1);
         void Clear();
+        int GetTotalItemAmount(string id);
     }
 }

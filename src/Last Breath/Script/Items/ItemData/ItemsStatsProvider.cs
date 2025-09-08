@@ -4,16 +4,20 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
     using Godot;
     using Newtonsoft.Json;
     using Utilities;
 
     // TODO: this class need more attention
-    public class ItemsStatsProvider : IItemDataProvider<ItemStats>
+    public class ItemsStatsProvider : IItemDataProvider
     {
         private const string PathToData = "res://Data/Jsons/";
         private Dictionary<string, ItemStats> _itemStatsData = [];
+
+        public static IItemDataProvider? Instance => throw new NotImplementedException();
 
         public void LoadData()
         {
@@ -85,5 +89,15 @@
                 File.Copy(file, dest, overwrite: true);
             }
         }
+
+        public IItem? CopyBaseItem(string id) => throw new NotImplementedException();
+        public IEnumerable<IItem> GetAllResources() => throw new NotImplementedException();
+        public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => throw new NotImplementedException();
+        public List<string> GetItemBaseStats(string id) => throw new NotImplementedException();
+        public string GetItemDisplayName(string id) => throw new NotImplementedException();
+        public Texture2D? GetItemIcon(string id) => throw new NotImplementedException();
+        public int GetItemMaxStackSize(string id) => throw new NotImplementedException();
+        public ItemStats GetItemStats(string id) => throw new NotImplementedException();
+        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id) => throw new NotImplementedException();
     }
 }

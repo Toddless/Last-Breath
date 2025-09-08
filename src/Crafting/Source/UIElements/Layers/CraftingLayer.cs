@@ -1,49 +1,41 @@
 ﻿namespace Crafting.Source.UIElements.Layers
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Utilities;
     using System.Linq;
     using Core.Constants;
-    using Core.Interfaces;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
+    using System.Collections.Generic;
     using Crafting.TestResources.Inventory;
-    using Godot;
-    using Utilities;
 
     public partial class CraftingLayer : CanvasLayer
     {
         private readonly HashSet<IMaterialModifier> _mainModifiers = [];
         private readonly HashSet<IMaterialModifier> _optionalModifiers = [];
 
-        private readonly List<string> _takenOptionalResources = [];
-        private readonly List<ICraftingResource> _mainResources = [];
-        private ICraftingRecipe? _currentSelectedRecipe;
+        private readonly HashSet<string> _takenOptionalResources = [];
+        private readonly HashSet<string> _mainResources = [];
+        private string? _currentSelectedRecipe;
 
         private ItemDataProvider? _dataProvider;
         private ItemCreator? _itemCreator;
-        //  private IInventory? _craftingInventory;
         private IInventory? _itemInventory;
-        private ICharacter? _player;
         [Export] private CraftingUI? _craftingUI;
 
         public override void _Ready()
         {
             _dataProvider = new("res://TestResources/RecipeAndResources/");
-            //var inventory = new Inventory();
-            //inventory.Initialize(30);
-            //_craftingInventory = inventory;
             _itemCreator = new ItemCreator();
             _dataProvider.LoadData();
 
-            // it is work only if we have separate inventories (for resources, equip, etc)
             VisibilityChanged += OnVisibilityChanges;
             if (_craftingUI != null)
             {
                 _craftingUI.RecipeSelected += OnRecipeSelected;
                 _craftingUI.ItemCreated += OnItemCreatePressed;
-                _craftingUI.ChangeLanguage += OnLaguageChanged;
             }
 
             for (int i = 0; i < 3; i++)
@@ -53,6 +45,7 @@
                 opt.AddPressed += () => OnAddPressed(opt);
                 _craftingUI?.AddOptionalResource(opt);
             }
+
             // for now
             // ____________________________________________
             var itemInventory = new ItemInventory();
@@ -79,7 +72,7 @@
         private void OnItemCreatePressed()
         {
             // we should have all data at this point, but just in case
-            if (_currentSelectedRecipe == null)
+            if (string.IsNullOrWhiteSpace(_currentSelectedRecipe))
             {
                 Logger.LogNull(nameof(_currentSelectedRecipe), this);
                 return;
@@ -89,7 +82,7 @@
             var item = CreateItem(_currentSelectedRecipe);
             if (item == null)
             {
-                Logger.LogError($"Failed to create an item. Recipe: {_currentSelectedRecipe.Id}", this);
+                Logger.LogError($"Failed to create an item. Recipe: {_currentSelectedRecipe}", this);
                 return;
             }
             CreateNotifier(item);
@@ -162,16 +155,18 @@
 
         }
 
-        private IItem? CreateItem(ICraftingRecipe recipe)
+        private IItem? CreateItem(string recipeId)
         {
             IItem? item = null;
+            var recipe = (ICraftingRecipe?)_dataProvider?.CopyBaseItem(_currentSelectedRecipe ?? string.Empty);
+            if (recipe == null) return null;
             switch (true)
             {
                 // TODO: Creation for generic items not working, i have no resources
                 case var _ when recipe.Tags.Contains(TagConstants.Equipment, StringComparer.OrdinalIgnoreCase):
                     item = recipe.Tags.Contains("Generic") ?
-                        _itemCreator?.CreateGenericItem(recipe, _mainResources, GetCraftingResources()) :
-                        _itemCreator?.CreateEquipItem(recipe, _mainResources, GetCraftingResources());
+                        _itemCreator?.CreateGenericItem(recipe, GetCraftingResources(_mainResources), GetCraftingResources(_takenOptionalResources)) :
+                        _itemCreator?.CreateEquipItem(recipe, GetCraftingResources(_mainResources), GetCraftingResources(_takenOptionalResources));
                     break;
                 case var _ when recipe.Tags.Contains("Item"):
                     item = _itemCreator?.CreateItem(recipe);
@@ -180,12 +175,12 @@
             return item;
         }
 
-        private IEnumerable<ICraftingResource> GetCraftingResources()
+        private IEnumerable<ICraftingResource> GetCraftingResources(HashSet<string> resourceIds)
         {
             var resources = new List<ICraftingResource>();
-            foreach (var res in _takenOptionalResources)
+            foreach (var res in resourceIds)
             {
-                var loadded = _dataProvider?.GetItem(res);
+                var loadded = _dataProvider?.CopyBaseItem(res);
                 if (loadded != null) resources.Add((ICraftingResource)loadded);
             }
 
@@ -194,29 +189,31 @@
 
         private void ConsumeResourcesFromInventory()
         {
-            foreach (var optResource in _takenOptionalResources)
+            foreach (var res in _dataProvider?.GetRecipeRequirements(_currentSelectedRecipe ?? string.Empty) ?? [])
             {
-                _itemInventory?.RemoveItem(optResource);
+                _itemInventory?.RemoveItem(res.CraftingResourceId, res.Amount);
+            }
+            foreach (var optResourceId in _takenOptionalResources)
+            {
+                _itemInventory?.RemoveItem(optResourceId);
             }
             _craftingUI?.ConsumeOptionalResource();
 
-            foreach (var mainRes in _currentSelectedRecipe?.MainResource ?? [])
-            {
-                _itemInventory?.RemoveItem(mainRes.CraftingResourceId, mainRes.Amount);
-            }
         }
 
         private void ShowCurrentRecipe()
         {
             // TODO: remember about generic items. they have special icon,
             // usual items have no optional resources, have no modifiers
-            var itemId = _currentSelectedRecipe?.ResultItemId ?? string.Empty;
-            var templates = CreateResourceTemplates(_currentSelectedRecipe?.MainResource ?? []);
+            var itemId = _dataProvider?.GetRecipeResultItemId(_currentSelectedRecipe ?? string.Empty) ?? string.Empty;
+            var templates = CreateResourceTemplates(_dataProvider?.GetRecipeRequirements(_currentSelectedRecipe ?? string.Empty) ?? []);
             var icon = _dataProvider?.GetItemIcon(itemId);
+
+
             _craftingUI?.ShowRecipe(templates.Keys);
             _craftingUI?.ShowModifiers(FormattedModifiers());
             ShowItemStats();
-            if (icon != null) _craftingUI?.SetItemIcon(icon);
+            //if (icon != null) _craftingUI?.SetItemIcon(icon);
             _craftingUI?.SetItemDescription(Lokalizator.LokalizeDescription(itemId));
             var allResourcesEnough = templates.Values.All(x => x.have >= x.need);
             if (templates.Count == 0) allResourcesEnough = false;
@@ -226,31 +223,30 @@
         private Dictionary<ResourceTemplateUI, (int have, int need)> CreateResourceTemplates(List<IRecipeRequirement> recipeRequirements)
         {
             var templates = new Dictionary<ResourceTemplateUI, (int have, int need)>();
-            foreach (var requirement in recipeRequirements)
+            foreach (var req in recipeRequirements)
             {
-                var requiredResourceId = requirement.CraftingResourceId;
-                var resource = _mainResources.FirstOrDefault(x => x.Id == requiredResourceId);
-                if (resource == null)
-                {
-                    resource = (ICraftingResource?)_dataProvider?.GetItem(requiredResourceId);
-                    if (resource == null) continue;
-                    _mainResources.Add(resource);
-                }
+                var reqResourceId = req.CraftingResourceId;
+                _mainResources.Add(reqResourceId);
 
+                var resourceDisplayName = _dataProvider?.GetItemDisplayName(reqResourceId) ?? string.Empty;
+                var resourceIcon = _dataProvider?.GetItemIcon(reqResourceId);
                 var template = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-                var amountHave = GetResourceAmountFromInventory(requiredResourceId);
-                template.SetText(resource.DisplayName, amountHave, requirement.Amount);
-                if (resource.Icon != null) template.SetIcon(resource.Icon);
-                templates.Add(template, (amountHave, requirement.Amount));
+                var amountHave = _itemInventory?.GetTotalItemAmount(reqResourceId) ?? 0;
+                var resourceModifiers = _dataProvider?.GetResourceModifiers(reqResourceId) ?? [];
 
-                AddModifiersToSet(_mainModifiers, resource.MaterialType?.Modifiers ?? []);
+                template.SetText(resourceDisplayName, amountHave, req.Amount);
+                if (resourceIcon != null) template.SetIcon(resourceIcon);
+                templates.Add(template, (amountHave, req.Amount));
+
+                AddModifiersToSet(_mainModifiers, resourceModifiers);
             }
             return templates;
         }
 
         private void ShowItemStats()
         {
-            var stats = _dataProvider?.GetItemBaseStats(_currentSelectedRecipe?.ResultItemId ?? string.Empty);
+            var resultItemId = _dataProvider?.GetRecipeResultItemId(_currentSelectedRecipe ?? string.Empty) ?? string.Empty;
+            var stats = _dataProvider?.GetItemBaseStats(resultItemId);
 
             foreach (var item in stats ?? [])
             {
@@ -275,16 +271,16 @@
 
         private void OnResourceAdded(string resource)
         {
-            var modifiers = CraftingResourceProvider.Instance?.GetResourceModifiers(resource) ?? [];
+            var modifiers = _dataProvider?.GetResourceModifiers(resource) ?? [];
             AddModifiersToSet(_optionalModifiers, modifiers);
             _craftingUI?.ShowModifiers(FormattedModifiers());
         }
 
         private void OnResourceRemoved(string resource)
         {
-            var modifiers = CraftingResourceProvider.Instance?.GetResourceModifiers(resource) ?? [];
+            var modifiers = _dataProvider?.GetResourceModifiers(resource) ?? [];
             RemoveModifiersFromSet(_optionalModifiers, modifiers);
-            _takenOptionalResources.RemoveAll(res => res == resource);
+            _takenOptionalResources.RemoveWhere(res => res == resource);
             _craftingUI?.ShowModifiers(FormattedModifiers());
         }
 
@@ -295,7 +291,7 @@
             var craftingItems = CraftingItems.Initialize().Instantiate<CraftingItems>();
             craftingItems.Setup(available, _takenOptionalResources, selected =>
             {
-                opt.AddCraftingResource(selected, GetResourceAmountFromInventory(selected));
+                opt.AddCraftingResource(selected, id => _itemInventory?.GetTotalItemAmount(id) ?? 0);
                 _takenOptionalResources.Add(selected);
                 OnResourceAdded(selected);
                 craftingItems.QueueFree();
@@ -315,9 +311,8 @@
         {
             _mainModifiers.Clear();
             _mainResources.Clear();
-            _craftingUI?.ClearItemIcon();
-            var recipe = (ICraftingRecipe?)_dataProvider?.GetItem(id);
-            _currentSelectedRecipe = recipe;
+           // _craftingUI?.RemoveItemIcon();
+            _currentSelectedRecipe = id;
             ShowCurrentRecipe();
         }
 
@@ -325,7 +320,6 @@
         {
             if (Visible)
                 _craftingUI?.CreatingRecipeTree(_dataProvider?.GetCraftingRecipes());
-
             else
             {
                 _currentSelectedRecipe = null;
@@ -336,10 +330,7 @@
         private void AddModifiersToSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
         {
             foreach (var modifier in modifiers)
-            {
-                if (set.Contains(modifier)) continue;
                 set.Add(modifier);
-            }
         }
 
         private void RemoveModifiersFromSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)

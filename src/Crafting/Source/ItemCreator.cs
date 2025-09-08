@@ -15,7 +15,7 @@
     public class ItemCreator
     {
         private record FilteredMaterialModifier(IMaterialModifier Modifier, float Weight);
-        private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To);
+        private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To, float Weight);
         private float _totalWeight;
 
         public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)
@@ -75,7 +75,8 @@
                 .GroupBy(mod => new { mod.ModifierType, mod.Parameter, mod.Value })
                 .Select(group =>
                 {
-                    return new FilteredMaterialModifier(group.First(), group.Sum(c => c.Weight));
+                    var x = new FilteredMaterialModifier(group.First(), group.Sum(c => c.Weight));
+                    return x;
                 }).ToList();
         }
 
@@ -87,10 +88,15 @@
             foreach (var modifier in modifiers)
             {
                 currentMaxWeight += modifier.Weight;
-                weights.Add(new(modifier.Modifier, from, currentMaxWeight));
+                weights.Add(new(modifier.Modifier, from, currentMaxWeight, modifier.Weight));
                 from = currentMaxWeight;
             }
+            foreach (var item in weights)
+            {
+                DebugLogger.LogDebug($"Percent: {MathF.Round(item.Weight / currentMaxWeight * 100), 2}% Modifier: {item.Modifier.Parameter}, {item.Modifier.ModifierType}, {item.Modifier.Value}");
+            }
             _totalWeight = currentMaxWeight;
+            DebugLogger.LogDebug($"Total weight: {currentMaxWeight}",this);
             return weights;
         }
 
@@ -103,7 +109,7 @@
                 return null;
             }
 
-            var item = (IEquipItem?)dataProvider.GetItem(itemId);
+            var item = (IEquipItem?)dataProvider.CopyBaseItem(itemId);
 
             if (item == null)
             {

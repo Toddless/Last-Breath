@@ -9,7 +9,7 @@
     {
         private const string UID = "uid://cldhk7d6f2k2p";
         private string? _resource;
-        private int _amountHave;
+        private Func<string, int>? _amountHave;
         [Export] private Button? _add, _remove;
         [Export] private HBoxContainer? _container;
         private Action<string, int>? _resourceConsumed;
@@ -24,15 +24,15 @@
             if (_remove != null) _remove.Pressed += RemoveCraftingResource;
         }
 
-        public void AddCraftingResource(string resource, int amountHave, int amountNeed = 1)
+        public void AddCraftingResource(string resource, Func<string, int> amountHave, int amountNeed = 1)
         {
             // only one resource can be added
             if (_resource != null) RemoveCraftingResource();
             _resource = resource;
             var templ = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-            var resourceIcon = CraftingResourceProvider.Instance?.GetResourceIcon(resource);
+            var resourceIcon = ItemDataProvider.Instance?.GetItemIcon(resource);
             if (resourceIcon != null) templ.SetIcon(resourceIcon);
-            templ.SetText(CraftingResourceProvider.Instance?.GetResourceName(resource) ?? string.Empty, amountHave, amountNeed);
+            templ.SetText(ItemDataProvider.Instance?.GetItemDisplayName(resource) ?? string.Empty, amountHave.Invoke(resource), amountNeed);
             _resourceConsumed += (displayName, amountHave) =>
             {
                 templ.SetText(displayName, amountHave, amountNeed);
@@ -45,13 +45,12 @@
         {
             if (_resource != null)
             {
-                _amountHave--;
-                var displayName = CraftingResourceProvider.Instance?.GetResourceName(_resource) ?? string.Empty;
-                _resourceConsumed?.Invoke(displayName, _amountHave);
+                var displayName = ItemDataProvider.Instance?.GetItemDisplayName(_resource) ?? string.Empty;
+                _resourceConsumed?.Invoke(displayName, _amountHave?.Invoke(_resource) ?? 0);
             }
         }
 
-        public bool CanClear() => _resource != null && _amountHave < 1;
+        public bool CanClear() => _resource != null && _amountHave?.Invoke(_resource) < 1;
 
         public void RemoveCraftingResource()
         {
@@ -62,7 +61,7 @@
                 ResourceRemoved?.Invoke(_resource);
                 _resourceConsumed = null;
                 _resource = null;
-                _amountHave = 0;
+                _amountHave = null;
             }
         }
 

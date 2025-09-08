@@ -1,8 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://iif75nev2q13"]
+[gd_scene load_steps=5 format=3 uid="uid://iif75nev2q13"]
 
 [ext_resource type="Script" uid="uid://csinkwyxcuaps" path="res://Source/UIElements/CraftingUI.cs" id="1_ykvyl"]
+[ext_resource type="Script" uid="uid://5jbef7vb67tu" path="res://TestResources/Inventory/CraftingSlot.cs" id="2_lupn8"]
 
-[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional", "_create", "_changeLanguage", "_iconRect", "_itemBaseStatsContainer", "_description", "_inventoryGrid")]
+[sub_resource type="Gradient" id="Gradient_lupn8"]
+colors = PackedColorArray(0.391381, 0.391381, 0.391381, 1, 0.615407, 0.615293, 0.615293, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_g6x84"]
+gradient = SubResource("Gradient_lupn8")
+
+[node name="CraftingUI" type="Panel" node_paths=PackedStringArray("_recipeTree", "_possibleModifiersList", "_main", "_optional", "_create", "_itemBaseStatsContainer", "_description", "_inventoryGrid", "_craftingSlot")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,12 +20,11 @@ _recipeTree = NodePath("HBoxContainer/Panel/MarginContainer/RecipeTree")
 _possibleModifiersList = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/Modifiers/ItemList")
 _main = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/MainResources/HBoxContainer2/ScrollContainer/HBoxContainer")
 _optional = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingResources/Optional/VBoxContainer/Resources")
-_create = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Button")
-_changeLanguage = NodePath("HBoxContainer/VBoxContainer/Panel2/MarginContainer/Button")
-_iconRect = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer/HBoxContainer/TextureRect")
-_itemBaseStatsContainer = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer/HBoxContainer/BaseStats/Container")
-_description = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/DescriptionContainer/RichTextLabel")
+_create = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Button")
+_itemBaseStatsContainer = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer/ItemWindow/ItemStats/Container")
+_description = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/DescriptionContainer/RichTextLabel")
 _inventoryGrid = NodePath("HBoxContainer/VBoxContainer/Panel2/MarginContainer/GridContainer")
+_craftingSlot = NodePath("HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer/ItemWindow/CraftingSlot")
 metadata/_edit_use_anchors_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -74,18 +80,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
+[node name="CraftingItemSlot" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.8
 
-[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2"]
+[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.9
 
-[node name="ItemContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel"]
+[node name="ItemContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel"]
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
@@ -94,47 +100,51 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_top = 15
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer"]
+[node name="ItemWindow" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer"]
 clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.7
 
-[node name="TextureRect" type="TextureRect" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer/HBoxContainer"]
-clip_contents = true
+[node name="CraftingSlot" type="TextureButton" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer/ItemWindow" node_paths=PackedStringArray("_itemBaseStatsContainer")]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("2_lupn8")
+_itemBaseStatsContainer = NodePath("../ItemStats/Container")
+DefaltTexture = SubResource("GradientTexture1D_g6x84")
+metadata/_custom_type_script = "uid://5jbef7vb67tu"
+
+[node name="ItemStats" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer/ItemWindow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.3
-expand_mode = 1
 
-[node name="BaseStats" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.3
-
-[node name="Container" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/MarginContainer/HBoxContainer/BaseStats"]
+[node name="Container" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/MarginContainer/ItemWindow/ItemStats"]
 layout_mode = 2
 
-[node name="DescriptionContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer"]
+[node name="DescriptionContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.3
 
-[node name="Description" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/DescriptionContainer"]
+[node name="Description" type="Label" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/DescriptionContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Description"
 
-[node name="RichTextLabel" type="RichTextLabel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2/Panel/ItemContainer/DescriptionContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot/Panel/ItemContainer/DescriptionContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/VBoxContainer2"]
+[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel/HBoxContainer/CraftingItemSlot"]
 layout_mode = 2
 size_flags_vertical = 8
 focus_mode = 0
@@ -231,14 +241,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 30
-
-[node name="Button" type="Button" parent="HBoxContainer/VBoxContainer/Panel2/MarginContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-focus_mode = 0
-text = "Change language"
 
 [node name="GridContainer" type="GridContainer" parent="HBoxContainer/VBoxContainer/Panel2/MarginContainer"]
 layout_mode = 2

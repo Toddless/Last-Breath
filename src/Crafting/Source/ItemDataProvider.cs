@@ -27,28 +27,18 @@
             Logger.LogInfo($"{nameof(ItemDataProvider)} was created.", this);
         }
 
-        public IItem? GetItem(string id)
-        {
-            if (!_itemData.TryGetValue(id, out var item)) return null;
-            return item.Copy<IItem>(true);
-        }
+        public IItem? CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>(true);
 
-        public Texture2D? GetItemIcon(string id)
-        {
-            if (!_itemData.TryGetValue(id, out var item)) return null;
-            return item.Icon;
-        }
+        public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
-        public int GetItemMaxStackSize(string id)
-        {
-            if (!_itemData.TryGetValue(id, out var item)) return 0;
-            return item.MaxStackSize;
-        }
+        public int GetItemMaxStackSize(string id) => TryGetItem(id)?.MaxStackSize ?? 0;
+
+        public string GetItemDisplayName(string id) => TryGetItem(id)?.DisplayName ?? string.Empty;
 
         public List<string> GetItemBaseStats(string id)
         {
-            if (!_itemStatsData.TryGetValue(id, out var item)) return [];
-            return ConvertItemStats(item);
+            if (!_itemStatsData.TryGetValue(id, out var data)) return [];
+            return ConvertItemStats(data);
         }
 
         public ItemStats GetItemStats(string id)
@@ -57,8 +47,38 @@
             return data;
         }
 
+        public List<IRecipeRequirement> GetRecipeRequirements(string id)
+        {
+            var item = TryGetItem(id);
+            if (item is not ICraftingRecipe recipe) return [];
+            return recipe.MainResource;
+        }
+
+        public string GetRecipeResultItemId(string recipeId)
+        {
+            var item = TryGetItem(recipeId);
+            if(item is not ICraftingRecipe recipe) return string.Empty;
+            return recipe.ResultItemId;
+        }
+
+        public bool IsItemImplement<T>(string id)
+        {
+            var item = TryGetItem(id);
+            return item != null && item is T;
+        }
+
+        public bool IsItemHasTag(string id, string tag) => TryGetItem(id)?.HasTag(tag) ?? false;
+
+        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
+        {
+            if (!_itemData.TryGetValue(id, out var res)) return [];
+            if (res is not ICraftingResource crafting) return [];
+            return crafting.MaterialType?.Modifiers ?? [];
+        }
+
         public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is ICraftingResource)];
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
+
         public void LoadData()
         {
             var itemData = ResourceLoader.ListDirectory(_itemDataPath);
@@ -80,8 +100,8 @@
                         {
                             var fullPath = Path.Combine(path, file);
                             var itemStats = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
-                             var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
-                             if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
+                            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
+                            if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
                         }
                         else
                         {
@@ -100,36 +120,6 @@
                 }
 
             }
-
-            //using var dire = DirAccess.Open(_itemDataPath);
-            //if (dir == null)
-            //{
-            //    Logger.LogNull(nameof(dir), this);
-            //    return;
-            //}
-            //dir.ListDirBegin();
-            //try
-            //{
-            //    string file;
-            //    while ((file = dir.GetNext()) != "")
-            //    {
-            //        if (!file.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) continue;
-
-            //        var fullPath = Path.Combine(_itemDataPath, file);
-            //        var data = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
-            //        var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(data);
-            //        if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
-            //    }
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logger.LogException("Data loading failed.", ex, this);
-            //}
-            //finally
-            //{
-            //    dir.ListDirEnd();
-            //}
         }
 
         // should not be there
@@ -145,6 +135,16 @@
             }
 
             return dict;
+        }
+
+        private IItem? TryGetItem(string id)
+        {
+            if (!_itemData.TryGetValue(id, out var item))
+            {
+                Logger.LogNotFound($"Item with id: {id}", this);
+                return null;
+            }
+            return item;
         }
     }
 }

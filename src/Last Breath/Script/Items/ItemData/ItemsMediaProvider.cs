@@ -1,16 +1,20 @@
 ﻿namespace LastBreath.Script.Items.ItemData
 {
+    using System.Collections.Generic;
     using System.IO;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
     using Godot;
-    using Godot.Collections;
     using Utilities;
 
-    public class ItemsMediaProvider : IItemDataProvider<ItemMediaData>
+    public class ItemsMediaProvider : IItemDataProvider
     {
         private const string PathToData = "res://Data/GenericItemMediaData/";
         // Generic data
-        private Dictionary<string, ItemMediaData> _mediaData = [];
+        private Godot.Collections.Dictionary<string, ItemMediaData> _mediaData = [];
+
+        public static IItemDataProvider? Instance => throw new System.NotImplementedException();
 
         public void LoadData()
         {
@@ -34,5 +38,14 @@
         }
 
         private GenericItemsMediaData LoadResource(string path) => !string.IsNullOrWhiteSpace(path) ? ResourceLoader.Load<GenericItemsMediaData>(path) : new();
+        public IItem? CopyBaseItem(string id) => throw new System.NotImplementedException();
+        public IEnumerable<IItem> GetAllResources() => throw new System.NotImplementedException();
+        public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => throw new System.NotImplementedException();
+        public List<string> GetItemBaseStats(string id) => throw new System.NotImplementedException();
+        public string GetItemDisplayName(string id) => throw new System.NotImplementedException();
+        public Texture2D? GetItemIcon(string id) => throw new System.NotImplementedException();
+        public int GetItemMaxStackSize(string id) => throw new System.NotImplementedException();
+        public ItemStats GetItemStats(string id) => throw new System.NotImplementedException();
+        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id) => throw new System.NotImplementedException();
     }
 }

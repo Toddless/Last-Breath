@@ -27,8 +27,8 @@
         public void AddItem(string resourceId, bool selectable = true)
         {
             _resources.Add(resourceId);
-            var displayName = CraftingResourceProvider.Instance?.GetResourceName(resourceId);
-            var icon = CraftingResourceProvider.Instance?.GetResourceIcon(resourceId);
+            var displayName = ItemDataProvider.Instance?.GetItemDisplayName(resourceId);
+            var icon = ItemDataProvider.Instance?.GetItemIcon(resourceId);
             _items?.AddItem(displayName, icon, selectable);
         }
 

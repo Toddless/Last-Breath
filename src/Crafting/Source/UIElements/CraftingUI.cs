@@ -16,15 +16,14 @@
         [Export] private Tree? _recipeTree;
         [Export] private ItemList? _possibleModifiersList;
         [Export] private VBoxContainer? _main, _optional;
-        [Export] private Button? _create, _changeLanguage;
-        [Export] private TextureRect? _iconRect;
+        [Export] private Button? _create;
         [Export] private VBoxContainer? _itemBaseStatsContainer;
         [Export] private RichTextLabel? _description;
         [Export] private GridContainer? _inventoryGrid;
+        [Export] private CraftingSlot? _craftingSlot;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ItemCreatedEventHandler();
-        [Signal] public delegate void ChangeLanguageEventHandler();
 
         public override void _Ready()
         {
@@ -34,11 +33,6 @@
             {
                 _create.Disabled = true;
                 _create.Pressed += () => EmitSignal(SignalName.ItemCreated);
-            }
-
-            if (_changeLanguage != null)
-            {
-                _changeLanguage.Pressed += () => EmitSignal(SignalName.ChangeLanguage);
             }
         }
 
@@ -124,16 +118,10 @@
             if (_create != null) _create.Disabled = !canUse;
         }
 
-        public void SetItemIcon(Texture2D icon)
-        {
-            if (_iconRect != null) _iconRect.Texture = icon;
-        }
-
         public void ClearUI()
         {
             ClearResources(_main);
             ClearOptionalResources();
-            ClearItemIcon();
             DestroyRecipeTree();
             SetCreateButtonState(false);
             _possibleModifiersList?.Clear();
@@ -148,12 +136,7 @@
         {
             if (_description != null) _description.Text = string.Empty;
         }
-
-        public void ClearItemIcon()
-        {
-            if (_iconRect != null) _iconRect.Texture = default;
-        }
-
+      
         public void DestroyRecipeTree() => _recipeTree?.Clear();
 
         private void ClearResources(VBoxContainer? container)

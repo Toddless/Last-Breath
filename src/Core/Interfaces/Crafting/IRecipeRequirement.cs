@@ -4,7 +4,5 @@
     {
         int Amount { get; }
         string CraftingResourceId { get; }
-
-        bool Matches(ICraftingResource resource);
     }
 }

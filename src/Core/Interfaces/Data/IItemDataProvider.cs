@@ -1,9 +1,24 @@
 ﻿namespace Core.Interfaces.Data
 {
-    public interface IItemDataProvider<T>
-        where T : class
+    using System.Collections.Generic;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Godot;
+
+    public interface IItemDataProvider
     {
-        public void LoadData();
-        T GetItemData(string id);
+        static abstract IItemDataProvider? Instance { get; }
+
+        IItem? CopyBaseItem(string id);
+        IEnumerable<IItem> GetAllResources();
+        IEnumerable<ICraftingRecipe> GetCraftingRecipes();
+        List<string> GetItemBaseStats(string id);
+        string GetItemDisplayName(string id);
+        Texture2D? GetItemIcon(string id);
+        int GetItemMaxStackSize(string id);
+        ItemStats GetItemStats(string id);
+        string GetItemType(string id);
+        IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id);
+        void LoadData();
     }
 }
