@@ -57,7 +57,7 @@
         public string GetRecipeResultItemId(string recipeId)
         {
             var item = TryGetItem(recipeId);
-            if(item is not ICraftingRecipe recipe) return string.Empty;
+            if (item is not ICraftingRecipe recipe) return string.Empty;
             return recipe.ResultItemId;
         }
 

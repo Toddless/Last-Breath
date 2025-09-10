@@ -8,6 +8,7 @@
         string ResultItemId {  get; }
         string Description { get; }
         string DisplayName { get; }
+        bool IsOpened { get; }
         string[] Tags { get; }
         List<IRecipeRequirement> MainResource { get; }
     }

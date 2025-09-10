@@ -6,6 +6,7 @@
     [GlobalClass]
     public partial class ResourceTemplateUI : MarginContainer
     {
+        private const string UID = "res://Source/UIElements/View/ResourceTemplateUI.tscn";
         [Export] private Label? _text;
         [Export] private TextureRect? _icon;
 
@@ -20,8 +21,11 @@
             }
         }
 
-        public void SetIcon(Texture2D icon) => _icon!.Texture = icon;
+        public void SetIcon(Texture2D? icon)
+        {
+            if(_icon != null) _icon.Texture = icon;
+        }
 
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>("res://Source/UIElements/View/ResourceTemplateUI.tscn");
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }
 }

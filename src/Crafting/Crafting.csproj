@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Stateless" Version="5.19.0" />
   </ItemGroup>
 </Project>

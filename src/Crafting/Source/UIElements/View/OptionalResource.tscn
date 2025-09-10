@@ -2,21 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bp7l7o48j0r6h" path="res://Source/UIElements/OptionalResource.cs" id="1_ib3ki"]
 
-[node name="OptionalResource" type="Panel" node_paths=PackedStringArray("_add", "_remove", "_container")]
-custom_minimum_size = Vector2(0, 58)
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_top = -29.0
-offset_bottom = 29.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="OptionalResource" type="Panel" node_paths=PackedStringArray("_add", "_remove", "Container")]
+custom_minimum_size = Vector2(0, 43)
+offset_bottom = 58.0
 script = ExtResource("1_ib3ki")
 _add = NodePath("HBoxContainer/Buttons/Add")
 _remove = NodePath("HBoxContainer/Buttons/Remove")
-_container = NodePath("HBoxContainer/Template")
+Container = NodePath("HBoxContainer/Template")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -28,11 +20,14 @@ grow_vertical = 2
 
 [node name="Template" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
 
 [node name="Buttons" type="HBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
-size_flags_stretch_ratio = 0.0
+theme_override_constants/separation = 1
 
 [node name="Add" type="Button" parent="HBoxContainer/Buttons"]
 custom_minimum_size = Vector2(35, 0)

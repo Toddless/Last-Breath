@@ -5,14 +5,10 @@
 
     [Tool]
     [GlobalClass]
-    public partial class OptionalResource : Node
+    public partial class OptionalResource : BaseResource
     {
         private const string UID = "uid://cldhk7d6f2k2p";
-        private string? _resource;
-        private Func<string, int>? _amountHave;
         [Export] private Button? _add, _remove;
-        [Export] private HBoxContainer? _container;
-        private Action<string, int>? _resourceConsumed;
 
         [Signal] public delegate void AddPressedEventHandler();
 
@@ -24,44 +20,18 @@
             if (_remove != null) _remove.Pressed += RemoveCraftingResource;
         }
 
-        public void AddCraftingResource(string resource, Func<string, int> amountHave, int amountNeed = 1)
+        public override void AddCraftingResource(string resource, Func<string, int> amounHave, int amountNeed = 1)
         {
-            // only one resource can be added
-            if (_resource != null) RemoveCraftingResource();
-            _resource = resource;
-            var templ = ResourceTemplateUI.Initialize().Instantiate<ResourceTemplateUI>();
-            var resourceIcon = ItemDataProvider.Instance?.GetItemIcon(resource);
-            if (resourceIcon != null) templ.SetIcon(resourceIcon);
-            templ.SetText(ItemDataProvider.Instance?.GetItemDisplayName(resource) ?? string.Empty, amountHave.Invoke(resource), amountNeed);
-            _resourceConsumed += (displayName, amountHave) =>
-            {
-                templ.SetText(displayName, amountHave, amountNeed);
-            };
-            _container?.AddChild(templ);
-            _amountHave = amountHave;
+            if (!string.IsNullOrWhiteSpace(ResourceId)) RemoveCraftingResource();
+            base.AddCraftingResource(resource, amounHave, amountNeed);
         }
 
-        public void ConsumeResource()
+        public override void RemoveCraftingResource()
         {
-            if (_resource != null)
+            if (!string.IsNullOrWhiteSpace(ResourceId))
             {
-                var displayName = ItemDataProvider.Instance?.GetItemDisplayName(_resource) ?? string.Empty;
-                _resourceConsumed?.Invoke(displayName, _amountHave?.Invoke(_resource) ?? 0);
-            }
-        }
-
-        public bool CanClear() => _resource != null && _amountHave?.Invoke(_resource) < 1;
-
-        public void RemoveCraftingResource()
-        {
-            if (_resource != null)
-            {
-                foreach (var child in _container?.GetChildren() ?? [])
-                    child.QueueFree();
-                ResourceRemoved?.Invoke(_resource);
-                _resourceConsumed = null;
-                _resource = null;
-                _amountHave = null;
+                ResourceRemoved?.Invoke(ResourceId);
+                base.RemoveCraftingResource();
             }
         }
 
