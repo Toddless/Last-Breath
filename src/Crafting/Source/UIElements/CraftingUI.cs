@@ -17,13 +17,12 @@
         private List<MainResource> _mainResources = [];
         private Dictionary<Categories, TreeItem> _categories = [];
         [Export] private Tree? _recipeTree;
-        [Export] private ItemList? _itemModifierList;
+        //[Export] private ItemList? _itemModifierList;
+        [Export] private ItemModifierList? _itemModifierList;
         [Export] private VBoxContainer? _optional, _main;
         [Export] private Button? _action;
-        [Export] private RichTextLabel? _description;
         [Export] private GridContainer? _inventoryGrid;
-        [Export] private Label? _randomLabel;
-        [Export] private RichTextLabel? _baseStats, _possibleModifiersList;
+        [Export] private RichTextLabel? _baseStats, _possibleModifiersList, _description;
         [Export] private CraftingSlot? _slot;
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
@@ -37,12 +36,16 @@
         public override void _Ready()
         {
             _recipeTree?.Clear();
-            if (_recipeTree != null) _recipeTree.ItemSelected += OnItemSelected;
+            if (_recipeTree != null) _recipeTree.ItemSelected += OnRecipeSelected;
             if (_action != null)
             {
                 _action.Disabled = true;
                 _action.Pressed += () => EmitSignal(SignalName.ActionButtonPressed);
             }
+            //if (_itemModifierList != null)
+            //{
+            //    _itemModifierList.ItemSelected += OnModifierItemSelected;
+            //}
             if (_itemModifierList != null)
             {
                 _itemModifierList.ItemSelected += OnModifierItemSelected;
@@ -125,11 +128,6 @@
             if (_action != null) _action.Text = text;
         }
 
-        public void SetRandomStatsLabel(string text)
-        {
-            if (_randomLabel != null) _randomLabel.Text = text;
-        }
-
         public void SetBaseStats(string text)
         {
             if (_baseStats != null) _baseStats.Text = text;
@@ -137,23 +135,22 @@
 
         public void SetItemModifiers(List<(string Mod, int Hash)> modifiers)
         {
-            if (_itemModifierList != null)
-            {
-                for (int i = 0; i < modifiers.Count; i++)
-                {
-                    _itemModifierList.AddItem(modifiers[i].Mod);
-                    _itemModifierList.SetItemMetadata(i, modifiers[i].Hash);
-                    // TODO: Not all mods can be changed
-                    _itemModifierList.SetItemSelectable(i, true);
-                }
-            }
+            _itemModifierList?.AddModifiersToList(modifiers);
+            //if (_itemModifierList != null)
+            //{
+            //    for (int i = 0; i < modifiers.Count; i++)
+            //    {
+            //        _itemModifierList.AddItem(modifiers[i].Mod);
+            //        _itemModifierList.SetItemMetadata(i, modifiers[i].Hash);
+            //        // TODO: Not all mods can be changed
+            //        _itemModifierList.SetItemSelectable(i, true);
+            //    }
+            //}
         }
 
-        public void SetInCraftingSlot(ItemInstance instance)
-        {
-            if (_slot != null) _slot.SetItem(instance);
-        }
-
+        public void SetRecipe(string id) => _slot?.SetRecipe(id);
+        public ItemInstance? GetCraftingSlotItem() => _slot?.CurrentItem;
+        public void ClearCraftingSlot() => _slot?.ClearSlot();
         public void ClearPossibleModifiers()
         {
             if (_possibleModifiersList != null) _possibleModifiersList.Text = string.Empty;
@@ -164,8 +161,8 @@
         }
         public void ClearItemModifiers()
         {
-            _lastSelectedModifierInd = -1;
-            _itemModifierList?.Clear();
+            //  _lastSelectedModifierInd = -1;
+            _itemModifierList?.ClearList();
         }
         public void ClearOptionalResources() => _optionalResources.ForEach(x => x.RemoveCraftingResource());
         public void ClearMainResources()
@@ -181,17 +178,26 @@
             if (_description != null) _description.Text = string.Empty;
         }
 
-        private void ConsumeResources<T>(List<T> resource)
-            where T : BaseResource
+        private void GetSelectedModifiers()
         {
-            foreach (var res in resource)
+            //    Godot.Collections.Array<int> hashes = [];
+            //    foreach (var selected in _itemModifierList?.GetSelectedItems() ?? [])
+            //    {
+            //        hashes.Add(_itemModifierList?.GetItemMetadata(selected).AsInt32() ?? 0);
+            //    }
+            // EmitSignal(SignalName.SelectedModifiers, hashes, _slot?.CurrentItem?.InstanceId ?? string.Empty);
+        }
+
+        private void ConsumeResources<T>(List<T> resources) where T : BaseResource
+        {
+            foreach (var res in resources)
             {
                 res.ConsumeResource();
                 if (res.CanClear()) res.RemoveCraftingResource();
             }
         }
 
-        private void OnItemSelected()
+        private void OnRecipeSelected()
         {
             var selected = _recipeTree?.GetSelected();
             if (selected == null) return;
@@ -199,17 +205,18 @@
             EmitSignal(SignalName.RecipeSelected, selectedRecipeId);
         }
 
-        private void OnModifierItemSelected(long index)
+        private void OnModifierItemSelected(int index)
         {
-            if (index == _lastSelectedModifierInd)
-            {
-                _itemModifierList?.Deselect((int)index);
-                _lastSelectedModifierInd = -1;
-                return;
-            }
-            _lastSelectedModifierInd = index;
-            var hash = _itemModifierList?.GetItemMetadata((int)index).AsInt32() ?? 0;
-            EmitSignal(SignalName.ModifierSelected, hash, _slot?.CurrentItem?.InstanceId ?? string.Empty);
+            EmitSignal(SignalName.ModifierSelected, index, _slot?.CurrentItem?.InstanceId ?? string.Empty);
+            //if (index == _lastSelectedModifierInd)
+            //{
+            //    _itemModifierList?.Deselect((int)index);
+            //    _lastSelectedModifierInd = -1;
+            //    return;
+            //}
+            //_lastSelectedModifierInd = index;
+            //var hash = _itemModifierList?.GetItemMetadata((int)index).AsInt32() ?? 0;
+            //EmitSignal(SignalName.ModifierSelected, hash, _slot?.CurrentItem?.InstanceId ?? string.Empty);
         }
     }
 }

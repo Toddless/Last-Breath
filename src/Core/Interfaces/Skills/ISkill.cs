@@ -2,9 +2,8 @@
 {
     using Core.Enums;
 
-    public interface ISkill
+    public interface ISkill : IIdentifiable,  IDisplayable
     {
-        string Id { get; }
         SkillType Type { get; }
         bool IsEvadable { get; }
     }

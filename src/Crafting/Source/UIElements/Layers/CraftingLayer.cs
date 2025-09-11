@@ -10,6 +10,7 @@
     using System.Collections.Generic;
     using Crafting.TestResources.Inventory;
     using Stateless;
+    using System.Text;
 
     public partial class CraftingLayer : CanvasLayer
     {
@@ -37,11 +38,12 @@
             _itemCreator = new ItemCreator();
             _dataProvider.LoadData();
 
+            ConfigureMachine();
             if (_craftingUI != null)
             {
                 _craftingUI.RecipeSelected += (id) => _machine.Fire(_recipeSelected, id);
                 _craftingUI.OnEquipItemPlaced += (id) => _machine.Fire(_equipItemSelected, id);
-                _craftingUI.OnEquipItemReturned += (id, instance) => _itemInventory?.ReturnItemToInventory(new(id, instance)); 
+                _craftingUI.OnEquipItemReturned += (id, instance) => _itemInventory?.ReturnItemToInventory(new(id, instance));
                 _craftingUI.OnEquipItemRemoved += PrepareUI;
                 _craftingUI.ModifierSelected += (hash, instanceId) => GD.Print($"Modifier with hash: {hash}. Have item in inventory: {_itemInventory?.GetItemInstance(instanceId) != null}");
             }
@@ -64,27 +66,18 @@
                 foreach (var resource in _dataProvider.GetAllResources())
                     _itemInventory.AddItem(resource, 100);
             // ____________________________________________
-            ConfigureMachine();
         }
 
         private void ConfigureMachine()
         {
             _recipeSelected = _machine.SetTriggerParameters<string>(Trigger.SetRecipe);
             _equipItemSelected = _machine.SetTriggerParameters<string>(Trigger.SetEquip);
-            // Основные стейты:
-            // 1. Интерфейс открыт, не выбран ни один рецеп, не выбран ни один айтем
-            // 2. Интерфейс закрыт
-            // 3. Выбран айтем для апгреда
-            // 4. Выбран айтем для рецепта
-            // 5. Убран айтем
-            // 6. Убран рецепт
-            // 7. Выбран айтем, в слоте был ранее выбран рецепт
-            // 8. Выбран рецепт, в слоте быр ранее выбран айтем
+
             _machine.Configure(State.Closed)
                 .OnEntry(() =>
                 {
                     Hide();
-                    // TODO: Later i need to return an item in inventory if it is still within crafting slot
+                    ReturnCraftingSlotItemIfNeeded();
                     _mainModifiers.Clear();
                     _mainResources.Clear();
                     _optionalModifiers.Clear();
@@ -112,15 +105,7 @@
             _machine.Configure(State.Recipe)
                 .OnEntry(PrepareUI)
                 .OnEntryFrom(_recipeSelected, SetRecipe)
-                .OnExit(() =>
-                {
-                    if (_craftingUI != null && _currentHandler != null)
-                    {
-                        _craftingUI.ActionButtonPressed -= _currentHandler.Invoke;
-                        _currentHandler = null;
-                    }
-                    _craftingUI?.SetActionButtonState(false);
-                })
+                .OnExit(UnsubscribeActionButton)
                 .PermitReentry(Trigger.SetRecipe)
                 .Permit(Trigger.Close, State.Closed)
                 .Permit(Trigger.SetEquip, State.Equip);
@@ -128,28 +113,24 @@
             _machine.Configure(State.Equip)
                 .OnEntry(PrepareUI)
                 .OnEntryFrom(_equipItemSelected, SetEquipItem)
-                .OnExit(() =>
-                {
-                    if (_craftingUI != null && _currentHandler != null)
-                    {
-                        _craftingUI.ActionButtonPressed -= _currentHandler.Invoke;
-                        _currentHandler = null;
-                    }
-                    _craftingUI?.SetActionButtonState(false);
-                })
+                .OnExit(UnsubscribeActionButton)
                 .PermitReentry(Trigger.SetEquip)
                 .Permit(Trigger.SetRecipe, State.Recipe)
                 .Permit(Trigger.Close, State.Closed);
         }
 
-        private void PrepareUI()
+        private void ReturnCraftingSlotItemIfNeeded()
         {
-            _mainResources?.Clear();
-            _mainModifiers.Clear();
-            _craftingUI?.ClearItemBaseStats();
-            _craftingUI?.ClearMainResources();
-            _craftingUI?.ClearItemModifiers();
-            _craftingUI?.ShowModifiers(FormattedModifiers());
+            var itemInstance = _craftingUI?.GetCraftingSlotItem();
+            // recipe, dont care just clear it
+            if (itemInstance == null || string.IsNullOrWhiteSpace(itemInstance.InstanceId))
+            {
+                _craftingUI?.ClearCraftingSlot();
+                return;
+            }
+            // crafting slot always have 1 item
+            _itemInventory?.ReturnItemToInventory(itemInstance);
+            _craftingUI?.ClearCraftingSlot();
         }
 
         private void SetRecipe(string id)
@@ -161,15 +142,16 @@
             }
             _craftingUI?.SetActionButtonName(Lokalizator.Lokalize("CraftingCreateButton"));
             // recipe should not have instance id
-            _craftingUI?.SetInCraftingSlot(new(id, string.Empty));
+            _craftingUI?.SetRecipe(id);
             var itemId = _dataProvider?.GetRecipeResultItemId(id) ?? string.Empty;
             ShowBaseItemStats(itemId);
-            ShowMainResources(_dataProvider?.GetRecipeRequirements(id) ?? []);
+            bool canCraft = ShowMainResources(_dataProvider?.GetRecipeRequirements(id) ?? []);
+            _craftingUI?.SetActionButtonState(canCraft);
             _craftingUI?.ShowModifiers(FormattedModifiers());
             _craftingUI?.SetItemDescription(Lokalizator.LokalizeDescription(itemId));
         }
 
-        private void ShowMainResources(List<IRecipeRequirement> recipeRequirements)
+        private bool ShowMainResources(List<IRecipeRequirement> recipeRequirements)
         {
             bool canCraft = false;
             foreach (var req in recipeRequirements)
@@ -178,14 +160,13 @@
                 _mainResources.Add(reqResourceId);
                 var mainRes = MainResource.Initialize().Instantiate<MainResource>();
                 mainRes.AddCraftingResource(reqResourceId, res => _itemInventory?.GetTotalItemAmount(reqResourceId) ?? 0, req.Amount);
-                _craftingUI?.AddMainResource(mainRes);
 
+                _craftingUI?.AddMainResource(mainRes);
                 var amountHave = _itemInventory?.GetTotalItemAmount(reqResourceId) ?? 0;
                 canCraft = amountHave >= req.Amount;
                 AddModifiersToSet(_mainModifiers, _dataProvider?.GetResourceModifiers(reqResourceId) ?? []);
             }
-
-            _craftingUI?.SetActionButtonState(canCraft);
+            return canCraft;
         }
 
         private void SetEquipItem(string itemId)
@@ -250,6 +231,7 @@
 
         }
 
+        // should not be there
         private void CreateNotifier(IItem item)
         {
             var notifier = ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
@@ -350,13 +332,10 @@
         private void ConsumeResourcesFromInventory(string id)
         {
             foreach (var res in _dataProvider?.GetRecipeRequirements(id) ?? [])
-            {
                 _itemInventory?.RemoveItemById(res.CraftingResourceId, res.Amount);
-            }
             foreach (var optResourceId in _optionalResources)
-            {
                 _itemInventory?.RemoveItemById(optResourceId);
-            }
+
             _craftingUI?.ConsumeOptionalResource();
             _craftingUI?.ConsumeMainResources();
         }
@@ -388,6 +367,26 @@
             _craftingUI?.SetBaseStats(baseStats);
         }
 
+        private void UnsubscribeActionButton()
+        {
+            if (_craftingUI != null && _currentHandler != null)
+            {
+                _craftingUI.ActionButtonPressed -= _currentHandler.Invoke;
+                _currentHandler = null;
+            }
+            _craftingUI?.SetActionButtonState(false);
+        }
+
+        private void PrepareUI()
+        {
+            _mainResources?.Clear();
+            _mainModifiers.Clear();
+            _craftingUI?.ClearItemBaseStats();
+            _craftingUI?.ClearMainResources();
+            _craftingUI?.ClearItemModifiers();
+            _craftingUI?.ShowModifiers(FormattedModifiers());
+            _craftingUI?.ClearDescription();
+        }
 
         private void OnResourceAdded(string resource)
         {
@@ -427,12 +426,10 @@
 
         private string FormattedModifiers()
         {
-            string formatted = "";
+            var formatted = new StringBuilder();
             foreach (var mod in ConcatModifierSets())
-            {
-                formatted += $"{Lokalizator.Format(mod)}\n";
-            }
-            return formatted;
+                formatted.AppendLine(Lokalizator.Format(mod));
+            return formatted.ToString();
         }
     }
 }

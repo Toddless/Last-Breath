@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cu1u7ht1lp0hc"]
 
-[ext_resource type="Script" uid="uid://dupl70ajxafcv" path="res://Source/UIElements/ItemCreatedNotifier.cs" id="1_uub7b"]
+[ext_resource type="Script" uid="uid://dupl70ajxafcv" path="res://Source/UIElements/ItemCreatedNotifier.cs" id="1_7f3vv"]
 
 [node name="ItemCreatedNotifier" type="ColorRect" node_paths=PackedStringArray("_itemImage", "_statContainer", "_okButton", "_destroyButton")]
 custom_minimum_size = Vector2(350, 500)
@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0941176, 0, 0, 0)
-script = ExtResource("1_uub7b")
+script = ExtResource("1_7f3vv")
 _itemImage = NodePath("Panel/MarginContainer/VBoxContainer/VBoxContainer/TextureRect")
 _statContainer = NodePath("Panel/MarginContainer/VBoxContainer/VBoxContainer/VBoxContainer")
 _okButton = NodePath("Panel/MarginContainer/VBoxContainer/HBoxContainer/Ok")

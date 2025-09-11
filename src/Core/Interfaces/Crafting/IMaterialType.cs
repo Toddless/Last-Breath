@@ -2,11 +2,8 @@
 {
     using System.Collections.Generic;
 
-    public interface IMaterialType
+    public interface IMaterialType : IIdentifiable
     {
-        string Id { get; }
-        string DisplayName { get; }
-        string[] Tags { get; }
         IReadOnlyList<IMaterialModifier>? Modifiers { get; }
         IMaterialCategory? MaterialCategory { get; }
     }

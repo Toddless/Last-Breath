@@ -9,7 +9,7 @@
     {
         public IReadOnlyList<IModifier> BaseModifiers { get; }
         public IReadOnlyList<IModifier> AdditionalModifiers { get; }
-        public EquipmentPart EquipmentPart { get; }
+        public EquipmentType EquipmentPart { get; }
         public AttributeType AttributeType { get; }
         public ISkill? Skill { get; }
 

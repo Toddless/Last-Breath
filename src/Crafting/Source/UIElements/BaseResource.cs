@@ -9,7 +9,7 @@
         protected string? ResourceId;
         protected Func<string, int>? AmountHave;
         protected Action<string, int>? ResourceConsumed;
-        [Export] protected Container? Container;
+        [Export] protected Control? Container;
 
         public virtual void AddCraftingResource(string resource, Func<string, int> amounHave, int amountNeed = 1)
         {

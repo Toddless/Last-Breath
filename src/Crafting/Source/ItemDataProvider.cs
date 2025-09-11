@@ -76,7 +76,8 @@
             return crafting.MaterialType?.Modifiers ?? [];
         }
 
-        public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is ICraftingResource)];
+        public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is IResource)];
+
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
 
         public void LoadData()

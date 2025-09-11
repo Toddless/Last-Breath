@@ -14,6 +14,10 @@ config/name="Crafting"
 run/main_scene="uid://dcpqui52lodel"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 
+[autoload]
+
+UIProvider="*res://Source/UIElements/Styles/UIResourcesProvider.cs"
+
 [display]
 
 window/size/viewport_width=1920
