@@ -27,13 +27,13 @@
             Logger.LogInfo($"{nameof(ItemDataProvider)} was created.", this);
         }
 
-        public IItem? CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>(true);
+        public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>(true);
 
-        public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
+        public Texture2D? GetItemIcon(string id) => TryGetItem(id, out var item)?.Icon;
 
-        public int GetItemMaxStackSize(string id) => TryGetItem(id)?.MaxStackSize ?? 0;
+        public int GetItemMaxStackSize(string id) => TryGetItem(id, out var item)?.MaxStackSize ?? 0;
 
-        public string GetItemDisplayName(string id) => TryGetItem(id)?.DisplayName ?? string.Empty;
+        public string GetItemDisplayName(string id) => TryGetItem(id, out var item)?.DisplayName ?? string.Empty;
 
         public List<string> GetItemBaseStats(string id)
         {
@@ -47,27 +47,27 @@
             return data;
         }
 
-        public List<IRecipeRequirement> GetRecipeRequirements(string id)
+        public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
-            var item = TryGetItem(id);
+            TryGetItem(id, out var item);
             if (item is not ICraftingRecipe recipe) return [];
             return recipe.MainResource;
         }
 
         public string GetRecipeResultItemId(string recipeId)
         {
-            var item = TryGetItem(recipeId);
+            TryGetItem(recipeId, out var item);
             if (item is not ICraftingRecipe recipe) return string.Empty;
             return recipe.ResultItemId;
         }
 
         public bool IsItemImplement<T>(string id)
         {
-            var item = TryGetItem(id);
+            TryGetItem(id, out var item);
             return item != null && item is T;
         }
 
-        public bool IsItemHasTag(string id, string tag) => TryGetItem(id)?.HasTag(tag) ?? false;
+        public bool IsItemHasTag(string id, string tag) => TryGetItem(id, out var item)?.HasTag(tag) ?? false;
 
         public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
         {
@@ -104,7 +104,7 @@
                             var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
                             if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
                         }
-                        else
+                        else if (file.EndsWith(".tres", StringComparison.OrdinalIgnoreCase))
                         {
                             var loadedData = ResourceLoader.Load(Path.Combine(path, file));
                             if (loadedData is IItem item) _itemData.Add(item.Id, item);
@@ -138,14 +138,14 @@
             return dict;
         }
 
-        private IItem? TryGetItem(string id)
+        private IItem? TryGetItem(string id, out IItem? item)
         {
-            if (!_itemData.TryGetValue(id, out var item))
+            if (!_itemData.TryGetValue(id, out var data))
             {
                 Logger.LogNotFound($"Item with id: {id}", this);
-                return null;
+                return item = null;
             }
-            return item;
+            return item = data;
         }
     }
 }

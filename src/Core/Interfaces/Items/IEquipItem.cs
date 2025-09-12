@@ -12,10 +12,14 @@
         public EquipmentType EquipmentPart { get; }
         public AttributeType AttributeType { get; }
         public ISkill? Skill { get; }
+        int UpdateLevel { get; }
 
         void SetBaseModifiers(IEnumerable<IModifier> modifiers);
         void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
         void SetSkill(ISkill skill);
         void OnUnequip();
+        void Upgrade(int upgradeLevel = 1);
+        void Downgrade(int downgradeLevel = 1);
+        void ReplaceAdditionalModifier(int hash, IModifier newModifier);
     }
 }

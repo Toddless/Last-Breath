@@ -6,6 +6,6 @@
     {
         string ResultItemId {  get; }
         bool IsOpened { get; }
-        List<IRecipeRequirement> MainResource { get; }
+        List<IResourceRequirement> MainResource { get; }
     }
 }

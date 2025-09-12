@@ -14,7 +14,7 @@
 
     public partial class CraftingLayer : CanvasLayer
     {
-        private enum Trigger { Open, Close, SetRecipe, SetEquip, Update }
+        private enum Trigger { Open, Close, SetRecipe, SetEquip }
         private enum State { Opened, Closed, Recipe, Equip }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.Closed);
@@ -28,15 +28,16 @@
 
         private ItemDataProvider? _dataProvider;
         private ItemCreator? _itemCreator;
+        private ItemUpgrader? _itemUpgrader;
         private ItemInventory? _itemInventory;
-        private Action? _currentHandler;
         [Export] private CraftingUI? _craftingUI;
 
         public override void _Ready()
         {
             _dataProvider = new("res://TestResources/RecipeAndResources/");
-            _itemCreator = new ItemCreator();
             _dataProvider.LoadData();
+            _itemCreator = new ItemCreator();
+            _itemUpgrader = new ItemUpgrader();
 
             ConfigureMachine();
             if (_craftingUI != null)
@@ -105,7 +106,7 @@
             _machine.Configure(State.Recipe)
                 .OnEntry(PrepareUI)
                 .OnEntryFrom(_recipeSelected, SetRecipe)
-                .OnExit(UnsubscribeActionButton)
+                .OnExit(() => { _craftingUI?.ClearActions(); })
                 .PermitReentry(Trigger.SetRecipe)
                 .Permit(Trigger.Close, State.Closed)
                 .Permit(Trigger.SetEquip, State.Equip);
@@ -113,7 +114,7 @@
             _machine.Configure(State.Equip)
                 .OnEntry(PrepareUI)
                 .OnEntryFrom(_equipItemSelected, SetEquipItem)
-                .OnExit(UnsubscribeActionButton)
+                .OnExit(() => { _craftingUI?.ClearActions(); })
                 .PermitReentry(Trigger.SetEquip)
                 .Permit(Trigger.SetRecipe, State.Recipe)
                 .Permit(Trigger.Close, State.Closed);
@@ -135,28 +136,82 @@
 
         private void SetRecipe(string id)
         {
-            if (_craftingUI != null)
-            {
-                _currentHandler = () => CreateItemButton(id);
-                _craftingUI.ActionButtonPressed += _currentHandler.Invoke;
-            }
-            _craftingUI?.SetActionButtonName(Lokalizator.Lokalize("CraftingCreateButton"));
-            // recipe should not have instance id
             _craftingUI?.SetRecipe(id);
             var itemId = _dataProvider?.GetRecipeResultItemId(id) ?? string.Empty;
             ShowBaseItemStats(itemId);
             bool canCraft = ShowMainResources(_dataProvider?.GetRecipeRequirements(id) ?? []);
-            _craftingUI?.SetActionButtonState(canCraft);
             _craftingUI?.ShowModifiers(FormattedModifiers());
-            _craftingUI?.SetItemDescription(Lokalizator.LokalizeDescription(itemId));
+            _craftingUI?.ClearDescription();
+            _craftingUI?.SetItemDescription(new RichTextLabel() { Text = Lokalizator.LokalizeDescription(itemId), SizeFlagsVertical = Control.SizeFlags.ExpandFill });
+            var button = new ActionButton();
+            button.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => CreateItemButton(id), canCraft);
+            _craftingUI?.AddActionNode(button);
         }
 
-        private bool ShowMainResources(List<IRecipeRequirement> recipeRequirements)
+        private void SetEquipItem(string itemId)
+        {
+            _craftingUI?.DeselecteAllRecipe();
+
+            var item = _itemInventory?.GetItemInstance(itemId);
+            if (item != null)
+            {
+                ShowBaseItemStats(item.InstanceId);
+                ShowItemModifiers(item);
+            }
+
+            // TODO: Remove from here
+            var buttonGroup = new ButtonGroup
+            {
+                AllowUnpress = true
+            };
+            var normal = new ActionButton();
+            normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), ToggleOne, buttonGroup);
+            var doubl = new ActionButton();
+            doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), ToggleTwo, buttonGroup);
+            var risky = new ActionButton();
+            risky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), ToggleThree, buttonGroup);
+            var update = new ActionButton();
+            update.SetupNormalButton(Lokalizator.Lokalize("CraftingUpdateButton"), UpdateItemButton);
+            _craftingUI?.AddActionNode(normal);
+            _craftingUI?.AddActionNode(doubl);
+            _craftingUI?.AddActionNode(risky);
+            _craftingUI?.AddActionNode(update);
+        }
+
+        private void ToggleOne(bool isToggled)
+        {
+            if (isToggled)
+            {
+                _craftingUI?.ClearMainResources();
+                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Normal) ?? [];
+                ShowMainResources(req);
+            }
+        }
+        private void ToggleTwo(bool isToggled)
+        {
+            if (isToggled)
+            {
+                _craftingUI?.ClearMainResources();
+                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Double) ?? [];
+                ShowMainResources(req);
+            }
+        }
+        private void ToggleThree(bool isToggled)
+        {
+            if (isToggled)
+            {
+                _craftingUI?.ClearMainResources();
+                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Lucky) ?? [];
+                ShowMainResources(req);
+            }
+        }
+
+        private bool ShowMainResources(List<IResourceRequirement> recipeRequirements)
         {
             bool canCraft = false;
             foreach (var req in recipeRequirements)
             {
-                var reqResourceId = req.CraftingResourceId;
+                var reqResourceId = req.ResourceId;
                 _mainResources.Add(reqResourceId);
                 var mainRes = MainResource.Initialize().Instantiate<MainResource>();
                 mainRes.AddCraftingResource(reqResourceId, res => _itemInventory?.GetTotalItemAmount(reqResourceId) ?? 0, req.Amount);
@@ -169,24 +224,7 @@
             return canCraft;
         }
 
-        private void SetEquipItem(string itemId)
-        {
-            if (_craftingUI != null && _currentHandler != null)
-            {
-                _currentHandler = UpdateItemButton;
-                _craftingUI.ActionButtonPressed += _currentHandler.Invoke;
-            }
 
-            _craftingUI?.SetActionButtonName(Lokalizator.Lokalize("CraftingUpdateButton"));
-            _craftingUI?.DeselecteAllRecipe();
-
-            var item = _itemInventory?.GetItemInstance(itemId);
-            if (item != null)
-            {
-                ShowBaseItemStats(item.Id);
-                ShowItemModifiers(item);
-            }
-        }
 
         private void ShowItemModifiers(IItem item)
         {
@@ -228,7 +266,11 @@
 
         private void UpdateItemButton()
         {
-
+            var instance = _craftingUI?.GetCraftingSlotItem();
+            var item = _itemInventory?.GetItemInstance(instance?.InstanceId ?? string.Empty);
+            if (item != null && item is IEquipItem equip) _itemUpgrader?.UpgradeItem(equip);
+            ShowBaseItemStats(item?.InstanceId ?? string.Empty);
+            ShowItemModifiers(item!);
         }
 
         // should not be there
@@ -332,7 +374,7 @@
         private void ConsumeResourcesFromInventory(string id)
         {
             foreach (var res in _dataProvider?.GetRecipeRequirements(id) ?? [])
-                _itemInventory?.RemoveItemById(res.CraftingResourceId, res.Amount);
+                _itemInventory?.RemoveItemById(res.ResourceId, res.Amount);
             foreach (var optResourceId in _optionalResources)
                 _itemInventory?.RemoveItemById(optResourceId);
 
@@ -356,25 +398,29 @@
             AddChild(craftingItems);
         }
 
+        //TODO: Rework
         private void ShowBaseItemStats(string itemId)
         {
-            var stats = _dataProvider?.GetItemBaseStats(itemId);
-            string baseStats = $"{Lokalizator.Lokalize("BaseStats")}\n";
-            foreach (var item in stats ?? [])
+            if (_machine.State == State.Recipe)
             {
-                baseStats += $"{item}\n";
+                var stats = _dataProvider?.GetItemBaseStats(itemId);
+                string baseStats = $"{Lokalizator.Lokalize("BaseStats")}\n";
+                foreach (var item in stats ?? [])
+                {
+                    baseStats += $"{item}\n";
+                }
+                _craftingUI?.SetBaseStats(baseStats);
             }
-            _craftingUI?.SetBaseStats(baseStats);
-        }
-
-        private void UnsubscribeActionButton()
-        {
-            if (_craftingUI != null && _currentHandler != null)
+            else
             {
-                _craftingUI.ActionButtonPressed -= _currentHandler.Invoke;
-                _currentHandler = null;
+                var item = _itemInventory?.GetItemInstance(itemId) as IEquipItem;
+                string baseStats = $"{Lokalizator.Lokalize(item?.Id ?? string.Empty)} : {item?.UpdateLevel}\n";
+                foreach (var stat in item?.BaseModifiers ?? [])
+                {
+                    baseStats += $"{Lokalizator.Format(stat)}\n";
+                }
+                _craftingUI?.SetBaseStats(baseStats);
             }
-            _craftingUI?.SetActionButtonState(false);
         }
 
         private void PrepareUI()

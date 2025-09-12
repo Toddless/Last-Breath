@@ -16,6 +16,7 @@
     {
         private record FilteredMaterialModifier(IMaterialModifier Modifier, float Weight);
         private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To, float Weight);
+
         private float _totalWeight;
 
         public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)

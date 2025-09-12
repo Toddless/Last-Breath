@@ -11,6 +11,7 @@
 
         public int Priority { get; } = priority;
 
+        public float BaseValue { get; } = value;
         public float Value { get; set; } = value;
 
         public object Source { get; } = source;
@@ -19,7 +20,7 @@
         {
             if (obj == null) return false;
             if (obj is not IModifier other) return false;
-            return Parameter == other.Parameter && Type == other.Type && Value == other.Value && Source == other.Source;
+            return Parameter == other.Parameter && Type == other.Type && BaseValue == other.BaseValue && Source == other.Source;
         }
 
         public override int GetHashCode()
@@ -29,7 +30,7 @@
                 int hash = 17;
                 hash = hash * 23 + Parameter.GetHashCode();
                 hash = hash * 23 + Type.GetHashCode();
-                hash = hash * 23 + BitConverter.SingleToInt32Bits(Value);
+                hash = hash * 23 + BitConverter.SingleToInt32Bits(BaseValue);
                 return hash;
             }
         }
