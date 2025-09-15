@@ -25,7 +25,6 @@
 
         [Signal] public delegate void RecipeSelectedEventHandler(string id);
         [Signal] public delegate void ModifierSelectedEventHandler(int hash, string itemInstanceId);
-        [Signal] public delegate void OnRemoveRecipeEventHandler();
         [Signal] public delegate void OnEquipItemPlacedEventHandler(string instanceId);
         [Signal] public delegate void OnEquipItemRemovedEventHandler();
         [Signal] public delegate void OnEquipItemReturnedEventHandler(string itemId, string instanceId);
@@ -98,7 +97,7 @@
 
         public void ConsumeMainResources() => ConsumeResources(_mainResources);
 
-        public void ShowModifiers(string formatted)
+        public void ShowPossibleModifiers(string formatted)
         {
             if (_possibleModifiersList != null) _possibleModifiersList.Text = formatted;
         }

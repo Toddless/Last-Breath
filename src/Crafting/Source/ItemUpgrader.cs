@@ -52,31 +52,24 @@
 
         public List<IResourceRequirement> GetResourceRequirements(string itemId) => _upgradeRequirements.GetValueOrDefault(itemId) ?? [];
 
-        public bool UpgradeItem(IEquipItem item)
+        public bool TryUpgradeItem(IEquipItem item)
         {
             using var rnd = new RandomNumberGenerator();
             rnd.Randomize();
             switch (_currentUpgradeMode)
             {
                 case ItemUpgradeMode.Normal:
-                    item.Upgrade();
-                    return true;
+                    return item.Upgrade();
                 case ItemUpgradeMode.Double:
-                    item.Upgrade(2);
-                    return true;
+                    return item.Upgrade(2);
                 case ItemUpgradeMode.Lucky:
                     if (rnd.Randf() >= 0.99f)
-                    {
-                        item.Upgrade(12);
-                        return true;
-                    }
+                        return item.Upgrade(12);
                     else
-                    {
-                        item.Downgrade(12);
-                        return false;
-                    }
+                        return !item.Downgrade(12);
+                default:
+                    return false;
             }
-            return false;
         }
 
 

@@ -25,6 +25,7 @@
             if(group != null) ButtonGroup = group;
         }
 
+        public void UpdateButtonState(bool isActive) => Disabled = !isActive;
 
         public override void _ExitTree()
         {
