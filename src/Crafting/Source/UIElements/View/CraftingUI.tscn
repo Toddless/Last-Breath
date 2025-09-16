@@ -1106,7 +1106,6 @@ metadata/_edit_use_anchors_ = true
 
 [node name="ItemModifierListControl" type="Control" parent="." node_paths=PackedStringArray("_container")]
 visible = false
-layout_mode = 2
 anchors_preset = 0
 offset_left = 701.0
 offset_top = 15.0

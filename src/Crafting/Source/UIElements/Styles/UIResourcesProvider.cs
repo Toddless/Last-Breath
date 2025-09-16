@@ -24,7 +24,7 @@ namespace Crafting
         {
             if (!_uiResources.TryGetValue(name, out var resource))
             {
-                Logger.LogNotFound($"Resource with name: {name}", this);
+                Tracker.TrackNotFound($"Resource with name: {name}", this);
                 return null;
             }
             return resource.Duplicate(true);

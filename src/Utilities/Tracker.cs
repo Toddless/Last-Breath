@@ -5,10 +5,11 @@
     using Godot;
     using Serilog;
 
-    public static class Logger
+    public static class Tracker
     {
         private static readonly ILogger s_logger;
-        static Logger()
+
+        static Tracker()
         {
             var logPath = ProjectSettings.GlobalizePath("user://log.txt");
             s_logger = new LoggerConfiguration()
@@ -17,16 +18,15 @@
                 .CreateLogger();
         }
 
-        public static void LogException(string msg,
+        public static void TrackException(string msg,
             Exception? ex = default, object? source = null, [CallerMemberName] string method = "", [CallerLineNumber] int line = 0) => ContextLogger(source, method, line).Error(ex, msg);
-
-        public static void LogInfo(string msg,
+        public static void TrackInfo(string msg,
             object? source = null, [CallerMemberName] string method = "", [CallerLineNumber] int line = 0) => ContextLogger(source, method, line).Information(msg);
-        public static void LogError(string msg,
+        public static void TrackError(string msg,
              object? source = null, [CallerMemberName] string method = "", [CallerLineNumber] int line = 0) => ContextLogger(source, method, line).Error(msg);
-        public static void LogNull(string param,
+        public static void TrackNull(string param,
             object? source = null, [CallerMemberName] string method = "", [CallerLineNumber] int line = 0) => ContextLogger(source, method, line).Error("{param} is null.", param);
-        public static void LogNotFound(string msg,
+        public static void TrackNotFound(string msg,
              object? source = null, [CallerMemberName] string method = "", [CallerLineNumber] int line = 0) => ContextLogger(source, method, line).Warning("{msg} not found.", msg);
 
         private static ILogger ContextLogger(object? source = null,

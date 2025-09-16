@@ -24,7 +24,7 @@
             // TODO: Path to generic items
             _itemDataPath = itemDataPath;
             Instance = this;
-            Logger.LogInfo($"{nameof(ItemDataProvider)} was created.", this);
+            Tracker.TrackInfo($"{nameof(ItemDataProvider)} was created.", this);
         }
 
         public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>(true);
@@ -113,7 +113,7 @@
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("Data loading failed.", ex, this);
+                    Tracker.TrackException("Data loading failed.", ex, this);
                 }
                 finally
                 {
@@ -142,7 +142,7 @@
         {
             if (!_itemData.TryGetValue(id, out var data))
             {
-                Logger.LogNotFound($"Item with id: {id}", this);
+                Tracker.TrackNotFound($"Item with id: {id}", this);
                 return item = null;
             }
             return item = data;

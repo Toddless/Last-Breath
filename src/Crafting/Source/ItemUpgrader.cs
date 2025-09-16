@@ -29,7 +29,7 @@
         {
             if (!_upgradeRequirements.TryGetValue(itemId, out var reqs))
             {
-                Logger.LogNotFound($"Requirements: {itemId}", this);
+                Tracker.TrackNotFound($"Requirements: {itemId}", this);
                 return [];
             }
             _currentUpgradeMode = mode;

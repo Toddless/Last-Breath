@@ -54,7 +54,7 @@
         {
             if (_recipeTree == null)
             {
-                Logger.LogNull(nameof(_recipeTree), this);
+                Tracker.TrackNull(nameof(_recipeTree), this);
                 return;
             }
 

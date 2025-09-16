@@ -11,6 +11,7 @@
     using Crafting.TestResources.Inventory;
     using Stateless;
     using System.Text;
+    using Core.Enums;
 
     public partial class CraftingLayer : CanvasLayer
     {
@@ -70,11 +71,6 @@
             using (var rnd = new RandomNumberGenerator())
                 foreach (var resource in _dataProvider.GetAllResources())
                 {
-                    if(resource.HasTag("Essence"))
-                    {
-                        _itemInventory.AddItem(resource);
-                        continue;
-                    }
                     _itemInventory.AddItem(resource, 100);
                 }
             // ____________________________________________
@@ -189,11 +185,11 @@
                 AllowUnpress = true
             };
             var normal = new ActionButton();
-            normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), ToggleOne, buttonGroup);
+            normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), UpgradeModeNormal, buttonGroup);
             var doubl = new ActionButton();
-            doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), ToggleTwo, buttonGroup);
+            doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), UpgradeModeDouble, buttonGroup);
             var risky = new ActionButton();
-            risky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), ToggleThree, buttonGroup);
+            risky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), UpgradeModeGamble, buttonGroup);
             var update = new ActionButton();
             update.SetupNormalButton(Lokalizator.Lokalize("CraftingUpdateButton"), UpdateItemButton);
             _updateButtonState = update.UpdateButtonState;
@@ -203,35 +199,26 @@
             _craftingUI?.AddActionNode(update);
         }
 
-        private void ToggleOne(bool isToggled)
+        private void UpgradeModeNormal(bool isToggled)
         {
-            if (isToggled)
-            {
-                _craftingUI?.ClearMainResources();
-                _mainResources.Clear();
-                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Normal) ?? [];
-                _updateButtonState?.Invoke(ShowMainResources(req));
-            }
+            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Normal);
         }
-        private void ToggleTwo(bool isToggled)
+        private void UpgradeModeDouble(bool isToggled)
         {
-            if (isToggled)
-            {
-                _craftingUI?.ClearMainResources();
-                _mainResources.Clear();
-                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Double) ?? [];
-                _updateButtonState?.Invoke(ShowMainResources(req));
-            }
+            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Double);
         }
-        private void ToggleThree(bool isToggled)
+
+        private void UpgradeModeGamble(bool isToggled)
         {
-            if (isToggled)
-            {
-                _craftingUI?.ClearMainResources();
-                _mainResources.Clear();
-                var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, Core.Enums.ItemUpgradeMode.Lucky) ?? [];
-                _updateButtonState?.Invoke(ShowMainResources(req));
-            }
+            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Lucky);
+        }
+
+        private void SetUpgradeMode(ItemUpgradeMode mode)
+        {
+            _craftingUI?.ClearMainResources();
+            _mainResources.Clear();
+            var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, mode) ?? [];
+            _updateButtonState?.Invoke(ShowMainResources(req));
         }
 
         private bool ShowMainResources(List<IResourceRequirement> requirements)
@@ -281,7 +268,7 @@
             var item = CreateItem(id);
             if (item == null)
             {
-                Logger.LogError($"Failed to create an item. Recipe: {id}", this);
+                Tracker.TrackError($"Failed to create an item. Recipe: {id}", this);
                 return;
             }
             CreateNotifier(item);
@@ -314,14 +301,7 @@
             _updateButtonState?.Invoke(IsEnoughtResources(_mainResources));
         }
 
-        private bool IsEnoughtResources(Dictionary<string, int> mainResources)
-        {
-            foreach (var resource in mainResources)
-            {
-                if (_itemInventory?.GetTotalItemAmount(resource.Key) < resource.Value) return false;
-            }
-            return true;
-        }
+        private bool IsEnoughtResources(Dictionary<string, int> mainResources) => !mainResources.Any(res => _itemInventory?.GetTotalItemAmount(res.Key) < res.Value);
 
         // should not be there
         private void CreateNotifier(IItem item)

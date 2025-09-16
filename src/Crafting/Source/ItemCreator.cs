@@ -106,7 +106,7 @@
             var dataProvider = ItemDataProvider.Instance;
             if (dataProvider == null)
             {
-                Logger.LogNull(nameof(ItemDataProvider), this);
+                Tracker.TrackNull(nameof(ItemDataProvider), this);
                 return null;
             }
 
@@ -114,7 +114,7 @@
 
             if (item == null)
             {
-                Logger.LogNotFound($"Item with id: {itemId}", this);
+                Tracker.TrackNotFound($"Item with id: {itemId}", this);
                 return null;
             }
 
@@ -178,7 +178,7 @@
 
         private void AddAnyNotTakenMod(HashSet<IMaterialModifier> takenMods, List<WeightedMaterialModifier> modifiers)
         {
-            Logger.LogInfo("Attemp limit was reached. Added first not taken modifier.", this);
+            Tracker.TrackInfo("Attemp limit was reached. Added first not taken modifier.", this);
             foreach (var mod in modifiers)
             {
                 if (!takenMods.Contains(mod.Modifier))

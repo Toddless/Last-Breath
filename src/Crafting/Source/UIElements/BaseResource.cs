@@ -38,12 +38,9 @@
 
         public virtual void RemoveCraftingResource()
         {
-            foreach (var child in Container?.GetChildren() ?? [])
-                child.QueueFree();
             ResourceId = null;
             AmountHave = null;
             ResourceConsumed = null;
         }
-
     }
 }

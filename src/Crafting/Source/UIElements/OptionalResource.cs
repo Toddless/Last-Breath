@@ -31,6 +31,8 @@
             if (!string.IsNullOrWhiteSpace(ResourceId))
             {
                 ResourceRemoved?.Invoke(ResourceId);
+                foreach (var child in Container?.GetChildren() ?? [])
+                    child.QueueFree();
                 base.RemoveCraftingResource();
             }
         }
