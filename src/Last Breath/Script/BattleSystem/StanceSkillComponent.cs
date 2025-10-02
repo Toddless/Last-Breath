@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
+    using Utilities;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using LastBreath.Components;
-    using Utilities;
 
     public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>(), IStanceSkillComponent
     {
@@ -13,7 +13,7 @@
         {
             if (skill.RequiredStance != _stance.StanceType)
             {
-                Logger.LogInfo($"Trying to add {skill.Id} to stance {_stance.StanceType}", this);
+                Tracker.TrackInfo($"Trying to add {skill.Id} to stance {_stance.StanceType}", this);
                 return;
             }
             base.AddSkill(skill);

@@ -10,8 +10,8 @@
     {
         event Action<TKey, TModule>? ModuleDecoratorChanges;
 
-        void AddDecorator(TDecorator decorator);
         TModule GetModule(TKey key);
+        void AddDecorator(TDecorator decorator);
         void RemoveDecorator(TDecorator decorator);
     }
 }

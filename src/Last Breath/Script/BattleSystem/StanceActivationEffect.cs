@@ -3,11 +3,10 @@
     using System.Collections.Generic;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
-    using Core.Modifiers;
 
     public class StanceActivationEffect : IStanceActivationEffect
     {
-        private List<IModifier> _modifiers = [];
+        private List<IItemModifier> _modifiers = [];
 
         public StanceActivationEffect()
         {
@@ -16,7 +15,7 @@
 
         public void OnActivate(ICharacter owner)
         {
-            foreach (IModifier modifier in _modifiers)
+            foreach (var modifier in _modifiers)
             {
                 owner.Modifiers.AddPermanentModifier(modifier);
             }

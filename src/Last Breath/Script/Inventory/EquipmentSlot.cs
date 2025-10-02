@@ -13,10 +13,7 @@
 
         public override void _Ready()
         {
-            StretchMode = StretchModeEnum.Scale;
-            IgnoreTextureSize = true;
             ClipContents = true;
-            TextureNormal = DefaltTexture;
             this.MouseEntered += OnMouseEnter;
             this.MouseExited += OnMouseExit;
         }

@@ -1,19 +1,19 @@
 ﻿namespace LastBreath.Script.UI
 {
+    using Godot;
     using System;
     using Core.Enums;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Godot;
     using Godot.Collections;
+    using Core.Interfaces.Items;
     using LastBreath.Script.Helpers;
+    using Core.Interfaces.Inventory;
     using LastBreath.Script.Inventory;
 
     public partial class PlayerInventoryUI : Control
     {
         [Export] private GridContainer? _equipInventory, _craftInventory, _questItemsInventory;
         [Export] private TabBar? _equip, _craft, _quest;
-        private Dictionary<EquipmentPart, EquipmentSlot> _slots = [];
+        private Dictionary<EquipmentType, EquipmentSlot> _slots = [];
         [Export] private Array<EquipmentSlot> _ringSlots = [];
 
         public event Action<IItem, MouseButtonPressed, IInventory>? InventorySlotClicked;
@@ -35,9 +35,9 @@
            // questItemsInventory.ItemSlotClicked += (t, e, x) => InventorySlotClicked?.Invoke(t, e, x);
         }
 
-        public EquipmentSlot? GetEquipmentSlot(EquipmentPart part)
+        public EquipmentSlot? GetEquipmentSlot(EquipmentType part)
         {
-            if (part == EquipmentPart.Ring)
+            if (part == EquipmentType.Ring)
             {
                 return GetFreeRingSlotOrDefault();
             }
@@ -59,14 +59,14 @@
         private void FillTheDictionary()
         {
             // Adding slot via [Export] always random, slots will be added like this instead
-            _slots.Add(EquipmentPart.BodyArmor, FindEquipmentSlot("BodyArmorSlot"));
-            _slots.Add(EquipmentPart.Amulet, FindEquipmentSlot("AmuletSlot"));
-            _slots.Add(EquipmentPart.Boots, FindEquipmentSlot("BootsSlot"));
-            _slots.Add(EquipmentPart.Gloves, FindEquipmentSlot("GlovesSlot"));
-            _slots.Add(EquipmentPart.Cloak, FindEquipmentSlot("CloakSlot"));
-            _slots.Add(EquipmentPart.Helmet, FindEquipmentSlot("HelmetSlot"));
-            _slots.Add(EquipmentPart.Belt, FindEquipmentSlot("BeltSlot"));
-            _slots.Add(EquipmentPart.Weapon, FindEquipmentSlot("WeaponSlot"));
+            _slots.Add(EquipmentType.BodyArmor, FindEquipmentSlot("BodyArmorSlot"));
+            _slots.Add(EquipmentType.Amulet, FindEquipmentSlot("AmuletSlot"));
+            _slots.Add(EquipmentType.Boots, FindEquipmentSlot("BootsSlot"));
+            _slots.Add(EquipmentType.Gloves, FindEquipmentSlot("GlovesSlot"));
+            _slots.Add(EquipmentType.Cloak, FindEquipmentSlot("CloakSlot"));
+            _slots.Add(EquipmentType.Helmet, FindEquipmentSlot("HelmetSlot"));
+            _slots.Add(EquipmentType.Belt, FindEquipmentSlot("BeltSlot"));
+            _slots.Add(EquipmentType.Weapon, FindEquipmentSlot("WeaponSlot"));
             NodeFinder.ClearCache();
         }
 

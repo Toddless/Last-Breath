@@ -1,36 +1,27 @@
 ﻿namespace LastBreath.Script.Items
 {
-    using System;
     using Godot;
+    using System;
+    using Utilities;
     using Core.Enums;
-    using Core.Interfaces.Items;
     using System.Linq;
+    using Core.Interfaces.Items;
 
     [Tool]
     [GlobalClass]
     public partial class Item : Resource, IItem
     {
-        private string _id = string.Empty;
-        [Export]
-        public string Id
-        {
-            get => _id;
-            protected set
-            {
-                _id = value;
-                LoadData();
-            }
-        }
+        [Export] public string Id { get; protected set; } = string.Empty;
         [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
         [Export] public Texture2D? Icon { get; set; }
         [Export] public Texture2D? FullImage { get; set; }
         [Export] public int MaxStackSize { get; set; } = 1;
-        [Export] public string[] Tags = [];
+        [Export] public string[] Tags { get; protected set; } = [];
 
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string DisplayName => GetLocalizedName();
+        public string DisplayName => Lokalizator.Lokalize(Id);
 
-        public string Description => GetLocalizedDescription();
+        public string Description => Lokalizator.LokalizeDescription(Id);
 
         public Item()
         {
@@ -52,7 +43,7 @@
             Tags = tags;
         }
 
-        public bool Equals(Item other)
+        public bool Equals(IItem other)
         {
             if (other == null || string.IsNullOrEmpty(DisplayName))
             {
@@ -67,23 +58,17 @@
             {
                 return false;
             }
-            return Equals((Item)obj);
+            return Equals((IItem)obj);
         }
 
         public override int GetHashCode() => HashCode.Combine(Id);
 
-        public T Copy<T>(bool subresources = false)
+        public T Copy<T>()
         {
-            var duplicate = (IItem)Duplicate(subresources);
+            var duplicate = (IItem)DuplicateDeep();
             return (T)duplicate;
         }
 
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
-        protected virtual void LoadData()
-        {
-
-        }
-        private string GetLocalizedName() => TranslationServer.Translate(Id);
-        private string GetLocalizedDescription() => TranslationServer.Translate(Id + "_Description");
     }
 }

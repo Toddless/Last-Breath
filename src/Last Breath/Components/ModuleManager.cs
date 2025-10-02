@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Components
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Interfaces.Battle.Decorator;
-    using Core.Interfaces.Components;
     using Utilities;
+    using System.Linq;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Battle.Decorator;
 
     public class ModuleManager<TKey, TModule, TDecorator> : IModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull
@@ -52,7 +52,7 @@
         {
             if (!_decorators.TryGetValue(decorator.SkillType, out var list))
             {
-                Logger.LogNotFound($"List for {decorator.SkillType}", this);
+                Tracker.TrackNotFound($"List for {decorator.SkillType}", this);
                 list = [];
                 _decorators[decorator.SkillType] = list;
             }
@@ -72,7 +72,7 @@
             // just in case
             if (!_decorators.TryGetValue(decorator.SkillType, out var decorators))
             {
-                Logger.LogNotFound("Trying to remove from non-existent list", this);
+                Tracker.TrackNotFound("Trying to remove from non-existent list", this);
                 return;
             }
             if (decorators.Remove(decorator))

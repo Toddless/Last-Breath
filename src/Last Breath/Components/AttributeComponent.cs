@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using Core.Modifiers;
+    using Core.Interfaces;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Attribute;
 
@@ -12,7 +12,7 @@
         private readonly Strength _strength;
         private readonly Intelligence _intelligence;
 
-        public Action<IModifier>? CallModifierManager;
+        public Action<IItemModifier>? CallModifierManager;
 
         public AttributeComponent()
         {
@@ -69,10 +69,10 @@
 
         private void UpdateModifiers(IAttribute attribute)
         {
-            foreach (var modifier in attribute.AttributeModifiers())
-            {
-                CallModifierManager?.Invoke(modifier);
-            }
+            //foreach (var modifier in attribute.AttributeModifiers())
+            //{
+            //    CallModifierManager?.Invoke(modifier);
+            //}
         }
 
         private void SetEvents()

@@ -176,14 +176,14 @@
         public void AddItemToInventory(IItem item)
         {
             if (item is IEquipItem)
-                _equipInventory?.AddItem(item);
+                _equipInventory?.TryAddItem(item);
 
             // if (item is CraftingItem)
             // _craftingInventory?.AddItem(item);
 
             if (item is QuestItem)
             {
-                _questItemsInventory?.AddItem(item);
+                _questItemsInventory?.TryAddItem(item);
                 Progress.OnQuestItemCollected(item);
             }
         }

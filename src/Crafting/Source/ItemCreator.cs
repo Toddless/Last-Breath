@@ -26,7 +26,7 @@
         public IEquipItem? CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
         {
             var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
-            return Create(resultItemId, Mods, TotalWeight);
+            return Create(resultItemId, Mods, TotalWeight, player);
         }
 
         public IEquipItem? CreateGenericItem(string resultItemId, IEnumerable<IMaterialModifier> resouces, ICharacter? player = default)
@@ -35,7 +35,7 @@
             var attribute = GetAttribute(player);
             var itemId = $"{resultItemId}_{attribute}_{rarity}";
             var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resouces);
-            var item = Create(itemId, Mods, TotalWeight);
+            var item = Create(itemId, Mods, TotalWeight, player);
             return item;
         }
 
@@ -57,7 +57,7 @@
             // TODO: Sometime i can get from this call AttributeType.None.
             if (player == null)
             {
-                var attribute = GetRandomValueFallBack<AttributeType>();
+                var attribute = AttributeType.None;
                 while (attribute == AttributeType.None)
                     attribute = GetRandomValueFallBack<AttributeType>();
                 return attribute;
@@ -66,18 +66,11 @@
             return AttributeType.Dexterity;
         }
 
-        private T GetRandomValueFallBack<T>()
-            where T : struct, Enum
-        {
-            _rnd.Randomize();
-            var values = Enum.GetValues<T>();
-            var idx = (byte)_rnd.RandiRange(0, values.Length - 1);
-            return values[idx];
-        }
+      
 
         private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
 
-        private IEquipItem? Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight)
+        private IEquipItem? Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, ICharacter? player = default)
         {
             var dataProvider = ItemDataProvider.Instance;
             if (dataProvider == null)
@@ -100,7 +93,7 @@
 
             var amountModifiers = GetAmountModifiers(item.Rarity);
 
-            HashSet<IMaterialModifier> takenMods = [.. WeightedRandomPicker.PickRandomMultiple(modifiers, totalWeight, amountModifiers, _rnd)];
+            HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, _rnd);
 
             // TODO : Change to get random effect/ability
             var skill = GetRandomSkill();
@@ -108,9 +101,7 @@
 
             List<IItemModifier> mods = [];
             foreach (var mod in takenMods)
-            {
-                mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.BaseValue, item));
-            }
+                mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, player), item));
 
             item.SetAdditionalModifiers(mods);
             item.SaveModifiersPool(modifiers.Select(x => x.Obj));
@@ -118,16 +109,34 @@
             return item;
         }
 
+        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)
+        {
+            if (player != null)
+            {
+
+            }
+
+            return baseValue * _rnd.RandfRange(0.95f, 1.2f);
+        }
+
         // TODO: An item can have skill or effect? Or both?
-        private ISkill? GetRandomSkill()
+        private ISkill? GetRandomSkill(ICharacter? player = default)
         {
             // TODO: Later i need to find way to inject SkillProvider to get some skill
             // TODO: Random skill not guaranteed.
+            // Again: we take probabillity from player
+
+
             return null;
         }
 
-        // TODO: GetRandomEffect()
-
-
+        private T GetRandomValueFallBack<T>()
+          where T : struct, Enum
+        {
+            _rnd.Randomize();
+            var values = Enum.GetValues<T>();
+            var idx = (byte)_rnd.RandiRange(0, values.Length - 1);
+            return values[idx];
+        }
     }
 }

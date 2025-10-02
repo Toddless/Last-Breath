@@ -11,80 +11,169 @@
 
     public class Inventory 
     {
-        public event Action<string, MouseButtonPressed, IInventory>? ItemSlotClicked;
-        public event Action? InventoryFull, NotEnougthItems;
-        public event Action<string, int>? ItemAmountChanges;
-
+        private readonly Dictionary<string, IItem> _itemInstances = [];
         protected List<IInventorySlot> Slots { get; } = [];
 
-        public void Initialize(int size, GridContainer container)
+        public event Action<string, MouseButtonPressed, IInventory>? ItemSlotClicked;
+        public event Action<string, string, int, int>? InventoryFull;
+        public event Action<string>? NotEnougthItems;
+        public event Action<string, int>? ItemAmountChanges;
+
+        public void Initialize(int amount, GridContainer? container)
         {
-            for (int i = 0; i < size; i++)
+            if (container != null)
             {
-                InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
-                container.AddChild(inventorySlot);
-                //inventorySlot.OnItemClicked += OnItemSlotClicked;
-                Slots.Add(inventorySlot);
+                for (int i = 0; i < amount; i++)
+                {
+                    InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
+                    inventorySlot.ItemDeleted += OnDeleteRequested;
+                    container.AddChild(inventorySlot);
+                    Slots.Add(inventorySlot);
+                }
             }
         }
 
+        public ItemInstance? GetCurrentItemByInstanceId(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
+        public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
+        public IItem? GetItemInstance(string instanceId) => _itemInstances.GetValueOrDefault(instanceId);
 
-        public IInventorySlot? GetSlotWithItemOrNull(string id) => Slots.FirstOrDefault(x => x.CurrentItem == id);
+        public int GetTotalItemAmount(string itemId) => Slots.Where(x => x.CurrentItem != null && x.CurrentItem.ItemId == itemId).Sum(x => x.Quantity);
 
-        public List<IInventorySlot> GetAllSlotsWithItemsWithTag(string tag) => Slots.FindAll(x => x.CurrentItem != null && x.ItemHasTag(tag));
-
-        public void AddItem(IItem item, int amount = 1)
+        /// <summary>
+        /// Add the stack of the item to the existing instance. <see langword="true"/> if the stack was added, <see langword="false"/> if the instance was not found.
+        /// </summary>
+        /// <param name="itemId">Meaningful Id. For example "Crafting_Resource_Diamond"</param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public bool TryAddItemStacks(string itemId, int amount = 1)
         {
-            var slot = GetSlotToAdd(item);
-            if (slot == null)
+            var itemInstance = _itemInstances.Values.FirstOrDefault(x => x.Id == itemId);
+            if (itemInstance == null) return false;
+            FitItemsInSlots(itemInstance.Id, itemInstance.InstanceId, amount, itemInstance.MaxStackSize);
+            return true;
+        }
+
+        public bool TryAddItem(IItem item, int amount = 1)
+        {
+            if (amount <= 0) return false;
+
+            if (!_itemInstances.ContainsKey(item.InstanceId))
+                _itemInstances[item.InstanceId] = item;
+
+            FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
+
+            ItemAmountChanges?.Invoke(item.Id, GetTotalItemAmount(item.Id));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Use to return item instance in inventory.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="amount"></param>
+        /// <returns><see langword="true"/> if item was successfully returned, <see langword="false"/> if amount < 0, instance is null, instance id null or empty, or item do not exist in inventory. </returns>
+        public bool TryReturnItemInstanceToInventory(ItemInstance? instance, int amount = 1)
+        {
+            if (amount <= 0 || instance == null || string.IsNullOrWhiteSpace(instance.InstanceId)) return false;
+            if (!_itemInstances.TryGetValue(instance.InstanceId, out var value))
             {
-                Logger.LogInfo("Cannot find slot without item", this);
-                InventoryFull?.Invoke();
+                Tracker.TrackNotFound($"Trying to return unknown item. Instance: {instance.InstanceId}, ItemId: {instance.ItemId}", this);
+                return false;
+            }
+
+            FitItemsInSlots(instance.ItemId, instance.InstanceId, amount, value.MaxStackSize);
+            return true;
+        }
+
+        public void RemoveItemById(string itemId, int amount = 1)
+        {
+            if (amount <= 0 || string.IsNullOrWhiteSpace(itemId)) return;
+
+            int remainToDelete = amount;
+
+            var slotsWithItem = Slots.Where(x => x.CurrentItem?.ItemId == itemId).OrderBy(x => x.Quantity);
+
+            if (slotsWithItem == null)
+            {
+                Tracker.TrackError($"Trying to remove non existent item from inventory: {itemId}", this);
                 return;
             }
 
-
-            if (slot.CurrentItem != null)
+            foreach (var slot in slotsWithItem)
             {
-                int rest = slot.AddItemStacks(amount);
-                if (rest > 0)
-                    AddItem(item, rest);
+                if (remainToDelete <= 0) break;
+                int canRemove = Mathf.Min(remainToDelete, slot.Quantity);
+                if (slot.TryRemoveItemStacks(canRemove))
+                    remainToDelete -= canRemove;
+                else
+                    Tracker.TrackError("");
             }
+            if (remainToDelete > 0) NotEnougthItems?.Invoke(itemId);
+
+            ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
+        }
+
+        public void RemoveItemByInstanceId(string instanceId)
+        {
+            if (string.IsNullOrWhiteSpace(instanceId)) return;
+
+            var slots = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId);
+            if (slots != null)
+                foreach (var slot in slots)
+                    slot.ClearSlot(isDeleted: true);
             else
-            {
-                slot.SetItem(item.Id, amount);
-            }
+                if (_itemInstances.ContainsKey(instanceId))
+                _itemInstances.Remove(instanceId);
         }
 
-        public void RemoveItem(string itemId, int amount = 1)
+        public void Clear()
         {
-            var slot = GetSlotToRemove(itemId);
+            Slots.ForEach(slot => slot.ClearSlot());
+            _itemInstances.Clear();
+        }
 
-            if (slot == null)
+        protected void OnDeleteRequested(string itemId)
+        {
+            if (string.IsNullOrWhiteSpace(itemId)) return;
+            if (!_itemInstances.TryGetValue(itemId, out var toRemove))
             {
-                Logger.LogNull(itemId, this);
+                Tracker.TrackNotFound($"Item with id: {itemId}", this);
                 return;
             }
-            if (slot.CurrentItem == null)
+            if (!Slots.Any(x => x.CurrentItem?.InstanceId == itemId))
             {
-                Logger.LogNull($"Slot with item: {itemId} was found, but item", this);
-                return;
-            }
-
-            if (!slot.RemoveItemStacks(amount))
-            {
-                NotEnougthItems?.Invoke();
-            }
-            else
-            {
-                ItemAmountChanges?.Invoke(itemId, slot.Quantity);
+                _itemInstances.Remove(toRemove.InstanceId);
+                ItemAmountChanges?.Invoke(toRemove.Id, GetTotalItemAmount(itemId));
             }
         }
 
+        private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
+        {
+            var remaining = amount;
+            var slotsWithSameItem = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId && x.CurrentItem?.ItemId == itemId);
+            foreach (var slot in slotsWithSameItem)
+            {
+                if (remaining <= 0) break;
+                slot.TryAddStacks(amount, out int left);
+                remaining = left;
+            }
 
-        public void Clear() => Slots.ForEach(slot => slot.ClearSlot());
-        private IInventorySlot? GetSlotToAdd(IItem item) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem == null || itemSlot.CurrentItem == item.Id && itemSlot.Quantity < item.MaxStackSize);
-        private IInventorySlot? GetSlotToRemove(string itemId) => Slots.FirstOrDefault(itemSlot => itemSlot.CurrentItem != null && itemSlot.CurrentItem == itemId);
-       // private void OnItemSlotClicked(IItem item, MouseButtonPressed pressed) => ItemSlotClicked?.Invoke(item.Id, pressed, this);
+            // add what left in empty slots
+            while (remaining > 0)
+            {
+                var emptySlot = Slots.FirstOrDefault(x => x.CurrentItem == null);
+                if (emptySlot == null)
+                {
+                    // send info about item
+                    InventoryFull?.Invoke(itemId, instanceId, amount, maxStackSize);
+                    return;
+                }
+
+                int toAdd = Mathf.Min(maxStackSize, remaining);
+                emptySlot.SetItem(new(itemId, instanceId, maxStackSize), toAdd);
+                remaining -= toAdd;
+            }
+        }
     }
 }

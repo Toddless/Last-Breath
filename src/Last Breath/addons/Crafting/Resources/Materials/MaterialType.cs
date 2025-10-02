@@ -1,15 +1,17 @@
 ﻿namespace LastBreath.Addons.Crafting.Resources.Materials
 {
-    using System.Collections.Generic;
-    using Core.Interfaces.Crafting;
     using Godot;
+    using System.Linq;
     using Godot.Collections;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
     using LastBreath.addons.Crafting.Resources.Materials;
 
     [Tool]
     [GlobalClass]
     public partial class MaterialType : Resource, IMaterialType
     {
+
         private IReadOnlyList<IMaterialModifier>? _cached;
         [Export] private MaterialCategory? _category;
         [Export] private Array<MaterialModifier> _modifiers = [];
@@ -28,19 +30,19 @@
         {
             get
             {
-                if(_cached != null) return _cached;
+                if (_cached != null) return _cached;
                 var list = new List<IMaterialModifier>();
 
-                if(MaterialCategory?.Modifiers is IReadOnlyList<IMaterialModifier> mods)
+                if (MaterialCategory?.Modifiers is IReadOnlyList<IMaterialModifier> mods)
                 {
-                     list.AddRange(mods);
+                    list.AddRange(mods);
                 }
 
-                if(_modifiers.Count > 0)
+                if (_modifiers.Count > 0)
                 {
                     foreach (var item in _modifiers)
                     {
-                        if(item != null)
+                        if (item != null)
                             list.Add(item);
                     }
                 }
@@ -50,7 +52,7 @@
             }
         }
 
-   
+
         // we need to create a default, parameterless constructor in order to create a resource from within the Godot Editor.
         public MaterialType()
         {
@@ -71,7 +73,7 @@
             _category = category;
         }
 
-
+        public bool HasTag(string tag) => Tags.Contains(tag);
         private string GetLocalizedMaterialName() => TranslationServer.Translate(Id);
     }
 }

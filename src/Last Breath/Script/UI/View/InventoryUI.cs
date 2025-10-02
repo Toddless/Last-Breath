@@ -27,7 +27,7 @@
             _inventory.Clear();
         }
 
-        public void AddItem(Item item) => _inventory.AddItem(item);
+        public void AddItem(Item item) => _inventory.TryAddItem(item);
 
         private void SetEvents()
         {

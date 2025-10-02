@@ -1,7 +1,6 @@
-﻿namespace Crafting.Source
+﻿namespace Utilities
 {
     using Godot;
-    using Utilities;
     using Core.Interfaces;
 
     public static class Lokalizator

@@ -8,7 +8,7 @@
     using Godot;
     using Utilities;
 
-    public class ItemsMediaProvider : IItemDataProvider
+    public class ItemsMediaProvider 
     {
         private const string PathToData = "res://Data/GenericItemMediaData/";
         // Generic data
@@ -31,7 +31,7 @@
         {
             if (!_mediaData.TryGetValue(id, out ItemMediaData? data))
             {
-                Logger.LogNotFound(id, this);
+                Tracker.TrackNotFound(id, this);
                 return new();
             }
             return data;

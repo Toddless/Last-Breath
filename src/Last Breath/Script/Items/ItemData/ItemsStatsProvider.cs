@@ -12,7 +12,7 @@
     using Utilities;
 
     // TODO: this class need more attention
-    public class ItemsStatsProvider : IItemDataProvider
+    public class ItemsStatsProvider 
     {
         private const string PathToData = "res://Data/Jsons/";
         private Dictionary<string, ItemStats> _itemStatsData = [];
@@ -39,7 +39,7 @@
         {
             if (!_itemStatsData.TryGetValue(id, out var stats))
             {
-                Logger.LogNotFound(id, this);
+                Tracker.TrackNotFound(id, this);
                 stats = new ItemStats();
             }
             return stats;
@@ -50,7 +50,7 @@
             using var dir = DirAccess.Open(PathToData);
             if(dir == null)
             {
-                Logger.LogError($"Cannot open directory. Path: {PathToData}", this);
+                Tracker.TrackError($"Cannot open directory. Path: {PathToData}", this);
                 return;
             }
             dir.ListDirBegin();
@@ -67,7 +67,7 @@
                 }
             }catch(Exception ex)
             {
-                Logger.LogException("Failed to load data", ex, this);
+                Tracker.TrackException("Failed to load data", ex, this);
             }
 
             finally

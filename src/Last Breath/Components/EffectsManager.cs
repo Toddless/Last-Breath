@@ -25,7 +25,7 @@
             var allEffects = GetCombinedEffects();
             if (!allEffects.Contains(effect))
             {
-                Logger.LogError($"Trying to remove an effect that doesn't exist in the list.", this);
+                Tracker.TrackError($"Trying to remove an effect that doesn't exist in the list.", this);
                 return;
             }
             effect.OnRemove(_owner);

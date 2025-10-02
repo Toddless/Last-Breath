@@ -39,12 +39,12 @@
         {
             if (_battleHandler == null )
             {
-                Logger.LogNull(nameof(_battleHandler), this);
+                Tracker.TrackNull(nameof(_battleHandler), this);
                 return;
             }
             if(_battleUI == null)
             {
-                Logger.LogNull(nameof(_battleUI), this);
+                Tracker.TrackNull(nameof(_battleUI), this);
                 return;
             }
 

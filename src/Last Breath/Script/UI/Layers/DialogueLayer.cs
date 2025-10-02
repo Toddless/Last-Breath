@@ -252,7 +252,7 @@
             if (_speaking == null) return;
             if (!_speaking.CompletedQuests.Remove(questToHandle.Id))
             {
-                Logger.LogNotFound(questToHandle.Id, this);               
+                Tracker.TrackNotFound(questToHandle.Id, this);               
             }
             _questToHandle = null;
         }

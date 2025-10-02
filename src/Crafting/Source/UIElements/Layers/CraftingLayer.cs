@@ -24,7 +24,7 @@
 
         private readonly HashSet<IMaterialModifier> _mainModifiers = [];
         private readonly HashSet<IMaterialModifier> _optionalModifiers = [];
-        // optional quantity for optional resource always 1
+        // quantity for optional resources is always 1
         private readonly HashSet<string> _optionalResources = [];
         private readonly Dictionary<string, int> _mainResources = [];
 
@@ -145,7 +145,6 @@
             button.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => OnCreateItem(id), () => IsEnoughtResources(_mainResources));
             _craftingUI?.AddActionNode(button);
         }
-       
 
         private IItem? CreateItem(string recipeId)
         {
@@ -218,16 +217,16 @@
             switch (result.Info)
             {
                 case ItemUpgradeResult.Success:
-                    HandleSuccess();
+                  //  HandleSuccess();
                     return true;
                 case ItemUpgradeResult.Failure:
-                    HandleFailure();
+                 //   HandleFailure();
                     return true;
                 case ItemUpgradeResult.CriticalSuccess:
-                    HandleCriticalSuccess();
+                  //  HandleCriticalSuccess();
                     return true;
                 case ItemUpgradeResult.CriticalFailure:
-                    HandleCriticalFailure();
+                  //  HandleCriticalFailure();
                     return true;
                 case ItemUpgradeResult.UpgradeModeNotSet:
                     return false;
@@ -277,7 +276,7 @@
             var newModifier = _itemUpgrader.TryRecraftModifier(equip, hash, equip.ModifiersPool.Concat(_optionalModifiers));
 
             _craftingUI?.UpdateSelectedItemModifer((Lokalizator.Format(newModifier), newModifier.GetHashCode()));
-
+            _craftingUI?.SetItemModifiersSelectable(IsEnoughtResources(_mainResources));
         }
         #endregion
 
@@ -415,7 +414,6 @@
 
         private void CreateActionButtons(string itemInstanceId)
         {
-            // TODO: позднее убрать кнопку апдейта и добавить функцию апгрейда предмета путем нажатия на окошко характеристик предмета
             var buttonGroup = new ButtonGroup
             {
                 AllowUnpress = true
@@ -429,6 +427,7 @@
             normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), UpgradeModeNormal, buttonGroup);
             doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), UpgradeModeDouble, buttonGroup);
             lucky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), UpgradeModeLucky, buttonGroup);
+            // TODO: позднее убрать кнопку апдейта и добавить функцию апгрейда предмета путем нажатия на окошко характеристик предмета
             update.SetupNormalButton(Lokalizator.Lokalize("CraftingUpdateButton"), () => UpdateItemButton(itemInstanceId), () => IsEnoughtResources(_mainResources));
             recraft.SetupToggleButton(Lokalizator.Lokalize("RecraftModifiers"), AllowRecraftModifier, buttonGroup);
 
@@ -522,7 +521,6 @@
                 var loadded = _dataProvider.GetResourceModifiers(res);
                 resources.AddRange(loadded);
             }
-
             return resources;
         }
 

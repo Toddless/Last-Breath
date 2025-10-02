@@ -1,7 +1,6 @@
 ﻿namespace Utilities
 {
     using Godot;
-    using System;
     using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.Data;
@@ -33,7 +32,7 @@
             return elements.First(x => rNumb >= x.From && rNumb < x.To).Obj;
         }
 
-        public static IEnumerable<T> PickRandomMultiple<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, RandomNumberGenerator rnd)
+        public static HashSet<T> PickRandomMultipleWithoutDublicate<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, RandomNumberGenerator rnd)
             where T : class
         {
             HashSet<T> taken = [];

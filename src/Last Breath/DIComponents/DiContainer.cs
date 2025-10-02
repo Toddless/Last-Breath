@@ -1,14 +1,11 @@
 ﻿namespace LastBreath.Script
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Core.Interfaces.Data;
-    using Godot;
-    using LastBreath.Script.Items.ItemData;
-    using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Microsoft.CodeAnalysis;
+    using System.Collections.Generic;
     using Microsoft.Extensions.DependencyInjection;
 
     public partial class DiContainer : Node
@@ -50,26 +47,6 @@
         private static void Configure()
         {
             var provider = new ServiceCollection();
-
-            provider.AddSingleton<IBasedOnRarityLootTable>(service =>
-            {
-                var instance = new BasedOnRarityLootTable();
-                instance.InitializeLootTable();
-                instance.ValidateTable();
-                return instance;
-            });
-            provider.AddSingleton<IItemDataProvider<ItemStats>>(service =>
-            {
-                var instance = new ItemsStatsProvider();
-                instance.LoadData();
-                return instance;
-            });
-            provider.AddSingleton<IItemDataProvider<ItemMediaData>>(service =>
-            {
-                var instance = new ItemsMediaProvider();
-                instance.LoadData();
-                return instance;
-            });
             provider.AddSingleton<RandomNumberGenerator>();
             s_serviceProvider = provider.BuildServiceProvider();
         }

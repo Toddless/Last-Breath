@@ -8,11 +8,27 @@
     [GlobalClass]
     public partial class MaterialModifier : Resource, IMaterialModifier
     {
+        private float _value;
+        private bool _isInitialized = false;
         [Export] public Parameter Parameter { get; set; }
         [Export] public ModifierType ModifierType { get; set; }
-        [Export] public float Value { get; set; }
+        [Export] public float BaseValue { get; private set; }
         [Export] public float Weight { get; set; }
+        [Export]
+        public float Value
+        {
+            get
+            {
 
-        public bool IsSame(IMaterialModifier other) => Parameter == other.Parameter && ModifierType == other.ModifierType && Value == other.Value;
+                if (!_isInitialized)
+                {
+                    _value = BaseValue;
+                    _isInitialized = true;
+                }
+                return _value;
+            }
+            set => _value = value;
+
+        }
     }
 }

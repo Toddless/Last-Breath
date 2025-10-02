@@ -3,11 +3,11 @@
     public enum SkillType : byte
     {
         /// <summary>
-        /// Skill type that modifies the attack context
+        /// A skill type that modifies the attack context
         /// </summary>
         PreAttack,
         /// <summary>
-        /// Skill type that applies to attacks
+        /// A skill type that applies to attacks
         /// </summary>
         OnAttack,
         /// <summary>

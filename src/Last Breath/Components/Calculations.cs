@@ -1,16 +1,16 @@
 ﻿namespace LastBreath.Components
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Modifiers;
     using Godot;
+    using System;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using System.Collections.Generic;
 
     public class Calculations
     {
-        public static float CalculateFloatValue(float value, IReadOnlyList<IModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
+        public static float CalculateFloatValue(float value, IReadOnlyList<IItemModifier> modifiers) => Math.Max(0, CalculateModifiers(modifiers, value));
 
         public static float DamageReduceByArmor(IAttackContext context)
         {
@@ -25,10 +25,10 @@
             return Mathf.Max(0, damage * (1 - Mathf.Min(context.Armor / 1000, context.MaxReduceDamage)));
         }
 
-        private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value)
+        private static float CalculateModifiers(IEnumerable<IItemModifier> modifiers, float value)
         {
             var factor = 1f;
-            foreach (var group in modifiers.GroupBy(m => m.Type).OrderBy(g => g.Key))
+            foreach (var group in modifiers.GroupBy(m => m.ModifierType).OrderBy(g => g.Key))
             {
                 switch (group.Key)
                 {
@@ -47,7 +47,7 @@
             return value;
         }
 
-        private static float ModifyValue(float value, IGrouping<ModifierType, IModifier> modifiers)
+        private static float ModifyValue(float value, IGrouping<ModifierType, IItemModifier> modifiers)
         {
             foreach (var modifier in modifiers.OrderByDescending(x => x.Priority))
             {

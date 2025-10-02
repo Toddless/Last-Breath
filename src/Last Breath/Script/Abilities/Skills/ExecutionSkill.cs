@@ -4,10 +4,9 @@
     using Godot;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Skills;
 
     [GlobalClass]
-    public partial class ExecutionSkill : Resource, IOnAttackSkill
+    public partial class ExecutionSkill : Resource
     {
         private readonly Lazy<string> _id;
         private const float Trashhold = 0.15f;

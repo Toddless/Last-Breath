@@ -1,19 +1,19 @@
 ﻿namespace LastBreath.Script.UI
 {
-    using System;
-    using System.Linq;
     using Godot;
-    using LastBreath.Script.Helpers;
-    using LastBreath.Script.Inventory;
-    using LastBreath.Script.QuestSystem;
-    using LastBreath.Resource.Quests;
-    using LastBreath.Script.Items;
-    using LastBreath.Script.UI.View;
+    using System;
+    using Utilities;
     using Stateless;
     using Core.Enums;
+    using System.Linq;
     using Core.Interfaces.Items;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.UI.View;
     using Core.Interfaces.Inventory;
-    using Utilities;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.QuestSystem;
 
     public partial class MainLayer : CanvasLayer
     {
@@ -49,29 +49,6 @@
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
-            var body = new BodyArmor(Rarity.Epic, AttributeType.Dexterity);
-            var dagger = new Dagger(Rarity.Epic);
-            var dexRing = new Ring(Rarity.Rare, AttributeType.Dexterity);
-            var strRing = new Ring(Rarity.Rare, AttributeType.Strength);
-            var amulet = new Amulet(Rarity.Rare);
-            var dexGloves = new Gloves(Rarity.Rare, AttributeType.Dexterity);
-            var dexBoots = new Boots(Rarity.Rare, AttributeType.Dexterity);
-            var dexHelmet = new Helmet(Rarity.Rare, AttributeType.Dexterity);
-            var belt = new Belt(Rarity.Rare);
-            var cloak = new Cloak(Rarity.Rare);
-            _player.AddItemToInventory(body);
-            _player.AddItemToInventory(dagger);
-            _player.AddItemToInventory(dexRing);
-            _player.AddItemToInventory(strRing);
-            _player.AddItemToInventory(amulet);
-            _player.AddItemToInventory(dexGloves);
-            _player.AddItemToInventory(dexBoots);
-            _player.AddItemToInventory(dexHelmet);
-            _player.AddItemToInventory(cloak);
-            _player.AddItemToInventory(new Belt(Rarity.Uncommon));
-            _player.AddItemToInventory(belt);
-            _player.AddItemToInventory(new Belt(Rarity.Epic));
-            _player.AddItemToInventory(new Belt(Rarity.Legendary));
 
             var item = ResourceLoader.Load<IEquipItem>("uid://74x3vgs2vs4r");
             _player.AddItemToInventory(item);
@@ -209,26 +186,26 @@
         {
             if (_playerInventory == null)
             {
-                Logger.LogNull(nameof(_playerInventory),this);
+                Tracker.TrackNull(nameof(_playerInventory),this);
                 return;
             }
 
             var equipSlot = _playerInventory.GetEquipmentSlot(item.EquipmentPart);
             if (equipSlot == null)
             {
-                Logger.LogError($"Inventory has no slot for {item.EquipmentPart}", this);
+                Tracker.TrackError($"Inventory has no slot for {item.EquipmentPart}", this);
                 return;
             }
 
-            if (equipSlot.CurrentItem != null)
-            {
-                HandleItemTransfer(item, equipSlot, inventory);
-            }
-            else
-            {
-                equipSlot.EquipItem((EquipItem)item, _player);
-                inventory.RemoveItem(item.Id);
-            }
+            //if (equipSlot.CurrentItem != null)
+            //{
+            //    HandleItemTransfer(item, equipSlot, inventory);
+            //}
+            //else
+            //{
+            //    equipSlot.EquipItem((EquipItem)item, _player);
+            //    inventory.RemoveItem(item.Id);
+            //}
         }
 
         private void HandleItemTransfer(IEquipItem newItem, EquipmentSlot equipSlot, IInventory inventory)
@@ -236,7 +213,6 @@
             var oldEquipedItem = equipSlot.CurrentItem;
             equipSlot.UnequipItem();
             equipSlot.EquipItem((EquipItem)newItem, _player);
-            inventory.RemoveItem(newItem.Id);
             // old item != null, we check this in method above
          //   inventory.AddItem(oldEquipedItem!);
         }
@@ -251,7 +227,7 @@
         private void RemoveQuestItems(Quest quest)
         {
             if (quest.QuestObjective == null || quest.QuestObjective.QuestObjectiveType != ObjectiveType.ItemCollection) return;
-            _player?.QuestItemsInventory.RemoveItem(quest.QuestObjective.TargetId, quest.QuestObjective.CurrentAmount);
+            _player?.QuestItemsInventory.RemoveItemById(quest.QuestObjective.TargetId, quest.QuestObjective.CurrentAmount);
         }
 
         private void OnInventoryTakeAll()

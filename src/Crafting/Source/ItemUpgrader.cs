@@ -32,11 +32,6 @@
 
         private ItemUpgradeMode _currentUpgradeMode = ItemUpgradeMode.None;
 
-
-        // Для рекрафта модификаторов предмета необходим один RecraftinResource
-        // с помощью данного ресурса можно изменить неограниченное кол-во модификаторов на предмете
-        // Данный вид ресурса разделен по типам и редкости: Армор, Ювелирка и Оружие (необычный - легендарный)
-        // TODO: Как быть с предметами которые добываются только путем дропа с того или иного нпс???
         public ItemUpgrader()
         {
             _rnd = new RandomNumberGenerator();
@@ -76,7 +71,9 @@
         public void SetDoubleUpgradeAmount(int amount) => _doubleUpgradeAmount = amount;
         public List<IResourceRequirement> GetUpgradeResourceRequirements(string itemId) => _upgradeRequirements.GetValueOrDefault(itemId) ?? [];
         public List<IResourceRequirement> GetRecraftResourceRequirements(string id) => _recraftRequirements.GetValueOrDefault(id) ?? [];
-        public IItemModifier TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers)
+
+
+        public IItemModifier TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
         {
             var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
 
@@ -88,13 +85,14 @@
 
                 if (newMod != null && !item.AdditionalModifiers.Any(x => x.GetHashCode() == newMod.GetHashCode()))
                 {
-                    modifier = ModifiersCreator.CreateModifier(newMod.Parameter, newMod.ModifierType, newMod.BaseValue, item);
+                    modifier = ModifiersCreator.CreateModifier(newMod.Parameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
                     item.AddAdditionalModifier(modifier);
                 }
             }
 
             return modifier;
         }
+
 
         public IResult<ItemUpgradeResult> TryUpgradeItem(IEquipItem item)
         {
@@ -139,6 +137,17 @@
         }
 
         private bool CheckRollIsCritical(float criticalChance, RandomNumberGenerator rnd) => rnd.Randf() <= criticalChance;
+
+
+        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)
+        {
+            if (player != null)
+            {
+
+            }
+
+            return baseValue * _rnd.RandfRange(0.95f, 1.2f);
+        }
 
         private void LoadData()
         {

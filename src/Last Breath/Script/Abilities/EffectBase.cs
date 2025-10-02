@@ -3,13 +3,12 @@
     using System;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
-    using Core.Modifiers;
     using Godot;
 
     public abstract class EffectBase(Core.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
         public Core.Enums.Effects Effect { get; } = effect;
-        public IModifier? Modifier { get; protected set; }
+        public IItemModifier? Modifier { get; protected set; }
         public int Duration { get; set; } = duration;
         public int Stacks { get; set; } = stacks;
         public bool Permanent { get; } = permanent;
