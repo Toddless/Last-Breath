@@ -2,11 +2,11 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
-    using Core.Modifiers;
+    using Core.Interfaces;
 
     public interface IModifiersChangedEventArgs
     {
-        IReadOnlyList<IModifier> Modifiers { get; }
+        IReadOnlyList<IItemModifier> Modifiers { get; }
         Parameter Parameter { get; }
     }
 }

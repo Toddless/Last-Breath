@@ -111,7 +111,9 @@
         }
 
         public void SetItemModifiers(List<(string Mod, int Hash)> modifiers) => _itemModifierList?.AddModifiersToList(modifiers);
-        public void SetRecipe(string id) => _slot?.SetRecipe(id);
+        public void SetItemModifiersSelectable(bool selectable) => _itemModifierList?.SetItemSelectable(selectable);
+        public void ShowRecipe(string id) => _slot?.SetRecipe(id);
+        public void UpdateSelectedItemModifer((string Modifier, int Hash) mod) => _itemModifierList?.UpdateSelectedItem(mod);
         public void ClearCraftingSlot() => _slot?.ClearSlot();
         public void ClearPossibleModifiers()
         {
@@ -134,7 +136,8 @@
 
         public void ClearDescription() => FreeChildren(_additionalActionsContainer);
 
-        private void ConsumeResources<T>(List<T> resources) where T : BaseResource
+        private void ConsumeResources<T>(List<T> resources)
+            where T : BaseResource
         {
             foreach (var res in resources)
             {
@@ -157,6 +160,6 @@
             EmitSignal(SignalName.RecipeSelected, selectedRecipeId);
         }
 
-        private void OnModifierItemSelected(int index) => EmitSignal(SignalName.ModifierSelected, index, _slot?.CurrentItem?.InstanceId ?? string.Empty);
+        private void OnModifierItemSelected(int hash) => EmitSignal(SignalName.ModifierSelected, hash, _slot?.CurrentItem?.InstanceId ?? string.Empty);
     }
 }

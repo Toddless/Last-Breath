@@ -6,13 +6,19 @@
     public partial class ActionButton : Button
     {
         private Action? _pressed;
+        private Func<bool>? _isActive;
 
-        public void SetupNormalButton(string name, Action action, bool isActive = true, FocusModeEnum focus = FocusModeEnum.None)
+        public void SetupNormalButton(string name, Action action, Func<bool> isActive, FocusModeEnum focus = FocusModeEnum.None)
         {
+            _isActive = isActive;
             _pressed = action;
-            Pressed += _pressed;
+            Pressed += () =>
+            {
+                _pressed?.Invoke();
+                Disabled = _isActive == null || !_isActive.Invoke();
+            };
             Text = name;
-            Disabled = !isActive;
+            Disabled = !_isActive.Invoke();
             FocusMode = focus;
         }
 
@@ -22,16 +28,15 @@
             Toggled += pressed => action(pressed);
             Text = name;
             FocusMode = focus;
-            if(group != null) ButtonGroup = group;
+            if (group != null) ButtonGroup = group;
         }
 
         public void UpdateButtonState(bool isActive) => Disabled = !isActive;
 
         public override void _ExitTree()
         {
-            if (_pressed != null) Pressed -= _pressed;
-            GD.Print($"Action button about to be free");
             _pressed = null;
+            _isActive = null;
         }
     }
 }

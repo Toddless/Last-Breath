@@ -27,7 +27,7 @@
             Tracker.TrackInfo($"{nameof(ItemDataProvider)} was created.", this);
         }
 
-        public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>(true);
+        public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>();
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id, out var item)?.Icon;
 
@@ -65,6 +65,12 @@
         {
             TryGetItem(id, out var item);
             return item != null && item is T;
+        }
+
+        public ICraftingRecipe? GetRecipeForItem(string itemId)
+        {
+            var recipe = _itemData.Values.Where(x => x is ICraftingRecipe recipe && recipe.ResultItemId == itemId).FirstOrDefault();
+            return recipe?.Copy<ICraftingRecipe>();
         }
 
         public bool IsItemHasTag(string id, string tag) => TryGetItem(id, out var item)?.HasTag(tag) ?? false;

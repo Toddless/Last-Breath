@@ -1,12 +1,12 @@
 ﻿namespace Core.Interfaces.Abilities
 {
     using Core.Enums;
-    using Core.Modifiers;
+    using Core.Interfaces;
 
     public interface IEffect
     {
         Effects Effect { get; }
-        IModifier? Modifier { get; }
+        IItemModifier? Modifier { get; }
         int Duration { get; set; }
         int Stacks { get; set; }
         bool Permanent { get; }

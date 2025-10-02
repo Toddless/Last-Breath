@@ -6,36 +6,40 @@
     using Core.Enums;
     using System.Linq;
     using Core.Modifiers;
+    using Core.Interfaces;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces;
 
     public class ItemCreator
     {
-        private record FilteredMaterialModifier(IMaterialModifier Modifier, float Weight);
-        private record WeightedMaterialModifier(IMaterialModifier Modifier, float From, float To, float Weight);
+        private readonly RandomNumberGenerator _rnd;
 
-        private float _totalWeight;
-
-        public IEquipItem? CreateEquipItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)
+        public ItemCreator()
         {
-            var modifiers = CalculateWeights(CombineModifiers(mainResources, optionalResources));
-            return Create(recipe.ResultItemId, modifiers);
+            _rnd = new RandomNumberGenerator();
+            _rnd.Randomize();
         }
 
-        public IEquipItem? CreateGenericItem(ICraftingRecipe recipe, IEnumerable<ICraftingResource> mainResources, IEnumerable<ICraftingResource> optionalResources, ICharacter? player = default)
+        public IEquipItem? CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
+        {
+            var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
+            return Create(resultItemId, Mods, TotalWeight);
+        }
+
+        public IEquipItem? CreateGenericItem(string resultItemId, IEnumerable<IMaterialModifier> resouces, ICharacter? player = default)
         {
             var rarity = GetRarity(player);
             var attribute = GetAttribute(player);
-            var itemId = $"{recipe.ResultItemId}_{attribute}_{rarity}";
-            var modifiers = CalculateWeights(CombineModifiers(mainResources, optionalResources));
-            var item = Create(itemId, modifiers);
+            var itemId = $"{resultItemId}_{attribute}_{rarity}";
+            var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resouces);
+            var item = Create(itemId, Mods, TotalWeight);
             return item;
         }
 
-        public IItem? CreateItem(ICraftingRecipe recipe)
+        public IItem? CreateItem(string resultItemId)
         {
             // for creating basic items i need a new item provider
             return null;
@@ -51,7 +55,13 @@
         private AttributeType GetAttribute(ICharacter? player = default)
         {
             // TODO: Sometime i can get from this call AttributeType.None.
-            if (player == null) return GetRandomValueFallBack<AttributeType>();
+            if (player == null)
+            {
+                var attribute = GetRandomValueFallBack<AttributeType>();
+                while (attribute == AttributeType.None)
+                    attribute = GetRandomValueFallBack<AttributeType>();
+                return attribute;
+            }
             // TODO: Later add call to players skill to get attribute
             return AttributeType.Dexterity;
         }
@@ -59,49 +69,15 @@
         private T GetRandomValueFallBack<T>()
             where T : struct, Enum
         {
-            using var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
+            _rnd.Randomize();
             var values = Enum.GetValues<T>();
-            var idx = (byte)rnd.RandiRange(0, values.Length - 1);
+            var idx = (byte)_rnd.RandiRange(0, values.Length - 1);
             return values[idx];
         }
 
         private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
 
-        private List<FilteredMaterialModifier> CombineModifiers(IEnumerable<ICraftingResource> main, IEnumerable<ICraftingResource> optional)
-        {
-            return main
-                .Concat(optional)
-                .SelectMany(res => res.MaterialType?.Modifiers ?? [])
-                .GroupBy(mod => new { mod.ModifierType, mod.Parameter, mod.Value })
-                .Select(group =>
-                {
-                    var x = new FilteredMaterialModifier(group.First(), group.Sum(c => c.Weight));
-                    return x;
-                }).ToList();
-        }
-
-        private List<WeightedMaterialModifier> CalculateWeights(List<FilteredMaterialModifier> modifiers)
-        {
-            List<WeightedMaterialModifier> weights = [];
-            float currentMaxWeight = 0;
-            float from = 0;
-            foreach (var modifier in modifiers)
-            {
-                currentMaxWeight += modifier.Weight;
-                weights.Add(new(modifier.Modifier, from, currentMaxWeight, modifier.Weight));
-                from = currentMaxWeight;
-            }
-            foreach (var item in weights)
-            {
-                DebugLogger.LogDebug($"Percent: {MathF.Round(item.Weight / currentMaxWeight * 100), 2}% Modifier: {item.Modifier.Parameter}, {item.Modifier.ModifierType}, {item.Modifier.Value}");
-            }
-            _totalWeight = currentMaxWeight;
-            DebugLogger.LogDebug($"Total weight: {currentMaxWeight}",this);
-            return weights;
-        }
-
-        private IEquipItem? Create(string itemId, List<WeightedMaterialModifier> modifiers)
+        private IEquipItem? Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight)
         {
             var dataProvider = ItemDataProvider.Instance;
             if (dataProvider == null)
@@ -123,46 +99,22 @@
             item.SetBaseModifiers(statModifiers);
 
             var amountModifiers = GetAmountModifiers(item.Rarity);
-            HashSet<IMaterialModifier> takenMods = [];
-            using var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            const int maxAttemps = 15;
 
-            while (amountModifiers > 0)
-            {
-                TakeMode(maxAttemps);
-                void TakeMode(int attemp)
-                {
-                    if (attemp <= 0)
-                    {
-                        AddAnyNotTakenMod(takenMods, modifiers);
-                        return;
-                    }
-                    attemp--;
-                    var rNumb = rnd.RandfRange(0, _totalWeight);
-                    var mod = modifiers.FirstOrDefault(x => rNumb >= x.From && rNumb <= x.To)?.Modifier;
-                    if (mod != null)
-                    {
-                        if (!takenMods.Add(mod))
-                            TakeMode(attemp);
-                    }
-                }
-                amountModifiers--;
-            }
+            HashSet<IMaterialModifier> takenMods = [.. WeightedRandomPicker.PickRandomMultiple(modifiers, totalWeight, amountModifiers, _rnd)];
 
             // TODO : Change to get random effect/ability
             var skill = GetRandomSkill();
             if (skill != null) item.SetSkill(skill);
 
-            List<IModifier> mods = [];
+            List<IItemModifier> mods = [];
             foreach (var mod in takenMods)
             {
-                mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.Value, item));
+                mods.Add(ModifiersCreator.CreateModifier(mod.Parameter, mod.ModifierType, mod.BaseValue, item));
             }
 
             item.SetAdditionalModifiers(mods);
+            item.SaveModifiersPool(modifiers.Select(x => x.Obj));
 
-            _totalWeight = 0;
             return item;
         }
 
@@ -176,17 +128,6 @@
 
         // TODO: GetRandomEffect()
 
-        private void AddAnyNotTakenMod(HashSet<IMaterialModifier> takenMods, List<WeightedMaterialModifier> modifiers)
-        {
-            Tracker.TrackInfo("Attemp limit was reached. Added first not taken modifier.", this);
-            foreach (var mod in modifiers)
-            {
-                if (!takenMods.Contains(mod.Modifier))
-                {
-                    takenMods.Add(mod.Modifier);
-                    break;
-                }
-            }
-        }
+
     }
 }

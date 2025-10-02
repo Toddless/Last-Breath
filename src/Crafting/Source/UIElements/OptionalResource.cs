@@ -37,6 +37,12 @@
             }
         }
 
+        public override void ConsumeResource()
+        {
+            base.ConsumeResource();
+            if (CanClear()) RemoveCraftingResource();
+        }
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public override void _ExitTree()

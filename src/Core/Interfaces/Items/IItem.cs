@@ -6,6 +6,6 @@
     {
         string InstanceId { get; }
         Rarity Rarity { get; }
-        T Copy<T>(bool subresources = false);
+        T Copy<T>();
     }
 }

@@ -2,23 +2,18 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
-    using Core.Modifiers;
+    using Core.Interfaces;
 
     public class ModifierFormatter(Func<string, string> localize)
     {
         // _localize here is public static string GetLokalizedName(string id) => TranslationServer.Translate(id); from lokalizator
         private readonly Func<string, string> _localize = localize;
 
-        public string FormatMaterialModifier(IMaterialModifier modifier)
+        public string FormatModifier(IModifier modifier)
         {
             return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.ModifierType, modifier.Parameter)), GetValueStringModifierType(modifier.ModifierType, modifier.Value));
         }
-
-        public string FormatModifier(IModifier modifier)
-        {
-            return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.Type, modifier.Parameter)), GetValueStringModifierType(modifier.Type, modifier.Value));
-        }
+     
 
         public string FormatItemStats(string propertyName, float value)
         {

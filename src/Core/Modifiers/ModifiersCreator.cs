@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Data;
 
     public class ModifiersCreator
@@ -47,9 +48,9 @@
 
         };
 
-        public static List<IModifier> ItemStatsToModifier(ItemStats stats, object source)
+        public static List<IItemModifier> ItemStatsToModifier(ItemStats stats, object source)
         {
-            List<IModifier> modifiers = [];
+            List<IItemModifier> modifiers = [];
             var properties = stats.GetType().GetProperties();
 
             foreach (var prop in properties)
@@ -71,7 +72,7 @@
             return modifiers;
         }
 
-        public static IModifier CreateModifier(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
+        public static IItemModifier CreateModifier(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
         {
             return parameter switch
             {

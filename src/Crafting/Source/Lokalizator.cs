@@ -1,9 +1,8 @@
 ﻿namespace Crafting.Source
 {
-    using Core.Interfaces.Crafting;
-    using Core.Modifiers;
     using Godot;
     using Utilities;
+    using Core.Interfaces;
 
     public static class Lokalizator
     {
@@ -18,8 +17,6 @@
         {
             switch (true)
             {
-                case var _ when obj is IMaterialModifier material:
-                    return s_modifierFormatter.FormatMaterialModifier(material);
                 case var _ when obj is IModifier modifier:
                     return s_modifierFormatter.FormatModifier(modifier);
                 default:

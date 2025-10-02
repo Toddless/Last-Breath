@@ -1,17 +1,19 @@
 ﻿namespace Crafting.Source.UIElements.Layers
 {
-    using Godot;
     using System;
-    using Utilities;
-    using System.Linq;
-    using Core.Constants;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Crafting.TestResources.Inventory;
-    using Stateless;
+    using System.Linq;
     using System.Text;
+    using Core.Constants;
     using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Results;
+    using Crafting.TestResources.Inventory;
+    using Godot;
+    using Stateless;
+    using Utilities;
 
     public partial class CraftingLayer : CanvasLayer
     {
@@ -19,6 +21,7 @@
         private enum State { Opened, Closed, Recipe, Equip }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.Closed);
+
         private readonly HashSet<IMaterialModifier> _mainModifiers = [];
         private readonly HashSet<IMaterialModifier> _optionalModifiers = [];
         // optional quantity for optional resource always 1
@@ -28,30 +31,36 @@
         private StateMachine<State, Trigger>.TriggerWithParameters<string>? _recipeSelected;
         private StateMachine<State, Trigger>.TriggerWithParameters<string>? _equipItemSelected;
 
-        private ItemDataProvider? _dataProvider;
-        private ItemCreator? _itemCreator;
-        private ItemUpgrader? _itemUpgrader;
-        private ItemInventory? _itemInventory;
+        private readonly ItemDataProvider _dataProvider = new("res://TestResources/RecipeAndResources/");
+        private readonly ItemCreator _itemCreator = new();
+        private readonly ItemUpgrader _itemUpgrader = new();
+        private readonly ItemInventory _itemInventory = new();
         [Export] private CraftingUI? _craftingUI;
-
-        private Action<bool>? _updateButtonState;
 
         public override void _Ready()
         {
             // TODO: Remember upgrade to Mythic item have special requirements
-            _dataProvider = new("res://TestResources/RecipeAndResources/");
             _dataProvider.LoadData();
-            _itemCreator = new ItemCreator();
-            _itemUpgrader = new ItemUpgrader();
-
             ConfigureMachine();
+
+            // for now
+            // ____________________________________________
+            _craftingUI?.InitializeInventory(_itemInventory);
+
+            using (var rnd = new RandomNumberGenerator())
+                foreach (var resource in _dataProvider.GetAllResources())
+                {
+                    _itemInventory.TryAddItem(resource, 100);
+                }
+            // ____________________________________________
+
             if (_craftingUI != null)
             {
                 _craftingUI.RecipeSelected += (id) => _machine.Fire(_recipeSelected, id);
-                _craftingUI.OnEquipItemPlaced += (id) => _machine.Fire(_equipItemSelected, id);
-                _craftingUI.OnEquipItemReturned += (id, instance) => _itemInventory?.ReturnItemToInventory(new(id, instance));
+                _craftingUI.OnEquipItemPlaced += (instanceId) => _machine.Fire(_equipItemSelected, instanceId);
+                _craftingUI.OnEquipItemReturned += (id, instance) => _itemInventory.TryReturnItemInstanceToInventory(new(id, instance));
                 _craftingUI.OnEquipItemRemoved += PrepareUI;
-                _craftingUI.ModifierSelected += (hash, instanceId) => GD.Print($"Modifier with hash: {hash}. Have item in inventory: {_itemInventory?.GetItemInstance(instanceId) != null}");
+                _craftingUI.ModifierSelected += ChangeSelectedModifier;
             }
 
             for (int i = 0; i < 4; i++)
@@ -61,28 +70,11 @@
                 opt.AddPressed += () => OnAddPressed(opt);
                 _craftingUI?.AddOptionalResource(opt);
             }
-
-            // for now
-            // ____________________________________________
-            var itemInventory = new ItemInventory();
-            _itemInventory = itemInventory;
-            _craftingUI?.InitializeInventory(itemInventory);
-
-            using (var rnd = new RandomNumberGenerator())
-                foreach (var resource in _dataProvider.GetAllResources())
-                {
-                    _itemInventory.AddItem(resource, 100);
-                }
-            // ____________________________________________
         }
 
         public override void _Input(InputEvent @event)
         {
-            if (@event.IsActionPressed("ui_crafting"))
-            {
-                if (Visible) FireTrigger(Trigger.Close);
-                else FireTrigger(Trigger.Open);
-            }
+            if (@event.IsActionPressed("ui_crafting")) FireTrigger(Visible ? Trigger.Close : Trigger.Open);
         }
 
         private void ConfigureMachine()
@@ -94,25 +86,23 @@
                 .OnEntry(() =>
                 {
                     Hide();
-                    ReturnCraftingSlotItemIfNeeded();
+                    ReturnItemInCraftingSlotIfNeeded();
                     _mainModifiers.Clear();
-                    _mainResources.Clear();
                     _optionalModifiers.Clear();
-                    _optionalResources.Clear();
+                    ClearOptionalResources();
                     _craftingUI?.DestroyRecipeTree();
                     _craftingUI?.ClearMainResources();
                     _craftingUI?.ClearDescription();
                     _craftingUI?.ClearItemBaseStats();
                     _craftingUI?.ClearPossibleModifiers();
                     _craftingUI?.ClearItemModifiers();
-                    _craftingUI?.ClearOptionalResources();
                 })
                 .Permit(Trigger.Open, State.Opened);
 
             _machine.Configure(State.Opened)
                 .OnEntry(() =>
                 {
-                    _craftingUI?.CreatingRecipeTree(_dataProvider?.GetCraftingRecipes() ?? []);
+                    _craftingUI?.CreatingRecipeTree(_dataProvider.GetCraftingRecipes());
                     Show();
                 })
                 .Permit(Trigger.SetEquip, State.Equip)
@@ -136,172 +126,231 @@
                 .Permit(Trigger.Close, State.Closed);
         }
 
-        private void ReturnCraftingSlotItemIfNeeded()
-        {
-            var itemInstance = _craftingUI?.GetCraftingSlotItem();
-            // recipe, dont care just clear it
-            if (itemInstance == null || string.IsNullOrWhiteSpace(itemInstance.InstanceId))
-            {
-                _craftingUI?.ClearCraftingSlot();
-                return;
-            }
-            // crafting slot always have 1 item
-            _itemInventory?.ReturnItemToInventory(itemInstance);
-            _craftingUI?.ClearCraftingSlot();
-        }
 
+        #region CREATE
         private void SetRecipe(string id)
         {
-            _craftingUI?.SetRecipe(id);
-            // show item metadata
-            var itemId = _dataProvider?.GetRecipeResultItemId(id) ?? string.Empty;
-            ShowBaseItemStats(itemId);
-            _craftingUI?.ClearDescription();
-            _craftingUI?.SetItemDescription(new RichTextLabel() { Text = Lokalizator.LokalizeDescription(itemId), SizeFlagsVertical = Control.SizeFlags.ExpandFill });
+            _craftingUI?.ShowRecipe(id);
 
-            bool canCraft = ShowMainResources(_dataProvider?.GetRecipeRequirements(id) ?? []);
+            var itemId = _dataProvider.GetRecipeResultItemId(id);
+            var requirements = _dataProvider.GetRecipeRequirements(id);
+
+            HandleRequirements(requirements);
+            ShowBaseItemStats(itemId);
+
+            _craftingUI?.SetItemDescription(new RichTextLabel() { Text = Lokalizator.LokalizeDescription(itemId), SizeFlagsVertical = Control.SizeFlags.ExpandFill });
             _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
 
             var button = new ActionButton();
-            button.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => CreateItemButton(id), canCraft);
-            _updateButtonState = button.UpdateButtonState;
+            button.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => OnCreateItem(id), () => IsEnoughtResources(_mainResources));
             _craftingUI?.AddActionNode(button);
         }
+       
+
+        private IItem? CreateItem(string recipeId)
+        {
+            IItem? item = null;
+            var resultItemId = _dataProvider.GetRecipeResultItemId(recipeId);
+            var hasTag = _dataProvider.IsItemHasTag;
+            if (string.IsNullOrWhiteSpace(resultItemId)) return item;
+
+            switch (true)
+            {
+                // TODO: Creation for generic items not working, i have no resources defined
+                case var _ when hasTag.Invoke(recipeId, TagConstants.Equipment):
+                    item = hasTag.Invoke(recipeId, "Generic") ?
+                        _itemCreator.CreateGenericItem(resultItemId, GetCraftingModifiers()) :
+                        _itemCreator.CreateEquipItem(resultItemId, GetCraftingModifiers());
+                    break;
+                case var _ when hasTag.Invoke(recipeId, TagConstants.Equipment):
+                    item = _itemCreator.CreateItem(resultItemId);
+                    break;
+            }
+
+            if (item is IEquipItem equip)
+                SaveUsedResources(equip);
+            return item;
+        }
+
+        private void SaveUsedResources(IEquipItem equip)
+        {
+            var resources = new Dictionary<string, int>(_mainResources);
+            foreach (var res in _optionalResources)
+                resources.TryAdd(res, 1);
+            equip.SaveUsedResources(resources);
+        }
+        #endregion
+
+
+        #region UPDATE
+        private void UpgradeModeNormal(bool isToggled) => SetUpgradeMode(isToggled ? ItemUpgradeMode.Normal : ItemUpgradeMode.None);
+        private void UpgradeModeDouble(bool isToggled) => SetUpgradeMode(isToggled ? ItemUpgradeMode.Double : ItemUpgradeMode.None);
+        private void UpgradeModeLucky(bool isToggled) => SetUpgradeMode(isToggled ? ItemUpgradeMode.Lucky : ItemUpgradeMode.None);
+
+        private void SetUpgradeMode(ItemUpgradeMode mode)
+        {
+            var requirements = _itemUpgrader.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, mode);
+            HandleRequirements(requirements);
+        }
+
+        private void UpdateItemButton(string itemInstanceId)
+        {
+            var item = _itemInventory.GetItemInstance(itemInstanceId);
+
+            // TODO: For now return
+            if (item == null) return;
+            if (item is not IEquipItem equip) return;
+            // ______________________________________
+
+            // TODO: Depends on result we have different sound/visual effect/etc.
+            var result = _itemUpgrader.TryUpgradeItem(equip);
+
+            if (!HandleUpdateResult(result))
+                return;
+
+            ShowBaseItemStats(equip.InstanceId);
+            ShowItemModifiers(equip.AdditionalModifiers);
+            ConsumeResourcesFromInventory();
+        }
+
+        private bool HandleUpdateResult(IResult<ItemUpgradeResult> result)
+        {
+            switch (result.Info)
+            {
+                case ItemUpgradeResult.Success:
+                    HandleSuccess();
+                    return true;
+                case ItemUpgradeResult.Failure:
+                    HandleFailure();
+                    return true;
+                case ItemUpgradeResult.CriticalSuccess:
+                    HandleCriticalSuccess();
+                    return true;
+                case ItemUpgradeResult.CriticalFailure:
+                    HandleCriticalFailure();
+                    return true;
+                case ItemUpgradeResult.UpgradeModeNotSet:
+                    return false;
+                case ItemUpgradeResult.ReachedMaxLevel:
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        private void HandleCriticalFailure() => throw new NotImplementedException();
+        private void HandleCriticalSuccess() => throw new NotImplementedException();
+        private void HandleFailure() => throw new NotImplementedException();
+        private void HandleSuccess() => throw new NotImplementedException();
+
+
+        private void AllowRecraftModifier(bool isToggled)
+        {
+            bool isSelectable = false;
+
+            if (isToggled)
+            {
+                // for now
+                var item = _itemInventory.GetItemInstance(_craftingUI?.GetCraftingSlotItem()?.InstanceId ?? string.Empty) as IEquipItem;
+                var reqs = _itemUpgrader.GetRecraftResourceRequirements($"{item?.EquipmentPart.ConvertEquipmentPartToCategory()}_{item?.Rarity}");
+                HandleRequirements(reqs);
+                isSelectable = IsEnoughtResources(_mainResources);
+            }
+            else
+            {
+                _craftingUI?.ClearMainResources();
+                ClearOptionalResources();
+            }
+
+            _craftingUI?.SetItemModifiersSelectable(isSelectable);
+        }
+
+        private void ChangeSelectedModifier(int hash, string itemInstanceId)
+        {
+            var item = _itemInventory.GetItemInstance(itemInstanceId);
+            // TODO: For now return
+            if (item == null) return;
+            if (item is not IEquipItem equip) return;
+
+            ConsumeResourcesFromInventory();
+            var newModifier = _itemUpgrader.TryRecraftModifier(equip, hash, equip.ModifiersPool.Concat(_optionalModifiers));
+
+            _craftingUI?.UpdateSelectedItemModifer((Lokalizator.Format(newModifier), newModifier.GetHashCode()));
+
+        }
+        #endregion
 
         private void SetEquipItem(string itemId)
         {
             _craftingUI?.DeselecteAllRecipe();
 
-            var item = _itemInventory?.GetItemInstance(itemId);
-            if (item != null)
+            var item = _itemInventory.GetItemInstance(itemId);
+            if (item != null && item is IEquipItem equip)
             {
-                ShowBaseItemStats(item.InstanceId);
-                ShowItemModifiers(item);
+                ShowBaseItemStats(equip.InstanceId);
+                ShowItemModifiers(equip.AdditionalModifiers);
+                CreateActionButtons(equip.InstanceId);
             }
+        }
 
-            // TODO: Remove from here
-            var buttonGroup = new ButtonGroup
+        private void ShowMainResources()
+        {
+            foreach (var res in _mainResources)
             {
-                AllowUnpress = true
-            };
-            var normal = new ActionButton();
-            normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), UpgradeModeNormal, buttonGroup);
-            var doubl = new ActionButton();
-            doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), UpgradeModeDouble, buttonGroup);
-            var risky = new ActionButton();
-            risky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), UpgradeModeGamble, buttonGroup);
-            var update = new ActionButton();
-            update.SetupNormalButton(Lokalizator.Lokalize("CraftingUpdateButton"), UpdateItemButton);
-            _updateButtonState = update.UpdateButtonState;
-            _craftingUI?.AddActionNode(normal);
-            _craftingUI?.AddActionNode(doubl);
-            _craftingUI?.AddActionNode(risky);
-            _craftingUI?.AddActionNode(update);
-        }
-
-        private void UpgradeModeNormal(bool isToggled)
-        {
-            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Normal);
-        }
-        private void UpgradeModeDouble(bool isToggled)
-        {
-            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Double);
-        }
-
-        private void UpgradeModeGamble(bool isToggled)
-        {
-            if (isToggled) SetUpgradeMode(ItemUpgradeMode.Lucky);
-        }
-
-        private void SetUpgradeMode(ItemUpgradeMode mode)
-        {
-            _craftingUI?.ClearMainResources();
-            _mainResources.Clear();
-            var req = _itemUpgrader?.SetCost(_craftingUI?.GetCraftingSlotItem()?.ItemId ?? string.Empty, mode) ?? [];
-            _updateButtonState?.Invoke(ShowMainResources(req));
-        }
-
-        private bool ShowMainResources(List<IResourceRequirement> requirements)
-        {
-            bool canCraft = true;
-            foreach (var req in requirements)
-            {
-                var id = req.ResourceId;
-                var amountNeed = req.Amount;
-                _mainResources.TryAdd(id, amountNeed);
-
+                var id = res.Key;
+                var amountNeed = GetAmountNeed(res);
                 var mainRes = MainResource.Initialize().Instantiate<MainResource>();
                 mainRes.AddCraftingResource(id, res => _itemInventory?.GetTotalItemAmount(id) ?? 0, amountNeed);
                 _craftingUI?.AddMainResource(mainRes);
-
-                var playerHave = _itemInventory?.GetTotalItemAmount(id) ?? 0;
-                if (playerHave < amountNeed) canCraft = false;
                 AddModifiersIfResource(id);
             }
-            return canCraft;
         }
 
-        private void AddModifiersIfResource(string id)
+        private void ShowItemModifiers(IReadOnlyList<IItemModifier> modifiers)
         {
-            if (_dataProvider?.IsItemImplement<IResource>(id) ?? false) AddModifiersToSet(_mainModifiers, _dataProvider?.GetResourceModifiers(id) ?? []);
-        }
-
-        private void ShowItemModifiers(IItem item)
-        {
-            if (item is IEquipItem equip)
+            var mods = new List<(string Modifier, int Hash)>();
+            foreach (var mod in modifiers)
             {
-                var mods = new List<(string, int)>();
-                foreach (var mod in equip.AdditionalModifiers)
+                mods.Add((Lokalizator.Format(mod), mod.GetHashCode()));
+            }
+            _craftingUI?.SetItemModifiers(mods);
+        }
+
+        //TODO: Rework
+        private void ShowBaseItemStats(string itemId)
+        {
+            if (_machine.State == State.Recipe)
+            {
+                var stats = _dataProvider.GetItemBaseStats(itemId);
+                string baseStats = $"{Lokalizator.Lokalize("BaseStats")}\n";
+                foreach (var item in stats ?? [])
                 {
-                    mods.Add((Lokalizator.Format(mod), mod.GetHashCode()));
+                    baseStats += $"{item}\n";
                 }
-                _craftingUI?.SetItemModifiers(mods);
+                _craftingUI?.SetBaseStats(baseStats);
+            }
+            else
+            {
+                var item = _itemInventory.GetItemInstance(itemId) as IEquipItem;
+                string symbol = item?.UpdateLevel > 0 ? ": +" : string.Empty;
+                string currentLevel = item?.UpdateLevel > 0 ? $"{item.UpdateLevel}" : string.Empty;
+                string baseStats = $"{Lokalizator.Lokalize(item?.Id ?? string.Empty)}{symbol}{currentLevel}\n";
+                foreach (var stat in item?.BaseModifiers ?? [])
+                {
+                    baseStats += $"{Lokalizator.Format(stat)}\n";
+                }
+                _craftingUI?.SetBaseStats(baseStats);
             }
         }
 
-        private void FireTrigger(Trigger trigger) => _machine.Fire(trigger);
-
-        // if we can press this button => we have enough resources
-        private void CreateItemButton(string id)
+        private void HandleRequirements(List<IResourceRequirement> requrements)
         {
-            // What if i need to create item instead of EquipItem??
-            var item = CreateItem(id);
-            if (item == null)
-            {
-                Tracker.TrackError($"Failed to create an item. Recipe: {id}", this);
-                return;
-            }
-            CreateNotifier(item);
-            ConsumeResourcesFromInventory();
-            _updateButtonState?.Invoke(IsEnoughtResources(_mainResources));
+            _mainResources.Clear();
+            _craftingUI?.ClearMainResources();
+            requrements.ForEach(req => _mainResources.TryAdd(req.ResourceId, req.Amount));
+            ShowMainResources();
         }
-
-        private void UpdateItemButton()
-        {
-            var instance = _craftingUI?.GetCraftingSlotItem();
-            var item = _itemInventory?.GetItemInstance(instance?.InstanceId ?? string.Empty);
-            // TODO: For now return
-            if (item == null) return;
-            if (item is not IEquipItem equip) return;
-            // ______________________________________
-            if (equip.UpdateLevel >= 12)
-            {
-                // Show some message "Item cannot be upgraded anymore" or something
-                return;
-            }
-            var updated = _itemUpgrader?.TryUpgradeItem(equip) ?? false;
-            if (updated)
-            {
-                ShowBaseItemStats(item?.InstanceId ?? string.Empty);
-                ShowItemModifiers(item!);
-                ConsumeResourcesFromInventory();
-                _craftingUI?.ConsumeMainResources();
-                _craftingUI?.ConsumeOptionalResource();
-            }
-            _updateButtonState?.Invoke(IsEnoughtResources(_mainResources));
-        }
-
-        private bool IsEnoughtResources(Dictionary<string, int> mainResources) => !mainResources.Any(res => _itemInventory?.GetTotalItemAmount(res.Key) < res.Value);
 
         // should not be there
         private void CreateNotifier(IItem item)
@@ -345,7 +394,7 @@
 
             void Add()
             {
-                _itemInventory?.AddItem(item);
+                _itemInventory.TryAddItem(item);
                 Unsubscribe();
             }
 
@@ -364,57 +413,84 @@
             CallDeferred(MethodName.AddChild, notifier);
         }
 
-        private void DestroyItem(IItem item)
+        private void CreateActionButtons(string itemInstanceId)
         {
-
-        }
-
-        private IItem? CreateItem(string recipeId)
-        {
-            IItem? item = null;
-            var recipe = (ICraftingRecipe?)_dataProvider?.CopyBaseItem(recipeId);
-            if (recipe == null) return null;
-            switch (true)
+            // TODO: позднее убрать кнопку апдейта и добавить функцию апгрейда предмета путем нажатия на окошко характеристик предмета
+            var buttonGroup = new ButtonGroup
             {
-                // TODO: Creation for generic items not working, i have no resources
-                case var _ when recipe.Tags.Contains(TagConstants.Equipment, StringComparer.OrdinalIgnoreCase):
-                    item = recipe.Tags.Contains("Generic") ?
-                        _itemCreator?.CreateGenericItem(recipe, GetCraftingResources(_mainResources.Keys), GetCraftingResources(_optionalResources)) :
-                        _itemCreator?.CreateEquipItem(recipe, GetCraftingResources(_mainResources.Keys), GetCraftingResources(_optionalResources));
-                    break;
-                case var _ when recipe.Tags.Contains("Item"):
-                    item = _itemCreator?.CreateItem(recipe);
-                    break;
-            }
-            return item;
-        }
+                AllowUnpress = true
+            };
+            var normal = new ActionButton();
+            var doubl = new ActionButton();
+            var lucky = new ActionButton();
+            var update = new ActionButton();
+            var recraft = new ActionButton();
 
-        private IEnumerable<ICraftingResource> GetCraftingResources(IEnumerable<string> resourceIds)
-        {
-            var resources = new List<ICraftingResource>();
-            foreach (var res in resourceIds)
-            {
-                var loadded = _dataProvider?.CopyBaseItem(res);
-                if (loadded != null) resources.Add((ICraftingResource)loadded);
-            }
+            normal.SetupToggleButton(Lokalizator.Lokalize("UpdateNormal"), UpgradeModeNormal, buttonGroup);
+            doubl.SetupToggleButton(Lokalizator.Lokalize("UpdateDouble"), UpgradeModeDouble, buttonGroup);
+            lucky.SetupToggleButton(Lokalizator.Lokalize("UpdateRisk"), UpgradeModeLucky, buttonGroup);
+            update.SetupNormalButton(Lokalizator.Lokalize("CraftingUpdateButton"), () => UpdateItemButton(itemInstanceId), () => IsEnoughtResources(_mainResources));
+            recraft.SetupToggleButton(Lokalizator.Lokalize("RecraftModifiers"), AllowRecraftModifier, buttonGroup);
 
-            return resources;
+            _craftingUI?.AddActionNode(normal);
+            _craftingUI?.AddActionNode(doubl);
+            _craftingUI?.AddActionNode(lucky);
+            _craftingUI?.AddActionNode(update);
+            _craftingUI?.AddActionNode(recraft);
         }
+        // ______________________________
 
         private void ConsumeResourcesFromInventory()
         {
+            // TODO: handle optional resources
             foreach (var res in _mainResources)
-                _itemInventory?.RemoveItemById(res.Key, res.Value);
+                ConsumeSingleResourceFromInventory(res.Key, res.Value);
             foreach (var optResourceId in _optionalResources)
-                _itemInventory?.RemoveItemById(optResourceId);
+                ConsumeSingleResourceFromInventory(optResourceId);
 
             _craftingUI?.ConsumeOptionalResource();
             _craftingUI?.ConsumeMainResources();
         }
 
+        #region EVENTS
+
+        private void OnResourceAdded(string resource)
+        {
+            var modifiers = _dataProvider.GetResourceModifiers(resource);
+            AddModifiersToSet(_optionalModifiers, modifiers);
+            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
+        }
+
+        private void OnResourceRemoved(string resource)
+        {
+            var modifiers = _dataProvider.GetResourceModifiers(resource);
+            RemoveModifiersFromSet(_optionalModifiers, modifiers);
+            _optionalResources.RemoveWhere(res => res == resource);
+            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
+        }
+
+        private void OnCreateItem(string id)
+        {
+            var item = CreateItem(id);
+            if (item == null)
+            {
+                Tracker.TrackError($"Failed to create an item. Recipe: {id}", this);
+                return;
+            }
+            CreateNotifier(item);
+            ConsumeResourcesFromInventory();
+        }
+
+        private void OnLaguageChanged()
+        {
+            var currentLang = TranslationServer.GetLocale();
+            if (currentLang == "en_GB") TranslationServer.SetLocale("ru");
+            else TranslationServer.SetLocale("en_GB");
+        }
+
         private void OnAddPressed(OptionalResource opt)
         {
-            var available = _itemInventory?.GetAllItemIdsWithTag(TagConstants.Essence) ?? [];
+            var available = _itemInventory.GetAllItemIdsWithTag(TagConstants.Essence) ?? [];
 
             var craftingItems = CraftingItems.Initialize().Instantiate<CraftingItems>();
             craftingItems.Setup(available, _optionalResources, selected =>
@@ -427,63 +503,33 @@
             craftingItems.QueueFree);
             AddChild(craftingItems);
         }
+        #endregion
 
-        //TODO: Rework
-        private void ShowBaseItemStats(string itemId)
+
+        private int GetResourceAmount(int value)
         {
-            if (_machine.State == State.Recipe)
+            // TODO: Need to call player to get multiplier
+            var playerMultiplier = 0.3f;
+
+            return Mathf.Max(0, Mathf.RoundToInt(value * playerMultiplier));
+        }
+
+        private List<IMaterialModifier> GetCraftingModifiers()
+        {
+            var resources = new List<IMaterialModifier>();
+            foreach (var res in _optionalResources.Concat(_mainResources.Keys))
             {
-                var stats = _dataProvider?.GetItemBaseStats(itemId);
-                string baseStats = $"{Lokalizator.Lokalize("BaseStats")}\n";
-                foreach (var item in stats ?? [])
-                {
-                    baseStats += $"{item}\n";
-                }
-                _craftingUI?.SetBaseStats(baseStats);
+                var loadded = _dataProvider.GetResourceModifiers(res);
+                resources.AddRange(loadded);
             }
-            else
-            {
-                var item = _itemInventory?.GetItemInstance(itemId) as IEquipItem;
-                string baseStats = $"{Lokalizator.Lokalize(item?.Id ?? string.Empty)} : {item?.UpdateLevel}\n";
-                foreach (var stat in item?.BaseModifiers ?? [])
-                {
-                    baseStats += $"{Lokalizator.Format(stat)}\n";
-                }
-                _craftingUI?.SetBaseStats(baseStats);
-            }
+
+            return resources;
         }
 
-        private void PrepareUI()
+        private void ReturnItemInCraftingSlotIfNeeded()
         {
-            _mainResources?.Clear();
-            _mainModifiers.Clear();
-            _craftingUI?.ClearItemBaseStats();
-            _craftingUI?.ClearMainResources();
-            _craftingUI?.ClearItemModifiers();
-            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
-            _craftingUI?.ClearDescription();
-        }
-
-        private void OnResourceAdded(string resource)
-        {
-            var modifiers = _dataProvider?.GetResourceModifiers(resource) ?? [];
-            AddModifiersToSet(_optionalModifiers, modifiers);
-            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
-        }
-
-        private void OnResourceRemoved(string resource)
-        {
-            var modifiers = _dataProvider?.GetResourceModifiers(resource) ?? [];
-            RemoveModifiersFromSet(_optionalModifiers, modifiers);
-            _optionalResources.RemoveWhere(res => res == resource);
-            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
-        }
-
-        private void OnLaguageChanged()
-        {
-            var currentLang = TranslationServer.GetLocale();
-            if (currentLang == "en_GB") TranslationServer.SetLocale("ru");
-            else TranslationServer.SetLocale("en_GB");
+            _itemInventory.TryReturnItemInstanceToInventory(_craftingUI?.GetCraftingSlotItem());
+            _craftingUI?.ClearCraftingSlot();
         }
 
         private void AddModifiersToSet(HashSet<IMaterialModifier> set, IReadOnlyList<IMaterialModifier> modifiers)
@@ -498,7 +544,54 @@
                 set.Remove(modifier);
         }
 
+        private void AddModifiersIfResource(string id)
+        {
+            if (_dataProvider?.IsItemImplement<ICraftingResource>(id) ?? false) AddModifiersToSet(_mainModifiers, _dataProvider.GetResourceModifiers(id));
+        }
+
+        private void ClearOptionalResources()
+        {
+            _optionalResources.Clear();
+            _craftingUI?.ClearOptionalResources();
+        }
+
+        // TODO: Maybe I'll have a skill that changes the amount?
+        private int GetAmountNeed(KeyValuePair<string, int> res) => res.Value;
+
+        private void ConsumeSingleResourceFromInventory(string resourceId, int amount = 1) => _itemInventory.RemoveItemById(resourceId, amount);
+
+        private void FireTrigger(Trigger trigger) => _machine.Fire(trigger);
+
+        private bool IsEnoughtResources(Dictionary<string, int> resources) => !resources.Any(res => _itemInventory.GetTotalItemAmount(res.Key) < res.Value);
+
         private HashSet<IMaterialModifier> ConcatModifierSets() => [.. _mainModifiers, .. _optionalModifiers];
+
+        private void DestroyItem(IItem item)
+        {
+            switch (item)
+            {
+                case var _ when item is IEquipItem eq:
+                    DestroyEquipItem(eq);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void DestroyEquipItem(IEquipItem equip)
+        {
+            foreach (var res in equip.UsedResources)
+            {
+                var amount = GetResourceAmount(res.Value);
+                if (amount == 0) continue;
+                if (!_itemInventory?.TryAddItemStacks(res.Key, amount) ?? false)
+                {
+                    var itemInstance = _dataProvider.CopyBaseItem(res.Key);
+                    if (itemInstance != null) _itemInventory?.TryAddItem(itemInstance, amount);
+                }
+            }
+        }
 
         private string FormattedModifiers()
         {
@@ -506,6 +599,16 @@
             foreach (var mod in ConcatModifierSets())
                 formatted.AppendLine(Lokalizator.Format(mod));
             return formatted.ToString();
+        }
+
+        private void PrepareUI()
+        {
+            _mainModifiers.Clear();
+            _craftingUI?.ClearItemBaseStats();
+            _craftingUI?.ClearMainResources();
+            _craftingUI?.ClearItemModifiers();
+            _craftingUI?.ClearDescription();
+            _craftingUI?.ShowPossibleModifiers(FormattedModifiers());
         }
     }
 }

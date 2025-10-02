@@ -6,22 +6,14 @@
     [GlobalClass]
     public partial class SelectableItem : Panel
     {
-        private bool _selected, _hovered, _selectable = true;
-        private int _selectedIndex;
+        private bool _hovered, _selectable = true;
+        private int _index;
         private Variant _metaData;
-        private StyleBoxFlat? _styleSelected, _styleHovered, _styleNormal;
+        private StyleBoxFlat? _styleHovered, _styleNormal;
+
+        private Label? _currentText;
 
         [Signal] public delegate void SelectedEventHandler(int index);
-
-        protected bool ItemSelected
-        {
-            get => _selected;
-            set
-            {
-                _selected = value;
-                UpdateState();
-            }
-        }
 
         protected bool IsHovered
         {
@@ -37,62 +29,52 @@
         {
             MouseEntered += OnMouseEntered;
             MouseExited += OnMouseExited;
-            _styleSelected = UIResourcesProvider.Instance?.GetResource("ItemSelectedStyle") as StyleBoxFlat;
             _styleHovered = UIResourcesProvider.Instance?.GetResource("ItemHoveredStyle") as StyleBoxFlat;
-            _styleNormal = new StyleBoxFlat() { BgColor = new(0, 0, 0, 0.1f) };
-            SizeFlagsHorizontal = SizeFlags.Fill;
-            SizeFlagsVertical = SizeFlags.Fill;
+            _styleNormal = new StyleBoxFlat() { BgColor = new(0, 0, 0, 0) };
+            SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsStretchRatio = 1f;
             CustomMinimumSize = new(0, 25);
+            AddThemeStyleboxOverride("panel", _styleNormal);
         }
 
 
         public override void _GuiInput(InputEvent @event)
         {
             if (@event is not InputEventMouseButton mb) return;
-            if (mb.ButtonIndex != MouseButton.Left) return;
-            if (mb.Pressed && _selectable)
+            if (mb.ButtonIndex == MouseButton.Left && mb.Pressed && _selectable)
             {
-                if (ItemSelected)
-                {
-                    ItemSelected = false;
-                    GD.Print("Item deselected");
-                }
-                else
-                {
-                    EmitSignal(SignalName.Selected, _selectedIndex);
-                    ItemSelected = true;
-                }
+                EmitSignal(SignalName.Selected, _index);
                 AcceptEvent();
             }
         }
 
-        public void SetIndex(int idx) => _selectedIndex = idx;
+        public void SetIndex(int idx) => _index = idx;
         public void SetSelectable(bool selectable) => _selectable = selectable;
         public void SetMetadata(Variant variant) => _metaData = variant;
 
         // not sure about this
-        public void SetText(string text) => AddChild(new Label
+        public void SetText(string text)
         {
-            Text = text,
-            LabelSettings = UIResourcesProvider.Instance?.GetResource("TextSettings") as LabelSettings,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            AnchorLeft = 0.03f,
-            AnchorRight = 0.1f
-        });
+            if (_currentText != null) GetChild(0).QueueFree();
+            _currentText = new Label
+            {
+                Text = text,
+                LabelSettings = UIResourcesProvider.Instance?.GetResource("TextSettings") as LabelSettings,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            _currentText.SetAnchorsPreset(LayoutPreset.FullRect);
+            AddChild(_currentText);
+        }
+
         public Variant GetMetadata() => _metaData;
 
         private void UpdateState()
         {
             switch (true)
             {
-                case var _ when !ItemSelected && IsHovered:
+                case var _ when IsHovered && _selectable:
                     CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleHovered!);
-                    break;
-                case var _ when ItemSelected:
-                    CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleSelected!);
                     break;
                 case var _ when !IsHovered:
                     CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleNormal!);

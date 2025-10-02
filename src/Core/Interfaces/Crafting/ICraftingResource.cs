@@ -4,7 +4,6 @@
     {
         float Quality { get; set; }
         IMaterialType? MaterialType { get; }
-
-        T Copy<T>(bool subresources = false);
+        T Copy<T>();
     }
 }

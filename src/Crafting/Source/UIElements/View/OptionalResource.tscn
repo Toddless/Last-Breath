@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bp7l7o48j0r6h" path="res://Source/UIElements/OptionalResource.cs" id="1_ib3ki"]
 
 [node name="OptionalResource" type="Panel" node_paths=PackedStringArray("_add", "_remove", "Container")]
-custom_minimum_size = Vector2(0, 43)
-offset_bottom = 43.0
+custom_minimum_size = Vector2(0, 25)
+offset_bottom = 25.0
 script = ExtResource("1_ib3ki")
 _add = NodePath("HBoxContainer/Buttons/Add")
 _remove = NodePath("HBoxContainer/Buttons/Remove")
@@ -28,14 +28,14 @@ size_flags_horizontal = 10
 theme_override_constants/separation = 1
 
 [node name="Add" type="Button" parent="HBoxContainer/Buttons"]
-custom_minimum_size = Vector2(35, 0)
+custom_minimum_size = Vector2(25, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 focus_mode = 0
 text = "+"
 
 [node name="Remove" type="Button" parent="HBoxContainer/Buttons"]
-custom_minimum_size = Vector2(35, 0)
+custom_minimum_size = Vector2(25, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 focus_mode = 0
