@@ -24,7 +24,8 @@
         int Initiative { get; }
 
         event Action<ICharacter>? Dead;
-        event Action? AllAttacksFinished;
+        event Action? TurnStart, TurnEnd;
+        event Action<IAttackContext>? BeforeAttack, AfterAttack;
         event Action<IOnGettingAttackEventArgs>? GettingAttack;
 
         void OnTurnEnd();

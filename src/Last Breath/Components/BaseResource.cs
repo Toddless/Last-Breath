@@ -75,12 +75,6 @@
                     break;
             }
         }
-
-        protected virtual void LoadData()
-        {
-
-        }
-
         private bool IsEnough(int amountToSpend) => Current <= amountToSpend;
     }
 }

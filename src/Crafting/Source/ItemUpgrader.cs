@@ -12,7 +12,7 @@
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
-    public class ItemUpgrader
+    public class ItemUpgrader : IItemUpgrader
     {
         private const string UpgradeData = "uid://br3am4hnn5iqg";
         private const string RecraftData = "uid://cg33ax8kmy3gx";
@@ -73,19 +73,19 @@
         public List<IResourceRequirement> GetRecraftResourceRequirements(string id) => _recraftRequirements.GetValueOrDefault(id) ?? [];
 
 
-        public IItemModifier TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
+        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
         {
             var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
 
             item.RemoveAdditionalModifier(modifierToReroll);
-            IItemModifier? modifier = null;
+            IModifierInstance? modifier = null;
             while (modifier == null)
             {
                 var newMod = WeightedRandomPicker.PickRandom(WeightedObjects, TotalWeight, _rnd);
 
                 if (newMod != null && !item.AdditionalModifiers.Any(x => x.GetHashCode() == newMod.GetHashCode()))
                 {
-                    modifier = ModifiersCreator.CreateModifier(newMod.Parameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
+                    modifier = ModifiersCreator.CreateModifierInstance(newMod.Parameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
                     item.AddAdditionalModifier(modifier);
                 }
             }

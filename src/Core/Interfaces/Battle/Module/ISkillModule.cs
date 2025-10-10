@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Battle.Module
 {
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
 
     public interface ISkillModule
     {

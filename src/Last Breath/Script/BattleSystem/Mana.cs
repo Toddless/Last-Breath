@@ -13,7 +13,6 @@
             maximumAmount: BaseMaximumAmount,
             resourceType: ResourceType.Mana)
         {
-            LoadData();
         }
     }
 }

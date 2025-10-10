@@ -8,8 +8,8 @@
 
     public interface IEquipItem : IItem
     {
-        public IReadOnlyList<IItemModifier> BaseModifiers { get; }
-        public IReadOnlyList<IItemModifier> AdditionalModifiers { get; }
+        public IReadOnlyList<IModifierInstance> BaseModifiers { get; }
+        public IReadOnlyList<IModifierInstance> AdditionalModifiers { get; }
         public EquipmentType EquipmentPart { get; }
         public AttributeType AttributeType { get; }
         public ISkill? Skill { get; }
@@ -18,16 +18,17 @@
         IReadOnlyDictionary<string, int> UsedResources { get; }
         IReadOnlyList<IMaterialModifier> ModifiersPool { get; }
 
-        void SetBaseModifiers(IEnumerable<IItemModifier> modifiers);
-        void SetAdditionalModifiers(IEnumerable<IItemModifier> modifiers);
+        void SetBaseModifiers(IEnumerable<IModifierInstance> modifiers);
+        void SetAdditionalModifiers(IEnumerable<IModifierInstance> modifiers);
         void SetSkill(ISkill skill);
+        void OnEquip(ICharacter owner);
         void OnUnequip();
         bool Upgrade(int upgradeLevel = 1);
         bool Downgrade(int downgradeLevel = 1);
-        void ReplaceAdditionalModifier(int hash, IItemModifier newModifier);
+        void ReplaceAdditionalModifier(int hash, IModifierInstance newModifier);
         void SaveModifiersPool(IEnumerable<IMaterialModifier> modifiers);
         void SaveUsedResources(Dictionary<string, int> resources);
         void RemoveAdditionalModifier(int hash);
-        void AddAdditionalModifier(IItemModifier modifier);
+        void AddAdditionalModifier(IModifierInstance modifier);
     }
 }

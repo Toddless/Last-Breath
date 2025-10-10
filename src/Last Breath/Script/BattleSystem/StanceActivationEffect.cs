@@ -10,7 +10,6 @@
 
         public StanceActivationEffect()
         {
-            LoadData();
         }
 
         public void OnActivate(ICharacter owner)
@@ -24,11 +23,6 @@
         public void OnDeactivate(ICharacter owner)
         {
             owner.Modifiers.RemovePermanentModifierBySource(this);
-        }
-
-        private void LoadData()
-        {
-
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Battle.Module;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle.Module;
 
     public abstract class BaseSkillModule(ICharacter owner, SkillType type, DecoratorPriority priority) : ISkillModule
     {

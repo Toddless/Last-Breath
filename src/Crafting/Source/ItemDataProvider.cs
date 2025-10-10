@@ -1,21 +1,23 @@
 ﻿namespace Crafting.Source
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
     using System.IO;
+    using Utilities;
     using System.Linq;
-    using Core.Interfaces.Crafting;
+    using Newtonsoft.Json;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Godot;
-    using Newtonsoft.Json;
-    using Utilities;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
+    using Core.Interfaces;
+    using Core.Modifiers;
 
     public class ItemDataProvider
     {
         private readonly string _itemDataPath;
         private Dictionary<string, IItem> _itemData = [];
-        private Dictionary<string, ItemStats> _itemStatsData = [];
+        private Dictionary<string, List<IModifier>> _itemBaseStatsData = [];
 
         public static ItemDataProvider? Instance { get; private set; }
 
@@ -24,27 +26,18 @@
             // TODO: Path to generic items
             _itemDataPath = itemDataPath;
             Instance = this;
-            Tracker.TrackInfo($"{nameof(ItemDataProvider)} was created.", this);
         }
 
         public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>();
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id, out var item)?.Icon;
 
-        public int GetItemMaxStackSize(string id) => TryGetItem(id, out var item)?.MaxStackSize ?? 0;
-
         public string GetItemDisplayName(string id) => TryGetItem(id, out var item)?.DisplayName ?? string.Empty;
 
-        public List<string> GetItemBaseStats(string id)
+        public List<IModifier> GetItemBaseStats(string id)
         {
-            if (!_itemStatsData.TryGetValue(id, out var data)) return [];
-            return ConvertItemStats(data);
-        }
-
-        public ItemStats GetItemStats(string id)
-        {
-            if (!_itemStatsData.TryGetValue(id, out var data)) data = new ItemStats();
-            return data;
+            if (!_itemBaseStatsData.TryGetValue(id, out var data)) return [];
+            return [.. data];
         }
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
@@ -65,12 +58,6 @@
         {
             TryGetItem(id, out var item);
             return item != null && item is T;
-        }
-
-        public ICraftingRecipe? GetRecipeForItem(string itemId)
-        {
-            var recipe = _itemData.Values.Where(x => x is ICraftingRecipe recipe && recipe.ResultItemId == itemId).FirstOrDefault();
-            return recipe?.Copy<ICraftingRecipe>();
         }
 
         public bool IsItemHasTag(string id, string tag) => TryGetItem(id, out var item)?.HasTag(tag) ?? false;
@@ -108,7 +95,14 @@
                             var fullPath = Path.Combine(path, file);
                             var itemStats = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
                             var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
-                            if (dict != null) _itemStatsData = _itemStatsData.Concat(dict).ToDictionary(k => k.Key, k => k.Value);
+                            if(dict != null)
+                            {
+                                foreach (var item in dict)
+                                {
+                                    var mods = ModifiersCreator.ItemStatsToModifiers(item.Value);
+                                    _itemBaseStatsData[item.Key] = mods;
+                                }
+                            }
                         }
                         else if (file.EndsWith(".tres", StringComparison.OrdinalIgnoreCase))
                         {
@@ -127,21 +121,6 @@
                 }
 
             }
-        }
-
-        // should not be there
-        private List<string> ConvertItemStats(ItemStats stats)
-        {
-            var properties = stats.GetType().GetProperties();
-            List<string> dict = [];
-            foreach (var prop in properties)
-            {
-                var value = Convert.ToSingle(prop.GetValue(stats));
-                if (value <= 0) continue;
-                dict.Add(Lokalizator.FormatItemStats(prop.Name, value));
-            }
-
-            return dict;
         }
 
         private IItem? TryGetItem(string id, out IItem? item)

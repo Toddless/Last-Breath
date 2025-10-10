@@ -7,11 +7,12 @@
     <UserSecretsId>0132e77a-2c43-41e0-acc0-5791c77b2d87</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="addons\Crafting\Source\CraftingRecipe.cs" />
+    <Compile Remove="Addons\Crafting\Source\CraftingRecipe.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="addons\Tools\ResourceValidatorPlugin\" />
+    <Folder Include="Addons\Tools\ResourceValidatorPlugin\" />
     <Folder Include="Scenes\" />
+    <Folder Include="Script\Items\ItemData\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />

@@ -1,17 +1,17 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Battle.Decorator;
-    using Core.Interfaces.Battle.Module;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Skills;
     using Godot;
+    using System;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces;
     using LastBreath.Components;
+    using Core.Interfaces.Skills;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Battle.Decorator;
     using LastBreath.Script.BattleSystem.Module;
 
     public abstract class StanceBase : IStance
@@ -106,7 +106,7 @@
 
         public virtual void OnActivate()
         {
-            // I have set the modules again so that I have all the updated modules.
+            // I have to reset the modules so that I have the latest updates.
             SetModules();
             SubscribeEvents();
             ActivationEffect.OnActivate(Owner);

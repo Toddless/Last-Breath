@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://b51puehs2d3mh"]
+
+[ext_resource type="PackedScene" uid="uid://byx7g1b2wlwfl" path="res://Source/UIElements/View/InventoryWindow.tscn" id="1_0x02o"]
+[ext_resource type="Script" uid="uid://b54c4dah2gh05" path="res://Source/UIElements/Layers/UILayer.cs" id="1_vqcch"]
+
+[node name="UILayer" type="CanvasLayer"]
+script = ExtResource("1_vqcch")
+
+[node name="InventoryWindow" parent="." instance=ExtResource("1_0x02o")]

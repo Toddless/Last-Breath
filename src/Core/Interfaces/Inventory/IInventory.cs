@@ -12,9 +12,9 @@
         event Action<string, string, int, int>? InventoryFull;
         event Action<string>? NotEnougthItems;
 
-        ItemInstance? GetCurrentItemByInstanceId(string id);
+        ItemInstance? GetItemInstance(string id);
         List<string> GetAllItemIdsWithTag(string tag);
-        IItem? GetItemInstance(string instanceId);
+        IItem? GetItem(string instanceId);
         int GetTotalItemAmount(string id);
         bool TryAddItem(IItem item, int amount = 1);
         void RemoveItemById(string itemId, int amount = 1);

@@ -3,4 +3,4 @@
 [resource]
 resource_name = "TextSettings"
 paragraph_spacing = 5.0
-font_size = 15
+font_size = 12

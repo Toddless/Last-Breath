@@ -6,7 +6,7 @@
     public interface IEffect
     {
         Effects Effect { get; }
-        IItemModifier? Modifier { get; }
+        IModifierInstance? Modifier { get; }
         int Duration { get; set; }
         int Stacks { get; set; }
         bool Permanent { get; }

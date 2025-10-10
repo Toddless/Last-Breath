@@ -16,7 +16,7 @@ config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 
 [autoload]
 
-UIProvider="*res://Source/UIElements/Styles/UIResourcesProvider.cs"
+UiResourcesProvider="*res://Source/UIElements/Styles/UIResourcesProvider.cs"
 
 [display]
 

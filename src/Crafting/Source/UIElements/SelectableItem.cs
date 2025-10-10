@@ -33,10 +33,8 @@
             _styleNormal = new StyleBoxFlat() { BgColor = new(0, 0, 0, 0) };
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsStretchRatio = 1f;
-            CustomMinimumSize = new(0, 25);
             AddThemeStyleboxOverride("panel", _styleNormal);
         }
-
 
         public override void _GuiInput(InputEvent @event)
         {
@@ -59,27 +57,28 @@
             _currentText = new Label
             {
                 Text = text,
-                LabelSettings = UIResourcesProvider.Instance?.GetResource("TextSettings") as LabelSettings,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
             _currentText.SetAnchorsPreset(LayoutPreset.FullRect);
             AddChild(_currentText);
+            CustomMinimumSize = _currentText.GetCombinedMinimumSize();
+        }
+
+        public void SetLabelSetting(LabelSettings? settings)
+        {
+            if (settings != null && _currentText != null)
+                _currentText.LabelSettings = settings;
         }
 
         public Variant GetMetadata() => _metaData;
 
         private void UpdateState()
         {
-            switch (true)
-            {
-                case var _ when IsHovered && _selectable:
-                    CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleHovered!);
-                    break;
-                case var _ when !IsHovered:
-                    CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleNormal!);
-                    break;
-            }
+            if (!_selectable) return;
+
+            if (IsHovered && _selectable) CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleHovered!);
+            else CallDeferred(MethodName.AddThemeStyleboxOverride, "panel", _styleNormal!);
         }
 
         private void OnMouseEntered() => IsHovered = true;

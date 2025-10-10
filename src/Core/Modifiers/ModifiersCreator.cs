@@ -1,10 +1,10 @@
 ﻿namespace Core.Modifiers
 {
     using System;
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Data;
+    using System.Collections.Generic;
 
     public class ModifiersCreator
     {
@@ -48,9 +48,16 @@
 
         };
 
-        public static List<IItemModifier> ItemStatsToModifier(ItemStats stats, object source)
+        public static List<IModifierInstance> CreateModifierInstances(List<IModifier> stats, object source)
         {
-            List<IItemModifier> modifiers = [];
+            List<IModifierInstance> modifiers = [];
+            stats.ForEach(mod => modifiers.Add(CreateModifierInstance(mod.Parameter, mod.ModifierType, mod.BaseValue, source)));
+            return modifiers;
+        }
+
+        public static List<IModifier> ItemStatsToModifiers(ItemStats stats)
+        {
+            List<IModifier> modifiers = [];
             var properties = stats.GetType().GetProperties();
 
             foreach (var prop in properties)
@@ -64,39 +71,16 @@
                     modifiers.Add(CreateModifier
                         (modMapping.Parameter,
                         modMapping.ModifierType,
-                        value,
-                        source,
-                        modMapping.Prioritry));
+                        value));
                 }
             }
             return modifiers;
         }
 
-        public static IItemModifier CreateModifier(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
-        {
-            return parameter switch
-            {
-                Parameter.MaxReduceDamage => new MaxReduceDamageModifier(modifierType, value, source, priority),
-                Parameter.MaxEvadeChance => new MaxEvadeChanceModifier(modifierType, value, source, priority),
-                Parameter.AdditionalHitChance => new AdditionalHitModifier(modifierType, value, source, priority),
-                Parameter.Suppress => new SuppressModifier(modifierType, value, source, priority),
-                Parameter.ResourceMax => new ResourceModifier(modifierType, value, source, priority),
-                Parameter.ResourceRecovery => new ResourceRecoveryModifier(modifierType, value, source, priority),
-                Parameter.CriticalDamage => new CriticalDamageModifier(modifierType, value, source, priority),
-                Parameter.Dexterity => new DexterityModifier(modifierType, value, source, priority),
-                Parameter.Strength => new StrengthModifier(modifierType, value, source, priority),
-                Parameter.Intelligence => new IntelligenceModifier(modifierType, value, source, priority),
-                Parameter.AllAttribute => new AllAtributeModifier(modifierType, value, source, priority),
-                Parameter.Movespeed => new MovespeedModifier(modifierType, value, source, priority),
-                Parameter.Armor => new ArmorModifier(modifierType, value, source, priority),
-                Parameter.Evade => new EvadeModifier(modifierType, value, source, priority),
-                Parameter.EnergyBarrier => new EnergyBarrierModifier(modifierType, value, source, priority),
-                Parameter.SpellDamage => new SpellDamageModfier(modifierType, value, source, priority),
-                Parameter.Damage => new DamageModifier(modifierType, value, source, priority),
-                Parameter.MaxHealth => new MaxHealthModifier(modifierType, value, source, priority),
-                Parameter.CriticalChance => new CriticalChanceModifier(modifierType, value, source, priority),
-                _ => throw new ArgumentOutOfRangeException(nameof(modifierType)),
-            };
-        }
+        public static IModifier CreateModifier(Parameter parameter, ModifierType type, float baseValue)
+            => new Modifier(type, parameter, baseValue);
+
+        public static IModifierInstance CreateModifierInstance(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
+            => new ModifierInstance(parameter, modifierType, value, source, priority);
     }
 }

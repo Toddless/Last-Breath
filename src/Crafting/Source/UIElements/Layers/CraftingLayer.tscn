@@ -1,11 +1,11 @@
 [gd_scene load_steps=3 format=3 uid="uid://cfcjlq0wdh2j0"]
 
 [ext_resource type="Script" uid="uid://c85pqhtr8dyi6" path="res://Source/UIElements/Layers/CraftingLayer.cs" id="1_g0b00"]
-[ext_resource type="PackedScene" uid="uid://iif75nev2q13" path="res://Source/UIElements/View/CraftingUI.tscn" id="2_0bxqo"]
+[ext_resource type="PackedScene" uid="uid://byx7g1b2wlwfl" path="res://Source/UIElements/View/InventoryWindow.tscn" id="2_g0b00"]
 
 [node name="CraftingLayer" type="CanvasLayer" node_paths=PackedStringArray("_craftingUI")]
 visible = false
 script = ExtResource("1_g0b00")
-_craftingUI = NodePath("CraftingUI")
+_craftingUI = NodePath("")
 
-[node name="CraftingUI" parent="." instance=ExtResource("2_0bxqo")]
+[node name="InventoryWindow" parent="." instance=ExtResource("2_g0b00")]

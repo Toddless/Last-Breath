@@ -1,23 +1,20 @@
 ﻿namespace LastBreath.Script.BattleSystem.Decorators
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Core.Enums;
-    using Core.Interfaces.Battle.Decorator;
+    using System.Linq;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle.Decorator;
 
-    public class ImmuneToSkillDecorator(SkillType type, DecoratorPriority priority, Type skill) : SkillModuleDecorator(type, priority)
+    public class ImmuneToSkillDecorator(SkillType type, DecoratorPriority priority, string skillId) : SkillModuleDecorator(type, priority)
     {
-        private readonly Type _typeToRemove = skill;
+        private string _skillIdImmuneTo = skillId;
 
         public override List<ISkill> GetSkills()
         {
             var skills = base.GetSkills().ToList();
-            skills.RemoveAll(_typeToRemove.IsInstanceOfType);
+            skills.RemoveAll(skill => skill.Id == _skillIdImmuneTo);
             return skills;
         }
-
-        protected override string CreateID() => base.CreateID() + $"_{_typeToRemove.Name}";
     }
 }

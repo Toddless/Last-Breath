@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Script.Inventory
 {
+    using Godot;
     using System;
     using Core.Enums;
     using Core.Interfaces;
-    using Godot;
+    using Core.Interfaces.Items;
     using LastBreath.Script.Helpers;
-    using LastBreath.Script.Items;
 
     public partial class EquipmentSlot : Slot
     {
@@ -27,7 +27,7 @@
             }
         }
 
-        public void EquipItem(EquipItem item, ICharacter owner)
+        public void EquipItem(IEquipItem item, ICharacter owner)
         {
             //CurrentItem = item;
             //if (CurrentItem is WeaponItem w && owner is Player p) p.OnEquipWeapon(w);

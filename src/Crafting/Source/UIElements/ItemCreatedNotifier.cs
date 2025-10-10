@@ -1,50 +1,60 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
+    using System;
+    using Core.Interfaces.UI;
 
     [Tool]
     [GlobalClass]
-    public partial class ItemCreatedNotifier : Control
+    public partial class ItemCreatedNotifier : Control, IInitializable, IClosable
     {
         private const string UID = "uid://cu1u7ht1lp0hc";
-        [Export] private TextureRect? _itemImage;
-        [Export] private VBoxContainer? _statContainer;
         [Export] private Button? _okButton, _destroyButton;
+        [Export] private Control? _container;
+        [Export] private PanelContainer? _panel;
+        public event Action? Close;
+        [Signal] public delegate void CanBeClosedEventHandler();
 
-        [Signal] public delegate void OkButtonPressedEventHandler();
-        [Signal] public delegate void DestroyButtonPressedEventHandler();
+        public event Action? OkPressed, DestroyPressed;
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += () =>
-            {
-                EmitSignal(SignalName.OkButtonPressed);
-                this.QueueFree();
-            };
-            if (_destroyButton != null) _destroyButton.Pressed += () =>
-            {
-                EmitSignal(SignalName.DestroyButtonPressed);
-                this.QueueFree();
-            };
+            if (_okButton != null) _okButton.Pressed += OnOkPressed;
+
+            if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
 
         public override void _Input(InputEvent @event)
         {
             if (@event.IsActionPressed("ui_accept"))
             {
-                EmitSignal(SignalName.OkButtonPressed);
+                OnOkPressed();
                 GetViewport().SetInputAsHandled();
-                QueueFree();
             }
         }
 
-        public void SetImage(Texture2D? icon)
+        public override void _ExitTree()
         {
-            if (_itemImage != null && icon != null) _itemImage.Texture = icon;
+            OkPressed = null;
+            DestroyPressed = null;
         }
 
-        public void SetText(Label label) => _statContainer?.AddChild(label);
+        public void SetItemDetails(ItemDetails node)
+        {
+            _panel.CustomMinimumSize += node.Size;
+            _container?.AddChild(node);
+        }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+        private void OnOkPressed()
+        {
+            OkPressed?.Invoke();
+            Close?.Invoke();
+        }
+        private void OnDestroyPressed()
+        {
+            DestroyPressed?.Invoke();
+            Close?.Invoke();
+        }
     }
 }

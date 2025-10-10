@@ -9,9 +9,6 @@ region = Rect2(16, 32, 96, 72)
 
 [resource]
 script = ExtResource("2_ftup6")
-Id = ""
 Rarity = 2
 Icon = SubResource("AtlasTexture_klwss")
-MaxStackSize = 1
-Tags = PackedStringArray()
 metadata/_custom_type_script = "uid://curr877vpisc3"

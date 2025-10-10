@@ -1,0 +1,5 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://cx30ua38vdc3b"]
+
+[resource]
+resource_name = "BaseItemStatsSetting"
+font_size = 14

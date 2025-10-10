@@ -13,7 +13,6 @@
             maximumAmount: BaseMaximumAmount,
             resourceType: ResourceType.Fury)
         {
-            LoadData();
         }
     }
 }

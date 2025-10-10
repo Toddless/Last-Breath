@@ -13,7 +13,6 @@
         {
             return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.ModifierType, modifier.Parameter)), GetValueStringModifierType(modifier.ModifierType, modifier.Value));
         }
-     
 
         public string FormatItemStats(string propertyName, float value)
         {

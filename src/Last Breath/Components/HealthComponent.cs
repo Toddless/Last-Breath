@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Components
 {
+    using Godot;
     using System;
     using Core.Enums;
-    using Core.Interfaces.Components;
-    using Godot;
     using LastBreath.Script.Helpers;
+    using Core.Interfaces.Components;
 
     public class HealthComponent : IHealthComponent
     {

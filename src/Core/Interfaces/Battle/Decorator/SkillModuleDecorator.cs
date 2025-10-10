@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Battle.Decorator
 {
     using System;
-    using System.Collections.Generic;
     using Core.Enums;
-    using Core.Interfaces.Battle.Module;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle.Module;
 
     public abstract class SkillModuleDecorator : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {

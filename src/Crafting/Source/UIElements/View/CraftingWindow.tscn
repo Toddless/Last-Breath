@@ -1,0 +1,203 @@
+[gd_scene load_steps=4 format=3 uid="uid://r4d7lhh2ta5x"]
+
+[ext_resource type="Script" uid="uid://c1omemmsluwv5" path="res://Source/UIElements/CraftingWindow.cs" id="1_vb7l8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb7l8"]
+bg_color = Color(0.13341236, 0.13341236, 0.13341236, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_vb7l8"]
+font_size = 22
+
+[node name="CraftingWindow" type="Panel" node_paths=PackedStringArray("_close", "_add", "_description", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_buttons", "_itemIcon", "DragArea")]
+custom_minimum_size = Vector2(800, 500)
+offset_right = 800.0
+offset_bottom = 500.0
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_vb7l8")
+script = ExtResource("1_vb7l8")
+_close = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer/CloseButtonContainer/Close")
+_add = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Add")
+_description = NodePath("MarginContainer/HBoxContainer/ItemStats/SkillAndDescription/Description/ItemDescription")
+_itemName = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemName")
+_itemUpgradeLevel = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemUpdateLevel")
+_requirements = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/RequirementsContainer/RequirementsScrollContainer/Requirements")
+_additionalStats = NodePath("MarginContainer/HBoxContainer/ItemStats/SkillAndDescription/AdditionalStats")
+_baseStats = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats/BaseStats")
+_buttons = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Buttons")
+_itemIcon = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats/Icon")
+DragArea = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer/DragArea")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(800, 500)
+layout_mode = 1
+offset_right = 800.0
+offset_bottom = 500.0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="ItemStats" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+theme_override_constants/separation = 1
+
+[node name="IconNameAndStats" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.4
+
+[node name="ItemName" type="HBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats"]
+layout_mode = 2
+size_flags_stretch_ratio = 0.1
+theme_override_constants/separation = 1
+alignment = 1
+
+[node name="ItemName" type="Label" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 5
+size_flags_stretch_ratio = 0.9
+label_settings = SubResource("LabelSettings_vb7l8")
+
+[node name="ItemUpdateLevel" type="Label" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 5
+size_flags_stretch_ratio = 0.1
+
+[node name="IconAndBaseStats" type="HBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.9
+
+[node name="Icon" type="TextureRect" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.45
+expand_mode = 1
+
+[node name="BaseStats" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.55
+theme_override_constants/separation = 1
+
+[node name="SkillAndDescription" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.6
+theme_override_constants/separation = 1
+
+[node name="AdditionalStats" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.45
+theme_override_constants/separation = 2
+
+[node name="Skill" type="Control" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.4
+mouse_filter = 1
+
+[node name="Description" type="MarginContainer" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.15
+theme_override_constants/margin_left = 5
+
+[node name="ItemDescription" type="RichTextLabel" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription/Description"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+
+[node name="RequirementsAndButtons" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+theme_override_constants/separation = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+
+[node name="DragArea" type="Control" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.9
+
+[node name="CloseButtonContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer"]
+custom_minimum_size = Vector2(35, 35)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.1
+mouse_filter = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Close" type="Button" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer/CloseButtonContainer"]
+custom_minimum_size = Vector2(35, 35)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_stretch_ratio = 0.2
+
+[node name="RequirementsContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.85
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="RequirementsScrollContainer" type="ScrollContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/RequirementsContainer"]
+layout_mode = 2
+
+[node name="Requirements" type="VBoxContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/RequirementsContainer/RequirementsScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+theme_override_constants/separation = 1
+
+[node name="ButtonsContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+size_flags_stretch_ratio = 0.15
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 10
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer"]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+size_flags_vertical = 10
+size_flags_stretch_ratio = 0.1
+
+[node name="Buttons" type="HBoxContainer" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 1
+alignment = 1
+
+[node name="Add" type="Button" parent="MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(35, 25)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_stretch_ratio = 0.1
+focus_mode = 0

@@ -51,7 +51,7 @@
         public void SameSkillWillNotBeAddedTwice_Test()
         {
             var character = new Mock<ICharacter>().Object;
-            var skill = new Mock<ISkill>();
+            var skill = new Mock<ISkillDefinition>();
             skill.Setup(x => x.Type).Returns(SkillType.PreAttack);
 
             var skillComp = new SkillsComponent(character);

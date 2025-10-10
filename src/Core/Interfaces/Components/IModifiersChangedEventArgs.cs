@@ -6,7 +6,7 @@
 
     public interface IModifiersChangedEventArgs
     {
-        IReadOnlyList<IItemModifier> Modifiers { get; }
+        IReadOnlyList<IModifierInstance> Modifiers { get; }
         Parameter Parameter { get; }
     }
 }

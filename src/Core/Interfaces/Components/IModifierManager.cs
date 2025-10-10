@@ -1,31 +1,31 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces;
+    using System.Collections.Generic;
 
     public interface IModifierManager
     {
-        IReadOnlyDictionary<Parameter, List<IItemModifier>> BattleModifiers { get; }
-        IReadOnlyDictionary<Parameter, List<IItemModifier>> PermanentModifiers { get; }
-        IReadOnlyDictionary<Parameter, List<IItemModifier>> TemporaryModifiers { get; }
+        IReadOnlyDictionary<Parameter, List<IModifierInstance>> BattleModifiers { get; }
+        IReadOnlyDictionary<Parameter, List<IModifierInstance>> PermanentModifiers { get; }
+        IReadOnlyDictionary<Parameter, List<IModifierInstance>> TemporaryModifiers { get; }
 
         event EventHandler<IModifiersChangedEventArgs>? ParameterModifiersChanged;
 
-        void AddBattleModifier(IItemModifier modifier);
-        void AddPermanentModifier(IItemModifier modifier);
-        void AddTemporaryModifier(IItemModifier modifier);
+        void AddBattleModifier(IModifierInstance modifier);
+        void AddPermanentModifier(IModifierInstance modifier);
+        void AddTemporaryModifier(IModifierInstance modifier);
         void RemoveAllBattleModifiers();
         void RemoveAllTemporaryModifiers();
-        void RemoveBattleModifier(IItemModifier modifier);
+        void RemoveBattleModifier(IModifierInstance modifier);
         void RemoveBattleModifierBySource(object source);
-        void RemovePermanentModifier(IItemModifier modifier);
+        void RemovePermanentModifier(IModifierInstance modifier);
         void RemovePermanentModifierBySource(object source);
-        void RemoveTemporaryModifier(IItemModifier modifier);
+        void RemoveTemporaryModifier(IModifierInstance modifier);
         void RemoveTemporaryModifierBySource(object source);
-        void UpdateBattleModifier(IItemModifier modifier);
-        void UpdatePermanentModifier(IItemModifier modifier);
-        void UpdateTemporaryModifier(IItemModifier modifier);
+        void UpdateBattleModifier(IModifierInstance modifier);
+        void UpdatePermanentModifier(IModifierInstance modifier);
+        void UpdateTemporaryModifier(IModifierInstance modifier);
     }
 }
