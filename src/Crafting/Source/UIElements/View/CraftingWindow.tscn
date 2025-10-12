@@ -89,6 +89,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.55
 theme_override_constants/separation = 1
+alignment = 1
 
 [node name="SkillAndDescription" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ItemStats"]
 layout_mode = 2
@@ -102,6 +103,7 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.45
 theme_override_constants/separation = 2
+alignment = 1
 
 [node name="Skill" type="Control" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
 custom_minimum_size = Vector2(0, 100)

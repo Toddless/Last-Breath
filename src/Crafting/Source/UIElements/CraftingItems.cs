@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Godot;
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
 
     [Tool]
     [GlobalClass]
@@ -42,19 +42,6 @@
             _onSelect = null;
         }
 
-        private void OnCancelPressed() => _onCancel?.Invoke();
-
-        private void OnAddPressed()
-        {
-            if (_items == null) return;
-            var selected = _items.GetSelectedItems();
-            if (selected.Length == 0) return;
-            var idx = selected[0];
-            if (idx < 0 || idx >= _resources.Count) return;
-
-            _onSelect?.Invoke(_resources[idx]);
-        }
-
         public void Setup(IEnumerable<string> resources,
             IEnumerable<string> disabledResources,
             Action<string> onSelect,
@@ -67,6 +54,19 @@
                 AddItem(res);
 
             UpdateDisabled(disabledResources);
+        }
+
+
+        private void OnCancelPressed() => _onCancel?.Invoke();
+        private void OnAddPressed()
+        {
+            if (_items == null) return;
+            var selected = _items.GetSelectedItems();
+            if (selected.Length == 0) return;
+            var idx = selected[0];
+            if (idx < 0 || idx >= _resources.Count) return;
+
+            _onSelect?.Invoke(_resources[idx]);
         }
 
         private void UpdateDisabled(IEnumerable<string> disabled)

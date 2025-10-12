@@ -2,29 +2,30 @@
 {
     using Godot;
     using System;
+    using Utilities;
     using Core.Interfaces.UI;
-    using System.Collections.Generic;
-    using Crafting.Source.UIElements;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
     using Crafting.TestResources.DI;
+    using Crafting.Source.UIElements;
+    using System.Collections.Generic;
 
     public class UIElementProvider
     {
         private readonly Dictionary<Type, Control> _singleInstances = [];
-        private readonly List<Control> _instances = [];
         private readonly UIWindowStateStorage _positionStorage = new();
 
-        public T CreateSingleClosableOrGet<T>(Node parent)
+        public T CreateSingleClosable<T>()
             where T : Control, IInitializable, IClosable
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
-                return (T)exist;
+                exist.QueueFree();
 
             var instance = T.Initialize().Instantiate<T>();
 
             var savedPos = _positionStorage.GetPosition<T>();
 
-            instance.Position = savedPos == null ? parent.GetViewport().GetVisibleRect().Position : savedPos.Value;
+            instance.Position =  savedPos ?? Vector2.Zero;
 
             if (instance is DraggableWindow drag)
                 drag.PositionChangedExternally += _positionStorage.SavePosition<T>;
@@ -32,9 +33,7 @@
                 require.InjectServices(ServiceProvider.Instance);
 
             instance.Close += Unload<T>;
-            parent.AddChild(instance);
             _singleInstances[typeof(T)] = instance;
-
             return instance;
         }
 
@@ -52,5 +51,50 @@
             }
         }
 
+        public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
+        {
+            var notifier = ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
+            if (item is IEquipItem equip)
+            {
+                var itemDetails = CreateItemDetails(equip);
+                notifier.SetItemDetails(itemDetails);
+            }
+            return notifier;
+        }
+
+        public ItemDetails CreateItemDetails(IEquipItem equip)
+        {
+            var itemDetails = ItemDetails.Initialize().Instantiate<ItemDetails>();
+
+            itemDetails.SetItemIcon(equip.Icon!);
+            itemDetails.SetItemName(equip.DisplayName);
+            itemDetails.SetItemUpdateLevel(equip.UpdateLevel);
+            foreach (var item in equip.BaseModifiers)
+            {
+                var selectable = new SelectableItem();
+                selectable.SetSelectable(false);
+                selectable.SetText(Lokalizator.Format(item));
+                itemDetails.SetItemBaseStats(selectable);
+            }
+
+            foreach (var modifier in equip.AdditionalModifiers)
+            {
+                var stat = new SelectableItem();
+                stat.SetText(Lokalizator.Format(modifier));
+                stat.SetSelectable(false);
+                itemDetails.SetItemAdditionalStats(stat);
+            }
+
+            if (equip.Skill != null)
+            {
+                var skill = equip.Skill;
+                var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
+                skillDescription.SetSkillName(skill.DisplayName);
+                skillDescription.SetSkillDescription(skill.Description);
+                itemDetails.SetSkillDescription(skillDescription);
+            }
+
+            return itemDetails;
+        }
     }
 }

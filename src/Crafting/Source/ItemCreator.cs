@@ -75,7 +75,6 @@
             // TODO : Change to get random effect/ability
             var skill = GetRandomSkill();
             if (skill != null) item.SetSkill(skill);
-            EventBus.RaiseItemCreated(item);
             return item;
         }
 

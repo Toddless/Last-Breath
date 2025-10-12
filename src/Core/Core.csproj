@@ -5,9 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Constants\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>

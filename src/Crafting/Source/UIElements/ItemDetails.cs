@@ -1,8 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Core.Interfaces.UI;
     using Godot;
 
-    public partial class ItemDetails : PanelContainer
+    public partial class ItemDetails : PanelContainer, IInitializable
     {
         private const string UID = "uid://bqx5ow411nolc";
         private Vector2 _baseSize;

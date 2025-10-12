@@ -3,10 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Inventory;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Mediator.Requests;
     using Core.Interfaces.UI;
-    using Crafting.TestResources.Inventory;
     using Godot;
     using Utilities;
 
@@ -23,10 +26,11 @@
         [Export] private TextureRect? _itemIcon;
 
         private ItemDataProvider? _dataProvider;
-        private ItemInventory? _inventory;
-        private IItemCreator? _itemCreator;
-
+        private IInventory? _inventory;
+        private IMediator? _mediator;
+        private Dictionary<string, int> _usedResources = [];
         private string? _id;
+
         public event Action? Close;
 
         public override void _Ready()
@@ -40,17 +44,18 @@
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {
             _dataProvider = provider.GetService<ItemDataProvider>();
-            _inventory = provider.GetService<ItemInventory>();
-            _itemCreator = provider.GetService<IItemCreator>();
+            _mediator = provider.GetService<IUiMediator>();
+            _inventory = provider.GetService<IInventory>();
         }
 
-        public void SetRecipeId(string recipeId)
+        public void SetRecipe(string recipeId)
         {
             if (recipeId.Equals(_id, StringComparison.OrdinalIgnoreCase)) return;
-            foreach (var child in _requirements?.GetChildren() ?? [])
-                child.QueueFree();
-            foreach(var child in _buttons?.GetChildren() ?? [])
-                child.QueueFree();
+            FreeChildren(_requirements?.GetChildren() ?? []);
+            FreeChildren(_buttons?.GetChildren() ?? []);
+            FreeChildren(_baseStats?.GetChildren() ?? []);
+            FreeChildren(_additionalStats?.GetChildren() ?? []);
+            _usedResources.Clear();
             _id = recipeId;
 
             var itemId = _dataProvider!.GetRecipeResultItemId(_id);
@@ -62,6 +67,7 @@
                 reqItem.SetMetadata(req.ResourceId);
                 reqItem.SetIcon(_dataProvider.GetItemIcon(req.ResourceId));
                 reqItem.SetText(Lokalizator.Lokalize(req.ResourceId), _inventory?.GetTotalItemAmount(req.ResourceId) ?? 0, req.Amount);
+                _usedResources.TryAdd(req.ResourceId, req.Amount);
                 _requirements?.AddChild(reqItem);
             }
             _itemName.Text = Lokalizator.Lokalize(itemId);
@@ -71,6 +77,77 @@
             var create = new ActionButton();
             create.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => CreateItem(recipeId), () => IsEnoughtResources(requirements));
             _buttons?.AddChild(create);
+            SetBaseStats();
+            SetPossibleModifiers();
+        }
+
+        public void SetItemId(string itemId)
+        {
+            _id = itemId;
+        }
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void SetBaseStats()
+        {
+            var itemId = _dataProvider!.GetRecipeResultItemId(_id ?? string.Empty);
+            var itemBaseStats = _dataProvider.GetItemBaseStats(itemId);
+
+            var container = CreatePopup(itemBaseStats);
+            _baseStats?.AddChild(container);
+        }
+
+        private void SetPossibleModifiers()
+        {
+            var possibleModifiers = new List<IMaterialModifier>();
+
+            foreach (var res in _usedResources)
+                possibleModifiers.AddRange(_dataProvider?.GetResourceModifiers(res.Key) ?? []);
+
+            var container = CreatePopup(possibleModifiers);
+            _additionalStats?.AddChild(container);
+        }
+
+        private HBoxContainer CreatePopup<T>(List<T> modifiers)
+            where T : IModifier
+        {
+            var popUp = new PopupWindow();
+            popUp.Setup();
+            foreach (var stat in modifiers)
+            {
+                var text = new Label
+                {
+                    Text = Lokalizator.Format(stat),
+                    LabelSettings = new LabelSettings()
+                    {
+                        FontSize = 12,
+                    }
+                };
+                popUp.AddItem(text);
+            }
+
+            var container = new HBoxContainer()
+            {
+                Alignment = BoxContainer.AlignmentMode.Center
+            };
+
+            var label = new Label()
+            {
+                Text = "1-4",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                LabelSettings = new LabelSettings()
+                {
+                    FontSize = 14
+                }
+            };
+            var hoverable = new HoverableItem();
+            hoverable.Setup();
+
+            container.AddChild(label);
+            container.AddChild(hoverable);
+
+            return container;
         }
 
         private void CreateItem(string id)
@@ -80,33 +157,16 @@
             var modifiers = new List<IMaterialModifier>();
             foreach (var req in requrements ?? [])
                 modifiers.AddRange(_dataProvider?.GetResourceModifiers(req.ResourceId) ?? []);
-            var item = _itemCreator?.CreateEquipItem(itemId ?? string.Empty, modifiers);
-            if (item != null)
-            {
-                requrements?.ForEach(req => _inventory?.RemoveItemById(req.ResourceId, req.Amount));
-                item.SaveUsedResources(requrements?.ToDictionary(x => x.ResourceId, x => x.Amount) ?? []);
-                item.SaveModifiersPool(modifiers);
-            }
 
-            UpdateResourceQuantity();
+            _mediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, _usedResources));
         }
 
-        private void UpdateResourceQuantity()
+        private void FreeChildren(Godot.Collections.Array<Node> children)
         {
-            var requrements = _dataProvider?.GetRecipeRequirements(_id ?? string.Empty);
-            foreach (var item in _requirements?.GetChildren().Cast<ClickableResource>() ?? [])
-            {
-                var resourceId = item.GetMetadata().AsString();
-                item.SetText(Lokalizator.Lokalize(resourceId), _inventory?.GetTotalItemAmount(resourceId) ?? 0, requrements?.Where(x => x.ResourceId == resourceId).First().Amount ?? 0);
-            }
+            foreach (var child in children)
+                child.QueueFree();
         }
+
         private bool IsEnoughtResources(IEnumerable<IResourceRequirement> requirements) => !requirements.Any(res => _inventory?.GetTotalItemAmount(res.ResourceId) < res.Amount);
-
-        public void SetItemId(string itemId)
-        {
-            _id = itemId;
-        }
-
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }
 }
