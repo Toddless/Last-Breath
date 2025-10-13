@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Inventory
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Items;
-    using Godot;
+    using System.Collections.Generic;
 
     public interface IInventory
     {
@@ -12,6 +12,7 @@
         event Action<string, int>? ItemAmountChanges;
         event Action<string, string, int, int>? InventoryFull;
         event Action<string>? NotEnougthItems;
+        event Action<IItem, MouseInteractions>? ItemInteraction;
 
         void Initialize(int amount, GridContainer? container);
         void Initialize(int amount);

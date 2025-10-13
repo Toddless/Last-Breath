@@ -18,13 +18,13 @@
     public class ItemCreator : IItemCreator
     {
         private readonly RandomNumberGenerator _rnd;
-        private readonly ItemDataProvider _dataProvider;
+        private readonly IItemDataProvider _dataProvider;
 
         public ItemCreator()
         {
             _rnd = new RandomNumberGenerator();
             _rnd.Randomize();
-            _dataProvider = ServiceProvider.Instance.GetService<ItemDataProvider>();
+            _dataProvider = ServiceProvider.Instance.GetService<IItemDataProvider>();
         }
 
         public IEquipItem? CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)

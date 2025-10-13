@@ -1,27 +1,41 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
+    using Utilities;
+    using Core.Interfaces;
+    using System.Collections.Generic;
 
-    [GlobalClass]
     public partial class HoverableItem : Panel
     {
-        private bool _isMouseInside;
-        [Signal] public delegate void HoveredEventHandler();
-        public void Setup()
+        private List<IModifier> _modifiers = [];
+
+        public override void _Ready()
         {
-            MouseEntered += OnMouseEnter;
-            MouseExited += OnMouseExit;
-            CustomMinimumSize = new Vector2(50, 50);
+            SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            CustomMinimumSize = new Vector2(25, 25);
         }
 
-        private void OnMouseExit() => _isMouseInside = false;
-
-        private async void OnMouseEnter()
+        public override GodotObject _MakeCustomTooltip(string forText)
         {
-            _isMouseInside = true;
-            await ToSignal(GetTree().CreateTimer(0.4), SceneTreeTimer.SignalName.Timeout);
-            if (_isMouseInside)
-                EmitSignal(SignalName.Hovered);
+            var popupWindow = PopupWindow.Initialize().Instantiate<PopupWindow>();
+
+            foreach (var mod in _modifiers)
+            {
+                var label = new Label
+                {
+                    LabelSettings = new()
+                    {
+                        FontSize = 12
+                    },
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Text = Lokalizator.Format(mod)
+                };
+                popupWindow.AddItem(label);
+            }
+            return popupWindow;
         }
+
+        public void SetModifiersToShow(List<IModifier> modifiers) => _modifiers = modifiers;
     }
 }

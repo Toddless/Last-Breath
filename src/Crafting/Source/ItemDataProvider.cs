@@ -13,26 +13,21 @@
     using Core.Interfaces;
     using Core.Modifiers;
 
-    public class ItemDataProvider
+    public class ItemDataProvider : IItemDataProvider
     {
         private readonly string _itemDataPath;
         private Dictionary<string, IItem> _itemData = [];
         private Dictionary<string, List<IModifier>> _itemBaseStatsData = [];
 
-        public static ItemDataProvider? Instance { get; private set; }
-
         public ItemDataProvider(string itemDataPath)
         {
             // TODO: Path to generic items
             _itemDataPath = itemDataPath;
-            Instance = this;
         }
 
         public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>();
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id, out var item)?.Icon;
-
-        public string GetItemDisplayName(string id) => TryGetItem(id, out var item)?.DisplayName ?? string.Empty;
 
         public List<IModifier> GetItemBaseStats(string id)
         {
@@ -53,14 +48,6 @@
             if (item is not ICraftingRecipe recipe) return string.Empty;
             return recipe.ResultItemId;
         }
-
-        public bool IsItemImplement<T>(string id)
-        {
-            TryGetItem(id, out var item);
-            return item != null && item is T;
-        }
-
-        public bool IsItemHasTag(string id, string tag) => TryGetItem(id, out var item)?.HasTag(tag) ?? false;
 
         public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
         {
@@ -95,7 +82,7 @@
                             var fullPath = Path.Combine(path, file);
                             var itemStats = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
                             var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
-                            if(dict != null)
+                            if (dict != null)
                             {
                                 foreach (var item in dict)
                                 {

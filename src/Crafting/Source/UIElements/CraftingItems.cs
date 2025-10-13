@@ -2,19 +2,28 @@
 {
     using Godot;
     using System;
+    using Utilities;
     using System.Linq;
+    using Core.Interfaces.UI;
+    using Core.Interfaces.Data;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Inventory;
     using System.Collections.Generic;
 
     [Tool]
     [GlobalClass]
-    public partial class CraftingItems : Control
+    public partial class CraftingItems : Control, IInitializable, IClosable, IRequireServices
     {
         private const string UID = "uid://dot5loe7a27rt";
+        private TaskCompletionSource<IEnumerable<string>>? _selectedTcs;
         [Export] private ItemList? _items;
         [Export] private Button? _add, _cancel;
-        private List<string> _resources = [];
-        private Action<string>? _onSelect;
-        private Action? _onCancel;
+        private Dictionary<int, string> _resources = [];
+        private IItemDataProvider? _itemDataProvider;
+        private IInventory? _inventory;
+
+
+        public event Action? Close;
 
         public override void _Ready()
         {
@@ -22,61 +31,73 @@
             if (_cancel != null) _cancel.Pressed += OnCancelPressed;
         }
 
+        private void OnAddPressed()
+        {
+            _selectedTcs?.TrySetResult(GetSelectedIds());
+            Close?.Invoke();
+        }
+
+        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        {
+            _itemDataProvider = provider.GetService<IItemDataProvider>();
+            _inventory = provider.GetService<IInventory>();
+        }
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public void AddItem(string resourceId, bool selectable = true)
+        public void Setup(IEnumerable<string> disabledResources)
         {
-            _resources.Add(resourceId);
-            var displayName = ItemDataProvider.Instance?.GetItemDisplayName(resourceId);
-            var icon = ItemDataProvider.Instance?.GetItemIcon(resourceId);
-            _items?.AddItem(displayName, icon, selectable);
-        }
-
-        public override void _ExitTree()
-        {
-            if (Engine.IsEditorHint()) return;
-            if (_add != null) _add.Pressed -= OnAddPressed;
-            if (_cancel != null) _cancel.Pressed -= OnCancelPressed;
-            _resources.Clear();
-            _onCancel = null;
-            _onSelect = null;
-        }
-
-        public void Setup(IEnumerable<string> resources,
-            IEnumerable<string> disabledResources,
-            Action<string> onSelect,
-            Action onCancel)
-        {
-            _onSelect = onSelect;
-            _onCancel = onCancel;
-
-            foreach (var res in resources)
+            var inventoryItems = _inventory?.GetAllItemIdsWithTag("Essence");
+            foreach (var res in inventoryItems ?? [])
                 AddItem(res);
 
             UpdateDisabled(disabledResources);
         }
 
-
-        private void OnCancelPressed() => _onCancel?.Invoke();
-        private void OnAddPressed()
+        public Task<IEnumerable<string>> WaitForSelectionAsync()
         {
-            if (_items == null) return;
-            var selected = _items.GetSelectedItems();
-            if (selected.Length == 0) return;
-            var idx = selected[0];
-            if (idx < 0 || idx >= _resources.Count) return;
+            _selectedTcs = new TaskCompletionSource<IEnumerable<string>>();
 
-            _onSelect?.Invoke(_resources[idx]);
+            return _selectedTcs.Task;
+        }
+
+
+        private void OnCancelPressed()
+        {
+            _selectedTcs?.TrySetResult([]);
+            Close?.Invoke();
+        }
+
+        private void AddItem(string resourceId, bool selectable = true)
+        {
+            if (_items != null)
+            {
+                var displayName = Lokalizator.Lokalize(resourceId);
+                var id = _items.AddItem(displayName, _itemDataProvider?.GetItemIcon(resourceId), selectable);
+                _resources.Add(id, resourceId);
+            }
+        }
+
+
+        private IEnumerable<string> GetSelectedIds()
+        {
+            List<string> result = [];
+            var selected = _items?.GetSelectedItems() ?? [];
+            for (int i = 0; i < selected.Length; i++)
+            {
+                result.Add(_resources[selected[i]]);
+            }
+
+            return result;
+
         }
 
         private void UpdateDisabled(IEnumerable<string> disabled)
         {
-            for (int i = 0; i < _resources.Count; i++)
+            foreach (var res in _resources)
             {
-                if (disabled.Contains(_resources[i]))
-                {
-                    _items?.SetItemDisabled(i, true);
-                }
+                if (disabled.Contains(res.Value))
+                    _items?.SetItemDisabled(res.Key, true);
             }
         }
     }

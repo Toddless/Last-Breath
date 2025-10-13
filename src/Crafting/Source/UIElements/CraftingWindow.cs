@@ -1,23 +1,24 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Utilities;
     using System.Linq;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
     using Core.Interfaces.UI;
-    using Godot;
-    using Utilities;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Inventory;
+    using System.Collections.Generic;
+    using Core.Interfaces.Mediator.Requests;
 
     [Tool]
     [GlobalClass]
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
     {
         private const string UID = "uid://r4d7lhh2ta5x";
+
         [Export] private Button? _close, _add;
         [Export] private RichTextLabel? _description;
         [Export] private Label? _itemName, _itemUpgradeLevel;
@@ -25,9 +26,12 @@
         [Export] private HBoxContainer? _buttons;
         [Export] private TextureRect? _itemIcon;
 
-        private ItemDataProvider? _dataProvider;
+        private IItemDataProvider? _dataProvider;
         private IInventory? _inventory;
-        private IMediator? _mediator;
+        private IUiMediator? _uiMediator;
+        private ISystemMediator? _systemMediator;
+        private IItemUpgrader? _itemUpgrader;
+
         private Dictionary<string, int> _usedResources = [];
         private string? _id;
 
@@ -37,25 +41,26 @@
         {
             if (_close != null)
                 _close.Pressed += () => Close?.Invoke();
+            if (_add != null)
+                _add.Pressed += OnAddPressed;
             if (DragArea != null)
                 DragArea.GuiInput += DragWindow;
         }
 
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {
-            _dataProvider = provider.GetService<ItemDataProvider>();
-            _mediator = provider.GetService<IUiMediator>();
+            _dataProvider = provider.GetService<IItemDataProvider>();
+            _uiMediator = provider.GetService<IUiMediator>();
             _inventory = provider.GetService<IInventory>();
+            _systemMediator = provider.GetService<ISystemMediator>();
+            _itemUpgrader = provider.GetService<IItemUpgrader>();
+            _uiMediator.UpdateUi += UpdateRequiredResources;
         }
 
         public void SetRecipe(string recipeId)
         {
             if (recipeId.Equals(_id, StringComparison.OrdinalIgnoreCase)) return;
-            FreeChildren(_requirements?.GetChildren() ?? []);
-            FreeChildren(_buttons?.GetChildren() ?? []);
-            FreeChildren(_baseStats?.GetChildren() ?? []);
-            FreeChildren(_additionalStats?.GetChildren() ?? []);
-            _usedResources.Clear();
+            RemoveOldData();
             _id = recipeId;
 
             var itemId = _dataProvider!.GetRecipeResultItemId(_id);
@@ -64,7 +69,7 @@
             foreach (var req in requirements)
             {
                 var reqItem = ClickableResource.Initialize().Instantiate<ClickableResource>();
-                reqItem.SetMetadata(req.ResourceId);
+                reqItem.SetResourceId(req.ResourceId);
                 reqItem.SetIcon(_dataProvider.GetItemIcon(req.ResourceId));
                 reqItem.SetText(Lokalizator.Lokalize(req.ResourceId), _inventory?.GetTotalItemAmount(req.ResourceId) ?? 0, req.Amount);
                 _usedResources.TryAdd(req.ResourceId, req.Amount);
@@ -83,71 +88,80 @@
 
         public void SetItemId(string itemId)
         {
+            if (itemId.Equals(_id, StringComparison.OrdinalIgnoreCase)) return;
+            RemoveOldData();
             _id = itemId;
+
+
+
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        public override void _ExitTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRequiredResources;
+        }
+
+        private async void OnAddPressed()
+        {
+            if (_uiMediator == null) return;
+            var takenResources = await _uiMediator.Send<OpenCraftingItemsWindowRequest, IEnumerable<string>>(new(_usedResources.Keys));
+            AddOptionalResources(takenResources);
+            foreach (var taken in takenResources)
+                _usedResources.TryAdd(taken, 1);
+        }
+
+        private void AddOptionalResources(IEnumerable<string> takenResources)
+        {
+            foreach (var res in takenResources)
+            {
+                if (_usedResources.TryAdd(res, 1))
+                {
+                    var reqIem = ClickableResource.Initialize().Instantiate<ClickableResource>();
+                    reqIem.SetResourceId(res);
+                    reqIem.SetIcon(_dataProvider?.GetItemIcon(res));
+                    reqIem.SetText(Lokalizator.Lokalize(res), _inventory?.GetTotalItemAmount(res) ?? 0, 1);
+                    reqIem.SetRightClickAction(() =>
+                    {
+                        _usedResources.Remove(res);
+                        reqIem.QueueFree();
+                    });
+                    reqIem.SetClickable(true);
+                    _requirements?.AddChild(reqIem);
+                }
+            }
+        }
+
+        private void UpdateRequiredResources()
+        {
+            foreach (var resource in _requirements?.GetChildren().Cast<ClickableResource>() ?? [])
+            {
+                var resourceId = resource.GetResourceId();
+                _usedResources.TryGetValue(resourceId, out var need);
+                resource.SetText(Lokalizator.Lokalize(resourceId), _inventory?.GetTotalItemAmount(resourceId) ?? 0, need);
+            }
+        }
 
         private void SetBaseStats()
         {
             var itemId = _dataProvider!.GetRecipeResultItemId(_id ?? string.Empty);
             var itemBaseStats = _dataProvider.GetItemBaseStats(itemId);
+            var hover = new HoverableItem();
+            hover.SetModifiersToShow(itemBaseStats);
+            _baseStats?.AddChild(hover);
 
-            var container = CreatePopup(itemBaseStats);
-            _baseStats?.AddChild(container);
         }
 
         private void SetPossibleModifiers()
         {
-            var possibleModifiers = new List<IMaterialModifier>();
+            var possibleModifiers = new List<IModifier>();
 
             foreach (var res in _usedResources)
                 possibleModifiers.AddRange(_dataProvider?.GetResourceModifiers(res.Key) ?? []);
-
-            var container = CreatePopup(possibleModifiers);
-            _additionalStats?.AddChild(container);
-        }
-
-        private HBoxContainer CreatePopup<T>(List<T> modifiers)
-            where T : IModifier
-        {
-            var popUp = new PopupWindow();
-            popUp.Setup();
-            foreach (var stat in modifiers)
-            {
-                var text = new Label
-                {
-                    Text = Lokalizator.Format(stat),
-                    LabelSettings = new LabelSettings()
-                    {
-                        FontSize = 12,
-                    }
-                };
-                popUp.AddItem(text);
-            }
-
-            var container = new HBoxContainer()
-            {
-                Alignment = BoxContainer.AlignmentMode.Center
-            };
-
-            var label = new Label()
-            {
-                Text = "1-4",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                LabelSettings = new LabelSettings()
-                {
-                    FontSize = 14
-                }
-            };
-            var hoverable = new HoverableItem();
-            hoverable.Setup();
-
-            container.AddChild(label);
-            container.AddChild(hoverable);
-
-            return container;
+            var hover = new HoverableItem();
+            hover.SetModifiersToShow(possibleModifiers);
+            _additionalStats?.AddChild(hover);
         }
 
         private void CreateItem(string id)
@@ -158,13 +172,22 @@
             foreach (var req in requrements ?? [])
                 modifiers.AddRange(_dataProvider?.GetResourceModifiers(req.ResourceId) ?? []);
 
-            _mediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, _usedResources));
+            _uiMediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, _usedResources));
         }
 
         private void FreeChildren(Godot.Collections.Array<Node> children)
         {
             foreach (var child in children)
                 child.QueueFree();
+        }
+
+        private void RemoveOldData()
+        {
+            FreeChildren(_requirements?.GetChildren() ?? []);
+            FreeChildren(_buttons?.GetChildren() ?? []);
+            FreeChildren(_baseStats?.GetChildren() ?? []);
+            FreeChildren(_additionalStats?.GetChildren() ?? []);
+            _usedResources.Clear();
         }
 
         private bool IsEnoughtResources(IEnumerable<IResourceRequirement> requirements) => !requirements.Any(res => _inventory?.GetTotalItemAmount(res.ResourceId) < res.Amount);

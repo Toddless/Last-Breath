@@ -10,7 +10,7 @@
     {
         private const string UID = "uid://naq3akxs2d3o";
         private Action? _onRightClick;
-        private Variant _meta;
+        private string _resourceId = string.Empty;
         [Export] private Label? _text, _quantity;
         [Export] private TextureRect? _icon;
 
@@ -39,22 +39,12 @@
             if (_icon != null)_icon.Texture = icon;
         }
 
-        public void SetMetadata(Variant metadata) => _meta = metadata;
+        public void SetResourceId(string resourceId) => _resourceId = resourceId;
 
         public void SetRightClickAction(Action? rightClickAction) => _onRightClick = rightClickAction;
 
-        public Variant GetMetadata() => _meta;
+        public string GetResourceId() => _resourceId;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        protected override void OnMouseEntered()
-        {
-
-        }
-
-        protected override void OnMouseExited()
-        {
-
-        }
     }
 }

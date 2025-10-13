@@ -12,7 +12,6 @@
         [Export] private BoxContainer? _additionalStatsContainer, _baseStatsContainer, _itemSkillDescription;
         [Export] private Label? _itemName, _itemUpdateLevel;
 
-
         public override void _Ready()
         {
             CallDeferred(nameof(CalculateNewHorizonalSize));

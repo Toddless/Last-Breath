@@ -141,18 +141,12 @@
 
         private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)
         {
-            if (player != null)
-            {
-
-            }
-
             return baseValue * _rnd.RandfRange(0.95f, 1.2f);
         }
 
         private void LoadData()
         {
             var data = ResourceLoader.Load<UpgradeRequirement>(UpgradeData);
-
             foreach (var req in data.UpgradeRequrements)
                 _upgradeRequirements.Add(req.Key, [.. req.Requirements]);
 

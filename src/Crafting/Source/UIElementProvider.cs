@@ -9,31 +9,51 @@
     using Crafting.TestResources.DI;
     using Crafting.Source.UIElements;
     using System.Collections.Generic;
+    using Crafting.Source.UIElements.Layers;
 
     public class UIElementProvider
     {
         private readonly Dictionary<Type, Control> _singleInstances = [];
         private readonly UIWindowStateStorage _positionStorage = new();
+        private UILayer? _uiLayer;
+
+        public void Subscribe(CanvasLayer layer) => _uiLayer = (UILayer)layer;
+
+        public T Create<T>()
+            where T : Control, IInitializable
+        {
+            var instance = T.Initialize().Instantiate<T>();
+            if (instance is IRequireServices require)
+                require.InjectServices(ServiceProvider.Instance);
+            return instance;
+        }
+
+        public T Create<T>(Action<T> configure)
+            where T : Control, IInitializable
+        {
+            var instance = Create<T>();
+            configure?.Invoke(instance);
+            return instance;
+        }
 
         public T CreateSingleClosable<T>()
             where T : Control, IInitializable, IClosable
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
-                exist.QueueFree();
+                return (T)exist;
 
-            var instance = T.Initialize().Instantiate<T>();
+            var instance = Create<T>();
 
             var savedPos = _positionStorage.GetPosition<T>();
 
-            instance.Position =  savedPos ?? Vector2.Zero;
+            instance.Position = savedPos ?? Vector2.Zero;
 
             if (instance is DraggableWindow drag)
                 drag.PositionChangedExternally += _positionStorage.SavePosition<T>;
-            if (instance is IRequireServices require)
-                require.InjectServices(ServiceProvider.Instance);
 
             instance.Close += Unload<T>;
             _singleInstances[typeof(T)] = instance;
+            _uiLayer?.ShowWindow(instance);
             return instance;
         }
 
@@ -53,19 +73,24 @@
 
         public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
         {
-            var notifier = ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
-            if (item is IEquipItem equip)
-            {
-                var itemDetails = CreateItemDetails(equip);
-                notifier.SetItemDetails(itemDetails);
-            }
+            var details = CreateItemDetails(item);
+            var notifier = Create<ItemCreatedNotifier>(X => X.SetItemDetails(details));
+            _uiLayer?.ShowWindow(notifier);
             return notifier;
         }
 
-        public ItemDetails CreateItemDetails(IEquipItem equip)
+        public ItemDetails CreateItemDetails(IItem item)
         {
-            var itemDetails = ItemDetails.Initialize().Instantiate<ItemDetails>();
+            var itemDetails = Create<ItemDetails>();
 
+            if (item is IEquipItem equip)
+                return ConfigureEquipItemDetails(itemDetails, equip);
+
+            return itemDetails;
+        }
+
+        private ItemDetails ConfigureEquipItemDetails(ItemDetails itemDetails, IEquipItem equip)
+        {
             itemDetails.SetItemIcon(equip.Icon!);
             itemDetails.SetItemName(equip.DisplayName);
             itemDetails.SetItemUpdateLevel(equip.UpdateLevel);

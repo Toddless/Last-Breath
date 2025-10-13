@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Mediator
 {
-    using Godot;
+    using System;
 
     public interface IUiMediator : IMediator
     {
-        void Subscribe<T>(T? layer)
-            where T: CanvasLayer;
+        event Action? UpdateUi;
+        void RaiseUpdateUi();
     }
 }

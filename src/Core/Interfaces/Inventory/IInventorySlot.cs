@@ -8,7 +8,7 @@
     {
         int Quantity { get; set; }
         ItemInstance? CurrentItem { get; }
-        event Action<IInventorySlot, MouseInteractions>? OnItemInteraction;
+        event Action<IInventorySlot, MouseInteractions>? ItemInteraction;
         bool TryAddStacks(int amount, out int leftover);
         void SetItem(ItemInstance item, int amount = 1);
         void ClearSlot(bool isDeleted = false);

@@ -28,6 +28,10 @@ window/stretch/mode="canvas_items"
 
 project/assembly_name="Crafting"
 
+[gui]
+
+timers/tooltip_delay_sec=0.4
+
 [input]
 
 ui_crafting={

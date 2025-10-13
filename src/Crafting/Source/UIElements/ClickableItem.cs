@@ -29,14 +29,5 @@
         }
 
         public virtual void SetClickable(bool clickable) => _clickable = clickable;
-
-        protected virtual void OnMouseEntered()
-        {
-
-        }
-        protected virtual void OnMouseExited()
-        {
-
-        }
     }
 }
