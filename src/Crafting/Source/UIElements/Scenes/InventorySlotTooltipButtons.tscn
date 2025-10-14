@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://dor0kden4oc1j"]
+
+[ext_resource type="Script" uid="uid://dkypunampt8dx" path="res://Source/UIElements/InventorySlotTooltipButtons.cs" id="1_3hkcc"]
+
+[node name="InventorySlotTooltipButtons" type="Control" node_paths=PackedStringArray("_equip", "_update", "_destroy", "_favorite")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 142.0
+offset_bottom = 63.0
+script = ExtResource("1_3hkcc")
+_equip = NodePath("GridContainer/Equip")
+_update = NodePath("GridContainer/Update")
+_destroy = NodePath("GridContainer/Destroy")
+_favorite = NodePath("GridContainer/Favorite")
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 0
+offset_right = 142.0
+offset_bottom = 63.0
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 2
+
+[node name="Update" type="Button" parent="GridContainer"]
+layout_mode = 2
+text = "Update"
+
+[node name="Equip" type="Button" parent="GridContainer"]
+layout_mode = 2
+text = "Equip"
+
+[node name="Favorite" type="Button" parent="GridContainer"]
+layout_mode = 2
+text = "Favorite"
+
+[node name="Destroy" type="Button" parent="GridContainer"]
+layout_mode = 2
+text = "Destroy"

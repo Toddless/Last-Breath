@@ -37,6 +37,7 @@
         public float ExtraDamage { get; set; } = 0;
         public float ExtraSuppress { get; set; } = 0;
         public float ExtraSpellDamage { get; set; } = 0;
+        public float ExtraCriticalChance { get; set; } = 0;
         #endregion
     }
 }

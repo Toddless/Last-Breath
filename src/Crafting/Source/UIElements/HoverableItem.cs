@@ -1,13 +1,16 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
+    using System;
     using Utilities;
+    using System.Linq;
     using Core.Interfaces;
     using System.Collections.Generic;
 
     public partial class HoverableItem : Panel
     {
-        private List<IModifier> _modifiers = [];
+        private HashSet<IModifier> _modifiers = [];
+        private Func<HashSet<IModifier>>? _getModifiers;
 
         public override void _Ready()
         {
@@ -19,8 +22,9 @@
         public override GodotObject _MakeCustomTooltip(string forText)
         {
             var popupWindow = PopupWindow.Initialize().Instantiate<PopupWindow>();
+            var modifiers = _getModifiers?.Invoke();
 
-            foreach (var mod in _modifiers)
+            foreach (var mod in _modifiers.Concat(modifiers ?? []))
             {
                 var label = new Label
                 {
@@ -36,6 +40,8 @@
             return popupWindow;
         }
 
-        public void SetModifiersToShow(List<IModifier> modifiers) => _modifiers = modifiers;
+        public void SetModifiersToShow(HashSet<IModifier> modifiers) => _modifiers = modifiers;
+
+        public void SetFuncToUpdateModifiers(Func<HashSet<IModifier>> getModifiers) => _getModifiers = getModifiers;
     }
 }

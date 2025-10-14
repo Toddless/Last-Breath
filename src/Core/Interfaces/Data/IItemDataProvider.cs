@@ -16,6 +16,7 @@
         List<IResourceRequirement> GetRecipeRequirements(string id);
         string GetRecipeResultItemId(string recipeId);
         IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id);
+        bool IsItemHasTag(string id, string tag);
         void LoadData();
     }
 }

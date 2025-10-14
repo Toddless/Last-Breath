@@ -25,9 +25,9 @@
             _itemDataPath = itemDataPath;
         }
 
-        public IItem? CopyBaseItem(string id) => TryGetItem(id, out var item)?.Copy<IItem>();
+        public IItem? CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>();
 
-        public Texture2D? GetItemIcon(string id) => TryGetItem(id, out var item)?.Icon;
+        public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
         public List<IModifier> GetItemBaseStats(string id)
         {
@@ -37,14 +37,14 @@
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
-            TryGetItem(id, out var item);
+            var item = TryGetItem(id);
             if (item is not ICraftingRecipe recipe) return [];
             return recipe.MainResource;
         }
 
         public string GetRecipeResultItemId(string recipeId)
         {
-            TryGetItem(recipeId, out var item);
+            var item = TryGetItem(recipeId);
             if (item is not ICraftingRecipe recipe) return string.Empty;
             return recipe.ResultItemId;
         }
@@ -55,6 +55,8 @@
             if (res is not ICraftingResource crafting) return [];
             return crafting.MaterialType?.Modifiers ?? [];
         }
+
+        public bool IsItemHasTag(string id, string tag) => TryGetItem(id)?.HasTag(tag) ?? false;
 
         public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is IResource)];
 
@@ -110,14 +112,14 @@
             }
         }
 
-        private IItem? TryGetItem(string id, out IItem? item)
+        private IItem? TryGetItem(string id)
         {
             if (!_itemData.TryGetValue(id, out var data))
             {
                 Tracker.TrackNotFound($"Item with id: {id}", this);
-                return item = null;
+                return null;
             }
-            return item = data;
+            return data;
         }
     }
 }

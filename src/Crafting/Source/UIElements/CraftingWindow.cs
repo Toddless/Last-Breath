@@ -3,6 +3,7 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Enums;
     using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.UI;
@@ -31,6 +32,8 @@
         private IUiMediator? _uiMediator;
         private ISystemMediator? _systemMediator;
         private IItemUpgrader? _itemUpgrader;
+
+        private CraftingMode _craftingMode;
 
         private Dictionary<string, int> _usedResources = [];
         private string? _id;
@@ -61,6 +64,7 @@
         {
             if (recipeId.Equals(_id, StringComparison.OrdinalIgnoreCase)) return;
             RemoveOldData();
+            _craftingMode = CraftingMode.Create;
             _id = recipeId;
 
             var itemId = _dataProvider!.GetRecipeResultItemId(_id);
@@ -68,32 +72,27 @@
 
             foreach (var req in requirements)
             {
-                var reqItem = ClickableResource.Initialize().Instantiate<ClickableResource>();
-                reqItem.SetResourceId(req.ResourceId);
-                reqItem.SetIcon(_dataProvider.GetItemIcon(req.ResourceId));
-                reqItem.SetText(Lokalizator.Lokalize(req.ResourceId), _inventory?.GetTotalItemAmount(req.ResourceId) ?? 0, req.Amount);
+                var reqItem = CreateClickableResource(req.ResourceId, _inventory?.GetTotalItemAmount(req.ResourceId) ?? 0, req.Amount);
                 _usedResources.TryAdd(req.ResourceId, req.Amount);
                 _requirements?.AddChild(reqItem);
             }
-            _itemName.Text = Lokalizator.Lokalize(itemId);
-            _description.Text = Lokalizator.LokalizeDescription(itemId);
-            _itemIcon.Texture = _dataProvider.GetItemIcon(itemId);
-
             var create = new ActionButton();
             create.SetupNormalButton(Lokalizator.Lokalize("CraftingCreateButton"), () => CreateItem(recipeId), () => IsEnoughtResources(requirements));
             _buttons?.AddChild(create);
-            SetBaseStats();
+            SetPossibleBaseStats();
             SetPossibleModifiers();
+            SetDisplayableData();
         }
 
-        public void SetItemId(string itemId)
+
+        public void SetItem(string itemId)
         {
             if (itemId.Equals(_id, StringComparison.OrdinalIgnoreCase)) return;
             RemoveOldData();
+            _craftingMode = CraftingMode.Upgrade;
             _id = itemId;
 
-
-
+            SetDisplayableData();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -118,10 +117,7 @@
             {
                 if (_usedResources.TryAdd(res, 1))
                 {
-                    var reqIem = ClickableResource.Initialize().Instantiate<ClickableResource>();
-                    reqIem.SetResourceId(res);
-                    reqIem.SetIcon(_dataProvider?.GetItemIcon(res));
-                    reqIem.SetText(Lokalizator.Lokalize(res), _inventory?.GetTotalItemAmount(res) ?? 0, 1);
+                    var reqIem = CreateClickableResource(res, _inventory?.GetTotalItemAmount(res) ?? 0, 1);
                     reqIem.SetRightClickAction(() =>
                     {
                         _usedResources.Remove(res);
@@ -143,25 +139,55 @@
             }
         }
 
-        private void SetBaseStats()
+        private void SetPossibleBaseStats()
         {
-            var itemId = _dataProvider!.GetRecipeResultItemId(_id ?? string.Empty);
-            var itemBaseStats = _dataProvider.GetItemBaseStats(itemId);
-            var hover = new HoverableItem();
-            hover.SetModifiersToShow(itemBaseStats);
-            _baseStats?.AddChild(hover);
+            if (_dataProvider == null || string.IsNullOrWhiteSpace(_id)) return;
 
+            var resultItemId = _dataProvider.GetRecipeResultItemId(_id);
+            var itemId = _dataProvider.IsItemHasTag(_id, "Generic") ? $"{resultItemId}_Generic" : resultItemId;
+            var itemBaseStats = _dataProvider.GetItemBaseStats(itemId).ToHashSet();
+            CreateHoverArea(itemBaseStats, _baseStats);
         }
 
-        private void SetPossibleModifiers()
+
+        private void SetPossibleModifiers() => CreateHoverArea([], _additionalStats, true);
+
+        private void CreateHoverArea(HashSet<IModifier> modifier, BoxContainer? areaContainer, bool updatable = false)
+        {
+            var label = new Label
+            {
+                LabelSettings = new LabelSettings()
+                {
+                    FontSize = 14,
+                },
+                Text = "1-4"
+            };
+
+            var boxContainer = new HBoxContainer()
+            {
+                Alignment = BoxContainer.AlignmentMode.Center,
+            };
+
+            var hover = new HoverableItem();
+            if (updatable)
+                hover.SetFuncToUpdateModifiers(GetModifiersUsedResources);
+            else
+                hover.SetModifiersToShow(modifier);
+
+            boxContainer.AddChild(label);
+            boxContainer.AddChild(hover);
+            areaContainer?.AddChild(boxContainer);
+        }
+
+
+        private HashSet<IModifier> GetModifiersUsedResources()
         {
             var possibleModifiers = new List<IModifier>();
 
             foreach (var res in _usedResources)
                 possibleModifiers.AddRange(_dataProvider?.GetResourceModifiers(res.Key) ?? []);
-            var hover = new HoverableItem();
-            hover.SetModifiersToShow(possibleModifiers);
-            _additionalStats?.AddChild(hover);
+
+            return [.. possibleModifiers];
         }
 
         private void CreateItem(string id)
@@ -173,6 +199,24 @@
                 modifiers.AddRange(_dataProvider?.GetResourceModifiers(req.ResourceId) ?? []);
 
             _uiMediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, _usedResources));
+        }
+
+        private void SetDisplayableData()
+        {
+            _itemName.Text = Lokalizator.Lokalize(_id ?? string.Empty);
+            _description.Text = Lokalizator.LokalizeDescription(_id ?? string.Empty);
+            _itemIcon.Texture = _dataProvider?.GetItemIcon(_id ?? string.Empty);
+        }
+
+
+        private ClickableResource CreateClickableResource(string resourceId, int have, int need)
+        {
+            var reqItem = ClickableResource.Initialize().Instantiate<ClickableResource>();
+            reqItem.SetResourceId(resourceId);
+            reqItem.SetIcon(_dataProvider?.GetItemIcon(resourceId));
+            reqItem.SetText(Lokalizator.Lokalize(resourceId), have, need);
+
+            return reqItem;
         }
 
         private void FreeChildren(Godot.Collections.Array<Node> children)

@@ -15,11 +15,11 @@
         public event Action? Close;
         [Signal] public delegate void CanBeClosedEventHandler();
 
-        public event Action? OkPressed, DestroyPressed;
+        public event Action? DestroyPressed;
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += OnOkPressed;
+            if (_okButton != null) _okButton.Pressed += () => Close?.Invoke();
 
             if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
@@ -28,15 +28,18 @@
         {
             if (@event.IsActionPressed("ui_accept"))
             {
-                OnOkPressed();
+                Close?.Invoke();
                 GetViewport().SetInputAsHandled();
             }
         }
 
         public override void _ExitTree()
         {
-            OkPressed = null;
-            DestroyPressed = null;
+            if (_destroyButton != null)
+            {
+                _destroyButton.Pressed -= OnDestroyPressed;
+                DestroyPressed = null;
+            }
         }
 
         public void SetItemDetails(ItemDetails node)
@@ -46,11 +49,6 @@
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-        private void OnOkPressed()
-        {
-            OkPressed?.Invoke();
-            Close?.Invoke();
-        }
         private void OnDestroyPressed()
         {
             DestroyPressed?.Invoke();

@@ -31,11 +31,6 @@
             if (_cancel != null) _cancel.Pressed += OnCancelPressed;
         }
 
-        private void OnAddPressed()
-        {
-            _selectedTcs?.TrySetResult(GetSelectedIds());
-            Close?.Invoke();
-        }
 
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {
@@ -68,6 +63,12 @@
             Close?.Invoke();
         }
 
+        private void OnAddPressed()
+        {
+            _selectedTcs?.TrySetResult(GetSelectedIds());
+            Close?.Invoke();
+        }
+
         private void AddItem(string resourceId, bool selectable = true)
         {
             if (_items != null)
@@ -77,7 +78,6 @@
                 _resources.Add(id, resourceId);
             }
         }
-
 
         private IEnumerable<string> GetSelectedIds()
         {

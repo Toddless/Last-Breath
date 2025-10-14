@@ -4,8 +4,8 @@
 
 [node name="ItemDetails" type="PanelContainer" node_paths=PackedStringArray("_itemIcon", "_additionalStatsContainer", "_baseStatsContainer", "_itemSkillDescription", "_itemName", "_itemUpdateLevel")]
 custom_minimum_size = Vector2(350, 400)
-offset_right = 14.0
-offset_bottom = 18.0
+offset_right = 350.0
+offset_bottom = 400.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_t1pta")
@@ -15,6 +15,7 @@ _baseStatsContainer = NodePath("MarginContainer/VBoxContainer/ItemIconAndBaseSta
 _itemSkillDescription = NodePath("MarginContainer/VBoxContainer/ItemSkillDescription")
 _itemName = NodePath("MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/ItemName")
 _itemUpdateLevel = NodePath("MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/ItemUpdateLevel")
+metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -42,7 +43,6 @@ theme_override_font_sizes/font_size = 22
 [node name="ItemUpdateLevel" type="Label" parent="MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "+3"
 
 [node name="ItemIconAndBaseStats" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2

@@ -1,9 +1,11 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using System;
     using Core.Interfaces.UI;
     using Godot;
+    using Godot.Collections;
 
-    public partial class ItemDetails : PanelContainer, IInitializable
+    public partial class ItemDetails : PanelContainer, IInitializable, IClosable
     {
         private const string UID = "uid://bqx5ow411nolc";
         private Vector2 _baseSize;
@@ -11,6 +13,8 @@
         [Export] private TextureRect? _itemIcon;
         [Export] private BoxContainer? _additionalStatsContainer, _baseStatsContainer, _itemSkillDescription;
         [Export] private Label? _itemName, _itemUpdateLevel;
+
+        public event Action? Close;
 
         public override void _Ready()
         {
@@ -21,10 +25,15 @@
                     FontSize = 22
                 };
         }
+        public void SetItemName(string itemName) => _itemName.Text = itemName;
 
         public void SetItemIcon(Texture2D icon)
         {
             if (_itemIcon != null) _itemIcon.Texture = icon;
+        }
+        public void SetItemUpdateLevel(int level)
+        {
+            _itemUpdateLevel.Text = level > 0 ? $"+{level}" : string.Empty;
         }
 
         public void SetItemBaseStats(SelectableItem item)
@@ -35,11 +44,6 @@
             _currentMaxSize = childSize > _currentMaxSize ? childSize : _currentMaxSize;
         }
 
-        public void SetItemName(string itemName) => _itemName.Text = itemName;
-        public void SetItemUpdateLevel(int level)
-        {
-            _itemUpdateLevel.Text = level > 0 ? $"+{level}" : string.Empty;
-        }
         public void SetItemAdditionalStats(SelectableItem item)
         {
             item.SetLabelSetting(UIResourcesProvider.Instance?.GetResource("AdditionalStatsSettings") as LabelSettings);
@@ -48,6 +52,21 @@
 
         public void SetSkillDescription(SkillDescription skillDescription) => _itemSkillDescription?.AddChild(skillDescription);
 
+
+        public void Clear()
+        {
+            FreeChildren(_baseStatsContainer?.GetChildren() ?? []);
+            FreeChildren(_additionalStatsContainer?.GetChildren() ?? []);
+            FreeChildren(_itemSkillDescription?.GetChildren() ?? []);
+        }
+
+        public override void _ExitTree() => Close?.Invoke();
+
+        private void FreeChildren(Array<Node> children)
+        {
+            foreach (var child in children)
+                child.QueueFree();
+        }
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private void CalculateNewHorizonalSize()
