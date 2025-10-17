@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum Categories : byte
+    public enum RecipeCategories : byte
     {
         BodyArmor,
         Belt,

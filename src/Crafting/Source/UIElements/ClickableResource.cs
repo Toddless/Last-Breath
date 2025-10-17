@@ -11,6 +11,7 @@
         private const string UID = "uid://naq3akxs2d3o";
         private Action? _onRightClick;
         private string _resourceId = string.Empty;
+        private int _amountNeed;
         [Export] private Label? _text, _quantity;
         [Export] private TextureRect? _icon;
 
@@ -21,6 +22,7 @@
 
         public void SetText(string displayName, int have, int need)
         {
+            _amountNeed = need;
             if (_text != null && _quantity != null)
             {
                 _text.Text = $"{displayName}";
@@ -44,6 +46,7 @@
         public void SetRightClickAction(Action? rightClickAction) => _onRightClick = rightClickAction;
 
         public string GetResourceId() => _resourceId;
+        public int GetAmountNeed() => _amountNeed;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }

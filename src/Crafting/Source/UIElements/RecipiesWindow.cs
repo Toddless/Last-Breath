@@ -18,7 +18,7 @@
     public partial class RecipiesWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
     {
         private const string UID = "uid://1qq3je71i5vi";
-        private Dictionary<Categories, TreeItem> _categories = [];
+        private Dictionary<RecipeCategories, TreeItem> _categories = [];
         [Export] private RecipeTree? _recipeTree;
         [Export] private Button? _closeButton;
 
@@ -65,7 +65,7 @@
             _categories.Clear();
 
             var treeRoot = _recipeTree.CreateItem();
-            foreach (var cat in Enum.GetValues<Categories>())
+            foreach (var cat in Enum.GetValues<RecipeCategories>())
             {
                 var category = _recipeTree.CreateItem(treeRoot);
                 category.SetText(0, Lokalizator.Lokalize(cat.ToString()));

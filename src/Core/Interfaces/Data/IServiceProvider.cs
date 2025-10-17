@@ -1,7 +1,10 @@
 ﻿namespace Core.Interfaces.Data
 {
-   public interface IServiceProvider
+    using System.Collections.Generic;
+
+    public interface IServiceProvider
     {
         T GetService<T>();
+        IEnumerable<T> GetServices<T>();
     }
 }

@@ -1,10 +1,11 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Crafting.Source.UIElements.Styles;
+    using Crafting.TestResources.DI;
     using Godot;
 
-    [Tool]
     [GlobalClass]
-    public partial class SelectableItem : Panel
+    public partial class InteractiveLabel : Panel
     {
         private bool _hovered, _selectable = true;
         private int _index;
@@ -29,7 +30,7 @@
         {
             MouseEntered += OnMouseEntered;
             MouseExited += OnMouseExited;
-            _styleHovered = UIResourcesProvider.Instance?.GetResource("ItemHoveredStyle") as StyleBoxFlat;
+            _styleHovered = ServiceProvider.Instance.GetService<UIResourcesProvider>().GetResource("ItemHoveredStyle") as StyleBoxFlat;
             _styleNormal = new StyleBoxFlat() { BgColor = new(0, 0, 0, 0) };
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsStretchRatio = 1f;
@@ -50,7 +51,6 @@
         public void SetSelectable(bool selectable) => _selectable = selectable;
         public void SetMetadata(Variant variant) => _metaData = variant;
 
-        // not sure about this
         public void SetText(string text)
         {
             if (_currentText != null) GetChild(0).QueueFree();
@@ -63,6 +63,16 @@
             _currentText.SetAnchorsPreset(LayoutPreset.FullRect);
             AddChild(_currentText);
             CustomMinimumSize = _currentText.GetCombinedMinimumSize();
+        }
+
+        public void UpdateText(string text)
+        {
+            if(_currentText == null)
+            {
+                SetText(text);
+                return;
+            }
+            _currentText.Text = text;
         }
 
         public void SetLabelSetting(LabelSettings? settings)

@@ -26,7 +26,11 @@
             if (_favorite != null) _favorite.Pressed += OnFavoritePressed;
         }
 
-        public override void _ExitTree() => Close?.Invoke();
+        public override void _ExitTree()
+        {
+            _uiMediator?.RaiseUpdateUi();
+            Close?.Invoke();
+        }
 
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {

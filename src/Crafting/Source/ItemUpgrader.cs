@@ -10,12 +10,12 @@
     using Core.Interfaces.Items;
     using Crafting.TestResources;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Mediator;
     using System.Collections.Generic;
+    using Crafting.TestResources.Requirements;
 
     public class ItemUpgrader : IItemUpgrader
     {
-        private const string UpgradeData = "uid://br3am4hnn5iqg";
-        private const string RecraftData = "uid://cg33ax8kmy3gx";
         private const float BaseDoubleRoll = 0.05f;
         private const float BaseLuckyRollUpgrade = 0.01f;
         private const float BaseLuckyRollDowngrade = 0.01f;
@@ -25,53 +25,67 @@
         private float _criticalLuckyRollUpgrade = BaseLuckyRollUpgrade;
         private float _criticalLuckyRollDowngrade = BaseLuckyRollDowngrade;
         private int _doubleUpgradeAmount = BaseDoubleUpgradeAmount;
+        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _upgradeRequiremens = new()
+        {
+            [EquipmentCategory.Weapon] =
+            [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Weapon_Rune"),
+            ],
+            [EquipmentCategory.Armor] =
+            [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Blacksmith_Rune"),
+            ],
+            [EquipmentCategory.Jewellery] =
+            [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Jeweler_Rune")
+            ]
+        };
+
+        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _recraftRequirements = new()
+        {
+            [EquipmentCategory.Weapon] =
+            [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Weapon_Dust")
+            ],
+            [EquipmentCategory.Jewellery] =
+            [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Jewellery_Dust")
+            ],
+            [EquipmentCategory.Armor] = [
+                new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Armor_Dust")
+            ]
+        };
 
         private readonly RandomNumberGenerator _rnd;
-        private Dictionary<string, List<IResourceRequirement>> _upgradeRequirements = [];
-        private Dictionary<string, List<IResourceRequirement>> _recraftRequirements = [];
 
+        private readonly ISystemMediator _systemMediator;
         private ItemUpgradeMode _currentUpgradeMode = ItemUpgradeMode.None;
 
-        public ItemUpgrader()
+        public ItemUpgrader(ISystemMediator systemMediator)
         {
             _rnd = new RandomNumberGenerator();
             _rnd.Randomize();
-            LoadData();
+            _systemMediator = systemMediator;
         }
 
-        public List<IResourceRequirement> SetCost(string itemId, ItemUpgradeMode mode)
+        public List<IResourceRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory, ItemUpgradeMode mode)
         {
-            if (!_upgradeRequirements.TryGetValue(itemId, out var reqs))
-            {
-                Tracker.TrackNotFound($"Requirements: {itemId}", this);
-                return [];
-            }
             _currentUpgradeMode = mode;
-            switch (mode)
-            {
-                case ItemUpgradeMode.Normal:
-                    return reqs;
-                case ItemUpgradeMode.Double:
-                    var doubl = new List<IResourceRequirement>();
-                    foreach (var req in reqs) doubl.Add(new ResourceRequirement() { ResourceId = req.ResourceId, Amount = req.Amount * 2 });
-                    return doubl;
-                case ItemUpgradeMode.Lucky:
-                    var lucky = new List<IResourceRequirement>();
-                    foreach (var req in reqs) lucky.Add(new ResourceRequirement() { ResourceId = req.ResourceId, Amount = req.Amount * 5 });
-                    return lucky;
-                default:
-                    return [];
-            }
+            var requirements = _upgradeRequiremens[itemCategory].Cast<IResourceRequirement>().ToList();
+            var newRequ = new List<IResourceRequirement>();
+            int amount = GetAmount(itemRarity, mode);
+            requirements.ForEach(req => newRequ.Add(new ResourceRequirement(req.Type, req.ResourceId, req.Amount + amount)));
+            return newRequ;
         }
 
-        // just flat percent or should i calculate it here??
-        public void SetCriticalDoubleRoll(float doubleRoll) => _criticalDobubleRoll = doubleRoll;
-        public void SetCriticalLuckyRollUpgrade(float luckyRoll) => _criticalLuckyRollUpgrade = luckyRoll;
-        public void SetCriticalLuckyRollDowngrde(float luckyRoll) => _criticalLuckyRollDowngrade = luckyRoll;
-        public void SetDoubleUpgradeAmount(int amount) => _doubleUpgradeAmount = amount;
-        public List<IResourceRequirement> GetUpgradeResourceRequirements(string itemId) => _upgradeRequirements.GetValueOrDefault(itemId) ?? [];
-        public List<IResourceRequirement> GetRecraftResourceRequirements(string id) => _recraftRequirements.GetValueOrDefault(id) ?? [];
+        public List<IResourceRequirement> GetRecraftResourceCost(Rarity itemRarity, EquipmentCategory itemCategory)
+        {
+            var requirements = _recraftRequirements[itemCategory].Cast<IResourceRequirement>().ToList();
+            var newRequrements = new List<IResourceRequirement>();
+            requirements.ForEach(req => newRequrements.Add(new ResourceRequirement(req.Type, req.ResourceId, req.Amount + (int)itemRarity)));
 
+            return newRequrements;
+        }
 
         public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
         {
@@ -89,70 +103,59 @@
                     item.AddAdditionalModifier(modifier);
                 }
             }
-
             return modifier;
         }
 
-
-        public IResult<ItemUpgradeResult> TryUpgradeItem(IEquipItem item)
+        public ItemUpgradeResult TryUpgradeItem(IEquipItem item)
         {
-            if (item.UpdateLevel == item.MaxUpdateLevel) return Result<ItemUpgradeResult>.Failure(ItemUpgradeResult.ReachedMaxLevel);
+            if (item.UpdateLevel == item.MaxUpdateLevel) return ItemUpgradeResult.ReachedMaxLevel;
 
-            if (_currentUpgradeMode == ItemUpgradeMode.None) return Result<ItemUpgradeResult>.Failure(ItemUpgradeResult.UpgradeModeNotSet);
+            if (_currentUpgradeMode == ItemUpgradeMode.None) return ItemUpgradeResult.UpgradeModeNotSet;
 
-            using var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
             var chances = UpgradeChances.GetChance(item.UpdateLevel);
-            bool upgradeSucced = rnd.Randf() <= chances;
+            bool upgradeSucced = _rnd.Randf() <= chances;
 
             if (upgradeSucced)
             {
                 switch (true)
                 {
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollUpgrade, rnd):
+                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollUpgrade):
                         item.Upgrade(item.MaxUpdateLevel);
-                        return Result<ItemUpgradeResult>.Success(ItemUpgradeResult.CriticalSuccess);
+                        return ItemUpgradeResult.CriticalSuccess;
                     case var _ when _currentUpgradeMode == ItemUpgradeMode.Double:
                         item.Upgrade(_doubleUpgradeAmount);
-                        return Result<ItemUpgradeResult>.Success();
+                        return ItemUpgradeResult.Success;
                     default:
                         item.Upgrade();
-                        return Result<ItemUpgradeResult>.Success();
+                        return ItemUpgradeResult.Success;
                 }
             }
             else
             {
                 switch (true)
                 {
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Double && CheckRollIsCritical(_criticalDobubleRoll, rnd):
+                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Double && CheckRollIsCritical(_criticalDobubleRoll):
                         item.Downgrade();
-                        return Result<ItemUpgradeResult>.Failure(ItemUpgradeResult.Failure);
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollDowngrade, rnd):
+                        return ItemUpgradeResult.Failure;
+                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollDowngrade):
                         item.Downgrade(item.MaxUpdateLevel);
-                        return Result<ItemUpgradeResult>.Failure(ItemUpgradeResult.CriticalFailure);
+                        return ItemUpgradeResult.CriticalFailure;
                     default:
-                        return Result<ItemUpgradeResult>.Failure(ItemUpgradeResult.Failure);
+                        return ItemUpgradeResult.Failure;
                 }
             }
         }
 
-        private bool CheckRollIsCritical(float criticalChance, RandomNumberGenerator rnd) => rnd.Randf() <= criticalChance;
+        private bool CheckRollIsCritical(float criticalChance) => _rnd.Randf() <= criticalChance;
+        private int GetAmount(Rarity itemRarity, ItemUpgradeMode mode) => (int)itemRarity + (mode == ItemUpgradeMode.None ? 0 : (int)mode + 1);
 
+        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default) => baseValue * _rnd.RandfRange(0.95f, 1.2f);
 
-        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)
-        {
-            return baseValue * _rnd.RandfRange(0.95f, 1.2f);
-        }
-
-        private void LoadData()
-        {
-            var data = ResourceLoader.Load<UpgradeRequirement>(UpgradeData);
-            foreach (var req in data.UpgradeRequrements)
-                _upgradeRequirements.Add(req.Key, [.. req.Requirements]);
-
-            var recraft = ResourceLoader.Load<UpgradeRequirement>(RecraftData);
-            foreach (var req in recraft.UpgradeRequrements)
-                _recraftRequirements.Add(req.Key, [.. req.Requirements]);
-        }
+        //public void SetCriticalDoubleRoll(float doubleRoll) => _criticalDobubleRoll = doubleRoll;
+        //public void SetCriticalLuckyRollUpgrade(float luckyRoll) => _criticalLuckyRollUpgrade = luckyRoll;
+        //public void SetCriticalLuckyRollDowngrde(float luckyRoll) => _criticalLuckyRollDowngrade = luckyRoll;
+        //public void SetDoubleUpgradeAmount(int amount) => _doubleUpgradeAmount = amount;
+        //public List<IRequirement> GetUpgradeResourceRequirements(string itemId) => [];
+        //public List<IRequirement> GetRecraftResourceRequirements(string id) => [];
     }
 }

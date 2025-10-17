@@ -1,25 +1,21 @@
-namespace Crafting
+namespace Crafting.Source.UIElements.Styles
 {
-    using System.Collections.Generic;
-    using System.IO;
     using Godot;
     using Utilities;
+    using System.IO;
+    using System.Collections.Generic;
 
-    [GlobalClass]
-    public partial class UIResourcesProvider : Node
+    public class UIResourcesProvider 
     {
         private const string Folder = "res://Source/UIElements/Styles/";
 
         private Dictionary<string, Resource> _uiResources = [];
 
-        public static UIResourcesProvider? Instance { get; private set; }
-
-        public override void _Ready()
+        public UIResourcesProvider()
         {
             LoadResources();
-            Instance = this;
         }
-
+   
         public Resource? GetResource(string name)
         {
             if (!_uiResources.TryGetValue(name, out var resource))

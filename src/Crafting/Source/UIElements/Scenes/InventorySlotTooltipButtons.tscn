@@ -23,16 +23,20 @@ columns = 2
 
 [node name="Update" type="Button" parent="GridContainer"]
 layout_mode = 2
+focus_mode = 0
 text = "Update"
 
 [node name="Equip" type="Button" parent="GridContainer"]
 layout_mode = 2
+focus_mode = 0
 text = "Equip"
 
 [node name="Favorite" type="Button" parent="GridContainer"]
 layout_mode = 2
+focus_mode = 0
 text = "Favorite"
 
 [node name="Destroy" type="Button" parent="GridContainer"]
 layout_mode = 2
+focus_mode = 0
 text = "Destroy"

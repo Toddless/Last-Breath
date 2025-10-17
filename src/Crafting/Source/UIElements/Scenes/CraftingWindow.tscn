@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://r4d7lhh2ta5x"]
+[gd_scene load_steps=5 format=3 uid="uid://r4d7lhh2ta5x"]
 
 [ext_resource type="Script" uid="uid://c1omemmsluwv5" path="res://Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
 
@@ -8,7 +8,10 @@ bg_color = Color(0.13341236, 0.13341236, 0.13341236, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_vb7l8"]
 font_size = 22
 
-[node name="CraftingWindow" type="Panel" node_paths=PackedStringArray("_close", "_add", "_description", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_buttons", "_itemIcon", "DragArea")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1mud6"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="CraftingWindow" type="Panel" node_paths=PackedStringArray("_close", "_add", "_description", "_skill", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_buttons", "_itemIcon", "DragArea")]
 custom_minimum_size = Vector2(800, 500)
 offset_right = 800.0
 offset_bottom = 500.0
@@ -18,6 +21,7 @@ script = ExtResource("1_1mud6")
 _close = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/HBoxContainer/CloseButtonContainer/Close")
 _add = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Add")
 _description = NodePath("MarginContainer/HBoxContainer/ItemStats/SkillAndDescription/Description/ItemDescription")
+_skill = NodePath("MarginContainer/HBoxContainer/ItemStats/SkillAndDescription/Skill")
 _itemName = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemName")
 _itemUpgradeLevel = NodePath("MarginContainer/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemUpdateLevel")
 _requirements = NodePath("MarginContainer/HBoxContainer/RequirementsAndButtons/RequirementsContainer/RequirementsScrollContainer/Requirements")
@@ -105,12 +109,13 @@ size_flags_stretch_ratio = 0.45
 theme_override_constants/separation = 2
 alignment = 1
 
-[node name="Skill" type="Control" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
+[node name="Skill" type="PanelContainer" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.4
 mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_1mud6")
 
 [node name="Description" type="MarginContainer" parent="MarginContainer/HBoxContainer/ItemStats/SkillAndDescription"]
 custom_minimum_size = Vector2(0, 25)

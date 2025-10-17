@@ -2,20 +2,20 @@
 {
     public static class EnumConverterExtension
     {
-        public static string ConvertEquipmentPartToCategory(this EquipmentType equipment)
+        public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentType equipment)
         {
             return equipment switch
             {
-                EquipmentType.BodyArmor => "Armor",
-                EquipmentType.Cloak => "Armor",
-                EquipmentType.Gloves => "Armor",
-                EquipmentType.Boots => "Armor",
-                EquipmentType.Helmet => "Armor",
-                EquipmentType.Amulet => "Jewellery",
-                EquipmentType.Belt => "Jewellery",
-                EquipmentType.Ring => "Jewellery",
-                EquipmentType.Weapon => "Weapon",
-                _ => string.Empty,
+                EquipmentType.BodyArmor => EquipmentCategory.Armor,
+                EquipmentType.Cloak => EquipmentCategory.Armor,
+                EquipmentType.Gloves => EquipmentCategory.Armor,
+                EquipmentType.Boots => EquipmentCategory.Armor,
+                EquipmentType.Helmet => EquipmentCategory.Armor,
+                EquipmentType.Amulet => EquipmentCategory.Jewellery,
+                EquipmentType.Belt => EquipmentCategory.Jewellery,
+                EquipmentType.Ring => EquipmentCategory.Jewellery,
+                EquipmentType.Weapon => EquipmentCategory.Weapon,
+                _ => throw new System.ArgumentOutOfRangeException(nameof(equipment))
             };
         }
     }

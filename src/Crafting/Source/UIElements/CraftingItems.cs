@@ -42,6 +42,7 @@
 
         public void Setup(IEnumerable<string> disabledResources)
         {
+            // TODO: I need not only Essences.
             var inventoryItems = _inventory?.GetAllItemIdsWithTag("Essence");
             foreach (var res in inventoryItems ?? [])
                 AddItem(res);
@@ -89,7 +90,6 @@
             }
 
             return result;
-
         }
 
         private void UpdateDisabled(IEnumerable<string> disabled)

@@ -19,7 +19,7 @@
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += () => Close?.Invoke();
+            if (_okButton != null) _okButton.Pressed += QueueFree;
 
             if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
@@ -28,7 +28,7 @@
         {
             if (@event.IsActionPressed("ui_accept"))
             {
-                Close?.Invoke();
+                QueueFree();
                 GetViewport().SetInputAsHandled();
             }
         }
@@ -49,10 +49,11 @@
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
         private void OnDestroyPressed()
         {
             DestroyPressed?.Invoke();
-            Close?.Invoke();
+            QueueFree();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using System;
-    using Core.Interfaces.UI;
     using Godot;
+    using System;
     using Godot.Collections;
+    using Core.Interfaces.UI;
+    using Core.Interfaces.Data;
+    using Crafting.Source.UIElements.Styles;
 
-    public partial class ItemDetails : PanelContainer, IInitializable, IClosable
+    public partial class ItemDetails : PanelContainer, IInitializable, IClosable, IRequireServices
     {
         private const string UID = "uid://bqx5ow411nolc";
         private Vector2 _baseSize;
@@ -13,7 +15,7 @@
         [Export] private TextureRect? _itemIcon;
         [Export] private BoxContainer? _additionalStatsContainer, _baseStatsContainer, _itemSkillDescription;
         [Export] private Label? _itemName, _itemUpdateLevel;
-
+        private UIResourcesProvider? _uiResourcesProvider;
         public event Action? Close;
 
         public override void _Ready()
@@ -25,6 +27,11 @@
                     FontSize = 22
                 };
         }
+        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        {
+            _uiResourcesProvider = provider.GetService<UIResourcesProvider>();
+        }
+
         public void SetItemName(string itemName) => _itemName.Text = itemName;
 
         public void SetItemIcon(Texture2D icon)
@@ -36,17 +43,17 @@
             _itemUpdateLevel.Text = level > 0 ? $"+{level}" : string.Empty;
         }
 
-        public void SetItemBaseStats(SelectableItem item)
+        public void SetItemBaseStats(InteractiveLabel item)
         {
-            item.SetLabelSetting(UIResourcesProvider.Instance?.GetResource("BaseItemStatsSetting") as LabelSettings);
+            item.SetLabelSetting(_uiResourcesProvider?.GetResource("BaseItemStatsSetting") as LabelSettings);
             _baseStatsContainer?.AddChild(item);
             var childSize = item.GetCombinedMinimumSize();
             _currentMaxSize = childSize > _currentMaxSize ? childSize : _currentMaxSize;
         }
 
-        public void SetItemAdditionalStats(SelectableItem item)
+        public void SetItemAdditionalStats(InteractiveLabel item)
         {
-            item.SetLabelSetting(UIResourcesProvider.Instance?.GetResource("AdditionalStatsSettings") as LabelSettings);
+            item.SetLabelSetting(_uiResourcesProvider?.GetResource("AdditionalStatsSettings") as LabelSettings);
             _additionalStatsContainer?.AddChild(item);
         }
 

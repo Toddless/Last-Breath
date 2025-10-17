@@ -1,41 +1,54 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
+    using System;
     using System.Linq;
+    using Core.Interfaces.UI;
     using System.Collections.Generic;
 
     [GlobalClass]
-    public partial class ItemModifierList : Control
+    public partial class ItemModifierList : Control, IInitializable, IClosable
     {
         private const string UID = "uid://b6glmp15vrdpg";
         private int _lastSelectedChild = -1;
         [Export] private VBoxContainer? _container;
+        private readonly Dictionary<int, InteractiveLabel> _labels = [];
+
+        public event Action? Close;
 
         [Signal] public delegate void ItemSelectedEventHandler(int hash, ItemModifierList source);
 
-        public void AddModifiersToList(List<(string Mod, int Hash)> modifiers)
+        public void AddModifiersToList(List<(string Mod, int Hash)> modifiers, LabelSettings? labelSettings)
         {
             for (int i = 0; i < modifiers.Count; i++)
             {
-                var item = new SelectableItem();
+                var item = new InteractiveLabel();
                 item.SetIndex(i);
                 item.SetText(modifiers[i].Mod);
                 item.SetMetadata(modifiers[i].Hash);
                 item.SetSelectable(false);
+                item.SetLabelSetting(labelSettings);
                 item.Selected += OnItemSelected;
                 _container?.AddChild(item);
+                _labels[modifiers[i].Hash] = item;
             }
         }
 
-        public void SetItemSelectable(bool selectable = true)
+        public void SetItemsSelectable(bool selectable = true)
         {
-            foreach (var item in _container?.GetChildren().Where(child => child is SelectableItem).Cast<SelectableItem>() ?? [])
+            foreach (var item in _container?.GetChildren().Cast<InteractiveLabel>() ?? [])
                 item.SetSelectable(selectable);
+        }
+
+        public void UpdateModifiertext(int hash, string newText)
+        {
+            if (_labels.TryGetValue(hash, out var label))
+                label.UpdateText(newText);
         }
 
         public void UpdateSelectedItem((string Mod, int Hash) newModifier)
         {
-            var selectableItem = _container?.GetChild<SelectableItem>(_lastSelectedChild);
+            var selectableItem = _container?.GetChild<InteractiveLabel>(_lastSelectedChild);
             selectableItem?.SetText(newModifier.Mod);
             selectableItem?.SetMetadata(newModifier.Hash);
         }
@@ -45,11 +58,8 @@
         private void OnItemSelected(int index)
         {
             _lastSelectedChild = index;
-            var hash = _container?.GetChild<SelectableItem>(index).GetMetadata().AsInt32() ?? 0;
-            if (hash != 0)
-            {
-                EmitSignal(SignalName.ItemSelected, hash, this);
-            }
+            var hash = _container?.GetChild<InteractiveLabel>(index).GetMetadata().AsInt32() ?? 0;
+            if (hash != 0) EmitSignal(SignalName.ItemSelected, hash, this);
         }
     }
 }

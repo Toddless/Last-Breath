@@ -7,3 +7,4 @@
 script = ExtResource("1_vqcch")
 
 [node name="InventoryWindow" parent="." instance=ExtResource("1_0x02o")]
+custom_minimum_size = Vector2(800, 1020)

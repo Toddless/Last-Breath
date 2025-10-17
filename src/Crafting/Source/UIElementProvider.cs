@@ -3,14 +3,14 @@
     using Godot;
     using System;
     using Utilities;
+    using System.Linq;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Crafting.Source.UIElements;
-    using System.Collections.Generic;
     using Crafting.TestResources.DI;
+    using System.Collections.Generic;
+    using Crafting.Source.UIElements;
     using Crafting.Source.UIElements.Layers;
-    using System.Linq;
 
     public class UIElementProvider
     {
@@ -36,7 +36,6 @@
             var instance = T.Initialize().Instantiate<T>();
             if (instance is IRequireServices require)
                 require.InjectServices(_serviceProvider);
-            instance.Close += instance.QueueFree;
             return instance;
         }
 
@@ -78,9 +77,9 @@
                 list.Remove(instance);
                 if (list.Count == 0) _instanceBySource.Remove(source);
                 instance.Close -= UnloadForSource;
-                instance.QueueFree();
+                if (!instance.IsQueuedForDeletion())
+                    instance.QueueFree();
             }
-
 
             list.Add(instance);
             _uiLayer?.ShowWindow(instance);
@@ -93,7 +92,6 @@
 
             foreach (var ui in existList ?? [])
                 ui.QueueFree();
-            _instanceBySource.Remove(source);
         }
 
         public T CreateSingleClosable<T>()
@@ -146,7 +144,7 @@
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);
 
-            return itemDetails;
+            return ConfigureItemDetails(itemDetails, item);
         }
 
         private ItemDetails CreateItemDetails(IItem item)
@@ -155,6 +153,15 @@
 
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);
+
+            return ConfigureItemDetails(itemDetails, item);
+        }
+
+        private ItemDetails ConfigureItemDetails(ItemDetails itemDetails, IItem item)
+        {
+            itemDetails.Clear();
+            itemDetails.SetItemIcon(item.Icon!);
+            itemDetails.SetItemName(item.DisplayName);
 
             return itemDetails;
         }
@@ -167,7 +174,7 @@
             itemDetails.SetItemUpdateLevel(equip.UpdateLevel);
             foreach (var item in equip.BaseModifiers)
             {
-                var selectable = new SelectableItem();
+                var selectable = new InteractiveLabel();
                 selectable.SetSelectable(false);
                 selectable.SetText(Lokalizator.Format(item));
                 itemDetails.SetItemBaseStats(selectable);
@@ -175,7 +182,7 @@
 
             foreach (var modifier in equip.AdditionalModifiers)
             {
-                var stat = new SelectableItem();
+                var stat = new InteractiveLabel();
                 stat.SetText(Lokalizator.Format(modifier));
                 stat.SetSelectable(false);
                 itemDetails.SetItemAdditionalStats(stat);

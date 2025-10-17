@@ -5,13 +5,13 @@
     using System.IO;
     using Utilities;
     using System.Linq;
+    using Core.Modifiers;
     using Newtonsoft.Json;
+    using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces;
-    using Core.Modifiers;
 
     public class ItemDataProvider : IItemDataProvider
     {
@@ -64,53 +64,87 @@
 
         public void LoadData()
         {
-            var itemData = ResourceLoader.ListDirectory(_itemDataPath);
-            foreach (var data in itemData)
+            try
             {
-                var path = Path.Combine(_itemDataPath, data);
-                using var dir = DirAccess.Open(path);
-                if (dir == null)
-                {
-                    continue;
-                }
-                dir.ListDirBegin();
-                try
-                {
-                    string file;
-                    while ((file = dir.GetNext()) != "")
-                    {
-                        if (file.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var fullPath = Path.Combine(path, file);
-                            var itemStats = Godot.FileAccess.Open(fullPath, Godot.FileAccess.ModeFlags.Read).GetAsText();
-                            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(itemStats);
-                            if (dict != null)
-                            {
-                                foreach (var item in dict)
-                                {
-                                    var mods = ModifiersCreator.ItemStatsToModifiers(item.Value);
-                                    _itemBaseStatsData[item.Key] = mods;
-                                }
-                            }
-                        }
-                        else if (file.EndsWith(".tres", StringComparison.OrdinalIgnoreCase))
-                        {
-                            var loadedData = ResourceLoader.Load(Path.Combine(path, file));
-                            if (loadedData is IItem item) _itemData.Add(item.Id, item);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Tracker.TrackException("Data loading failed.", ex, this);
-                }
-                finally
-                {
-                    dir.ListDirEnd();
-                }
-
+                LoadDataFromDirectory(_itemDataPath);
+            }
+            catch (Exception ex)
+            {
+                Tracker.TrackException("Data loading failed.", ex, this);
             }
         }
+
+        private void LoadDataFromDirectory(string directoryPath)
+        {
+            var itemData = ResourceLoader.ListDirectory(directoryPath);
+            foreach (var item in itemData)
+            {
+                var path = Path.Combine(directoryPath, item);
+
+                if (ShouldSkipItem(path))
+                    continue;
+
+                if (IsDirectory(path))
+                {
+                    LoadDataFromDirectory(path);
+                }
+                else
+                {
+                    ProcessFile(path);
+                }
+            }
+        }
+
+        private void ProcessFile(string filePath)
+        {
+            try
+            {
+                var extension = Path.GetExtension(filePath).ToLowerInvariant();
+                switch (extension)
+                {
+                    case ".json":
+                        ProcessJsonFile(filePath);
+                        break;
+                    case ".tres":
+                        ProcessTresFile(filePath);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Tracker.TrackException($"Failed to process file: {filePath}", ex, this);
+            }
+        }
+
+        private void ProcessJsonFile(string filePath)
+        {
+            using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
+
+            var jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
+
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(jsonContent) ?? throw new FileNotFoundException();
+
+            foreach (var item in dict)
+            {
+                var mod = ModifiersCreator.ItemStatsToModifiers(item.Value);
+                _itemBaseStatsData[item.Key] = mod;
+            }
+        }
+
+        private void ProcessTresFile(string filePath)
+        {
+            var loaded = ResourceLoader.Load(filePath);
+            if (loaded is IItem item)
+                _itemData.Add(item.Id, item);
+        }
+
+        private bool IsDirectory(string path)
+        {
+            using var dir = DirAccess.Open(path);
+            return dir != null;
+        }
+
+        private bool ShouldSkipItem(string itemName) => itemName.StartsWith(".") || itemName.Equals("__MACOSX", StringComparison.OrdinalIgnoreCase);
 
         private IItem? TryGetItem(string id)
         {

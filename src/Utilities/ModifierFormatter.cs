@@ -3,6 +3,7 @@
     using System;
     using Core.Enums;
     using Core.Interfaces;
+    using Godot;
 
     public class ModifierFormatter(Func<string, string> localize)
     {
@@ -11,70 +12,71 @@
 
         public string FormatModifier(IModifier modifier)
         {
-            return string.Format(GetTemplate(), _localize.Invoke(CombineParameterWithType(modifier.ModifierType, modifier.Parameter)), GetValueStringModifierType(modifier.ModifierType, modifier.Value));
-        }
+            ArgumentNullException.ThrowIfNull(modifier);
 
-        public string FormatItemStats(string propertyName, float value)
-        {
-            return string.Format(GetTemplate(), _localize.Invoke(propertyName), GetValueString(value));
-        }
-
-        private string GetTemplate() => _localize.Invoke("modifier.format");
-
-        private string GetValueString(float value)
-        {
-            // Rework this later, if multiplier will be bigger than x4
-            return true switch
+            return modifier.ModifierType switch
             {
-                bool _ when value < 1 => FormatPercent(value),
-                bool _ when value > 1 && value < 4 => FormatMultiplier(value),
-                bool _ when value > 5 => FormatFlat(value),
-                _ => FallbackFormat(value)
+                ModifierType.Flat => FormatFlat(modifier.Value, modifier.Parameter),
+                ModifierType.Increase => FormatIncrease(modifier.Value, modifier.Parameter),
+                ModifierType.Multiplicative => FormatMultiplicative(modifier.Value, modifier.Parameter),
+                _ => FormatFallback(modifier.Value, modifier.Parameter)
             };
         }
 
-        private string GetValueStringModifierType(ModifierType type, float value)
+        private string FormatFlat(float value, Parameter parameter)
         {
-            return type switch
+            string number = FormatSignedNumber(value);
+            string percentSign = GetPercentSigh(parameter);
+            return $"{number + percentSign} {_localize.Invoke("Flat")} {_localize.Invoke(parameter.ToString())}";
+        }
+
+        private string GetPercentSigh(Parameter parameter)
+        {
+            return parameter switch
             {
-                ModifierType.Flat => FormatFlat(value),
-                ModifierType.Increase => FormatPercent(value),
-                ModifierType.Multiplicative => FormatMultiplier(value),
-                _ => FallbackFormat(value)
+                Parameter.CriticalChance => "%",
+                Parameter.CriticalDamage => "%",
+                Parameter.AdditionalHitChance => "%",
+                Parameter.MaxEvadeChance => "%",
+                Parameter.MaxCriticalChance => "%",
+                Parameter.MaxAdditionalHitChance => "%",
+                _ => string.Empty,
             };
         }
 
-        private string FormatFlat(float value) => string.Format("{0}{1:0.##}", value >= 0 ? "+" : "", MathF.Abs(value));
-        private string FormatMultiplier(float value) => string.Format("x{0:0.##}", value);
-        private string FormatPercent(float value)
+        private string FormatIncrease(float value, Parameter parameter)
         {
-            float percent = value * 100;
-            return string.Format("{0}{1:0.##}%", percent >= 0 ? "+" : "", percent);
-        }
-        private string FallbackFormat(float value)
-        {
-            if (MathF.Abs(value) > 0 && MathF.Abs(value) < 1) return FormatPercent(value);
-            return FormatFlat(value);
+            string percent = FormatSignedPercent(value * 100f);
+            return $"{percent} {_localize.Invoke("Increase")} {_localize.Invoke(parameter.ToString())}";
         }
 
-        private string CombineParameterWithType(ModifierType type, Parameter parameter)
+        private string FormatMultiplicative(float value, Parameter parameter)
         {
-            // TODO: should multiplicative be called "Extra"?
-            return type switch
-            {
-                ModifierType.Multiplicative => parameter switch
-                {
-                    Parameter.Damage => $"Extra{parameter}",
-                    Parameter.Armor => $"Extra{parameter}",
-                    Parameter.Evade => $"Extra{parameter}",
-                    Parameter.EnergyBarrier => $"Extra{parameter}",
-                    Parameter.Suppress => $"Extra{parameter}",
-                    Parameter.SpellDamage => $"Extra{parameter}",
-                    Parameter.MaxHealth => "ExtraHealth",
-                    _ => $"{parameter}"
-                },
-                _ => $"{parameter}"
-            };
+            float deltaPercent = (value - 1f) * 100f;
+            string percent = FormatSignedPercent(deltaPercent);
+            return $"{percent} {_localize.Invoke("Multiplicative")} {_localize.Invoke(parameter.ToString())}";
+        }
+
+        private string FormatFallback(float value, Parameter parameter)
+        {
+            float abs = MathF.Abs(value);
+            if (abs > 0f && abs < 1f)
+                return FormatIncrease(value, parameter);
+            return FormatFlat(value, parameter);
+        }
+
+        private string FormatSignedNumber(float value)
+        {
+            string sign = value >= 0 ? "+" : "-";
+            float abs = MathF.Abs(value);
+            return $"{sign}{(abs % 1 == 0 ? Mathf.RoundToInt(abs) : abs.ToString("0.#"))}";
+        }
+
+        private string FormatSignedPercent(float percent)
+        {
+            string sign = percent >= 0 ? "+" : "-";
+            float abs = MathF.Abs(percent);
+            return $"{sign}{abs:0.#}%";
         }
     }
 }

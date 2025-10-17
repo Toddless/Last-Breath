@@ -10,6 +10,7 @@
         [Signal] public delegate void RightClickEventHandler();
         [Signal] public delegate void CtrLeftClickEventHandler();
 
+        public override void _Ready() => MouseForcePassScrollEvents = true;
         public override void _GuiInput(InputEvent @event)
         {
             if (@event is not InputEventMouseButton mb || !_clickable) return;
