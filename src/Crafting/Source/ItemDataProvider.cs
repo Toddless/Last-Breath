@@ -25,7 +25,7 @@
             _itemDataPath = itemDataPath;
         }
 
-        public IItem? CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>();
+        public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 

@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Mediator.Requests
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
 
-    public record CreateEquipItemRequest(string EquipItemId, IEnumerable<IMaterialModifier> ResourceModifiers, Dictionary<string, int> UsedResources) : IRequest{}
+    public record CreateEquipItemRequest(string RecipeId, Dictionary<string, int> UsedResources) : IRequestWithResponce<IEquipItem?> { }
 }

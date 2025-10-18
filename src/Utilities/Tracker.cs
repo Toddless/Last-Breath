@@ -1,9 +1,11 @@
 ﻿namespace Utilities
 {
-    using System;
-    using System.Runtime.CompilerServices;
     using Godot;
+    using System;
     using Serilog;
+    using System.Diagnostics;
+    using System.Runtime.CompilerServices;
+    using System.Linq;
 
     public static class Tracker
     {
@@ -14,7 +16,7 @@
             var logPath = ProjectSettings.GlobalizePath("user://log.txt");
             s_logger = new LoggerConfiguration()
                 .WriteTo.File(logPath,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}")
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}  \n CallStack: {CallStack}")
                 .CreateLogger();
         }
 
@@ -33,9 +35,15 @@
             [CallerMemberName] string method = "",
             [CallerLineNumber] int line = 0)
         {
+            string callStack = string.Join(" <= ",
+                new StackTrace(2, true)
+                .GetFrames()
+                .Take(10));
+
             return s_logger.ForContext("Line", line)
                 .ForContext("Method", method)
-                .ForContext("Source", source?.GetType().Name);
+                .ForContext("Source", source?.GetType().Name)
+                .ForContext("CallStack", callStack);
         }
     }
 }

@@ -10,7 +10,6 @@
     using Core.Interfaces.Items;
     using Crafting.TestResources;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Mediator;
     using System.Collections.Generic;
     using Crafting.TestResources.Requirements;
 
@@ -58,14 +57,12 @@
 
         private readonly RandomNumberGenerator _rnd;
 
-        private readonly ISystemMediator _systemMediator;
         private ItemUpgradeMode _currentUpgradeMode = ItemUpgradeMode.None;
 
-        public ItemUpgrader(ISystemMediator systemMediator)
+        public ItemUpgrader()
         {
             _rnd = new RandomNumberGenerator();
             _rnd.Randomize();
-            _systemMediator = systemMediator;
         }
 
         public List<IResourceRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory, ItemUpgradeMode mode)
@@ -89,7 +86,7 @@
 
         public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
         {
-            var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
+            var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
 
             item.RemoveAdditionalModifier(modifierToReroll);
             IModifierInstance? modifier = null;
@@ -110,7 +107,7 @@
         {
             if (item.UpdateLevel == item.MaxUpdateLevel) return ItemUpgradeResult.ReachedMaxLevel;
 
-            if (_currentUpgradeMode == ItemUpgradeMode.None) return ItemUpgradeResult.UpgradeModeNotSet;
+            if (_currentUpgradeMode == ItemUpgradeMode.None) return ItemUpgradeResult.Failure;
 
             var chances = UpgradeChances.GetChance(item.UpdateLevel);
             bool upgradeSucced = _rnd.Randf() <= chances;

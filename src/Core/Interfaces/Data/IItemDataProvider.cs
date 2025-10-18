@@ -8,7 +8,7 @@
 
     public interface IItemDataProvider
     {
-        IItem? CopyBaseItem(string id);
+        IItem CopyBaseItem(string id);
         IEnumerable<IItem> GetAllResources();
         IEnumerable<ICraftingRecipe> GetCraftingRecipes();
         List<IModifier> GetItemBaseStats(string id);

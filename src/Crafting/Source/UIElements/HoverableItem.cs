@@ -9,8 +9,8 @@
 
     public partial class HoverableItem : Panel
     {
-        private HashSet<IModifier> _modifiers = [];
-        private Func<HashSet<IModifier>>? _getModifiers;
+        private IEnumerable<IModifier> _modifiers = [];
+        private Func<IEnumerable<IModifier>>? _getModifiers;
 
         public override void _Ready()
         {
@@ -23,8 +23,9 @@
         {
             var popupWindow = PopupWindow.Initialize().Instantiate<PopupWindow>();
             var modifiers = _getModifiers?.Invoke();
-
-            foreach (var mod in _modifiers.Concat(modifiers ?? []))
+            var allModifiers = _modifiers.Concat(modifiers ?? []);
+            var sorted = allModifiers.GroupBy(mod => mod.GetHashCode()).Select(x => x.OrderByDescending(mod => mod.BaseValue).First());
+            foreach (var mod in sorted)
             {
                 var label = new Label
                 {
@@ -42,6 +43,6 @@
 
         public void SetModifiersToShow(HashSet<IModifier> modifiers) => _modifiers = modifiers;
 
-        public void SetFuncToUpdateModifiers(Func<HashSet<IModifier>> getModifiers) => _getModifiers = getModifiers;
+        public void SetFuncToUpdateModifiers(Func<IEnumerable<IModifier>> getModifiers) => _getModifiers = getModifiers;
     }
 }

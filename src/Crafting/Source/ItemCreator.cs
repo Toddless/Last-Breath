@@ -27,13 +27,13 @@
             _dataProvider = ServiceProvider.Instance.GetService<IItemDataProvider>();
         }
 
-        public IEquipItem? CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
+        public IEquipItem CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
         {
             var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
             return Create(resultItemId, Mods, TotalWeight, player);
         }
 
-        public IEquipItem? CreateGenericItem(string resultItemId, IEnumerable<IMaterialModifier> resouces, ICharacter? player = default)
+        public IEquipItem CreateGenericItem(string resultItemId, IEnumerable<IMaterialModifier> resouces, ICharacter? player = default)
         {
             var rarity = GetRarity(player);
             var attribute = GetAttribute(player);
@@ -47,35 +47,37 @@
             return null;
         }
 
-        private IEquipItem? Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, ICharacter? player = default)
+        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, ICharacter? player = default)
         {
-            var item = (IEquipItem?)_dataProvider.CopyBaseItem(itemId);
-
-            if (item == null)
+            try
             {
-                Tracker.TrackNotFound($"Item with id: {itemId}", this);
-                return null;
+                var item = (IEquipItem)_dataProvider.CopyBaseItem(itemId);
+
+                var baseStats = _dataProvider.GetItemBaseStats(itemId);
+                var statModifiers = ModifiersCreator.CreateModifierInstances(baseStats, item).ToHashSet();
+                item.SetBaseModifiers(statModifiers);
+
+                var amountModifiers = GetAmountModifiers(item.Rarity);
+
+                HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, _rnd);
+
+                List<IModifierInstance> mods = [];
+                foreach (var mod in takenMods)
+                    mods.Add(ModifiersCreator.CreateModifierInstance(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, player), item));
+
+                item.SetAdditionalModifiers(mods);
+                item.SaveModifiersPool(modifiers.Select(x => x.Obj));
+
+                // TODO : Change to get random effect/ability
+                var skill = GetRandomSkill();
+                if (skill != null) item.SetSkill(skill);
+                return item;
             }
-
-            var baseStats = _dataProvider.GetItemBaseStats(itemId);
-            var statModifiers = ModifiersCreator.CreateModifierInstances(baseStats, item).ToHashSet();
-            item.SetBaseModifiers(statModifiers);
-
-            var amountModifiers = GetAmountModifiers(item.Rarity);
-
-            HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, _rnd);
-
-            List<IModifierInstance> mods = [];
-            foreach (var mod in takenMods)
-                mods.Add(ModifiersCreator.CreateModifierInstance(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, player), item));
-
-            item.SetAdditionalModifiers(mods);
-            item.SaveModifiersPool(modifiers.Select(x => x.Obj));
-
-            // TODO : Change to get random effect/ability
-            var skill = GetRandomSkill();
-            if (skill != null) item.SetSkill(skill);
-            return item;
+            catch (ArgumentNullException ex)
+            {
+                Tracker.TrackException($"Failed to copy base item: {itemId}", ex, this);
+                throw new InvalidOperationException($"Cannot create item: base item {itemId} not found", ex);
+            }
         }
 
         private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)

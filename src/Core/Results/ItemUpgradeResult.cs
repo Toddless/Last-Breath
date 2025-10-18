@@ -7,7 +7,5 @@
         CriticalSuccess,
         CriticalFailure,
         ReachedMaxLevel,
-        UpgradeModeNotSet,
-        WrongItemType
     }
 }

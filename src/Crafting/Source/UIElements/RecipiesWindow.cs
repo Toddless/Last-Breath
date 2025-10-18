@@ -7,11 +7,14 @@
     using System.Linq;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Mediator.Requests;
+    using System.Threading.Tasks;
 
     [Tool]
     [GlobalClass]
@@ -23,7 +26,6 @@
         [Export] private Button? _closeButton;
 
         private IItemDataProvider? _dataProvider;
-        private IInventory? _inventory;
         private IUiMediator? _uiMediator;
         private ISystemMediator? _systemMediator;
 
@@ -43,7 +45,6 @@
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _inventory = provider.GetService<IInventory>();
             _uiMediator = provider.GetService<IUiMediator>();
             _systemMediator = provider.GetService<ISystemMediator>();
             _uiMediator.UpdateUi += UpdateRecipeTree;
@@ -54,7 +55,7 @@
             if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRecipeTree;
         }
 
-        public void CreateRecipeTree(IEnumerable<ICraftingRecipe> recipes)
+        public async void CreateRecipeTree(IEnumerable<ICraftingRecipe> recipes)
         {
             if (_recipeTree == null)
             {
@@ -78,7 +79,7 @@
             {
                 var category = _categories.Keys.FirstOrDefault(category => recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
                 var treeItem = _recipeTree.CreateItem(_categories[category]);
-                CalculateAmountToCraft(recipe.MainResource, out var amount);
+                var amount = await CalculateAmountToCraft(recipe.MainResource);
                 var recipeName = $"{Lokalizator.Lokalize(recipe.Id)}";
                 if (amount > 0)
                     recipeName += $" ({amount})";
@@ -90,34 +91,37 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnRightClick(string id, TreeItem treeItem)
+        private async void OnRightClick(string id, TreeItem treeItem)
         {
+            ArgumentNullException.ThrowIfNull(_systemMediator);
             var requrements = _dataProvider?.GetRecipeRequirements(id);
-            var itemId = _dataProvider?.GetRecipeResultItemId(id);
 
-            CalculateAmountToCraft(requrements ?? [], out var amount);
+            var amount = await CalculateAmountToCraft(requrements ?? []);
             if (amount > 1 && requrements != null)
             {
-                var modifiers = new List<IMaterialModifier>();
-                foreach (var req in requrements)
-                    modifiers.AddRange(_dataProvider?.GetResourceModifiers(req.ResourceId) ?? []);
-
-                _systemMediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, requrements.ToDictionary(key => key.ResourceId, value => value.Amount)));
+                var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id, requrements.ToDictionary(key => key.ResourceId, value => value.Amount)));
+                if (item != null)
+                    _uiMediator?.Publish(new ItemCreatedEvent(item));
             }
         }
 
         private void OnLeftClick(string id) => _uiMediator?.Send(new OpenWindowRequest(typeof(CraftingWindow), id));
 
-        private void CalculateAmountToCraft(IEnumerable<IResourceRequirement> requirements, out int amount)
+        private async Task<int> CalculateAmountToCraft(IEnumerable<IResourceRequirement> requirements)
         {
+            ArgumentNullException.ThrowIfNull(_systemMediator);
             int canCraft = int.MaxValue;
+            var result = await _systemMediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(requirements.Select(x => x.ResourceId)));
             foreach (var requirement in requirements)
             {
-                var have = _inventory?.GetTotalItemAmount(requirement.ResourceId) ?? 0;
-                int amountToCraft = have / requirement.Amount;
-                canCraft = Mathf.Min(canCraft, amountToCraft);
+                if (result.TryGetValue(requirement.ResourceId, out var have))
+                {
+                    int amountToCraft = have / requirement.Amount;
+                    canCraft = Mathf.Min(canCraft, amountToCraft);
+                }
             }
-            amount = canCraft;
+
+            return canCraft;
         }
 
         private void UpdateRecipeTree()
@@ -125,14 +129,15 @@
             var root = _recipeTree?.GetRoot();
             UpdateTreeItem(root);
 
-            void UpdateTreeItem(TreeItem? item)
+            async void UpdateTreeItem(TreeItem? item)
             {
-                if(item == null) return;
+                if (item == null) return;
 
                 string meta = item.GetMetadata(0).AsString();
-                if (!meta.Equals("category", StringComparison.OrdinalIgnoreCase))
+
+                if (!meta.Equals("category", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(meta))
                 {
-                    CalculateAmountToCraft(_dataProvider?.GetRecipeRequirements(meta) ?? [], out var amount);
+                    var amount = await CalculateAmountToCraft(_dataProvider?.GetRecipeRequirements(meta) ?? []);
                     var recipeName = $"{Lokalizator.Lokalize(meta)}";
                     if (amount > 0)
                         recipeName += $" ({amount})";

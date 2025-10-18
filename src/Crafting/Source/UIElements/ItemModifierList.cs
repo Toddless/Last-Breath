@@ -40,7 +40,7 @@
                 item.SetSelectable(selectable);
         }
 
-        public void UpdateModifiertext(int hash, string newText)
+        public void UpdateModifierText(int hash, string newText)
         {
             if (_labels.TryGetValue(hash, out var label))
                 label.UpdateText(newText);
@@ -48,9 +48,16 @@
 
         public void UpdateSelectedItem((string Mod, int Hash) newModifier)
         {
-            var selectableItem = _container?.GetChild<InteractiveLabel>(_lastSelectedChild);
-            selectableItem?.SetText(newModifier.Mod);
-            selectableItem?.SetMetadata(newModifier.Hash);
+            ArgumentNullException.ThrowIfNull(_container);
+            var selectableItem = _container.GetChild<InteractiveLabel>(_lastSelectedChild);
+            var oldHash = selectableItem.GetMetadata().AsInt32();
+            selectableItem.SetText(newModifier.Mod);
+            selectableItem.SetMetadata(newModifier.Hash);
+            if( _labels.TryGetValue(oldHash, out var label))
+            {
+                _labels.Remove(_lastSelectedChild);
+                _labels[newModifier.Hash] = label;
+            }
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

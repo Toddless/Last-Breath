@@ -48,12 +48,9 @@
 
         public override void _Ready()
         {
-            if (_close != null)
-                _close.Pressed += () => Close?.Invoke();
-            if (_add != null)
-                _add.Pressed += OnAddPressed;
-            if (DragArea != null)
-                DragArea.GuiInput += DragWindow;
+            _close.Pressed += () => Close?.Invoke();
+            _add.Pressed += OnAddPressed;
+            DragArea.GuiInput += DragWindow;
         }
 
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
@@ -115,75 +112,10 @@
                 _buttons?.AddChild(CreateToggleUpgradeButton("N", ItemUpgradeMode.Normal, buttonGroup));
                 _buttons?.AddChild(CreateToggleUpgradeButton("D", ItemUpgradeMode.Double, buttonGroup));
                 _buttons?.AddChild(CreateToggleUpgradeButton("L", ItemUpgradeMode.Lucky, buttonGroup));
+                var recraftBtn = new ActionButton();
+                recraftBtn.SetupToggleButton("R", OnRecraftModeToggled, buttonGroup);
+                _buttons?.AddChild(recraftBtn);
             }
-        }
-
-        private void PerformActionOnItem()
-        {
-            switch (_craftingMode)
-            {
-                case CraftingMode.Upgrade:
-                    UpgradeEquipItem();
-                    break;
-
-                case CraftingMode.Ascend:
-                    break;
-                case CraftingMode.Recraft:
-                    break;
-                case CraftingMode.Create:
-                    CreateItem(_recipeId ?? string.Empty);
-                    break;
-            }
-            UpdateActionButtonState();
-        }
-
-        private async void UpdateActionButtonState()
-        {
-            try
-            {
-                _actionButton?.UpdateButtonState(await AllRequirementsMet());
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackException("Update button state failed.", ex, this);
-                _actionButton?.UpdateButtonState(false);
-            }
-        }
-
-        private async void UpgradeEquipItem()
-        {
-            _systemMediator!.Publish(new ConsumeResourcesInInventoryEvent(_usedResources));
-            var result = await _systemMediator.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_equpItem?.InstanceId ?? string.Empty));
-            // on result i need to update current item upgrade level, all modifiers
-            switch (result)
-            {
-                case ItemUpgradeResult.Success:
-                    break;
-                case ItemUpgradeResult.Failure:
-                    break;
-            }
-            _itemUpgradeLevel.Text = GetUpdateLevel();
-            UpdateItemModifiers();
-        }
-
-        private string SetButtonName()
-        {
-            return _craftingMode switch
-            {
-                CraftingMode.Create => Lokalizator.Lokalize("CraftingCreateButton"),
-                CraftingMode.Upgrade => Lokalizator.Lokalize("CraftingUpgradeButton"),
-                CraftingMode.Ascend => Lokalizator.Lokalize("CraftingAscendButton"),
-                _ => string.Empty
-            };
-        }
-
-        private void UpdateItemModifiers()
-        {
-            var baseModifiersList = _baseStats?.GetChildren().Cast<ItemModifierList>().FirstOrDefault();
-            var additionalModifiersList = _additionalStats?.GetChildren().Cast<ItemModifierList>().FirstOrDefault();
-
-            UpdateModifiersInList(_equpItem?.BaseModifiers ?? [], baseModifiersList);
-            UpdateModifiersInList(_equpItem?.AdditionalModifiers ?? [], additionalModifiersList);
         }
 
         private ActionButton CreateaActionButton(string name, Action onPressed)
@@ -202,6 +134,89 @@
             return btn;
         }
 
+        private void PerformActionOnItem()
+        {
+            try
+            {
+                switch (_craftingMode)
+                {
+                    case CraftingMode.Upgrade:
+                        UpgradeEquipItem();
+                        break;
+                    case CraftingMode.Ascend:
+                        AscendEquipItem();
+                        break;
+                    case CraftingMode.Recraft:
+                        RecraftEquipItemModifiers();
+                        break;
+                    case CraftingMode.Create:
+                        CreateItem(_recipeId ?? string.Empty);
+                        break;
+                }
+                UpdateActionButtonState();
+            }
+            catch (Exception ex)
+            {
+                Tracker.TrackException($"Perform action went wrong. Crafint mode: {_craftingMode}", ex, this);
+            }
+        }
+
+        private void AscendEquipItem()
+        {
+
+        }
+
+        private void RecraftEquipItemModifiers()
+        {
+
+        }
+
+        private async void CreateItem(string id)
+        {
+            ArgumentNullException.ThrowIfNull(_systemMediator);
+            var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new(id, _usedResources));
+            if (item != null)
+                _uiMediator?.Publish(new ItemCreatedEvent(item));
+        }
+
+        private async void UpgradeEquipItem()
+        {
+            ArgumentNullException.ThrowIfNull(_systemMediator);
+            var result = await _systemMediator.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_equpItem?.InstanceId ?? string.Empty, _usedResources));
+            switch (result)
+            {
+                case ItemUpgradeResult.Success:
+                    break;
+                case ItemUpgradeResult.Failure:
+                    break;
+            }
+            UpdateItemStats();
+        }
+
+        private async void UpdateActionButtonState() => _actionButton?.UpdateButtonState(await AllRequirementsMet());
+
+
+        private string SetButtonName()
+        {
+            return _craftingMode switch
+            {
+                CraftingMode.Create => Lokalizator.Lokalize("CraftingCreateButton"),
+                CraftingMode.Upgrade => Lokalizator.Lokalize("CraftingUpgradeButton"),
+                CraftingMode.Ascend => Lokalizator.Lokalize("CraftingAscendButton"),
+                _ => string.Empty
+            };
+        }
+
+        private void UpdateItemStats()
+        {
+            var baseModifiersList = _baseStats?.GetChildren().Cast<ItemModifierList>().FirstOrDefault();
+            var additionalModifiersList = _additionalStats?.GetChildren().Cast<ItemModifierList>().FirstOrDefault();
+
+            UpdateModifiersInList(_equpItem?.BaseModifiers ?? [], baseModifiersList);
+            UpdateModifiersInList(_equpItem?.AdditionalModifiers ?? [], additionalModifiersList);
+            if (_itemUpgradeLevel != null) _itemUpgradeLevel.Text = GetUpdateLevel();
+        }
+
         private async void OnUpgradeModeToggled(bool isToggled, ItemUpgradeMode mode)
         {
             if (!isToggled || _systemMediator == null) return;
@@ -211,6 +226,20 @@
             SetMainResourceRequirements(upgradeCost);
         }
 
+        private async void OnRecraftModeToggled(bool isToggled)
+        {
+            if (_systemMediator == null) return;
+            if (isToggled)
+            {
+                if (_craftingMode != CraftingMode.Recraft)
+                    _craftingMode = CraftingMode.Recraft;
+                var recraftCost = await _systemMediator.Send<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>(new(_equpItem?.InstanceId ?? string.Empty));
+                SetMainResourceRequirements(recraftCost);
+                UpdateAdditionalModifiersSelectable();
+            }
+            else
+                UpdateAdditionalModifiersSelectable(false);
+        }
 
         private async void SetMainResourceRequirements(IEnumerable<IResourceRequirement> requirements)
         {
@@ -229,35 +258,59 @@
             UpdateActionButtonState();
         }
 
-
-        private void SetBaseStats()
-        {
+        private void SetBaseStats() =>
             _baseStats?.AddChild(CreateItemModifierList(_equpItem?.BaseModifiers ?? [], _uiResourcesProvider?.GetResource("BaseItemStatsSetting") as LabelSettings));
-        }
 
         private void SetAdditionalModifiers()
         {
-            _additionalStats?.AddChild(CreateItemModifierList(_equpItem?.AdditionalModifiers ?? [], _uiResourcesProvider?.GetResource("AdditionalStatsSettings") as LabelSettings));
+            var itemModifierList = CreateItemModifierList(_equpItem?.AdditionalModifiers ?? [], _uiResourcesProvider?.GetResource("AdditionalStatsSettings") as LabelSettings);
+            itemModifierList.ItemSelected += OnModifierSelected;
+            itemModifierList.TreeExiting += OnItemModifierListFree;
+
+            void OnItemModifierListFree()
+            {
+                itemModifierList.ItemSelected -= OnModifierSelected;
+                itemModifierList.TreeExiting -= OnItemModifierListFree;
+            }
+            _additionalStats?.AddChild(itemModifierList);
         }
 
-        private ItemModifierList? CreateItemModifierList(IReadOnlyList<IModifierInstance> modifiers, LabelSettings? labelSettings)
+
+        private async void OnModifierSelected(int hash, ItemModifierList source)
         {
-            var modifiersList = _uiElementProvider?.Create<ItemModifierList>();
+            if (_craftingMode != CraftingMode.Recraft) return;
+            ArgumentNullException.ThrowIfNull(_systemMediator);
+
+            var result = await _systemMediator.Send<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(new(_equpItem?.InstanceId ?? string.Empty, hash, _usedResources));
+            if (result.IsSuccess)
+                source.UpdateSelectedItem((Lokalizator.Format(result.Param), result.Param!.GetHashCode()));
+        }
+
+        private ItemModifierList CreateItemModifierList(IReadOnlyList<IModifierInstance> modifiers, LabelSettings? labelSettings)
+        {
+            ArgumentNullException.ThrowIfNull(_uiElementProvider);
+            var modifiersList = _uiElementProvider.Create<ItemModifierList>();
 
             var modsWithHash = new List<(string Mod, int Hash)>();
             foreach (var mod in modifiers)
                 modsWithHash.Add((Lokalizator.Format(mod), mod.GetHashCode()));
 
-            modifiersList?.AddModifiersToList(modsWithHash, labelSettings);
-            modifiersList?.SetItemsSelectable(false);
+            modifiersList.AddModifiersToList(modsWithHash, labelSettings);
+            modifiersList.SetItemsSelectable(false);
 
             return modifiersList;
+        }
+
+        private void UpdateAdditionalModifiersSelectable(bool isSelectable = true)
+        {
+            var modifierList = _additionalStats?.GetChildren().Cast<ItemModifierList>().FirstOrDefault() ?? throw new MissingMemberException("Item list for additional stats was not created");
+            modifierList.SetItemsSelectable(isSelectable);
         }
 
         private void UpdateModifiersInList(IReadOnlyList<IModifierInstance> modifiers, ItemModifierList? list)
         {
             foreach (var modifier in modifiers)
-                list?.UpdateModifiertext(modifier.GetHashCode(), Lokalizator.Format(modifier));
+                list?.UpdateModifierText(modifier.GetHashCode(), Lokalizator.Format(modifier));
         }
 
         private void SetSkill()
@@ -270,14 +323,11 @@
             _skill?.AddChild(skillDescription);
         }
 
-
         private async void OnAddPressed()
         {
             if (_uiMediator == null) return;
             var takenResources = await _uiMediator.Send<OpenCraftingItemsWindowRequest, IEnumerable<string>>(new(_usedResources.Keys));
             AddOptionalResources(takenResources);
-            foreach (var taken in takenResources)
-                _usedResources.TryAdd(taken, 1);
         }
 
         private async void AddOptionalResources(IEnumerable<string> takenResources)
@@ -353,22 +403,14 @@
             areaContainer?.AddChild(boxContainer);
         }
 
-        private HashSet<IModifier> GetModifiersUsedResources()
+        private IEnumerable<IModifier> GetModifiersUsedResources()
         {
             var possibleModifiers = new List<IModifier>();
 
             foreach (var res in _usedResources)
                 possibleModifiers.AddRange(_dataProvider?.GetResourceModifiers(res.Key) ?? []);
 
-            return [.. possibleModifiers];
-        }
-
-        private void CreateItem(string id)
-        {
-            var requrements = _dataProvider?.GetRecipeRequirements(id);
-            var itemId = _dataProvider?.GetRecipeResultItemId(id);
-            var modifiers = requrements?.SelectMany(x => _dataProvider?.GetResourceModifiers(x.ResourceId) ?? Enumerable.Empty<IMaterialModifier>()) ?? [];
-            _systemMediator?.Send(new CreateEquipItemRequest(itemId ?? string.Empty, modifiers, _usedResources));
+            return possibleModifiers;
         }
 
         private void SetDisplayableData(string id)
