@@ -20,6 +20,7 @@
 
         public override void _Ready()
         {
+            // TODO: Not sure if i need this tooltipbuttons at all
             if (_equip != null) _equip.Pressed += OnEquipPressed;
             if (_update != null) _update.Pressed += OnUpdatePressed;
             if (_destroy != null) _destroy.Pressed += OnDestroyPressed;
@@ -52,7 +53,7 @@
 
         private void OnUpdatePressed()
         {
-            _uiMediator?.Publish(new OpenCraftingWindowEvent(_itemInstance, false));
+            _uiMediator?.Publish(new OpenCraftingWindowEvent(_itemInstance, true));
             Close?.Invoke();
         }
 

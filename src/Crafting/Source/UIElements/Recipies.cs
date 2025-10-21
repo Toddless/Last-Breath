@@ -8,28 +8,25 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
+    using System.Threading.Tasks;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Mediator.Requests;
-    using System.Threading.Tasks;
 
-    [Tool]
     [GlobalClass]
-    public partial class RecipiesWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
+    public partial class Recipies : PanelContainer, IInitializable, IRequireServices
     {
         private const string UID = "uid://1qq3je71i5vi";
         private Dictionary<RecipeCategories, TreeItem> _categories = [];
         [Export] private RecipeTree? _recipeTree;
-        [Export] private Button? _closeButton;
 
         private IItemDataProvider? _dataProvider;
         private IUiMediator? _uiMediator;
         private ISystemMediator? _systemMediator;
 
-        public event Action? Close;
+        [Signal] public delegate void RecipeSelectedEventHandler(string id);
 
         public override void _Ready()
         {
@@ -38,8 +35,7 @@
                 _recipeTree.LeftClick += OnLeftClick;
                 _recipeTree.RightClick += OnRightClick;
             }
-            if (_closeButton != null) _closeButton.Pressed += () => Close?.Invoke();
-            if (DragArea != null) DragArea.GuiInput += DragWindow;
+            CreateRecipeTree(_dataProvider?.GetCraftingRecipes() ?? []);
         }
 
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
@@ -55,7 +51,9 @@
             if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRecipeTree;
         }
 
-        public async void CreateRecipeTree(IEnumerable<ICraftingRecipe> recipes)
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private async void CreateRecipeTree(IEnumerable<ICraftingRecipe> recipes)
         {
             if (_recipeTree == null)
             {
@@ -89,38 +87,35 @@
             }
         }
 
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
         private async void OnRightClick(string id, TreeItem treeItem)
         {
             ArgumentNullException.ThrowIfNull(_systemMediator);
-            var requrements = _dataProvider?.GetRecipeRequirements(id);
 
-            var amount = await CalculateAmountToCraft(requrements ?? []);
-            if (amount > 1 && requrements != null)
+            var requirements = _dataProvider?.GetRecipeRequirements(id) ?? [];
+            var amount = await CalculateAmountToCraft(requirements);
+            if (amount > 1)
             {
-                var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id, requrements.ToDictionary(key => key.ResourceId, value => value.Amount)));
+                var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id, requirements.ToDictionary(key => key.ResourceId, value => value.Amount)));
                 if (item != null)
                     _uiMediator?.Publish(new ItemCreatedEvent(item));
             }
         }
 
-        private void OnLeftClick(string id) => _uiMediator?.Send(new OpenWindowRequest(typeof(CraftingWindow), id));
+        private void OnLeftClick(string id) => EmitSignal(SignalName.RecipeSelected, id);
 
         private async Task<int> CalculateAmountToCraft(IEnumerable<IResourceRequirement> requirements)
         {
             ArgumentNullException.ThrowIfNull(_systemMediator);
             int canCraft = int.MaxValue;
-            var result = await _systemMediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(requirements.Select(x => x.ResourceId)));
+            var itemsInInventory = await _systemMediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(requirements.Select(x => x.ResourceId)));
             foreach (var requirement in requirements)
             {
-                if (result.TryGetValue(requirement.ResourceId, out var have))
+                if (itemsInInventory.TryGetValue(requirement.ResourceId, out var have))
                 {
                     int amountToCraft = have / requirement.Amount;
                     canCraft = Mathf.Min(canCraft, amountToCraft);
                 }
             }
-
             return canCraft;
         }
 
@@ -137,7 +132,8 @@
 
                 if (!meta.Equals("category", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(meta))
                 {
-                    var amount = await CalculateAmountToCraft(_dataProvider?.GetRecipeRequirements(meta) ?? []);
+                    var requirements = _dataProvider?.GetRecipeRequirements(meta) ?? [];
+                    var amount = await CalculateAmountToCraft(requirements);
                     var recipeName = $"{Lokalizator.Lokalize(meta)}";
                     if (amount > 0)
                         recipeName += $" ({amount})";

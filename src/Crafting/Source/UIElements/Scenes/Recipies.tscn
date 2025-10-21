@@ -1,42 +1,38 @@
 [gd_scene load_steps=4 format=3 uid="uid://1qq3je71i5vi"]
 
-[ext_resource type="Script" uid="uid://c2hqqf7eyagle" path="res://Source/UIElements/RecipiesWindow.cs" id="1_ipcuk"]
+[ext_resource type="Script" uid="uid://cmete5k6aexy7" path="res://Source/UIElements/Recipies.cs" id="1_f4f5a"]
 [ext_resource type="Script" uid="uid://syu4jo6j0sq7" path="res://Source/UIElements/RecipeTree.cs" id="1_jiiyu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ipcuk"]
 bg_color = Color(0.16735566, 0.14861423, 0.14861423, 1)
 
-[node name="Recipies" type="Panel" node_paths=PackedStringArray("_recipeTree", "_closeButton", "DragArea")]
-custom_minimum_size = Vector2(300, 450)
-offset_right = 250.0
-offset_bottom = 300.0
-focus_mode = 1
+[node name="Recipies" type="PanelContainer" node_paths=PackedStringArray("_recipeTree")]
+offset_right = 258.0
+offset_bottom = 500.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_ipcuk")
-script = ExtResource("1_ipcuk")
-_recipeTree = NodePath("ScrollContainer/MarginContainer/RecipeTree")
-_closeButton = NodePath("HBoxContainer/Button")
-DragArea = NodePath("HBoxContainer/Control")
+script = ExtResource("1_f4f5a")
+_recipeTree = NodePath("FoldableContainer/ScrollContainer/MarginContainer/RecipeTree")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="FoldableContainer" type="FoldableContainer" parent="."]
+layout_mode = 2
+focus_mode = 0
+folded = true
+title = "Recipies"
+title_text_overrun_behavior = 4
 
-[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="FoldableContainer"]
+visible = false
+custom_minimum_size = Vector2(250, 460)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
 
-[node name="RecipeTree" type="Tree" parent="ScrollContainer/MarginContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="FoldableContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RecipeTree" type="Tree" parent="FoldableContainer/ScrollContainer/MarginContainer"]
 layout_mode = 2
 focus_mode = 0
 allow_rmb_select = true
@@ -44,28 +40,3 @@ hide_root = true
 auto_tooltip = false
 script = ExtResource("1_jiiyu")
 metadata/_custom_type_script = "uid://syu4jo6j0sq7"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-custom_minimum_size = Vector2(0, 25)
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 25.0
-grow_horizontal = 2
-theme_override_constants/separation = 1
-alignment = 1
-
-[node name="Control" type="Control" parent="HBoxContainer"]
-custom_minimum_size = Vector2(0, 25)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.75
-
-[node name="Button" type="Button" parent="HBoxContainer"]
-custom_minimum_size = Vector2(25, 0)
-layout_mode = 2
-size_flags_stretch_ratio = 0.25
-
-[node name="Control2" type="Control" parent="HBoxContainer"]
-custom_minimum_size = Vector2(9, 0)
-layout_mode = 2

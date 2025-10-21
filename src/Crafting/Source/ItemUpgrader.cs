@@ -50,7 +50,8 @@
             [
                 new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Jewellery_Dust")
             ],
-            [EquipmentCategory.Armor] = [
+            [EquipmentCategory.Armor] =
+            [
                 new ResourceRequirement(RequirementType.ResourceAmount, "Upgrade_Resource_Armor_Dust")
             ]
         };
@@ -145,7 +146,6 @@
 
         private bool CheckRollIsCritical(float criticalChance) => _rnd.Randf() <= criticalChance;
         private int GetAmount(Rarity itemRarity, ItemUpgradeMode mode) => (int)itemRarity + (mode == ItemUpgradeMode.None ? 0 : (int)mode + 1);
-
         private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default) => baseValue * _rnd.RandfRange(0.95f, 1.2f);
 
         //public void SetCriticalDoubleRoll(float doubleRoll) => _criticalDobubleRoll = doubleRoll;

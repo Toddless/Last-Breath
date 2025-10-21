@@ -7,7 +7,7 @@
     using Core.Interfaces.Data;
     using Crafting.Source.UIElements.Styles;
 
-    public partial class ItemDetails : PanelContainer, IInitializable, IClosable, IRequireServices
+    public partial class ItemDetails : PanelContainer, IInitializable, IClosable, IRequireServices, IRequireReposition
     {
         private const string UID = "uid://bqx5ow411nolc";
         private Vector2 _baseSize;
@@ -16,17 +16,15 @@
         [Export] private BoxContainer? _additionalStatsContainer, _baseStatsContainer, _itemSkillDescription;
         [Export] private Label? _itemName, _itemUpdateLevel;
         private UIResourcesProvider? _uiResourcesProvider;
+
         public event Action? Close;
+        public event Action<Control>? Reposition;
 
         public override void _Ready()
         {
             CallDeferred(nameof(CalculateNewHorizonalSize));
-            if (_itemName != null)
-                _itemName.LabelSettings = new LabelSettings()
-                {
-                    FontSize = 22
-                };
         }
+
         public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
         {
             _uiResourcesProvider = provider.GetService<UIResourcesProvider>();
@@ -59,7 +57,6 @@
 
         public void SetSkillDescription(SkillDescription skillDescription) => _itemSkillDescription?.AddChild(skillDescription);
 
-
         public void Clear()
         {
             FreeChildren(_baseStatsContainer?.GetChildren() ?? []);
@@ -91,6 +88,11 @@
                 CallDeferred(nameof(UpdateSize));
             }
         }
-        private void UpdateSize() => this.CustomMinimumSize = Size;
+
+        private void UpdateSize()
+        {
+            CustomMinimumSize = Size;
+            Reposition?.Invoke(this);
+        }
     }
 }

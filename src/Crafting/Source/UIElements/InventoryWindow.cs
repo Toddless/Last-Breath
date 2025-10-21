@@ -42,6 +42,6 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnCraftingButtonPressed() => _uiMediator?.Send(new OpenWindowRequest(typeof(RecipiesWindow)));
+        private void OnCraftingButtonPressed() => _uiMediator?.Send(new OpenWindowRequest(typeof(CraftingWindow)));
     }
 }

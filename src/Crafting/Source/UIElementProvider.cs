@@ -14,8 +14,8 @@
 
     public class UIElementProvider
     {
-        private const float MOUSE_OFFSET = 10;
-        private const float WINDOW_MARGIN = 10f;
+        private const float MOUSE_OFFSET = 15;
+        private const float WINDOW_MARGIN = 20f;
 
         private readonly Dictionary<Type, Control> _singleInstances = [];
         private readonly UIWindowStateStorage _positionStorage = new();
@@ -30,7 +30,22 @@
 
         public void Subscribe(CanvasLayer layer) => _uiLayer = (UILayer)layer;
 
+        public T CreateRequireServices<T>()
+            where T : Control, IInitializable, IRequireServices
+        {
+            var instance = T.Initialize().Instantiate<T>();
+            instance.InjectServices(_serviceProvider);
+            return instance;
+        }
+
         public T Create<T>()
+            where T : Control, IInitializable
+        {
+            var instance = T.Initialize().Instantiate<T>();
+            return instance;
+        }
+
+        public T CreateClosable<T>()
             where T : Control, IInitializable, IClosable
         {
             var instance = T.Initialize().Instantiate<T>();
@@ -39,15 +54,15 @@
             return instance;
         }
 
-        public T Create<T>(Action<T> configure)
+        public T CreateClosable<T>(Action<T> configure)
             where T : Control, IInitializable, IClosable
         {
-            var instance = Create<T>();
+            var instance = CreateClosable<T>();
             configure?.Invoke(instance);
             return instance;
         }
 
-        public T Create<T>(Control source)
+        public T CreateClosable<T>(Control source)
             where T : Control, IInitializable, IClosable
         {
             if (_uiLayer == null) throw new InvalidOperationException();
@@ -61,14 +76,16 @@
             var exist = list.OfType<T>().FirstOrDefault();
             if (exist != null) return exist;
 
-            var instance = Create<T>();
+            var instance = CreateClosable<T>();
+            if (instance is IRequireReposition reposition)
+                reposition.Reposition += OnRepositionRequired;
 
             var screenSize = _uiLayer.GetViewport().GetVisibleRect().Size;
             var windowSize = instance.GetCombinedMinimumSize();
             if (windowSize == Vector2.Zero)
                 windowSize = instance.Size;
 
-            instance.Position = CalculatePosition(source, instance, list, screenSize, windowSize);
+            instance.Position = CalculatePosition(list, screenSize, windowSize);
 
             instance.Close += UnloadForSource;
 
@@ -77,6 +94,7 @@
                 list.Remove(instance);
                 if (list.Count == 0) _instanceBySource.Remove(source);
                 instance.Close -= UnloadForSource;
+                if (instance is IRequireReposition repo) repo.Reposition -= OnRepositionRequired;
                 if (!instance.IsQueuedForDeletion())
                     instance.QueueFree();
             }
@@ -84,6 +102,24 @@
             list.Add(instance);
             _uiLayer?.ShowWindow(instance);
             return instance;
+        }
+
+        private void OnRepositionRequired(Control source)
+        {
+            ArgumentNullException.ThrowIfNull(_uiLayer);
+
+            if (!_instanceBySource.TryGetValue(source, out var list))
+            {
+                list = [];
+                _instanceBySource[source] = list;
+            }
+
+            var screenSize = _uiLayer.GetViewport().GetVisibleRect().Size;
+            var windowSize = source.GetCombinedMinimumSize();
+            if (windowSize == Vector2.Zero)
+                windowSize = source.Size;
+
+            source.Position = CalculatePosition(list, screenSize, windowSize);
         }
 
         public void ClearSource(Control source)
@@ -100,7 +136,7 @@
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
                 return (T)exist;
 
-            var instance = Create<T>();
+            var instance = CreateClosable<T>();
 
             var savedPos = _positionStorage.GetPosition<T>();
 
@@ -132,14 +168,14 @@
         public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
         {
             var details = CreateItemDetails(item);
-            var notifier = Create<ItemCreatedNotifier>(X => X.SetItemDetails(details));
+            var notifier = CreateClosable<ItemCreatedNotifier>(X => X.SetItemDetails(details));
             _uiLayer?.ShowWindow(notifier);
             return notifier;
         }
 
         public ItemDetails CreateItemDetails(IItem item, Control source)
         {
-            var itemDetails = Create<ItemDetails>(source);
+            var itemDetails = CreateClosable<ItemDetails>(source);
 
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);
@@ -149,7 +185,7 @@
 
         private ItemDetails CreateItemDetails(IItem item)
         {
-            var itemDetails = Create<ItemDetails>();
+            var itemDetails = CreateClosable<ItemDetails>();
 
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);
@@ -200,8 +236,7 @@
             return itemDetails;
         }
 
-
-        private Vector2 CalculatePosition(Control source, Control instance, List<Control> existingInstances, Vector2 screenSize, Vector2 windowSize)
+        private Vector2 CalculatePosition(List<Control> existingInstances, Vector2 screenSize, Vector2 windowSize)
         {
             if (existingInstances.Count == 0)
             {

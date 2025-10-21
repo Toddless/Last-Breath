@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using System;
     using Godot;
+    using System;
 
-    public partial class DraggableWindow : Panel
+    public partial class DraggableWindow : PanelContainer
     {
         private bool _isDragging = false;
         private Vector2 _dragOffset;
