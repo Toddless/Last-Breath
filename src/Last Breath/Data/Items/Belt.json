@@ -1,0 +1,50 @@
+{
+	"Defensive_Belt": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "multiplicative",
+				"value": 1.2
+			},
+			{
+				"parameter": "Armor",
+				"type": "multiplicative",
+				"value": 1.2
+			},
+			{
+				"parameter": "Evade",
+				"type": "multiplicative",
+				"value": 1.2
+			},
+			{
+				"parameter": "EnergyBarrier",
+				"type": "multiplicative",
+				"value": 1.2
+			}
+		]
+	},
+	"Test_Belt": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "multiplicative",
+				"value": 1.4
+			},
+			{
+				"parameter": "Evade",
+				"type": "multiplicative",
+				"value": 1.4
+			},
+			{
+				"parameter": "Damage",
+				"type": "multiplicative",
+				"value": 1.4
+			},
+			{
+				"parameter": "CriticalChance",
+				"type": "multiplicative",
+				"value": 1.4
+			}
+		]
+	}
+}

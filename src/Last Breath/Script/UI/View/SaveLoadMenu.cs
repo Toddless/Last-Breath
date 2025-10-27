@@ -1,23 +1,38 @@
 ﻿namespace LastBreath.Script.UI
 {
     using Godot;
+    using System;
+    using Core.Interfaces.UI;
+    using Core.Interfaces.Data;
     using LastBreath.Script.Helpers;
 
-    public partial class SaveLoadMenu : Control
+    public partial class SaveLoadMenu : Control, IInitializable, IClosable, IRequireServices
     {
-        private Button? _returnButton;
+        private const string UID = "uid://cserxppd6wiui";
+        [Export] private Button? _returnButton;
 
-        [Signal]
-        public delegate void ReturnPressedEventHandler();
-
+        public event Action? Close;
 
         public override void _Ready()
         {
-            _returnButton = (Button?)NodeFinder.FindBFSCached(this, "Return");
-            NodeFinder.ClearCache();
-            _returnButton!.Pressed += ReturnButtonPressed;
+            _returnButton!.Pressed += () => Close?.Invoke();
         }
 
-        private void ReturnButtonPressed() => EmitSignal(SignalName.ReturnPressed);
+        public override void _Input(InputEvent @event)
+        {
+            if (@event.IsActionPressed(Settings.Cancel))
+            {
+                Close?.Invoke();
+                AcceptEvent();
+            }
+        }
+
+        public void InjectServices(IGameServiceProvider provider)
+        {
+
+        }
+
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }
 }

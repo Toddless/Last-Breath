@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Script.Abilities.Effects
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Modifiers;
-    using LastBreath.Script.Abilities;
+    using Core.Interfaces;
     using LastBreath.Script.Helpers;
+    using LastBreath.Script.Abilities;
 
     public class RegenerationEffect : EffectBase
     {
@@ -13,7 +13,7 @@
                 stacks,
                 permanent)
         {
-            Modifier = new CurrentHealthModifier(ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
+            Modifier = new ModifierInstance(Parameter.MaxHealth, ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
         }
 
         public override void OnTick(ICharacter character)

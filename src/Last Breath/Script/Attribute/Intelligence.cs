@@ -22,10 +22,10 @@
                 ModifierType.Flat,
                 0.1f);
 
-            yield return new AttributeEffect
-                (Parameter.ResourceMax,
-                ModifierType.Flat,
-                0.1f);
+            //yield return new AttributeEffect
+            //    (Parameter.ResourceMax,
+            //    ModifierType.Flat,
+            //    0.1f);
         }
     }
 }

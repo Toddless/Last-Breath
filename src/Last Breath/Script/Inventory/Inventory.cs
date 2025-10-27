@@ -1,23 +1,31 @@
 ﻿namespace LastBreath.Script.Inventory
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
     using Godot;
+    using System;
     using Utilities;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Inventory;
+    using System.Collections.Generic;
 
-    public class Inventory 
+    public class Inventory : IInventory
     {
         private readonly Dictionary<string, IItem> _itemInstances = [];
+        private readonly IUiMediator _uiMediator;
         protected List<IInventorySlot> Slots { get; } = [];
 
-        public event Action<string, MouseButtonPressed, IInventory>? ItemSlotClicked;
+        public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
         public event Action<string, string, int, int>? InventoryFull;
         public event Action<string>? NotEnougthItems;
         public event Action<string, int>? ItemAmountChanges;
+        public event Action<IItem, MouseInteractions>? ItemInteraction;
+
+        public Inventory(IUiMediator mediator)
+        {
+            _uiMediator = mediator;
+        }
 
         public void Initialize(int amount, GridContainer? container)
         {
@@ -27,18 +35,33 @@
                 {
                     InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
                     inventorySlot.ItemDeleted += OnDeleteRequested;
+                    inventorySlot.GetItemInstance = (GetItem<IItem>);
+                    inventorySlot.GetItemIcon = GetItemIcon;
+                    inventorySlot.ItemInteraction += OnItemInteraction;
+                    inventorySlot.SetUIElementProvider(_uiMediator);
                     container.AddChild(inventorySlot);
                     Slots.Add(inventorySlot);
                 }
             }
         }
 
-        public ItemInstance? GetCurrentItemByInstanceId(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
+        private void OnItemInteraction(IInventorySlot slot, MouseInteractions interactions)
+        {
+
+        }
+
+        public void Initialize(int amount)
+        {
+
+        }
+
+
+
+        public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
         public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
-        public IItem? GetItemInstance(string instanceId) => _itemInstances.GetValueOrDefault(instanceId);
-
+        public T? GetItem<T>(string instanceId)
+            where T : IItem => (T?)_itemInstances.GetValueOrDefault(instanceId);
         public int GetTotalItemAmount(string itemId) => Slots.Where(x => x.CurrentItem != null && x.CurrentItem.ItemId == itemId).Sum(x => x.Quantity);
-
         /// <summary>
         /// Add the stack of the item to the existing instance. <see langword="true"/> if the stack was added, <see langword="false"/> if the instance was not found.
         /// </summary>
@@ -148,6 +171,8 @@
             }
         }
 
+        private Texture2D? GetItemIcon(string instacnceId) => _itemInstances[instacnceId].Icon;
+
         private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
         {
             var remaining = amount;
@@ -175,5 +200,6 @@
                 remaining -= toAdd;
             }
         }
+
     }
 }

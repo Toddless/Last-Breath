@@ -6,9 +6,9 @@
     using Core.Interfaces.Components;
     using System.Collections.Generic;
 
-    public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IItemModifier> modifiers) : EventArgs, IModifiersChangedEventArgs
+    public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifierInstance> modifiers) : EventArgs, IModifiersChangedEventArgs
     {
         public Parameter Parameter { get; } = parameter;
-        public IReadOnlyList<IItemModifier> Modifiers { get; } = modifiers;
+        public IReadOnlyList<IModifierInstance> Modifiers { get; } = modifiers;
     }
 }

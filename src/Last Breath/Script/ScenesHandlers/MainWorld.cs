@@ -66,8 +66,6 @@ namespace LastBreath
 
         public void ResetBattleState() => _isBattleActive = false;
 
-        protected void ResolveDependencies() => DiContainer.InjectDependencies(this);
-
         // if i need dynamically add new openableObjects
         private void OnChildAdded(Node node)
         {

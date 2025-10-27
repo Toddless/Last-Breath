@@ -4,6 +4,7 @@
     {
         public const string Resolution = nameof(Resolution);
         public const string WindowMode = "Window Mode";
+        public const string Borderless = nameof(Borderless);
         public const string Master = nameof(Master);
         public const string Music = nameof(Music);
         public const string Sfx = nameof(Sfx);

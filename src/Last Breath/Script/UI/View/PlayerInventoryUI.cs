@@ -1,12 +1,9 @@
 ﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using System;
     using Core.Enums;
     using Godot.Collections;
-    using Core.Interfaces.Items;
     using LastBreath.Script.Helpers;
-    using Core.Interfaces.Inventory;
     using LastBreath.Script.Inventory;
 
     public partial class PlayerInventoryUI : Control
@@ -16,13 +13,10 @@
         private Dictionary<EquipmentType, EquipmentSlot> _slots = [];
         [Export] private Array<EquipmentSlot> _ringSlots = [];
 
-        public event Action<IItem, MouseButtonPressed, IInventory>? InventorySlotClicked;
-        public event Action<EquipmentSlot, MouseButtonPressed>? EquipmentSlotPressed;
 
         public override void _Ready()
         {
             FillTheDictionary();
-            SetEvents();
         }
 
         public void InitializeInventories(Inventory equipInventory, Inventory craftingInventory, Inventory questItemsInventory)
@@ -51,8 +45,6 @@
                 return slot;
             }
         }
-
-        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed) => EquipmentSlotPressed?.Invoke(slot, pressed);
 
         private EquipmentSlot GetFreeRingSlotOrDefault() => _ringSlots[0].CurrentItem == null ? _ringSlots[0] : _ringSlots[1];
 
@@ -83,17 +75,5 @@
             return slot;
         }
 
-        private void SetEvents()
-        {
-            foreach (var slot in _slots)
-            {
-                slot.Value.EquipItemPressed += OnEquipItemPressed;
-            }
-
-            foreach (var ringSlot in _ringSlots)
-            {
-                ringSlot.EquipItemPressed += OnEquipItemPressed;
-            }
-        }
     }
 }

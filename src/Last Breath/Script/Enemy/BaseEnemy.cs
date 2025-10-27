@@ -1,24 +1,20 @@
 namespace LastBreath
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Skills;
-    using Core.Modifiers;
     using Godot;
+    using System;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces;
     using LastBreath.Components;
-    using LastBreath.Script;
-    using LastBreath.Script.BattleSystem;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Skills;
     using LastBreath.Script.Enemy;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components;
+    using LastBreath.Script.BattleSystem;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using LastBreath.Script.UI;
 
-    [Inject]
     public partial class BaseEnemy : CharacterBody2D, ICharacter
     {
         #region Components
@@ -51,7 +47,6 @@ namespace LastBreath
         private Node2D? _inventoryNode;
         private Panel? _inventoryWindow;
         private GridContainer? _inventoryContainer;
-        private EnemyInventory? _inventory;
         #endregion
 
 
@@ -102,13 +97,6 @@ namespace LastBreath
 
         }
 
-        public EnemyInventory? Inventory
-        {
-            get => _inventory;
-            set => _inventory = value;
-        }
-
-        [Inject]
         protected IBasedOnRarityLootTable? LootTable
         {
             get => _lootTable;
@@ -138,6 +126,10 @@ namespace LastBreath
         public event Action<ICharacter>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
         public event Action<IOnGettingAttackEventArgs>? GettingAttack;
+        public event Action? TurnStart;
+        public event Action? TurnEnd;
+        public event Action<IAttackContext>? BeforeAttack;
+        public event Action<IAttackContext>? AfterAttack;
 
         #endregion
 
@@ -153,8 +145,6 @@ namespace LastBreath
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            Inventory = new EnemyInventory();
-            Inventory.Initialize(25, _inventoryContainer);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
@@ -162,7 +152,6 @@ namespace LastBreath
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _inventoryNode.Hide();
             SetEvents();
-            DiContainer.InjectDependencies(this);
             SetStats();
             // SpawnItems();
             Health?.HealUpToMax();
@@ -196,7 +185,7 @@ namespace LastBreath
                 }
                 CurrentStance?.OnAttack(target);
             }
-            UIEventBus.PublishNextPhase();
+            //UIEventBus.PublishNextPhase();
         }
 
         public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
@@ -280,7 +269,6 @@ namespace LastBreath
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, points.Dexterity);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, points.Strength);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Intelligence, points.Intelligence);
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 500, this));
             SetAnimation();
             _currentStance = SetStance(_enemyAttributeType);
             _currentStance.OnActivate();
@@ -293,7 +281,6 @@ namespace LastBreath
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
             Health.EntityDead += OnEntityDead;
-            _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
         private void OnEntityDead()

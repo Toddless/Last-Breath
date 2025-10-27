@@ -82,7 +82,7 @@
             if (target is not Player && target != null)
             {
                 _player?.CurrentStance?.OnAttack(target);
-                UIEventBus.PublishNextPhase();
+                //UIEventBus.PublishNextPhase();
             }
         }
 

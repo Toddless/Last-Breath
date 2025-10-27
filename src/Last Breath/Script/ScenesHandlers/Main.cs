@@ -11,6 +11,7 @@
 
     public partial class Main : Node2D
     {
+        private const string UID = "uid://drgs10sgp405d";
         private enum State { Play, Paused, Dialog, Monologue }
         private enum Trigger { Resume, Pause, Dialog, Monologue, Close }
 
@@ -68,7 +69,7 @@
             base._ExitTree();
         }
 
-        public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(ScenePath.Main);
+        public static PackedScene InitializeAsPacked() => ResourceLoader.Load<PackedScene>(UID);
 
         private void SetEvents()
         {
@@ -82,8 +83,8 @@
                 obj.OpenObject += ObjectOpen;
             }
 
-            UIEventBus.Close += FireClose;
-            UIEventBus.Resume += FireResume;
+            //UIEventBus.Close += FireClose;
+          //  UIEventBus.Resume += FireResume;
         }
 
         private void ConfigureStateMachine()

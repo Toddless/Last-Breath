@@ -1,0 +1,98 @@
+{
+	"Boots_Strength_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "Movespeed",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "Armor",
+				"type": "flat",
+				"value": 120
+			},
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.08
+			}
+		]
+	},
+	"Boots_Dexterity_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "Movespeed",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 500
+			},
+			{
+				"parameter": "MaxEvadeChance",
+				"type": "increase",
+				"value": 0.03
+			}
+		]
+	},
+	"Boots_Intelligence_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "Movespeed",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "EnergyBarrier",
+				"type": "flat",
+				"value": 120
+			},
+			{
+				"parameter": "MaxResource",
+				"type": "flat",
+				"value": 15
+			}
+		]
+	},
+	"Test_Boots": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 300
+			},
+			{
+				"parameter": "Movespeed",
+				"type": "flat",
+				"value": 25
+			},
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 600
+			},
+			{
+				"parameter": "Dexterity",
+				"type": "flat",
+				"value": 15
+			}
+		]
+	}
+}

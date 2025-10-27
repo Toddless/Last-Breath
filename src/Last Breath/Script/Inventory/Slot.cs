@@ -3,7 +3,6 @@
     using Godot;
     using System;
     using Utilities;
-    using Crafting.Source;
     using Godot.Collections;
     using Core.Interfaces.Items;
 
@@ -14,6 +13,8 @@
         [Export] protected TextureRect? Background;
         [Export] protected TextureRect? Icon;
         [Export] protected TextureRect? Frame;
+
+        public Func<string, Texture2D?>? GetItemIcon;
 
         public ItemInstance? CurrentItem
         {
@@ -55,7 +56,7 @@
 
             var preview = new TextureRect
             {
-                Texture = ItemDataProvider.Instance?.GetItemIcon(CurrentItem.ItemId),
+                Texture = Icon?.Texture,
                 MouseFilter = MouseFilterEnum.Ignore,
                 StretchMode = TextureRect.StretchModeEnum.Scale,
                 ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
@@ -159,12 +160,9 @@
             return true;
         }
 
-        protected virtual void OnMouseExit() { }
-        protected virtual void OnMouseEnter() { }
-
         protected virtual void RefreshUI()
         {
-            if (Icon != null) Icon.Texture = CurrentItem != null ? ItemDataProvider.Instance?.GetItemIcon(CurrentItem.ItemId) : null;
+            if (Icon != null) Icon.Texture = CurrentItem == null ? null : GetItemIcon?.Invoke(CurrentItem.InstanceId);
         }
     }
 }

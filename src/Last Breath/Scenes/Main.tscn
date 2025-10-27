@@ -1,24 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=5 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" uid="uid://hl7koqv3auw2" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
-[ext_resource type="PackedScene" uid="uid://boqqyrt0sfpve" path="res://Script/UI/MainUI.tscn" id="2_heqcp"]
-[ext_resource type="PackedScene" uid="uid://j6cqo6u0s83x" path="res://Script/UI/BattleUI.tscn" id="4_vfafg"]
-[ext_resource type="PackedScene" uid="uid://b03h1pcqbp3iw" path="res://Script/UI/PauseMenu.tscn" id="5_17akd"]
-[ext_resource type="Script" uid="uid://dxjawyd26k7nx" path="res://Script/UI/Layers/MainLayer.cs" id="5_bee3c"]
-[ext_resource type="Script" uid="uid://c3cd54sl0tbrs" path="res://Script/UI/Layers/PauseLayer.cs" id="5_bjedh"]
-[ext_resource type="PackedScene" uid="uid://boa2lmvm2an46" path="res://Script/UI/PlayerInventoryUI.tscn" id="6_3tvjc"]
-[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="6_7fdro"]
-[ext_resource type="PackedScene" uid="uid://cqr8ohljxh8kt" path="res://Script/UI/QuestsMenu.tscn" id="7_637ag"]
-[ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="7_uuajh"]
-[ext_resource type="AudioStream" uid="uid://c7elo2qldwqgg" path="res://Assets/Sounds/PauseMenu.mp3" id="8_11jk4"]
-[ext_resource type="PackedScene" uid="uid://b7ndt5b1q2dif" path="res://Script/UI/CharacterMenu.tscn" id="8_fr0w8"]
-[ext_resource type="PackedScene" uid="uid://caiotu53nk856" path="res://Script/UI/MapMenu.tscn" id="9_4lb6e"]
-[ext_resource type="PackedScene" uid="uid://dolelj83vd4cv" path="res://Script/UI/Inventory.tscn" id="11_jyqft"]
-[ext_resource type="Script" uid="uid://dv52xthi2iu6h" path="res://Script/UI/Layers/BattleLayer.cs" id="16_vnox3"]
-[ext_resource type="Script" uid="uid://bt4bcaxsbsu8l" path="res://Script/UI/Layers/DialogueLayer.cs" id="21_nfb6a"]
-[ext_resource type="PackedScene" uid="uid://eh2wvi8x5l80" path="res://Script/UI/DialogueWindow.tscn" id="21_rf13s"]
+[ext_resource type="Script" uid="uid://dyf5ot3mh4nfp" path="res://Script/UI/Layers/UILayer.cs" id="4_rgh2o"]
 
 [node name="Main" type="Node2D"]
 process_mode = 3
@@ -29,61 +14,5 @@ script = ExtResource("1_dp7k8")
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
 
-[node name="MainLayer" type="CanvasLayer" parent="."]
-process_mode = 1
-follow_viewport_enabled = true
-script = ExtResource("5_bee3c")
-
-[node name="MainUI" parent="MainLayer" instance=ExtResource("2_heqcp")]
-metadata/_edit_use_anchors_ = true
-
-[node name="PlayerInventoryUI" parent="MainLayer" instance=ExtResource("6_3tvjc")]
-visible = false
-
-[node name="QuestsMenu" parent="MainLayer" instance=ExtResource("7_637ag")]
-visible = false
-
-[node name="CharacterMenu" parent="MainLayer" instance=ExtResource("8_fr0w8")]
-visible = false
-
-[node name="MapMenu" parent="MainLayer" instance=ExtResource("9_4lb6e")]
-visible = false
-
-[node name="Inventory" parent="MainLayer" instance=ExtResource("11_jyqft")]
-visible = false
-
-[node name="PauseLayer" type="CanvasLayer" parent="."]
-process_mode = 1
-visible = false
-follow_viewport_enabled = true
-script = ExtResource("5_bjedh")
-
-[node name="PauseMenu" parent="PauseLayer" instance=ExtResource("5_17akd")]
-
-[node name="OptionsMenu" parent="PauseLayer" instance=ExtResource("6_7fdro")]
-visible = false
-
-[node name="SaveLoadMenu" parent="PauseLayer" instance=ExtResource("7_uuajh")]
-visible = false
-focus_mode = 0
-
-[node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="PauseLayer"]
-stream = ExtResource("8_11jk4")
-autoplay = true
-parameters/looping = true
-
-[node name="BattleLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("_battleUI")]
-process_mode = 1
-visible = false
-follow_viewport_enabled = true
-script = ExtResource("16_vnox3")
-_battleUI = NodePath("BattleUI")
-
-[node name="BattleUI" parent="BattleLayer" instance=ExtResource("4_vfafg")]
-
-[node name="DialogueLayer" type="CanvasLayer" parent="."]
-visible = false
-follow_viewport_enabled = true
-script = ExtResource("21_nfb6a")
-
-[node name="DialogueWindow" parent="DialogueLayer" instance=ExtResource("21_rf13s")]
+[node name="UILayer" type="CanvasLayer" parent="."]
+script = ExtResource("4_rgh2o")

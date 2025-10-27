@@ -1,0 +1,98 @@
+{
+	"Gloves_Dexterity_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 450
+			},
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 600
+			},
+			{
+				"parameter": "CriticalChance",
+				"type": "increase",
+				"value": 0.8
+			},
+			{
+				"parameter": "CriticalDamage",
+				"type": "flat",
+				"value": 15
+			}
+		]
+	},
+	"Gloves_Strength_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 700
+			},
+			{
+				"parameter": "Armor",
+				"type": "flat",
+				"value": 600
+			},
+			{
+				"parameter": "Damage",
+				"type": "flat",
+				"value": 10
+			},
+			{
+				"parameter": "MaxReduceDamage",
+				"type": "increase",
+				"value": 0.05
+			}
+		]
+	},
+	"Gloves_Intelligence_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 450
+			},
+			{
+				"parameter": "ResourceRecovery",
+				"type": "flat",
+				"value": 1
+			},
+			{
+				"parameter": "EnergyBarrier",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "SpellDamage",
+				"type": "flat",
+				"value": 20
+			}
+		]
+	},
+	"Test_Gloves": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 450
+			},
+			{
+				"parameter": "CriticalChance",
+				"type": "increase",
+				"value": 0.5
+			},
+			{
+				"parameter": "Armor",
+				"type": "flat",
+				"value": 300
+			},
+			{
+				"parameter": "ResourceRecovery",
+				"type": "flat",
+				"value": 1
+			}
+		]
+	}
+}

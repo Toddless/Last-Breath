@@ -5,7 +5,6 @@
     using Stateless;
     using LastBreath;
     using System.Linq;
-    using LastBreath.Script.UI;
     using System.Collections.Generic;
     using LastBreath.Script.ScenesHandlers;
     using Core.Enums;
@@ -54,7 +53,7 @@
 
         public void BattleStart()
         {
-            UIEventBus.NextTurnPhase += NextPhase;
+            //UIEventBus.NextTurnPhase += NextPhase;
             SetNextFighter();
             NextPhase();
         }
@@ -159,7 +158,7 @@
         {
             BattleEnd?.Invoke(results);
             _machine.Fire(Trigger.AwaitForBattle);
-            UIEventBus.NextTurnPhase -= NextPhase;
+           // UIEventBus.NextTurnPhase -= NextPhase;
         }
 
         private void OnAllContextsHandled() => NextPhase();

@@ -12,7 +12,7 @@
     using Crafting.Source.UIElements;
     using Crafting.Source.UIElements.Layers;
 
-    public class UIElementProvider
+    public class UIElementProvider : IUIElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
@@ -20,7 +20,7 @@
         private readonly Dictionary<Type, Control> _singleInstances = [];
         private readonly UIWindowStateStorage _positionStorage = new();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
-        private readonly Core.Interfaces.Data.IGameServiceProvider _serviceProvider;
+        private readonly IGameServiceProvider _serviceProvider;
         private UILayer? _uiLayer;
 
         public UIElementProvider()
@@ -47,6 +47,23 @@
             instance.InjectServices(_serviceProvider);
             return instance;
         }
+
+        public T CreateRequireServicesClosable<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            var instance = CreateRequireServices<T>();
+
+            instance.Close += Close;
+
+            void Close()
+            {
+                if (!instance.IsQueuedForDeletion())
+                    instance.QueueFree();
+                instance.Close -= Close;
+            }
+            return instance;
+        }
+
 
         public T CreateAndShowOnUI<T>()
             where T : Control, IInitializable
@@ -266,5 +283,6 @@
             float y = Mathf.Clamp(pos.Y, WINDOW_MARGIN, screen.Y - size.Y - WINDOW_MARGIN);
             return new Vector2(x, y);
         }
+
     }
 }

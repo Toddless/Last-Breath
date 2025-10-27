@@ -4,7 +4,6 @@
     using System;
     using Utilities;
     using Stateless;
-    using Core.Enums;
     using System.Linq;
     using Core.Interfaces.Items;
     using LastBreath.Script.Items;
@@ -44,7 +43,6 @@
             _inventoryUI = GetNode<InventoryUI>("Inventory");
             _questManager = QuestManager.Instance;
             _player = GameManager.Instance.Player;
-            _playerInventory.InitializeInventories(_player.EquipInventory, _player.CraftingInventory, _player.QuestItemsInventory);
             _questManager?.Initialize();
             ConfigureMachine();
             AddActionTriggers();
@@ -76,11 +74,9 @@
 
             if (_currentOpenedObj == null)
             {
-                if (_inventoryCloseHandler != null) _inventoryUI.Close -= _inventoryCloseHandler;
                 _currentOpenedObj = obj;
                 // Handler for pressing the "Close" button
                 _inventoryCloseHandler = () => _currentOpenedObj?.Close();
-                _inventoryUI.Close += _inventoryCloseHandler;
                 _currentOpenedObj.CloseObject += ObjectClosing;
             }
             if (_machine?.State == State.Inventory) return;
@@ -89,11 +85,6 @@
 
         public void UpdateItems()
         {
-            if (_currentOpenedObj == null) return;
-            foreach (var item in _currentOpenedObj.Items)
-            {
-                _inventoryUI?.AddItem(item);
-            }
         }
 
         // Close object if player leaves without pressing Close or TakeAll button
@@ -127,22 +118,9 @@
             _mainUI!.Inventory += () => _machine?.Fire(Trigger.ShowPlayerInventory);
             _mainUI!.Quests += () => _machine?.Fire(Trigger.ShowQuests);
             _mainUI!.Map += () => _machine?.Fire(Trigger.ShowMap);
-            _inventoryUI!.TakeAll += OnInventoryTakeAll;
-            _playerInventory!.InventorySlotClicked += OnInventorySlotClicked;
-            _playerInventory.EquipmentSlotPressed += OnEquipItemPressed;
+      
         }
 
-        private void OnEquipItemPressed(EquipmentSlot slot, MouseButtonPressed pressed)
-        {
-            switch (pressed)
-            {
-                case MouseButtonPressed.RightClick:
-                    HandleItemUnequip(slot);
-                    break;
-                default:
-                    break;
-            }
-        }
 
         private void HandleItemUnequip(EquipmentSlot slot)
         {
@@ -156,32 +134,7 @@
             slot.UnequipItem();
         }
 
-        private void OnInventorySlotClicked(IItem itemClicked, MouseButtonPressed buttonPressed, IInventory inventory)
-        {
-            // Item can be correct equiped only if they have IDs.
-            // Strange behavior? Check items id
-            if (itemClicked is IEquipItem item)
-            {
-                HandleEquipmentItemPressed(item, buttonPressed, inventory);
-            }
-        }
-
-        private void HandleEquipmentItemPressed(IEquipItem item, MouseButtonPressed pressed, IInventory inventory)
-        {
-            switch (pressed)
-            {
-                case MouseButtonPressed.CtrRightClick:
-                    HandleItemEquipment(item, inventory);
-                    break;
-                case MouseButtonPressed.CtrLeftClick:
-                    // TODO: Action on ctr + left click
-                    break;
-
-                default: break;
-                    // TODO: Other cases
-            }
-        }
-
+     
         private void HandleItemEquipment(IEquipItem item, IInventory inventory)
         {
             if (_playerInventory == null)
@@ -227,7 +180,6 @@
         private void RemoveQuestItems(Quest quest)
         {
             if (quest.QuestObjective == null || quest.QuestObjective.QuestObjectiveType != ObjectiveType.ItemCollection) return;
-            _player?.QuestItemsInventory.RemoveItemById(quest.QuestObjective.TargetId, quest.QuestObjective.CurrentAmount);
         }
 
         private void OnInventoryTakeAll()
@@ -309,7 +261,6 @@
                 _currentOpenedObj = null;
             }
             if (_inventoryCloseHandler != null) _inventoryCloseHandler = null;
-            _inventoryUI?.Clear();
         }
 
         private void ShowMainHideAll()

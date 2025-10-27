@@ -56,13 +56,11 @@
 
         private void SetEvents()
         {
-            _menu!.Continue += UIEventBus.PublishResume;
+          //  _menu!.Continue += UIEventBus.PublishResume;
             _menu.SaveLoad += () => _machine?.Fire(Trigger.ToSaveLoad);
             _menu.Options += () => _machine?.Fire(Trigger.ToOptions);
-            _menu.MainMenu += () => GetTree().ChangeSceneToPacked(MainMenu.InitializeAsPackedScene());
+            _menu.MainMenu += () => GetTree().ChangeSceneToPacked(MainMenu.Initialize());
             _menu.Exit += () => GetTree().Quit();
-            _options!.ReturnPressed += () => _machine?.Fire(Trigger.Back);
-            _saveLoad!.ReturnPressed += () => _machine?.Fire(Trigger.Back);
         }
 
         private void ConfigureStateMachine()

@@ -1,25 +1,24 @@
 ﻿namespace LastBreath
 {
-    using System;
-    using System.Collections.Generic;
     using Godot;
-    using LastBreath.Components;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.BattleSystem;
-    using LastBreath.Script.Helpers;
-    using LastBreath.Script.Inventory;
-    using LastBreath.Localization;
-    using LastBreath.Resource.Quests;
-    using LastBreath.Script.Items;
-    using LastBreath.Script.QuestSystem;
+    using System;
     using Core.Enums;
-    using Core.Modifiers;
+    using Core.Interfaces;
+    using LastBreath.Script;
+    using LastBreath.Components;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Battle;
+    using LastBreath.Localization;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.Helpers;
     using Core.Interfaces.Components;
-    using Core.Interfaces;
+    using LastBreath.Resource.Quests;
+    using System.Collections.Generic;
+    using LastBreath.Script.Inventory;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public partial class Player : CharacterBody2D, ICharacter
     {
@@ -96,9 +95,6 @@
         public IDefenseComponent Defense => _playerDefense ??= new DefenseComponent();
         public IHealthComponent Health => _playerHealth ??= new HealthComponent();
         public IDamageComponent Damage => _playerDamage ??= new DamageComponent(new UnarmedDamageStrategy());
-        public Inventory EquipInventory => _equipInventory ??= new();
-        public Inventory CraftingInventory => _craftingInventory ??= new();
-        public Inventory QuestItemsInventory => _questItemsInventory ??= new();
         public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
         public IModifierManager Modifiers => _modifierManager;
 
@@ -118,6 +114,10 @@
         public event Action<ICharacter>? Dead;
         public event Action? AllAttacksFinished;
         public event Action<IOnGettingAttackEventArgs>? GettingAttack;
+        public event Action? TurnStart;
+        public event Action? TurnEnd;
+        public event Action<IAttackContext>? BeforeAttack;
+        public event Action<IAttackContext>? AfterAttack;
 
         [Signal]
         public delegate void PlayerEnterTheBattleEventHandler();
@@ -134,16 +134,11 @@
             _playerDefense = new DefenseComponent();
             _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _sprite.Play("Idle_down");
-            _equipInventory = new();
-            _craftingInventory = new();
-            _questItemsInventory = new();
             _playerSkills = new(this);
             LoadDialogues();
             SetEvents();
             _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
             _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
-            Modifiers.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 10000, this));
-            Modifiers.AddPermanentModifier(new DamageModifier(ModifierType.Flat, 500, this));
             Health.HealUpToMax();
             _stances.Add(Stance.Dexterity, new DexterityStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
@@ -305,14 +300,7 @@
 
         private void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
-            switch (args.Parameter)
-            {
-                case Parameter.Movespeed:
-                    Speed = Mathf.RoundToInt(Calculations.CalculateFloatValue(BaseSpeed, args.Modifiers));
-                    break;
-                default:
-                    break;
-            }
+          
         }
 
         private void UpdateTargetForCurrentSetOfAbilities(ICharacter value)

@@ -65,9 +65,6 @@
         {
             switch (args.Parameter)
             {
-                case Parameter.ResourceMax:
-                    MaximumAmount = Calculations.CalculateFloatValue(_baseMaximumAmount, args.Modifiers);
-                    break;
                 case Parameter.ResourceRecovery:
                     RecoveryAmount = Calculations.CalculateFloatValue(_baseRecoveryAmount, args.Modifiers);
                     break;

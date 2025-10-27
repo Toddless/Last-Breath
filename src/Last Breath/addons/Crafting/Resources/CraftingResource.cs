@@ -24,7 +24,7 @@
         public string DisplayName => Lokalizator.Lokalize(Id);
         public IMaterialType? MaterialType => _material;
         public int Quantity { get; set; } = 1;
-        public Rarity Rarity { get; } = Rarity.Rare;
+        public Rarity Rarity { get; set; } = Rarity.Rare;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
 

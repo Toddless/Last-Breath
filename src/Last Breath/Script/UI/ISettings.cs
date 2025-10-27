@@ -2,7 +2,7 @@
 {
     public interface ISettings
     {
-        void LoadSettings(ConfigFileHandler config);
-        void SaveSettings(ConfigFileHandler config);
+        void LoadSettings();
+        void SaveSettings();
     }
 }

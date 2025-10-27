@@ -3,37 +3,91 @@
     using Godot;
     using System;
     using Core.Enums;
-    using Crafting.Source;
-    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
-    using Crafting.TestResources.Inventory;
+    using Core.Interfaces.Mediator.Events;
 
     public partial class InventorySlot : Slot, IInventorySlot
     {
         private const string UID = "uid://cekpl68hghs2v";
 
+        private bool _isMouseInside, _rmbWasPressed, _detailsShowing;
         [Export] protected Label? QuantityLabel;
 
-        public event Action<string, MouseButtonPressed>? OnItemClicked;
+        private IUiMediator? _uiMediator;
+        public Func<string, IItem?>? GetItemInstance;
+        public event Action<IInventorySlot, MouseInteractions>? ItemInteraction;
 
         public override void _Ready()
         {
-            this.MouseEntered += OnMouseEnter;
-            this.MouseExited += OnMouseExit;
+            MouseExited += OnMouseExit;
+            MouseEntered += OnMouseEnter;
         }
 
-        public override bool _CanDropData(Vector2 atPosition, Variant data)
+        public override void _GuiInput(InputEvent @event)
         {
-            // we know we have dictionary with item here
-            if (base._CanDropData(atPosition, data))
+            if (@event is InputEventMouseButton mb)
             {
-                var source = GetNodeOrNull<Slot>(data.AsGodotDictionary()["Source"].AsNodePath());
-                if (source == null) return false;
-                bool isCraftingItem = CurrentItem != null && (ItemDataProvider.Instance?.IsItemImplement<IResource>(CurrentItem.ItemId) ?? true);
-                if (source is CraftingSlot && isCraftingItem) return false;
+                if (CurrentItem == null) return;
+                if (mb.Pressed)
+                {
+                    if (mb.AltPressed)
+                    {
+                        switch (true)
+                        {
+                            case var _ when mb.ButtonIndex == MouseButton.Left:
+                                RaiseEvent(MouseInteractions.AltRMB);
+                                break;
+                            case var _ when mb.ButtonIndex == MouseButton.Right:
+                                RaiseEvent(MouseInteractions.AltRMB);
+                                break;
+                        }
+                    }
+
+                    if (mb.CtrlPressed)
+                    {
+                        switch (true)
+                        {
+                            case var _ when mb.ButtonIndex == MouseButton.Left:
+                                RaiseEvent(MouseInteractions.CtrLMB);
+                                break;
+                            case var _ when mb.ButtonIndex == MouseButton.Right:
+                                RaiseEvent(MouseInteractions.CtrRMB);
+                                break;
+                        }
+                    }
+                    if (mb.ButtonIndex == MouseButton.Right)
+                        ShowButtonsTooltip();
+
+                    AcceptEvent();
+                }
             }
-            return true;
         }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (_rmbWasPressed && @event.IsActionPressed("ui_cancel"))
+            {
+                Clear();
+                GetViewport().SetInputAsHandled();
+            }
+        }
+
+        public void SetUIElementProvider(IUiMediator mediator)
+        {
+            _uiMediator = mediator;
+            _uiMediator.UpdateUi += Clear;
+        }
+
+        private void Clear()
+        {
+            _rmbWasPressed = false;
+            _detailsShowing = false;
+            _uiMediator?.Publish(new ClearUiElementsEvent(this));
+        }
+
+        private void RaiseEvent(MouseInteractions interaction) => ItemInteraction?.Invoke(this, interaction);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -43,14 +97,33 @@
             if (QuantityLabel != null) QuantityLabel.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
         }
 
-        protected override void OnMouseExit()
+        private async void OnMouseEnter()
         {
+            _isMouseInside = true;
 
+            await ToSignal(GetTree().CreateTimer(0.4), SceneTreeTimer.SignalName.Timeout);
+
+            if (_isMouseInside && CurrentItem != null)
+            {
+                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem, this));
+                _detailsShowing = true;
+            }
         }
 
-        protected override void OnMouseEnter()
+        private void OnMouseExit()
         {
+            _isMouseInside = false;
+            if (_rmbWasPressed) return;
+            _detailsShowing = false;
+            _uiMediator?.Publish(new ClearUiElementsEvent(this));
+        }
 
+        private void ShowButtonsTooltip()
+        {
+            _rmbWasPressed = true;
+            if (!_detailsShowing)
+                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem!, this));
+            _uiMediator?.Publish(new ShowInventorySlotButtonsTooltipEvent(this, CurrentItem!.InstanceId));
         }
     }
 }

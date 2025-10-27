@@ -12,7 +12,6 @@
             maximumAmount: BaseMaximumAmount,
             resourceType: ResourceType.Combopoints)
         {
-            LoadData();
         }
     }
 }

@@ -18,7 +18,6 @@ namespace LastBreath.Script.Enemy
         private PackedScene? _enemyToSpawn;
 
         #region Properties
-        [Inject]
         protected RandomNumberGenerator? Rnd
         {
             get => _rnd;
@@ -56,10 +55,7 @@ namespace LastBreath.Script.Enemy
             ParentScene = (MainWorld)GetParent();
             EnemyToSpawn = ResourceLoader.Load<PackedScene>(ScenePath.EnemyToSpawn);
             ParentScene.Enemies!.CollectionChanged += OnCollectionChanged;
-            ResolveDependencies();
         }
-
-        private void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         public void InitializeEnemiesPositions(List<Vector2> positions)
         {

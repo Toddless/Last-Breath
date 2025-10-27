@@ -190,26 +190,17 @@
         {
             var skills = this[SkillType.PreAttack].GetSkills();
 
-            foreach (var skill in skills.OfType<IPreAttackSkill>())
-            {
-                skill.Activate(context);
-            }
+          
         }
 
         protected virtual void HandleOnAttackSkills(List<ISkill> passiveSkills)
         {
-            foreach (var skill in passiveSkills.OfType<IOnAttackSkill>())
-            {
-                skill.Activate(Owner);
-            }
+           
         }
 
         protected virtual void HandleOnGettingAttackSkills(List<ISkill> passiveSkills)
         {
-            foreach (var skill in passiveSkills.OfType<IOnGettingAttackSkill>())
-            {
-                skill.Activate(Owner);
-            }
+          
         }
 
         protected virtual void SubscribeEvents()

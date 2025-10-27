@@ -1,0 +1,98 @@
+{
+	"Ring_Strength_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Strength",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "Armor",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "MaxHealth",
+				"type": "flat",
+				"value": 200
+			},
+			{
+				"parameter": "Damage",
+				"type": "flat",
+				"value": 20
+			}
+		]
+	},
+	"Ring_Dexterity_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Dexterity",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 120
+			},
+			{
+				"parameter": "AdditionalHitChance",
+				"type": "increase",
+				"value": 0.04
+			},
+			{
+				"parameter": "CriticalDamage",
+				"type": "flat",
+				"value": 20
+			}
+		]
+	},
+	"Ring_Intelligence_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Intelligence",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "EnergyBarrier",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "ResourceRecovery",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "SpellDamage",
+				"type": "flat",
+				"value": 15
+			}
+		]
+	},
+	"Test_Ring": {
+		"modifiers": [
+			{
+				"parameter": "AllAttribute",
+				"type": "flat",
+				"value": 25
+			},
+			{
+				"parameter": "Damage",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "CriticalDamage",
+				"type": "flat",
+				"value": 20
+			},
+			{
+				"parameter": "CriticalChance",
+				"type": "flat",
+				"value": 3
+			}
+		]
+	}
+}

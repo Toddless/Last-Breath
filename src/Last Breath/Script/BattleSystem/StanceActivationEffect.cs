@@ -6,7 +6,7 @@
 
     public class StanceActivationEffect : IStanceActivationEffect
     {
-        private List<IItemModifier> _modifiers = [];
+        private List<IModifierInstance> _modifiers = [];
 
         public StanceActivationEffect()
         {

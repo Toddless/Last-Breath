@@ -1,28 +1,21 @@
 ﻿namespace LastBreath.Script.Inventory
 {
     using Godot;
-    using System;
-    using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Items;
-    using LastBreath.Script.Helpers;
 
     public partial class EquipmentSlot : Slot
     {
-        public event Action<EquipmentSlot, MouseButtonPressed>? EquipItemPressed;
 
         public override void _Ready()
         {
             ClipContents = true;
-            this.MouseEntered += OnMouseEnter;
-            this.MouseExited += OnMouseExit;
         }
 
         public override void _GuiInput(InputEvent @event)
         {
             if (@event is InputEventMouseButton p && CurrentItem != null)
             {
-                EquipItemPressed?.Invoke(this, MouseInputHelper.GetPressedButtons(p));
                 GetViewport().SetInputAsHandled();
             }
         }

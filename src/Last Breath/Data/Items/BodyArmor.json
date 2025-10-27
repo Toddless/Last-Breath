@@ -1,0 +1,98 @@
+{
+	"Body_Strength_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 800
+			},
+			{
+				"parameter": "Armor",
+				"type": "flat",
+				"value": 500
+			},
+			{
+				"parameter": "Armor",
+				"type": "increase",
+				"value": 0.5
+			},
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.7
+			}
+		]
+	},
+	"Body_Dexterity_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 800
+			},
+			{
+				"parameter": "Evade",
+				"type": "increase",
+				"value": 0.5
+			},
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 250
+			},
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.1
+			}
+		]
+	},
+	"Body_Intelligence_Generic": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 210
+			},
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.3
+			},
+			{
+				"parameter": "Barrier",
+				"type": "flat",
+				"value": 500
+			},
+			{
+				"parameter": "Barrier",
+				"type": "increase",
+				"value": 0.5
+			}
+		]
+	},
+	"Test_Body_Four_Mods": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.5
+			},
+			{
+				"parameter": "Armor",
+				"type": "Flat",
+				"value": 500
+			},
+			{
+				"parameter": "Armor",
+				"type": "increase",
+				"value": 0.5
+			},
+			{
+				"parameter": "Health",
+				"type": "increase",
+				"value": 0.5
+			}
+		]
+	}
+}

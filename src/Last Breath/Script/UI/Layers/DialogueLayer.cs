@@ -5,7 +5,6 @@
     using Godot;
     using Godot.Collections;
     using LastBreath.Script;
-    using LastBreath.Script.UI;
     using LastBreath.Localization;
     using LastBreath.Resource;
     using LastBreath.Resource.Quests;
@@ -278,7 +277,7 @@
 
         private void OnQuitPressed()
         {
-            UIEventBus.PublishClose();
+            //UIEventBus.PublishClose();
             _player!.CanMove = true;
             _machine?.Fire(Trigger.Dialogue);
         }

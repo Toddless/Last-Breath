@@ -19,19 +19,10 @@ config/icon="res://icon.svg"
 
 buses/default_bus_layout="uid://blfs8ca5iilus"
 
-[autoload]
-
-DiContainer="*res://DIComponents/DiContainer.cs"
-ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
-GameManager="*res://Script/GameManager.cs"
-QuestsTable="*res://Resources/QuestsTable.cs"
-RewardTable="*res://Resources/RewardTable.cs"
-QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
-
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1980
+window/size/viewport_height=1020
 window/stretch/mode="canvas_items"
 
 [dotnet]
@@ -40,7 +31,7 @@ project/assembly_name="LastBreath"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Crafting/Source/plugin.cfg", "res://addons/Tools/TagGenerator/plugin.cfg")
+enabled=PackedStringArray("res://addons/Crafting/Source/plugin.cfg")
 
 [file_customization]
 

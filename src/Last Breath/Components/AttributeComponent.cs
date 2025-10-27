@@ -12,7 +12,7 @@
         private readonly Strength _strength;
         private readonly Intelligence _intelligence;
 
-        public Action<IItemModifier>? CallModifierManager;
+        public Action<IModifierInstance>? CallModifierManager;
 
         public AttributeComponent()
         {
