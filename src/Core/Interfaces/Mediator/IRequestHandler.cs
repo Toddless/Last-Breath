@@ -1,7 +1,10 @@
 ﻿namespace Core.Interfaces.Mediator
 {
-    public interface IRequestHandler<TRequest>
+    using System.Threading.Tasks;
+
+    public interface IRequestHandler<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
     {
-        void Handle(TRequest request);
+        Task<TResponse> Handle(TRequest request);
     }
 }

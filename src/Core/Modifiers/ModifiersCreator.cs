@@ -8,44 +8,37 @@
 
     public class ModifiersCreator
     {
-        private record ModifierMapping(Parameter Parameter, ModifierType ModifierType, int Prioritry = 10);
-
-        private static readonly Dictionary<string, ModifierMapping> s_parameterMapping = new()
+        private static readonly Dictionary<string, Parameter> s_parameterMapping = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["MaxReduceDamage"] = new(Parameter.MaxReduceDamage, ModifierType.Flat),
-            ["MaxEvadeChance"] = new(Parameter.MaxEvadeChance, ModifierType.Flat),
-            ["AdditionalHitChance"] = new(Parameter.AdditionalHitChance, ModifierType.Flat),
-            ["Suppress"] = new(Parameter.Suppress, ModifierType.Flat),
-            ["Resource"] = new(Parameter.ResourceMax, ModifierType.Flat),
-            ["ResourceRecovery"] = new(Parameter.ResourceRecovery, ModifierType.Flat),
-            ["CriticalDamage"] = new(Parameter.CriticalDamage, ModifierType.Flat),
-            ["Dexterity"] = new(Parameter.Dexterity, ModifierType.Flat),
-            ["Strength"] = new(Parameter.Strength, ModifierType.Flat),
-            ["Intelligence"] = new(Parameter.Intelligence, ModifierType.Flat),
-            ["AllAttribute"] = new(Parameter.AllAttribute, ModifierType.Flat),
-            ["Movespeed"] = new(Parameter.Movespeed, ModifierType.Flat),
-            ["Armor"] = new(Parameter.Armor, ModifierType.Flat),
-            ["EnergyBarrier"] = new(Parameter.EnergyBarrier, ModifierType.Flat),
-            ["SpellDamage"] = new(Parameter.SpellDamage, ModifierType.Flat),
-            ["Damage"] = new(Parameter.Damage, ModifierType.Flat),
-            ["Health"] = new(Parameter.MaxHealth, ModifierType.Flat),
-            ["CriticalChance"] = new(Parameter.CriticalChance, ModifierType.Flat),
-            ["Evade"] = new(Parameter.Evade, ModifierType.Flat),
-            ["ArmorPercent"] = new(Parameter.Armor, ModifierType.Increase),
-            ["EvadePercent"] = new(Parameter.Evade, ModifierType.Increase),
-            ["SpellDamagePercent"] = new(Parameter.SpellDamage, ModifierType.Increase),
-            ["EnergyBarrierPercent"] = new(Parameter.EnergyBarrier, ModifierType.Increase),
-            ["DamagePercent"] = new(Parameter.Damage, ModifierType.Increase),
-            ["HealthPercent"] = new(Parameter.MaxHealth, ModifierType.Increase),
-            ["CritChancePercent"] = new(Parameter.CriticalChance, ModifierType.Increase),
-            ["ExtraSpellDamage"] = new(Parameter.SpellDamage, ModifierType.Multiplicative),
-            ["ExtraDamage"] = new(Parameter.Damage, ModifierType.Multiplicative),
-            ["ExtraCritChance"] = new(Parameter.CriticalChance, ModifierType.Multiplicative),
-            ["ExtraHealth"] = new(Parameter.MaxHealth, ModifierType.Multiplicative),
-            ["ExtraArmor"] = new(Parameter.Armor, ModifierType.Multiplicative),
-            ["ExtraEnergyBarrier"] = new(Parameter.EnergyBarrier, ModifierType.Multiplicative),
-            ["ExtraEvade"] = new(Parameter.Evade, ModifierType.Multiplicative),
+            ["Damage"] = Parameter.Damage,
+            ["AllAttribute"] = Parameter.AllAttribute,
+            ["Intelligence"] = Parameter.Intelligence,
+            ["Dexterity"] = Parameter.Dexterity,
+            ["Strength"] = Parameter.Strength,
+            ["CriticalChance"] = Parameter.CriticalChance,
+            ["CriticalDamage"] = Parameter.CriticalDamage,
+            ["AdditionalHitChance"] = Parameter.AdditionalHitChance,
+            ["Armor"] = Parameter.Armor,
+            ["Evade"] = Parameter.Evade,
+            ["EnergyBarrier"] = Parameter.EnergyBarrier,
+            ["SpellDamage"] = Parameter.SpellDamage,
+            ["ResourceRecovery"] = Parameter.ResourceRecovery,
+            ["Movespeed"] = Parameter.Movespeed,
+            ["Suppress"] = Parameter.Suppress,
+            ["Health"] = Parameter.MaxHealth,
+            ["MaxResource"] = Parameter.MaxResource,
+            ["MaxEvadeChance"] = Parameter.MaxEvadeChance,
+            ["MaxReduceDamage"] = Parameter.MaxReduceDamage,
+        };
 
+        private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["flat"] = ModifierType.Flat,
+            ["increase"] = ModifierType.Increase,
+            ["inc"] = ModifierType.Increase,
+            ["mult"] = ModifierType.Multiplicative,
+            ["multiplicative"] = ModifierType.Multiplicative,
+            ["mul"] = ModifierType.Multiplicative
         };
 
         public static List<IModifierInstance> CreateModifierInstances(List<IModifier> stats, object source)
@@ -55,25 +48,20 @@
             return modifiers;
         }
 
-        public static List<IModifier> ItemStatsToModifiers(ItemStats stats)
+        public static List<IModifier> ConvertDtoToModifiers(List<ModifierDto> dtos)
         {
-            List<IModifier> modifiers = [];
-            var properties = stats.GetType().GetProperties();
+            var modifiers = new List<IModifier>();
 
-            foreach (var prop in properties)
+            foreach (var d in dtos)
             {
-                if (s_parameterMapping.TryGetValue(prop.Name, out var modMapping))
-                {
-                    float value = Convert.ToSingle(prop.GetValue(stats));
+                if (!s_parameterMapping.TryGetValue(d.Parameter, out var param)) continue;
+                if (!s_typeMap.TryGetValue(d.Type ?? "flat", out var type)) continue;
+                if (d.Value <= 0) continue;
 
-                    if (value <= 0) continue;
-
-                    modifiers.Add(CreateModifier
-                        (modMapping.Parameter,
-                        modMapping.ModifierType,
-                        value));
-                }
+                var modifier = CreateModifier(param, type, d.Value);
+                modifiers.Add(modifier);
             }
+
             return modifiers;
         }
 

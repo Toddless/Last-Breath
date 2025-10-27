@@ -20,7 +20,7 @@
         private readonly Dictionary<Type, Control> _singleInstances = [];
         private readonly UIWindowStateStorage _positionStorage = new();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
-        private readonly Core.Interfaces.Data.IServiceProvider _serviceProvider;
+        private readonly Core.Interfaces.Data.IGameServiceProvider _serviceProvider;
         private UILayer? _uiLayer;
 
         public UIElementProvider()
@@ -28,42 +28,36 @@
             _serviceProvider = ServiceProvider.Instance;
         }
 
-        public void Subscribe(CanvasLayer layer) => _uiLayer = (UILayer)layer;
+        public void Subscribe(CanvasLayer layer)
+        {
+            _uiLayer = (UILayer)layer;
+        }
+
+        public T Create<T>()
+           where T : Control, IInitializable
+        {
+            var instance = T.Initialize().Instantiate<T>();
+            return instance;
+        }
 
         public T CreateRequireServices<T>()
             where T : Control, IInitializable, IRequireServices
         {
-            var instance = T.Initialize().Instantiate<T>();
+            var instance = Create<T>();
             instance.InjectServices(_serviceProvider);
             return instance;
         }
 
-        public T Create<T>()
+        public T CreateAndShowOnUI<T>()
             where T : Control, IInitializable
         {
-            var instance = T.Initialize().Instantiate<T>();
+            var instance = Create<T>();
+            _uiLayer?.ShowWindow(instance);
             return instance;
         }
 
-        public T CreateClosable<T>()
-            where T : Control, IInitializable, IClosable
-        {
-            var instance = T.Initialize().Instantiate<T>();
-            if (instance is IRequireServices require)
-                require.InjectServices(_serviceProvider);
-            return instance;
-        }
-
-        public T CreateClosable<T>(Action<T> configure)
-            where T : Control, IInitializable, IClosable
-        {
-            var instance = CreateClosable<T>();
-            configure?.Invoke(instance);
-            return instance;
-        }
-
-        public T CreateClosable<T>(Control source)
-            where T : Control, IInitializable, IClosable
+        public T CreateClosableForSource<T>(Control source)
+            where T : Control, IInitializable, IClosable, IRequireServices
         {
             if (_uiLayer == null) throw new InvalidOperationException();
 
@@ -76,7 +70,7 @@
             var exist = list.OfType<T>().FirstOrDefault();
             if (exist != null) return exist;
 
-            var instance = CreateClosable<T>();
+            var instance = CreateRequireServices<T>();
             if (instance is IRequireReposition reposition)
                 reposition.Reposition += OnRepositionRequired;
 
@@ -136,9 +130,11 @@
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
                 return (T)exist;
 
-            var instance = CreateClosable<T>();
+            var instance = CreateAndShowOnUI<T>();
 
             var savedPos = _positionStorage.GetPosition<T>();
+            if (instance is IRequireServices require)
+                require.InjectServices(_serviceProvider);
 
             instance.Position = savedPos ?? Vector2.Zero;
 
@@ -147,7 +143,6 @@
 
             instance.Close += Unload<T>;
             _singleInstances[typeof(T)] = instance;
-            _uiLayer?.ShowWindow(instance);
             return instance;
         }
 
@@ -167,15 +162,14 @@
 
         public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
         {
-            var details = CreateItemDetails(item);
-            var notifier = CreateClosable<ItemCreatedNotifier>(X => X.SetItemDetails(details));
-            _uiLayer?.ShowWindow(notifier);
+            var notifier = CreateSingleClosable<ItemCreatedNotifier>();
+            notifier.SetItemDetails(CreateItemDetails(item));
             return notifier;
         }
 
         public ItemDetails CreateItemDetails(IItem item, Control source)
         {
-            var itemDetails = CreateClosable<ItemDetails>(source);
+            var itemDetails = CreateClosableForSource<ItemDetails>(source);
 
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);
@@ -185,7 +179,7 @@
 
         private ItemDetails CreateItemDetails(IItem item)
         {
-            var itemDetails = CreateClosable<ItemDetails>();
+            var itemDetails = CreateRequireServices<ItemDetails>();
 
             if (item is IEquipItem equip)
                 return ConfigureEquipItemDetails(itemDetails, equip);

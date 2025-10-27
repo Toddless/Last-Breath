@@ -2,5 +2,5 @@
 {
     using System.Collections.Generic;
 
-    public record CheckAllRequirementsFulfillRequest(IEnumerable<IRequirement> requrements) : IRequestWithResponce<bool> { }
+    public record CheckAllRequirementsFulfillRequest(IEnumerable<IRequirement> requrements) : IRequest<bool> { }
 }

@@ -4,10 +4,9 @@
 
     public interface IMediator
     {
-        void Send<TRequest>(TRequest request)
-            where TRequest : IRequest;
         Task<TResponce> Send<TRequest, TResponce>(TRequest request)
-          where TRequest : IRequestWithResponce<TResponce>;
+          where TRequest : IRequest<TResponce>;
+
         void Publish<TEvent>(TEvent evt)
           where TEvent : IEvent;
     }

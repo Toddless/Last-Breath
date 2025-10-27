@@ -7,14 +7,12 @@
     using System.Collections.Generic;
 
     [GlobalClass]
-    public partial class ItemModifierList : Control, IInitializable, IClosable
+    public partial class ItemModifierList : Control, IInitializable
     {
         private const string UID = "uid://b6glmp15vrdpg";
         private int _lastSelectedChild = -1;
         [Export] private VBoxContainer? _container;
         private readonly Dictionary<int, InteractiveLabel> _labels = [];
-
-        public event Action? Close;
 
         [Signal] public delegate void ItemSelectedEventHandler(int hash, ItemModifierList source);
 

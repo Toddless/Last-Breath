@@ -12,6 +12,7 @@
         [Export] private Button? _okButton, _destroyButton;
         [Export] private Control? _container;
         [Export] private PanelContainer? _panel;
+
         public event Action? Close;
         [Signal] public delegate void CanBeClosedEventHandler();
 
@@ -19,8 +20,7 @@
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += QueueFree;
-
+            if (_okButton != null) _okButton.Pressed += () => Close?.Invoke();
             if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
 
@@ -28,7 +28,7 @@
         {
             if (@event.IsActionPressed("ui_accept"))
             {
-                QueueFree();
+                Close?.Invoke();
                 GetViewport().SetInputAsHandled();
             }
         }
@@ -53,7 +53,7 @@
         private void OnDestroyPressed()
         {
             DestroyPressed?.Invoke();
-            QueueFree();
+            Close?.Invoke();
         }
     }
 }

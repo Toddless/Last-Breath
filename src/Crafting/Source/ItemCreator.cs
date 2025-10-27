@@ -19,30 +19,29 @@
     {
         private readonly RandomNumberGenerator _rnd;
         private readonly IItemDataProvider _dataProvider;
+        private readonly CraftingMastery _craftingMastery;
 
-        public ItemCreator()
+        public ItemCreator(CraftingMastery craftingMastery, RandomNumberGenerator rnd)
         {
-            _rnd = new RandomNumberGenerator();
-            _rnd.Randomize();
+            _rnd = rnd;
             _dataProvider = ServiceProvider.Instance.GetService<IItemDataProvider>();
+            _craftingMastery = craftingMastery;
         }
 
-        public IEquipItem CreateEquipItem(string resultItemId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
+        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
         {
+            var recipe = _dataProvider.GetRecipe(recipeId);
             var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
-            return Create(resultItemId, Mods, TotalWeight, player);
+            if (recipe.HasTag("Generic"))
+            {
+                var resultItemId = GetGenericItemId(recipe);
+                return Create(resultItemId, Mods, TotalWeight, player);
+            }
+            else
+                return Create(recipe.ResultItemId, Mods, TotalWeight, player);
         }
 
-        public IEquipItem CreateGenericItem(string resultItemId, IEnumerable<IMaterialModifier> resouces, ICharacter? player = default)
-        {
-            var rarity = GetRarity(player);
-            var attribute = GetAttribute(player);
-            var itemId = $"{resultItemId}_{attribute}_{rarity}";
-            var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resouces);
-            return Create(itemId, Mods, TotalWeight, player);
-        }
-
-        public IItem? CreateItem(string resultItemId)
+        public IItem? CreateItem(string recipeId)
         {
             return null;
         }
@@ -52,18 +51,19 @@
             try
             {
                 var item = (IEquipItem)_dataProvider.CopyBaseItem(itemId);
-
+                var itemRarity = GetRarity(player);
+                item.Rarity = itemRarity;
                 var baseStats = _dataProvider.GetItemBaseStats(itemId);
-                var statModifiers = ModifiersCreator.CreateModifierInstances(baseStats, item).ToHashSet();
-                item.SetBaseModifiers(statModifiers);
-
                 var amountModifiers = GetAmountModifiers(item.Rarity);
+
+                var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid()).Take(amountModifiers)], item).ToHashSet();
+                item.SetBaseModifiers(statModifiers);
 
                 HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, _rnd);
 
                 List<IModifierInstance> mods = [];
                 foreach (var mod in takenMods)
-                    mods.Add(ModifiersCreator.CreateModifierInstance(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, player), item));
+                    mods.Add(ModifiersCreator.CreateModifierInstance(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierType, player), item));
 
                 item.SetAdditionalModifiers(mods);
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
@@ -80,36 +80,48 @@
             }
         }
 
-        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default)
+        private string GetGenericItemId(ICraftingRecipe recipe)
         {
-            if (player != null)
+            var attribute = GetAttribute();
+            return true switch
             {
-
-            }
-
-            return baseValue * _rnd.RandfRange(0.95f, 1.2f);
+                var _ when recipe.HasTag("Belt") || recipe.HasTag("Cloak") || recipe.HasTag("Amulet") || recipe.HasTag("Weapong") => recipe.ResultItemId,
+                _ => $"{recipe.ResultItemId}_{attribute}_Generic"
+            };
         }
 
-        // TODO: An item can have skill or effect? Or both?
-        private ISkill? GetRandomSkill(ICharacter? player = default)
+
+        private float ApplyPlayerMultiplier(float baseValue, ModifierType type, ICharacter? player = default)
         {
-            // TODO: Later i need to find way to inject SkillProvider to get some skill
-            // TODO: Random skill not guaranteed.
-            // Again: we take probabillity from player
-            var skillProvider = new PassiveSkillProvider();
-
-            var rNumb = _rnd.RandiRange(1, 2);
-
-            return skillProvider.CreateSkill(rNumb == 1 ? "Passive_Skill_Precise_Technique" : "Passive_Skill_Touch_Of_God");
+            float multiplier = _craftingMastery.GetFinalValueMultiplier();
+            if (type == ModifierType.Multiplicative)
+                return 1f + (baseValue - 1f) * multiplier;
+            else
+                return baseValue * multiplier;
         }
+
+        private ISkill? GetRandomSkill()
+        {
+            if (_rnd.Randf() <= _craftingMastery.GetFinalSkillChance())
+                return new PassiveSkillProvider().CreateSkill(GetSkillId(_rnd.RandiRange(1, 4)));
+            return null;
+        }
+
+        private string GetSkillId(int number) => number switch
+        {
+            1 => "Passive_Skill_Touch_Of_God",
+            2 => "Passive_Skill_Precise_Technique",
+            3 => "Passive_Skill_Enhanced_Mastery",
+            _ => "Passive_Skill_Master_Apprentice"
+        };
 
         private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
 
         private Rarity GetRarity(ICharacter? player = default)
         {
-            if (player == null) return GetRandomValueFallBack<Rarity>();
+            // if (player == null) return GetRandomValueFallBack<Rarity>();
             // TODO: Later add call to players skill to get Rarity
-            return Rarity.Rare;
+            return _craftingMastery.RollRarity();
         }
 
         private AttributeType GetAttribute(ICharacter? player = default)

@@ -33,7 +33,7 @@
             Close?.Invoke();
         }
 
-        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
         {
             _systemMediator = provider.GetService<ISystemMediator>();
             _uiMediator = provider.GetService<IUiMediator>();
@@ -47,7 +47,7 @@
 
         private void OnDestroyPressed()
         {
-            _systemMediator?.Send(new DestroyItemRequest(_itemInstance));
+            _systemMediator?.Publish(new DestroyItemEvent(_itemInstance));
             Close?.Invoke();
         }
 

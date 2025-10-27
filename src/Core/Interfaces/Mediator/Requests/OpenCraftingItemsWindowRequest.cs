@@ -2,5 +2,5 @@
 {
     using System.Collections.Generic;
 
-    public record OpenCraftingItemsWindowRequest(IEnumerable<string> TakenResources) : IRequestWithResponce<IEnumerable<string>> { }
+    public record OpenCraftingItemsWindowRequest(IEnumerable<string> TakenResources) : IRequest<IEnumerable<string>> { }
 }

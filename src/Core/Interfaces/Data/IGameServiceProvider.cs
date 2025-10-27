@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public interface IServiceProvider
+    public interface IGameServiceProvider
     {
         T GetService<T>();
         IEnumerable<T> GetServices<T>();

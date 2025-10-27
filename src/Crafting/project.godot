@@ -39,3 +39,7 @@ ui_crafting={
 [internationalization]
 
 locale/translations=PackedStringArray("res://TestResources/Lokalization/en.po", "res://TestResources/Lokalization/ru.po")
+
+[xr]
+
+shaders/enabled=true

@@ -1,4 +1,4 @@
 ﻿namespace Core.Interfaces.Mediator
 {
-    public interface IRequest { }
+    public interface IRequest<TResponce> { }
 }

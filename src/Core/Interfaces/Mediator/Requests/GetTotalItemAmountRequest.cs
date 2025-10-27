@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public  record GetTotalItemAmountRequest(IEnumerable<string> ItemsId) : IRequestWithResponce<Dictionary<string, int>>
+    public  record GetTotalItemAmountRequest(IEnumerable<string> ItemsId) : IRequest<Dictionary<string, int>>
     {
     }
 }

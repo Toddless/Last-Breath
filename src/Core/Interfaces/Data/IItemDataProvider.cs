@@ -13,6 +13,7 @@
         IEnumerable<ICraftingRecipe> GetCraftingRecipes();
         List<IModifier> GetItemBaseStats(string id);
         Texture2D? GetItemIcon(string id);
+        ICraftingRecipe GetRecipe(string recipeId);
         List<IResourceRequirement> GetRecipeRequirements(string id);
         string GetRecipeResultItemId(string recipeId);
         IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id);

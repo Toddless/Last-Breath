@@ -60,10 +60,9 @@
 
         private ItemUpgradeMode _currentUpgradeMode = ItemUpgradeMode.None;
 
-        public ItemUpgrader()
+        public ItemUpgrader(RandomNumberGenerator rnd)
         {
-            _rnd = new RandomNumberGenerator();
-            _rnd.Randomize();
+            _rnd = rnd;
         }
 
         public List<IResourceRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory, ItemUpgradeMode mode)

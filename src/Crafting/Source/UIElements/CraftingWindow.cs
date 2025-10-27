@@ -52,11 +52,14 @@
             _add.Pressed += OnAddPressedAsync;
             DragArea.GuiInput += DragWindow;
             _recipies = _uiElementProvider?.CreateRequireServices<Recipies>();
-            _recipeContainer?.AddChild(_recipies);
-            if (_recipies != null) _recipies.RecipeSelected += SetRecipe;
+            if (_recipies != null)
+            {
+                _recipeContainer?.AddChild(_recipies);
+                _recipies.RecipeSelected += SetRecipe;
+            }
         }
 
-        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
             _uiMediator = provider.GetService<IUiMediator>();
@@ -175,9 +178,10 @@
         private async void CreateItemAsync(string id)
         {
             ArgumentNullException.ThrowIfNull(_systemMediator);
+            ArgumentNullException.ThrowIfNull(_uiMediator);
             var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new(id, _usedResources));
             if (item != null)
-                _uiMediator?.Publish(new ItemCreatedEvent(item));
+                _uiMediator.Publish(new ItemCreatedEvent(item));
         }
 
         private async void UpgradeEquipItemAsync()
@@ -316,7 +320,6 @@
         {
             try
             {
-
                 var itemModifierList = CreateItemModifierList(_equpItem?.AdditionalModifiers ?? [], _uiResourcesProvider?.GetResource("AdditionalStatsSettings") as LabelSettings);
                 itemModifierList.ItemSelected += OnModifierSelectedAsync;
                 itemModifierList.TreeExiting += OnItemModifierListFree;
@@ -355,7 +358,7 @@
         private ItemModifierList CreateItemModifierList(IReadOnlyList<IModifierInstance> modifiers, LabelSettings? labelSettings)
         {
             ArgumentNullException.ThrowIfNull(_uiElementProvider);
-            var modifiersList = _uiElementProvider.CreateClosable<ItemModifierList>();
+            var modifiersList = _uiElementProvider.Create<ItemModifierList>();
 
             var modsWithHash = new List<(string Mod, int Hash)>();
             foreach (var mod in modifiers)

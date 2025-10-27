@@ -4,7 +4,7 @@
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
-    public record GetEquipItemUpgradeCostRequest(string ItemInstanceId, ItemUpgradeMode Mode) : IRequestWithResponce<IEnumerable<IResourceRequirement>>
+    public record GetEquipItemUpgradeCostRequest(string ItemInstanceId, ItemUpgradeMode Mode) : IRequest<IEnumerable<IResourceRequirement>>
     {
     }
 }

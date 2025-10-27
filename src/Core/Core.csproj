@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>

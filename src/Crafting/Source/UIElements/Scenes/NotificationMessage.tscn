@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://dsfb7ik6bw6h3"]
+
+[ext_resource type="Script" uid="uid://buux576yuk0fp" path="res://Source/UIElements/NotificationMessage.cs" id="1_gn4et"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gn4et"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[node name="NotificationMessage" type="MarginContainer" node_paths=PackedStringArray("_msgLabel")]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -229.0
+offset_top = -73.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("1_gn4et")
+_msgLabel = NodePath("PanelContainer/Label")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_gn4et")
+
+[node name="Label" type="Label" parent="PanelContainer"]
+layout_mode = 2
+text = "Some notificationassas"
+horizontal_alignment = 1
+vertical_alignment = 1

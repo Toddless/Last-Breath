@@ -5,7 +5,7 @@
     public interface IItem : IIdentifiable, IDisplayable, IStackable
     {
         string InstanceId { get; }
-        Rarity Rarity { get; }
+        Rarity Rarity { get; set; }
         T Copy<T>();
     }
 }

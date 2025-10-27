@@ -25,7 +25,7 @@
             CallDeferred(nameof(CalculateNewHorizonalSize));
         }
 
-        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
         {
             _uiResourcesProvider = provider.GetService<UIResourcesProvider>();
         }

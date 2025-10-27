@@ -3,5 +3,5 @@
     using System.Collections.Generic;
     using Core.Interfaces.Items;
 
-    public record CreateEquipItemRequest(string RecipeId, Dictionary<string, int> UsedResources) : IRequestWithResponce<IEquipItem?> { }
+    public record CreateEquipItemRequest(string RecipeId, Dictionary<string, int> UsedResources) : IRequest<IEquipItem?> { }
 }

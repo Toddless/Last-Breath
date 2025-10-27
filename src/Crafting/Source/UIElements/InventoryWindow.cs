@@ -1,16 +1,14 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using Core.Enums;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Items;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
     using Crafting.TestResources.DI;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator.Requests;
-    using Core.Interfaces.Data;
 
-    public partial class InventoryWindow : Panel, IInitializable
+    public partial class InventoryWindow : Panel, IInitializable, IRequireServices
     {
         private const string UID = "uid://byx7g1b2wlwfl";
 
@@ -27,7 +25,6 @@
             _uiMediator = ServiceProvider.Instance.GetService<IUiMediator>();
 
             _inventory.Initialize(210, _inventoryGrid);
-            _inventory.ItemInteraction += OnInventoryItemInteraction;
             if (_craftingButton != null)
                 _craftingButton.Pressed += OnCraftingButtonPressed;
 
@@ -36,12 +33,14 @@
                     _inventory.TryAddItem(resource, 100);
         }
 
-        private void OnInventoryItemInteraction(IItem item, MouseInteractions interactions)
+        public void InjectServices(IGameServiceProvider provider)
         {
+            _uiMediator = ServiceProvider.Instance.GetService<IUiMediator>();
+            _inventory = ServiceProvider.Instance.GetService<IInventory>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnCraftingButtonPressed() => _uiMediator?.Send(new OpenWindowRequest(typeof(CraftingWindow)));
+        private void OnCraftingButtonPressed() => _uiMediator?.Publish(new OpenWindowEvent(typeof(CraftingWindow)));
     }
 }

@@ -1,4 +1,4 @@
 ﻿namespace Core.Interfaces.Mediator.Requests
 {
-    public record CreateItemRequest(string RecipeId) : IRequest{}
+    public record CreateItemRequest(string RecipeId) : IEvent{}
 }

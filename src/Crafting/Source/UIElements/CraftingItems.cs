@@ -32,7 +32,7 @@
         }
 
 
-        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
         {
             _itemDataProvider = provider.GetService<IItemDataProvider>();
             _inventory = provider.GetService<IInventory>();

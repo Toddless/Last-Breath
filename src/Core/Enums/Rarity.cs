@@ -6,6 +6,7 @@
         Rare,
         Epic,
         Legendary,
-        Mythic
+        Mythic,
+        Unique
     }
 }

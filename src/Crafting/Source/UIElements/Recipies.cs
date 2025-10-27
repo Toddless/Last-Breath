@@ -38,7 +38,7 @@
             CreateRecipeTree(_dataProvider?.GetCraftingRecipes() ?? []);
         }
 
-        public void InjectServices(Core.Interfaces.Data.IServiceProvider provider)
+        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
             _uiMediator = provider.GetService<IUiMediator>();

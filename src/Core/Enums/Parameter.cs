@@ -3,26 +3,25 @@
     public enum Parameter
     {
         Damage = 1,
-        CriticalChance,
-        MaxCriticalChance,
-        CriticalDamage,
-        AdditionalHitChance,
-        MaxAdditionalHitChance,
-        CurrentHealth,
-        MaxHealth,
+        AllAttribute,
+        Intelligence,
         Dexterity,
         Strength,
-        Intelligence,
+        CriticalChance,
+        CriticalDamage,
+        AdditionalHitChance,
         Armor,
         Evade,
         EnergyBarrier,
         SpellDamage,
-        ResourceMax,
         ResourceRecovery,
-        MaxReduceDamage,
         Movespeed,
-        MaxEvadeChance,
         Suppress,
-        AllAttribute
+        MaxHealth,
+        MaxResource,
+        MaxEvadeChance,
+        MaxCriticalChance,
+        MaxAdditionalHitChance,
+        MaxReduceDamage
     }
 }

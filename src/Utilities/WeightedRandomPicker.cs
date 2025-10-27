@@ -8,21 +8,21 @@
 
     public class WeightedRandomPicker
     {
-
+        // We are fine until we have fewer than 10k elements in the list.
         public static (List<WeightedObject<T>> WeightedObjects, float TotalWeight) CalculateWeights<T>(IEnumerable<T> objects)
             where T : IWeighable
         {
-            List<WeightedObject<T>> weights = [];
+            List<WeightedObject<T>> weightedObjs = [];
             float currentMaxWeight = 0;
             float from = 0;
             foreach (var obj in objects)
             {
                 currentMaxWeight += obj.Weight;
-                weights.Add(new(obj, from, currentMaxWeight, obj.Weight));
+                weightedObjs.Add(new(obj, from, currentMaxWeight, obj.Weight));
                 from = currentMaxWeight;
               //  DebugLogger.LogDebug($"Percent: {MathF.Round(obj.Weight / currentMaxWeight * 100),2}% object: {obj.GetType().Name}");
             }
-            return (weights, currentMaxWeight);
+            return (weightedObjs, currentMaxWeight);
         }
 
         public static T PickRandom<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, RandomNumberGenerator rnd)

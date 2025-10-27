@@ -56,6 +56,13 @@
             return crafting.MaterialType?.Modifiers ?? [];
         }
 
+        public ICraftingRecipe GetRecipe(string recipeId)
+        {
+            var item = TryGetItem(recipeId);
+            if (item is not ICraftingRecipe recipe || recipe == null) throw new ArgumentNullException($"Recipe not found: {recipeId}");
+            return recipe;
+        }
+
         public bool IsItemHasTag(string id, string tag) => TryGetItem(id)?.HasTag(tag) ?? false;
 
         public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is IResource)];
@@ -122,12 +129,14 @@
 
             var jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
 
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemStats>>(jsonContent) ?? throw new FileNotFoundException();
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemFileDTO>>(jsonContent) ?? [];
 
             foreach (var item in dict)
             {
-                var mod = ModifiersCreator.ItemStatsToModifiers(item.Value);
-                _itemBaseStatsData[item.Key] = mod;
+                var itemName = item.Key;
+                var dto = item.Value;
+                var mods = ModifiersCreator.ConvertDtoToModifiers(dto.Modifiers);
+                _itemBaseStatsData[itemName] = mods;
             }
         }
 
@@ -155,5 +164,9 @@
             }
             return data;
         }
+
+       
+
+        
     }
 }

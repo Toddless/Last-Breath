@@ -3,9 +3,9 @@
     using Godot;
     using System;
     using Serilog;
+    using System.Linq;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
-    using System.Linq;
 
     public static class Tracker
     {

@@ -7,7 +7,7 @@
     {
         RequirementType Type { get; }
 
-        bool Evaluate<T>(T requirement, IServiceProvider provider)
+        bool Evaluate<T>(T requirement, IGameServiceProvider provider)
             where T : IRequirement;
         
     }

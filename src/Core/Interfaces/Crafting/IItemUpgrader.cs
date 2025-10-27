@@ -1,10 +1,9 @@
-﻿namespace Crafting.Source
+﻿namespace Core.Interfaces.Crafting
 {
     using Core.Enums;
     using Core.Results;
     using Core.Interfaces;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
     public interface IItemUpgrader

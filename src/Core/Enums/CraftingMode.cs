@@ -5,6 +5,7 @@
         Create,
         Upgrade,
         Ascend,
-        Recraft
+        Recraft,
+        Shatter
     }
 }

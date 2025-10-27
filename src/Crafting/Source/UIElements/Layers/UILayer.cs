@@ -18,6 +18,7 @@
                 else Show();
             }
         }
+
         public void ShowWindow(Control control) => CallDeferred(MethodName.AddChild, control);
     }
 }

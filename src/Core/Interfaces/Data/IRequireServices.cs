@@ -2,6 +2,6 @@
 {
     public interface IRequireServices
     {
-        void InjectServices(IServiceProvider provider);
+        void InjectServices(IGameServiceProvider provider);
     }
 }
