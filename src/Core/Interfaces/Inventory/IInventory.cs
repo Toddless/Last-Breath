@@ -15,11 +15,9 @@
         event Action<IItem, MouseInteractions>? ItemInteraction;
 
         void Initialize(int amount, GridContainer? container);
-        void Initialize(int amount);
         ItemInstance? GetItemInstance(string id);
         List<string> GetAllItemIdsWithTag(string tag);
-        T? GetItem<T>(string instanceId)
-            where T : IItem;
+        T? GetItem<T>(string instanceId) where T : IItem;
         int GetTotalItemAmount(string id);
         bool TryAddItem(IItem item, int amount = 1);
         void RemoveItemById(string itemId, int amount = 1);

@@ -1,0 +1,40 @@
+{
+	"Amulet": {
+		"modifiers": [
+			{
+				"parameter": "Resource",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "ResourceRecovery",
+				"type": "flat",
+				"value": 120
+			},
+			{
+				"parameter": "AllAttribute",
+				"type": "flat",
+				"value": 15
+			},
+			{
+				"parameter": "AllAttribute",
+				"type": "inc",
+				"value": 0.1
+			}
+		]
+	},
+	"Amulet_Of_Defence": {
+		"modifiers": [
+			{
+				"parameter": "",
+				"type": "",
+				"value": 2
+			},
+			{
+				"parameter": "",
+				"type": "",
+				"value": 3
+			}
+		]
+	}
+}

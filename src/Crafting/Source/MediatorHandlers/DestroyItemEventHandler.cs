@@ -1,13 +1,12 @@
 ﻿namespace Crafting.Source.MediatorHandlers
 {
     using Godot;
+    using Crafting.Source;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator.Events;
-    using Core.Interfaces.Mediator.Requests;
-    using Crafting.Source;
 
     public class DestroyItemEventHandler : IEventHandler<DestroyItemEvent>
     {

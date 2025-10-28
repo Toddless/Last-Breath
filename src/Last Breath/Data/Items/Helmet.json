@@ -1,0 +1,74 @@
+{
+	"Helmet_Strength_Legendary": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "Defence",
+				"type": "flat",
+				"value": 300
+			},
+			{
+				"parameter": "Damage",
+				"type": "flat",
+				"value": 120
+			},
+			{
+				"parameter": "MaxHealth",
+				"type": "inc",
+				"value": 0.1
+			}
+		]
+	},
+	"Helmet_Dexterity_Legendary": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "Evade",
+				"type": "flat",
+				"value": 200
+			},
+			{
+				"parameter": "CriticalChance",
+				"type": "inc",
+				"value": 0.1
+			},
+			{
+				"parameter": "AdditionalHitChance",
+				"type": "inc",
+				"value": 0.3
+			}
+		]
+	},
+	"Helmet_Intelligence_Legendary": {
+		"modifiers": [
+			{
+				"parameter": "Health",
+				"type": "flat",
+				"value": 100
+			},
+			{
+				"parameter": "EnergyBarrier",
+				"type": "flat",
+				"value": 150
+			},
+			{
+				"parameter": "ResourceRecovery",
+				"type": "inc",
+				"value": 3
+			},
+			{
+				"parameter": "MaxResource",
+				"type": "flat",
+				"value": 15
+			}
+		]
+	}
+}

@@ -9,8 +9,8 @@
     public class ItemCreatedEventHandler : IEventHandler<ItemCreatedEvent>
     {
         private readonly UIElementProvider _uIElementProvider;
-        private readonly IInventory _inventory;
         private readonly ISystemMediator _systemMediator;
+        private readonly IInventory _inventory;
 
         public ItemCreatedEventHandler(UIElementProvider provider, IInventory inventory, ISystemMediator systemMediator)
         {

@@ -1,30 +1,37 @@
-[gd_scene load_steps=5 format=3 uid="uid://drgs10sgp405d"]
+[gd_scene load_steps=8 format=3 uid="uid://drgs10sgp405d"]
 
 [ext_resource type="Script" uid="uid://hl7koqv3auw2" path="res://Script/ScenesHandlers/Main.cs" id="1_dp7k8"]
 [ext_resource type="PackedScene" uid="uid://8k6f2la171lp" path="res://Scenes/MainWorld.tscn" id="1_l3ktu"]
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
-[ext_resource type="Script" uid="uid://dyf5ot3mh4nfp" path="res://Script/UI/Layers/UILayer.cs" id="4_rgh2o"]
+[ext_resource type="Script" uid="uid://c8fpnqky6vps8" path="res://Script/UI/Layers/UILayersManager.cs" id="4_pbw6q"]
+[ext_resource type="Script" uid="uid://dxjawyd26k7nx" path="res://Script/UI/Layers/MainLayer.cs" id="4_rgh2o"]
+[ext_resource type="Script" uid="uid://m0fit1e1xt0f" path="res://Script/UI/Layers/WindowLayer.cs" id="6_jw32o"]
+[ext_resource type="Script" uid="uid://b1yulpcwy3hr6" path="res://Script/UI/Layers/NotificationLayer.cs" id="7_50glp"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld")]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_uiLayerManager")]
 process_mode = 3
 script = ExtResource("1_dp7k8")
 _mainWorld = NodePath("MainWorld")
+_uiLayerManager = NodePath("UILayersManager")
 
 [node name="MainWorld" parent="." instance=ExtResource("1_l3ktu")]
 
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
 
-[node name="UI" type="Node" parent="."]
+[node name="UILayersManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_notificationLayer")]
+script = ExtResource("4_pbw6q")
+_mainLayer = NodePath("MainLayer")
+_windowLayer = NodePath("WindowsLayer")
+_notificationLayer = NodePath("NotificationsLayer")
 
-[node name="MainLayer" type="CanvasLayer" parent="UI"]
+[node name="MainLayer" type="CanvasLayer" parent="UILayersManager"]
 script = ExtResource("4_rgh2o")
 
-[node name="WindowsLayer" type="CanvasLayer" parent="UI"]
+[node name="WindowsLayer" type="CanvasLayer" parent="UILayersManager"]
 layer = 2
+script = ExtResource("6_jw32o")
 
-[node name="PopupLayer" type="CanvasLayer" parent="UI"]
+[node name="NotificationsLayer" type="CanvasLayer" parent="UILayersManager"]
 layer = 3
-
-[node name="OverlayLayer" type="CanvasLayer" parent="UI"]
-layer = 4
+script = ExtResource("7_50glp")

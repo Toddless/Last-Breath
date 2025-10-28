@@ -3,6 +3,8 @@
     using Godot;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Mediator.Events;
 
     public partial class PlayerHUD : Control, IInitializable, IRequireServices
     {
@@ -12,15 +14,22 @@
         [Export] private TextureProgressBar? _playerHealth;
         [Export] private GridContainer? _playerEffects;
 
+        private IUiMediator? _uiMediator;
 
         public override void _Ready()
         {
-
+            _characterBtn.Pressed += OnCharacterBtnPressed;
+            _inventoryBtn.Pressed += OnIntenoryBtnPressed;
+            _questsBtn.Pressed += OnQuestBtnPressed;
         }
+
+        private void OnQuestBtnPressed() => _uiMediator?.Publish(new OpenQuestWindowEvent());
+        private void OnIntenoryBtnPressed() => _uiMediator?.Publish(new OpenInventoryWindowEvent());
+        private void OnCharacterBtnPressed() => _uiMediator?.Publish(new OpenCharacterWindowEvent());
 
         public void InjectServices(IGameServiceProvider provider)
         {
-
+            _uiMediator = provider.GetService<IUiMediator>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

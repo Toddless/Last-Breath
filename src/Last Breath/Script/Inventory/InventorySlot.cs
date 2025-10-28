@@ -10,7 +10,7 @@
 
     public partial class InventorySlot : Slot, IInventorySlot
     {
-        private const string UID = "uid://cekpl68hghs2v";
+        private const string UID = "uid://bqlqfsqoepfhs";
 
         private bool _isMouseInside, _rmbWasPressed, _detailsShowing;
         [Export] protected Label? QuantityLabel;

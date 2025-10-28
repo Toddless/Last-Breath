@@ -1,20 +1,26 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqlqfsqoepfhs"]
+[gd_scene load_steps=6 format=3 uid="uid://bqlqfsqoepfhs"]
 
 [ext_resource type="Script" uid="uid://xvnepkg3q1bw" path="res://Script/Inventory/InventorySlot.cs" id="1_yg5o5"]
 [ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ehf1w"]
+
+[sub_resource type="Gradient" id="Gradient_sbkx4"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.19434911, 0.19434932, 0.1943492, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ng85e"]
+gradient = SubResource("Gradient_sbkx4")
 
 [sub_resource type="LabelSettings" id="LabelSettings_gs3g4"]
 font = ExtResource("2_ehf1w")
 shadow_color = Color(0, 0, 0, 1)
 
 [node name="InventorySlot" type="Control" node_paths=PackedStringArray("QuantityLabel", "Background", "Icon", "Frame")]
-clip_contents = true
-custom_minimum_size = Vector2(57, 56)
+custom_minimum_size = Vector2(55, 55)
 layout_mode = 3
 anchors_preset = 0
-offset_right = 57.0
-offset_bottom = 56.0
-scale = Vector2(1, 1.16)
+offset_right = 55.0
+offset_bottom = 55.0
+size_flags_horizontal = 0
 mouse_filter = 1
 script = ExtResource("1_yg5o5")
 QuantityLabel = NodePath("QuantityText")
@@ -22,18 +28,23 @@ Background = NodePath("Background")
 Icon = NodePath("Icon")
 Frame = NodePath("Frame")
 
-[node name="QuantityText" type="Label" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -27.0
-offset_top = -23.0
-grow_horizontal = 0
-grow_vertical = 0
-label_settings = SubResource("LabelSettings_gs3g4")
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_ng85e")
+expand_mode = 1
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Frame" type="TextureRect" parent="."]
 layout_mode = 1
@@ -43,18 +54,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="QuantityText" type="Label" parent="."]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Icon" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = -27.0
+offset_top = -22.999998
+grow_horizontal = 0
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_gs3g4")

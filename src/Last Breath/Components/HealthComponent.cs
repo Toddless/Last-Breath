@@ -25,6 +25,11 @@
             }
         }
 
+        // I need to publish PlayerHealthChangeEvent from here.
+        // then i need to create different handlers.
+        // E.g one for all ui changes
+        // second??
+
         public float MaxHealth
         {
             get => Mathf.RoundToInt(_maxHealth);

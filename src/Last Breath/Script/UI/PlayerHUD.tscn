@@ -21,7 +21,6 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
-mouse_filter = 1
 script = ExtResource("1_22o70")
 _characterBtn = NodePath("MarginContainer/HBoxContainerButtons/Character")
 _inventoryBtn = NodePath("MarginContainer/HBoxContainerButtons/Inventory")
@@ -71,13 +70,16 @@ theme_override_constants/separation = 5
 
 [node name="Character" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
+focus_mode = 0
 text = "Character"
 
 [node name="Inventory" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
+focus_mode = 0
 text = "Inventory"
 
 [node name="Quests" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
+focus_mode = 0
 text = "Quests
 "

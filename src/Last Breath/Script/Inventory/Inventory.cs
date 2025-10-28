@@ -50,13 +50,6 @@
 
         }
 
-        public void Initialize(int amount)
-        {
-
-        }
-
-
-
         public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
         public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
         public T? GetItem<T>(string instanceId)

@@ -21,8 +21,8 @@ buses/default_bus_layout="uid://blfs8ca5iilus"
 
 [display]
 
-window/size/viewport_width=1980
-window/size/viewport_height=1020
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 
 [dotnet]
@@ -31,7 +31,7 @@ project/assembly_name="LastBreath"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Crafting/Source/plugin.cfg")
+enabled=PackedStringArray()
 
 [file_customization]
 

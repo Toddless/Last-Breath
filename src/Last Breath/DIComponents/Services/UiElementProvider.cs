@@ -1,37 +1,49 @@
-﻿namespace Crafting.Source
+﻿namespace LastBreath.DIComponents.Services
 {
     using Godot;
     using System;
     using Utilities;
     using System.Linq;
     using Core.Interfaces.UI;
+    using LastBreath.Script.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using System.Collections.Generic;
     using Crafting.Source.UIElements;
-    using Crafting.Source.UIElements.Layers;
-    using Crafting.Source.DI;
+    using System.Collections.Generic;
+    using LastBreath.Script.UI.Layers;
 
-    public class UIElementProvider 
+    internal class UiElementProvider : IUIElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
 
         private readonly Dictionary<Type, Control> _singleInstances = [];
-        private readonly UIWindowStateStorage _positionStorage = new();
+        private readonly IUIWindowPositionStorage _positionStorage = new UIWindowPositionStorage();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
         private readonly IGameServiceProvider _serviceProvider;
-        private UILayer? _uiLayer;
+        private UILayersManager? _uiLayers;
 
-        public UIElementProvider()
+        public UiElementProvider()
         {
-            _serviceProvider = ServiceProvider.Instance;
+            _serviceProvider = GameServiceProvider.Instance;
         }
 
         public void Subscribe(Node layer)
         {
-            _uiLayer = (UILayer)layer;
+            _uiLayers = (UILayersManager)layer;
         }
+
+        // I need 3 type of methods:
+        // 1. Creating main elements, that will be shown on MainLayer (HUD´s)
+        // 2. Creating window elements. E.g inventory window, crafting window, etc.
+        // 3. Notifications. All type of notifications: mastery lvl up, player lvlup, events etc.
+        // each method creates and adds children to the corresponding layer
+        // we can get needed layer from UILayerManager
+
+        // We should make sure that all types of windows exist as single instance (same rule for main elements)
+        // All notifications can be created multiple times. We do not need to track it life cycle.
+
+        public bool IsInstanceTypeExist(Type instanceType, out Control? instance) => _singleInstances.TryGetValue(instanceType, out instance);
 
         public T Create<T>()
            where T : Control, IInitializable
@@ -52,7 +64,6 @@
             where T : Control, IInitializable, IRequireServices, IClosable
         {
             var instance = CreateRequireServices<T>();
-
             instance.Close += Close;
 
             void Close()
@@ -64,20 +75,38 @@
             return instance;
         }
 
-
         public T CreateAndShowOnUI<T>()
             where T : Control, IInitializable
         {
             var instance = Create<T>();
-            _uiLayer?.ShowWindow(instance);
+            _uiLayers?.ShowWindow(instance);
             return instance;
         }
+
+        public T CreateAndShowMainElement<T>()
+            where T : Control, IInitializable, IRequireServices
+        {
+            var instance = CreateRequireServices<T>();
+            _singleInstances.TryAdd(typeof(T), instance);
+            _uiLayers?.ShowHUD(instance);
+            return instance;
+        }
+
+        public T CreateAndShowWindowElement<T>()
+            where T: Control, IInitializable, IRequireServices
+        {
+            var instance = CreateRequireServices<T>();
+            _singleInstances.TryAdd(typeof(T), instance);
+            _uiLayers?.ShowWindow(instance);
+            return instance;
+        }
+
+
+
 
         public T CreateClosableForSource<T>(Control source)
             where T : Control, IInitializable, IClosable, IRequireServices
         {
-            if (_uiLayer == null) throw new InvalidOperationException();
-
             if (!_instanceBySource.TryGetValue(source, out var list))
             {
                 list = [];
@@ -91,7 +120,7 @@
             if (instance is IRequireReposition reposition)
                 reposition.Reposition += OnRepositionRequired;
 
-            var screenSize = _uiLayer.GetViewport().GetVisibleRect().Size;
+            var screenSize = _uiLayers.GetViewport().GetVisibleRect().Size;
             var windowSize = instance.GetCombinedMinimumSize();
             if (windowSize == Vector2.Zero)
                 windowSize = instance.Size;
@@ -111,13 +140,13 @@
             }
 
             list.Add(instance);
-            _uiLayer?.ShowWindow(instance);
+            _uiLayers?.ShowWindow(instance);
             return instance;
         }
 
         private void OnRepositionRequired(Control source)
         {
-            ArgumentNullException.ThrowIfNull(_uiLayer);
+            ArgumentNullException.ThrowIfNull(_uiLayers);
 
             if (!_instanceBySource.TryGetValue(source, out var list))
             {
@@ -125,7 +154,7 @@
                 _instanceBySource[source] = list;
             }
 
-            var screenSize = _uiLayer.GetViewport().GetVisibleRect().Size;
+            var screenSize = _uiLayers.GetViewport().GetVisibleRect().Size;
             var windowSize = source.GetCombinedMinimumSize();
             if (windowSize == Vector2.Zero)
                 windowSize = source.Size;
@@ -251,7 +280,7 @@
         {
             if (existingInstances.Count == 0)
             {
-                var mousePosition = _uiLayer?.GetViewport().GetMousePosition() ?? Vector2.Zero;
+                var mousePosition = _uiLayers?.GetViewport().GetMousePosition() ?? Vector2.Zero;
 
                 var position = mousePosition + new Vector2(MOUSE_OFFSET, -windowSize.Y - MOUSE_OFFSET);
                 if (position.Y < WINDOW_MARGIN)
@@ -283,6 +312,5 @@
             float y = Mathf.Clamp(pos.Y, WINDOW_MARGIN, screen.Y - size.Y - WINDOW_MARGIN);
             return new Vector2(x, y);
         }
-
     }
 }

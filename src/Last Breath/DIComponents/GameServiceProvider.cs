@@ -1,15 +1,20 @@
 ﻿namespace LastBreath.DIComponents
 {
-    using System;
-    using System.Collections.Generic;
-    using Core.Interfaces;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator;
     using Godot;
+    using System;
+    using Core.Interfaces;
     using LastBreath.Script;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Inventory;
+    using System.Collections.Generic;
     using LastBreath.Script.Inventory;
+    using LastBreath.DIComponents.Services;
+    using LastBreath.DIComponents.Mediator;
+    using Core.Interfaces.Mediator.Events;
     using Microsoft.Extensions.DependencyInjection;
+    using LastBreath.DIComponents.Mediator.MediatorHandlers.EventHandlers;
+    using LastBreath.Script.UI;
 
     public class GameServiceProvider : IGameServiceProvider
     {
@@ -29,7 +34,7 @@
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
-            services.AddSingleton<IUIElementProvider,UiElementProvider>();
+            services.AddSingleton<IUIElementProvider, UiElementProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IUiMediator, UIMediator>();
             services.AddSingleton<ISystemMediator, SystemMediator>();
@@ -40,6 +45,11 @@
                 return instance;
             });
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
+
+
+            services.AddSingleton<IEventHandler<OpenInventoryWindowEvent>, OpenWindowEventHandler<OpenInventoryWindowEvent, InventoryWindow>>();
+            services.AddSingleton<IEventHandler<OpenQuestWindowEvent>, OpenWindowEventHandler<OpenQuestWindowEvent, QuestsWindow>>();
+            services.AddSingleton<IEventHandler<OpenCharacterWindowEvent>, OpenWindowEventHandler<OpenCharacterWindowEvent, CharacterWindow>>();
             return services.BuildServiceProvider();
         }
 

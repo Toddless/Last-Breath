@@ -67,7 +67,6 @@
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
 
             services.AddSingleton<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
-            services.AddSingleton<IEventHandler<OpenWindowEvent>, OpenWindowEventHandler>();
             services.AddSingleton<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExpirienceEventHandler>();
             services.AddSingleton<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
             services.AddSingleton<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
