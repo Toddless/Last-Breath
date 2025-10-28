@@ -8,11 +8,11 @@
     using LastBreath.Script.UI;
     using LastBreath.DIComponents;
     using LastBreath.Script.ScenesHandlers;
-    using LastBreath.Script.Helpers.Extensions;
 
     public partial class MainMenu : Control, IInitializable
     {
         private const string UID = "uid://bd5wylwyowomd";
+
         [Export] private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
 
         private IUIElementProvider? _uIElementProvider;
@@ -25,16 +25,10 @@
             _loadGameButton.Pressed += LoadGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
             _quitButton.Pressed += () => GetTree().Quit();
-            _newGameButton.Pressed += () => GetTree().ChangeSceneToPacked(Main.InitializeAsPacked());
+            _newGameButton.Pressed += () => GetTree().ChangeSceneToPacked(Main.Initialize());
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        private void OnWindowSizeChanged()
-        {
-            if (DisplayServer.WindowGetMode() != DisplayServer.WindowMode.Fullscreen)
-                ScreenResizeExtension.CenterWindow();
-        }
 
         private void LoadGamePressed()
         {

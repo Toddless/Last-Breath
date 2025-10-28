@@ -7,10 +7,10 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Crafting.TestResources.DI;
     using System.Collections.Generic;
     using Crafting.Source.UIElements;
     using Crafting.Source.UIElements.Layers;
+    using Crafting.Source.DI;
 
     public class UIElementProvider : IUIElementProvider
     {

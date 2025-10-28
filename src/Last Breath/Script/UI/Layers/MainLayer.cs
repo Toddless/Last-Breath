@@ -26,7 +26,7 @@
         private QuestManager? _questManager;
         private InventoryUI? _inventoryUI;
         private MapMenu? _mapUI;
-        private MainUI? _mainUI;
+        private PlayerHUD? _mainUI;
         private BaseOpenableObject? _currentOpenedObj;
         private Player? _player;
 
@@ -34,7 +34,7 @@
 
         public override void _Ready()
         {
-            _mainUI = GetNode<MainUI>(nameof(MainUI));
+            _mainUI = GetNode<PlayerHUD>(nameof(PlayerHUD));
             _machine = new(State.Main);
             _questsUI = GetNode<QuestsMenu>(nameof(QuestsMenu));
             _characterUI = GetNode<CharacterMenu>(nameof(CharacterMenu));
@@ -47,10 +47,6 @@
             ConfigureMachine();
             AddActionTriggers();
             SetEvents();
-
-            var item = ResourceLoader.Load<IEquipItem>("uid://74x3vgs2vs4r");
-            _player.AddItemToInventory(item);
-
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -106,19 +102,6 @@
 
         private void SetEvents()
         {
-            var player = GameManager.Instance.Player;
-            if (player != null)
-            {
-                player.Health.MaxHealthChanged += (value) => _mainUI?.UpdateMaxHealthBar(Mathf.RoundToInt(value));
-                player.Health!.CurrentHealthChanged += (value) => _mainUI?.UpdatePlayerHealthBar(Mathf.RoundToInt(value));
-            }
-            _questManager!.QuestAccepted += _questsUI!.AddQuests;
-            _questManager.QuestCompleted += OnQuestCompleted;
-            _mainUI!.Character += () => _machine?.Fire(Trigger.ShowCharacter);
-            _mainUI!.Inventory += () => _machine?.Fire(Trigger.ShowPlayerInventory);
-            _mainUI!.Quests += () => _machine?.Fire(Trigger.ShowQuests);
-            _mainUI!.Map += () => _machine?.Fire(Trigger.ShowMap);
-      
         }
 
 

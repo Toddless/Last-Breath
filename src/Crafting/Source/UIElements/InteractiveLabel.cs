@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using Crafting.TestResources.DI;
     using Crafting.Source.UIElements.Styles;
+    using Crafting.Source.DI;
 
     [GlobalClass]
     public partial class InteractiveLabel : Panel

@@ -12,8 +12,8 @@
     using Crafting.TestResources;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
-    using Crafting.TestResources.DI;
     using System.Collections.Generic;
+    using Crafting.Source.DI;
 
     public class ItemCreator : IItemCreator
     {

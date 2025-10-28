@@ -1,17 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bqx5ow411nolc"]
+[gd_scene load_steps=5 format=3 uid="uid://bqx5ow411nolc"]
 
-[ext_resource type="Texture2D" uid="uid://dv18xsyuetgp6" path="res://TestResources/!!!/FrameTest.png" id="1_3eds3"]
 [ext_resource type="Script" uid="uid://ce70hktwrq5s5" path="res://Source/UIElements/ItemDetails.cs" id="1_t1pta"]
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_3eds3"]
-diffuse_texture = ExtResource("1_3eds3")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_88iya"]
-texture = SubResource("CanvasTexture_3eds3")
-expand_margin_left = 210.0
-expand_margin_top = 110.0
-expand_margin_right = 210.0
-expand_margin_bottom = 70.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_y5oxe"]
 font_size = 24
@@ -27,7 +16,6 @@ offset_right = 350.0
 offset_bottom = 400.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxTexture_88iya")
 script = ExtResource("1_t1pta")
 _itemIcon = NodePath("VBoxContainer/ItemIconAndBaseStats/ItemIcon")
 _additionalStatsContainer = NodePath("VBoxContainer/AdditionalStats")
@@ -101,6 +89,7 @@ alignment = 1
 vertical = true
 
 [node name="TextureRect" type="TextureRect" parent="."]
+visible = false
 z_index = -1
 layout_mode = 2
 texture = SubResource("GradientTexture1D_88iya")

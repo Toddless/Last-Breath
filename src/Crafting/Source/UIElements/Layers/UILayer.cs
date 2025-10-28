@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements.Layers
 {
     using Godot;
-    using Crafting.TestResources.DI;
+    using Crafting.Source.DI;
 
     public partial class UILayer : CanvasLayer
     {

@@ -1,18 +1,18 @@
 [gd_scene load_steps=6 format=3 uid="uid://boqqyrt0sfpve"]
 
-[ext_resource type="Script" uid="uid://rx4nq2jh70l7" path="res://Script/UI/View/MainUI.cs" id="1_8jnuc"]
-[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_v8awq"]
-[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_ptkne"]
+[ext_resource type="Script" uid="uid://cr74fmmgk0qwd" path="res://Script/UI/View/PlayerHUD.cs" id="1_22o70"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="2_aoa6y"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="3_bore2"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hnvv8"]
-atlas = ExtResource("1_v8awq")
+atlas = ExtResource("2_aoa6y")
 region = Rect2(0, 16, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pksnw"]
-atlas = ExtResource("2_ptkne")
+atlas = ExtResource("3_bore2")
 region = Rect2(0, 32, 64, 16)
 
-[node name="MainUI" type="Control"]
+[node name="PlayerHUD" type="Control" node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_playerHealth", "_playerEffects")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +22,12 @@ grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
 mouse_filter = 1
-script = ExtResource("1_8jnuc")
+script = ExtResource("1_22o70")
+_characterBtn = NodePath("MarginContainer/HBoxContainerButtons/Character")
+_inventoryBtn = NodePath("MarginContainer/HBoxContainerButtons/Inventory")
+_questsBtn = NodePath("MarginContainer/HBoxContainerButtons/Quests")
+_playerHealth = NodePath("MarginContainer/VBoxContainer/Health")
+_playerEffects = NodePath("MarginContainer/VBoxContainer/Effects")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 z_index = 1
@@ -32,6 +37,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -72,7 +81,3 @@ text = "Inventory"
 layout_mode = 2
 text = "Quests
 "
-
-[node name="Map" type="Button" parent="MarginContainer/HBoxContainerButtons"]
-layout_mode = 2
-text = "Map"

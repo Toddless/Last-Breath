@@ -4,9 +4,9 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
-    using Crafting.TestResources.DI;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator.Requests;
+    using Crafting.Source.DI;
 
     public partial class InventoryWindow : Panel, IInitializable, IRequireServices
     {

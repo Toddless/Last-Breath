@@ -5,14 +5,26 @@
 [ext_resource type="PackedScene" uid="uid://dt02wd1ss75rn" path="res://Scenes/Player.tscn" id="2_gpchr"]
 [ext_resource type="Script" uid="uid://dyf5ot3mh4nfp" path="res://Script/UI/Layers/UILayer.cs" id="4_rgh2o"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld")]
 process_mode = 3
 script = ExtResource("1_dp7k8")
+_mainWorld = NodePath("MainWorld")
 
 [node name="MainWorld" parent="." instance=ExtResource("1_l3ktu")]
 
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
 
-[node name="UILayer" type="CanvasLayer" parent="."]
+[node name="UI" type="Node" parent="."]
+
+[node name="MainLayer" type="CanvasLayer" parent="UI"]
 script = ExtResource("4_rgh2o")
+
+[node name="WindowsLayer" type="CanvasLayer" parent="UI"]
+layer = 2
+
+[node name="PopupLayer" type="CanvasLayer" parent="UI"]
+layer = 3
+
+[node name="OverlayLayer" type="CanvasLayer" parent="UI"]
+layer = 4
