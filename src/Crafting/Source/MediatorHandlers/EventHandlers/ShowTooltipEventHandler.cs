@@ -1,15 +1,15 @@
 ﻿namespace Crafting.Source.MediatorHandlers.EventHandlers
 {
-    using Crafting.Source;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Events;
     using Crafting.Source.UIElements;
+    using Core.Interfaces.Mediator.Events;
 
-    internal class ShowTooltipEventHandler : IEventHandler<ShowInventorySlotButtonsTooltipEvent>
+    public class ShowTooltipEventHandler : IEventHandler<ShowInventorySlotButtonsTooltipEvent>
     {
-        private readonly UIElementProvider _uiElementProvider;
+        private readonly IUIElementProvider _uiElementProvider;
 
-        public ShowTooltipEventHandler(UIElementProvider uIElementProvider)
+        public ShowTooltipEventHandler(IUIElementProvider uIElementProvider)
         {
             _uiElementProvider = uIElementProvider;
         }

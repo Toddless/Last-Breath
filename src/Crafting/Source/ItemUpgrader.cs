@@ -8,10 +8,8 @@
     using Core.Modifiers;
     using Core.Interfaces;
     using Core.Interfaces.Items;
-    using Crafting.TestResources;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Crafting.TestResources.Requirements;
 
     public class ItemUpgrader : IItemUpgrader
     {

@@ -1,7 +1,6 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using Crafting.Source.DI;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
@@ -17,24 +16,24 @@
 
         private IInventory? _inventory;
         private IUiMediator? _uiMediator;
+        private IItemDataProvider? _itemDataProvider;
 
         public override void _Ready()
         {
-            var dataProvider = ServiceProvider.Instance.GetService<IItemDataProvider>();
-
-            _inventory?.Initialize(210, _inventoryGrid);
+            _inventory?.Initialize(216, _inventoryGrid);
             if (_craftingButton != null)
                 _craftingButton.Pressed += OnCraftingButtonPressed;
 
             using (var rnd = new RandomNumberGenerator())
-                foreach (var resource in dataProvider.GetAllResources())
+                foreach (var resource in _itemDataProvider?.GetAllResources() ?? [])
                     _inventory?.TryAddItem(resource, 100);
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _uiMediator = ServiceProvider.Instance.GetService<IUiMediator>();
-            _inventory = ServiceProvider.Instance.GetService<IInventory>();
+            _uiMediator = provider.GetService<IUiMediator>();
+            _inventory = provider.GetService<IInventory>();
+            _itemDataProvider = provider.GetService<IItemDataProvider>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

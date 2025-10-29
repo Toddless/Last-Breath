@@ -10,7 +10,6 @@
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
 
-    [Tool]
     [GlobalClass]
     public partial class CraftingItems : Control, IInitializable, IClosable, IRequireServices
     {

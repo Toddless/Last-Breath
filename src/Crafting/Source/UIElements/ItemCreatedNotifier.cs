@@ -4,23 +4,21 @@
     using System;
     using Core.Interfaces.UI;
 
-    [Tool]
     [GlobalClass]
-    public partial class ItemCreatedNotifier : Control, IInitializable, IClosable
+    public partial class ItemCreatedNotifier : Control, IInitializable
     {
         private const string UID = "uid://cu1u7ht1lp0hc";
         [Export] private Button? _okButton, _destroyButton;
         [Export] private Control? _container;
         [Export] private PanelContainer? _panel;
 
-        public event Action? Close;
         [Signal] public delegate void CanBeClosedEventHandler();
 
         public event Action? DestroyPressed;
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += () => Close?.Invoke();
+            if (_okButton != null) _okButton.Pressed += QueueFree; 
             if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
 
@@ -28,7 +26,7 @@
         {
             if (@event.IsActionPressed("ui_accept"))
             {
-                Close?.Invoke();
+                QueueFree();
                 GetViewport().SetInputAsHandled();
             }
         }
@@ -53,7 +51,7 @@
         private void OnDestroyPressed()
         {
             DestroyPressed?.Invoke();
-            Close?.Invoke();
+            QueueFree();
         }
     }
 }

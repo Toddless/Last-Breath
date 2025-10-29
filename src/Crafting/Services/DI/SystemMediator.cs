@@ -1,10 +1,9 @@
-﻿namespace Crafting.Source
+﻿namespace Crafting.Services.DI
 {
     using System.Threading.Tasks;
     using Core.Interfaces.Mediator;
-    using Crafting.Source.DI;
 
-    public class SystemMediator : ISystemMediator
+    internal class SystemMediator : ISystemMediator
     {
         public void Publish<TEvent>(TEvent evt)
             where TEvent : IEvent

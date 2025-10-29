@@ -1,4 +1,4 @@
-﻿namespace Crafting.Source
+﻿namespace LastBreath.Addons.Crafting
 {
     using Godot;
     using System;
@@ -7,8 +7,9 @@
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
     using Core.Interfaces.Mediator.Events;
+    using Core.Interfaces.Crafting;
 
-    public class CraftingMastery
+    public class CraftingMastery : ICraftingMastery
     {
         // TODO: Remove from here
         // ________________________________________________________
@@ -51,7 +52,7 @@
             get => _bonusLevel;
             private set
             {
-                if(value != _bonusLevel)
+                if (value != _bonusLevel)
                 {
                     _bonusLevel = value;
                     BonusLevelChange?.Invoke(_bonusLevel);

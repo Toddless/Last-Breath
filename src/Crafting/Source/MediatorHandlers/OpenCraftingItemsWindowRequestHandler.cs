@@ -1,17 +1,17 @@
 ﻿namespace Crafting.Source.MediatorHandlers
 {
-    using Crafting.Source;
     using System.Threading.Tasks;
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
     using Crafting.Source.UIElements;
     using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.Data;
 
-    internal class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
+    public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {
-        private readonly UIElementProvider _uIElementProvider;
+        private readonly IUIElementProvider _uIElementProvider;
 
-        public OpenCraftingItemsWindowRequestHandler(UIElementProvider uIElementProvider)
+        public OpenCraftingItemsWindowRequestHandler(IUIElementProvider uIElementProvider)
         {
             _uIElementProvider = uIElementProvider;
         }

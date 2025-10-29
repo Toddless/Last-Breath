@@ -1,10 +1,9 @@
-﻿namespace Crafting.Source.DI
+﻿namespace Crafting.Services.DI
 {
     using Godot;
     using System;
     using Core.Results;
     using Core.Interfaces;
-    using Crafting.Source;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
@@ -14,12 +13,13 @@
     using Core.Interfaces.Mediator.Events;
     using Crafting.TestResources.Inventory;
     using Core.Interfaces.Mediator.Requests;
-    using Crafting.Source.UIElements.Styles;
     using Microsoft.Extensions.DependencyInjection;
+    using Crafting.TestResources;
+    using Crafting.Source;
     using Crafting.Source.MediatorHandlers;
     using Crafting.Source.MediatorHandlers.EventHandlers;
 
-    public class ServiceProvider : IGameServiceProvider
+    internal class ServiceProvider : IGameServiceProvider
     {
         private readonly Microsoft.Extensions.DependencyInjection.ServiceProvider _serviceProvider;
 
@@ -39,8 +39,8 @@
             var services = new ServiceCollection();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemCreator, ItemCreator>();
-            services.AddSingleton<UIElementProvider>();
-            services.AddSingleton<UIResourcesProvider>();
+            services.AddSingleton<IUIElementProvider, UIElementProvider>();
+            services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IUiMediator, UIMediator>();
             services.AddSingleton<ISystemMediator, SystemMediator>();
@@ -56,7 +56,7 @@
                 instance.Randomize();
                 return instance;
             });
-            services.AddSingleton<CraftingMastery>();
+            services.AddSingleton<ICraftingMastery, CraftingMastery>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();

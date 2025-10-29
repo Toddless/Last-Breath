@@ -2,13 +2,10 @@
 {
     using Godot;
     using System;
-    using Utilities;
     using System.Linq;
     using Core.Interfaces.UI;
     using LastBreath.Script.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Items;
-    using Crafting.Source.UIElements;
     using System.Collections.Generic;
     using LastBreath.Script.UI.Layers;
 
@@ -102,8 +99,8 @@
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
                 return (T)exist;
             var instance = CreateRequireServices<T>();
-            instance.Close += _uiLayers.CloseAllWindows; 
             _singleInstances.TryAdd(typeof(T), instance);
+            instance.Close += _uiLayers.CloseAllWindows;
             _uiLayers.ShowWindowElement(instance);
             return instance;
         }
@@ -124,6 +121,14 @@
                 ArgumentNullException.ThrowIfNull(exist);
 
             _uiLayers?.ShowWindowElement(exist);
+        }
+
+        public T CreateAndShowNotification<T>()
+            where T : Control, IInitializable
+        {
+            var instance = Create<T>();
+            _uiLayers?.ShowNotification(instance);
+            return instance;
         }
 
         public T CreateClosableForSource<T>(Control source)
@@ -203,9 +208,6 @@
 
             instance.Position = savedPos ?? Vector2.Zero;
 
-            if (instance is DraggableWindow drag)
-                drag.PositionChangedExternally += _positionStorage.SavePosition<T>;
-
             instance.Close += Unload<T>;
             _singleInstances[typeof(T)] = instance;
             return instance;
@@ -215,83 +217,11 @@
         {
             if (_singleInstances.TryGetValue(typeof(T), out var control))
             {
-                if (control is DraggableWindow draggable)
-                    draggable.PositionChangedExternally -= _positionStorage.SavePosition<T>;
                 if (control is IClosable close)
                     close.Close -= Unload<T>;
                 control.QueueFree();
                 _singleInstances.Remove(typeof(T));
             }
-        }
-
-        public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
-        {
-            var notifier = CreateSingleClosable<ItemCreatedNotifier>();
-            notifier.SetItemDetails(CreateItemDetails(item));
-            return notifier;
-        }
-
-        public ItemDetails CreateItemDetails(IItem item, Control source)
-        {
-            var itemDetails = CreateClosableForSource<ItemDetails>(source);
-
-            if (item is IEquipItem equip)
-                return ConfigureEquipItemDetails(itemDetails, equip);
-
-            return ConfigureItemDetails(itemDetails, item);
-        }
-
-        private ItemDetails CreateItemDetails(IItem item)
-        {
-            var itemDetails = CreateRequireServices<ItemDetails>();
-
-            if (item is IEquipItem equip)
-                return ConfigureEquipItemDetails(itemDetails, equip);
-
-            return ConfigureItemDetails(itemDetails, item);
-        }
-
-        private ItemDetails ConfigureItemDetails(ItemDetails itemDetails, IItem item)
-        {
-            itemDetails.Clear();
-            itemDetails.SetItemIcon(item.Icon!);
-            itemDetails.SetItemName(item.DisplayName);
-
-            return itemDetails;
-        }
-
-        private ItemDetails ConfigureEquipItemDetails(ItemDetails itemDetails, IEquipItem equip)
-        {
-            itemDetails.Clear();
-            itemDetails.SetItemIcon(equip.Icon!);
-            itemDetails.SetItemName(equip.DisplayName);
-            itemDetails.SetItemUpdateLevel(equip.UpdateLevel);
-            foreach (var item in equip.BaseModifiers)
-            {
-                var selectable = new InteractiveLabel();
-                selectable.SetSelectable(false);
-                selectable.SetText(Lokalizator.Format(item));
-                itemDetails.SetItemBaseStats(selectable);
-            }
-
-            foreach (var modifier in equip.AdditionalModifiers)
-            {
-                var stat = new InteractiveLabel();
-                stat.SetText(Lokalizator.Format(modifier));
-                stat.SetSelectable(false);
-                itemDetails.SetItemAdditionalStats(stat);
-            }
-
-            if (equip.Skill != null)
-            {
-                var skill = equip.Skill;
-                var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
-                skillDescription.SetSkillName(skill.DisplayName);
-                skillDescription.SetSkillDescription(skill.Description);
-                itemDetails.SetSkillDescription(skillDescription);
-            }
-
-            return itemDetails;
         }
 
         private Vector2 CalculatePosition(List<Control> existingInstances, Vector2 screenSize, Vector2 windowSize)

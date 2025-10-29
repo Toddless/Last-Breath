@@ -12,7 +12,7 @@ region = Rect2(0, 16, 64, 32)
 atlas = ExtResource("3_bore2")
 region = Rect2(0, 32, 64, 16)
 
-[node name="PlayerHUD" type="Control" node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_playerHealth", "_playerEffects")]
+[node name="PlayerHUD" type="Control" node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_craftingBtn", "_playerHealth", "_playerEffects")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,6 +25,7 @@ script = ExtResource("1_22o70")
 _characterBtn = NodePath("MarginContainer/HBoxContainerButtons/Character")
 _inventoryBtn = NodePath("MarginContainer/HBoxContainerButtons/Inventory")
 _questsBtn = NodePath("MarginContainer/HBoxContainerButtons/Quests")
+_craftingBtn = NodePath("MarginContainer/HBoxContainerButtons/Crafting")
 _playerHealth = NodePath("MarginContainer/VBoxContainer/Health")
 _playerEffects = NodePath("MarginContainer/VBoxContainer/Effects")
 

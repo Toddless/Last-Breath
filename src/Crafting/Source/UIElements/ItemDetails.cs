@@ -5,7 +5,6 @@
     using Godot.Collections;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Crafting.Source.UIElements.Styles;
 
     public partial class ItemDetails : PanelContainer, IInitializable, IClosable, IRequireServices, IRequireReposition
     {
@@ -15,7 +14,7 @@
         [Export] private TextureRect? _itemIcon;
         [Export] private BoxContainer? _additionalStatsContainer, _baseStatsContainer, _itemSkillDescription;
         [Export] private Label? _itemName, _itemUpdateLevel;
-        private UIResourcesProvider? _uiResourcesProvider;
+        private IUIResourcesProvider? _uiResourcesProvider;
 
         public event Action? Close;
         public event Action<Control>? Reposition;
@@ -25,9 +24,9 @@
             CallDeferred(nameof(CalculateNewHorizonalSize));
         }
 
-        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
+        public void InjectServices(IGameServiceProvider provider)
         {
-            _uiResourcesProvider = provider.GetService<UIResourcesProvider>();
+            _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
         }
 
         public void SetItemName(string itemName) => _itemName.Text = itemName;

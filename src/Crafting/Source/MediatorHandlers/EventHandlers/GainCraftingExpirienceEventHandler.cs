@@ -3,14 +3,14 @@
     using Godot;
     using Core.Enums;
     using Core.Interfaces.Mediator;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Mediator.Events;
-    using Crafting.Source;
 
     public class GainCraftingExpirienceEventHandler : IEventHandler<GainCraftingExpirienceEvent>
     {
-        private readonly CraftingMastery _craftingMastery;
+        private readonly ICraftingMastery _craftingMastery;
 
-        public GainCraftingExpirienceEventHandler(CraftingMastery craftingMastery)
+        public GainCraftingExpirienceEventHandler(ICraftingMastery craftingMastery)
         {
             _craftingMastery = craftingMastery;
         }

@@ -21,5 +21,6 @@
         void Subscribe(Node layer);
         void Unload<T>() where T : Control;
         void ClearSource(Control source);
+        T CreateAndShowNotification<T>() where T : Control, IInitializable;
     }
 }

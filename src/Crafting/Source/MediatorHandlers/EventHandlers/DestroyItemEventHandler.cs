@@ -1,10 +1,10 @@
-﻿namespace Crafting.Source.MediatorHandlers
+﻿namespace Crafting.Source.MediatorHandlers.EventHandlers
 {
     using Godot;
-    using Crafting.Source;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator.Events;
 
@@ -13,9 +13,9 @@
         private readonly IInventory _inventory;
         private readonly IItemDataProvider _dataProvider;
         private readonly ISystemMediator _systemMediator;
-        private readonly CraftingMastery _craftingMastery;
+        private readonly ICraftingMastery _craftingMastery;
 
-        public DestroyItemEventHandler(IInventory inventory, IItemDataProvider provider, ISystemMediator systemMediator, CraftingMastery craftingMastery)
+        public DestroyItemEventHandler(IInventory inventory, IItemDataProvider provider, ISystemMediator systemMediator, ICraftingMastery craftingMastery)
         {
             _inventory = inventory;
             _dataProvider = provider;

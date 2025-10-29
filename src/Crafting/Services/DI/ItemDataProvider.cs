@@ -1,4 +1,4 @@
-﻿namespace Crafting.Source
+﻿namespace Crafting.Services.DI
 {
     using Godot;
     using System;
@@ -13,7 +13,7 @@
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
-    public class ItemDataProvider : IItemDataProvider
+    internal class ItemDataProvider : IItemDataProvider
     {
         private readonly string _itemDataPath;
         private Dictionary<string, IItem> _itemData = [];
@@ -21,7 +21,6 @@
 
         public ItemDataProvider(string itemDataPath)
         {
-            // TODO: Path to generic items
             _itemDataPath = itemDataPath;
         }
 

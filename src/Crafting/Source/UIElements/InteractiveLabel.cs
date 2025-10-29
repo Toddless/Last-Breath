@@ -1,8 +1,6 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using Crafting.Source.UIElements.Styles;
-    using Crafting.Source.DI;
 
     [GlobalClass]
     public partial class InteractiveLabel : Panel
@@ -30,7 +28,7 @@
         {
             MouseEntered += OnMouseEntered;
             MouseExited += OnMouseExited;
-            _styleHovered = ServiceProvider.Instance.GetService<UIResourcesProvider>().GetResource("ItemHoveredStyle") as StyleBoxFlat;
+           // _styleHovered = ServiceProvider.Instance.GetService<UIResourcesProvider>().GetResource("ItemHoveredStyle") as StyleBoxFlat;
             _styleNormal = new StyleBoxFlat() { BgColor = new(0, 0, 0, 0) };
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsStretchRatio = 1f;

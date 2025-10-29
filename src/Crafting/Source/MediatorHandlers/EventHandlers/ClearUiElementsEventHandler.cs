@@ -1,14 +1,14 @@
 ﻿namespace Crafting.Source.MediatorHandlers.EventHandlers
 {
-    using Crafting.Source;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Mediator.Events;
 
-    internal class ClearUiElementsEventHandler : IEventHandler<ClearUiElementsEvent>
+    public class ClearUiElementsEventHandler : IEventHandler<ClearUiElementsEvent>
     {
-        private readonly UIElementProvider _uIElementProvider;
+        private readonly IUIElementProvider _uIElementProvider;
 
-        public ClearUiElementsEventHandler(UIElementProvider provider)
+        public ClearUiElementsEventHandler(IUIElementProvider provider)
         {
             _uIElementProvider = provider;
         }

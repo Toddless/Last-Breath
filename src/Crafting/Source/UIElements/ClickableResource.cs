@@ -4,7 +4,6 @@
     using System;
     using Core.Interfaces.UI;
 
-    [Tool]
     [GlobalClass]
     public partial class ClickableResource : ClickableItem, IInitializable
     {

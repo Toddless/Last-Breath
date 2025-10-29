@@ -1,11 +1,10 @@
-﻿namespace Crafting.Source
+﻿namespace Crafting.Services.DI
 {
     using System;
     using System.Threading.Tasks;
     using Core.Interfaces.Mediator;
-    using Crafting.Source.DI;
 
-    public class UIMediator : IUiMediator
+    internal class UIMediator : IUiMediator
     {
         public event Action? UpdateUi;
 

@@ -2,19 +2,27 @@
 {
     using Godot;
     using System;
+    using Core.Results;
     using Core.Interfaces;
     using LastBreath.Script;
-    using Core.Interfaces.Data;
     using LastBreath.Script.UI;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
+    using LastBreath.Addons.Crafting;
     using System.Collections.Generic;
     using LastBreath.Script.Inventory;
     using Core.Interfaces.Mediator.Events;
     using LastBreath.DIComponents.Mediator;
     using LastBreath.DIComponents.Services;
-    using Microsoft.Extensions.DependencyInjection;
+    using Core.Interfaces.Mediator.Requests;
     using LastBreath.DIComponents.MediatorHandlers;
+    using Microsoft.Extensions.DependencyInjection;
+    using Crafting.Source.MediatorHandlers;
+    using Crafting.Source.MediatorHandlers.EventHandlers;
+    using Crafting.Source;
 
     public class GameServiceProvider : IGameServiceProvider
     {
@@ -34,10 +42,17 @@
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>((provider) =>
+            {
+                var instance = new ItemDataProvider("res://Data/");
+                instance.LoadData();
+                return instance;
+            });
             services.AddSingleton<IUIElementProvider, UIElementProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IUiMediator, UIMediator>();
             services.AddSingleton<ISystemMediator, SystemMediator>();
+            services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton((provider) =>
             {
                 var instance = new RandomNumberGenerator();
@@ -45,6 +60,26 @@
                 return instance;
             });
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
+
+            services.AddSingleton<ICraftingMastery, CraftingMastery>();
+
+            services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemHandler>();
+            services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
+            services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
+            services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();
+            services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
+            services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
+            services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
+
+            services.AddSingleton<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
+            services.AddSingleton<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExpirienceEventHandler>();
+            services.AddSingleton<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
+            services.AddSingleton<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
+            services.AddSingleton<IEventHandler<ShowInventoryItemEvent>, ShowInventoryItemEventHandler>();
+            services.AddSingleton<IEventHandler<ConsumeResourcesInInventoryEvent>, ConsumeResourcesWithinInventoryEventHandler>();
+            services.AddSingleton<IEventHandler<ClearUiElementsEvent>, ClearUiElementsEventHandler>();
+            services.AddSingleton<IEventHandler<ItemCreatedEvent>, ItemCreatedEventHandler>();
+            services.AddSingleton<IEventHandler<OpenCraftingWindowEvent>, OpenCraftingWindowEventHandler>();
 
 
             services.AddSingleton<IEventHandler<OpenInventoryWindowEvent>, OpenWindowEventHandler<OpenInventoryWindowEvent, InventoryWindow>>();

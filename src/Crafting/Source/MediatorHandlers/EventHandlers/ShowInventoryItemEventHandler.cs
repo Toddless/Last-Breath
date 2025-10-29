@@ -1,17 +1,19 @@
 ﻿namespace Crafting.Source.MediatorHandlers.EventHandlers
 {
-    using Crafting.Source;
+    using Utilities;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
+    using Crafting.Source.UIElements;
     using Core.Interfaces.Mediator.Events;
-    using Core.Interfaces.Items;
 
-    internal class ShowInventoryItemEventHandler : IEventHandler<ShowInventoryItemEvent>
+    public class ShowInventoryItemEventHandler : IEventHandler<ShowInventoryItemEvent>
     {
         private readonly IInventory _inventory;
-        private readonly UIElementProvider _uiElementProvider;
+        private readonly IUIElementProvider _uiElementProvider;
 
-        public ShowInventoryItemEventHandler(IInventory inventory, UIElementProvider uiElementProvider)
+        public ShowInventoryItemEventHandler(IInventory inventory, IUIElementProvider uiElementProvider)
         {
             _inventory = inventory;
             _uiElementProvider = uiElementProvider;
@@ -21,7 +23,59 @@
         {
             var item = _inventory.GetItem<IItem>(evnt.Item.InstanceId);
             if (item != null)
-                _uiElementProvider.CreateItemDetails(item, evnt.Source);
+            {
+                var details = _uiElementProvider.Create<ItemDetails>();
+                ConfigureDetails(details, item);
+            }
+        }
+
+        private void ConfigureDetails(ItemDetails details, IItem item)
+        {
+            if (item is IEquipItem equip) ConfigureEquipItemDetails(details, equip);
+            else ConfigureItemDetails(details, item);
+        }
+
+        private ItemDetails ConfigureItemDetails(ItemDetails itemDetails, IItem item)
+        {
+            itemDetails.Clear();
+            itemDetails.SetItemIcon(item.Icon!);
+            itemDetails.SetItemName(item.DisplayName);
+
+            return itemDetails;
+        }
+
+        private ItemDetails ConfigureEquipItemDetails(ItemDetails itemDetails, IEquipItem equip)
+        {
+            itemDetails.Clear();
+            itemDetails.SetItemIcon(equip.Icon!);
+            itemDetails.SetItemName(equip.DisplayName);
+            itemDetails.SetItemUpdateLevel(equip.UpdateLevel);
+            foreach (var item in equip.BaseModifiers)
+            {
+                var selectable = new InteractiveLabel();
+                selectable.SetSelectable(false);
+                selectable.SetText(Lokalizator.Format(item));
+                itemDetails.SetItemBaseStats(selectable);
+            }
+
+            foreach (var modifier in equip.AdditionalModifiers)
+            {
+                var stat = new InteractiveLabel();
+                stat.SetText(Lokalizator.Format(modifier));
+                stat.SetSelectable(false);
+                itemDetails.SetItemAdditionalStats(stat);
+            }
+
+            if (equip.Skill != null)
+            {
+                var skill = equip.Skill;
+                var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
+                skillDescription.SetSkillName(skill.DisplayName);
+                skillDescription.SetSkillDescription(skill.Description);
+                itemDetails.SetSkillDescription(skillDescription);
+            }
+
+            return itemDetails;
         }
     }
 }

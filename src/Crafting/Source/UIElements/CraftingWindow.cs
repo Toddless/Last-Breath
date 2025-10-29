@@ -16,12 +16,10 @@
     using System.Collections.Generic;
     using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Mediator.Requests;
-    using Crafting.Source.UIElements.Styles;
 
-    [GlobalClass]
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
     {
-        private const string UID = "uid://r4d7lhh2ta5x";
+        private const string UID = "uid://betq124kfglyy";
 
         [Export] private Button? _close, _add;
         [Export] private RichTextLabel? _description;
@@ -35,8 +33,8 @@
         private IItemDataProvider? _dataProvider;
         private IUiMediator? _uiMediator;
         private ISystemMediator? _systemMediator;
-        private UIElementProvider? _uiElementProvider;
-        private UIResourcesProvider? _uiResourcesProvider;
+        private IUIElementProvider? _uiElementProvider;
+        private IUIResourcesProvider? _uiResourcesProvider;
 
         private CraftingMode _craftingMode;
         private ActionButton? _actionButton;
@@ -64,8 +62,8 @@
             _dataProvider = provider.GetService<IItemDataProvider>();
             _uiMediator = provider.GetService<IUiMediator>();
             _systemMediator = provider.GetService<ISystemMediator>();
-            _uiElementProvider = provider.GetService<UIElementProvider>();
-            _uiResourcesProvider = provider.GetService<UIResourcesProvider>();
+            _uiElementProvider = provider.GetService<IUIElementProvider>();
+            _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
             _uiMediator.UpdateUi += UpdateRequiredResourcesAsync;
         }
 

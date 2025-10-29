@@ -1,18 +1,17 @@
-﻿namespace Crafting.Source
+﻿namespace Crafting.Services.DI
 {
-    using Godot;
     using System;
-    using Utilities;
+    using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.UI;
-    using Crafting.Source.DI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using System.Collections.Generic;
+    using Core.Interfaces.UI;
     using Crafting.Source.UIElements;
-    using Crafting.Source.UIElements.Layers;
+    using Crafting.TestResources.Layers;
+    using Godot;
+    using Utilities;
 
-    internal class UIElementProvider 
+    internal class UIElementProvider : IUIElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
@@ -21,7 +20,7 @@
         private readonly UIWindowStateStorage _positionStorage = new();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
         private readonly IGameServiceProvider _serviceProvider;
-        private UILayer? _uiLayer;
+        private UILayerManager? _uiLayer;
 
         public UIElementProvider()
         {
@@ -30,8 +29,10 @@
 
         public void Subscribe(Node layer)
         {
-            _uiLayer = (UILayer)layer;
+            _uiLayer = (UILayerManager)layer;
         }
+
+        public bool IsInstanceTypeExist(Type instanceType, out Control? exist) => _singleInstances.TryGetValue(instanceType, out exist);
 
         public T Create<T>()
            where T : Control, IInitializable
@@ -45,6 +46,75 @@
         {
             var instance = Create<T>();
             instance.InjectServices(_serviceProvider);
+            return instance;
+        }
+
+        public T CreateAndShowMainElement<T>()
+            where T : Control, IInitializable, IRequireServices
+        {
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+                return (T)exist;
+            var instance = CreateRequireServices<T>();
+            _singleInstances.TryAdd(typeof(T), instance);
+            _uiLayer?.ShowMainElement(instance);
+            return instance;
+        }
+
+        public void HideMainElement<T>()
+            where T : Control, IInitializable, IRequireServices
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayer?.RemoveMainElement(exist);
+        }
+
+        public void ShowMainElement<T>()
+             where T : Control, IInitializable, IRequireServices
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayer?.ShowMainElement(exist);
+        }
+
+        public T CreateAndShowWindowElement<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            ArgumentNullException.ThrowIfNull(_uiLayer);
+
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+                return (T)exist;
+            var instance = CreateRequireServices<T>();
+            _singleInstances.TryAdd(typeof(T), instance);
+            instance.Close += _uiLayer.CloseAllWindows;
+            _uiLayer.ShowWindowElement(instance);
+            return instance;
+        }
+
+        public void HideWindowElement<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayer?.RemoveWindowElement(exist);
+        }
+
+        public void ShowWindowElement<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayer?.ShowWindowElement(exist);
+        }
+
+        public T CreateAndShowNotification<T>()
+            where T : Control, IInitializable
+        {
+            var instance = Create<T>();
+            _uiLayer?.ShowNotification(instance);
             return instance;
         }
 
@@ -69,7 +139,7 @@
             where T : Control, IInitializable
         {
             var instance = Create<T>();
-            _uiLayer?.ShowWindow(instance);
+            _uiLayer?.ShowWindowElement(instance);
             return instance;
         }
 
@@ -111,7 +181,7 @@
             }
 
             list.Add(instance);
-            _uiLayer?.ShowWindow(instance);
+            _uiLayer?.ShowWindowElement(instance);
             return instance;
         }
 
@@ -179,7 +249,7 @@
 
         public ItemCreatedNotifier CreateItemCreatedNotifier(IItem item)
         {
-            var notifier = CreateSingleClosable<ItemCreatedNotifier>();
+            var notifier = Create<ItemCreatedNotifier>();
             notifier.SetItemDetails(CreateItemDetails(item));
             return notifier;
         }
@@ -283,6 +353,5 @@
             float y = Mathf.Clamp(pos.Y, WINDOW_MARGIN, screen.Y - size.Y - WINDOW_MARGIN);
             return new Vector2(x, y);
         }
-
     }
 }

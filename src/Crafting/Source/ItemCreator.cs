@@ -9,22 +9,20 @@
     using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Crafting.TestResources;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Crafting.Source.DI;
 
     public class ItemCreator : IItemCreator
     {
         private readonly RandomNumberGenerator _rnd;
         private readonly IItemDataProvider _dataProvider;
-        private readonly CraftingMastery _craftingMastery;
+        private readonly ICraftingMastery _craftingMastery;
 
-        public ItemCreator(CraftingMastery craftingMastery, RandomNumberGenerator rnd)
+        public ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         {
             _rnd = rnd;
-            _dataProvider = ServiceProvider.Instance.GetService<IItemDataProvider>();
+            _dataProvider = itemDataProvider;
             _craftingMastery = craftingMastery;
         }
 
@@ -102,8 +100,8 @@
 
         private ISkill? GetRandomSkill()
         {
-            if (_rnd.Randf() <= _craftingMastery.GetFinalSkillChance())
-                return new PassiveSkillProvider().CreateSkill(GetSkillId(_rnd.RandiRange(1, 4)));
+            //if (_rnd.Randf() <= _craftingMastery.GetFinalSkillChance())
+            //    return new PassiveSkillProvider().CreateSkill(GetSkillId(_rnd.RandiRange(1, 4)));
             return null;
         }
 
