@@ -7,7 +7,7 @@
     using Crafting.Source.UIElements;
     using Core.Interfaces.Mediator.Requests;
 
-    public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
+    internal class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {
         private readonly UIElementProvider _uIElementProvider;
 

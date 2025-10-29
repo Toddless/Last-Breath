@@ -4,7 +4,7 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Mediator.Events;
 
-    public class ClearUiElementsEventHandler : IEventHandler<ClearUiElementsEvent>
+    internal class ClearUiElementsEventHandler : IEventHandler<ClearUiElementsEvent>
     {
         private readonly UIElementProvider _uIElementProvider;
 

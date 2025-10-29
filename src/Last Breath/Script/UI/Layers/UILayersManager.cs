@@ -32,15 +32,24 @@
                 case var _ when @event.IsActionPressed(Settings.Character):
                     _uiMediator?.Publish(new OpenCharacterWindowEvent());
                     break;
+                case var _ when @event.IsActionPressed(Settings.Cancel):
+                    _uiMediator?.Publish(new PauseGameEvent());
+                    break;
                 default: return;
             }
             GetViewport().SetInputAsHandled();
         }
 
-        public void ShowHUD(Control hud) => _mainLayer?.CallDeferred(MethodName.AddChild, hud);
-
-        public void ShowWindow(Control window) => _windowLayer?.CallDeferred(MethodName.AddChild, window);
-
+        public void ShowMainElement(Control hud) => _mainLayer?.CallDeferred(MethodName.AddChild, hud);
+        public void ShowWindowElement(Control window) => _windowLayer?.CallDeferred(MethodName.AddChild, window);
         public void ShowNotification(Control notificaton) => _notificationLayer?.CallDeferred(MethodName.AddChild, notificaton);
+        public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(MethodName.RemoveChild, hud);
+        public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(MethodName.RemoveChild, window);
+
+        public void CloseAllWindows()
+        {
+            foreach (var child in _windowLayer?.GetChildren() ?? [])
+                _windowLayer?.CallDeferred(MethodName.RemoveChild, child);
+        }
     }
 }

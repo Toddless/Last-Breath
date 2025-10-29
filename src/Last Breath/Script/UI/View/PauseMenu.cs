@@ -1,32 +1,70 @@
 ﻿namespace LastBreath.Script.UI
 {
-    using System;
     using Godot;
+    using System;
+    using Core.Interfaces.UI;
+    using Core.Interfaces.Data;
     using LastBreath.Script.Helpers;
 
-    public partial class PauseMenu : Control
+    public partial class PauseMenu : Control, IInitializable, IRequireServices, IClosable
     {
-        public event Action? Continue, SaveLoad, Options, MainMenu, Exit;
-        private Button? _continueBtn, _saveLoadBtn, _optionsBtn, _mainMenuBtn, _exitBtn;
+        private const string UID = "uid://b03h1pcqbp3iw";
+        [Export] private Button? _continueBtn, _saveLoadBtn, _optionsBtn, _mainMenuBtn, _exitBtn;
+
+        private IUIElementProvider? _uiElementProvider;
+        public event Action? Close;
 
         public override void _Ready()
         {
-            _continueBtn = (Button?)NodeFinder.FindBFSCached(this, "ContinueBtn");
-            _saveLoadBtn = (Button?)NodeFinder.FindBFSCached(this, "SaveLoadBtn");
-            _optionsBtn = (Button?)NodeFinder.FindBFSCached(this, "OptionsBtn");
-            _mainMenuBtn = (Button?)NodeFinder.FindBFSCached(this, "MainMenuBtn");
-            _exitBtn = (Button?)NodeFinder.FindBFSCached(this, "ExitBtn");
-            NodeFinder.ClearCache();
-            SetEvents();
+            _continueBtn.Pressed += OnContinueBtnPressed;
+            _saveLoadBtn.Pressed += OnSaveLoadBtnPressed;
+            _optionsBtn.Pressed += OnOptionsBtnPressed;
+            _mainMenuBtn.Pressed += OnMainMenuBtnPressed;
+            _exitBtn.Pressed += () => GetTree().Quit();
         }
 
-        private void SetEvents()
+        public override void _UnhandledInput(InputEvent @event)
         {
-            _continueBtn!.Pressed += () => Continue?.Invoke();
-            _saveLoadBtn!.Pressed += () => SaveLoad?.Invoke();
-            _optionsBtn!.Pressed += () => Options?.Invoke();
-            _mainMenuBtn!.Pressed += () => MainMenu?.Invoke();
-            _exitBtn!.Pressed += () => Exit?.Invoke();
+            if (@event.IsActionPressed(Settings.Cancel))
+            {
+                UnpauseGame();
+                AcceptEvent();
+            }
+        }
+
+        public override void _ExitTree() => UnpauseGame();
+
+        public void InjectServices(IGameServiceProvider provider)
+        {
+            _uiElementProvider = provider.GetService<IUIElementProvider>();
+        }
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void OnMainMenuBtnPressed() => GetTree().ChangeSceneToPacked(MainMenu.Initialize());
+
+        private void OnOptionsBtnPressed()
+        {
+            ArgumentNullException.ThrowIfNull(_uiElementProvider);
+            var saveLoad = _uiElementProvider.CreateRequireServicesClosable<SaveLoadWindow>();
+            CallDeferred(MethodName.AddChild, saveLoad);
+        }
+
+        private void OnSaveLoadBtnPressed()
+        {
+            ArgumentNullException.ThrowIfNull(_uiElementProvider);
+            var options = _uiElementProvider.CreateRequireServicesClosable<OptionsWindow>();
+            CallDeferred(MethodName.AddChild, options);
+        }
+
+        private void OnContinueBtnPressed() => UnpauseGame();
+
+        private void UnpauseGame()
+        {
+            var tree = Engine.GetMainLoop();
+            if (tree != null && tree is SceneTree scene)
+                scene.Paused = false;
+            Close?.Invoke();
         }
     }
 }

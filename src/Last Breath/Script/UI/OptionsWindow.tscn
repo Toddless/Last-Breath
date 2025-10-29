@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://crpiglshqam38"]
 
-[ext_resource type="Script" uid="uid://cbyqib4f61wm7" path="res://Script/UI/View/OptionsMenu.cs" id="1_y1hxi"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="4_4fi0k"]
-[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="4_y2sv3"]
+[ext_resource type="Script" uid="uid://dl4hun7bcr7l" path="res://Script/UI/View/OptionsWindow.cs" id="1_up0l5"]
+[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="2_ew5qt"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_f3bv4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ixu47"]
 font_size = 48
@@ -13,7 +13,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_y1hxi")
+script = ExtResource("1_up0l5")
 _music = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMusic/HSliderMusic")
 _sfx = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerSfx/HSliderSfx")
 _master = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMaster/HSliderMaster")
@@ -64,7 +64,7 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Resolution"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="OptionButtonResolution" type="OptionButton" parent="MarginContainer/VBoxContainer/VideoContainer/ScrollContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(256, 0)
@@ -74,7 +74,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Window Mode"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="OptionButtonWindowMode" type="OptionButton" parent="MarginContainer/VBoxContainer/VideoContainer/ScrollContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(256, 0)
@@ -111,7 +111,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Master Volume"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="HSliderMaster" type="HSlider" parent="MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMaster"]
 custom_minimum_size = Vector2(300, 32)
@@ -131,7 +131,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Music Volume"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="HSliderMusic" type="HSlider" parent="MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMusic"]
 custom_minimum_size = Vector2(300, 32)
@@ -151,7 +151,7 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SFX Volume"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="HSliderSfx" type="HSlider" parent="MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerSfx"]
 custom_minimum_size = Vector2(300, 32)
@@ -185,7 +185,7 @@ size_flags_horizontal = 4
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/UIContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Language"
-label_settings = ExtResource("4_y2sv3")
+label_settings = ExtResource("2_ew5qt")
 
 [node name="OptionButtonLanguage" type="OptionButton" parent="MarginContainer/VBoxContainer/UIContainer/ScrollContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -199,6 +199,6 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("4_4fi0k")
+theme_override_fonts/font = ExtResource("3_f3bv4")
 theme_override_font_sizes/font_size = 26
 text = "Return"

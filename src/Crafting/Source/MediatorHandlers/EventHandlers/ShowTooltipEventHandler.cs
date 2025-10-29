@@ -5,7 +5,7 @@
     using Core.Interfaces.Mediator.Events;
     using Crafting.Source.UIElements;
 
-    public class ShowTooltipEventHandler : IEventHandler<ShowInventorySlotButtonsTooltipEvent>
+    internal class ShowTooltipEventHandler : IEventHandler<ShowInventorySlotButtonsTooltipEvent>
     {
         private readonly UIElementProvider _uiElementProvider;
 

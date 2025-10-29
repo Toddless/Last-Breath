@@ -5,16 +5,16 @@
     using Core.Interfaces;
     using LastBreath.Script;
     using Core.Interfaces.Data;
+    using LastBreath.Script.UI;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using LastBreath.Script.Inventory;
-    using LastBreath.DIComponents.Services;
-    using LastBreath.DIComponents.Mediator;
     using Core.Interfaces.Mediator.Events;
+    using LastBreath.DIComponents.Mediator;
+    using LastBreath.DIComponents.Services;
     using Microsoft.Extensions.DependencyInjection;
-    using LastBreath.DIComponents.Mediator.MediatorHandlers.EventHandlers;
-    using LastBreath.Script.UI;
+    using LastBreath.DIComponents.MediatorHandlers;
 
     public class GameServiceProvider : IGameServiceProvider
     {
@@ -34,7 +34,7 @@
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
-            services.AddSingleton<IUIElementProvider, UiElementProvider>();
+            services.AddSingleton<IUIElementProvider, UIElementProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IUiMediator, UIMediator>();
             services.AddSingleton<ISystemMediator, SystemMediator>();
@@ -50,6 +50,7 @@
             services.AddSingleton<IEventHandler<OpenInventoryWindowEvent>, OpenWindowEventHandler<OpenInventoryWindowEvent, InventoryWindow>>();
             services.AddSingleton<IEventHandler<OpenQuestWindowEvent>, OpenWindowEventHandler<OpenQuestWindowEvent, QuestsWindow>>();
             services.AddSingleton<IEventHandler<OpenCharacterWindowEvent>, OpenWindowEventHandler<OpenCharacterWindowEvent, CharacterWindow>>();
+            services.AddSingleton<IEventHandler<PauseGameEvent>, PauseGameEventHandler>();
             return services.BuildServiceProvider();
         }
 

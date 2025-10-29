@@ -6,7 +6,7 @@
     using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Items;
 
-    public class ShowInventoryItemEventHandler : IEventHandler<ShowInventoryItemEvent>
+    internal class ShowInventoryItemEventHandler : IEventHandler<ShowInventoryItemEvent>
     {
         private readonly IInventory _inventory;
         private readonly UIElementProvider _uiElementProvider;

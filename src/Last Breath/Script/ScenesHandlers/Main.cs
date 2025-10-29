@@ -1,8 +1,10 @@
 ﻿namespace LastBreath.Script.ScenesHandlers
 {
     using Godot;
-    using LastBreath.Script.UI;
+    using System;
+    using Utilities;
     using Core.Interfaces.Data;
+    using LastBreath.Script.UI;
     using LastBreath.DIComponents;
 
     public partial class Main : Node2D
@@ -14,8 +16,18 @@
 
         public override void _Ready()
         {
-            if (_uiLayerManager != null) GameServiceProvider.Instance.GetService<IUIElementProvider>().Subscribe(_uiLayerManager);
-            GameServiceProvider.Instance.GetService<IUIElementProvider>().CreateAndShowMainElement<PlayerHUD>();
+            try
+            {
+                ArgumentNullException.ThrowIfNull(_uiLayerManager);
+                ArgumentNullException.ThrowIfNull(_mainWorld);
+                var serviceProvider = GameServiceProvider.Instance;
+                serviceProvider.GetService<IUIElementProvider>().Subscribe(_uiLayerManager);
+                serviceProvider.GetService<IUIElementProvider>().CreateAndShowMainElement<PlayerHUD>();
+            }
+            catch (Exception ex)
+            {
+                Tracker.TrackException("Failed to load main.", ex, this);
+            }
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

@@ -19,8 +19,9 @@
 
         public override void _Ready()
         {
-            _uIElementProvider = GameServiceProvider.Instance.GetService<IUIElementProvider>();
-            GameServiceProvider.Instance.GetService<ISettingsHandler>().ApplySavedSettings();
+            var provider = GameServiceProvider.Instance;
+            _uIElementProvider = provider.GetService<IUIElementProvider>();
+            provider.GetService<ISettingsHandler>().ApplySavedSettings();
 
             _loadGameButton.Pressed += LoadGamePressed;
             _optionsButton.Pressed += OptionsButtonPressed;
@@ -33,14 +34,14 @@
         private void LoadGamePressed()
         {
             ArgumentNullException.ThrowIfNull(_uIElementProvider);
-            var saveLoad = _uIElementProvider.CreateRequireServicesClosable<SaveLoadMenu>();
+            var saveLoad = _uIElementProvider.CreateRequireServicesClosable<SaveLoadWindow>();
             CallDeferred(MethodName.AddChild, saveLoad);
         }
 
         private void OptionsButtonPressed()
         {
             ArgumentNullException.ThrowIfNull(_uIElementProvider);
-            var options = _uIElementProvider.CreateRequireServicesClosable<OptionsMenu>();
+            var options = _uIElementProvider.CreateRequireServicesClosable<OptionsWindow>();
             CallDeferred(MethodName.AddChild, options);
         }
     }

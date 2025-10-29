@@ -7,7 +7,7 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vf40p"]
 texture = ExtResource("1_253hr")
 
-[node name="PauseMenu" type="Control"]
+[node name="PauseMenu" type="Control" node_paths=PackedStringArray("_continueBtn", "_saveLoadBtn", "_optionsBtn", "_mainMenuBtn", "_exitBtn")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,6 +15,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_dbrtl")
+_continueBtn = NodePath("MarginContainer/VBoxContainer/ContinueBtn")
+_saveLoadBtn = NodePath("MarginContainer/VBoxContainer/SaveLoadBtn")
+_optionsBtn = NodePath("MarginContainer/VBoxContainer/OptionsBtn")
+_mainMenuBtn = NodePath("MarginContainer/VBoxContainer/MainMenuBtn")
+_exitBtn = NodePath("MarginContainer/VBoxContainer/ExitBtn")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1

@@ -4,9 +4,8 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator.Events;
-    using Core.Interfaces.Mediator.Requests;
 
-    public class ItemCreatedEventHandler : IEventHandler<ItemCreatedEvent>
+    internal class ItemCreatedEventHandler : IEventHandler<ItemCreatedEvent>
     {
         private readonly UIElementProvider _uIElementProvider;
         private readonly ISystemMediator _systemMediator;

@@ -7,7 +7,7 @@
     using Crafting.Source.UIElements;
     using Core.Interfaces.Mediator.Events;
 
-    public class OpenCraftingWindowEventHandler : IEventHandler<OpenCraftingWindowEvent>
+    internal class OpenCraftingWindowEventHandler : IEventHandler<OpenCraftingWindowEvent>
     {
         private readonly UIElementProvider _provider;
         private readonly IInventory _inventory;

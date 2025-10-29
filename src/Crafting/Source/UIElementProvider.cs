@@ -5,14 +5,14 @@
     using Utilities;
     using System.Linq;
     using Core.Interfaces.UI;
+    using Crafting.Source.DI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using System.Collections.Generic;
     using Crafting.Source.UIElements;
     using Crafting.Source.UIElements.Layers;
-    using Crafting.Source.DI;
 
-    public class UIElementProvider 
+    internal class UIElementProvider 
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;

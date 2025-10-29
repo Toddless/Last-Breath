@@ -10,7 +10,7 @@
     {
         private const string UID = "uid://boqqyrt0sfpve";
 
-        [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn;
+        [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
         [Export] private TextureProgressBar? _playerHealth;
         [Export] private GridContainer? _playerEffects;
 
@@ -21,8 +21,10 @@
             _characterBtn.Pressed += OnCharacterBtnPressed;
             _inventoryBtn.Pressed += OnIntenoryBtnPressed;
             _questsBtn.Pressed += OnQuestBtnPressed;
+          //  _craftingBtn.Pressed += OnCraftingBtnPressed;
         }
 
+      //  private void OnCraftingBtnPressed() => _uiMediator?.Publish(new OpenCraftingWindowEvent(string.Empty));
         private void OnQuestBtnPressed() => _uiMediator?.Publish(new OpenQuestWindowEvent());
         private void OnIntenoryBtnPressed() => _uiMediator?.Publish(new OpenInventoryWindowEvent());
         private void OnCharacterBtnPressed() => _uiMediator?.Publish(new OpenCharacterWindowEvent());

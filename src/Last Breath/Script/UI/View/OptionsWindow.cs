@@ -8,7 +8,7 @@
     using Core.Interfaces.Data;
     using LastBreath.Script.Helpers;
 
-    public partial class OptionsMenu : Control, IInitializable, IRequireServices, IClosable
+    public partial class OptionsWindow : UI.Window, IInitializable, IRequireServices
     {
         private const string UID = "uid://crpiglshqam38";
 
@@ -18,11 +18,9 @@
 
         private ISettingsHandler? _settings;
 
-        public event Action? Close;
-
         public override void _Ready()
         {
-            if (_returnButton != null) _returnButton.Pressed += () => Close?.Invoke();
+            if (_returnButton != null) _returnButton.Pressed += RaiseClose;
             AddWindowMods();
             AddWindowResolutions();
             AddLanguages();
@@ -36,16 +34,7 @@
             _windowResolution.ItemSelected += OnWindowResolurionSelected;
         }
 
-        public override void _Input(InputEvent @event)
-        {
-            if (@event.IsActionPressed(Settings.Cancel))
-            {
-                Close?.Invoke();
-                AcceptEvent();
-            }
-        }
-
-        public void InjectServices(IGameServiceProvider provider)
+        public override void InjectServices(IGameServiceProvider provider)
         {
             _settings = provider.GetService<ISettingsHandler>();
         }

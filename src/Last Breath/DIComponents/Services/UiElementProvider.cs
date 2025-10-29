@@ -12,7 +12,7 @@
     using System.Collections.Generic;
     using LastBreath.Script.UI.Layers;
 
-    internal class UiElementProvider : IUIElementProvider
+    internal class UIElementProvider : IUIElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
@@ -23,7 +23,7 @@
         private readonly IGameServiceProvider _serviceProvider;
         private UILayersManager? _uiLayers;
 
-        public UiElementProvider()
+        public UIElementProvider()
         {
             _serviceProvider = GameServiceProvider.Instance;
         }
@@ -33,17 +33,7 @@
             _uiLayers = (UILayersManager)layer;
         }
 
-        // I need 3 type of methods:
-        // 1. Creating main elements, that will be shown on MainLayer (HUD´s)
-        // 2. Creating window elements. E.g inventory window, crafting window, etc.
-        // 3. Notifications. All type of notifications: mastery lvl up, player lvlup, events etc.
-        // each method creates and adds children to the corresponding layer
-        // we can get needed layer from UILayerManager
-
-        // We should make sure that all types of windows exist as single instance (same rule for main elements)
-        // All notifications can be created multiple times. We do not need to track it life cycle.
-
-        public bool IsInstanceTypeExist(Type instanceType, out Control? instance) => _singleInstances.TryGetValue(instanceType, out instance);
+        public bool IsInstanceTypeExist(Type instanceType, out Control? exist) => _singleInstances.TryGetValue(instanceType, out exist);
 
         public T Create<T>()
            where T : Control, IInitializable
@@ -75,34 +65,66 @@
             return instance;
         }
 
-        public T CreateAndShowOnUI<T>()
-            where T : Control, IInitializable
-        {
-            var instance = Create<T>();
-            _uiLayers?.ShowWindow(instance);
-            return instance;
-        }
-
         public T CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+                return (T)exist;
             var instance = CreateRequireServices<T>();
             _singleInstances.TryAdd(typeof(T), instance);
-            _uiLayers?.ShowHUD(instance);
+            _uiLayers?.ShowMainElement(instance);
             return instance;
+        }
+
+        public void HideMainElement<T>()
+            where T : Control, IInitializable, IRequireServices
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayers?.RemoveMainElement(exist);
+        }
+
+        public void ShowMainElement<T>()
+             where T : Control, IInitializable, IRequireServices
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayers?.ShowMainElement(exist);
         }
 
         public T CreateAndShowWindowElement<T>()
-            where T: Control, IInitializable, IRequireServices
+            where T : Control, IInitializable, IRequireServices, IClosable
         {
+            ArgumentNullException.ThrowIfNull(_uiLayers);
+
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+                return (T)exist;
             var instance = CreateRequireServices<T>();
+            instance.Close += _uiLayers.CloseAllWindows; 
             _singleInstances.TryAdd(typeof(T), instance);
-            _uiLayers?.ShowWindow(instance);
+            _uiLayers.ShowWindowElement(instance);
             return instance;
         }
 
+        public void HideWindowElement<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
 
+            _uiLayers?.RemoveWindowElement(exist);
+        }
 
+        public void ShowWindowElement<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable
+        {
+            if (!_singleInstances.TryGetValue(typeof(T), out var exist))
+                ArgumentNullException.ThrowIfNull(exist);
+
+            _uiLayers?.ShowWindowElement(exist);
+        }
 
         public T CreateClosableForSource<T>(Control source)
             where T : Control, IInitializable, IClosable, IRequireServices
@@ -140,10 +162,9 @@
             }
 
             list.Add(instance);
-            _uiLayers?.ShowWindow(instance);
+            _uiLayers?.ShowWindowElement(instance);
             return instance;
         }
-
         private void OnRepositionRequired(Control source)
         {
             ArgumentNullException.ThrowIfNull(_uiLayers);
@@ -161,7 +182,6 @@
 
             source.Position = CalculatePosition(list, screenSize, windowSize);
         }
-
         public void ClearSource(Control source)
         {
             if (!_instanceBySource.TryGetValue(source, out var existList)) return;
@@ -169,14 +189,13 @@
             foreach (var ui in existList ?? [])
                 ui.QueueFree();
         }
-
         public T CreateSingleClosable<T>()
             where T : Control, IInitializable, IClosable
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
                 return (T)exist;
 
-            var instance = CreateAndShowOnUI<T>();
+            var instance = Create<T>();
 
             var savedPos = _positionStorage.GetPosition<T>();
             if (instance is IRequireServices require)
@@ -191,7 +210,6 @@
             _singleInstances[typeof(T)] = instance;
             return instance;
         }
-
         public void Unload<T>()
             where T : Control
         {

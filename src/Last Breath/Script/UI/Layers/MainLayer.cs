@@ -1,7 +1,6 @@
 ﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using System;
 
     public partial class MainLayer : CanvasLayer
     {

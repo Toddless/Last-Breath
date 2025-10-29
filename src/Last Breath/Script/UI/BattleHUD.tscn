@@ -1,25 +1,25 @@
 [gd_scene load_steps=18 format=3 uid="uid://j6cqo6u0s83x"]
 
-[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="1_671fa"]
-[ext_resource type="Script" uid="uid://402jw803k746" path="res://Script/UI/View/BattleUI.cs" id="1_xg6rw"]
-[ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_c5cqn"]
-[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="2_tr072"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="3_00t1l"]
-[ext_resource type="Script" uid="uid://kgidvbxkxbav" path="res://Script/UI/ResourceProgressBar.cs" id="5_nkmc7"]
-[ext_resource type="Script" uid="uid://du3w1tmvgffcx" path="res://Script/UI/AbilityButtons.cs" id="6_mc3dc"]
-[ext_resource type="Texture2D" uid="uid://dw4nn6k6cfbap" path="res://Assets/Combo.bmp" id="6_tuwow"]
-[ext_resource type="Texture2D" uid="uid://wrycjitbr00h" path="res://Assets/Mana.bmp" id="7_l2rcb"]
-[ext_resource type="Texture2D" uid="uid://b02h28hf5wiqv" path="res://Assets/Fury.bmp" id="8_506f5"]
+[ext_resource type="Script" uid="uid://snamp6anmfft" path="res://Script/UI/View/BattleHUD.cs" id="1_mkgrk"]
+[ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_y6srj"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="3_w3y2b"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="4_0hdpq"]
+[ext_resource type="Script" uid="uid://kgidvbxkxbav" path="res://Script/UI/ResourceProgressBar.cs" id="5_n22wm"]
+[ext_resource type="Texture2D" uid="uid://wrycjitbr00h" path="res://Assets/Mana.bmp" id="6_qn343"]
+[ext_resource type="Texture2D" uid="uid://dw4nn6k6cfbap" path="res://Assets/Combo.bmp" id="7_amp0p"]
+[ext_resource type="Texture2D" uid="uid://b02h28hf5wiqv" path="res://Assets/Fury.bmp" id="8_te0gi"]
+[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="9_hemsg"]
+[ext_resource type="Script" uid="uid://du3w1tmvgffcx" path="res://Script/UI/AbilityButtons.cs" id="10_w4upr"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
-texture = ExtResource("2_c5cqn")
+texture = ExtResource("2_y6srj")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sabj2"]
-atlas = ExtResource("1_671fa")
+atlas = ExtResource("3_w3y2b")
 region = Rect2(0, 16, 64, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l5ci7"]
-atlas = ExtResource("2_tr072")
+atlas = ExtResource("4_0hdpq")
 region = Rect2(0, 32, 64, 16)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_fnpvt"]
@@ -34,7 +34,7 @@ size = Vector2(75, 75)
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_215ms"]
 size = Vector2(75, 75)
 
-[node name="BattleUI" type="Control" node_paths=PackedStringArray("_returnButton", "_playerHealthBar", "_enemyHealthBar", "_playerEffects", "_enemyEffects", "_dexterityStance", "_strengthStance", "_intelligenceStance", "_head", "_body", "_legs", "_playerResource", "_enemyResource", "_player", "_enemy", "_abilities", "_attackButtons", "_stanceContainer", "_bodyContainer")]
+[node name="BattleHUD" type="Control" node_paths=PackedStringArray("_returnButton", "_playerHealthBar", "_enemyHealthBar", "_playerEffects", "_enemyEffects", "_dexterityStance", "_strengthStance", "_intelligenceStance", "_head", "_body", "_legs", "_playerResource", "_enemyResource", "_player", "_enemy", "_abilities", "_attackButtons", "_stanceContainer", "_bodyContainer")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,7 +43,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
-script = ExtResource("1_xg6rw")
+script = ExtResource("1_mkgrk")
 _returnButton = NodePath("MarginContainer/VBoxContainer/ReturnButton")
 _playerHealthBar = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars/PlayerHealth")
 _enemyHealthBar = NodePath("MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainerHealthBars/EnemyHealth")
@@ -124,11 +124,11 @@ value = 9.0
 rounded = true
 nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
-script = ExtResource("5_nkmc7")
+script = ExtResource("5_n22wm")
 TextureByResourceType = Dictionary[int, Texture2D]({
-0: ExtResource("7_l2rcb"),
-1: ExtResource("6_tuwow"),
-2: ExtResource("8_506f5")
+0: ExtResource("6_qn343"),
+1: ExtResource("7_amp0p"),
+2: ExtResource("8_te0gi")
 })
 
 [node name="EnemyResource" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/HealthEffectsResources/HBoxContainer"]
@@ -142,11 +142,11 @@ rounded = true
 fill_mode = 1
 nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_sabj2")
-script = ExtResource("5_nkmc7")
+script = ExtResource("5_n22wm")
 TextureByResourceType = Dictionary[int, Texture2D]({
-0: ExtResource("7_l2rcb"),
-1: ExtResource("6_tuwow"),
-2: ExtResource("8_506f5")
+0: ExtResource("6_qn343"),
+1: ExtResource("7_amp0p"),
+2: ExtResource("8_te0gi")
 })
 
 [node name="HBoxContainerStatusEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HealthEffectsResources"]
@@ -173,7 +173,7 @@ columns = 11
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("3_00t1l")
+theme_override_fonts/font = ExtResource("9_hemsg")
 theme_override_font_sizes/font_size = 16
 text = "Escape"
 
@@ -274,4 +274,4 @@ texture_normal = SubResource("PlaceholderTexture2D_215ms")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 10
-script = ExtResource("6_mc3dc")
+script = ExtResource("10_w4upr")
