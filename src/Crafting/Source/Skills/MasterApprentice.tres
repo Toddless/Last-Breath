@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MastersApprentice" load_steps=4 format=3 uid="uid://cyusi7e6q1mow"]
+
+[ext_resource type="Script" uid="uid://rngqbgvc6ows" path="res://Source/Skills/MastersApprentice.cs" id="1_urtvk"]
+
+[sub_resource type="Gradient" id="Gradient_urtvk"]
+colors = PackedColorArray(0, 0, 0, 1, 0.7313145, 0.86306447, 0.9752062, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8vqnp"]
+gradient = SubResource("Gradient_urtvk")
+
+[resource]
+script = ExtResource("1_urtvk")
+Percent = 25
+Id = "Passive_Skill_Master_Apprentice"
+Icon = SubResource("GradientTexture1D_8vqnp")
+Type = 2
+metadata/_custom_type_script = "uid://rngqbgvc6ows"

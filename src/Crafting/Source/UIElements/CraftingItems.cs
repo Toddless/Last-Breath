@@ -73,7 +73,7 @@
         {
             if (_items != null)
             {
-                var displayName = Lokalizator.Lokalize(resourceId);
+                var displayName = Localizator.Localize(resourceId);
                 var id = _items.AddItem(displayName, _itemDataProvider?.GetItemIcon(resourceId), selectable);
                 _resources.Add(id, resourceId);
             }

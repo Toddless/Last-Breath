@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://betq124kfglyy"]
 
-[ext_resource type="Script" uid="uid://div5mhvyq01xf" path="res://Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
+[ext_resource type="Script" uid="uid://div5mhvyq01xf" path="res://Addons/Crafting/Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb7l8"]
 bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0)

@@ -5,6 +5,7 @@
     using Utilities;
     using Core.Enums;
     using Core.Interfaces;
+    using Core.Interfaces.Mediator;
     using LastBreath.Script.Helpers;
 
     public class SettingsHandler : ISettingsHandler
@@ -15,8 +16,9 @@
         private readonly Vector2I[] _resolution = [new(1366, 768), new(1920, 1080), new(2560, 1440)];
         private readonly string[] _windowMods = ["Full-Screen", "Window", "Borderless Window"];
         private readonly string[] _resolutins = ["1366 x 768", "1920 x 1080", "2560 x 1440"];
+        private readonly IUiMediator _uiMediator;
 
-        public SettingsHandler()
+        public SettingsHandler(IUiMediator uiMediator)
         {
             if (!FileAccess.FileExists(ConfigFilePath))
             {
@@ -38,6 +40,8 @@
             }
             else
                 _config.Load(ConfigFilePath);
+
+            _uiMediator = uiMediator;
         }
 
         public void ApplySavedSettings()
@@ -45,6 +49,7 @@
             LoadSoundSettings();
             LoadVideoSettings();
             LoadUISettings();
+            _uiMediator.RaiseUpdateUi();
         }
 
         public string[] GetWindowMods() => _windowMods;

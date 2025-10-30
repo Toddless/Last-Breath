@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnhancedMastery" load_steps=2 format=3 uid="uid://c6evnrobeywq2"]
+
+[ext_resource type="Script" uid="uid://c46qrydrsc8u8" path="res://Source/Skills/EnhancedMastery.cs" id="1_g7juw"]
+
+[resource]
+script = ExtResource("1_g7juw")
+MasteryPool = PackedStringArray("Passive_Skill_Crafting_Mastery", "Passive_Skill_Sword_Mastery", "Passive_Skill_Fishing_Mastery", "Passive_Skill_Battle_Mastery")
+MaxBonusLevel = 3
+Id = "Passive_Skill_Enhanced_Mastery"
+Type = 2
+metadata/_custom_type_script = "uid://c46qrydrsc8u8"

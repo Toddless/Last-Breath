@@ -35,8 +35,8 @@
         public Texture2D? FullImage { get; set; }
         public ISkill? Skill { get; private set; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string Description => Lokalizator.Lokalize(Id + "_Description");
-        public string DisplayName => Lokalizator.Lokalize(Id);
+        public string Description => Localizator.Localize(Id + "_Description");
+        public string DisplayName => Localizator.Localize(Id);
         public int UpdateLevel => _currentUpdateLevel;
         public int MaxUpdateLevel => _maxUpdateLevel;
         public IReadOnlyList<IModifierInstance> AdditionalModifiers => [.. _additionalModifiers];

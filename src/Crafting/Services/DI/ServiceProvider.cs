@@ -3,6 +3,7 @@
     using Godot;
     using System;
     using Core.Results;
+    using Crafting.Source;
     using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
@@ -11,12 +12,10 @@
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using Core.Interfaces.Mediator.Events;
+    using Crafting.Source.MediatorHandlers;
     using Crafting.TestResources.Inventory;
     using Core.Interfaces.Mediator.Requests;
     using Microsoft.Extensions.DependencyInjection;
-    using Crafting.TestResources;
-    using Crafting.Source;
-    using Crafting.Source.MediatorHandlers;
     using Crafting.Source.MediatorHandlers.EventHandlers;
 
     internal class ServiceProvider : IGameServiceProvider

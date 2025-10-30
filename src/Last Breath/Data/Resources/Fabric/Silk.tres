@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="CraftingResource" load_steps=2 format=3 uid="uid://x3rso116oei0"]
+
+[ext_resource type="Script" uid="uid://0efhu2ubg0nh" path="res://Addons/Crafting/Source/CraftingResource.cs" id="1_tuoqt"]
+
+[resource]
+script = ExtResource("1_tuoqt")

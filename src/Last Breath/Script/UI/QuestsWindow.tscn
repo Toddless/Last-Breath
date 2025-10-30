@@ -1,11 +1,17 @@
 [gd_scene load_steps=7 format=3 uid="uid://cqr8ohljxh8kt"]
 
 [ext_resource type="Script" uid="uid://bpnr444hb0tor" path="res://Script/UI/View/QuestsWindow.cs" id="1_l0i88"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_bax32"]
 [ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="2_upioa"]
 [ext_resource type="LabelSettings" uid="uid://bvl3lfttlwy3" path="res://Fonts/HeadingsSettings.tres" id="3_ncypl"]
 [ext_resource type="LabelSettings" uid="uid://b23ryeqb5g6qo" path="res://Fonts/QuestsMenu.tres" id="4_b800w"]
 [ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Fonts/BaseFonts20Pix.tres" id="5_c7ebf"]
+
+[sub_resource type="FontFile" id="FontFile_a2sbb"]
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
 
 [node name="QuestsWindow" type="Control" node_paths=PackedStringArray("_mainQuests", "_sideQuests", "_questDescription", "_questStatus")]
 clip_contents = true
@@ -161,7 +167,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/line_separation = 3
-theme_override_fonts/normal_font = ExtResource("2_bax32")
+theme_override_fonts/normal_font = SubResource("FontFile_a2sbb")
 theme_override_font_sizes/normal_font_size = 24
 fit_content = true
 

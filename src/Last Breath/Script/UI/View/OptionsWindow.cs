@@ -6,6 +6,8 @@
     using Core.Interfaces;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
+    using LastBreath.Script.UI;
+    using Core.Interfaces.Mediator;
     using LastBreath.Script.Helpers;
 
     public partial class OptionsWindow : UI.Window, IInitializable, IRequireServices
@@ -14,13 +16,17 @@
 
         [Export] private HSlider? _music, _sfx, _master;
         [Export] private OptionButton? _languange, _windowMode, _windowResolution;
-        [Export] private Button? _returnButton;
+        [Export] private LocalizableButton? _returnButton, _applyBtn;
+        [Export] private LocalizableLabel[] _labels = [];
 
         private ISettingsHandler? _settings;
+        private IUiMediator? _uiMediator;
 
         public override void _Ready()
         {
             if (_returnButton != null) _returnButton.Pressed += RaiseClose;
+            if (_applyBtn != null) _applyBtn.Pressed += OnApplyPressed;
+
             AddWindowMods();
             AddWindowResolutions();
             AddLanguages();
@@ -32,14 +38,34 @@
             _languange.ItemSelected += OnLanguageSelected;
             _windowMode.ItemSelected += OnWindowModeSelected;
             _windowResolution.ItemSelected += OnWindowResolurionSelected;
+            UpdateUI();
         }
+
+
+        private void OnApplyPressed() => _settings?.ApplySavedSettings();
 
         public override void InjectServices(IGameServiceProvider provider)
         {
             _settings = provider.GetService<ISettingsHandler>();
+            _uiMediator = provider.GetService<IUiMediator>();
+            _uiMediator.UpdateUi += UpdateUI;
+        }
+
+        public override void _ExitTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void UpdateUI()
+        {
+            _returnButton?.UpdateButtonText();
+            _applyBtn?.UpdateButtonText();
+            foreach (var label in _labels)
+                label.UpdateLabelText();
+        }
+
 
         private void SetSavedSettingsValues()
         {
@@ -80,6 +106,5 @@
         private void OnMusicSliderValueChanges(double value) => SlideValueChanges(value, SoundBus.Music);
         private void OnSfxSliderValueChanges(double value) => SlideValueChanges(value, SoundBus.Sfx);
         private void OnMasterValueChanges(double value) => SlideValueChanges(value, SoundBus.Master);
-
     }
 }

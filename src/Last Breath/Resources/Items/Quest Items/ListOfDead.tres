@@ -1,10 +1,8 @@
-[gd_resource type="Resource" script_class="QuestItem" load_steps=4 format=3 uid="uid://bgyt3vacw15ik"]
+[gd_resource type="Resource" script_class="QuestItem" load_steps=3 format=3 uid="uid://bgyt3vacw15ik"]
 
 [ext_resource type="Script" uid="uid://curr877vpisc3" path="res://Script/Items/QuestItem.cs" id="2_ftup6"]
-[ext_resource type="Texture2D" uid="uid://cl6suu3c17y4s" path="res://Assets/ReputationPositive.svg" id="2_k0ugo"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_klwss"]
-atlas = ExtResource("2_k0ugo")
 region = Rect2(16, 32, 96, 72)
 
 [resource]

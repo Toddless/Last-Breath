@@ -10,7 +10,7 @@
     {
         private const string UID = "uid://boqqyrt0sfpve";
 
-        [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
+        [Export] private LocalizableButton? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
         [Export] private TextureProgressBar? _playerHealth;
         [Export] private GridContainer? _playerEffects;
 
@@ -32,6 +32,15 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _uiMediator = provider.GetService<IUiMediator>();
+            _uiMediator.UpdateUi += UpdateUI;
+        }
+
+        private void UpdateUI()
+        {
+            _characterBtn?.UpdateButtonText();
+            _inventoryBtn?.UpdateButtonText();
+            _questsBtn?.UpdateButtonText();
+            _craftingBtn?.UpdateButtonText();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

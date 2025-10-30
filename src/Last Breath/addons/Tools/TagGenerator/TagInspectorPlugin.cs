@@ -1,5 +1,5 @@
 ﻿#if TOOLS
-namespace LastBreath.addons.Tools.TagGenerator
+namespace LastBreath.Addons.Tools.TagGenerator
 {
     using System.Linq;
     using Godot;

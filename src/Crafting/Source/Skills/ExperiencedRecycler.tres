@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ExperiencedRecycler" load_steps=2 format=3 uid="uid://b1lm7cmdw81o7"]
+
+[ext_resource type="Script" uid="uid://bflmbdq7lhxdl" path="res://Source/Skills/ExperiencedRecycler.cs" id="1_yh36w"]
+
+[resource]
+script = ExtResource("1_yh36w")
+Percent = 15
+Id = "Passive_Skill_Experienced_Recycler"
+metadata/_custom_type_script = "uid://bflmbdq7lhxdl"

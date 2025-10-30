@@ -202,9 +202,9 @@
         {
             return _craftingMode switch
             {
-                CraftingMode.Create => Lokalizator.Lokalize("CraftingCreateButton"),
-                CraftingMode.Upgrade => Lokalizator.Lokalize("CraftingUpgradeButton"),
-                CraftingMode.Ascend => Lokalizator.Lokalize("CraftingAscendButton"),
+                CraftingMode.Create => Localizator.Localize("CraftingCreateButton"),
+                CraftingMode.Upgrade => Localizator.Localize("CraftingUpgradeButton"),
+                CraftingMode.Ascend => Localizator.Localize("CraftingAscendButton"),
                 _ => string.Empty
             };
         }
@@ -345,7 +345,7 @@
 
                 var result = await _systemMediator.Send<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(new(_equpItem?.InstanceId ?? string.Empty, hash, _usedResources));
                 if (result.IsSuccess)
-                    source.UpdateSelectedItem((Lokalizator.Format(result.Param), result.Param!.GetHashCode()));
+                    source.UpdateSelectedItem((Localizator.Format(result.Param), result.Param!.GetHashCode()));
             }
             catch (Exception ex)
             {
@@ -360,7 +360,7 @@
 
             var modsWithHash = new List<(string Mod, int Hash)>();
             foreach (var mod in modifiers)
-                modsWithHash.Add((Lokalizator.Format(mod), mod.GetHashCode()));
+                modsWithHash.Add((Localizator.Format(mod), mod.GetHashCode()));
 
             modifiersList.AddModifiersToList(modsWithHash, labelSettings);
             modifiersList.SetItemsSelectable(false);
@@ -377,7 +377,7 @@
         private void UpdateModifiersInList(IReadOnlyList<IModifierInstance> modifiers, ItemModifierList? list)
         {
             foreach (var modifier in modifiers)
-                list?.UpdateModifierText(modifier.GetHashCode(), Lokalizator.Format(modifier));
+                list?.UpdateModifierText(modifier.GetHashCode(), Localizator.Format(modifier));
         }
 
         private void SetSkill()
@@ -440,7 +440,7 @@
                     var resourceId = resource.GetResourceId();
                     result.TryGetValue(resourceId, out var amount);
                     _usedResources.TryGetValue(resourceId, out var need);
-                    resource.SetText(Lokalizator.Lokalize(resourceId), amount, need);
+                    resource.SetText(Localizator.Localize(resourceId), amount, need);
                 }
             }
             catch (Exception ex)
@@ -507,8 +507,8 @@
 
         private void SetDisplayableData(string id)
         {
-            _itemName.Text = Lokalizator.Lokalize(id);
-            _description.Text = Lokalizator.LokalizeDescription(id);
+            _itemName.Text = Localizator.Localize(id);
+            _description.Text = Localizator.LocalizeDescription(id);
             _itemIcon.Texture = GetChachedIcon(id);
             _itemUpgradeLevel.Text = GetUpdateLevel();
         }
@@ -535,7 +535,7 @@
             var reqItem = ClickableResource.Initialize().Instantiate<ClickableResource>();
             reqItem.SetResourceId(resourceId);
             reqItem.SetIcon(_dataProvider?.GetItemIcon(resourceId));
-            reqItem.SetText(Lokalizator.Lokalize(resourceId), have, need);
+            reqItem.SetText(Localizator.Localize(resourceId), have, need);
             return reqItem;
         }
 

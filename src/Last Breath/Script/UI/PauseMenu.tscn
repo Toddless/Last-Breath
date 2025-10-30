@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://birlnsko8jyj4" path="res://Assets/PauseMenu_Placeholder.webp" id="1_253hr"]
 [ext_resource type="Script" uid="uid://gdt7n01my4nb" path="res://Script/UI/View/PauseMenu.cs" id="1_dbrtl"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ivxo3"]
+[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="3_g7wd7"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vf40p"]
 texture = ExtResource("1_253hr")
@@ -55,30 +55,35 @@ size_flags_vertical = 8
 
 [node name="ContinueBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_ivxo3")
 theme_override_font_sizes/font_size = 36
-text = "Continue"
+text = "ContinueBtn"
+script = ExtResource("3_g7wd7")
+metadata/_custom_type_script = "uid://co1n2nli0tm0e"
 
 [node name="SaveLoadBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_ivxo3")
 theme_override_font_sizes/font_size = 36
-text = "Save / Load"
+text = "LoadGameBtn"
+script = ExtResource("3_g7wd7")
+metadata/_custom_type_script = "uid://co1n2nli0tm0e"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_ivxo3")
 theme_override_font_sizes/font_size = 36
-text = "Options"
+text = "OptionsBtn"
+script = ExtResource("3_g7wd7")
+metadata/_custom_type_script = "uid://co1n2nli0tm0e"
 
 [node name="MainMenuBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_ivxo3")
 theme_override_font_sizes/font_size = 36
-text = "Main Menu"
+text = "MainMenuBtn"
+script = ExtResource("3_g7wd7")
+metadata/_custom_type_script = "uid://co1n2nli0tm0e"
 
 [node name="ExitBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_ivxo3")
 theme_override_font_sizes/font_size = 36
-text = "Exit"
+text = "QuitBtn"
+script = ExtResource("3_g7wd7")
+metadata/_custom_type_script = "uid://co1n2nli0tm0e"

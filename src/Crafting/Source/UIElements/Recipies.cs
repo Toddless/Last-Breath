@@ -67,7 +67,7 @@
             foreach (var cat in Enum.GetValues<RecipeCategories>())
             {
                 var category = _recipeTree.CreateItem(treeRoot);
-                category.SetText(0, Lokalizator.Lokalize(cat.ToString()));
+                category.SetText(0, Localizator.Localize(cat.ToString()));
                 category.SetSelectable(0, false);
                 category.SetMetadata(0, "category");
                 _categories[cat] = category;
@@ -78,7 +78,7 @@
                 var category = _categories.Keys.FirstOrDefault(category => recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
                 var treeItem = _recipeTree.CreateItem(_categories[category]);
                 var amount = await CalculateAmountToCraft(recipe.MainResource);
-                var recipeName = $"{Lokalizator.Lokalize(recipe.Id)}";
+                var recipeName = $"{Localizator.Localize(recipe.Id)}";
                 if (amount > 0)
                     recipeName += $" ({amount})";
                 treeItem.SetText(0, recipeName);
@@ -134,7 +134,7 @@
                 {
                     var requirements = _dataProvider?.GetRecipeRequirements(meta) ?? [];
                     var amount = await CalculateAmountToCraft(requirements);
-                    var recipeName = $"{Lokalizator.Lokalize(meta)}";
+                    var recipeName = $"{Localizator.Localize(meta)}";
                     if (amount > 0)
                         recipeName += $" ({amount})";
                     item.SetText(0, recipeName);

@@ -1,7 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://bqlqfsqoepfhs"]
 
 [ext_resource type="Script" uid="uid://xvnepkg3q1bw" path="res://Script/Inventory/InventorySlot.cs" id="1_yg5o5"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_ehf1w"]
 
 [sub_resource type="Gradient" id="Gradient_sbkx4"]
 offsets = PackedFloat32Array(0)
@@ -10,8 +9,10 @@ colors = PackedColorArray(0.19434911, 0.19434932, 0.1943492, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_ng85e"]
 gradient = SubResource("Gradient_sbkx4")
 
+[sub_resource type="SystemFont" id="SystemFont_pbd5n"]
+
 [sub_resource type="LabelSettings" id="LabelSettings_gs3g4"]
-font = ExtResource("2_ehf1w")
+font = SubResource("SystemFont_pbd5n")
 shadow_color = Color(0, 0, 0, 1)
 
 [node name="InventorySlot" type="Control" node_paths=PackedStringArray("QuantityLabel", "Background", "Icon", "Frame")]

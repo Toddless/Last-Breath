@@ -1,4 +1,4 @@
-﻿namespace LastBreath.addons.Tools.TagGenerator
+﻿namespace LastBreath.Addons.Tools.TagGenerator
 {
     public static class TagUtils
     {

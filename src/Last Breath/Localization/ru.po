@@ -156,3 +156,106 @@ msgstr "Дополнительное подавление"
 # Extra Spell Damage
 msgid "ExtraSpellDamage"
 msgstr "Дополнительный урон способностей"
+
+
+
+
+
+# ------------------------
+# Buttons
+# ------------------------
+
+msgid "CraftingCreateBtn"
+msgstr "Создать"
+
+msgid "CraftingUpgradeBtn"
+msgstr "Улучшить"
+
+msgid "CraftingAscendBtn"
+msgstr "Возвысить"
+
+msgid "NewGameBtn"
+msgstr "Новая игра"
+
+msgid "LoadGameBtn"
+msgstr "Загрузить"
+
+msgid "OptionsBtn"
+msgstr "Настройки"
+
+msgid "QuitBtn"
+msgstr "Выход"
+
+msgid "ContinueBtn"
+msgstr "Продолжить"
+
+msgid "MainMenuBtn"
+msgstr "Главное меню"
+
+msgid "CharacterBtn"
+msgstr "Персонаж"
+
+msgid "InventoryBtn"
+msgstr "Инвентарь"
+
+msgid "CraftingBtn"
+msgstr "Ремесло"
+
+msgid "QuestsBtn"
+msgstr "Квесты"
+
+msgid "ApplyBtn"
+msgstr "Применить"
+
+msgid "ReturnBtn"
+msgstr "Вернуться"
+
+msgid "DeleteBtn"
+msgstr "Удалить"
+
+msgid "LoadBtn"
+msgstr "Загрузить"
+
+# -----------------------
+# Texts
+# -----------------------
+
+msgid "RandomStats"
+msgstr "Случайные хар-ки"
+
+msgid "BaseStats"
+msgstr "Базовые хар-ки"
+
+msgid "GameTitle"
+msgstr "Last Breath"
+
+msgid "VideoSettings"
+msgstr "Видео"
+
+msgid "ResolutionSetting"
+msgstr "Разрешение"
+
+msgid "WindowModeSetting"
+msgstr "Режим окна"
+
+msgid "SoundSettings"
+msgstr "Звук"
+
+msgid "MasterVolumeSetting"
+msgstr "Общая громкость"
+
+msgid "MusicVolumeSetting"
+msgstr "Громкость музыки"
+
+msgid "SFXVolumeSetting"
+msgstr "Громкость SFX"
+
+msgid "UISettings"
+msgstr "UI"
+
+msgid "LanguageSetting"
+msgstr "Язык"
+
+msgid "SaveLoadLabel"
+msgstr "Сохранить/Загрузить"
+

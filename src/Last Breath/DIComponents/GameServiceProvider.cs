@@ -4,6 +4,7 @@
     using System;
     using Core.Results;
     using Core.Interfaces;
+    using Crafting.Source;
     using LastBreath.Script;
     using LastBreath.Script.UI;
     using Core.Interfaces.Data;
@@ -11,7 +12,6 @@
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
-    using LastBreath.Addons.Crafting;
     using System.Collections.Generic;
     using LastBreath.Script.Inventory;
     using Core.Interfaces.Mediator.Events;
@@ -22,7 +22,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Crafting.Source.MediatorHandlers;
     using Crafting.Source.MediatorHandlers.EventHandlers;
-    using Crafting.Source;
 
     public class GameServiceProvider : IGameServiceProvider
     {

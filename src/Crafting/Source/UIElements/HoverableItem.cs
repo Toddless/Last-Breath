@@ -34,7 +34,7 @@
                         FontSize = 12
                     },
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Text = Lokalizator.Format(mod)
+                    Text = Localizator.Format(mod)
                 };
                 popupWindow.AddItem(label);
             }

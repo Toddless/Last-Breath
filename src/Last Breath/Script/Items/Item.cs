@@ -19,9 +19,9 @@
         [Export] public string[] Tags { get; protected set; } = [];
 
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string DisplayName => Lokalizator.Lokalize(Id);
+        public string DisplayName => Localizator.Localize(Id);
 
-        public string Description => Lokalizator.LokalizeDescription(Id);
+        public string Description => Localizator.LocalizeDescription(Id);
 
         public Item()
         {

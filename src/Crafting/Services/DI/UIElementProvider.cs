@@ -293,14 +293,14 @@
             {
                 var selectable = new InteractiveLabel();
                 selectable.SetSelectable(false);
-                selectable.SetText(Lokalizator.Format(item));
+                selectable.SetText(Localizator.Format(item));
                 itemDetails.SetItemBaseStats(selectable);
             }
 
             foreach (var modifier in equip.AdditionalModifiers)
             {
                 var stat = new InteractiveLabel();
-                stat.SetText(Lokalizator.Format(modifier));
+                stat.SetText(Localizator.Format(modifier));
                 stat.SetSelectable(false);
                 itemDetails.SetItemAdditionalStats(stat);
             }
