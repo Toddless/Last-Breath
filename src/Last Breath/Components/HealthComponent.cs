@@ -51,7 +51,7 @@
 
         public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
-            if (args.Parameter != Parameter.MaxHealth)
+            if (args.Parameter != Parameter.Health)
                 return;
             var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, args.Modifiers);
             if (MathF.Abs(newMaxHealth - MaxHealth) > float.Epsilon)

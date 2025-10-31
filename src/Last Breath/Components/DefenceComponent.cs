@@ -28,7 +28,7 @@
                 case Parameter.Evade:
                     Evade = Calculations.CalculateFloatValue(BaseEvade, args.Modifiers);
                     break;
-                case Parameter.EnergyBarrier:
+                case Parameter.Barrier:
                     EnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, args.Modifiers);
                     break;
                 case Parameter.MaxReduceDamage:

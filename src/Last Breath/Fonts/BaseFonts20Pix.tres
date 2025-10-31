@@ -1,8 +1,0 @@
-[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://cj8qeb6jo6im5"]
-
-[sub_resource type="SystemFont" id="SystemFont_miyea"]
-
-[resource]
-font = SubResource("SystemFont_miyea")
-font_size = 14
-font_color = Color(0, 0, 0, 1)

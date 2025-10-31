@@ -8,7 +8,7 @@
         private static IEnumerable<AttributeEffect> GetEffects()
         {
             yield return new AttributeEffect
-                (Parameter.EnergyBarrier,
+                (Parameter.Barrier,
                 ModifierType.Flat,
                 10);
 

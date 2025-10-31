@@ -1,7 +1,0 @@
-[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://b23ryeqb5g6qo"]
-
-[sub_resource type="SystemFont" id="SystemFont_yue3c"]
-
-[resource]
-font = SubResource("SystemFont_yue3c")
-font_size = 25

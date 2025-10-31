@@ -2,7 +2,7 @@
 {
     public enum EquipmentType : byte
     {
-        BodyArmor,
+        Body,
         Belt,
         Gloves,
         Boots,

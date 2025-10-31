@@ -6,7 +6,7 @@
         {
             return equipment switch
             {
-                EquipmentType.BodyArmor => EquipmentCategory.Armor,
+                EquipmentType.Body => EquipmentCategory.Armor,
                 EquipmentType.Cloak => EquipmentCategory.Armor,
                 EquipmentType.Gloves => EquipmentCategory.Armor,
                 EquipmentType.Boots => EquipmentCategory.Armor,

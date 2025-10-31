@@ -353,7 +353,7 @@
             }
         }
 
-        private ItemModifierList CreateItemModifierList(IReadOnlyList<IModifierInstance> modifiers, LabelSettings? labelSettings)
+        private ItemModifierList CreateItemModifierList(IReadOnlyList<IModifier> modifiers, LabelSettings? labelSettings)
         {
             ArgumentNullException.ThrowIfNull(_uiElementProvider);
             var modifiersList = _uiElementProvider.Create<ItemModifierList>();
@@ -374,7 +374,7 @@
             modifierList.SetItemsSelectable(isSelectable);
         }
 
-        private void UpdateModifiersInList(IReadOnlyList<IModifierInstance> modifiers, ItemModifierList? list)
+        private void UpdateModifiersInList(IReadOnlyList<IModifier> modifiers, ItemModifierList? list)
         {
             foreach (var modifier in modifiers)
                 list?.UpdateModifierText(modifier.GetHashCode(), Localizator.Format(modifier));

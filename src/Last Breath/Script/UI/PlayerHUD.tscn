@@ -73,26 +73,31 @@ theme_override_constants/separation = 5
 [node name="Character" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
 focus_mode = 0
-text = "CharacterBtn"
+text = "Character"
 script = ExtResource("4_aoa6y")
+_id = "CharacterBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"
 
 [node name="Inventory" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
 focus_mode = 0
-text = "InventoryBtn"
+text = "Inventory"
 script = ExtResource("4_aoa6y")
+_id = "InventoryBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"
 
 [node name="Quests" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
 focus_mode = 0
-text = "QuestsBtn"
+text = "Quests"
 script = ExtResource("4_aoa6y")
+_id = "QuestsBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"
 
 [node name="Crafting" type="Button" parent="MarginContainer/HBoxContainerButtons"]
 layout_mode = 2
-text = "CraftingBtn"
+focus_mode = 0
+text = "Crafting"
 script = ExtResource("4_aoa6y")
+_id = "CraftingBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"

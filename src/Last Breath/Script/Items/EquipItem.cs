@@ -18,29 +18,27 @@
         private float _currentUpdateMultiplier = 1f;
         private int _maxUpdateLevel = 12;
         private int _currentUpdateLevel = 0;
-        private HashSet<IModifierInstance> _baseModifiers = [];
-        private HashSet<IModifierInstance> _additionalModifiers = [];
+        private HashSet<IModifier> _baseModifiers = [];
+        private HashSet<IModifier> _additionalModifiers = [];
         private List<IMaterialModifier> _modifiersPool = [];
         private Dictionary<string, int> _usedResources = [];
         private ICharacter? _owner;
 
         [Export] public EquipmentType EquipmentPart { get; set; }
         [Export] public string Id { get; set; } = string.Empty;
-        [Export] public int Quantity { get; set; }
         [Export] public int MaxStackSize { get; set; }
         [Export] public Texture2D? Icon { get; set; }
         [Export] public Rarity Rarity { get; set; }
         [Export] public string[] Tags { get; set; } = [];
         [Export] public AttributeType AttributeType { get; set; } = AttributeType.None;
-        public Texture2D? FullImage { get; set; }
         public ISkill? Skill { get; private set; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string Description => Localizator.Localize(Id + "_Description");
         public string DisplayName => Localizator.Localize(Id);
         public int UpdateLevel => _currentUpdateLevel;
         public int MaxUpdateLevel => _maxUpdateLevel;
-        public IReadOnlyList<IModifierInstance> AdditionalModifiers => [.. _additionalModifiers];
-        public IReadOnlyList<IModifierInstance> BaseModifiers => [.. _baseModifiers];
+        public IReadOnlyList<IModifier> AdditionalModifiers => [.. _additionalModifiers];
+        public IReadOnlyList<IModifier> BaseModifiers => [.. _baseModifiers];
         public IReadOnlyList<IMaterialModifier> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
 
@@ -48,17 +46,17 @@
 
         public EquipItem()
         {
-            
+
         }
 
         public EquipItem(EquipmentType part,
             string id,
-            Texture2D icon,
+            Texture2D? icon,
             Rarity rarity,
             string[] tags,
-            HashSet<IModifierInstance> baseModifiers,
-            HashSet<IModifierInstance> addModifiers,
-            AttributeType attributeType = default, int quantity = 1, int maxStackSize = 1, ISkill? skill = default)
+            List<IModifier> baseModifiers,
+            List<IModifier> addModifiers,
+            AttributeType attributeType = default, int maxStackSize = 1, ISkill? skill = default)
         {
             EquipmentPart = part;
             Id = id;
@@ -66,10 +64,9 @@
             Rarity = rarity;
             Tags = tags;
             AttributeType = attributeType;
-            Quantity = quantity;
             MaxStackSize = maxStackSize;
-            _baseModifiers = baseModifiers;
-            _additionalModifiers = addModifiers;
+            _baseModifiers = [..baseModifiers];
+            _additionalModifiers = [.. addModifiers];
             Skill = skill;
         }
 
@@ -79,11 +76,11 @@
             return (T)duplicate;
         }
 
-        public void SetBaseModifiers(IEnumerable<IModifierInstance> modifiers) => SetModifiers(_baseModifiers, modifiers);
-        public void SetAdditionalModifiers(IEnumerable<IModifierInstance> modifiers) => SetModifiers(_additionalModifiers, modifiers);
+        public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
+        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_additionalModifiers, modifiers);
         public void SetSkill(ISkill skill) => Skill = skill;
         public void RemoveAdditionalModifier(int hash) => _additionalModifiers.RemoveWhere(m => m.GetHashCode() == hash);
-        public void AddAdditionalModifier(IModifierInstance modifier) => SetModifier(_additionalModifiers, modifier);
+        public void AddAdditionalModifier(IModifier modifier) => SetModifier(_additionalModifiers, modifier);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public bool Upgrade(int upgradeLevel = 1)
@@ -111,7 +108,7 @@
             return true;
         }
 
-        public void ReplaceAdditionalModifier(int hash, IModifierInstance newModifier)
+        public void ReplaceAdditionalModifier(int hash, IModifier newModifier)
         {
             _additionalModifiers.RemoveWhere(mod => mod.GetHashCode() == hash);
             _additionalModifiers.Add(newModifier);
@@ -119,17 +116,17 @@
 
         public void OnUnequip()
         {
-            foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
-                _owner?.Modifiers.RemovePermanentModifier(mod);
+            //foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
+            //    _owner?.Modifiers.RemovePermanentModifier(mod);
             _owner = null;
         }
 
         public void OnEquip(ICharacter owner)
         {
             _owner = owner;
-            var modifiers = _baseModifiers.Concat(_additionalModifiers);
-            foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
-                _owner.Modifiers.AddPermanentModifier(mod);
+            //var modifiers = _baseModifiers.Concat(_additionalModifiers);
+            //foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
+            //    _owner.Modifiers.AddPermanentModifier(mod);
             Skill?.Attach(_owner);
         }
         public void SaveModifiersPool(IEnumerable<IMaterialModifier> modifiers) => _modifiersPool.AddRange(modifiers);
@@ -144,14 +141,14 @@
             return false;
         }
 
-        private void SetModifiers(HashSet<IModifierInstance> itemModifiers, IEnumerable<IModifierInstance> newModifiers)
+        private void SetModifiers(HashSet<IModifier> itemModifiers, IEnumerable<IModifier> newModifiers)
         {
             itemModifiers.Clear();
             foreach (var modifier in newModifiers)
                 SetModifier(itemModifiers, modifier);
         }
 
-        private void SetModifier(HashSet<IModifierInstance> itemModifiers, IModifierInstance newModifier)
+        private void SetModifier(HashSet<IModifier> itemModifiers, IModifier newModifier)
         {
             newModifier.Value = newModifier.BaseValue * _currentUpdateMultiplier;
             itemModifiers.Add(newModifier);

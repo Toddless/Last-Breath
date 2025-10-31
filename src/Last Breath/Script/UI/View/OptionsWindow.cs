@@ -16,7 +16,7 @@
 
         [Export] private HSlider? _music, _sfx, _master;
         [Export] private OptionButton? _languange, _windowMode, _windowResolution;
-        [Export] private LocalizableButton? _returnButton, _applyBtn;
+        [Export] private LocalizableButton? _returnButton;
         [Export] private LocalizableLabel[] _labels = [];
 
         private ISettingsHandler? _settings;
@@ -25,7 +25,6 @@
         public override void _Ready()
         {
             if (_returnButton != null) _returnButton.Pressed += RaiseClose;
-            if (_applyBtn != null) _applyBtn.Pressed += OnApplyPressed;
 
             AddWindowMods();
             AddWindowResolutions();
@@ -41,8 +40,6 @@
             UpdateUI();
         }
 
-
-        private void OnApplyPressed() => _settings?.ApplySavedSettings();
 
         public override void InjectServices(IGameServiceProvider provider)
         {
@@ -61,7 +58,6 @@
         private void UpdateUI()
         {
             _returnButton?.UpdateButtonText();
-            _applyBtn?.UpdateButtonText();
             foreach (var label in _labels)
                 label.UpdateLabelText();
         }

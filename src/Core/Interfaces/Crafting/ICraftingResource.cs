@@ -2,8 +2,8 @@
 {
     public interface ICraftingResource : IResource
     {
-        float Quality { get; set; }
-        IMaterialType? MaterialType { get; }
+        IMaterial? Material { get; }
+
         T Copy<T>();
     }
 }

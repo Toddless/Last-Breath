@@ -1,4 +1,4 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source
 {
     using Godot;
     using Core.Enums;

@@ -41,7 +41,7 @@
         private void FillTheDictionary()
         {
             // Adding slot via [Export] always random, slots will be added like this instead
-            _slots.Add(EquipmentType.BodyArmor, FindEquipmentSlot("BodyArmorSlot"));
+            _slots.Add(EquipmentType.Body, FindEquipmentSlot("BodyArmorSlot"));
             _slots.Add(EquipmentType.Amulet, FindEquipmentSlot("AmuletSlot"));
             _slots.Add(EquipmentType.Boots, FindEquipmentSlot("BootsSlot"));
             _slots.Add(EquipmentType.Gloves, FindEquipmentSlot("GlovesSlot"));

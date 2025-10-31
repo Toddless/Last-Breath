@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://cserxppd6wiui"]
 
 [ext_resource type="Script" uid="uid://b82dy3x5ekixn" path="res://Script/UI/View/SaveLoadWindow.cs" id="1_75103"]
-[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Fonts/LabelSettings.tres" id="2_psio3"]
-[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Fonts/SettingsMenu.tres" id="3_m62os"]
+[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Assets/UI/Fonts/LabelSettings.tres" id="2_psio3"]
+[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Assets/UI/Fonts/SettingsMenu.tres" id="3_m62os"]
 [ext_resource type="Script" uid="uid://d0j1nts8hqfnb" path="res://Script/UI/LocalizableLabel.cs" id="3_psio3"]
 [ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="4_75103"]
 
@@ -95,16 +95,20 @@ alignment = 1
 [node name="LoadBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainerButtons"]
 layout_mode = 2
 size_flags_horizontal = 0
+focus_mode = 0
 theme_override_font_sizes/font_size = 26
-text = "LoadBtn"
+text = "Load"
 script = ExtResource("4_75103")
+_id = "LoadBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"
 
 [node name="DeleteBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainerButtons"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 26
-text = "DeleteBtn"
+text = "Delete"
 script = ExtResource("4_75103")
+_id = "DeleteBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
@@ -115,7 +119,9 @@ alignment = 1
 [node name="Return" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
+focus_mode = 0
 theme_override_font_sizes/font_size = 26
-text = "ReturnBtn"
+text = "Return"
 script = ExtResource("4_75103")
+_id = "ReturnBtn"
 metadata/_custom_type_script = "uid://bxravf1ugfs0x"

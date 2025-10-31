@@ -1,98 +1,156 @@
 {
-	"Ring_Strength_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Strength",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "Armor",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "MaxHealth",
-				"type": "flat",
-				"value": 200
-			},
-			{
-				"parameter": "Damage",
-				"type": "flat",
-				"value": 20
-			}
-		]
-	},
-	"Ring_Dexterity_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Dexterity",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "Evade",
-				"type": "flat",
-				"value": 120
-			},
-			{
-				"parameter": "AdditionalHitChance",
-				"type": "increase",
-				"value": 0.04
-			},
-			{
-				"parameter": "CriticalDamage",
-				"type": "flat",
-				"value": 20
-			}
-		]
-	},
-	"Ring_Intelligence_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Intelligence",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "EnergyBarrier",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "ResourceRecovery",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "SpellDamage",
-				"type": "flat",
-				"value": 15
-			}
-		]
-	},
-	"Test_Ring": {
-		"modifiers": [
-			{
-				"parameter": "AllAttribute",
-				"type": "flat",
-				"value": 25
-			},
-			{
-				"parameter": "Damage",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "CriticalDamage",
-				"type": "flat",
-				"value": 20
-			},
-			{
-				"parameter": "CriticalChance",
-				"type": "flat",
-				"value": 3
-			}
-		]
-	}
+	"items": [
+		{
+			"id": "Ring_Strength_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingStrengthGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 200
+				},
+				{
+					"parameter": "Damage",
+					"modifierType": "flat",
+					"value": 20
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Dexterity_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingDexterityGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 120
+				},
+				{
+					"parameter": "AdditionalHitChance",
+					"modifierType": "increase",
+					"value": 0.04
+				},
+				{
+					"parameter": "CriticalDamage",
+					"modifierType": "flat",
+					"value": 20
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Intelligence_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingIntelligenceGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "ResourceRecovery",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "SpellDamage",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Ring",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "TestRing.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "AllAttribute",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Damage",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "CriticalDamage",
+					"modifierType": "flat",
+					"value": 20
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "flat",
+					"value": 3
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
 }

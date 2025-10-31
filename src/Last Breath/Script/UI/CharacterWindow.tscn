@@ -1,7 +1,8 @@
 [gd_scene load_steps=3 format=3 uid="uid://b7ndt5b1q2dif"]
 
 [ext_resource type="Script" uid="uid://c6dvomk0rum1n" path="res://Script/UI/View/CharacterWindow.cs" id="1_lmf12"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="2_g7iid"]
+
+[sub_resource type="SystemFont" id="SystemFont_r5efu"]
 
 [node name="CharacterWindow" type="Control"]
 layout_mode = 3
@@ -48,7 +49,7 @@ size_flags_horizontal = 10
 [node name="TabContainer" type="TabContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_fonts/font = ExtResource("2_g7iid")
+theme_override_fonts/font = SubResource("SystemFont_r5efu")
 theme_override_font_sizes/font_size = 32
 current_tab = 0
 

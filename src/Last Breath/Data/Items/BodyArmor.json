@@ -1,98 +1,156 @@
 {
-	"Body_Strength_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 800
-			},
-			{
-				"parameter": "Armor",
-				"type": "flat",
-				"value": 500
-			},
-			{
-				"parameter": "Armor",
-				"type": "increase",
-				"value": 0.5
-			},
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.7
-			}
-		]
-	},
-	"Body_Dexterity_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Evade",
-				"type": "flat",
-				"value": 800
-			},
-			{
-				"parameter": "Evade",
-				"type": "increase",
-				"value": 0.5
-			},
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 250
-			},
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.1
-			}
-		]
-	},
-	"Body_Intelligence_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 210
-			},
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.3
-			},
-			{
-				"parameter": "Barrier",
-				"type": "flat",
-				"value": 500
-			},
-			{
-				"parameter": "Barrier",
-				"type": "increase",
-				"value": 0.5
-			}
-		]
-	},
-	"Test_Body_Four_Mods": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.5
-			},
-			{
-				"parameter": "Armor",
-				"type": "Flat",
-				"value": 500
-			},
-			{
-				"parameter": "Armor",
-				"type": "increase",
-				"value": 0.5
-			},
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.5
-			}
-		]
-	}
+	"items": [
+		{
+			"id": "Body_Strength_Generic",
+			"equipmentPart": "Body",
+			"maxStackSize": 1,
+			"icon": "BodyStrengthGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "increase",
+					"value": 0.5
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.7
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Dexterity_Generic",
+			"equipmentPart": "Body",
+			"maxStackSize": 1,
+			"icon": "BodyDexterityGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "increase",
+					"value": 0.5
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.1
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Intelligence_Generic",
+			"equipmentPart": "Body",
+			"maxStackSize": 1,
+			"icon": "BodyIntelligenceGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 210
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.3
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "increase",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Body_Four",
+			"equipmentPart": "Body",
+			"maxStackSize": 1,
+			"icon": "BodyFour.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.5
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "increase",
+					"value": 0.5
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
 }

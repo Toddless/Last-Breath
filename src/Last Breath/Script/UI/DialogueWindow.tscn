@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://eh2wvi8x5l80"]
 
 [ext_resource type="Script" uid="uid://c2fipqliahv3c" path="res://Script/UI/View/DialogueWindow.cs" id="1_q0bu3"]
-[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Fonts/BaseFonts20Pix.tres" id="2_p6x8j"]
+[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Assets/UI/Fonts/BaseFonts20Pix.tres" id="2_p6x8j"]
 
 [node name="DialogueWindow" type="Control" node_paths=PackedStringArray("_options", "_buttonsContainer", "_questsContainer", "_text", "_playerIcon", "_questAdded", "_questOptions", "_skip", "_moreSpeed", "_lessSpeed", "_default", "_quests", "_quit", "_back", "_accept", "_completedQuests", "_completeQuest")]
 layout_mode = 3

@@ -15,6 +15,7 @@
         private const float WINDOW_MARGIN = 20f;
 
         private readonly Dictionary<Type, Control> _singleInstances = [];
+
         private readonly IUIWindowPositionStorage _positionStorage = new UIWindowPositionStorage();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
         private readonly IGameServiceProvider _serviceProvider;
@@ -130,6 +131,21 @@
             _uiLayers?.ShowNotification(instance);
             return instance;
         }
+
+        public void RemoveAllInstances()
+        {
+            ArgumentNullException.ThrowIfNull(_uiLayers);
+            foreach (var instance in _singleInstances)
+            {
+                if (instance.Value is IClosable closable)
+                    closable.Close -= _uiLayers.CloseAllWindows;
+                instance.Value.QueueFree();
+            }
+            _singleInstances.Clear();
+        }
+
+
+
 
         public T CreateClosableForSource<T>(Control source)
             where T : Control, IInitializable, IClosable, IRequireServices

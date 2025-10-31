@@ -1,98 +1,156 @@
 {
-	"Boots_Strength_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "Movespeed",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "Armor",
-				"type": "flat",
-				"value": 120
-			},
-			{
-				"parameter": "Health",
-				"type": "increase",
-				"value": 0.08
-			}
-		]
-	},
-	"Boots_Dexterity_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "Movespeed",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "Evade",
-				"type": "flat",
-				"value": 500
-			},
-			{
-				"parameter": "MaxEvadeChance",
-				"type": "increase",
-				"value": 0.03
-			}
-		]
-	},
-	"Boots_Intelligence_Generic": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 100
-			},
-			{
-				"parameter": "Movespeed",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "EnergyBarrier",
-				"type": "flat",
-				"value": 120
-			},
-			{
-				"parameter": "MaxResource",
-				"type": "flat",
-				"value": 15
-			}
-		]
-	},
-	"Test_Boots": {
-		"modifiers": [
-			{
-				"parameter": "Health",
-				"type": "flat",
-				"value": 300
-			},
-			{
-				"parameter": "Movespeed",
-				"type": "flat",
-				"value": 25
-			},
-			{
-				"parameter": "Evade",
-				"type": "flat",
-				"value": 600
-			},
-			{
-				"parameter": "Dexterity",
-				"type": "flat",
-				"value": 15
-			}
-		]
-	}
+	"items": [
+		{
+			"id": "Boots_Strength_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsStrengthGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 120
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "increase",
+					"value": 0.08
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Dexterity_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsDexterityGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "MaxEvadeChance",
+					"modifierType": "increase",
+					"value": 0.03
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Intelligence_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsIntelligenceGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 120
+				},
+				{
+					"parameter": "Resource",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Boots",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "TestBoots.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 300
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
 }

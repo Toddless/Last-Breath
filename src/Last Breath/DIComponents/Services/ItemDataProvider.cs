@@ -5,13 +5,12 @@
     using Utilities;
     using System.IO;
     using System.Linq;
-    using Core.Modifiers;
-    using Newtonsoft.Json;
     using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     internal class ItemDataProvider : IItemDataProvider
     {
@@ -52,7 +51,7 @@
         {
             if (!_itemData.TryGetValue(id, out var res)) return [];
             if (res is not ICraftingResource crafting) return [];
-            return crafting.MaterialType?.Modifiers ?? [];
+            return crafting.Material?.Modifiers ?? [];
         }
 
         public ICraftingRecipe GetRecipe(string recipeId)
@@ -68,11 +67,11 @@
 
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
 
-        public void LoadData()
+        public async void LoadData()
         {
             try
             {
-                LoadDataFromDirectory(_itemDataPath);
+                await LoadDataFromDirectory(_itemDataPath);
             }
             catch (Exception ex)
             {
@@ -80,79 +79,43 @@
             }
         }
 
-        private void LoadDataFromDirectory(string directoryPath)
+        private async Task LoadDataFromDirectory(string itemDataPath)
         {
-            var itemData = ResourceLoader.ListDirectory(directoryPath);
-            foreach (var item in itemData)
+            using var dir = DirAccess.Open(itemDataPath);
+            if (dir == null) return;
+
+            dir.ListDirBegin();
+
+            string fileName = dir.GetNext();
+            while (fileName != string.Empty)
             {
-                var path = Path.Combine(directoryPath, item);
-
-                if (ShouldSkipItem(path))
-                    continue;
-
-                if (IsDirectory(path))
-                {
-                    LoadDataFromDirectory(path);
-                }
+                var filePath = Path.Combine(itemDataPath, fileName);
+                if (dir.CurrentIsDir())
+                    await LoadDataFromDirectory(filePath);
                 else
                 {
-                    ProcessFile(path);
+                    if (!filePath.EndsWith(".json")) continue;
+                    using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
+                    var jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
+                    List<IItem> data = [];
+                    switch (true)
+                    {
+                        case var _ when itemDataPath.EndsWith("Items"):
+                            data = await DataParser.ParseEquipItems(jsonContent);
+                            break;
+                        case var _ when itemDataPath.EndsWith("Recipies"):
+                            data = await DataParser.ParseRecipes(jsonContent);
+                            break;
+                        case var _ when itemDataPath.EndsWith("Resources"):
+                            data = await DataParser.ParseResources(jsonContent);
+                            break;
+                    }
+                    data.ForEach(item => _itemData.TryAdd(item.Id, item));
                 }
+                fileName = dir.GetNext();
             }
+            dir.ListDirEnd();
         }
-
-        private void ProcessFile(string filePath)
-        {
-            try
-            {
-                var extension = Path.GetExtension(filePath).ToLowerInvariant();
-                switch (extension)
-                {
-                    case ".json":
-                        ProcessJsonFile(filePath);
-                        break;
-                    case ".tres":
-                        ProcessTresFile(filePath);
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackException($"Failed to process file: {filePath}", ex, this);
-            }
-        }
-
-        private void ProcessJsonFile(string filePath)
-        {
-            using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
-
-            var jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
-
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, ItemFileDTO>>(jsonContent) ?? [];
-
-            foreach (var item in dict)
-            {
-                var itemName = item.Key;
-                var dto = item.Value;
-                var mods = ModifiersCreator.ConvertDtoToModifiers(dto.Modifiers);
-                _itemBaseStatsData[itemName] = mods;
-            }
-        }
-
-        private void ProcessTresFile(string filePath)
-        {
-            var loaded = ResourceLoader.Load(filePath);
-            if (loaded is IItem item)
-                _itemData.Add(item.Id, item);
-        }
-
-        private bool IsDirectory(string path)
-        {
-            using var dir = DirAccess.Open(path);
-            return dir != null;
-        }
-
-        private bool ShouldSkipItem(string itemName) => itemName.StartsWith(".") || itemName.Equals("__MACOSX", StringComparison.OrdinalIgnoreCase);
 
         private IItem? TryGetItem(string id)
         {

@@ -25,6 +25,7 @@
             _uIElementProvider = provider.GetService<IUIElementProvider>();
             _uiMediator = provider.GetService<IUiMediator>();
             provider.GetService<ISettingsHandler>().ApplySavedSettings();
+            provider.GetService<IItemDataProvider>().LoadData();
 
             _uiMediator.UpdateUi += UpdateUI;
             _loadGameButton.Pressed += LoadGamePressed;

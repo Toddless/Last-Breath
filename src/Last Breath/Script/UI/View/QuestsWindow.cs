@@ -69,7 +69,6 @@
         {
             _questDescription!.Text = questDescription;
             _questStatus!.Text = quest?.QuestStatus.ToString();
-            // TODO: Show quest reward, progression
         }
     }
 }

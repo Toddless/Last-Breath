@@ -1,13 +1,3 @@
 {
-	"Dagger_Legendary": {
-		"BaseDamage": 300,
-		"CriticalChance": 0.9,
-		"CriticalDamage": 180,
-		"AdditionalHitChance": 0.1
-	},
-	"Sword_Legendary": {
-		"BaseDamage": 450,
-		"CriticalChance": 0.5,
-		"CriticalDamage": 100
-	}
+	
 }

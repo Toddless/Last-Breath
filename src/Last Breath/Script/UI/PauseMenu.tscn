@@ -55,35 +55,40 @@ size_flags_vertical = 8
 
 [node name="ContinueBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "ContinueBtn"
+text = "Continue"
 script = ExtResource("3_g7wd7")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "ContinueBtn"
 
 [node name="SaveLoadBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "LoadGameBtn"
+text = "Save / Load"
 script = ExtResource("3_g7wd7")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "LoadGameBtn"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "OptionsBtn"
+text = "Options"
 script = ExtResource("3_g7wd7")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "OptionsBtn"
 
 [node name="MainMenuBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "MainMenuBtn"
+text = "Main Menu"
 script = ExtResource("3_g7wd7")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "MainMenuBtn"
 
 [node name="ExitBtn" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "QuitBtn"
+text = "Quit"
 script = ExtResource("3_g7wd7")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "QuitBtn"

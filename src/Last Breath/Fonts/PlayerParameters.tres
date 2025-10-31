@@ -1,7 +1,0 @@
-[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://orfhh71cylqw"]
-
-[sub_resource type="SystemFont" id="SystemFont_lfowa"]
-
-[resource]
-font = SubResource("SystemFont_lfowa")
-font_size = 18

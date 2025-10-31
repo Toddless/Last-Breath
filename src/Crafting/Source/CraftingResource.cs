@@ -1,4 +1,4 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source
 {
     using Godot;
     using System;
@@ -8,21 +8,17 @@
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
 
-    [GlobalClass]
     public partial class CraftingResource : Resource, ICraftingResource, IItem
     {
-        [Export] private MaterialType? _material;
-        [Export] public string Id { get; private set; } = string.Empty;
-        [Export] public int MaxStackSize { get; private set; }
-        [Export] public string[] Tags { get; private set; } = [];
-        [Export] public Texture2D? Icon { get; set; }
-        public float Quality { get; set; } = 1;
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
-        public IMaterialType? MaterialType => _material;
-        public int Quantity { get; set; } = 1;
+        public string Id { get; private set; } = string.Empty;
+        public int MaxStackSize { get; private set; }
+        public string[] Tags { get; private set; } = [];
+        public Texture2D? Icon { get; set; }
+        public IMaterial? Material { get; private set; }
         public Rarity Rarity { get; set; } = Rarity.Rare;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+        public string Description => Localizator.LocalizeDescription(Id);
+        public string DisplayName => Localizator.Localize(Id);
 
 
         /// <summary>
@@ -37,21 +33,19 @@
         /// Сtor to create resource within code
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="displayName"></param>
         /// <param name="maxStackSize"></param>
         /// <param name="tags"></param>
         /// <param name="icon"></param>
-        /// <param name="materialType"></param>
-        /// <param name="quality"></param>
-        public CraftingResource(string id, int maxStackSize, string[] tags, Texture2D icon, MaterialType materialType, float quality)
+        /// <param name="material"></param>
+        public CraftingResource(string id, int maxStackSize, string[] tags, Texture2D? icon, IMaterial material, Rarity rarity)
         {
             Id = id;
             MaxStackSize = maxStackSize;
             Tags = tags;
             Icon = icon;
-            _material = materialType;
-            Quality = Mathf.Clamp(quality, 0, 1);
+            Material = material;
             InstanceId = Guid.NewGuid().ToString();
+            Rarity = rarity;
         }
 
         public T Copy<T>()

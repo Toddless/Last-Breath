@@ -1,6 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://c5i7lirll15ky"]
-
-[ext_resource type="Script" path="res://Addons/Crafting/Source/UpgradeResource.cs" id="1_gwo5d"]
-
-[resource]
-script = ExtResource("1_gwo5d")

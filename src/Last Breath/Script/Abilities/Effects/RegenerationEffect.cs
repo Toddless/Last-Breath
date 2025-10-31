@@ -13,7 +13,7 @@
                 stacks,
                 permanent)
         {
-            Modifier = new ModifierInstance(Parameter.MaxHealth, ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
+            Modifier = new ModifierInstance(Parameter.Health, ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
         }
 
         public override void OnTick(ICharacter character)

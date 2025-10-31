@@ -353,5 +353,7 @@
             float y = Mathf.Clamp(pos.Y, WINDOW_MARGIN, screen.Y - size.Y - WINDOW_MARGIN);
             return new Vector2(x, y);
         }
+
+        public void RemoveAllInstances() => throw new NotImplementedException();
     }
 }

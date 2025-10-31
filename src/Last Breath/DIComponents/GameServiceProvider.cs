@@ -44,7 +44,6 @@
             services.AddSingleton<IItemDataProvider, ItemDataProvider>((provider) =>
             {
                 var instance = new ItemDataProvider("res://Data/");
-                instance.LoadData();
                 return instance;
             });
             services.AddSingleton<IUIElementProvider, UIElementProvider>();

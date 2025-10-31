@@ -49,7 +49,6 @@
             LoadSoundSettings();
             LoadVideoSettings();
             LoadUISettings();
-            _uiMediator.RaiseUpdateUi();
         }
 
         public string[] GetWindowMods() => _windowMods;
@@ -94,6 +93,7 @@
             var result = SaveSettings(SettingsSection.UI, Settings.Language, index);
             if (result != Error.Ok)
                 Tracker.TrackError($"Failed to save Language setting. Error: {result}", this);
+            _uiMediator.RaiseUpdateUi();
         }
 
         public void SetSoundBus(SoundBus bus, double value)
@@ -132,9 +132,6 @@
 
         }
 
-        private void LoadUISettings()
-        {
-            TranslationServer.SetLocale(_languages[(int)_config.GetValue(SettingsSection.UI, Settings.Language)]);
-        }
+        private void LoadUISettings() => SetLanguage((long)_config.GetValue(SettingsSection.UI, Settings.Language));
     }
 }

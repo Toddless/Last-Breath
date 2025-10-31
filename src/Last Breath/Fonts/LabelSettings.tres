@@ -1,9 +1,0 @@
-[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://b8bihgx3i4r2o"]
-
-[sub_resource type="SystemFont" id="SystemFont_pyqjx"]
-
-[resource]
-font = SubResource("SystemFont_pyqjx")
-font_size = 48
-outline_size = 5
-outline_color = Color(0, 0, 0, 1)

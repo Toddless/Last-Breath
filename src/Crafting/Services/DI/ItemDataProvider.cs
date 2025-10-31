@@ -52,7 +52,7 @@
         {
             if (!_itemData.TryGetValue(id, out var res)) return [];
             if (res is not ICraftingResource crafting) return [];
-            return crafting.MaterialType?.Modifiers ?? [];
+            return crafting.Material?.Modifiers ?? [];
         }
 
         public ICraftingRecipe GetRecipe(string recipeId)

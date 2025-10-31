@@ -23,7 +23,7 @@
                 0.02f);
 
             yield return new AttributeEffect
-                (Parameter.MaxHealth,
+                (Parameter.Health,
                 ModifierType.Flat,
                 10f);
         }

@@ -4,8 +4,8 @@
     using System;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using LastBreath.Script.Helpers;
     using Core.Interfaces.Mediator;
+    using LastBreath.Script.Helpers;
 
     public partial class PauseMenu : Control, IInitializable, IRequireServices, IClosable
     {
@@ -23,6 +23,11 @@
             _optionsBtn.Pressed += OnOptionsBtnPressed;
             _mainMenuBtn.Pressed += OnMainMenuBtnPressed;
             _exitBtn.Pressed += () => GetTree().Quit();
+        }
+
+        public override void _EnterTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateUI;
         }
 
         private void UpdateUI()
@@ -45,7 +50,6 @@
 
         public override void _ExitTree()
         {
-            UnpauseGame();
             if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
         }
 
@@ -53,7 +57,6 @@
         {
             _uiElementProvider = provider.GetService<IUIElementProvider>();
             _uiMediator = provider.GetService<IUiMediator>();
-            _uiMediator.UpdateUi += UpdateUI;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -61,6 +64,7 @@
         private void OnMainMenuBtnPressed()
         {
             UnpauseGame();
+            _uiElementProvider?.RemoveAllInstances();
             GetTree().ChangeSceneToPacked(MainMenu.Initialize());
         }
 

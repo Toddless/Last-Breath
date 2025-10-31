@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public interface IMaterialType : IIdentifiable
+    public interface IMaterial
     {
         IReadOnlyList<IMaterialModifier>? Modifiers { get; }
         IMaterialCategory? MaterialCategory { get; }

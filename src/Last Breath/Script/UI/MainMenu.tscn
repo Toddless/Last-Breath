@@ -68,34 +68,38 @@ alignment = 1
 [node name="NewGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(120, 30)
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "NewGameBtn"
+text = "New Game"
 script = ExtResource("3_4e8ab")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "NewGameBtn"
 
 [node name="LoadGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(120, 30)
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "LoadGameBtn"
+text = "Load Game"
 script = ExtResource("3_4e8ab")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "LoadGameBtn"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "OptionsBtn"
+text = "Options"
 script = ExtResource("3_4e8ab")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "OptionsBtn"
 
 [node name="QuitBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
-text = "QuitBtn"
+text = "Quit"
 script = ExtResource("3_4e8ab")
-metadata/_custom_type_script = "uid://co1n2nli0tm0e"
+_id = "QuitBtn"
 
 [node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_gnfau")

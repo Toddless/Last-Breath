@@ -1,40 +1,66 @@
 {
-	"Amulet": {
-		"modifiers": [
-			{
-				"parameter": "Resource",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "ResourceRecovery",
-				"type": "flat",
-				"value": 120
-			},
-			{
-				"parameter": "AllAttribute",
-				"type": "flat",
-				"value": 15
-			},
-			{
-				"parameter": "AllAttribute",
-				"type": "inc",
-				"value": 0.1
-			}
-		]
-	},
-	"Amulet_Of_Defence": {
-		"modifiers": [
-			{
-				"parameter": "",
-				"type": "",
-				"value": 2
-			},
-			{
-				"parameter": "",
-				"type": "",
-				"value": 3
-			}
-		]
-	}
+	"items": [
+		{
+			"id": "Amulet",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "Amulet.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Amulet",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Resource",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "ResourceRecovery",
+					"modifierType": "flat",
+					"value": 120
+				},
+				{
+					"parameter": "AllAttribute",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "AllAttribute",
+					"modifierType": "inc",
+					"value": 0.1
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Of_Defence",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "AmuletOfDefence.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "inc",
+					"value": 2
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "multi",
+					"value": 3
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
 }

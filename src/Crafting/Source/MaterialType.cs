@@ -1,25 +1,15 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source
 {
     using Godot;
-    using System.Linq;
-    using Godot.Collections;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
-    [Tool]
-    [GlobalClass]
-    public partial class MaterialType : Resource, IMaterialType
+    public partial class MaterialType : Resource, IMaterial
     {
         private IReadOnlyList<IMaterialModifier>? _cached;
-        [Export] private MaterialCategory? _category;
-        [Export] private Array<MaterialModifier> _modifiers = [];
+        private List<IMaterialModifier> _modifiers = [];
 
-        [Export] public string Id { get; set; } = string.Empty;
-        [Export] public string[] Tags { get; private set; } = [];
-
-        public string DisplayName => GetLocalizedMaterialName();
-
-        public IMaterialCategory? MaterialCategory => _category;
+        public IMaterialCategory? MaterialCategory { get; set; }
 
         /// <summary>
         /// Combined modifiers
@@ -58,18 +48,11 @@
         /// Constructor to create a resource within code
         /// </summary>
         /// <param name="modifiers"></param>
-        /// <param name="id"></param>
-        /// <param name="tags"></param>
         /// <param name="category"></param>
-        public MaterialType(Array<MaterialModifier> modifiers, string id, string[] tags, MaterialCategory category)
+        public MaterialType(List<IMaterialModifier> modifiers, IMaterialCategory category)
         {
             _modifiers = modifiers;
-            Id = id;
-            Tags = tags;
-            _category = category;
+            MaterialCategory = category;
         }
-
-        public bool HasTag(string tag) => Tags.Contains(tag);
-        private string GetLocalizedMaterialName() => TranslationServer.Translate(Id);
     }
 }

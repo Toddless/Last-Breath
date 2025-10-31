@@ -24,6 +24,16 @@
             _craftingBtn.Pressed += OnCraftingBtnPressed;
         }
 
+        public override void _EnterTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateUI;
+        }
+
+        public override void _ExitTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
+        }
+
         private void OnCraftingBtnPressed() => _uiMediator?.Publish(new OpenCraftingWindowEvent(string.Empty));
         private void OnQuestBtnPressed() => _uiMediator?.Publish(new OpenQuestWindowEvent());
         private void OnIntenoryBtnPressed() => _uiMediator?.Publish(new OpenInventoryWindowEvent());
@@ -32,7 +42,6 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _uiMediator = provider.GetService<IUiMediator>();
-            _uiMediator.UpdateUi += UpdateUI;
         }
 
         private void UpdateUI()
