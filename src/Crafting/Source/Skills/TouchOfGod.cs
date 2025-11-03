@@ -2,8 +2,8 @@
 {
     using Godot;
     using Core.Enums;
-    using Core.Interfaces;
     using Utilities;
+    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
@@ -14,7 +14,7 @@
         [Export] public int Duration { get; private set; }
         [Export] private int HealAmount { get; set; }
 
-        public override void Attach(ICharacter owner)
+        public override void Attach(IEntity owner)
         {
 
         }

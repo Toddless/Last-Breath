@@ -2,12 +2,12 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Entity;
 
-    public abstract class ActionModuleDecorator : IActionModule<ICharacter>, IModuleDecorator<ActionModule, IActionModule<ICharacter>>
+    public abstract class ActionModuleDecorator : IActionModule<IEntity>, IModuleDecorator<ActionModule, IActionModule<IEntity>>
     {
-        private IActionModule<ICharacter>? _module;
+        private IActionModule<IEntity>? _module;
         private readonly Lazy<string> _id;
 
         public ActionModule SkillType { get; }
@@ -21,9 +21,9 @@
             _id = new(CreateID);
         }
 
-        public void ChainModule(IActionModule<ICharacter> module) => _module = module;
+        public void ChainModule(IActionModule<IEntity> module) => _module = module;
 
-        public virtual void PerformModuleAction(ICharacter target)
+        public virtual void PerformModuleAction(IEntity target)
         {
             if (target.IsAlive) _module?.PerformModuleAction(target);
         }

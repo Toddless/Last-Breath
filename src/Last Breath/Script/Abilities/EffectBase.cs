@@ -4,6 +4,7 @@
     using System;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
 
     public abstract class EffectBase(Core.Enums.Effects effect, int duration = 3, int stacks = 1, bool permanent = false) : IEffect
     {
@@ -15,17 +16,17 @@
 
         public bool Expired => !Permanent && Duration < 1;
 
-        public virtual void OnApply(ICharacter character)
+        public virtual void OnApply(IEntity character)
         {
             character.Modifiers.AddTemporaryModifier(Modifier);
         }
 
-        public virtual void OnRemove(ICharacter character)
+        public virtual void OnRemove(IEntity character)
         {
             character.Modifiers.RemoveTemporaryModifier(Modifier);
         }
 
-        public virtual void OnTick(ICharacter character)
+        public virtual void OnTick(IEntity character)
         {
             if (!Permanent) Duration--;
             GD.Print($"Effect: {GetType().Name} Duration: {Duration}");

@@ -1,21 +1,21 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Entity;
 
     public class ArmorModule : IStatModule
     {
-        private readonly ICharacter _owner;
+        private readonly IEntity _owner;
         public StatModule SkillType => StatModule.Armor;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public ArmorModule(ICharacter owner)
+        public ArmorModule(IEntity owner)
         {
             _owner = owner;
         }
 
-        public float GetValue() => _owner.Defense.Armor;
+        public float GetValue() => _owner.Defence.Armor;
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
     using LastBreath.Components;
 
     public class DexterityStance : StanceBase
     {
-        public DexterityStance(ICharacter owner) : base(owner, new ComboPoints(), effect: new StanceActivationEffect(), Stance.Dexterity)
+        public DexterityStance(IEntity owner) : base(owner, new ComboPoints(), effect: new StanceActivationEffect(), Stance.Dexterity)
         {
             StanceSkillComponent = new StanceSkillComponent(this);
         }

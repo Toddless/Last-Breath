@@ -1,13 +1,13 @@
 ﻿namespace LastBreath.Script
 {
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
-    public class BattleResult(ICharacter player, ICharacter enemy, BattleResults result)
+    public class BattleResult(IEntity player, IEntity enemy, BattleResults result)
     {
-        public ICharacter Player { get; set; } = player;
+        public IEntity Player { get; set; } = player;
 
-        public ICharacter Enemy { get; set; } = enemy;
+        public IEntity Enemy { get; set; } = enemy;
 
         public BattleResults Results { get; set; } = result;
     }

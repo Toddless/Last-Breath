@@ -4,7 +4,6 @@
     using System;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
     using LastBreath.Components;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Battle;
@@ -13,6 +12,7 @@
     using Core.Interfaces.Battle.Module;
     using Core.Interfaces.Battle.Decorator;
     using LastBreath.Script.BattleSystem.Module;
+    using Core.Interfaces.Entity;
 
     public abstract class StanceBase : IStance
     {
@@ -22,15 +22,15 @@
 
         private Dictionary<StatModule, IStatModule> _statModules { get; set; } = [];
         private Dictionary<SkillType, ISkillModule> _skillModules { get; set; } = [];
-        private Dictionary<ActionModule, IActionModule<ICharacter>> _characterActionModules { get; set; } = [];
+        private Dictionary<ActionModule, IActionModule<IEntity>> _characterActionModules { get; set; } = [];
         private IStanceSkillComponent? _skillComponent;
 
         protected IStatModule this[StatModule type] => _statModules[type];
         protected ISkillModule this[SkillType type] => _skillModules[type];
-        protected IActionModule<ICharacter> this[ActionModule type] => _characterActionModules[type];
+        protected IActionModule<IEntity> this[ActionModule type] => _characterActionModules[type];
 
         protected IStanceActivationEffect ActivationEffect { get; }
-        protected ICharacter Owner { get; }
+        protected IEntity Owner { get; }
 
         protected bool CanProceed
         {
@@ -61,14 +61,14 @@
         public IResource Resource { get; }
 
         public IModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
-        public IModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator> ActionDecoratorManager { get; }
+        public IModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator> ActionDecoratorManager { get; }
         public IModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public Stance StanceType { get; }
 
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
-        protected StanceBase(ICharacter owner, IResource resource, IStanceActivationEffect effect, Stance stanceType)
+        protected StanceBase(IEntity owner, IResource resource, IStanceActivationEffect effect, Stance stanceType)
         {
             Owner = owner;
             Resource = resource;
@@ -87,7 +87,7 @@
                 [StatModule.CritDamage] = new CritDamageModule(Owner),
             });
 
-            ActionDecoratorManager = new ModuleManager<ActionModule, IActionModule<ICharacter>, ActionModuleDecorator>(new Dictionary<ActionModule, IActionModule<ICharacter>>
+            ActionDecoratorManager = new ModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator>(new Dictionary<ActionModule, IActionModule<IEntity>>
             {
                 [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
                 [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
@@ -118,7 +118,7 @@
             ActivationEffect.OnDeactivate(Owner);
         }
 
-        public virtual void OnAttack(ICharacter target)
+        public virtual void OnAttack(IEntity target)
         {
             if (!CanAttack(target)) return;
             PendingAttacks++;
@@ -152,7 +152,7 @@
 
         public bool IsChainAttack() => Mathf.Min(this[StatModule.AdditionalAttackChance].GetValue(), Owner.Damage.MaxAdditionalHit) <= Owner.Damage.AdditionalHit;
 
-        protected bool CanAttack(ICharacter target) => target.IsAlive && Owner.IsAlive;
+        protected bool CanAttack(IEntity target) => target.IsAlive && Owner.IsAlive;
 
         protected virtual void HandleReceivedAttack(IAttackContext context)
         {
@@ -214,7 +214,7 @@
         }
 
         protected bool IsCrit() => Mathf.Min(this[StatModule.CritChance].GetValue(), Owner.Damage.MaxCriticalChance) <= Owner.Damage.CriticalChance;
-        protected bool IsEvade() => Mathf.Min(this[StatModule.EvadeChance].GetValue(), Owner.Defense.MaxEvadeChance) <= Owner.Defense.Evade;
+        protected bool IsEvade() => Mathf.Min(this[StatModule.EvadeChance].GetValue(), Owner.Defence.MaxEvadeChance) <= Owner.Defence.Evade;
 
         private void HandleEvadeReceivedAttack(IAttackContext context)
         {
@@ -285,7 +285,7 @@
         }
 
         private void OnStatModuleDecoratorChanges(StatModule parameter, IStatModule module) => _statModules[parameter] = module;
-        private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<ICharacter> module) => _characterActionModules[type] = module;
+        private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<IEntity> module) => _characterActionModules[type] = module;
         private void OnSkillModuleDecoratorChanges(SkillType type, ISkillModule module) => _skillModules[type] = module;
         private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
         private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);

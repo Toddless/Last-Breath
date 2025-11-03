@@ -1,19 +1,18 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Entity;
 
-    public class HandleAttackBlockedModule(ICharacter owner) : IActionModule<ICharacter>
+    public class HandleAttackBlockedModule(IEntity owner) : IActionModule<IEntity>
     {
-        private readonly ICharacter _owner = owner;
+        private readonly IEntity _owner = owner;
         public ActionModule SkillType => ActionModule.BlockAction;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public void PerformModuleAction(ICharacter target)
+        public void PerformModuleAction(IEntity target)
         {
-            _owner.CurrentStance?.Resource.Recover();
         }
     }
 }

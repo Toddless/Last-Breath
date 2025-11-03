@@ -5,6 +5,7 @@
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces.Entity;
 
     public interface IEquipItem : IItem
     {
@@ -21,7 +22,7 @@
         void SetBaseModifiers(IEnumerable<IModifier> modifiers);
         void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
         void SetSkill(ISkill skill);
-        void OnEquip(ICharacter owner);
+        void OnEquip(IEntity owner);
         void OnUnequip();
         bool Upgrade(int upgradeLevel = 1);
         bool Downgrade(int downgradeLevel = 1);

@@ -3,7 +3,7 @@
     using System;
     using Godot;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     [GlobalClass]
     public partial class ExecutionSkill : Resource
@@ -19,7 +19,7 @@
             _id = new(CreateId);
         }
 
-        public void Activate(ICharacter target)
+        public void Activate(IEntity target)
         {
             if (target.Health.CurrentHealth / target.Health.MaxHealth <= Trashhold) target.TakeDamage(int.MaxValue);
         }

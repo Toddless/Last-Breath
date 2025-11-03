@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
-    public class OnAttackSkillModule(ICharacter owner) : BaseSkillModule(owner, SkillType.OnAttack, DecoratorPriority.Base)
+    public class OnAttackSkillModule(IEntity owner) : BaseSkillModule(owner, SkillType.OnAttack, DecoratorPriority.Base)
     {
     }
 }

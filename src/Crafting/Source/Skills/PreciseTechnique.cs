@@ -1,6 +1,6 @@
 ﻿namespace Crafting.TestResources.Skills
 {
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
     using Godot;
     using Utilities;
 
@@ -12,7 +12,7 @@
         [Export] public float Duration { get; set; }
         [Export] public bool Stackable { get; set; }
 
-        public override void Attach(ICharacter owner)
+        public override void Attach(IEntity owner)
         {
 
         }

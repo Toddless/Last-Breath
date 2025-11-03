@@ -10,7 +10,7 @@ namespace LastBreath
     using LastBreath.Script.ScenesHandlers;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.NPC;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public partial class MainWorld : ObservableNode2D
     {
@@ -57,7 +57,7 @@ namespace LastBreath
             InitializeEnemies();
         }
 
-        public void InitializingFight(ICharacter enemy)
+        public void InitializingFight(IEntity enemy)
         {
             if (_isBattleActive) return;
             InitializeFight?.Invoke(new BattleContext([enemy, GameManager.Instance.Player!]));

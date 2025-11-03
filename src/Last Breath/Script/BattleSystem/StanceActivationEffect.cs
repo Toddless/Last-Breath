@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
 
     public class StanceActivationEffect : IStanceActivationEffect
     {
@@ -12,7 +13,7 @@
         {
         }
 
-        public void OnActivate(ICharacter owner)
+        public void OnActivate(IEntity owner)
         {
             foreach (var modifier in _modifiers)
             {
@@ -20,7 +21,7 @@
             }
         }
 
-        public void OnDeactivate(ICharacter owner)
+        public void OnDeactivate(IEntity owner)
         {
             owner.Modifiers.RemovePermanentModifierBySource(this);
         }

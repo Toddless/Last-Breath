@@ -1,11 +1,11 @@
 ﻿namespace LastBreath.Script.BattleSystem
 {
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public class IntelligenceStance : StanceBase
     {
-        public IntelligenceStance(ICharacter owner) : base(owner, resource: new Mana(), effect: new StanceActivationEffect(), Stance.Intelligence)
+        public IntelligenceStance(IEntity owner) : base(owner, resource: new Mana(), effect: new StanceActivationEffect(), Stance.Intelligence)
         {
             StanceSkillComponent = new StanceSkillComponent(this);
         }

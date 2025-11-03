@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Components
 {
-    public interface IDefenseComponent
+    public interface IDefenceComponent
     {
         float Armor { get; }
         float EnergyBarrier { get; }

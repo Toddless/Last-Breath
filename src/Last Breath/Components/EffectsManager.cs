@@ -3,18 +3,18 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Entity;
     using Utilities;
 
-    public class EffectsManager(ICharacter owner) : IEffectsManager
+    public class EffectsManager(IEntity owner) : IEffectsManager
     {
         // all effects from equip, passive skills etc.
         private readonly List<IEffect> _permanentEffects = [];
         // temporary effects will be getting only in figth
         private readonly List<IEffect> _temporaryEffects = [];
-        private readonly ICharacter _owner = owner;
+        private readonly IEntity _owner = owner;
 
         public void AddPermanentEffect(IEffect effect) => AddEffects(effect, _permanentEffects);
 

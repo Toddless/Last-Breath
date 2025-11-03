@@ -2,6 +2,7 @@
 {
     using Core.Enums;
     using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public interface IEffect
     {
@@ -12,9 +13,9 @@
         bool Permanent { get; }
         bool Expired { get; }
 
-        void OnApply(ICharacter character);
-        void OnTick(ICharacter character);
-        void OnRemove(ICharacter character);
+        void OnApply(IEntity character);
+        void OnTick(IEntity character);
+        void OnRemove(IEntity character);
         void OnStacks(IEffect newEffect);
     }
 }

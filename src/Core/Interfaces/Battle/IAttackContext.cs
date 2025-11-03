@@ -2,12 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
     public interface IAttackContext
     {
         float Armor { get; set; }
-        ICharacter Attacker { get; }
+        IEntity Attacker { get; }
         float CriticalDamageMultiplier { get; set; }
         float Damage { get; set; }
         float FinalDamage { get; set; }
@@ -17,7 +18,7 @@
         bool IsCritical { get; set; }
         float MaxReduceDamage { get; set; }
         List<ISkill> PassiveSkills { get; set; }
-        ICharacter Target { get; }
+        IEntity Target { get; }
 
         event Action<IAttackContext>? OnAttackCanceled;
         event Action<IAttackResult>? OnAttackResult;

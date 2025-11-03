@@ -1,8 +1,10 @@
 ﻿namespace Core.Interfaces.Battle
 {
+    using Core.Interfaces.Entity;
+
     public interface IStanceActivationEffect
     {
-        void OnActivate(ICharacter owner);
-        void OnDeactivate(ICharacter owner);
+        void OnActivate(IEntity owner);
+        void OnDeactivate(IEntity owner);
     }
 }

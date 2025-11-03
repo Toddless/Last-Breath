@@ -4,7 +4,6 @@ namespace LastBreath
     using System;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
     using LastBreath.Components;
     using Core.Interfaces.Items;
     using Core.Interfaces.Battle;
@@ -14,8 +13,10 @@ namespace LastBreath
     using Core.Interfaces.Components;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Utilities;
+    using Core.Interfaces.Entity;
 
-    public partial class BaseEnemy : CharacterBody2D, ICharacter
+    public partial class BaseEnemy : CharacterBody2D, IEntity
     {
         #region Components
         private readonly AttributeComponent _enemyAttribute = new();
@@ -23,7 +24,7 @@ namespace LastBreath
         private IEffectsManager? _effectsManager;
         private IHealthComponent? _enemyHealth;
         private IDamageComponent? _enemyDamage;
-        private IDefenseComponent? _enemyDefense;
+        private IDefenceComponent? _enemyDefense;
         private SkillsComponent? _enemySkills;
         #endregion
 
@@ -56,7 +57,18 @@ namespace LastBreath
         public EnemyType EnemyType => _enemyType;
         public AttributeType? AttributeType => _enemyAttributeType;
         public string CharacterName { get; private set; } = "Enemy";
-        public bool CanFight
+
+        [Export] public string Id { get; private set; } = string.Empty;
+
+        [Export] public string[] Tags { get; set; } = [];
+
+        [Export] public Texture2D? Icon { get; set; }
+
+        public string Description => Localizator.LocalizeDescription(Id);
+
+        public string DisplayName => Localizator.Localize(Id);
+
+        public bool IsFighting
         {
             get => _enemyFight;
             set => _enemyFight = value;
@@ -112,18 +124,17 @@ namespace LastBreath
 
         public IDamageComponent Damage => _enemyDamage ??= new DamageComponent(new UnarmedDamageStrategy());
         public IHealthComponent Health => _enemyHealth ??= new HealthComponent();
-        public IDefenseComponent Defense => _enemyDefense ??= new DefenseComponent();
+        public IDefenceComponent Defence => _enemyDefense ??= new DefenseComponent();
         public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
         public IModifierManager Modifiers => _modifierManager;
 
         public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
 
-        int ICharacter.Initiative => Rnd.RandiRange(0, 15);
-
         public bool IsAlive => _isAlive;
 
 
-        public event Action<ICharacter>? Dead, InitializeFight;
+
+        public event Action<IEntity>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
         public event Action<IOnGettingAttackEventArgs>? GettingAttack;
         public event Action? TurnStart;
@@ -159,7 +170,7 @@ namespace LastBreath
 
         public void OnGettingKill()
         {
-            CanFight = false;
+            IsFighting = false;
             CanMove = false;
             // TODO: Turn "death" state on in witch enemy lay down for N time befor reincarnated
             // change sprite and animation
@@ -204,7 +215,7 @@ namespace LastBreath
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+                var damageLeftAfterBarrierabsorption = this.Defence.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
                 {
@@ -279,13 +290,13 @@ namespace LastBreath
             _area!.BodyEntered += PlayerEntered;
             Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Health.EntityDead += OnEntityDead;
         }
 
         private void OnEntityDead()
         {
-            CanFight = false;
+            IsFighting = false;
             _isAlive = false;
             Dead?.Invoke(this);
             GD.Print($"Dead: {GetType().Name}");
@@ -334,7 +345,7 @@ namespace LastBreath
             if (body is Player s && _area!.OverlapsBody(s))
             {
                 InitializeFight?.Invoke(this);
-                CanFight = false;
+                IsFighting = false;
             }
         }
 
@@ -365,6 +376,6 @@ namespace LastBreath
         }
 
         private string SetId() => $"{NpcName}_{Fraction}";
-      
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
 }

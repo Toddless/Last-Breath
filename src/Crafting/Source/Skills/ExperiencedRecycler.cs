@@ -2,7 +2,7 @@
 {
     using Godot;
     using Utilities;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
@@ -10,7 +10,7 @@
     {
         [Export] private int Percent { get; set; }
         
-        public override void Attach(ICharacter owner)
+        public override void Attach(IEntity owner)
         {
 
         }

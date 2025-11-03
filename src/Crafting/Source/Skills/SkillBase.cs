@@ -5,8 +5,8 @@
     using Utilities;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Entity;
 
     public abstract partial class SkillBase : Resource, ISkill
     {
@@ -18,7 +18,7 @@
         public string Description => GetDescription();
         public string DisplayName => Localizator.Localize(Id);
 
-        public abstract void Attach(ICharacter owner);
+        public abstract void Attach(IEntity owner);
         public virtual ISkill? Copy() => (ISkill)DuplicateDeep();
         public abstract void Detach();
 

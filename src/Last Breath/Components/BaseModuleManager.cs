@@ -2,13 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
-    public abstract class BaseModuleManager<TKey, TModule>(Dictionary<TKey, TModule> cache, ICharacter owner)
+    public abstract class BaseModuleManager<TKey, TModule>(Dictionary<TKey, TModule> cache, IEntity owner)
         where TKey : notnull
     {
         protected Dictionary<TKey, TModule> Cache = cache;
-        protected readonly ICharacter Owner = owner;
+        protected readonly IEntity Owner = owner;
 
         public event Action<TKey, TModule>? ModuleDecoratorChanges;
 

@@ -4,7 +4,7 @@
     using Core.Interfaces.Components;
     using Godot;
 
-    public class DefenseComponent : IDefenseComponent
+    public class DefenseComponent : IDefenceComponent
     {
         private const float BaseArmor = 100f;
         private const float BaseEvade = 0f;

@@ -8,7 +8,7 @@
     using System.Collections.Generic;
     using LastBreath.Script.ScenesHandlers;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public class BattleHandler
     {
@@ -17,16 +17,16 @@
 
         private readonly StateMachine<State, Trigger> _machine = new(State.AwaitingBattleToStart);
         private StateMachine<State, Trigger>.TriggerWithParameters<BattleResults>? _battleEnds;
-        private ICharacter? _currentAttacking;
-        private List<ICharacter> _fighters = [];
-        private Queue<ICharacter> _attackQueue = [];
+        private IEntity? _currentAttacking;
+        private List<IEntity> _fighters = [];
+        private Queue<IEntity> _attackQueue = [];
         private CombatScheduler _combatScheduler;
 
         public event Action<BattleResults>? BattleEnd;
-        public event Action<ICharacter>? StartTurn;
+        public event Action<IEntity>? StartTurn;
         public event Action? OnEnterStartPhase, OnExitStartPhase;
 
-        public IReadOnlyList<ICharacter> Fighters => _fighters;
+        public IReadOnlyList<IEntity> Fighters => _fighters;
         public static BattleHandler? Instance { get; private set; }
 
         public BattleHandler()
@@ -122,20 +122,16 @@
 
         private void DecideTurnsOrder()
         {
-            foreach (var fighter in _fighters.OrderByDescending(x => x.Initiative))
-            {
-                _attackQueue.Enqueue(fighter);
-            }
         }
 
 
         // i cant delete character from attack queue on death (Queue<T> has no methods for this), so i made this workaround
-        private void OnFighterDeath(ICharacter character)
+        private void OnFighterDeath(IEntity character)
         {
             CheckIfBattleShouldEnd();
         }
 
-        private void OnPlayerDead(ICharacter character)
+        private void OnPlayerDead(IEntity character)
         {
             // Handle player dead
             _combatScheduler.CancelQueue();

@@ -1,17 +1,17 @@
 ﻿namespace LastBreath.Script.BattleSystem.Module
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Entity;
 
     public class CritDamageModule : IStatModule
     {
-        private readonly ICharacter _owner;
+        private readonly IEntity _owner;
         public StatModule SkillType => StatModule.CritDamage;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
-        public CritDamageModule(ICharacter owner)
+        public CritDamageModule(IEntity owner)
         {
             _owner = owner;
         }

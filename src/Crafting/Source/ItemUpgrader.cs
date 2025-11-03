@@ -10,6 +10,7 @@
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces.Entity;
 
     public class ItemUpgrader : IItemUpgrader
     {
@@ -82,7 +83,7 @@
             return newRequrements;
         }
 
-        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, ICharacter? player = default)
+        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, IEntity? player = default)
         {
             var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
 
@@ -143,7 +144,7 @@
 
         private bool CheckRollIsCritical(float criticalChance) => _rnd.Randf() <= criticalChance;
         private int GetAmount(Rarity itemRarity, ItemUpgradeMode mode) => (int)itemRarity + (mode == ItemUpgradeMode.None ? 0 : (int)mode + 1);
-        private float ApplyPlayerMultiplier(float baseValue, ICharacter? player = default) => baseValue * _rnd.RandfRange(0.95f, 1.2f);
+        private float ApplyPlayerMultiplier(float baseValue, IEntity? player = default) => baseValue * _rnd.RandfRange(0.95f, 1.2f);
 
         //public void SetCriticalDoubleRoll(float doubleRoll) => _criticalDobubleRoll = doubleRoll;
         //public void SetCriticalLuckyRollUpgrade(float luckyRoll) => _criticalLuckyRollUpgrade = luckyRoll;

@@ -1,40 +1,40 @@
 ﻿namespace LastBreath
 {
-    using Godot;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Constants;
     using Core.Enums;
-    using Core.Interfaces;
-    using LastBreath.Script;
-    using LastBreath.Components;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
-    using Core.Interfaces.Battle;
+    using Godot;
+    using LastBreath.Components;
     using LastBreath.Localization;
-    using LastBreath.Script.Items;
-    using LastBreath.Script.Helpers;
-    using Core.Interfaces.Components;
     using LastBreath.Resource.Quests;
-    using System.Collections.Generic;
-    using LastBreath.Script.Inventory;
-    using LastBreath.Script.QuestSystem;
-    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using Core.Constants;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.Items;
+    using LastBreath.Script.QuestSystem;
+    using Utilities;
 
-    public partial class Player : CharacterBody2D, ICharacter
+    public partial class Player : CharacterBody2D, IEntity
     {
         #region Private fields
         private const int BaseSpeed = 600;
         private bool _canMove = true, _canFight = true, _isPlayerRunning = false, _isAlive = true;
         private float _moveProgress = 0f;
         private int _exp, _gold;
-        private ICharacter? _target;
         private IStance? _currentStance;
         private AnimatedSprite2D? _sprite;
         private Vector2 _targetPosition, _startPosition;
-        private Inventory? _equipInventory, _craftingInventory, _questItemsInventory;
+        private IInventory? _equipInventory, _questItemsInventory;
         private readonly Dictionary<string, DialogueNode> _dialogs = [];
-        private IDefenseComponent? _playerDefense;
+        private IDefenceComponent? _playerDefense;
         private IEffectsManager? _effectsManager;
         private IHealthComponent? _playerHealth;
         private IDamageComponent? _playerDamage;
@@ -43,19 +43,28 @@
         private readonly AttributeComponent _attribute = new();
         private readonly PlayerProgress _progress = new();
         private readonly Dictionary<Stance, IStance> _stances = [];
-        private RandomNumberGenerator _rnd = new();
         #endregion
 
         #region Properties
-        protected SkillsComponent Skills => _playerSkills ??= new(this);
         protected IStance this[Stance stance] => _stances[stance];
+
+        [Export] public string Id { get; private set; } = string.Empty;
+
+        [Export] public string[] Tags { get; set; } = [];
+
+        [Export] public Texture2D? Icon { get; set; }
+
+        public string Description => Localizator.LocalizeDescription(Id);
+
+        public string DisplayName => Localizator.Localize(Id);
+
         public bool CanMove
         {
             get => _canMove;
             set => _canMove = value;
         }
 
-        public bool CanFight
+        public bool IsFighting
         {
             get => _canFight;
             set => _canFight = value;
@@ -64,42 +73,20 @@
         public IStance? CurrentStance
         {
             get => _currentStance;
-            set
-            {
-                if (ObservableProperty.SetProperty(ref _currentStance, value))
-                {
-
-                }
-            }
-        }
-
-        public ICharacter? Target
-        {
-            get => _target;
-            set
-            {
-                if (ObservableProperty.SetProperty(ref _target, value))
-                {
-                    GD.Print($"New Target set to: {_target?.GetType().Name}");
-                    UpdateTargetForCurrentSetOfAbilities(value);
-                }
-            }
+            set => _currentStance = value;
         }
 
         [Export]
         public bool FirstSpawn { get; set; } = true;
         [Export]
         public int Speed { get; private set; } = BaseSpeed;
-        public string CharacterName { get; private set; } = "Player";
-        public Dictionary<string, DialogueNode> Dialogs => _dialogs;
         public PlayerProgress Progress => _progress;
-        public IDefenseComponent Defense => _playerDefense ??= new DefenseComponent();
+
+        public IDefenceComponent Defence => _playerDefense ??= new DefenseComponent();
         public IHealthComponent Health => _playerHealth ??= new HealthComponent();
         public IDamageComponent Damage => _playerDamage ??= new DamageComponent(new UnarmedDamageStrategy());
         public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
         public IModifierManager Modifiers => _modifierManager;
-
-        int ICharacter.Initiative => _rnd.RandiRange(0, 15);
 
         public bool IsAlive
         {
@@ -112,7 +99,7 @@
         public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
         public event Action<EnemyKilledEventArgs>? EnemyKilled;
         public event Action<List<IAbility>>? SetAvailableAbilities;
-        public event Action<ICharacter>? Dead;
+        public event Action<IEntity>? Dead;
         public event Action? AllAttacksFinished;
         public event Action<IOnGettingAttackEventArgs>? GettingAttack;
         public event Action? TurnStart;
@@ -169,6 +156,8 @@
             MoveAndSlide();
         }
 
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
+
         public void AddItemToInventory(IItem item)
         {
             if (item is IEquipItem)
@@ -184,12 +173,6 @@
             }
         }
 
-        public void OnItemCollect(IItem item)
-        {
-            AddItemToInventory(item);
-            ItemCollected?.Invoke(item.Id);
-        }
-
         public void OnRunAway(Vector2 enemyPosition)
         {
             _targetPosition = enemyPosition;
@@ -198,7 +181,6 @@
             _isPlayerRunning = true;
         }
 
-        public void OnEquipWeapon(IDamageStrategy strategy) => _playerDamage?.ChangeStrategy(strategy);
         public void OnUnequipWeapon() => _playerDamage?.ChangeStrategy(new UnarmedDamageStrategy());
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
@@ -251,14 +233,12 @@
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+                var damageLeftAfterBarrierabsorption = Defence.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
                 {
                     Health.TakeDamage(damageLeftAfterBarrierabsorption);
                 }
-
-                context.SetAttackResult(new AttackResult(Skills.GetSkills(SkillType.GettingAttack), AttackResults.Succeed, context));
                 return;
             }
             _currentStance.OnReceiveAttack(context);
@@ -267,46 +247,23 @@
         public void AllAttacks() => AllAttacksFinished?.Invoke();
         public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
         public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
-        public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
-
-        public void AddSkill(ISkill skill)
-        {
-            if (skill is IStanceSkill stanceSkill) AddToStance(stanceSkill);
-            else Skills.AddSkill(skill);
-        }
-
-        public void RemoveSkill(ISkill skill)
-        {
-            if (skill is IStanceSkill stanceSkill) RemoveFromStance(stanceSkill);
-            else Skills.RemoveSkill(skill);
-        }
 
         public void TakeDamage(float damage, bool isCrit = false)
         {
             // some actions like sound, animation etc.
             Health.TakeDamage(damage);
-            GD.Print($"{this.CharacterName} taked: {damage} damage");
             GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
         }
-
-        private void RemoveFromStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillComponent.RemoveSkill(stanceSkill);
-        private void AddToStance(IStanceSkill stanceSkill) => this[stanceSkill.RequiredStance].StanceSkillComponent.AddSkill(stanceSkill);
-
         private void OnPlayerDead()
         {
             Dead?.Invoke(this);
-            CanFight = false;
+            IsFighting = false;
             IsAlive = false;
         }
 
         private void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
-          
-        }
 
-        private void UpdateTargetForCurrentSetOfAbilities(ICharacter value)
-        {
-            //_abilities[_currentStance].ForEach(x => x.Target = value);
         }
 
         private void UpdateAbilityStates()
@@ -348,7 +305,7 @@
         {
             Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += OnParameterChanges;
             Health.EntityDead += OnPlayerDead;
             _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;

@@ -12,6 +12,7 @@
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces.Entity;
 
     public class ItemCreator : IItemCreator
     {
@@ -26,7 +27,7 @@
             _craftingMastery = craftingMastery;
         }
 
-        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, ICharacter? player = default)
+        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, IEntity? player = default)
         {
             var recipe = _dataProvider.GetRecipe(recipeId);
             var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
@@ -44,7 +45,7 @@
             return null;
         }
 
-        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, ICharacter? player = default)
+        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, IEntity? player = default)
         {
             try
             {
@@ -89,7 +90,7 @@
         }
 
 
-        private float ApplyPlayerMultiplier(float baseValue, ModifierType type, ICharacter? player = default)
+        private float ApplyPlayerMultiplier(float baseValue, ModifierType type, IEntity? player = default)
         {
             float multiplier = _craftingMastery.GetFinalValueMultiplier();
             if (type == ModifierType.Multiplicative)
@@ -115,14 +116,14 @@
 
         private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
 
-        private Rarity GetRarity(ICharacter? player = default)
+        private Rarity GetRarity(IEntity? player = default)
         {
             // if (player == null) return GetRandomValueFallBack<Rarity>();
             // TODO: Later add call to players skill to get Rarity
             return _craftingMastery.RollRarity();
         }
 
-        private AttributeType GetAttribute(ICharacter? player = default)
+        private AttributeType GetAttribute(IEntity? player = default)
         {
             // TODO: Sometime i can get from this call AttributeType.None.
             if (player == null)

@@ -10,6 +10,7 @@
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
@@ -22,7 +23,7 @@
         private HashSet<IModifier> _additionalModifiers = [];
         private List<IMaterialModifier> _modifiersPool = [];
         private Dictionary<string, int> _usedResources = [];
-        private ICharacter? _owner;
+        private IEntity? _owner;
 
         [Export] public EquipmentType EquipmentPart { get; set; }
         [Export] public string Id { get; set; } = string.Empty;
@@ -123,7 +124,7 @@
             _owner = null;
         }
 
-        public void OnEquip(ICharacter owner)
+        public void OnEquip(IEntity owner)
         {
             _owner = owner;
             //var modifiers = _baseModifiers.Concat(_additionalModifiers);

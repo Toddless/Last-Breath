@@ -2,9 +2,9 @@
 {
     using Core.Enums;
     using Core.Modifiers;
-    using Core.Interfaces;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Abilities;
+    using Core.Interfaces.Entity;
 
     public class RegenerationEffect : EffectBase
     {
@@ -16,7 +16,7 @@
             Modifier = new ModifierInstance(Parameter.Health, ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
         }
 
-        public override void OnTick(ICharacter character)
+        public override void OnTick(IEntity character)
         {
             base.OnTick(character);
             character.Health.Heal(Modifier.Value);

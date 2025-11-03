@@ -1,10 +1,11 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using Core.Enums;
+    using Core.Interfaces.Entity;
 
     public interface IOnGettingAttackEventArgs
     {
-        ICharacter Character { get; }
+        IEntity Character { get; }
         float Damage { get; }
         bool IsCrit { get; }
         AttackResults Result { get; }

@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using System.Collections.Generic;
-    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public interface IBattleContext
     {
-        List<ICharacter> Fighters { get; }
+        List<IEntity> Fighters { get; }
     }
 }

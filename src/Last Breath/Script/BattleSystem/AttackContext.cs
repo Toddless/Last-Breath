@@ -2,14 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using Core.Interfaces;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public class AttackContext(ICharacter attaker, ICharacter target) : IAttackContext
+    public class AttackContext(IEntity attaker, IEntity target) : IAttackContext
     {
-        public ICharacter Attacker { get; } = attaker;
-        public ICharacter Target { get; } = target;
+        public IEntity Attacker { get; } = attaker;
+        public IEntity Target { get; } = target;
         public float Damage { get; set; }
         public float CriticalDamageMultiplier { get; set; }
         public float Armor { get; set; }
