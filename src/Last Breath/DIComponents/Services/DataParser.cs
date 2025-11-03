@@ -9,10 +9,12 @@
     using Newtonsoft.Json;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
-    using LastBreath.Script.Items;
     using Core.Interfaces.Crafting;
+    using LastBreath.Script.Items;
     using System.Collections.Generic;
     using Newtonsoft.Json.Serialization;
+    using Godot;
+    using System.IO;
 
     public class DataParser
     {
@@ -45,14 +47,7 @@
 
             foreach (var categoryData in data?.MaterialCategories ?? [])
             {
-                var modifiers = new List<IMaterialModifier>();
-                foreach (var modifierData in categoryData.Modifiers)
-                {
-                    var parameter = ParseEnum<Parameter>(modifierData.Parameter);
-                    s_typeMap.TryGetValue(modifierData.ModifierType, out var modifierType);
-                    var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
-                    modifiers.Add(modifier);
-                }
+                List<IMaterialModifier> modifiers = await LoadMaterialsModifiers(categoryData);
 
                 var category = new Crafting.Source.MaterialCategory(modifiers, categoryData.Id);
                 materialCategories.Add(category);
@@ -60,61 +55,13 @@
             }
 
             var items = new List<IItem>();
-            foreach (var upgradeData in data?.UpgradeResources ?? [])
-            {
-                var rarity = ParseEnum<Rarity>(upgradeData.Rarity);
-                var category = ParseEnum<EquipmentCategory>(upgradeData.Category);
-                //var icon = ResourceLoader.Load<Texture2D>(Path.Combine($"{s_assetsPath}/Resources", upgradeData.Icon));
-                var upgrade = new UpgradeResource(
-                    upgradeData.Id,
-                    upgradeData.Tags,
-                    rarity,
-                    category,
-                   null,
-                    upgradeData.MaxStackSize);
 
-                items.Add(upgrade);
-            }
+            items.AddRange(LoadUpgradeResources(categoryDic, data?.UpgradeResources ?? []));
 
-            foreach (var craftingData in data?.CraftingResources ?? [])
-            {
-                var materialData = craftingData.Material;
-                if (!categoryDic.TryGetValue(materialData.CategoryId, out var category))
-                {
-                    Tracker.TrackError("Category not found");
-                    continue;
-                }
-                var materialModifiers = new List<IMaterialModifier>();
-
-                foreach (var modifierData in materialData.Modifiers)
-                {
-                    var parameter = ParseEnum<Parameter>(modifierData.Parameter);
-                    s_typeMap.TryGetValue(modifierData.ModifierType, out var modifierType);
-                    var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
-                    materialModifiers.Add(modifier);
-                }
-
-                var materialType = new MaterialType(materialModifiers, category);
-                var rarity = ParseEnum<Rarity>(craftingData.Rarity);
-                //var icon = ResourceLoader.Load<Texture2D>(Path.Combine(s_assetsPath, craftingData.Icon));
-                var craftingResource = new CraftingResource(
-                    craftingData.Id,
-                    craftingData.MaxStackSize,
-                    craftingData.Tags,
-                    null,
-                    materialType,
-                    rarity);
-
-                items.Add(craftingResource);
-            }
-
+            items.AddRange(LoadCraftingResources(categoryDic, data?.CraftingResources ?? []));
 
             return await Task.FromResult(items);
         }
-
-        private static TEnum ParseEnum<TEnum>(string enumAsString)
-            where TEnum : struct => Enum.Parse<TEnum>(enumAsString);
-
 
         public static async Task<List<IItem>> ParseRecipes(string json)
         {
@@ -139,7 +86,7 @@
                     recipeData.Id,
                     recipeData.ResultItemid,
                     recipeData.Tags,
-                   null,
+                    null,
                     rarity,
                     requirements,
                     recipeData.IsOpened);
@@ -160,15 +107,15 @@
             {
                 var baseModifiers = await LoadModifiers(item.BaseModifiers);
                 var additionalModifiers = await LoadModifiers(item.AdditionalModifiers);
-                var rarity = ParseEnum<Rarity>(item.Rarity);
-                var equipmentType = ParseEnum<EquipmentType>(item.EquipmentPart);
-                var attributeType = ParseEnum<AttributeType>(item.AttributeType);
-                //  var icon = ResourceLoader.Load<Texture2D>(Path.Combine($"{s_assetsPath}/Items", item.Icon));
+                ParseEnum<Rarity>(item.Rarity, out var rarity);
+                ParseEnum<EquipmentType>(item.EquipmentPart, out var equipmentType);
+                ParseEnum<AttributeType>(item.AttributeType, out var attributeType);
+                var icon = ResourceLoader.Load<Texture2D>(Path.Combine($"{s_assetsPath}/Equip", item.Icon));
 
                 var newItem = new EquipItem(
                     equipmentType,
                     item.Id,
-                    null,
+                    icon,
                     rarity,
                     item.Tags,
                     baseModifiers,
@@ -189,16 +136,98 @@
 
             foreach (var baseMod in modifiers)
             {
-                s_typeMap.TryGetValue(baseMod.ModifierType, out var modifierType);
-                var parameter = ParseEnum<Parameter>(baseMod.Parameter);
+                if (!s_typeMap.TryGetValue(baseMod.ModifierType, out var modifierType))
+                {
+                    modifierType = default;
+                }
+                ParseEnum<Parameter>(baseMod.Parameter, out var parameter);
                 modifiersList.Add(new Modifier(modifierType, parameter, baseMod.Value));
             }
 
             return Task.FromResult(modifiersList);
         }
 
+        private static List<IItem> LoadUpgradeResources(Dictionary<string, IMaterialCategory> categories, List<UpgradeResourceData> upgradeResourceDatas)
+        {
+            var items = new List<IItem>();
+            foreach (var upgradeData in upgradeResourceDatas)
+            {
+                ParseEnum<Rarity>(upgradeData.Rarity, out var rarity);
+                ParseEnum<EquipmentCategory>(upgradeData.Category, out var category);
+                //var icon = ResourceLoader.Load<Texture2D>(Path.Combine($"{s_assetsPath}/Resources", upgradeData.Icon));
+                var upgrade = new UpgradeResource(
+                    upgradeData.Id,
+                    upgradeData.Tags,
+                    rarity,
+                    category,
+                    null,
+                    upgradeData.MaxStackSize);
 
+                items.Add(upgrade);
+            }
+            return items;
+        }
 
+        private static List<IItem> LoadCraftingResources(Dictionary<string, IMaterialCategory> categories, List<CraftingResourceData> resourceDatas)
+        {
+            var items = new List<IItem>();
+            foreach (var craftingData in resourceDatas)
+            {
+                var materialData = craftingData.Material;
+                if (!categories.TryGetValue(materialData.CategoryId, out var category))
+                {
+                    Tracker.TrackError("Category not found");
+                    continue;
+                }
+                var materialModifiers = new List<IMaterialModifier>();
+
+                foreach (var modifierData in materialData.Modifiers)
+                {
+                    ParseEnum<Parameter>(modifierData.Parameter, out var parameter);
+                    if (!s_typeMap.TryGetValue(modifierData.ModifierType, out var modifierType))
+                    {
+                        modifierType = default;
+                    }
+                    var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
+                    materialModifiers.Add(modifier);
+                }
+
+                var materialType = new MaterialType(materialModifiers, category);
+                ParseEnum<Rarity>(craftingData.Rarity, out var rarity);
+                //var icon = ResourceLoader.Load<Texture2D>(Path.Combine(s_assetsPath, craftingData.Icon));
+                var craftingResource = new CraftingResource(
+                    craftingData.Id,
+                    craftingData.MaxStackSize,
+                    craftingData.Tags,
+                    null,
+                    materialType,
+                    rarity);
+
+                items.Add(craftingResource);
+            }
+
+            return items;
+        }
+
+        private static async Task<List<IMaterialModifier>> LoadMaterialsModifiers(MaterialCategoryData categoryData)
+        {
+            var modifiers = new List<IMaterialModifier>();
+            foreach (var modifierData in categoryData.Modifiers)
+            {
+                ParseEnum<Parameter>(modifierData.Parameter, out var parameter);
+                if (!s_typeMap.TryGetValue(modifierData.ModifierType, out var modifierType))
+                {
+                    modifierType = default;
+                }
+                var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
+                modifiers.Add(modifier);
+            }
+
+            return await Task.FromResult(modifiers);
+        }
+
+        private static bool ParseEnum<TEnum>(string enumAsString, out TEnum result)
+         where TEnum : struct => Enum.TryParse(enumAsString, true, out result);
 
         private record ResourcesData(List<MaterialCategoryData> MaterialCategories, List<UpgradeResourceData> UpgradeResources, List<CraftingResourceData> CraftingResources);
         private record CraftingResourceData(string Id, MaterialData Material, int MaxStackSize, string[] Tags, string Icon, string Rarity);
@@ -211,10 +240,8 @@
         private record RecipeData(List<CraftingRecipeData> CraftingRecipes);
 
         private record EquipItemDataList(List<EquipItemData> Items);
-
         private record EquipItemData(string Id, string EquipmentPart, int MaxStackSize, string Icon, string Rarity, string[] Tags, string AttributeType, string Skill, int UpdateLevel, int MaxUpdateLevel, List<ItemModifier> BaseModifiers, List<ItemModifier> AdditionalModifiers);
         private record ItemModifier(string Parameter, string ModifierType, float Value);
-
 
     }
 }

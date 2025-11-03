@@ -9,6 +9,7 @@
     using LastBreath.Script.UI;
     using Core.Interfaces.Mediator;
     using LastBreath.Script.Helpers;
+    using Core.Constants;
 
     public partial class OptionsWindow : UI.Window, IInitializable, IRequireServices
     {

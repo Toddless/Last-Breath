@@ -115,7 +115,7 @@
 			"additionalModifiers": []
 		},
 		{
-			"id": "Test_Ring",
+			"id": "Creators_Ring",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
 			"icon": "TestRing.png",

@@ -3,8 +3,8 @@
     using Godot;
     using LastBreath.DIComponents;
     using Core.Interfaces.Mediator;
-    using LastBreath.Script.Helpers;
     using Core.Interfaces.Mediator.Events;
+    using Core.Constants;
 
     public partial class UILayersManager : Node
     {
@@ -16,7 +16,6 @@
         {
             var serviceProvider = GameServiceProvider.Instance;
             _uiMediator = serviceProvider.GetService<IUiMediator>();
-
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -33,6 +32,7 @@
                     _uiMediator?.Publish(new OpenCharacterWindowEvent());
                     break;
                 case var _ when @event.IsActionPressed(Settings.Cancel):
+                    CloseAllWindows();
                     _uiMediator?.Publish(new PauseGameEvent());
                     break;
                 default: return;

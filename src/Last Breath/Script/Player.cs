@@ -19,6 +19,7 @@
     using LastBreath.Script.QuestSystem;
     using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Abilities.Interfaces;
+    using Core.Constants;
 
     public partial class Player : CharacterBody2D, ICharacter
     {

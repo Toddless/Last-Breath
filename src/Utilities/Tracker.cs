@@ -16,7 +16,7 @@
             var logPath = ProjectSettings.GlobalizePath("user://log.txt");
             s_logger = new LoggerConfiguration()
                 .WriteTo.File(logPath,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}  \n CallStack: {CallStack}")
+                outputTemplate: "\n{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}  \n CallStack: {CallStack}")
                 .CreateLogger();
         }
 

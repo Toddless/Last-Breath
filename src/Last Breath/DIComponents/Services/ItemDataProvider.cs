@@ -5,18 +5,16 @@
     using Utilities;
     using System.IO;
     using System.Linq;
-    using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
+    using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     internal class ItemDataProvider : IItemDataProvider
     {
         private readonly string _itemDataPath;
         private Dictionary<string, IItem> _itemData = [];
-        private Dictionary<string, List<IModifier>> _itemBaseStatsData = [];
 
         public ItemDataProvider(string itemDataPath)
         {
@@ -26,12 +24,6 @@
         public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
-
-        public List<IModifier> GetItemBaseStats(string id)
-        {
-            if (!_itemBaseStatsData.TryGetValue(id, out var data)) return [];
-            return [.. data];
-        }
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
@@ -100,7 +92,7 @@
                     List<IItem> data = [];
                     switch (true)
                     {
-                        case var _ when itemDataPath.EndsWith("Items"):
+                        case var _ when itemDataPath.EndsWith("EquipItems"):
                             data = await DataParser.ParseEquipItems(jsonContent);
                             break;
                         case var _ when itemDataPath.EndsWith("Recipies"):

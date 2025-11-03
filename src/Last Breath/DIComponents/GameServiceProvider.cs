@@ -18,9 +18,9 @@
     using LastBreath.DIComponents.Mediator;
     using LastBreath.DIComponents.Services;
     using Core.Interfaces.Mediator.Requests;
+    using Crafting.Source.MediatorHandlers;
     using LastBreath.DIComponents.MediatorHandlers;
     using Microsoft.Extensions.DependencyInjection;
-    using Crafting.Source.MediatorHandlers;
     using Crafting.Source.MediatorHandlers.EventHandlers;
 
     public class GameServiceProvider : IGameServiceProvider
@@ -51,6 +51,8 @@
             services.AddSingleton<IUiMediator, UIMediator>();
             services.AddSingleton<ISystemMediator, SystemMediator>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
+            services.AddSingleton<IItemCreator, ItemCreator>();
+            services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton((provider) =>
             {
                 var instance = new RandomNumberGenerator();
@@ -61,7 +63,7 @@
 
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
 
-            services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemHandler>();
+            services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
             services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
             services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();

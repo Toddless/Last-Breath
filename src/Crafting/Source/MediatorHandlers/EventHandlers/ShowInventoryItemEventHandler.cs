@@ -15,6 +15,7 @@
 
         public ShowInventoryItemEventHandler(IInventory inventory, IUIElementProvider uiElementProvider)
         {
+            // TODO: Should i remove this from crafting dll??
             _inventory = inventory;
             _uiElementProvider = uiElementProvider;
         }
@@ -24,7 +25,7 @@
             var item = _inventory.GetItem<IItem>(evnt.Item.InstanceId);
             if (item != null)
             {
-                var details = _uiElementProvider.Create<ItemDetails>();
+                var details = _uiElementProvider.CreateAndShowNotification<ItemDetails>();
                 ConfigureDetails(details, item);
             }
         }

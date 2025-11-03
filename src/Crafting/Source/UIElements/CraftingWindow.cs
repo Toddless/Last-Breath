@@ -6,6 +6,7 @@
     using Core.Enums;
     using System.Linq;
     using Core.Results;
+    using Core.Constants;
     using Core.Interfaces;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
@@ -48,12 +49,35 @@
         {
             _close.Pressed += () => Close?.Invoke();
             _add.Pressed += OnAddPressedAsync;
-            DragArea.GuiInput += DragWindow;
-            _recipies = _uiElementProvider?.CreateRequireServices<Recipies>();
-            if (_recipies != null)
+            if (_uiElementProvider != null)
             {
+                _recipies = _uiElementProvider.CreateRequireServices<Recipies>();
                 _recipeContainer?.AddChild(_recipies);
                 _recipies.RecipeSelected += SetRecipe;
+            }
+
+            // TODO: Update this window afer reopening
+        }
+
+        public override void _EnterTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateRequiredResourcesAsync;
+            if (DragArea != null) DragArea.GuiInput += DragWindow;
+            UpdateRequiredResourcesAsync();
+        }
+
+        public override void _ExitTree()
+        {
+            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRequiredResourcesAsync;
+            if (DragArea != null) DragArea.GuiInput -= DragWindow;
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (@event.IsActionPressed(Settings.Cancel) && Visible)
+            {
+                GetParent().RemoveChild(this);
+                AcceptEvent();
             }
         }
 
@@ -81,7 +105,6 @@
             CreateActionButtons();
         }
 
-
         public void SetItem(IEquipItem? item)
         {
             if (item?.InstanceId.Equals(_equpItem?.InstanceId, StringComparison.OrdinalIgnoreCase) ?? true) return;
@@ -98,13 +121,6 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public override void _ExitTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRequiredResourcesAsync;
-            if (DragArea != null) DragArea.GuiInput -= DragWindow;
-            _equpItem = null;
-            _recipeId = null;
-        }
 
 
         private void CreateActionButtons()
@@ -457,7 +473,7 @@
                 var id = _recipeId ?? string.Empty;
                 var resultItemId = _dataProvider.GetRecipeResultItemId(id);
                 var itemId = _dataProvider.IsItemHasTag(id, "Generic") ? $"{resultItemId}_Generic" : resultItemId;
-                var itemBaseStats = _dataProvider.GetItemBaseStats(itemId).ToHashSet();
+                var itemBaseStats = _equpItem?.BaseModifiers.ToHashSet() ?? [];
                 CreateHoverArea(itemBaseStats, _baseStats);
             }
             catch (Exception ex)

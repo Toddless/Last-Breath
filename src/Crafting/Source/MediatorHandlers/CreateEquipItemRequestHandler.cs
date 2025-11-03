@@ -11,13 +11,13 @@
     using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Mediator.Requests;
 
-    public class CreateEquipItemHandler : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
+    public class CreateEquipItemRequestHandler : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
     {
         private readonly IItemCreator _itemCreator;
         private readonly ISystemMediator _systemMediator;
         private readonly IItemDataProvider _itemDataProvider;
 
-        public CreateEquipItemHandler(IItemCreator creator, ISystemMediator systemMediator, IItemDataProvider itemDataProvider)
+        public CreateEquipItemRequestHandler(IItemCreator creator, ISystemMediator systemMediator, IItemDataProvider itemDataProvider)
         {
             _itemCreator = creator;
             _systemMediator = systemMediator;

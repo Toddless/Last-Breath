@@ -10,12 +10,13 @@
 
     public partial class CraftingResource : Resource, ICraftingResource, IItem
     {
-        public string Id { get; private set; } = string.Empty;
-        public int MaxStackSize { get; private set; }
-        public string[] Tags { get; private set; } = [];
-        public Texture2D? Icon { get; set; }
-        public IMaterial? Material { get; private set; }
-        public Rarity Rarity { get; set; } = Rarity.Rare;
+        [Export] private MaterialType? _material;
+        [Export] public string Id { get; private set; } = string.Empty;
+        [Export] public int MaxStackSize { get; private set; }
+        [Export] public string[] Tags { get; private set; } = [];
+        [Export] public Texture2D? Icon { get; set; }
+        [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
+        public IMaterial? Material => _material;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string Description => Localizator.LocalizeDescription(Id);
         public string DisplayName => Localizator.Localize(Id);
@@ -43,14 +44,14 @@
             MaxStackSize = maxStackSize;
             Tags = tags;
             Icon = icon;
-            Material = material;
             InstanceId = Guid.NewGuid().ToString();
             Rarity = rarity;
+            _material = (MaterialType)material;
         }
 
         public T Copy<T>()
         {
-            var duplicate = (ICraftingResource)DuplicateDeep();
+            var duplicate = (ICraftingResource)DuplicateDeep(DeepDuplicateMode.All);
             return (T)duplicate;
         }
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);

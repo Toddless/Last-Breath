@@ -1,10 +1,10 @@
 {
 	"items": [
 		{
-			"id": "Helmet_Strength_Legendary",
+			"id": "Helmet_Strength_Generic",
 			"equipmentPart": "Helmet",
 			"maxStackSize": 1,
-			"icon": "HelmetStrengthLegendary.png",
+			"icon": "HelmetStrengthGeneric.png",
 			"rarity": "Legendary",
 			"tags": [
 				"Helmet",
@@ -39,10 +39,10 @@
 			"additionalModifiers": []
 		},
 		{
-			"id": "Helmet_Dexterity_Legendary",
+			"id": "Helmet_Dexterity_Generic",
 			"equipmentPart": "Helmet",
 			"maxStackSize": 1,
-			"icon": "HelmetDexterityLegendary.png",
+			"icon": "HelmetDexterityGeneric.png",
 			"rarity": "Legendary",
 			"tags": [
 				"Helmet",
@@ -77,10 +77,10 @@
 			"additionalModifiers": []
 		},
 		{
-			"id": "Helmet_Intelligence_Legendary",
+			"id": "Helmet_Intelligence_Generic",
 			"equipmentPart": "Helmet",
 			"maxStackSize": 1,
-			"icon": "HelmetIntelligenceLegendary.png",
+			"icon": "HelmetIntelligenceGeneric.png",
 			"rarity": "Legendary",
 			"tags": [
 				"Helmet",

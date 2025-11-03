@@ -101,7 +101,15 @@
                 return (T)exist;
             var instance = CreateRequireServices<T>();
             _singleInstances.TryAdd(typeof(T), instance);
-            instance.Close += _uiLayers.CloseAllWindows;
+            instance.Close += OnClose;
+
+            void OnClose()
+            {
+                _uiLayers.RemoveWindowElement(instance);
+                if (instance.IsQueuedForDeletion())
+                    instance.Close -= OnClose;
+            }
+
             _uiLayers.ShowWindowElement(instance);
             return instance;
         }
@@ -144,12 +152,10 @@
             _singleInstances.Clear();
         }
 
-
-
-
         public T CreateClosableForSource<T>(Control source)
             where T : Control, IInitializable, IClosable, IRequireServices
         {
+            ArgumentNullException.ThrowIfNull(_uiLayers);
             if (!_instanceBySource.TryGetValue(source, out var list))
             {
                 list = [];
@@ -228,6 +234,7 @@
             _singleInstances[typeof(T)] = instance;
             return instance;
         }
+
         public void Unload<T>()
             where T : Control
         {

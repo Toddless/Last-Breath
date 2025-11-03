@@ -1,59 +1,107 @@
 {
-  "craftingRecipes": [
-	{
-	  "id": "Recipe_Creators_Ring",
-	  "resultItemId": "Creators_Ring",
-	  "tags": [
-		"Ring",
-		"Recipe",
-		"Crafting",
-        "Equipment"
-	  ],
-	  "icon": "CreatorsRing.png",
-	  "rarity": "Rare",
-	  "isOpened": true,
-	  "mainResources": [
+	"craftingRecipes": [
 		{
-		  "type": "ResourceAmount",
-		  "resourceId": "Crafting_Resource_Gold_Ore",
-		  "amount": 3
+			"id": "Recipe_Creators_Ring",
+			"resultItemId": "Creators_Ring",
+			"tags": [
+				"Ring",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"icon": "CreatorsRing.png",
+			"rarity": "Rare",
+			"isOpened": true,
+			"mainResources": [
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Gold_Ore",
+					"amount": 3
+				},
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Emerald_Gem",
+					"amount": 2
+				},
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Ruby_Gem",
+					"amount": 2
+				}
+			]
 		},
 		{
-		  "type": "ResourceAmount",
-		  "resourceId": "Crafting_Resource_Emerald_Gem",
-		  "amount": 2
+			"id": "Recipe_Generic_Boots",
+			"resultItemId": "Boots",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"icon": "GenericBoots.png",
+			"rarity": "Rare",
+			"isOpened": true,
+			"mainResources": [
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Wild_Boar_Leather",
+					"amount": 2
+				},
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Silk_Fabric",
+					"amount": 2
+				}
+			]
 		},
 		{
-		  "type": "ResourceAmount",
-		  "resourceId": "Crafting_Resource_Ruby_Gem",
-		  "amount": 2
+			"id": "Recipe_Generic_Gloves",
+			"resultItemId": "Gloves",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"icon": "GenericGloves.png",
+			"rarity": "Rare",
+			"isOpened": true,
+			"mainResources": [
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Silk_Fabric",
+					"amount": 2
+				},
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Wild_Boar_Leather",
+					"amount": 2
+				}
+			]
+		},
+		{
+			"id": "Recipe_Generic_Helmet",
+			"resultItemId": "Helmet",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"icon": "GenericHelmet.png",
+			"rarity": "Rare",
+			"isOpened": true,
+			"mainResources": [
+				{
+					"type": "ResourceAmount",
+					"resourceId": "Crafting_Resource_Deer_Leather",
+					"amount": 2
+				}
+			]
 		}
-	  ]
-	},
-	{
-	  "id": "Recipe_Generic_Boots",
-	  "resultItemId": "Boots",
-	  "tags": [
-		"Boots",
-		"Recipe",
-		"Crafting",
-        "Equipment"
-	  ],
-	  "icon": "GenericBoots.png",
-	  "rarity": "Rare",
-	  "isOpened": true,
-	  "mainResources": [
-		{
-		  "type": "ResourceAmount",
-		  "resourceId": "Crafting_Resource_Wild_Boar_Leather",
-		  "amount": 2
-		},
-		{
-		  "type": "ResourceAmount",
-		  "resourceId": "Crafting_Resource_Silk_Fabric",
-		  "amount": 2
-		}
-	  ]
-	}
-  ]
+	]
 }

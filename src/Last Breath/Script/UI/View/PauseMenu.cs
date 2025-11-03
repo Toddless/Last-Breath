@@ -5,7 +5,7 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
-    using LastBreath.Script.Helpers;
+    using Core.Constants;
 
     public partial class PauseMenu : Control, IInitializable, IRequireServices, IClosable
     {

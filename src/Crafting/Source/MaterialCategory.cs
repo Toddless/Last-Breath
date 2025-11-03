@@ -1,13 +1,15 @@
 ﻿namespace Crafting.Source
 {
     using Godot;
+    using System.Linq;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
     public partial class MaterialCategory : Resource, IMaterialCategory
     {
-        public string Id { get; set; } = string.Empty;
-        public IReadOnlyList<IMaterialModifier>? Modifiers { get; private set; }
+        [Export] private MaterialModifier[] _modifiers = [];
+        [Export] public string Id { get; set; } = string.Empty;
+        public IReadOnlyList<IMaterialModifier>? Modifiers => _modifiers;
 
         // we need to create a default, parameterless constructor in order to create a resource from within the Godot Editor.
         public MaterialCategory()
@@ -21,7 +23,7 @@
         /// <param name="id"></param>
         public MaterialCategory(List<IMaterialModifier> modifiers, string id)
         {
-            Modifiers = modifiers;
+            _modifiers = [.. modifiers.Cast<MaterialModifier>()];
             Id = id;
         }
     }

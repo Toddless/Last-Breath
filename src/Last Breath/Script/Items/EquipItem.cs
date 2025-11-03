@@ -72,7 +72,9 @@
 
         public T Copy<T>()
         {
-            var duplicate = (IEquipItem)DuplicateDeep();
+            var duplicate = (IEquipItem)DuplicateDeep(DeepDuplicateMode.All);
+            duplicate.SetBaseModifiers([.. _baseModifiers]);
+            duplicate.SetAdditionalModifiers([.._additionalModifiers]);
             return (T)duplicate;
         }
 
@@ -159,6 +161,5 @@
             foreach (var modifier in _baseModifiers.Concat(_additionalModifiers))
                 modifier.Value = modifier.BaseValue * _currentUpdateMultiplier;
         }
-
     }
 }

@@ -8,6 +8,8 @@
     using Core.Interfaces.Inventory;
     using LastBreath.Script.Helpers;
     using LastBreath.Script.Inventory;
+    using System;
+    using Core.Interfaces.Items;
 
     public partial class InventoryWindow : Window, IInitializable
     {
@@ -17,15 +19,22 @@
         [Export] private Array<EquipmentSlot> _ringSlots = [];
 
         private IInventory? _inventory;
+        private IItemDataProvider? _dataProvider;
 
         public override void _Ready()
         {
             _inventory?.Initialize(286,_inventoryContainer);
+
+            ArgumentNullException.ThrowIfNull(_dataProvider);
+            var allResources = _dataProvider.GetAllResources();
+            foreach (var item in allResources)
+                _inventory?.TryAddItem(item.Copy<IItem>(), 999);
         }
 
         public override void InjectServices(IGameServiceProvider provider)
         {
             _inventory = provider.GetService<IInventory>();
+            _dataProvider = provider.GetService<IItemDataProvider>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

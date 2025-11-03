@@ -4,7 +4,7 @@
     using System;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using LastBreath.Script.Helpers;
+    using Core.Constants;
 
     public abstract partial class Window : Control, IRequireServices, IClosable
     {

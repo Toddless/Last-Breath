@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Helpers
+﻿namespace Core.Constants
 {
     public static class Settings
     {

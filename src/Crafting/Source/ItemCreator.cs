@@ -51,7 +51,7 @@
                 var item = (IEquipItem)_dataProvider.CopyBaseItem(itemId);
                 var itemRarity = GetRarity(player);
                 item.Rarity = itemRarity;
-                var baseStats = _dataProvider.GetItemBaseStats(itemId);
+                var baseStats = item.BaseModifiers;
                 var amountModifiers = GetAmountModifiers(item.Rarity);
 
                 var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid()).Take(amountModifiers)], item).ToHashSet();

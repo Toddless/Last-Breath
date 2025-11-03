@@ -45,7 +45,7 @@
         public bool HasTag(string tag) => Tags.Contains(tag);
         public T Copy<T>()
         {
-            var duplicate = (IUpgradingResource)DuplicateDeep();
+            var duplicate = (IUpgradingResource)DuplicateDeep(DeepDuplicateMode.All);
             return (T)duplicate;
         }
     }

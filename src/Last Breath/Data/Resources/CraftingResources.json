@@ -504,7 +504,7 @@
             "rarity": "Rare"
         },
         {
-            "id": "Crafting_resource_Silk_Fabric",
+            "id": "Crafting_Resource_Silk_Fabric",
             "material": {
                 "id": "Material_Silk",
                 "categoryId": "Category_Fabric",

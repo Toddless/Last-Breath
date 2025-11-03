@@ -11,17 +11,17 @@
 
     public partial class CraftingRecipe : Resource, ICraftingRecipe, IItem
     {
-        public string Id { get; private set; } = string.Empty;
-        public string ResultItemId { get; protected set; } = string.Empty;
-        public string[] Tags { get; private set; } = [];
-        public Texture2D? Icon { get; private set; }
-        public Rarity Rarity { get; set; }
-        public bool IsOpened { get; private set; } = true;
+        [Export] public string Id { get; private set; } = string.Empty;
+        [Export] public string ResultItemId { get; protected set; } = string.Empty;
+        [Export] public string[] Tags { get; private set; } = [];
+        [Export] public Texture2D? Icon { get; private set; }
+        [Export] public Rarity Rarity { get; set; }
+        [Export] public bool IsOpened { get; private set; } = true;
+        [Export] public int MaxStackSize { get; private set; } = 1;
         public string DisplayName => Localizator.Localize(Id);
         public string Description => Localizator.LocalizeDescription(Id);
-        public List<IResourceRequirement> MainResource { get; private set; } = [];
+        public List<IResourceRequirement> MainResource { get; set; } = [];
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public int MaxStackSize => 1;
 
         public CraftingRecipe()
         {
@@ -36,13 +36,14 @@
             Icon = icon;
             Rarity = rarity;
             IsOpened = isOpened;
-            MainResource = requirements;
+            MainResource= requirements;
         }
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public T Copy<T>()
         {
             var duplicate = (ICraftingRecipe)DuplicateDeep();
+            duplicate.MainResource = MainResource;
             return (T)duplicate;
         }
     }
