@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.Attribute
+﻿namespace LastBreath.Script.Attribute
 {
-    using Playground.Script.Enums;
+    using Core.Enums;
 
     public class AttributeEffect(Parameter parameter, ModifierType type, float valuePerPoint, int priority = 0)
     {

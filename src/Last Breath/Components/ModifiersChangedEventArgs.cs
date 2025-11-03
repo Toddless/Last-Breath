@@ -1,13 +1,14 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Script.Abilities.Modifiers;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Playground.Script.Enums;
 
-    public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifier> modifiers) : EventArgs
+    public class ModifiersChangedEventArgs(Parameter parameter, IReadOnlyList<IModifierInstance> modifiers) : EventArgs, IModifiersChangedEventArgs
     {
         public Parameter Parameter { get; } = parameter;
-        public IReadOnlyList<IModifier> Modifiers { get; } = modifiers;
+        public IReadOnlyList<IModifierInstance> Modifiers { get; } = modifiers;
     }
 }

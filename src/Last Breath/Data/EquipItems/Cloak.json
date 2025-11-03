@@ -1,0 +1,39 @@
+{
+	"items": [
+		{
+			"id": "Creators_Cloak",
+			"equipmentPart": "Cloak",
+			"maxStackSize": 1,
+			"icon": "Cloak.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "multi",
+					"value": 1.1
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "multi",
+					"value": 1.1
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "multi",
+					"value": 1.1
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "multi",
+					"value": 1.1
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

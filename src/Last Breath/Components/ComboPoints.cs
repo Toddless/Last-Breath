@@ -1,5 +1,6 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
+    using Core.Enums;
 
     public class ComboPoints : BaseResource
     {
@@ -9,9 +10,8 @@
         public ComboPoints() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Script.Enums.ResourceType.Combopoints)
+            resourceType: ResourceType.Combopoints)
         {
-            LoadData();
         }
     }
 }

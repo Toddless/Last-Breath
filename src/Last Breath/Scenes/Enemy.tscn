@@ -332,6 +332,7 @@ shape = SubResource("RectangleShape2D_up6k3")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_2uv7i")
 animation = &"Bat_Epic"
+frame_progress = 0.8346684
 
 [node name="Area2D" type="Area2D" parent="."]
 scale = Vector2(2.5, 2.5)

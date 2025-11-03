@@ -1,7 +1,8 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     using Godot;
-    using Playground.Script.Enemy;
+    using LastBreath.Script;
+    using LastBreath.Script.Enemy;
 
     [GlobalClass]
     public partial class EnemyKillingQuestObjective : QuestObjective

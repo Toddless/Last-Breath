@@ -1,9 +1,11 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components;
-    using Playground.Script.Abilities.Interfaces;
+    using Utilities;
+    using Core.Enums;
+    using Core.Interfaces.Battle;
+    using LastBreath.Components;
 
-    public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>()
+    public class StanceSkillComponent(IStance stance) : BaseSkillComponent<IStanceSkill>(), IStanceSkillComponent
     {
         private readonly IStance _stance = stance;
 
@@ -11,7 +13,7 @@
         {
             if (skill.RequiredStance != _stance.StanceType)
             {
-                //TODO: Log
+                Tracker.TrackInfo($"Trying to add {skill.Id} to stance {_stance.StanceType}", this);
                 return;
             }
             base.AddSkill(skill);
@@ -19,13 +21,13 @@
 
         protected override void ActivateSkill(IStanceSkill skill)
         {
-            if (skill.Type != Enums.SkillType.AlwaysActive) return;
+            if (skill.Type != SkillType.AlwaysActive) return;
             skill.Activate(_stance);
         }
 
         protected override void DeactivateSkill(IStanceSkill skill)
         {
-            if (skill.Type != Enums.SkillType.AlwaysActive) return;
+            if (skill.Type != SkillType.AlwaysActive) return;
             skill.Deactivate(_stance);
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
     using Godot;
 

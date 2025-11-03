@@ -1,9 +1,9 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using LastBreath.Script.Helpers;
 
     public abstract class BaseResource : IResource
     {
@@ -61,13 +61,10 @@
                 Current = MaximumAmount;
         }
 
-        public virtual void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public virtual void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             switch (args.Parameter)
             {
-                case Parameter.ResourceMax:
-                    MaximumAmount = Calculations.CalculateFloatValue(_baseMaximumAmount, args.Modifiers);
-                    break;
                 case Parameter.ResourceRecovery:
                     RecoveryAmount = Calculations.CalculateFloatValue(_baseRecoveryAmount, args.Modifiers);
                     break;
@@ -75,12 +72,6 @@
                     break;
             }
         }
-
-        protected virtual void LoadData()
-        {
-
-        }
-
         private bool IsEnough(int amountToSpend) => Current <= amountToSpend;
     }
 }

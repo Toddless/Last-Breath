@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     using Godot;
     using Godot.Collections;

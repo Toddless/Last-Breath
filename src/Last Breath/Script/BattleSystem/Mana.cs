@@ -1,6 +1,7 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Components;
+    using Core.Enums;
+    using LastBreath.Components;
 
     public class Mana : BaseResource
     {
@@ -10,9 +11,8 @@
         public Mana() : base
             (recoveryAmount: BaseRecovery,
             maximumAmount: BaseMaximumAmount,
-            resourceType: Enums.ResourceType.Mana)
+            resourceType: ResourceType.Mana)
         {
-            LoadData();
         }
     }
 }

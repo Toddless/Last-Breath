@@ -1,13 +1,13 @@
-namespace Playground.Components
+namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
+    using Core.Enums;
+    using Core.Interfaces.Components;
     using Godot;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
-    public class DamageComponent
+    public class DamageComponent : IDamageComponent
     {
         // Random range for damage
         private const float From = 0.9f;
@@ -17,7 +17,7 @@ namespace Playground.Components
         // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
         // TODO: Rename strategy
         private IDamageStrategy _strategy;
-        private Dictionary<Parameter, Func<float, ModifiersChangedEventArgs, float>> _overrideCalculations = [];
+        private Dictionary<Parameter, Func<float, IModifiersChangedEventArgs, float>> _overrideCalculations = [];
 
         public event Action<Parameter, float>? PropertyValueChanges;
 
@@ -109,7 +109,7 @@ namespace Playground.Components
             _strategy = strategy;
         }
 
-        public void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             switch (args.Parameter)
             {
@@ -136,7 +136,7 @@ namespace Playground.Components
             }
         }
 
-        public void AddOverrideFuncForParameter(Func<float, ModifiersChangedEventArgs, float> newFunc, Parameter parameter)
+        public void AddOverrideFuncForParameter(Func<float, IModifiersChangedEventArgs, float> newFunc, Parameter parameter)
         {
             if (!_overrideCalculations.TryAdd(parameter, newFunc))
             {
@@ -153,37 +153,37 @@ namespace Playground.Components
             }
         }
 
-        private float CalculateMaxAdditionalChance(ModifiersChangedEventArgs args)
+        private float CalculateMaxAdditionalChance(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.MaxAdditionalHitChance, out var func)) return func.Invoke(_strategy.GetBaseExtraHitChance(), args);
             return Calculations.CalculateFloatValue(_maxAdditionalHitChance, args.Modifiers);
         }
 
-        private float CalculateMaxCriticalChance(ModifiersChangedEventArgs args)
+        private float CalculateMaxCriticalChance(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.MaxCriticalChance, out var func)) return func.Invoke(_strategy.GetBaseExtraHitChance(), args);
             return Calculations.CalculateFloatValue(_maxCriticalChance, args.Modifiers);
         }
 
-        private float CalculateAdditionalChance(ModifiersChangedEventArgs args)
+        private float CalculateAdditionalChance(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.AdditionalHitChance, out var func)) return func.Invoke(_strategy.GetBaseExtraHitChance(), args);
             return Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseExtraHitChance(), args.Modifiers), _maxAdditionalHitChance);
         }
 
-        private float CalculateCriticalDamage(ModifiersChangedEventArgs args)
+        private float CalculateCriticalDamage(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.CriticalDamage, out var func)) return func.Invoke(_strategy.GetBaseCriticalDamage(), args);
             return Calculations.CalculateFloatValue(_strategy.GetBaseCriticalDamage(), args.Modifiers);
         }
 
-        private float CalculateCriticaChance(ModifiersChangedEventArgs args)
+        private float CalculateCriticaChance(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.CriticalChance, out var func)) return func.Invoke(_strategy.GetBaseCriticalChance(), args);
             return Mathf.Min(Calculations.CalculateFloatValue(_strategy.GetBaseCriticalChance(), args.Modifiers), _maxCriticalChance);
         }
 
-        private float CalculateDamage(ModifiersChangedEventArgs args)
+        private float CalculateDamage(IModifiersChangedEventArgs args)
         {
             if (_overrideCalculations.TryGetValue(Parameter.Damage, out var func)) return func.Invoke(_strategy.GetDamage(), args);
             return Calculations.CalculateFloatValue(_strategy.GetDamage(), args.Modifiers);

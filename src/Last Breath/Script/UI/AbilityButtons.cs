@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public partial class AbilityButtons : HBoxContainer
     {

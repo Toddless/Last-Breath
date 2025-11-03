@@ -1,12 +1,13 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Skills;
 
-    public abstract class BaseSkillComponent<T>
+    public abstract class BaseSkillComponent<T> : IBaseSkillComponent<T>
         where T : ISkill
     {
         protected readonly Dictionary<SkillType, List<T>> Skills;

@@ -1,7 +1,8 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
+    using Core.Interfaces.Entity;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     public partial class TurnNotifier : Panel
     {
@@ -11,7 +12,7 @@
 
         [Signal] public delegate void CompletedEventHandler();
 
-        public async void ShowMessage(ICharacter character)
+        public async void ShowMessage(IEntity character)
         {
             if (_textLabel == null)
             {
@@ -22,7 +23,6 @@
 
             var screenSize = GetViewportRect().Size;
             Position = new Vector2((screenSize.X - Size.X) / 2, Offset);
-            _textLabel.Text = $"{character.CharacterName}´s turn.";
 
             Modulate = new Color(Modulate, 0);
             var tween = CreateTween();

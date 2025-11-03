@@ -1,0 +1,261 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ru\n"
+
+# ------------------------------
+# Parameters
+# ------------------------------
+
+#. Player damage stat
+msgid "Damage"
+msgstr "Урон"
+
+#. Player health stat
+msgid "Health"
+msgstr "Здоровье"
+
+#. Player critical chance
+msgid "CriticalChance"
+msgstr "Шанс критического удара"
+
+#. Maximum possible critical chance
+msgid "MaxCriticalChance"
+msgstr "Макс. шанс критического удара"
+
+#. Critical damage multiplier
+msgid "CriticalDamage"
+msgstr "Критический урон"
+
+#. Additional hit chance
+msgid "AdditionalHitChance"
+msgstr "Шанс дополнительного удара"
+
+#. Maximum additional hit chance
+msgid "MaxAdditionalHitChance"
+msgstr "Макс. шанс дополнительного удара"
+
+#. Current health value
+msgid "CurrentHealth"
+msgstr "Текущее здоровье"
+
+#. Maximum health
+msgid "MaxHealth"
+msgstr "Макс. здоровье"
+
+#. Dexterity attribute
+msgid "Dexterity"
+msgstr "Ловкость"
+
+#. Strength attribute
+msgid "Strength"
+msgstr "Сила"
+
+#. Intelligence attribute
+msgid "Intelligence"
+msgstr "Интеллект"
+
+#. Armor stat
+msgid "Armor"
+msgstr "Броня"
+
+#. Evasion stat
+msgid "Evade"
+msgstr "Уклонение"
+
+#. Magical barrier
+msgid "EnergyBarrier"
+msgstr "Энергетический барьер"
+
+#. Spell damage stat
+msgid "SpellDamage"
+msgstr "Урон от заклинаний"
+
+#. Maximum resource (mana, energy etc.)
+msgid "ResourceMax"
+msgstr "Макс. ресурс"
+
+#. Resource recovery per turn
+msgid "ResourceRecovery"
+msgstr "Восстановление ресурса"
+
+#. Maximum damage reduction cap
+msgid "MaxReduceDamage"
+msgstr "Макс. снижение урона"
+
+#. Movement speed
+msgid "Movespeed"
+msgstr "Скорость передвижения"
+
+#. Maximum evade chance
+msgid "MaxEvadeChance"
+msgstr "Макс. шанс уклонения"
+
+#. Suppression stat
+msgid "Suppress"
+msgstr "Подавление"
+
+#. All attributes (universal modifier)
+msgid "AllAttribute"
+msgstr "Все атрибуты"
+
+# ------------------------------
+# Modifier Types
+# ------------------------------
+
+#. Flat modifier: +300 HP, +15 Def, etc.
+msgid "Flat"
+msgstr "Фиксированный"
+
+#. Increase modifier: percent values like 0.1, 0.3
+msgid "Increase"
+msgstr "Увеличение"
+
+#. Multiplicative modifier: values like 1.3, 1.1
+msgid "Multiplicative"
+msgstr "Множитель"
+
+# ------------------------------
+# Modifier Format String
+# ------------------------------
+
+#. Template for showing modifiers: {0} = parameter, {1} = value
+msgid "modifier.format"
+msgstr "{0}: {1}"
+
+
+# -----------------------------
+# Item stats
+# -----------------------------
+
+# Extra Health
+msgid "ExtraHealth"
+msgstr "Дополнительное здоровье"
+
+# Extra Armor
+msgid "ExtraArmor"
+msgstr "Дополнительная броня"
+
+# Extra Energy Barrier
+msgid "ExtraEnergyBarrier"
+msgstr "Дополнительный энергетический барьер"
+
+# Extra Evade
+msgid "ExtraEvade"
+msgstr "Дополнительное уклонение"
+
+# Extra Damage
+msgid "ExtraDamage"
+msgstr "Дополнительный урон"
+
+# Extra Suppress
+msgid "ExtraSuppress"
+msgstr "Дополнительное подавление"
+
+# Extra Spell Damage
+msgid "ExtraSpellDamage"
+msgstr "Дополнительный урон способностей"
+
+
+
+
+
+# ------------------------
+# Buttons
+# ------------------------
+
+msgid "CraftingCreateBtn"
+msgstr "Создать"
+
+msgid "CraftingUpgradeBtn"
+msgstr "Улучшить"
+
+msgid "CraftingAscendBtn"
+msgstr "Возвысить"
+
+msgid "NewGameBtn"
+msgstr "Новая игра"
+
+msgid "LoadGameBtn"
+msgstr "Загрузить"
+
+msgid "OptionsBtn"
+msgstr "Настройки"
+
+msgid "QuitBtn"
+msgstr "Выход"
+
+msgid "ContinueBtn"
+msgstr "Продолжить"
+
+msgid "MainMenuBtn"
+msgstr "Главное меню"
+
+msgid "CharacterBtn"
+msgstr "Персонаж"
+
+msgid "InventoryBtn"
+msgstr "Инвентарь"
+
+msgid "CraftingBtn"
+msgstr "Ремесло"
+
+msgid "QuestsBtn"
+msgstr "Квесты"
+
+msgid "ApplyBtn"
+msgstr "Применить"
+
+msgid "ReturnBtn"
+msgstr "Вернуться"
+
+msgid "DeleteBtn"
+msgstr "Удалить"
+
+msgid "LoadBtn"
+msgstr "Загрузить"
+
+# -----------------------
+# Texts
+# -----------------------
+
+msgid "RandomStats"
+msgstr "Случайные хар-ки"
+
+msgid "BaseStats"
+msgstr "Базовые хар-ки"
+
+msgid "GameTitle"
+msgstr "Last Breath"
+
+msgid "VideoSettings"
+msgstr "Видео"
+
+msgid "ResolutionSetting"
+msgstr "Разрешение"
+
+msgid "WindowModeSetting"
+msgstr "Режим окна"
+
+msgid "SoundSettings"
+msgstr "Звук"
+
+msgid "MasterVolumeSetting"
+msgstr "Общая громкость"
+
+msgid "MusicVolumeSetting"
+msgstr "Громкость музыки"
+
+msgid "SFXVolumeSetting"
+msgstr "Громкость SFX"
+
+msgid "UISettings"
+msgstr "UI"
+
+msgid "LanguageSetting"
+msgstr "Язык"
+
+msgid "SaveLoadLabel"
+msgstr "Сохранить/Загрузить"
+

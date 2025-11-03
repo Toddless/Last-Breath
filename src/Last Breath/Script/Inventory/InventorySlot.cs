@@ -1,92 +1,129 @@
-﻿namespace Playground.Script.Inventory
+﻿namespace LastBreath.Script.Inventory
 {
-    using System;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
-    using Playground.Script.Items;
+    using System;
+    using Core.Enums;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Inventory;
+    using Core.Interfaces.Mediator.Events;
 
-    public partial class InventorySlot : BaseSlot<Item>
+    public partial class InventorySlot : Slot, IInventorySlot
     {
         private const string UID = "uid://bqlqfsqoepfhs";
-        private Label? _quantityLabel;
-        private int _quantity;
 
-        public event Action<Item, MouseButtonPressed>? OnClick;
+        private bool _isMouseInside, _rmbWasPressed, _detailsShowing;
+        [Export] protected Label? QuantityLabel;
 
-        public int Quantity
-        {
-            get => _quantity;
-            set
-            {
-                if (ObservableProperty.SetProperty(ref _quantity, value))
-                    UpdateQuantity();
-            }
-        }
+        private IUiMediator? _uiMediator;
+        public Func<string, IItem?>? GetItemInstance;
+        public event Action<IInventorySlot, MouseInteractions>? ItemInteraction;
 
         public override void _Ready()
         {
-            _quantityLabel = GetNode<Label>("QuantityText");
-            this.MouseEntered += OnMouseEnter;
-            this.MouseExited += OnMouseExit;
-            this.TextureNormal = DefaltTexture;
+            MouseExited += OnMouseExit;
+            MouseEntered += OnMouseEnter;
         }
 
         public override void _GuiInput(InputEvent @event)
         {
-            if (@event is InputEventMouseButton p && CurrentItem != null)
+            if (@event is InputEventMouseButton mb)
             {
-                OnClick?.Invoke(CurrentItem, MouseInputHelper.GetPressedButtons(p));
+                if (CurrentItem == null) return;
+                if (mb.Pressed)
+                {
+                    if (mb.AltPressed)
+                    {
+                        switch (true)
+                        {
+                            case var _ when mb.ButtonIndex == MouseButton.Left:
+                                RaiseEvent(MouseInteractions.AltRMB);
+                                break;
+                            case var _ when mb.ButtonIndex == MouseButton.Right:
+                                RaiseEvent(MouseInteractions.AltRMB);
+                                break;
+                        }
+                    }
+
+                    if (mb.CtrlPressed)
+                    {
+                        switch (true)
+                        {
+                            case var _ when mb.ButtonIndex == MouseButton.Left:
+                                RaiseEvent(MouseInteractions.CtrLMB);
+                                break;
+                            case var _ when mb.ButtonIndex == MouseButton.Right:
+                                RaiseEvent(MouseInteractions.CtrRMB);
+                                break;
+                        }
+                    }
+                    if (mb.ButtonIndex == MouseButton.Right)
+                        ShowButtonsTooltip();
+
+                    AcceptEvent();
+                }
+            }
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (_rmbWasPressed && @event.IsActionPressed("ui_cancel"))
+            {
+                Clear();
                 GetViewport().SetInputAsHandled();
             }
         }
 
-        public void AddNewItem(Item item)
+        public void SetUIElementProvider(IUiMediator mediator)
         {
-            CurrentItem = item;
-            Quantity += item.Quantity;
-            this.TextureNormal = item.Icon;
+            _uiMediator = mediator;
+            _uiMediator.UpdateUi += Clear;
         }
 
-        public bool RemoveItemStacks(int amount)
+        private void Clear()
         {
-            int canRemove = Mathf.Min(Quantity, amount);
-            if (amount - canRemove > 0) return false;
-
-            Quantity -= canRemove;
-
-            return true;
+            _rmbWasPressed = false;
+            _detailsShowing = false;
+            _uiMediator?.Publish(new ClearUiElementsEvent(this));
         }
 
-        public int AddItemStacks(int amount)
-        {
-            if (CurrentItem == null) return amount;
-
-            int availableSpace = CurrentItem.MaxStackSize - Quantity;
-            int addAmount = Mathf.Min(availableSpace, amount);
-            Quantity += addAmount;
-
-            return amount - addAmount;
-        }
-
-        public void ClearSlot()
-        {
-            CurrentItem = null;
-            this.TextureNormal = DefaltTexture;
-            _quantityLabel!.Text = string.Empty;
-            Quantity = 0;
-        }
+        private void RaiseEvent(MouseInteractions interaction) => ItemInteraction?.Invoke(this, interaction);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void UpdateQuantity()
+        protected override void RefreshUI()
         {
-            if (Quantity < 1)
-                ClearSlot();
-            else
-                _quantityLabel!.Text = SetQuantity();
+            base.RefreshUI();
+            if (QuantityLabel != null) QuantityLabel.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
         }
 
-        private string SetQuantity() => Quantity > 1 ? Quantity.ToString() : string.Empty;
+        private async void OnMouseEnter()
+        {
+            _isMouseInside = true;
+
+            await ToSignal(GetTree().CreateTimer(0.4), SceneTreeTimer.SignalName.Timeout);
+
+            if (_isMouseInside && CurrentItem != null)
+            {
+                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem, this));
+                _detailsShowing = true;
+            }
+        }
+
+        private void OnMouseExit()
+        {
+            _isMouseInside = false;
+            if (_rmbWasPressed) return;
+            _detailsShowing = false;
+            _uiMediator?.Publish(new ClearUiElementsEvent(this));
+        }
+
+        private void ShowButtonsTooltip()
+        {
+            _rmbWasPressed = true;
+            if (!_detailsShowing)
+                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem!, this));
+            _uiMediator?.Publish(new ShowInventorySlotButtonsTooltipEvent(this, CurrentItem!.InstanceId));
+        }
     }
 }

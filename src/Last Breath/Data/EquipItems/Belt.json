@@ -1,0 +1,74 @@
+{
+	"items": [
+		{
+			"id": "Belt",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"icon": "Belt.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "multiplicative",
+					"value": 1.2
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "multiplicative",
+					"value": 1.2
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "multiplicative",
+					"value": 1.2
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "multiplicative",
+					"value": 1.2
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Belt",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"icon": "TestBelt.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "multiplicative",
+					"value": 1.4
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "multiplicative",
+					"value": 1.4
+				},
+				{
+					"parameter": "Damage",
+					"modifierType": "multiplicative",
+					"value": 1.4
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "multiplicative",
+					"value": 1.4
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

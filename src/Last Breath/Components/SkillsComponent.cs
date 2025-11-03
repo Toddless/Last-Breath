@@ -1,23 +1,20 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Skills;
 
-    public class SkillsComponent(ICharacter owner) : BaseSkillComponent<ISkill>()
+    public class SkillsComponent(IEntity owner) : BaseSkillComponent<ISkill>()
     {
-        private readonly ICharacter _owner = owner;
+        private readonly IEntity _owner = owner;
 
         protected override void ActivateSkill(ISkill skill)
         {
-            if (skill.Type != SkillType.AlwaysActive || skill is not ITargetSkill targetSkill) return;
-            targetSkill.Activate(_owner);
+          
         }
 
         protected override void DeactivateSkill(ISkill skill)
         {
-            if (skill.Type != SkillType.AlwaysActive || skill is not ITargetSkill targetSkill) return;
-            targetSkill.Deactivate(_owner);
+   
         }
     }
 }

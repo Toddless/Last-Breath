@@ -1,9 +1,10 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
+    using Core.Enums;
+    using Core.Interfaces.Components;
     using Godot;
-    using Playground.Script.Enums;
 
-    public class DefenseComponent
+    public class DefenseComponent : IDefenceComponent
     {
         private const float BaseArmor = 100f;
         private const float BaseEvade = 0f;
@@ -17,7 +18,7 @@
         public float MaxReduceDamage { get; private set; } = BaseMaxReduceDamage;
         public float MaxEvadeChance { get; private set; } = BaseMaxEvade;
 
-        public void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
             switch (args.Parameter)
             {
@@ -27,7 +28,7 @@
                 case Parameter.Evade:
                     Evade = Calculations.CalculateFloatValue(BaseEvade, args.Modifiers);
                     break;
-                case Parameter.EnergyBarrier:
+                case Parameter.Barrier:
                     EnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, args.Modifiers);
                     break;
                 case Parameter.MaxReduceDamage:

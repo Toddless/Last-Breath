@@ -1,0 +1,118 @@
+{
+	"items": [
+		{
+			"id": "Helmet_Strength_Generic",
+			"equipmentPart": "Helmet",
+			"maxStackSize": 1,
+			"icon": "HelmetStrengthGeneric.png",
+			"rarity": "Legendary",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 300
+				},
+				{
+					"parameter": "Damage",
+					"modifierType": "flat",
+					"value": 120
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.1
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Dexterity_Generic",
+			"equipmentPart": "Helmet",
+			"maxStackSize": 1,
+			"icon": "HelmetDexterityGeneric.png",
+			"rarity": "Legendary",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 200
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "inc",
+					"value": 0.1
+				},
+				{
+					"parameter": "AdditionalHitChance",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Intelligence_Generic",
+			"equipmentPart": "Helmet",
+			"maxStackSize": 1,
+			"icon": "HelmetIntelligenceGeneric.png",
+			"rarity": "Legendary",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 150
+				},
+				{
+					"parameter": "ResourceRecovery",
+					"modifierType": "inc",
+					"value": 3
+				},
+				{
+					"parameter": "Resource",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

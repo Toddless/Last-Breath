@@ -1,11 +1,11 @@
-﻿namespace Playground.Resource
+﻿namespace LastBreath.Resource
 {
     using System.Collections.Generic;
     using System.Linq;
     using Godot;
-    using Playground.Resource.Quests;
-    using Playground.Script.Helpers;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Resource.Quests;
+    using LastBreath.Script.QuestSystem;
 
     public partial class QuestsTable : Table<Quest>
     {

@@ -1,8 +1,10 @@
-﻿namespace Playground.Script.Abilities.Effects
+﻿namespace LastBreath.Script.Abilities.Effects
 {
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using Core.Enums;
+    using Core.Modifiers;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.Abilities;
+    using Core.Interfaces.Entity;
 
     public class RegenerationEffect : EffectBase
     {
@@ -11,10 +13,10 @@
                 stacks,
                 permanent)
         {
-            Modifier = new CurrentHealthModifier(ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
+            Modifier = new ModifierInstance(Parameter.Health, ModifierType.Flat, 80, this, ModifierPriorities.Buffs);
         }
 
-        public override void OnTick(ICharacter character)
+        public override void OnTick(IEntity character)
         {
             base.OnTick(character);
             character.Health.Heal(Modifier.Value);

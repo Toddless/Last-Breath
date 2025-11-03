@@ -1,10 +1,10 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Attribute;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Attribute;
 
     public class AttributeComponent
     {
@@ -12,7 +12,7 @@
         private readonly Strength _strength;
         private readonly Intelligence _intelligence;
 
-        public Action<IModifier>? CallModifierManager;
+        public Action<IModifierInstance>? CallModifierManager;
 
         public AttributeComponent()
         {
@@ -69,10 +69,10 @@
 
         private void UpdateModifiers(IAttribute attribute)
         {
-            foreach (var modifier in attribute.AttributeModifiers())
-            {
-                CallModifierManager?.Invoke(modifier);
-            }
+            //foreach (var modifier in attribute.AttributeModifiers())
+            //{
+            //    CallModifierManager?.Invoke(modifier);
+            //}
         }
 
         private void SetEvents()

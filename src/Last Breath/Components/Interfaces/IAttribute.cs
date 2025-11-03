@@ -1,7 +1,7 @@
-﻿namespace Playground.Components.Interfaces
+﻿namespace LastBreath.Components.Interfaces
 {
     using System.Collections.Generic;
-    using Playground.Script.Attribute;
+    using LastBreath.Script.Attribute;
 
     public interface IAttribute
     {

@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
+﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    using Playground.Script.Enums;
+    using LastBreath.Script.LootGenerator;
 
     public class Rarity : GenericObject
     {
-        public Rarity(GlobalRarity rarity)
+        public Rarity(Core.Enums.Rarity rarity)
         {
             Rarity = rarity;
             ProbabilityWeight = ConvertGlobalRarity.rarityWeights[rarity];

@@ -1,9 +1,9 @@
-﻿namespace Playground.Localization
+﻿namespace LastBreath.Localization
 {
     using System.Linq;
     using Godot;
     using Godot.Collections;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.QuestSystem;
 
     [GlobalClass]
     public partial class DialogueOption : Resource

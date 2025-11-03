@@ -1,0 +1,543 @@
+{
+    "materialCategories": [
+        {
+            "id": "Category_Metal",
+            "modifiers": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "baseValue": 300,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "baseValue": 0.1,
+                    "weight": 150
+                }
+            ]
+        },
+        {
+            "id": "Category_Fabric",
+            "modifiers": [
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "baseValue": 200,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "baseValue": 0.1,
+                    "weight": 150
+                }
+            ]
+        },
+        {
+            "id": "Category_Leather",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "baseValue": 250,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "baseValue": 0.1,
+                    "weight": 150
+                }
+            ]
+        },
+        {
+            "id": "Category_Gem",
+            "modifiers": [
+                {
+                    "parameter": "AllAttribute",
+                    "modifierType": "flat",
+                    "baseValue": 5,
+                    "weight": 200
+                },
+                {
+                    "parameter": "AllAttribute",
+                    "modifierType": "inc",
+                    "baseValue": 0.1,
+                    "weight": 150
+                }
+            ]
+        },
+        {
+            "id": "Category_Essence",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "baseValue": 350,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "baseValue": 0.15,
+                    "weight": 150
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "baseValue": 250,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "baseValue": 0.15,
+                    "weight": 150
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "baseValue": 350,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "baseValue": 0.15,
+                    "weight": 150
+                }
+            ]
+        }
+    ],
+    "upgradeResources": [
+        {
+            "id": "Upgrade_Resource_Armor_Dust",
+            "tags": [
+                "Crafting",
+                "Recraft",
+                "Resource",
+                "Armor"
+            ],
+            "rarity": "Rare",
+            "category": "Armor",
+            "icon": "ArmorDust.png",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Jewellery_Dust",
+            "tags": [
+                "Crafting",
+                "Recraft",
+                "Resource",
+                "Jewellery"
+            ],
+            "rarity": "Rare",
+            "category": "Jewellery",
+            "icon": "JeselleryDust.png",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Weapon_Dust",
+            "tags": [
+                "Crafting",
+                "Recraft",
+                "Resource",
+                "Weapon"
+            ],
+            "rarity": "Rare",
+            "category": "Weapon",
+            "icon": "WeaponDust.png",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Blacksmith_Rune",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Armor"
+            ],
+            "rarity": "Epic",
+            "category": "Armor",
+            "icon": "BlacksmithRune.png",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Jeweler_Rune",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Jewellery"
+            ],
+            "rarity": "Rare",
+            "category": "Jewellery",
+            "icon": "JewelerRune.png",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Weapon_Rune",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Weapon"
+            ],
+            "rarity": "Rare",
+            "category": "Weapon",
+            "icon": "WeaponRune.png",
+            "maxStackSize": 999
+        }
+    ],
+    "craftingResources": [
+        {
+            "id": "Crafting_Resource_Cooper_Ore",
+            "material": {
+                "id": "Material_Cooper_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "inc",
+                        "baseValue": 0.7,
+                        "weight": 250
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 180,
+                        "weight": 250
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Cooper"
+            ],
+            "icon": "CooperOre.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Gold_Ore",
+            "material": {
+                "id": "Material_Gold_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "baseValue": 250,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "inc",
+                        "baseValue": 0.15,
+                        "weight": 75
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Gold"
+            ],
+            "icon": "GoldOre.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Iron_Ore",
+            "material": {
+                "id": "Material_Iron_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "flat",
+                        "baseValue": 70,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "inc",
+                        "baseValue": 0.15,
+                        "weight": 80
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Iron"
+            ],
+            "icon": "IronOre.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Deer_Leather",
+            "material": {
+                "id": "Material_Deer_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [
+                    {
+                        "parameter": "Movespeed",
+                        "modifierType": "flat",
+                        "baseValue": 15,
+                        "weight": 150
+                    },
+                    {
+                        "parameter": "Movespeed",
+                        "modifierType": "inc",
+                        "baseValue": 0.15,
+                        "weight": 100
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "Deer"
+            ],
+            "icon": "DeerLeather.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Wild_Boar_Leather",
+            "material": {
+                "id": "Material_Wild_Boar_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "baseValue": 350,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "multi",
+                        "baseValue": 1.15,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "WildBoar"
+            ],
+            "icon": "WildBoarLeather.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Diamond_Gem",
+            "material": {
+                "id": "Material_Diamond",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Intelligence",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "Intelligence",
+                        "modifierType": "flat",
+                        "baseValue": 10,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "WildBoar"
+            ],
+            "icon": "Diamond.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Emerald_Gem",
+            "material": {
+                "id": "Material_Emerald",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Dexterity",
+                        "modifierType": "flat",
+                        "baseValue": 10,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "Dexterity",
+                        "modifierType": "inc",
+                        "baseValue": 0.3,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Gem",
+                "Emerald"
+            ],
+            "icon": "Emerald.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Ruby_Gem",
+            "material": {
+                "id": "Material_Ruby",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Strength",
+                        "modifierType": "flat",
+                        "baseValue": 10,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "Strength",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Gem",
+                "Ruby"
+            ],
+            "icon": "Ruby.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_resource_Linen_Fabric",
+            "material": {
+                "id": "Material_Linen",
+                "categoryId": "Category_Fabric",
+                "modifiers": [
+                    {
+                        "parameter": "Resource",
+                        "modifierType": "flat",
+                        "baseValue": 5,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Resource",
+                        "modifierType": "inc",
+                        "baseValue": 0.1,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "ResourceRecovery",
+                        "modifierType": "flat",
+                        "baseValue": 5,
+                        "weight": 150
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Fabric",
+                "Linen"
+            ],
+            "icon": "Linen.png",
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Silk_Fabric",
+            "material": {
+                "id": "Material_Silk",
+                "categoryId": "Category_Fabric",
+                "modifiers": [
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "multi",
+                        "baseValue": 1.2,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "flat",
+                        "baseValue": 200,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 100
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Fabric",
+                "Silk"
+            ],
+            "icon": "Silk.png",
+            "rarity": "Rare"
+        }
+    ]
+}

@@ -1,7 +1,8 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System.Collections.Generic;
-    using Playground.Script.Items;
+    using Core.Interfaces.Items;
+    using LastBreath.Script.Items;
 
     public class PlayerProgress
     {
@@ -21,14 +22,14 @@
         /// Collecting quest items
         /// </summary>
         /// <param name="item"></param>
-        public void OnQuestItemCollected(Item item)
+        public void OnQuestItemCollected(IItem item)
         {
             if (item is not QuestItem) return;
 
-            if (!QuestItems.TryAdd(item.Id, item.Quantity))
-            {
-                // log
-            }
+            //if (!QuestItems.TryAdd(item.Id, item.Quantity))
+            //{
+            //    // log
+            //}
 
         }
 

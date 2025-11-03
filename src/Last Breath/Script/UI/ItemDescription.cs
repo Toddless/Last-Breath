@@ -1,10 +1,10 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using System.Collections.Generic;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
-    public partial class ItemDescription : MarginContainer
+    public partial class ItemDescription : Panel
     {
         [Export] private TextureRect? _itemImage;
         [Export] private VBoxContainer? _statsBox, _descriptionBox;

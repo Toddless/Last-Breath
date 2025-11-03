@@ -1,36 +1,38 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using System.Collections.Generic;
+    using Utilities;
+    using Core.Enums;
     using System.Linq;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.Enums;
+    using Core.Interfaces;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components;
 
-    public class ModifierManager
+    public class ModifierManager : IModifierManager
     {
         // all modifiers from equipment, passive abilities etc.
-        private readonly Dictionary<Parameter, List<IModifier>> _permanentModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifierInstance>> _permanentModifiers = [];
         // temporary modifiers from abilities, weapon effect etc.
-        private readonly Dictionary<Parameter, List<IModifier>> _temporaryModifiers = [];
-        private readonly Dictionary<Parameter, List<IModifier>> _battleModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifierInstance>> _temporaryModifiers = [];
+        private readonly Dictionary<Parameter, List<IModifierInstance>> _battleModifiers = [];
 
-        public IReadOnlyDictionary<Parameter, List<IModifier>> PermanentModifiers => _permanentModifiers;
-        public IReadOnlyDictionary<Parameter, List<IModifier>> TemporaryModifiers => _temporaryModifiers;
-        public IReadOnlyDictionary<Parameter, List<IModifier>> BattleModifiers => _battleModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifierInstance>> PermanentModifiers => _permanentModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifierInstance>> TemporaryModifiers => _temporaryModifiers;
+        public IReadOnlyDictionary<Parameter, List<IModifierInstance>> BattleModifiers => _battleModifiers;
 
-        public event EventHandler<ModifiersChangedEventArgs>? ParameterModifiersChanged;
+        public event EventHandler<IModifiersChangedEventArgs>? ParameterModifiersChanged;
 
-        public void AddPermanentModifier(IModifier modifier) => AddToCategory(_permanentModifiers, modifier);
-        public void AddTemporaryModifier(IModifier modifier) => AddToCategory(_temporaryModifiers, modifier);
-        public void AddBattleModifier(IModifier modifier) => AddToCategory(_battleModifiers, modifier);
+        public void AddPermanentModifier(IModifierInstance modifier) => AddToCategory(_permanentModifiers, modifier);
+        public void AddTemporaryModifier(IModifierInstance modifier) => AddToCategory(_temporaryModifiers, modifier);
+        public void AddBattleModifier(IModifierInstance modifier) => AddToCategory(_battleModifiers, modifier);
 
-        public void UpdatePermanentModifier(IModifier modifier) => UpdateModifier(_permanentModifiers, modifier);
-        public void UpdateTemporaryModifier(IModifier modifier) => UpdateModifier(_temporaryModifiers, modifier);
-        public void UpdateBattleModifier(IModifier modifier) => UpdateModifier(_battleModifiers, modifier);
+        public void UpdatePermanentModifier(IModifierInstance modifier) => UpdateModifier(_permanentModifiers, modifier);
+        public void UpdateTemporaryModifier(IModifierInstance modifier) => UpdateModifier(_temporaryModifiers, modifier);
+        public void UpdateBattleModifier(IModifierInstance modifier) => UpdateModifier(_battleModifiers, modifier);
 
-        public void RemovePermanentModifier(IModifier modifier) => RemoveFromCategory(_permanentModifiers, modifier);
-        public void RemoveTemporaryModifier(IModifier modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
-        public void RemoveBattleModifier(IModifier modifier) => RemoveFromCategory(_battleModifiers, modifier);
+        public void RemovePermanentModifier(IModifierInstance modifier) => RemoveFromCategory(_permanentModifiers, modifier);
+        public void RemoveTemporaryModifier(IModifierInstance modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
+        public void RemoveBattleModifier(IModifierInstance modifier) => RemoveFromCategory(_battleModifiers, modifier);
 
         public void RemovePermanentModifierBySource(object source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
         public void RemoveTemporaryModifierBySource(object source) => RemoveAllFromCategoryBySource(_temporaryModifiers, source);
@@ -40,9 +42,9 @@
         public void RemoveAllBattleModifiers() => _battleModifiers.Clear();
 
 
-        private List<IModifier> GetCombinedModifiers(Parameter parameter)
+        private List<IModifierInstance> GetCombinedModifiers(Parameter parameter)
         {
-            var modifiers = new List<IModifier>();
+            var modifiers = new List<IModifierInstance>();
             if (_permanentModifiers.TryGetValue(parameter, out var permanent))
                 modifiers.AddRange(permanent);
             if (_temporaryModifiers.TryGetValue(parameter, out var temp))
@@ -62,19 +64,18 @@
         }
 
         // adding multiple modifiers via foreach generate to many unnecessary calls
-
-        private void UpdateModifier(Dictionary<Parameter, List<IModifier>> category, IModifier newModifier)
+        private void UpdateModifier(Dictionary<Parameter, List<IModifierInstance>> category, IModifierInstance newModifier)
         {
             if (!category.TryGetValue(newModifier.Parameter, out var list))
             {
-                //TODO: Log
+                Tracker.TrackNotFound($"List for {newModifier.Parameter}", this);
                 list = [];
                 category[newModifier.Parameter] = list;
             }
-            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.Type == newModifier.Type);
+            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierType == newModifier.ModifierType);
             if (existingModifier == null)
             {
-                // TODO: Log
+                Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierType}", this);
                 list.Add(newModifier);
             }
             else
@@ -85,17 +86,18 @@
             RaiseEvent(newModifier.Parameter);
         }
 
-        private void AddToCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
+        private void AddToCategory(Dictionary<Parameter, List<IModifierInstance>> category, IModifierInstance modifier)
         {
-            if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
+            if (!category.TryGetValue(modifier.Parameter, out List<IModifierInstance>? list))
             {
+                Tracker.TrackNotFound($"List for: {modifier.Parameter}", this);
                 list = [];
                 category[modifier.Parameter] = list;
             }
 
             if (list.Contains(modifier))
             {
-                //TODO: Log
+                Tracker.TrackError("Trying to add a modifier that already exists in the list", this);
             }
 
             list.Add(modifier);
@@ -103,11 +105,11 @@
             RaiseEvent(modifier.Parameter);
         }
 
-        private void RemoveFromCategory(Dictionary<Parameter, List<IModifier>> category, IModifier modifier)
+        private void RemoveFromCategory(Dictionary<Parameter, List<IModifierInstance>> category, IModifierInstance modifier)
         {
-            if (!category.TryGetValue(modifier.Parameter, out List<IModifier>? list))
+            if (!category.TryGetValue(modifier.Parameter, out List<IModifierInstance>? list))
             {
-                // log
+                Tracker.TrackError("Trying to remove a modifier from non-existent list", this);
                 return;
             }
             list.Remove(modifier);
@@ -118,7 +120,7 @@
             RaiseEvent(modifier.Parameter);
         }
 
-        private void RemoveAllFromCategoryBySource(Dictionary<Parameter, List<IModifier>> category, object source)
+        private void RemoveAllFromCategoryBySource(Dictionary<Parameter, List<IModifierInstance>> category, object source)
         {
             foreach (var list in category)
             {
@@ -126,8 +128,8 @@
             }
         }
 
-        private IModifier? FindFirstModifierBySource(Dictionary<Parameter, List<IModifier>> collection, object source) => collection.Values.SelectMany(list => list).FirstOrDefault(modifier => modifier.Source == source);
-        private List<IModifier> FindAllModifiersBySource(Dictionary<Parameter, List<IModifier>> collection, object source) => [.. collection.Values.SelectMany(list => list).Where(modifier => modifier.Source == source)];
+        private IModifier? FindFirstModifierBySource(Dictionary<Parameter, List<IModifierInstance>> collection, object source) => collection.Values.SelectMany(list => list).FirstOrDefault(modifier => modifier.Source == source);
+        private List<IModifierInstance> FindAllModifiersBySource(Dictionary<Parameter, List<IModifierInstance>> collection, object source) => [.. collection.Values.SelectMany(list => list).Where(modifier => modifier.Source == source)];
 
         private IEnumerable<Parameter> GetAffectedParameters(object source)
         {

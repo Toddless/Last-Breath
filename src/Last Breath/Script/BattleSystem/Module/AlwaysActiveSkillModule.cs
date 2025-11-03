@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
 
-    public class AlwaysActiveSkillModule(ICharacter owner) : BaseSkillModule(owner, SkillType.AlwaysActive,  DecoratorPriority.Base)
+    public class AlwaysActiveSkillModule(IEntity owner) : BaseSkillModule(owner, SkillType.AlwaysActive,  DecoratorPriority.Base)
     {
     }
 }

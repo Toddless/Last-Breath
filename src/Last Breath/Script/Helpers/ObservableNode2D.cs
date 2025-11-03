@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.Helpers
+﻿namespace LastBreath.Script.Helpers
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;

@@ -1,14 +1,14 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Playground;
-    using Playground.Script;
-    using Playground.Script.Enums;
-    using Playground.Script.ScenesHandlers;
-    using Playground.Script.UI;
     using Stateless;
+    using LastBreath;
+    using System.Linq;
+    using System.Collections.Generic;
+    using LastBreath.Script.ScenesHandlers;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
 
     public class BattleHandler
     {
@@ -17,16 +17,16 @@
 
         private readonly StateMachine<State, Trigger> _machine = new(State.AwaitingBattleToStart);
         private StateMachine<State, Trigger>.TriggerWithParameters<BattleResults>? _battleEnds;
-        private ICharacter? _currentAttacking;
-        private List<ICharacter> _fighters = [];
-        private Queue<ICharacter> _attackQueue = [];
+        private IEntity? _currentAttacking;
+        private List<IEntity> _fighters = [];
+        private Queue<IEntity> _attackQueue = [];
         private CombatScheduler _combatScheduler;
 
         public event Action<BattleResults>? BattleEnd;
-        public event Action<ICharacter>? StartTurn;
+        public event Action<IEntity>? StartTurn;
         public event Action? OnEnterStartPhase, OnExitStartPhase;
 
-        public IReadOnlyList<ICharacter> Fighters => _fighters;
+        public IReadOnlyList<IEntity> Fighters => _fighters;
         public static BattleHandler? Instance { get; private set; }
 
         public BattleHandler()
@@ -53,7 +53,7 @@
 
         public void BattleStart()
         {
-            UIEventBus.NextTurnPhase += NextPhase;
+            //UIEventBus.NextTurnPhase += NextPhase;
             SetNextFighter();
             NextPhase();
         }
@@ -112,7 +112,7 @@
                 if (nextFighter.IsAlive)
                 {
                     _currentAttacking = nextFighter;
-                    break;
+                    return;
                 }
             }
             // no characters allive except one => battle ends (but probably we should end the battle way ealier)
@@ -122,20 +122,16 @@
 
         private void DecideTurnsOrder()
         {
-            foreach (var fighter in _fighters.OrderByDescending(x => x.Initiative))
-            {
-                _attackQueue.Enqueue(fighter);
-            }
         }
 
 
         // i cant delete character from attack queue on death (Queue<T> has no methods for this), so i made this workaround
-        private void OnFighterDeath(ICharacter character)
+        private void OnFighterDeath(IEntity character)
         {
             CheckIfBattleShouldEnd();
         }
 
-        private void OnPlayerDead(ICharacter character)
+        private void OnPlayerDead(IEntity character)
         {
             // Handle player dead
             _combatScheduler.CancelQueue();
@@ -147,6 +143,8 @@
             // <2 because it is still players turn, and enemies still in queue
             if (_currentAttacking is Player && _attackQueue.Count < 2)
             {
+                GD.Print($"Attack queue:{_attackQueue.Count}");
+                GD.Print("Check if battle should end is true");
                 _combatScheduler.CancelQueue();
                 _machine.Fire(_battleEnds, BattleResults.PlayerWon);
             }
@@ -156,7 +154,7 @@
         {
             BattleEnd?.Invoke(results);
             _machine.Fire(Trigger.AwaitForBattle);
-            UIEventBus.NextTurnPhase -= NextPhase;
+           // UIEventBus.NextTurnPhase -= NextPhase;
         }
 
         private void OnAllContextsHandled() => NextPhase();
@@ -166,12 +164,14 @@
             _battleEnds = _machine.SetTriggerParameters<BattleResults>(Trigger.EndBattle);
 
             _machine.Configure(State.AwaitingBattleToStart)
+                .OnExit(()=> GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.TurnStartPhase)
                 .OnEntry(TurnStart)
                 .OnExit(() =>
                 {
+                    GD.Print($"Leaving state: {_machine.State}");
                     OnExitStartPhase?.Invoke();
                 })
                 .Permit(Trigger.EndBattle, State.EndBattle)
@@ -185,6 +185,7 @@
                 })
                 .OnExit(() =>
                 {
+                    GD.Print($"Leaving state: {_machine.State}");
                     _combatScheduler.AllContextsHandled -= OnAllContextsHandled;
                 })
                 .Permit(Trigger.EndBattle, State.EndBattle)
@@ -193,16 +194,19 @@
 
             _machine.Configure(State.TurnEndPhase)
                  .OnEntry(TurnEnds)
+                 .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                  .Permit(Trigger.EndBattle, State.EndBattle)
                  .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
 
             _machine.Configure(State.TurnTransitionPhase)
                 .OnEntry(PerformTurnTransition)
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.EndBattle)
                 .Ignore(Trigger.NextPhase)
                 .OnEntryFrom(_battleEnds, EndBattle)
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.AwaitForBattle, State.AwaitingBattleToStart);
         }
 

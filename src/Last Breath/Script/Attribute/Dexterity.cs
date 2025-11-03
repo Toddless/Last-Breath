@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Attribute
+﻿namespace LastBreath.Script.Attribute
 {
     using System.Collections.Generic;
-    using Playground.Script.Enums;
+    using Core.Enums;
 
     public class Dexterity() : AttributeBase(GetEffects())
     {

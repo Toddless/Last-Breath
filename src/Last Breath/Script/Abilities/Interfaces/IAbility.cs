@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.Abilities.Interfaces
+﻿namespace LastBreath.Script.Abilities.Interfaces
 {
     using System;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
     using Godot;
-    using Playground.Script.Enums;
 
     public interface IAbility
     {
@@ -13,7 +14,7 @@
         int Cost { get; }
         bool ActivateOnlyOnCaster { get; }
         ResourceType Type { get; }
-        ICharacter Target { get; set; }
+        IEntity Target { get; set; }
 
         event Action? OnCooldown, OnCost, OnTarget, AbilityUpdateState;
         void Activate();

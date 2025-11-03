@@ -1,11 +1,12 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
-    using System;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using System;
+    using Core.Enums;
+    using LastBreath.Script.Helpers;
+    using Core.Interfaces.Components;
 
-    public class HealthComponent
+    public class HealthComponent : IHealthComponent
     {
         private const float BaseHealth = 100;
         private float _currentHealth;
@@ -23,6 +24,11 @@
                 if (_currentHealth <= 0) EntityDead?.Invoke();
             }
         }
+
+        // I need to publish PlayerHealthChangeEvent from here.
+        // then i need to create different handlers.
+        // E.g one for all ui changes
+        // second??
 
         public float MaxHealth
         {
@@ -43,9 +49,9 @@
 
         public void HealUpToMax() => CurrentHealth = MaxHealth;
 
-        public void OnParameterChanges(object? sender, ModifiersChangedEventArgs args)
+        public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
         {
-            if (args.Parameter != Parameter.MaxHealth)
+            if (args.Parameter != Parameter.Health)
                 return;
             var newMaxHealth = Calculations.CalculateFloatValue(BaseHealth, args.Modifiers);
             if (MathF.Abs(newMaxHealth - MaxHealth) > float.Epsilon)

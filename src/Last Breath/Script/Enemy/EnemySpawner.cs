@@ -1,11 +1,11 @@
-namespace Playground.Script.Enemy
+namespace LastBreath.Script.Enemy
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Linq;
     using Godot;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Helpers;
 
     // TODO: Need to rework this
     public partial class EnemySpawner : Node, IEnemySpawner
@@ -18,7 +18,6 @@ namespace Playground.Script.Enemy
         private PackedScene? _enemyToSpawn;
 
         #region Properties
-        [Inject]
         protected RandomNumberGenerator? Rnd
         {
             get => _rnd;
@@ -56,10 +55,7 @@ namespace Playground.Script.Enemy
             ParentScene = (MainWorld)GetParent();
             EnemyToSpawn = ResourceLoader.Load<PackedScene>(ScenePath.EnemyToSpawn);
             ParentScene.Enemies!.CollectionChanged += OnCollectionChanged;
-            ResolveDependencies();
         }
-
-        private void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         public void InitializeEnemiesPositions(List<Vector2> positions)
         {

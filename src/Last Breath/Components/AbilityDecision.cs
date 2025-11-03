@@ -1,7 +1,7 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
-    using Playground.Components.Interfaces;
-    using Playground.Script.Abilities.Interfaces;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Abilities.Interfaces;
 
     public class AbilityDecision(IAbility ability, float priority) : IAbilityDecision
     {

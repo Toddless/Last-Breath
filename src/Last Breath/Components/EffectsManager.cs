@@ -1,18 +1,20 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Entity;
+    using Utilities;
 
-    public class EffectsManager(ICharacter owner)
+    public class EffectsManager(IEntity owner) : IEffectsManager
     {
         // all effects from equip, passive skills etc.
         private readonly List<IEffect> _permanentEffects = [];
         // temporary effects will be getting only in figth
         private readonly List<IEffect> _temporaryEffects = [];
-        private readonly ICharacter _owner = owner;
+        private readonly IEntity _owner = owner;
 
         public void AddPermanentEffect(IEffect effect) => AddEffects(effect, _permanentEffects);
 
@@ -23,7 +25,7 @@
             var allEffects = GetCombinedEffects();
             if (!allEffects.Contains(effect))
             {
-                // TODO: log
+                Tracker.TrackError($"Trying to remove an effect that doesn't exist in the list.", this);
                 return;
             }
             effect.OnRemove(_owner);
@@ -52,7 +54,7 @@
 
         public void ClearAllTemporaryEffects() => _temporaryEffects.Clear();
 
-        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x=>x.Effect == effect);
+        public bool IsEffectApplied(Effects effect) => GetCombinedEffects().Any(x => x.Effect == effect);
 
         private void AddEffects(IEffect effect, List<IEffect> list)
         {

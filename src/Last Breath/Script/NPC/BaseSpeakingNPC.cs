@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.NPC
+﻿namespace LastBreath.Script.NPC
 {
     using System.Collections.Generic;
     using System.Text;
     using Godot;
-    using Playground.Localization;
-    using Playground.Resource;
-    using Playground.Resource.Quests;
-    using Playground.Script.QuestSystem;
+    using LastBreath.Script.QuestSystem;
+    using LastBreath.Localization;
+    using LastBreath.Resource;
+    using LastBreath.Resource.Quests;
 
     public partial class BaseSpeakingNPC : BaseNPC
     {

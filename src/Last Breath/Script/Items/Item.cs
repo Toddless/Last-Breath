@@ -1,39 +1,55 @@
-﻿namespace Playground.Script.Items
+﻿namespace LastBreath.Script.Items
 {
-    using System;
-    using System.Collections.Generic;
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Enums;
+    using System;
+    using Utilities;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces.Items;
 
+    [Tool]
     [GlobalClass]
-    public partial class Item : Resource
+    public partial class Item : Resource, IItem
     {
-        private string? _id;
-        //  [Export] public string? ItemResourcePath;
-        [Export] public LocalizedString? ItemName;
-        [Export] public int MaxStackSize = 1;
-        [Export] public Texture2D? Icon, FullImage;
-        [Export] public GlobalRarity Rarity;
-        [Export] public int Quantity = 1;
-        [Export] public LocalizedString? Description;
+        [Export] public string Id { get; protected set; } = string.Empty;
+        [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
+        [Export] public Texture2D? Icon { get; set; }
+        [Export] public Texture2D? FullImage { get; set; }
+        [Export] public int MaxStackSize { get; set; } = 1;
+        [Export] public string[] Tags { get; protected set; } = [];
 
-        public string Id => _id ??= SetId();
-        private static string SetId()
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
+        public string DisplayName => Localizator.Localize(Id);
+
+        public string Description => Localizator.LocalizeDescription(Id);
+
+        public Item()
         {
-            // TODO: Later item name is LocalizedString, i need to take an en name
-          //  if (string.IsNullOrEmpty(ItemName?.Text)) return string.Empty;
-            //return ItemName.Text.Replace(' ', '_');
-            return Guid.NewGuid().ToString();
+
         }
 
-        public bool Equals(Item other)
+        public Item(string id,
+            Rarity rarity,
+            Texture2D icon,
+            Texture2D fullImage,
+            int maxStackSize,
+            string[] tags)
         {
-            if (other == null || ItemName == null)
+            Id = id;
+            Rarity = rarity;
+            Icon = icon;
+            FullImage = fullImage;
+            MaxStackSize = maxStackSize;
+            Tags = tags;
+        }
+
+        public bool Equals(IItem other)
+        {
+            if (other == null || string.IsNullOrEmpty(DisplayName))
             {
                 return false;
             }
-            return ItemName.Equals(other.ItemName) && Quantity == other.Quantity;
+            return Id.Equals(other.Id) && MaxStackSize == other.MaxStackSize;
         }
 
         public override bool Equals(object? obj)
@@ -42,12 +58,17 @@
             {
                 return false;
             }
-            return Equals((Item)obj);
+            return Equals((IItem)obj);
         }
 
-        public override int GetHashCode()=>HashCode.Combine(ItemName, Quantity);
+        public override int GetHashCode() => HashCode.Combine(Id);
 
-        // TODO: Format strings
-        public virtual List<string> GetItemStatsAsStrings() => [];
+        public T Copy<T>()
+        {
+            var duplicate = (IItem)DuplicateDeep();
+            return (T)duplicate;
+        }
+
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
 }

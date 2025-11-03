@@ -1,15 +1,16 @@
-namespace Playground
+namespace LastBreath
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Godot;
-    using Playground.Script;
-    using Playground.Script.Enemy;
-    using Playground.Script.Helpers;
-    using Playground.Script.NPC;
-    using Playground.Script.ScenesHandlers;
+    using LastBreath.Script;
+    using LastBreath.Script.Enemy;
+    using LastBreath.Script.ScenesHandlers;
+    using LastBreath.Script.Helpers;
+    using LastBreath.Script.NPC;
+    using Core.Interfaces.Entity;
 
     public partial class MainWorld : ObservableNode2D
     {
@@ -56,7 +57,7 @@ namespace Playground
             InitializeEnemies();
         }
 
-        public void InitializingFight(ICharacter enemy)
+        public void InitializingFight(IEntity enemy)
         {
             if (_isBattleActive) return;
             InitializeFight?.Invoke(new BattleContext([enemy, GameManager.Instance.Player!]));
@@ -64,8 +65,6 @@ namespace Playground
         }
 
         public void ResetBattleState() => _isBattleActive = false;
-
-        protected void ResolveDependencies() => DiContainer.InjectDependencies(this);
 
         // if i need dynamically add new openableObjects
         private void OnChildAdded(Node node)

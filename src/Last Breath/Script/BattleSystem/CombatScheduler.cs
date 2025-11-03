@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
     using System;
     using System.Collections.Generic;

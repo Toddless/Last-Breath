@@ -1,13 +1,13 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
-    using Playground.Script;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
 
     public class IntelligenceStance : StanceBase
     {
-        public IntelligenceStance(ICharacter owner) : base(owner, resource: new Mana(), effect: new StanceActivationEffect(), Stance.Intelligence)
+        public IntelligenceStance(IEntity owner) : base(owner, resource: new Mana(), effect: new StanceActivationEffect(), Stance.Intelligence)
         {
-            StanceSkillManager = new(this);
+            StanceSkillComponent = new StanceSkillComponent(this);
         }
 
         public override void OnActivate()

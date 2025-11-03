@@ -1,16 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://bd5wylwyowomd"]
+[gd_scene load_steps=6 format=3 uid="uid://bd5wylwyowomd"]
 
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="1_hrn6o"]
 [ext_resource type="Texture2D" uid="uid://d3s62mu2qu0f1" path="res://Assets/MainMenuBackground.png" id="1_kk64l"]
 [ext_resource type="Script" uid="uid://bd8dkamekmlop" path="res://Script/UI/View/MainMenu.cs" id="1_ogonq"]
-[ext_resource type="PackedScene" uid="uid://crpiglshqam38" path="res://Script/UI/OptionsMenu.tscn" id="4_7ktkb"]
+[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="3_4e8ab"]
 [ext_resource type="AudioStream" uid="uid://c41u82tba0tul" path="res://Assets/Sounds/mainTheme.mp3" id="5_gnfau"]
-[ext_resource type="PackedScene" uid="uid://cserxppd6wiui" path="res://Script/UI/SaveLoadMenu.tscn" id="5_ki6sx"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gssjr"]
 texture = ExtResource("1_kk64l")
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" node_paths=PackedStringArray("_newGameButton", "_optionsButton", "_quitButton", "_loadGameButton")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,6 +17,10 @@ grow_horizontal = 2
 grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_ogonq")
+_newGameButton = NodePath("MarginContainer/HBoxContainer/VBoxContainer/NewGameBtn")
+_optionsButton = NodePath("MarginContainer/HBoxContainer/VBoxContainer/OptionsBtn")
+_quitButton = NodePath("MarginContainer/HBoxContainer/VBoxContainer/QuitBtn")
+_loadGameButton = NodePath("MarginContainer/HBoxContainer/VBoxContainer/LoadGameBtn")
 metadata/_edit_use_anchors_ = true
 
 [node name="TextureRect" type="PanelContainer" parent="."]
@@ -47,13 +49,9 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 60
 
-[node name="Seperator" type="Control" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
 [node name="GameTitel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/outline_size = 12
-theme_override_fonts/font = ExtResource("1_hrn6o")
 theme_override_font_sizes/font_size = 78
 text = "Last Breath"
 horizontal_alignment = 1
@@ -70,38 +68,38 @@ alignment = 1
 [node name="NewGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(120, 30)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_hrn6o")
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "New Game"
+script = ExtResource("3_4e8ab")
+_id = "NewGameBtn"
 
 [node name="LoadGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(120, 30)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_hrn6o")
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Load Game"
+script = ExtResource("3_4e8ab")
+_id = "LoadGameBtn"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_hrn6o")
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Options"
+script = ExtResource("3_4e8ab")
+_id = "OptionsBtn"
 
 [node name="QuitBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_hrn6o")
+focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Quit"
-
-[node name="OptionsMenu" parent="." instance=ExtResource("4_7ktkb")]
-visible = false
-layout_mode = 1
-
-[node name="SaveLoadMenu" parent="." instance=ExtResource("5_ki6sx")]
-visible = false
-layout_mode = 1
+script = ExtResource("3_4e8ab")
+_id = "QuitBtn"
 
 [node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_gnfau")

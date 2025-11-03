@@ -1,11 +1,13 @@
-﻿namespace Playground.Components
+﻿namespace LastBreath.Components
 {
     using System;
-    using System.Collections.Generic;
+    using Utilities;
     using System.Linq;
-    using Playground.Script.BattleSystem.Decorators;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Battle.Decorator;
 
-    public class ModuleManager<TKey, TModule, TDecorator>
+    public class ModuleManager<TKey, TModule, TDecorator> : IModuleManager<TKey, TModule, TDecorator>
         where TKey : notnull
         where TModule : class
         where TDecorator : TModule, IModuleDecorator<TKey, TModule>
@@ -50,6 +52,7 @@
         {
             if (!_decorators.TryGetValue(decorator.SkillType, out var list))
             {
+                Tracker.TrackNotFound($"List for {decorator.SkillType}", this);
                 list = [];
                 _decorators[decorator.SkillType] = list;
             }
@@ -69,7 +72,7 @@
             // just in case
             if (!_decorators.TryGetValue(decorator.SkillType, out var decorators))
             {
-                // TODO: Log
+                Tracker.TrackNotFound("Trying to remove from non-existent list", this);
                 return;
             }
             if (decorators.Remove(decorator))

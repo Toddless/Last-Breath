@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
+﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
-    using Playground.Script.Items;
+    using LastBreath.Script.Items;
 
     public interface IBasedOnRarityLootTable
     {

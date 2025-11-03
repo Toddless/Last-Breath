@@ -1,34 +1,29 @@
-﻿namespace Playground.Script.BattleSystem
+﻿namespace LastBreath.Script.BattleSystem
 {
     using System.Collections.Generic;
-    using Playground.Script;
-    using Playground.Script.Abilities.Modifiers;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
 
     public class StanceActivationEffect : IStanceActivationEffect
     {
-        private List<IModifier> _modifiers = [];
+        private List<IModifierInstance> _modifiers = [];
 
         public StanceActivationEffect()
         {
-            LoadData();
         }
 
-        public void OnActivate(ICharacter owner)
+        public void OnActivate(IEntity owner)
         {
-            foreach (IModifier modifier in _modifiers)
+            foreach (var modifier in _modifiers)
             {
                 owner.Modifiers.AddPermanentModifier(modifier);
             }
         }
 
-        public void OnDeactivate(ICharacter owner)
+        public void OnDeactivate(IEntity owner)
         {
             owner.Modifiers.RemovePermanentModifierBySource(this);
-        }
-
-        private void LoadData()
-        {
-
         }
     }
 }

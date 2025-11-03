@@ -1,9 +1,10 @@
-﻿namespace PlaygroundTest.BattleSystemTests
+﻿namespace LastBreathTest.BattleSystemTests
 {
-    using Playground.Components.Interfaces;
-    using Playground.Script;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using LastBreath.Script.BattleSystem;
 
     public class DexterityStanceTest : StanceBase
     {

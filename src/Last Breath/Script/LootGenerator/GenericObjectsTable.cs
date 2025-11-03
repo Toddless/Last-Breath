@@ -1,12 +1,9 @@
-﻿namespace Playground.Script.LootGenerator
+﻿namespace LastBreath.Script.LootGenerator
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Godot;
-    using Playground.Script.Enums;
-    using Playground.Script.Items;
-    using Playground.Script.Items.Factories;
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
 
     public abstract class GenericObjectsTable<T>
         where T : GenericObject
@@ -17,12 +14,10 @@
 
         public List<T> LootDropItems = [];
 
-        public List<ItemCreator> Factories = [];
-
 
         public virtual void ValidateTable()
         {
-            SetFactories();
+          //  SetFactories();
             if (LootDropItems != null && LootDropItems.Count > 0)
             {
                 float currentProbabilityWeighMaximum = 0f;
@@ -49,12 +44,12 @@
             }
         }
 
-        public virtual Item GetRandomItem()
-        {
-            float pickedNumber = _random.RandfRange(1, _probabilityTotalWeight);
-            return Factories[_random.RandiRange(0, Factories.Count - 1)]
-                .GenerateItem(LootDropItems.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? GlobalRarity.Uncommon);
-        }
+        //public virtual Item GetRandomItem()
+        //{
+        //    float pickedNumber = _random.RandfRange(1, _probabilityTotalWeight);
+        //    return Factories[_random.RandiRange(0, Factories.Count - 1)]
+        //        .GenerateItem(LootDropItems.FirstOrDefault(item => pickedNumber >= item.ProbabilityRangeFrom && pickedNumber <= item.ProbabilityRangeTo)?.Rarity ?? Rarity.Uncommon);
+        //}
 
         public virtual T? GetRarity()
         {
@@ -62,19 +57,19 @@
             return LootDropItems.FirstOrDefault(rarity => pickedNumber >= rarity.ProbabilityRangeFrom && pickedNumber <= rarity.ProbabilityRangeTo);
         }
 
-        public virtual Item? GetItemWithSelectedRarity(int index)
-        {
-            return Factories[_random.RandiRange(0, Factories.Count - 1)].GenerateItem(LootDropItems[index].Rarity);
-        }
+        //public virtual Item? GetItemWithSelectedRarity(int index)
+        //{
+        //    return Factories[_random.RandiRange(0, Factories.Count - 1)].GenerateItem(LootDropItems[index].Rarity);
+        //}
 
-        private void SetFactories()
-        {
-            Factories =
-            [
-                new BowFactory(_random),
-                new SwordFactory(_random),
-                new BodyArmorFactory(_random),
-            ];
-        }
+        //private void SetFactories()
+        //{
+        //    Factories =
+        //    [
+        //        new BowFactory(_random),
+        //        new SwordFactory(_random),
+        //        new BodyArmorFactory(_random),
+        //    ];
+        //}
     }
 }

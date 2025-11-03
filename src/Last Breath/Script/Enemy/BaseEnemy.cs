@@ -1,33 +1,34 @@
-namespace Playground
+namespace LastBreath
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Godot;
-    using Playground.Components;
-    using Playground.Script;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Abilities.Modifiers;
-    using Playground.Script.BattleSystem;
-    using Playground.Script.Enemy;
-    using Playground.Script.Enums;
-    using Playground.Script.LootGenerator.BasedOnRarityLootGenerator;
-    using Playground.Script.UI;
+    using System;
+    using Core.Enums;
+    using System.Linq;
+    using LastBreath.Components;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Skills;
+    using LastBreath.Script.Enemy;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components;
+    using LastBreath.Script.BattleSystem;
+    using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
+    using Utilities;
+    using Core.Interfaces.Entity;
 
-    [Inject]
-    public partial class BaseEnemy : CharacterBody2D, ICharacter
+    public partial class BaseEnemy : CharacterBody2D, IEntity
     {
         #region Components
         private readonly AttributeComponent _enemyAttribute = new();
-        private readonly ModifierManager _modifierManager = new();
-        private EffectsManager? _effectsManager;
-        private HealthComponent? _enemyHealth;
-        private DamageComponent? _enemyDamage;
-        private DefenseComponent? _enemyDefense;
+        private readonly IModifierManager _modifierManager = new ModifierManager();
+        private IEffectsManager? _effectsManager;
+        private IHealthComponent? _enemyHealth;
+        private IDamageComponent? _enemyDamage;
+        private IDefenceComponent? _enemyDefense;
         private SkillsComponent? _enemySkills;
         #endregion
 
-        private bool _enemyFight = false, _playerEncounter = false, _canMove, _isAlive = true;
+        private bool _enemyFight = false, _playerEncounter = false, _canMove;
         private int _level;
         private string? _enemyId;
         private IBasedOnRarityLootTable? _lootTable;
@@ -39,7 +40,7 @@ namespace Playground
         private Vector2 _respawnPosition;
         private Area2D? _area;
         private AttributeType? _enemyAttributeType;
-        private GlobalRarity _rarity;
+        private Core.Enums.Rarity _rarity;
         private EnemyType _enemyType;
         private IStance? _currentStance;
 
@@ -47,7 +48,6 @@ namespace Playground
         private Node2D? _inventoryNode;
         private Panel? _inventoryWindow;
         private GridContainer? _inventoryContainer;
-        private EnemyInventory? _inventory;
         #endregion
 
 
@@ -57,7 +57,18 @@ namespace Playground
         public EnemyType EnemyType => _enemyType;
         public AttributeType? AttributeType => _enemyAttributeType;
         public string CharacterName { get; private set; } = "Enemy";
-        public bool CanFight
+
+        [Export] public string Id { get; private set; } = string.Empty;
+
+        [Export] public string[] Tags { get; set; } = [];
+
+        [Export] public Texture2D? Icon { get; set; }
+
+        public string Description => Localizator.LocalizeDescription(Id);
+
+        public string DisplayName => Localizator.Localize(Id);
+
+        public bool IsFighting
         {
             get => _enemyFight;
             set => _enemyFight = value;
@@ -91,20 +102,13 @@ namespace Playground
             get => _respawnPosition;
         }
 
-        public GlobalRarity Rarity
+        public Core.Enums.Rarity Rarity
         {
             get => _rarity;
             set => _rarity = value;
 
         }
 
-        public EnemyInventory? Inventory
-        {
-            get => _inventory;
-            set => _inventory = value;
-        }
-
-        [Inject]
         protected IBasedOnRarityLootTable? LootTable
         {
             get => _lootTable;
@@ -118,43 +122,40 @@ namespace Playground
 
         public string EnemyId => _enemyId ??= SetId();
 
-        public DamageComponent Damage => _enemyDamage ??= new(new UnarmedDamageStrategy());
-
-        public HealthComponent Health => _enemyHealth ??= new();
-
-        public DefenseComponent Defense => _enemyDefense ??= new();
-
-        public EffectsManager Effects => _effectsManager ??= new(this);
-
-        public ModifierManager Modifiers => _modifierManager;
+        public IDamageComponent Damage => _enemyDamage ??= new DamageComponent(new UnarmedDamageStrategy());
+        public IHealthComponent Health => _enemyHealth ??= new HealthComponent();
+        public IDefenceComponent Defence => _enemyDefense ??= new DefenseComponent();
+        public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
+        public IModifierManager Modifiers => _modifierManager;
 
         public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
 
-        int ICharacter.Initiative => Rnd.RandiRange(0, 15);
-
-        public bool IsAlive => _isAlive;
+        public bool IsAlive { get; set; }
 
 
-        public event Action<ICharacter>? Dead, InitializeFight;
+
+        public event Action<IEntity>? Dead, InitializeFight;
         public event Action? AllAttacksFinished;
-        public event Action<OnGettingAttackEventArgs>? GettingAttack;
+        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
+        public event Action? TurnStart;
+        public event Action? TurnEnd;
+        public event Action<IAttackContext>? BeforeAttack;
+        public event Action<IAttackContext>? AfterAttack;
 
         #endregion
 
         public override void _Ready()
         {
-            _effectsManager = new(this);
-            _enemyHealth = new();
-            _enemyDefense = new();
+            _effectsManager = new EffectsManager(this);
+            _enemyHealth = new HealthComponent();
+            _enemyDefense = new DefenseComponent();
             _enemySkills = new(this);
             // later i need strategy for enemies
-            _enemyDamage = new(new UnarmedDamageStrategy());
+            _enemyDamage = new DamageComponent(new UnarmedDamageStrategy());
             var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
             _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
             _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
             _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            Inventory = new EnemyInventory();
-            Inventory.Initialize(25, _inventoryContainer);
             _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
             _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
             _area = parentNode.GetNode<Area2D>(nameof(Area2D));
@@ -162,7 +163,6 @@ namespace Playground
             _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
             _inventoryNode.Hide();
             SetEvents();
-            DiContainer.InjectDependencies(this);
             SetStats();
             // SpawnItems();
             Health?.HealUpToMax();
@@ -170,7 +170,7 @@ namespace Playground
 
         public void OnGettingKill()
         {
-            CanFight = false;
+            IsFighting = false;
             CanMove = false;
             // TODO: Turn "death" state on in witch enemy lay down for N time befor reincarnated
             // change sprite and animation
@@ -181,7 +181,7 @@ namespace Playground
         {
             Health.TakeDamage(damage);
             GD.Print($"{this.Name} taked: {damage} damage");
-            GettingAttack?.Invoke(new(this, AttackResults.Succeed, damage, isCrit));
+            GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
         }
 
         public void OnTurnStart()
@@ -196,18 +196,18 @@ namespace Playground
                 }
                 CurrentStance?.OnAttack(target);
             }
-            UIEventBus.PublishNextPhase();
+            //UIEventBus.PublishNextPhase();
         }
 
-        public void OnEvadeAttack() => GettingAttack?.Invoke(new(this, AttackResults.Evaded));
-        public void OnBlockAttack() => GettingAttack?.Invoke(new(this, AttackResults.Blocked));
+        public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
+        public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
 
         public void OnTurnEnd()
         {
             //Effects.UpdateEffects();
         }
 
-        public void OnReceiveAttack(AttackContext context)
+        public void OnReceiveAttack(IAttackContext context)
         {
             if (_currentStance == null)
             {
@@ -215,7 +215,7 @@ namespace Playground
                 HandleSkills(context.PassiveSkills);
                 // TODO: Own method
                 var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = this.Defense.BarrierAbsorbDamage(reducedByArmorDamage);
+                var damageLeftAfterBarrierabsorption = this.Defence.BarrierAbsorbDamage(reducedByArmorDamage);
 
                 if (damageLeftAfterBarrierabsorption > 0)
                 {
@@ -236,7 +236,7 @@ namespace Playground
             if (skill is IStanceSkill stanceSkill)
             {
                 if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillManager.AddSkill(stanceSkill);
+                    CurrentStance.StanceSkillComponent.AddSkill(stanceSkill);
             }
             else
                 Skills.AddSkill(skill);
@@ -247,12 +247,17 @@ namespace Playground
             if (skill is IStanceSkill stanceSkill)
             {
                 if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillManager.RemoveSkill(stanceSkill);
+                    CurrentStance.StanceSkillComponent.RemoveSkill(stanceSkill);
             }
             else Skills.RemoveSkill(skill);
         }
 
         public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
+
+        public void AddItemToInventory(IItem item)
+        {
+
+        }
 
         protected void SpawnItems()
         {
@@ -275,7 +280,6 @@ namespace Playground
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, points.Dexterity);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, points.Strength);
             _enemyAttribute.IncreaseAttributeByAmount(Parameter.Intelligence, points.Intelligence);
-            _modifierManager.AddPermanentModifier(new MaxHealthModifier(ModifierType.Flat, 500, this));
             SetAnimation();
             _currentStance = SetStance(_enemyAttributeType);
             _currentStance.OnActivate();
@@ -286,15 +290,14 @@ namespace Playground
             _area!.BodyEntered += PlayerEntered;
             Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += Defense.OnParameterChanges;
+            Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Health.EntityDead += OnEntityDead;
-            _enemyAttribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
         }
 
         private void OnEntityDead()
         {
-            CanFight = false;
-            _isAlive = false;
+            IsFighting = false;
+            IsAlive = false;
             Dead?.Invoke(this);
             GD.Print($"Dead: {GetType().Name}");
         }
@@ -303,32 +306,32 @@ namespace Playground
         {
             return enemyAttributeType switch
             {
-                Script.Enums.AttributeType.Dexterity => new DexterityStance(this),
-                Script.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                Script.Enums.AttributeType.Strength => new StrengthStance(this),
+                Core.Enums.AttributeType.Dexterity => new DexterityStance(this),
+                Core.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
+                Core.Enums.AttributeType.Strength => new StrengthStance(this),
                 _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
             };
         }
 
-        private GlobalRarity EnemyRarity()
+        private Core.Enums.Rarity EnemyRarity()
         {
-            return GlobalRarity.Uncommon;
+            return Core.Enums.Rarity.Uncommon;
         }
 
         private void SetAnimation()
         {
             switch (Rarity)
             {
-                case GlobalRarity.Rare:
+                case Core.Enums.Rarity.Rare:
                     _sprite!.Play("Bat_Rare");
                     break;
-                case GlobalRarity.Epic:
+                case Core.Enums.Rarity.Epic:
                     _sprite!.Play("Bat_Epic");
                     break;
-                case GlobalRarity.Legendary:
+                case Core.Enums.Rarity.Legendary:
                     _sprite!.Play("Bat_Legend");
                     break;
-                case GlobalRarity.Mythic:
+                case Core.Enums.Rarity.Mythic:
                     _sprite!.Play("Bat_Myth");
                     break;
                 default:
@@ -342,7 +345,7 @@ namespace Playground
             if (body is Player s && _area!.OverlapsBody(s))
             {
                 InitializeFight?.Invoke(this);
-                CanFight = false;
+                IsFighting = false;
             }
         }
 
@@ -355,9 +358,9 @@ namespace Playground
 
             return enemyType switch
             {
-                Script.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
-                Script.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
+                Core.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
+                Core.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
+                Core.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
                 _ => (1, 1, 1)
             };
         }
@@ -366,12 +369,13 @@ namespace Playground
         {
             return index switch
             {
-                1 => Script.Enums.AttributeType.Dexterity,
-                2 => Script.Enums.AttributeType.Strength,
-                _ => Script.Enums.AttributeType.Intelligence,
+                1 => Core.Enums.AttributeType.Dexterity,
+                2 => Core.Enums.AttributeType.Strength,
+                _ => Core.Enums.AttributeType.Intelligence,
             };
         }
 
         private string SetId() => $"{NpcName}_{Fraction}";
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
 }

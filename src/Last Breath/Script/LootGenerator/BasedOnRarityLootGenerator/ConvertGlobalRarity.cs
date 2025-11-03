@@ -1,34 +1,33 @@
-﻿namespace Playground.Script.LootGenerator.BasedOnRarityLootGenerator
+﻿namespace LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator
 {
     using System.Collections.Generic;
-    using Playground.Script.Enums;
 
     public static class ConvertGlobalRarity
     {
-        public static readonly Dictionary<GlobalRarity, float> rarityWeights = new()
+        public static readonly Dictionary<Core.Enums.Rarity, float> rarityWeights = new()
         {
-            {GlobalRarity.Uncommon, 1500 },
-            {GlobalRarity.Rare, 250 },
-            {GlobalRarity.Epic, 125 },
-            {GlobalRarity.Legendary, 25 },
+            { Core.Enums.Rarity.Uncommon, 1500 },
+            { Core.Enums.Rarity.Rare, 250 },
+            { Core.Enums.Rarity.Epic, 125 },
+            { Core.Enums.Rarity.Legendary, 25 },
         };
 
-        public static readonly Dictionary<GlobalRarity, int> multiplier = new()
+        public static readonly Dictionary<Core.Enums.Rarity, int> multiplier = new()
         {
-            {GlobalRarity.Uncommon, 1 },
-            {GlobalRarity.Rare, 2 },
-            {GlobalRarity.Epic, 3 },
-            {GlobalRarity.Legendary, 4 },
-            {GlobalRarity.Mythic, 5 },
+            { Core.Enums.Rarity.Uncommon, 1 },
+            { Core.Enums.Rarity.Rare, 2 },
+            { Core.Enums.Rarity.Epic, 3 },
+            { Core.Enums.Rarity.Legendary, 4 },
+            { Core.Enums.Rarity.Mythic, 5 },
         };
 
-        public static readonly Dictionary<GlobalRarity, int> abilityQuantity = new()
+        public static readonly Dictionary<Core.Enums.Rarity, int> abilityQuantity = new()
         {
-            {GlobalRarity.Uncommon, 1 },
-            {GlobalRarity.Rare, 2 },
-            {GlobalRarity.Epic, 4 },
-            {GlobalRarity.Legendary, 6 },
-            {GlobalRarity.Mythic, 8 },
+            { Core.Enums.Rarity.Uncommon, 1 },
+            { Core.Enums.Rarity.Rare, 2 },
+            { Core.Enums.Rarity.Epic, 4 },
+            { Core.Enums.Rarity.Legendary, 6 },
+            { Core.Enums.Rarity.Mythic, 8 },
         };
     }
 }

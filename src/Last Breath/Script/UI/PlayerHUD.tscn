@@ -1,0 +1,103 @@
+[gd_scene load_steps=7 format=3 uid="uid://boqqyrt0sfpve"]
+
+[ext_resource type="Script" uid="uid://cr74fmmgk0qwd" path="res://Script/UI/View/PlayerHUD.cs" id="1_22o70"]
+[ext_resource type="Texture2D" uid="uid://dl8h81qprpmdf" path="res://Assets/HealthBarUnder.svg" id="2_aoa6y"]
+[ext_resource type="Texture2D" uid="uid://cyi8qcr0kysm5" path="res://Assets/HealthBar.svg" id="3_bore2"]
+[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="4_aoa6y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hnvv8"]
+atlas = ExtResource("2_aoa6y")
+region = Rect2(0, 16, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pksnw"]
+atlas = ExtResource("3_bore2")
+region = Rect2(0, 32, 64, 16)
+
+[node name="PlayerHUD" type="Control" node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_craftingBtn", "_playerHealth", "_playerEffects")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+script = ExtResource("1_22o70")
+_characterBtn = NodePath("MarginContainer/HBoxContainerButtons/Character")
+_inventoryBtn = NodePath("MarginContainer/HBoxContainerButtons/Inventory")
+_questsBtn = NodePath("MarginContainer/HBoxContainerButtons/Quests")
+_craftingBtn = NodePath("MarginContainer/HBoxContainerButtons/Crafting")
+_playerHealth = NodePath("MarginContainer/VBoxContainer/Health")
+_playerEffects = NodePath("MarginContainer/VBoxContainer/Effects")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 2
+
+[node name="Health" type="TextureProgressBar" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(285, 35)
+layout_mode = 2
+mouse_filter = 0
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_hnvv8")
+texture_progress = SubResource("AtlasTexture_pksnw")
+
+[node name="Effects" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/h_separation = 1
+columns = 11
+
+[node name="HBoxContainerButtons" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/separation = 5
+
+[node name="Character" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+focus_mode = 0
+text = "Character"
+script = ExtResource("4_aoa6y")
+_id = "CharacterBtn"
+metadata/_custom_type_script = "uid://bxravf1ugfs0x"
+
+[node name="Inventory" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+focus_mode = 0
+text = "Inventory"
+script = ExtResource("4_aoa6y")
+_id = "InventoryBtn"
+metadata/_custom_type_script = "uid://bxravf1ugfs0x"
+
+[node name="Quests" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+focus_mode = 0
+text = "Quests"
+script = ExtResource("4_aoa6y")
+_id = "QuestsBtn"
+metadata/_custom_type_script = "uid://bxravf1ugfs0x"
+
+[node name="Crafting" type="Button" parent="MarginContainer/HBoxContainerButtons"]
+layout_mode = 2
+focus_mode = 0
+text = "Crafting"
+script = ExtResource("4_aoa6y")
+_id = "CraftingBtn"
+metadata/_custom_type_script = "uid://bxravf1ugfs0x"

@@ -10,24 +10,15 @@ config_version=5
 
 [application]
 
-config/name="Playground"
+config/name="Last Breath"
 run/main_scene="res://Script/UI/MainMenu.tscn"
-config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+run/max_fps=144
 config/icon="res://icon.svg"
 
 [audio]
 
 buses/default_bus_layout="uid://blfs8ca5iilus"
-
-[autoload]
-
-DiContainer="*res://DIComponents/DiContainer.cs"
-ConfigFileHandler="*res://Script/ConfigFileHandler.cs"
-GameManager="*res://Script/GameManager.cs"
-QuestsTable="*res://Resources/QuestsTable.cs"
-RewardTable="*res://Resources/RewardTable.cs"
-QuestsManager="*res://Script/QuestSystem/QuestManager.cs"
-ItemsMediaHandler="*res://Script/Items/ItemData/ItemsMediaHandler.cs"
 
 [display]
 
@@ -37,7 +28,11 @@ window/stretch/mode="canvas_items"
 
 [dotnet]
 
-project/assembly_name="Playground"
+project/assembly_name="LastBreath"
+
+[editor_plugins]
+
+enabled=PackedStringArray()
 
 [file_customization]
 
@@ -142,7 +137,7 @@ ui_dialog={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/GuardianDialogues/guardianDialogues.en.translation", "res://Resources/Dialogues/GuardianDialogues/guardianDialogues.ru.translation", "res://Resources/Quests/questData.en.translation", "res://Resources/Quests/questData.ru.translation")
+locale/translations=PackedStringArray("res://Localization/en.po", "res://Localization/ru.po")
 
 [rendering]
 

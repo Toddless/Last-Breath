@@ -1,18 +1,19 @@
-﻿namespace Playground.Script.Abilities
+﻿namespace LastBreath.Script.Abilities
 {
     using System;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
     using Godot;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
-    using Playground.Script.Helpers;
+    using LastBreath.Script.Abilities.Interfaces;
+    using LastBreath.Script.Helpers;
 
-    public abstract class AbilityBase(ICharacter owner, int cooldown, int cost, ResourceType type, bool activateOnlyOnCaster) : IAbility
+    public abstract class AbilityBase(IEntity owner, int cooldown, int cost, ResourceType type, bool activateOnlyOnCaster) : IAbility
     {
         public Texture2D? Icon { get; protected set; }
-        private ICharacter? _target;
+        private IEntity? _target;
         // TODO: Icons, Animations etc
         private readonly int _baseCooldown = cooldown;
-        private readonly ICharacter _owner = owner;
+        private readonly IEntity _owner = owner;
         public string Name { get; } = string.Empty;
         public string Description { get; } = string.Empty;
         public int Cooldown { get; set; } = 0;
@@ -21,7 +22,7 @@
         public ResourceType Type { get; } = type;
         public bool ActivateOnlyOnCaster { get; } = activateOnlyOnCaster;
 
-        public ICharacter Target
+        public IEntity Target
         {
             get => _target ??= _owner;
             set
@@ -93,7 +94,7 @@
             }
         }
 
-        private void ApplyTargetEffects(ICharacter target, AbilityEffectConfig config)
+        private void ApplyTargetEffects(IEntity target, AbilityEffectConfig config)
         {
             foreach (var effect in config.TargetEffects)
             {

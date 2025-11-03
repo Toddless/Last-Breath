@@ -1,7 +1,7 @@
-﻿namespace Playground.Script.Attribute
+﻿namespace LastBreath.Script.Attribute
 {
     using System.Collections.Generic;
-    using Playground.Script.Enums;
+    using Core.Enums;
 
     public class Strength() : AttributeBase(GetEffects())
     {
@@ -23,7 +23,7 @@
                 0.02f);
 
             yield return new AttributeEffect
-                (Parameter.MaxHealth,
+                (Parameter.Health,
                 ModifierType.Flat,
                 10f);
         }

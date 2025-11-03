@@ -1,4 +1,4 @@
-﻿namespace Playground.Script.QuestSystem
+﻿namespace LastBreath.Script.QuestSystem
 {
     public enum ObjectiveType
     {

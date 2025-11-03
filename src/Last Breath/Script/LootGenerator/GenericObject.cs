@@ -1,6 +1,6 @@
-﻿namespace Playground.Script.LootGenerator
+﻿namespace LastBreath.Script.LootGenerator
 {
-    using Playground.Script.Enums;
+    using Core.Enums;
 
     public abstract class GenericObject
     {
@@ -12,6 +12,6 @@
 
         public float ProbabilityRangeTo;
 
-        public GlobalRarity Rarity;
+        public Rarity Rarity;
     }
 }

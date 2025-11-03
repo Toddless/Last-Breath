@@ -1,8 +1,9 @@
-﻿namespace Playground.Script.BattleSystem.Module
+﻿namespace LastBreath.Script.BattleSystem.Module
 {
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
 
-    public class GettingAttackSkillModule(ICharacter owner) : BaseSkillModule(owner, type: SkillType.GettingAttack, priority:DecoratorPriority.Base)
+    public class GettingAttackSkillModule(IEntity owner) : BaseSkillModule(owner, type: SkillType.GettingAttack, priority:DecoratorPriority.Base)
     {
     }
 }

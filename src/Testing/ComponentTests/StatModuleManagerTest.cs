@@ -1,10 +1,10 @@
-﻿namespace PlaygroundTest.ComponentTests
+﻿namespace LastBreathTest.ComponentTests
 {
-    using Playground.Components;
-    using Playground.Script.BattleSystem.Decorators;
-    using Playground.Script.BattleSystem.Module;
-    using Playground.Script.Enums;
-    using PlaygroundTest.ComponentTests.TestData;
+    using Core.Enums;
+    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Battle.Module;
+    using LastBreath.Components;
+    using LastBreathTest.ComponentTests.TestData;
 
     [TestClass]
     public class StatModuleManagerTest

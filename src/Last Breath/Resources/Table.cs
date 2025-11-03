@@ -1,4 +1,4 @@
-﻿namespace Playground.Resource
+﻿namespace LastBreath.Resource
 {
     using System.Collections.Generic;
     using Godot;

@@ -1,13 +1,12 @@
-﻿namespace Playground.Script.Abilities.Skills
+﻿namespace LastBreath.Script.Abilities.Skills
 {
     using System;
     using Godot;
-    using Playground.Localization;
-    using Playground.Script.Abilities.Interfaces;
-    using Playground.Script.Enums;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
 
     [GlobalClass]
-    public partial class ExecutionSkill : Resource, IOnAttackSkill
+    public partial class ExecutionSkill : Resource
     {
         private readonly Lazy<string> _id;
         private const float Trashhold = 0.15f;
@@ -15,16 +14,12 @@
         public SkillType Type => SkillType.OnAttack;
         public bool IsEvadable => false;
 
-        [Export] public LocalizedString? Description { get; set; }
-
-        [Export] public Texture2D? Icon { get; set; }
-
         public ExecutionSkill()
         {
             _id = new(CreateId);
         }
 
-        public void Activate(ICharacter target)
+        public void Activate(IEntity target)
         {
             if (target.Health.CurrentHealth / target.Health.MaxHealth <= Trashhold) target.TakeDamage(int.MaxValue);
         }

@@ -1,9 +1,9 @@
-﻿namespace Playground.Script.Attribute
+﻿namespace LastBreath.Script.Attribute
 {
     using System;
     using System.Collections.Generic;
-    using Playground.Components.Interfaces;
-    using Playground.Script.Helpers;
+    using LastBreath.Components.Interfaces;
+    using LastBreath.Script.Helpers;
 
     public abstract class AttributeBase(IEnumerable<AttributeEffect> effects) : IAttribute
     {

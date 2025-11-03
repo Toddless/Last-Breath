@@ -1,12 +1,12 @@
-﻿namespace Playground.Script.UI
+﻿namespace LastBreath.Script.UI
 {
     using Godot;
 
     public partial class BaseControl : Control
     {
-        private ConfigFileHandler? _configFileHandler;
+        private SettingsHandler? _configFileHandler;
 
-        protected ConfigFileHandler? Configuration
+        protected SettingsHandler? Configuration
         {
             get => _configFileHandler;
             set => _configFileHandler = value;

@@ -1,4 +1,4 @@
-﻿namespace Playground.Localization
+﻿namespace LastBreath.Localization
 {
     using System.IO;
     using Godot;
