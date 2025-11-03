@@ -19,11 +19,12 @@ _uiLayerManager = NodePath("UILayersManager")
 [node name="Player" parent="MainWorld" instance=ExtResource("2_gpchr")]
 z_index = 1
 
-[node name="UILayersManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_notificationLayer")]
+[node name="UILayersManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_tooltipLayer", "_notificationLayer")]
 process_mode = 3
 script = ExtResource("4_pbw6q")
 _mainLayer = NodePath("MainLayer")
 _windowLayer = NodePath("WindowsLayer")
+_tooltipLayer = NodePath("TooltipLayer")
 _notificationLayer = NodePath("NotificationsLayer")
 
 [node name="MainLayer" type="CanvasLayer" parent="UILayersManager"]
@@ -33,6 +34,9 @@ script = ExtResource("4_rgh2o")
 layer = 2
 script = ExtResource("6_jw32o")
 
-[node name="NotificationsLayer" type="CanvasLayer" parent="UILayersManager"]
+[node name="TooltipLayer" type="CanvasLayer" parent="UILayersManager"]
 layer = 3
+
+[node name="NotificationsLayer" type="CanvasLayer" parent="UILayersManager"]
+layer = 4
 script = ExtResource("7_50glp")

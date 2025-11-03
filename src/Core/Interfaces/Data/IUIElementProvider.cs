@@ -23,5 +23,6 @@
         void ClearSource(Control source);
         T CreateAndShowNotification<T>() where T : Control, IInitializable;
         void RemoveAllInstances();
+        T CreateAndShowTooltip<T>() where T : Control, IInitializable, IRequireServices, IClosable, IRequireReposition;
     }
 }

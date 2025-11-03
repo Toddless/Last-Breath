@@ -8,32 +8,49 @@
     using Crafting.Source.UIElements;
     using Core.Interfaces.Mediator.Events;
 
-    public class ShowInventoryItemEventHandler : IEventHandler<ShowInventoryItemEvent>
+    public class ItemCreatedEventHandler : IEventHandler<ItemCreatedEvent>
     {
+        private readonly IUIElementProvider _uIElementProvider;
+        private readonly ISystemMediator _systemMediator;
         private readonly IInventory _inventory;
-        private readonly IUIElementProvider _uiElementProvider;
 
-        public ShowInventoryItemEventHandler(IInventory inventory, IUIElementProvider uiElementProvider)
+        public ItemCreatedEventHandler(IUIElementProvider provider, IInventory inventory, ISystemMediator systemMediator)
         {
-            // TODO: Should i remove this from crafting dll??
+            _uIElementProvider = provider;
             _inventory = inventory;
-            _uiElementProvider = uiElementProvider;
+            _systemMediator = systemMediator;
         }
 
-        public void Handle(ShowInventoryItemEvent evnt)
+        public void Handle(ItemCreatedEvent evnt)
         {
-            var item = _inventory.GetItem<IItem>(evnt.Item.InstanceId);
-            if (item != null)
+            var notifier = _uIElementProvider.CreateAndShowNotification<ItemCreatedNotifier>();
+            ConfigureItemCreatedNotifier(evnt.CreatedItem, notifier);
+
+            _inventory.TryAddItem(evnt.CreatedItem);
+
+            notifier.DestroyPressed += OnDestroyPressed;
+
+            void OnDestroyPressed()
             {
-                var details = _uiElementProvider.CreateAndShowTooltip<ItemDetails>();
-                ConfigureDetails(details, item);
+                _systemMediator.Publish(new DestroyItemEvent(evnt.CreatedItem.InstanceId));
+                notifier.DestroyPressed -= OnDestroyPressed;
             }
         }
 
-        private void ConfigureDetails(ItemDetails details, IItem item)
+        public ItemCreatedNotifier ConfigureItemCreatedNotifier(IItem item, ItemCreatedNotifier instance)
         {
-            if (item is IEquipItem equip) ConfigureEquipItemDetails(details, equip);
-            else ConfigureItemDetails(details, item);
+            instance.SetItemDetails(CreateItemDetails(item));
+            return instance;
+        }
+
+        private ItemDetails CreateItemDetails(IItem item)
+        {
+            var itemDetails = _uIElementProvider.CreateRequireServices<ItemDetails>();
+
+            if (item is IEquipItem equip)
+                return ConfigureEquipItemDetails(itemDetails, equip);
+
+            return ConfigureItemDetails(itemDetails, item);
         }
 
         private ItemDetails ConfigureItemDetails(ItemDetails itemDetails, IItem item)
@@ -80,3 +97,4 @@
         }
     }
 }
+

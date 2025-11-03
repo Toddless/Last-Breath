@@ -28,7 +28,7 @@ namespace LastBreath
         private SkillsComponent? _enemySkills;
         #endregion
 
-        private bool _enemyFight = false, _playerEncounter = false, _canMove, _isAlive = true;
+        private bool _enemyFight = false, _playerEncounter = false, _canMove;
         private int _level;
         private string? _enemyId;
         private IBasedOnRarityLootTable? _lootTable;
@@ -130,7 +130,7 @@ namespace LastBreath
 
         public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
 
-        public bool IsAlive => _isAlive;
+        public bool IsAlive { get; set; }
 
 
 
@@ -297,7 +297,7 @@ namespace LastBreath
         private void OnEntityDead()
         {
             IsFighting = false;
-            _isAlive = false;
+            IsAlive = false;
             Dead?.Invoke(this);
             GD.Print($"Dead: {GetType().Name}");
         }

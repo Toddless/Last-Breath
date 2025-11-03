@@ -132,6 +132,27 @@
             _uiLayers?.ShowWindowElement(exist);
         }
 
+        public T CreateAndShowTooltip<T>()
+            where T : Control, IInitializable, IRequireServices, IClosable, IRequireReposition
+        {
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+                return (T)exist;
+
+            var instance = CreateRequireServices<T>();
+            instance.Reposition += OnRepositionRequired;
+            //instance.Close += OnClose;
+
+            //void OnClose()
+            //{
+            //    instance.Reposition -= OnRepositionRequired;
+            //    instance.Close -= OnClose;
+            //}
+
+            _singleInstances.Add(typeof(T), instance);
+            _uiLayers?.ShowTooltipElement(instance);
+            return instance;
+        }
+
         public T CreateAndShowNotification<T>()
             where T : Control, IInitializable
         {
@@ -192,23 +213,24 @@
             _uiLayers?.ShowWindowElement(instance);
             return instance;
         }
+
         private void OnRepositionRequired(Control source)
         {
             ArgumentNullException.ThrowIfNull(_uiLayers);
-
-            if (!_instanceBySource.TryGetValue(source, out var list))
-            {
-                list = [];
-                _instanceBySource[source] = list;
-            }
 
             var screenSize = _uiLayers.GetViewport().GetVisibleRect().Size;
             var windowSize = source.GetCombinedMinimumSize();
             if (windowSize == Vector2.Zero)
                 windowSize = source.Size;
 
-            source.Position = CalculatePosition(list, screenSize, windowSize);
+            var mousePosition = _uiLayers.GetViewport().GetMousePosition();
+            var position = mousePosition + new Vector2(MOUSE_OFFSET, -windowSize.Y - MOUSE_OFFSET);
+            if (position.Y < WINDOW_MARGIN)
+                position = mousePosition + new Vector2(MOUSE_OFFSET, MOUSE_OFFSET);
+
+            source.Position = ClampToScreen(position, windowSize, screenSize);
         }
+
         public void ClearSource(Control source)
         {
             if (!_instanceBySource.TryGetValue(source, out var existList)) return;

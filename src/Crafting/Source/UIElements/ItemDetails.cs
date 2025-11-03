@@ -6,7 +6,7 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
 
-    public partial class ItemDetails : PanelContainer, IInitializable, IClosable, IRequireServices, IRequireReposition
+    public partial class ItemDetails : Control, IInitializable, IClosable, IRequireServices, IRequireReposition
     {
         private const string UID = "uid://bqx5ow411nolc";
         private Vector2 _baseSize;
@@ -19,15 +19,12 @@
         public event Action? Close;
         public event Action<Control>? Reposition;
 
-        public override void _Ready()
-        {
-            CallDeferred(nameof(CalculateNewHorizonalSize));
-        }
-
         public void InjectServices(IGameServiceProvider provider)
         {
             _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
         }
+
+        public override void _EnterTree() => CallDeferred(nameof(CalculateNewHorizonalSize));
 
         public void SetItemName(string itemName) => _itemName.Text = itemName;
 
@@ -63,13 +60,12 @@
             FreeChildren(_itemSkillDescription?.GetChildren() ?? []);
         }
 
-        public override void _ExitTree() => Close?.Invoke();
-
         private void FreeChildren(Array<Node> children)
         {
             foreach (var child in children)
                 child.QueueFree();
         }
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private void CalculateNewHorizonalSize()

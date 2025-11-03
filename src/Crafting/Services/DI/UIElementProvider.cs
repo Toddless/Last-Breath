@@ -355,5 +355,6 @@
         }
 
         public void RemoveAllInstances() => throw new NotImplementedException();
+        public T CreateAndShowTooltip<T>() where T : Control, IInitializable, IRequireServices, IClosable, IRequireReposition => throw new NotImplementedException();
     }
 }

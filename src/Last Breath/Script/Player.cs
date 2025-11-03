@@ -91,7 +91,7 @@
         public bool IsAlive
         {
             get => _isAlive;
-            protected set => _isAlive = value;
+            set => _isAlive = value;
         }
         #endregion
 
