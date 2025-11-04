@@ -1,11 +1,11 @@
-﻿namespace LastBreath.Script.UI
+﻿namespace Battle.Services
 {
-    using Godot;
     using System;
-    using Core.Interfaces.UI;
     using System.Collections.Generic;
+    using Core.Interfaces.UI;
+    using Godot;
 
-    public class UIWindowPositionStorage : IUIWindowPositionStorage
+    internal class UIWindowPositionStorage : IUIWindowPositionStorage
     {
         private readonly Dictionary<Type, Vector2> _windowPositions = [];
 

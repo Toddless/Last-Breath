@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://dj86l1gr2ffle"]
+
+[ext_resource type="Script" uid="uid://ca5gpxs6eux12" path="res://Main.cs" id="1_idj7w"]
+[ext_resource type="PackedScene" uid="uid://okfegogbrc05" path="res://Scenes/MainWorld.tscn" id="1_r150o"]
+[ext_resource type="Script" uid="uid://bgcok43tokjli" path="res://UILayerManager.cs" id="3_kln2b"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_uiLayerManager")]
+script = ExtResource("1_idj7w")
+_mainWorld = NodePath("MainWorld")
+_uiLayerManager = NodePath("UILayerManager")
+
+[node name="MainWorld" parent="." instance=ExtResource("1_r150o")]
+
+[node name="UILayerManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_tooltipLayer", "_notificationLayer")]
+script = ExtResource("3_kln2b")
+_mainLayer = NodePath("MainLayer")
+_windowLayer = NodePath("WindowLayer")
+_tooltipLayer = NodePath("TooltipLayer")
+_notificationLayer = NodePath("NotificationLayer")
+
+[node name="MainLayer" type="CanvasLayer" parent="UILayerManager"]
+
+[node name="WindowLayer" type="CanvasLayer" parent="UILayerManager"]
+
+[node name="TooltipLayer" type="CanvasLayer" parent="UILayerManager"]
+
+[node name="NotificationLayer" type="CanvasLayer" parent="UILayerManager"]

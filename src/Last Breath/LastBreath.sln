@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "..\Core\Core.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "..\Utilities\Utilities.csproj", "{4D58BE81-09AD-473D-A991-7C75C097BAF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battle", "..\Battle\Battle.csproj", "{0273A84C-A333-DD6B-DBCD-4AF477484F38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,12 @@ Global
 		{4D58BE81-09AD-473D-A991-7C75C097BAF8}.ExportDebug|Any CPU.Build.0 = Release|Any CPU
 		{4D58BE81-09AD-473D-A991-7C75C097BAF8}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{4D58BE81-09AD-473D-A991-7C75C097BAF8}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
