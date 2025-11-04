@@ -1,6 +1,7 @@
 ﻿namespace Core.Interfaces.Entity
 {
     using System;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
 
     public interface IFightable
@@ -13,5 +14,15 @@
         bool IsAlive {  get; set; }
 
         event Action? TurnStart, TurnEnd;
+        event Action<IAttackContext>? BeforeAttack, AfterAttack;
+        event Action<IOnGettingAttackEventArgs>? GettingAttack;
+
+        void OnTurnEnd();
+        void OnTurnStart();
+        void OnReceiveAttack(IAttackContext context);
+        void TakeDamage(float damage, bool isCrit = false);
+        void AllAttacks();
+        void OnEvadeAttack();
+        void OnBlockAttack();
     }
 }
