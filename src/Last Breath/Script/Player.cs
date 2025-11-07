@@ -181,7 +181,6 @@
             _isPlayerRunning = true;
         }
 
-        public void OnUnequipWeapon() => _playerDamage?.ChangeStrategy(new UnarmedDamageStrategy());
         public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
         public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
 
@@ -303,7 +302,6 @@
 
         private void SetEvents()
         {
-            Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += OnParameterChanges;

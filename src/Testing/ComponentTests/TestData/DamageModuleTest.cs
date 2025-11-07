@@ -3,10 +3,10 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Module;
 
-    public class DamageModuleTest(float value) : IStatModule
+    public class DamageModuleTest(float value) : IParameterModule
     {
         private float _value = value;
-        public StatModule SkillType => StatModule.Damage;
+        public Parameter Parameter => Parameter.Damage;
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => _value;

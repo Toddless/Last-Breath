@@ -10,13 +10,13 @@
         private IActionModule<IEntity>? _module;
         private readonly Lazy<string> _id;
 
-        public ActionModule SkillType { get; }
+        public ActionModule Parameter { get; }
         public DecoratorPriority Priority { get; }
         public string Id => _id.Value;
 
         public ActionModuleDecorator(ActionModule type, DecoratorPriority priority)
         {
-            SkillType = type;
+            Parameter = type;
             Priority = priority;
             _id = new(CreateID);
         }
@@ -28,6 +28,6 @@
             if (target.IsAlive) _module?.PerformModuleAction(target);
         }
 
-        protected virtual string CreateID() => $"{GetType().Name}_{SkillType}_{Priority}";
+        protected virtual string CreateID() => $"{GetType().Name}_{Parameter}_{Priority}";
     }
 }

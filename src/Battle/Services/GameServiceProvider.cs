@@ -3,6 +3,7 @@ namespace Battle.Services
     using System;
     using Core.Interfaces.Data;
     using System.Collections.Generic;
+    using Core.Interfaces.Mediator;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider
@@ -10,7 +11,7 @@ namespace Battle.Services
         private readonly ServiceProvider _serviceProvider;
         public static GameServiceProvider Instance { get; } = new();
 
-        public GameServiceProvider()
+        private GameServiceProvider()
         {
             _serviceProvider = RegisterServices();
         }
@@ -21,7 +22,7 @@ namespace Battle.Services
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
-
+            services.AddSingleton<IUiMediator, UiMediator>();
             return services.BuildServiceProvider();
         }
     }

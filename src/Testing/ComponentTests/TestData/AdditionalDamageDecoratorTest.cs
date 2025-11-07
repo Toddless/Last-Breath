@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Decorator;
 
-    public class AdditionalDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(type: StatModule.Damage, priority)
+    public class AdditionalDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(parameter: Parameter.Damage, priority, "AdditioanlDamageDecorator")
     {
         private readonly float _value = value;
 

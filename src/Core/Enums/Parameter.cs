@@ -9,19 +9,19 @@
         Strength,
         CriticalChance,
         CriticalDamage,
+        BlockChance,
         AdditionalHitChance,
         Armor,
         Evade,
         Barrier,
         SpellDamage,
+        Resource,
         ResourceRecovery,
         Movespeed,
         Suppress,
         Health,
-        Resource,
+        HealthRecovery,
         MaxEvadeChance,
-        MaxCriticalChance,
-        MaxAdditionalHitChance,
         MaxReduceDamage
     }
 }

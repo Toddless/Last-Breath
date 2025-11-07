@@ -11,7 +11,7 @@
     {
         IResource Resource { get; }
         Stance StanceType { get; }
-        IModuleManager<StatModule, IStatModule, StatModuleDecorator> StatDecoratorManager { get; }
+        IModuleManager<Parameter, IParameterModule, StatModuleDecorator> StatDecoratorManager { get; }
         IModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator> ActionDecoratorManager { get; }
         IModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
         IStanceSkillComponent StanceSkillComponent { get; }

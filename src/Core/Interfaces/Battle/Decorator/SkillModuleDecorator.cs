@@ -11,7 +11,7 @@
         private ISkillModule? _module;
         private readonly Lazy<string> _id;
 
-        public SkillType SkillType { get; }
+        public SkillType Parameter { get; }
 
         public DecoratorPriority Priority { get; }
 
@@ -19,7 +19,7 @@
 
         public SkillModuleDecorator(SkillType type, DecoratorPriority priority)
         {
-            SkillType = type;
+            Parameter = type;
             Priority = priority;
             _id = new(CreateID);
         }
@@ -28,6 +28,6 @@
 
         public virtual List<ISkill> GetSkills() => _module?.GetSkills() ?? [];
 
-        protected virtual string CreateID() => $"{GetType().Name}_{SkillType}_{Priority}";
+        protected virtual string CreateID() => $"{GetType().Name}_{Parameter}_{Priority}";
     }
 }

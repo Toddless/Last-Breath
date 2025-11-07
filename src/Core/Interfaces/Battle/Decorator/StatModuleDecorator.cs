@@ -1,29 +1,18 @@
 ﻿namespace Core.Interfaces.Battle.Decorator
 {
-    using System;
     using Core.Enums;
     using Core.Interfaces.Battle.Module;
 
-    public abstract class StatModuleDecorator : IStatModule, IModuleDecorator<StatModule, IStatModule>
+    public abstract class StatModuleDecorator(Parameter parameter, DecoratorPriority priority, string id) : IParameterModule, IModuleDecorator<Parameter, IParameterModule>
     {
-        private IStatModule? _module;
-        private readonly Lazy<string> _id;
+        private IParameterModule? _module;
 
-        public StatModule SkillType { get; }
-        public DecoratorPriority Priority { get; }
-        public string Id => _id.Value;
+        public Parameter Parameter { get; } = parameter;
+        public DecoratorPriority Priority { get; } = priority;
+        public string Id { get; } = id;
 
-        public StatModuleDecorator(StatModule type, DecoratorPriority priority)
-        {
-            SkillType = type;
-            Priority = priority;
-            _id = new(CreateID);
-        }
-
-        public void ChainModule(IStatModule module) => _module = module;
+        public void ChainModule(IParameterModule module) => _module = module;
 
         public virtual float GetValue() => _module?.GetValue() ?? 0;
-
-        protected virtual string CreateID() => $"{GetType().Name}_{SkillType}_{Priority}";
     }
 }

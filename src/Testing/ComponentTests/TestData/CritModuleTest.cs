@@ -3,10 +3,10 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Module;
 
-    public class CritModuleTest : IStatModule
+    public class CritModuleTest : IParameterModule
     {
         private readonly Random _random = new();
-        public StatModule SkillType => StatModule.CritChance;
+        public Parameter Parameter => Parameter.CriticalChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 

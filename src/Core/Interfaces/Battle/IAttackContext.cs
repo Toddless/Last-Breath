@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using System;
-    using System.Collections.Generic;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
 
     public interface IAttackContext
     {

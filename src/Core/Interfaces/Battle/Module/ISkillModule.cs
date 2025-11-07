@@ -6,7 +6,7 @@
 
     public interface ISkillModule
     {
-        SkillType SkillType { get; }
+        SkillType Parameter { get; }
 
         DecoratorPriority Priority { get; }
 

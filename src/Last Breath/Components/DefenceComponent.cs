@@ -3,6 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Components;
     using Godot;
+    using Utilities;
 
     public class DefenseComponent : IDefenceComponent
     {
@@ -14,7 +15,7 @@
 
         public float Armor { get; private set; } = BaseArmor;
         public float Evade { get; private set; } = BaseEvade;
-        public float EnergyBarrier { get; private set; } = BaseEnergyBarrier;
+        public float Barrier { get; private set; } = BaseEnergyBarrier;
         public float MaxReduceDamage { get; private set; } = BaseMaxReduceDamage;
         public float MaxEvadeChance { get; private set; } = BaseMaxEvade;
 
@@ -29,7 +30,7 @@
                     Evade = Calculations.CalculateFloatValue(BaseEvade, args.Modifiers);
                     break;
                 case Parameter.Barrier:
-                    EnergyBarrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, args.Modifiers);
+                    Barrier = Calculations.CalculateFloatValue(BaseEnergyBarrier, args.Modifiers);
                     break;
                 case Parameter.MaxReduceDamage:
                     MaxReduceDamage = Calculations.CalculateFloatValue(BaseMaxReduceDamage, args.Modifiers);
@@ -44,12 +45,12 @@
 
         public float BarrierAbsorbDamage(float amount)
         {
-            if (EnergyBarrier == 0) return amount;
+            if (Barrier == 0) return amount;
 
-            float absorbed = Mathf.Min(EnergyBarrier, amount);
+            float absorbed = Mathf.Min(Barrier, amount);
 
             // TODO: Raise event
-            EnergyBarrier -= absorbed;
+            Barrier -= absorbed;
 
             return amount - absorbed;
         }

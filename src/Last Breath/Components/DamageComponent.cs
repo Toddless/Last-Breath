@@ -6,6 +6,7 @@ namespace LastBreath.Components
     using Core.Interfaces.Components;
     using Godot;
     using LastBreath.Script.Helpers;
+    using Utilities;
 
     public class DamageComponent : IDamageComponent
     {

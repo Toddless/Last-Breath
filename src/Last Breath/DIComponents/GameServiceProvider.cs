@@ -40,6 +40,7 @@
 
         private ServiceProvider RegisterServices()
         {
+            // i need to figure out how to add all services from another projects 
             var services = new ServiceCollection();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>((provider) =>
             {

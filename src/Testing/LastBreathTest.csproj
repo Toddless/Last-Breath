@@ -9,10 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SkillTests\**" />
+    <EmbeddedResource Remove="SkillTests\**" />
+    <None Remove="SkillTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Battle\Battle.csproj" />
+    <ProjectReference Include="..\Crafting\Crafting.csproj" />
     <ProjectReference Include="..\Last Breath\LastBreath.csproj" />
   </ItemGroup>
 
@@ -41,10 +49,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SkillTests\" />
   </ItemGroup>
 
 

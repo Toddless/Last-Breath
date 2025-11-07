@@ -38,8 +38,6 @@
                 Parameter.CriticalDamage => "%",
                 Parameter.AdditionalHitChance => "%",
                 Parameter.MaxEvadeChance => "%",
-                Parameter.MaxCriticalChance => "%",
-                Parameter.MaxAdditionalHitChance => "%",
                 _ => string.Empty,
             };
         }

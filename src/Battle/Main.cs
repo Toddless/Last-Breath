@@ -3,7 +3,7 @@
     using Godot;
     using System;
     using Utilities;
-    using Battle.Services;
+    using Services;
     using Core.Interfaces.Data;
 
     internal partial class Main : Node2D

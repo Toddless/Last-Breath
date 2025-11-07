@@ -1,111 +1,57 @@
 namespace Battle.Components
 {
-    using System;
-    using System.Collections.Generic;
-    using Core.Enums;
-    using Core.Interfaces.Components;
     using Godot;
+    using Source;
+    using Core.Enums;
+    using Source.Module.StatModules;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Battle.Decorator;
 
-    internal class DamageComponent : IDamageComponent
+    internal class DamageComponent : Component, IDamageComponent
     {
-        // Random range for damage
-        private const float From = 0.9f;
-        private const float To = 1.1f;
-        private float _damage, _criticalChance, _criticalDamage, _additionalHit, _maxCriticalChance = 0.75f, _maxAdditionalHitChance = 0.9f;
         private readonly RandomNumberGenerator _rnd = new();
-        // here we have base values for damage, critical strike chance and damage etc. This strategy changes if we equip a new weapon. Base strategy is "Unarmed"
-        // TODO: Rename strategy
-        private IDamageStrategy _strategy;
-        private Dictionary<Parameter, Func<float, IModifiersChangedEventArgs, float>> _overrideCalculations = [];
 
-        public event Action<Parameter, float>? PropertyValueChanges;
+        public float Damage => this[Parameter.Damage].GetValue();
+        public float CriticalChance => this[Parameter.CriticalChance].GetValue();
+        public float CriticalDamage => this[Parameter.CriticalDamage].GetValue();
+        public float AdditionalHit => this[Parameter.AdditionalHitChance].GetValue();
+        public float SpellDamage => this[Parameter.SpellDamage].GetValue();
 
-        public float Damage
+        public DamageComponent()
         {
-            get => _damage * _rnd.RandfRange(From, To);
-            private set
+            _rnd.Randomize();
+            Parameters = new()
             {
-                
-            }
+                [Parameter.Damage] = (50f, 50f),
+                [Parameter.CriticalDamage] = (0.05f, 0.05f),
+                [Parameter.CriticalChance] = (1f, 1f),
+                [Parameter.SpellDamage] = (25f, 25f),
+                [Parameter.AdditionalHitChance] = (0.05f, 0.05f),
+            };
+
+            ModuleManager = new ModuleManager<Parameter, IParameterModule, StatModuleDecorator>(
+                new Dictionary<Parameter, IParameterModule>
+                {
+                    [Parameter.Damage] = new DamageModule(() => Parameters[Parameter.Damage].Current),
+                    [Parameter.CriticalChance] =
+                        new CritChanceModule(() => Mathf.Min(1f, Parameters[Parameter.CriticalChance].Current)),
+                    [Parameter.CriticalDamage] =
+                        new CritDamageModule(() => Parameters[Parameter.CriticalDamage].Current),
+                    [Parameter.AdditionalHitChance] =
+                        new AdditionalHitChanceModule(() =>
+                            Mathf.Min(1f, Parameters[Parameter.AdditionalHitChance].Current)),
+                    [Parameter.SpellDamage] = new SpellDamageModule(() => Parameters[Parameter.SpellDamage].Current),
+                });
+
+            SetModule();
         }
 
-        public float CriticalChance
+        private void SetModule()
         {
-            get => _criticalChance;
-            private set
-            {
-               
-            }
+            foreach (var param in Parameters.Keys)
+                Stats[param] = ModuleManager.GetModule(param);
         }
-
-        public float MaxCriticalChance
-        {
-            get => _maxCriticalChance;
-            private set
-            {
-              
-            }
-        }
-
-        public float CriticalDamage
-        {
-            get => _criticalDamage;
-            private set
-            {
-              
-            }
-        }
-
-        public float AdditionalHit
-        {
-            get => _additionalHit;
-            private set
-            {
-                
-            }
-        }
-
-        public float MaxAdditionalHit
-        {
-            get => _maxAdditionalHitChance;
-            private set
-            {
-               
-            }
-        }
-
-        public DamageComponent(IDamageStrategy strategy)
-        {
-            _strategy = strategy;
-        }
-
-
-        // TODO: on change strategy i need to recalculate modifiers
-        public void ChangeStrategy(IDamageStrategy strategy)
-        {
-            _strategy = strategy;
-        }
-
-        public void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
-        {
-        }
-
-        public void AddOverrideFuncForParameter(Func<float, IModifiersChangedEventArgs, float> newFunc, Parameter parameter)
-        {
-            if (!_overrideCalculations.TryAdd(parameter, newFunc))
-            {
-                // TODO Log
-            }
-        }
-
-
-        public void RemoveOverrideFuncForParameter(Parameter parameter)
-        {
-            if (!_overrideCalculations.Remove(parameter))
-            {
-                // TODO Log
-            }
-        }
-
     }
 }

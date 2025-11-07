@@ -9,6 +9,7 @@
         IHealthComponent Health {  get; }
         IDamageComponent Damage {  get; }
         IDefenceComponent Defence {  get; }
+        IStance CurrentStance { get; }
 
         bool IsFighting { get; set; }
         bool IsAlive {  get; set; }

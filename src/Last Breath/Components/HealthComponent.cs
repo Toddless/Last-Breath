@@ -5,6 +5,7 @@
     using Core.Enums;
     using LastBreath.Script.Helpers;
     using Core.Interfaces.Components;
+    using Utilities;
 
     public class HealthComponent : IHealthComponent
     {
@@ -36,6 +37,7 @@
             private set => _maxHealth = value;
         }
 
+        public float HealthRecovery => throw new NotImplementedException();
 
         public HealthComponent()
         {

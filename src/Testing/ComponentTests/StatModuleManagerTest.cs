@@ -1,9 +1,9 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
+    using Battle.Source;
     using Core.Enums;
     using Core.Interfaces.Battle.Decorator;
     using Core.Interfaces.Battle.Module;
-    using LastBreath.Components;
     using LastBreathTest.ComponentTests.TestData;
 
     [TestClass]
@@ -12,9 +12,9 @@
         private const float BaseValue = 10;
 
         [TestMethod]
-        [DataRow(StatModule.Damage)]
-        [DataRow(StatModule.CritChance)]
-        public void BaseModulesInitialized_Test(StatModule key)
+        [DataRow(Parameter.Damage)]
+        [DataRow(Parameter.CriticalChance)]
+        public void BaseModulesInitialized_Test(Parameter key)
         {
             var manager = CreateManager();
             var module = manager.GetModule(key);
@@ -25,7 +25,7 @@
         public void AvgCritChanceBiggerWithLuckyDecorator_Test()
         {
             var manager = CreateManager();
-            var critModuleWithoutDecorator = manager.GetModule(StatModule.CritChance);
+            var critModuleWithoutDecorator = manager.GetModule(Parameter.CriticalChance);
             float avgCrit = 0;
 
             for (int i = 0; i < 10; i++)
@@ -37,7 +37,7 @@
             var critDecorator = new LuckyCritDecoratorTest(DecoratorPriority.Weak);
             manager.AddDecorator(critDecorator);
 
-            var moduleWithDecorator = manager.GetModule(StatModule.CritChance);
+            var moduleWithDecorator = manager.GetModule(Parameter.CriticalChance);
 
             float avgWithDecorator = 0;
             for (int i = 0; i < 10; i++)
@@ -65,7 +65,7 @@
             manager.AddDecorator(weakIncDecorator);
             manager.AddDecorator(strongIncDecorator);
 
-            var moduleWithDecorators = manager.GetModule(StatModule.Damage);
+            var moduleWithDecorators = manager.GetModule(Parameter.Damage);
             var value = moduleWithDecorators.GetValue();
 
             Assert.IsTrue(value > 54);
@@ -83,9 +83,9 @@
 
             var secondDecorator = new AdditionalDamageDecoratorTest(DecoratorPriority.Strong, 25);
             manager.ModuleDecoratorChanges += OnModuleChanges;
-            manager.RemoveDecorator(secondDecorator);
+            manager.RemoveDecorator(secondDecorator.Id, secondDecorator.Parameter);
 
-            void OnModuleChanges(StatModule stat, IStatModule module)
+            void OnModuleChanges(Parameter stat, IParameterModule module)
             {
                 activated = true;
             }
@@ -93,10 +93,10 @@
             Assert.IsFalse(activated);
         }
 
-        private ModuleManager<StatModule, IStatModule, StatModuleDecorator> CreateManager() => new(new Dictionary<StatModule, IStatModule>
+        private ModuleManager<Parameter, IParameterModule, StatModuleDecorator> CreateManager() => new(new Dictionary<Parameter, IParameterModule>
         {
-            [StatModule.Damage] = new DamageModuleTest(BaseValue),
-            [StatModule.CritChance] = new CritModuleTest()
+            [Parameter.Damage] = new DamageModuleTest(BaseValue),
+            [Parameter.CriticalChance] = new CritModuleTest()
         });
     }
 }

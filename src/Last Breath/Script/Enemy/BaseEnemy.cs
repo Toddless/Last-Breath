@@ -288,7 +288,6 @@ namespace LastBreath
         private void SetEvents()
         {
             _area!.BodyEntered += PlayerEntered;
-            Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Health.EntityDead += OnEntityDead;
