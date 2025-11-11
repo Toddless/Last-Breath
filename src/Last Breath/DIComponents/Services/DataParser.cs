@@ -19,6 +19,7 @@
     public class DataParser
     {
         private static readonly string s_assetsPath = "res://Assets/Items/";
+
         private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
         {
             ["flat"] = ModifierType.Flat,
@@ -33,10 +34,7 @@
 
         private static readonly JsonSerializerSettings s_settings = new()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            }
+            ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
         };
 
         public static async Task<List<IItem>> ParseResources(string json)
@@ -140,6 +138,7 @@
                 {
                     modifierType = default;
                 }
+
                 ParseEnum<Parameter>(baseMod.Parameter, out var parameter);
                 modifiersList.Add(new Modifier(modifierType, parameter, baseMod.Value));
             }
@@ -147,7 +146,8 @@
             return Task.FromResult(modifiersList);
         }
 
-        private static List<IItem> LoadUpgradeResources(Dictionary<string, IMaterialCategory> categories, List<UpgradeResourceData> upgradeResourceDatas)
+        private static List<IItem> LoadUpgradeResources(Dictionary<string, IMaterialCategory> categories,
+            List<UpgradeResourceData> upgradeResourceDatas)
         {
             var items = new List<IItem>();
             foreach (var upgradeData in upgradeResourceDatas)
@@ -165,10 +165,12 @@
 
                 items.Add(upgrade);
             }
+
             return items;
         }
 
-        private static List<IItem> LoadCraftingResources(Dictionary<string, IMaterialCategory> categories, List<CraftingResourceData> resourceDatas)
+        private static List<IItem> LoadCraftingResources(Dictionary<string, IMaterialCategory> categories,
+            List<CraftingResourceData> resourceDatas)
         {
             var items = new List<IItem>();
             foreach (var craftingData in resourceDatas)
@@ -179,6 +181,7 @@
                     Tracker.TrackError("Category not found");
                     continue;
                 }
+
                 var materialModifiers = new List<IMaterialModifier>();
 
                 foreach (var modifierData in materialData.Modifiers)
@@ -188,7 +191,9 @@
                     {
                         modifierType = default;
                     }
-                    var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
+
+                    var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue,
+                        modifierData.Weight);
                     materialModifiers.Add(modifier);
                 }
 
@@ -219,7 +224,9 @@
                 {
                     modifierType = default;
                 }
-                var modifier = new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
+
+                var modifier =
+                    new MaterialModifier(parameter, modifierType, modifierData.BaseValue, modifierData.Weight);
                 modifiers.Add(modifier);
             }
 
@@ -227,21 +234,64 @@
         }
 
         private static bool ParseEnum<TEnum>(string enumAsString, out TEnum result)
-         where TEnum : struct => Enum.TryParse(enumAsString, true, out result);
+            where TEnum : struct => Enum.TryParse(enumAsString, true, out result);
 
-        private record ResourcesData(List<MaterialCategoryData> MaterialCategories, List<UpgradeResourceData> UpgradeResources, List<CraftingResourceData> CraftingResources);
-        private record CraftingResourceData(string Id, MaterialData Material, int MaxStackSize, string[] Tags, string Icon, string Rarity);
-        private record UpgradeResourceData(string Id, string[] Tags, string Rarity, string Category, string Icon, int MaxStackSize);
+        private record ResourcesData(
+            List<MaterialCategoryData> MaterialCategories,
+            List<UpgradeResourceData> UpgradeResources,
+            List<CraftingResourceData> CraftingResources);
+
+        private record CraftingResourceData(
+            string Id,
+            MaterialData Material,
+            int MaxStackSize,
+            string[] Tags,
+            string Icon,
+            string Rarity);
+
+        private record UpgradeResourceData(
+            string Id,
+            string[] Tags,
+            string Rarity,
+            string Category,
+            string Icon,
+            int MaxStackSize);
+
         private record MaterialModifierData(string Parameter, string ModifierType, float BaseValue, int Weight);
+
         private record MaterialData(string Id, string CategoryId, List<MaterialModifierData> Modifiers);
+
         private record MaterialCategoryData(string Id, List<MaterialModifierData> Modifiers);
+
         private record ResourceRequirementData(string Type, string ResourceId, int Amount);
-        private record CraftingRecipeData(string Id, string ResultItemid, string[] Tags, string Icon, string Rarity, bool IsOpened, List<ResourceRequirementData> MainResources);
+
+        private record CraftingRecipeData(
+            string Id,
+            string ResultItemid,
+            string[] Tags,
+            string Icon,
+            string Rarity,
+            bool IsOpened,
+            List<ResourceRequirementData> MainResources);
+
         private record RecipeData(List<CraftingRecipeData> CraftingRecipes);
 
         private record EquipItemDataList(List<EquipItemData> Items);
-        private record EquipItemData(string Id, string EquipmentPart, int MaxStackSize, string Icon, string Rarity, string[] Tags, string AttributeType, string Skill, int UpdateLevel, int MaxUpdateLevel, List<ItemModifier> BaseModifiers, List<ItemModifier> AdditionalModifiers);
-        private record ItemModifier(string Parameter, string ModifierType, float Value);
 
+        private record EquipItemData(
+            string Id,
+            string EquipmentPart,
+            int MaxStackSize,
+            string Icon,
+            string Rarity,
+            string[] Tags,
+            string AttributeType,
+            string Skill,
+            int UpdateLevel,
+            int MaxUpdateLevel,
+            List<ItemModifier> BaseModifiers,
+            List<ItemModifier> AdditionalModifiers);
+
+        private record ItemModifier(string Parameter, string ModifierType, float Value);
     }
 }

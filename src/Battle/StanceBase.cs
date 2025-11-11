@@ -43,6 +43,7 @@
                     FlushQueue();
             }
         }
+
         protected int PendingAttacks
         {
             get => _pendingAttacks;
@@ -59,20 +60,24 @@
             protected set => _skillComponent = value;
         }
 
-        public IResource Resource { get; }
+        public IResource Resource { get; } = new ManaResource();
 
         public IModuleManager<Parameter, IParameterModule, StatModuleDecorator> StatDecoratorManager { get; }
-        public IModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator> ActionDecoratorManager { get; }
+
+        public IModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator> ActionDecoratorManager
+        {
+            get;
+        }
+
         public IModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
 
         public Stance StanceType { get; }
 
         public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
 
-        protected StanceBase(IEntity owner, IResource resource, IStanceActivationEffect effect, Stance stanceType)
+        protected StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType)
         {
             Owner = owner;
-            Resource = resource;
             ActivationEffect = effect;
             StanceType = stanceType;
             // TODO: Rework this part later.
@@ -88,20 +93,22 @@
             //    [Parameter.CriticalDamage] = new CritDamageModule(),
             //});
 
-            ActionDecoratorManager = new ModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator>(new Dictionary<ActionModule, IActionModule<IEntity>>
-            {
-                [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
-                [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
-                [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
-            });
+            ActionDecoratorManager = new ModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator>(
+                new Dictionary<ActionModule, IActionModule<IEntity>>
+                {
+                    [ActionModule.EvadeAction] = new HandleAttackEvadeModule(Owner),
+                    [ActionModule.SucceedAction] = new HandleAttackSucceedModule(Owner),
+                    [ActionModule.BlockAction] = new HandleAttackBlockedModule(Owner),
+                });
 
-            SkillDecoratorManager = new ModuleManager<SkillType, ISkillModule, SkillModuleDecorator>(new Dictionary<SkillType, ISkillModule>
-            {
-                [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
-                [SkillType.OnAttack] = new OnAttackSkillModule(Owner),
-                [SkillType.AlwaysActive] = new AlwaysActiveSkillModule(Owner),
-                [SkillType.GettingAttack] = new GettingAttackSkillModule(Owner),
-            });
+            SkillDecoratorManager = new ModuleManager<SkillType, ISkillModule, SkillModuleDecorator>(
+                new Dictionary<SkillType, ISkillModule>
+                {
+                    [SkillType.PreAttack] = new PreAttackSkillModule(Owner),
+                    [SkillType.OnAttack] = new OnAttackSkillModule(Owner),
+                    [SkillType.AlwaysActive] = new AlwaysActiveSkillModule(Owner),
+                    [SkillType.GettingAttack] = new GettingAttackSkillModule(Owner),
+                });
             SetModules();
         }
 
@@ -139,7 +146,6 @@
             // I need the result to decide what to do next
             context.OnAttackResult += OnAttackResult;
             context.OnAttackCanceled += OnAttackCanceled;
-            CombatScheduler.Instance?.Schedule(context);
         }
 
         public virtual void OnReceiveAttack(IAttackContext context)
@@ -170,7 +176,8 @@
             Owner.TakeDamage(context.FinalDamage, context.IsCritical);
 
             HandleOnAttackSkills(context.PassiveSkills);
-            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Succeed, context));
+            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Succeed,
+                context));
             CanProceed = true;
         }
 
@@ -189,18 +196,14 @@
         protected void ApplyPreAttackSkills(IAttackContext context)
         {
             var skills = this[SkillType.PreAttack].GetSkills();
-
-
         }
 
         protected virtual void HandleOnAttackSkills(List<ISkill> passiveSkills)
         {
-
         }
 
         protected virtual void HandleOnGettingAttackSkills(List<ISkill> passiveSkills)
         {
-
         }
 
         protected virtual void SubscribeEvents()
@@ -214,12 +217,15 @@
         }
 
         protected bool IsCrit() => this[Parameter.CriticalChance].GetValue() <= Owner.Damage.CriticalChance;
-        protected bool IsEvade() => Mathf.Min(this[Parameter.MaxEvadeChance].GetValue(), Owner.Defence.MaxEvadeChance) <= Owner.Defence.Evade;
+
+        protected bool IsEvade() =>
+            Mathf.Min(this[Parameter.MaxEvadeChance].GetValue(), Owner.Defence.MaxEvadeChance) <= Owner.Defence.Evade;
 
         private void HandleEvadeReceivedAttack(IAttackContext context)
         {
             Owner.OnEvadeAttack();
-            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Evaded, context));
+            context.SetAttackResult(new AttackResult(this[SkillType.GettingAttack].GetSkills(), AttackResults.Evaded,
+                context));
         }
 
         private void CheckIfAllAttacksHandled()
@@ -284,15 +290,21 @@
             }
         }
 
-        private void OnStatModuleDecoratorChanges(Parameter parameter, IParameterModule module) => _statModules[parameter] = module;
-        private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<IEntity> module) => _characterActionModules[type] = module;
+        private void OnStatModuleDecoratorChanges(Parameter parameter, IParameterModule module) =>
+            _statModules[parameter] = module;
+
+        private void OnCharacterActionModuleDecoratorChanges(ActionModule type, IActionModule<IEntity> module) =>
+            _characterActionModules[type] = module;
+
         private void OnSkillModuleDecoratorChanges(SkillType type, ISkillModule module) => _skillModules[type] = module;
         private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
         private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
+
         private void SetModules()
         {
             _statModules = Enum.GetValues<Parameter>().ToDictionary(param => param, StatDecoratorManager.GetModule);
-            _characterActionModules = Enum.GetValues<ActionModule>().ToDictionary(param => param, ActionDecoratorManager.GetModule);
+            _characterActionModules = Enum.GetValues<ActionModule>()
+                .ToDictionary(param => param, ActionDecoratorManager.GetModule);
             _skillModules = Enum.GetValues<SkillType>().ToDictionary(param => param, SkillDecoratorManager.GetModule);
         }
     }

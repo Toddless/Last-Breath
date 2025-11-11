@@ -12,7 +12,7 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces.Mediator.Events;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator.Requests;
 
     [GlobalClass]
@@ -23,10 +23,10 @@
         [Export] private RecipeTree? _recipeTree;
 
         private IItemDataProvider? _dataProvider;
-        private IUiMediator? _uiMediator;
-        private ISystemMediator? _systemMediator;
+        private IMediator? _mediator;
 
-        [Signal] public delegate void RecipeSelectedEventHandler(string id);
+        [Signal]
+        public delegate void RecipeSelectedEventHandler(string id);
 
         public override void _Ready()
         {
@@ -35,24 +35,24 @@
                 _recipeTree.LeftClick += OnLeftClick;
                 _recipeTree.RightClick += OnRightClick;
             }
+
             CreateRecipeTree(_dataProvider?.GetCraftingRecipes() ?? []);
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _uiMediator = provider.GetService<IUiMediator>();
-            _systemMediator = provider.GetService<ISystemMediator>();
+            _mediator = provider.GetService<IMediator>();
         }
 
         public override void _EnterTree()
         {
-            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateRecipeTree;
+            if (_mediator != null) _mediator.UpdateUi += UpdateRecipeTree;
         }
 
         public override void _ExitTree()
         {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateRecipeTree;
+            if (_mediator != null) _mediator.UpdateUi -= UpdateRecipeTree;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -64,6 +64,7 @@
                 Tracker.TrackNull(nameof(_recipeTree), this);
                 return;
             }
+
             _recipeTree.Clear();
             _categories.Clear();
 
@@ -79,7 +80,8 @@
 
             foreach (var recipe in recipes)
             {
-                var category = _categories.Keys.FirstOrDefault(category => recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
+                var category = _categories.Keys.FirstOrDefault(category =>
+                    recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
                 var treeItem = _recipeTree.CreateItem(_categories[category]);
                 var amount = await CalculateAmountToCraft(recipe.MainResource);
                 var recipeName = $"{Localizator.Localize(recipe.Id)}";
@@ -93,15 +95,18 @@
 
         private async void OnRightClick(string id, TreeItem treeItem)
         {
-            ArgumentNullException.ThrowIfNull(_systemMediator);
+            ArgumentNullException.ThrowIfNull(_mediator);
 
             var requirements = _dataProvider?.GetRecipeRequirements(id) ?? [];
             var amount = await CalculateAmountToCraft(requirements);
             if (amount > 1)
             {
-                var item = await _systemMediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id, requirements.ToDictionary(key => key.ResourceId, value => value.Amount)));
+                var item = await _mediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id,
+                    requirements.ToDictionary(key => key.ResourceId, value => value.Amount)));
                 if (item != null)
-                    _uiMediator?.Publish(new ItemCreatedEvent(item));
+                {
+                    _mediator?.PublishAsync(new ItemCreatedEvent(item));
+                }
             }
         }
 
@@ -109,9 +114,11 @@
 
         private async Task<int> CalculateAmountToCraft(IEnumerable<IResourceRequirement> requirements)
         {
-            ArgumentNullException.ThrowIfNull(_systemMediator);
+            ArgumentNullException.ThrowIfNull(_mediator);
             int canCraft = int.MaxValue;
-            var itemsInInventory = await _systemMediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(requirements.Select(x => x.ResourceId)));
+            var itemsInInventory =
+                await _mediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
+                    new(requirements.Select(x => x.ResourceId)));
             foreach (var requirement in requirements)
             {
                 if (itemsInInventory.TryGetValue(requirement.ResourceId, out var have))
@@ -120,6 +127,7 @@
                     canCraft = Mathf.Min(canCraft, amountToCraft);
                 }
             }
+
             return canCraft;
         }
 

@@ -17,6 +17,7 @@
         event Action? TurnStart, TurnEnd;
         event Action<IAttackContext>? BeforeAttack, AfterAttack;
         event Action<IOnGettingAttackEventArgs>? GettingAttack;
+        event Action<IFightable> Dead;
 
         void OnTurnEnd();
         void OnTurnStart();

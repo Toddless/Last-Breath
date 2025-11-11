@@ -11,7 +11,7 @@
         float HealthRecovery { get; }
 
         event Action<float>? CurrentHealthChanged;
-        event Action? EntityDead;
+        event Action? NoMoreHealth;
         event Action<Parameter, float> ParameterChanged;
 
         void RemoveModuleDecorator(string id, Parameter key);

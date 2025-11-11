@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using LastBreath.Components.Interfaces;
     using LastBreath.Script.Helpers;
 
@@ -36,18 +37,8 @@
         public List<AttributeModifier> AttributeModifiers()
         {
             List<AttributeModifier> modifiers = [];
+            modifiers.AddRange(_effects.Select(effect => new AttributeModifier(effect.Parameter, (BaseValue + _investedPoints) * effect.ValuePerPoint, effect.ModifierType, this, effect.Priority)));
 
-            foreach (var effect in _effects)
-            {
-                var modifier = new AttributeModifier(
-                    effect.TargetParameter,
-                    (BaseValue + _investedPoints) * effect.ValuePerPoint,
-                    effect.ModifierType,
-                    this,
-                    effect.Priority);
-
-                modifiers.Add(modifier);
-            }
             return modifiers;
         }
     }

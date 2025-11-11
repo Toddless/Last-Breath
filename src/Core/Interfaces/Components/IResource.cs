@@ -5,7 +5,6 @@
 
     public interface IResource
     {
-        ResourceType ResourceType { get; }
         float Current { get; }
         float MaximumAmount { get; }
         float RecoveryAmount { get; }

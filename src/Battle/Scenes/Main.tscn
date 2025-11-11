@@ -1,13 +1,13 @@
 [gd_scene load_steps=4 format=3 uid="uid://dj86l1gr2ffle"]
 
-[ext_resource type="Script" uid="uid://ca5gpxs6eux12" path="res://Main.cs" id="1_idj7w"]
+[ext_resource type="Script" uid="uid://bkjhhot1r0eiy" path="res://Main.cs" id="1_idj7w"]
 [ext_resource type="PackedScene" uid="uid://okfegogbrc05" path="res://Scenes/MainWorld.tscn" id="1_r150o"]
-[ext_resource type="Script" uid="uid://bgcok43tokjli" path="res://UILayerManager.cs" id="3_kln2b"]
+[ext_resource type="Script" uid="uid://dvgyct0lq236k" path="res://UILayerManager.cs" id="3_kln2b"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_uiLayerManager")]
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_layerManager")]
 script = ExtResource("1_idj7w")
 _mainWorld = NodePath("MainWorld")
-_uiLayerManager = NodePath("UILayerManager")
+_layerManager = NodePath("UILayerManager")
 
 [node name="MainWorld" parent="." instance=ExtResource("1_r150o")]
 

@@ -5,16 +5,9 @@
 
     public class CombatScheduler
     {
-        private readonly LinkedList<AttackContext> _attackQueue = new();
-        private bool _inProcess = false, _isCancelled = false;
+        private readonly LinkedList<AttackContext> _attackQueue = [];
+        private bool _inProcess, _isCancelled;
         public event Action? AllContextsHandled;
-
-        public static CombatScheduler? Instance { get; private set; }
-
-        public CombatScheduler()
-        {
-            Instance = this;
-        }
 
         public void Schedule(AttackContext context)
         {
@@ -38,12 +31,6 @@
             CheckQueueLeft();
         }
 
-        private void CheckQueueLeft()
-        {
-            if (_attackQueue.Count == 0)
-                AllContextsHandled?.Invoke();
-        }
-
         public void CancelQueue()
         {
             _isCancelled = true;
@@ -56,6 +43,12 @@
             }
             _isCancelled = false;
             CheckQueueLeft();
+        }
+
+        private void CheckQueueLeft()
+        {
+            if (_attackQueue.Count == 0)
+                AllContextsHandled?.Invoke();
         }
     }
 }

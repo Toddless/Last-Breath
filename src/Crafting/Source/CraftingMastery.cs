@@ -6,8 +6,8 @@
     using System.Linq;
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
-    using Core.Interfaces.Mediator.Events;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Events;
 
     public class CraftingMastery : ICraftingMastery
     {
@@ -37,7 +37,7 @@
         // --------------------------------------------------------
 
 
-        private readonly IUiMediator _uiMediator;
+        private readonly IMediator _mediator;
 
         public int CurrentExp { get; private set; } = 0;
 
@@ -62,9 +62,9 @@
 
         public event Action<int>? ExpirienceChange, BonusLevelChange;
 
-        public CraftingMastery(IUiMediator uiMediator, RandomNumberGenerator rnd)
+        public CraftingMastery(IMediator mediator, RandomNumberGenerator rnd)
         {
-            _uiMediator = uiMediator;
+            _mediator = mediator;
             _rnd = rnd;
         }
 
@@ -137,7 +137,8 @@
                 {
                     CurrentExp -= need;
                     _currentLevel++;
-                    _uiMediator.Publish(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    // EventBus
+                   // _mediator.Publish(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;

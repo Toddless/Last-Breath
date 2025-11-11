@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=4 uid="uid://okfegogbrc05"]
+[gd_scene load_steps=7 format=4 uid="uid://okfegogbrc05"]
 
 [ext_resource type="Texture2D" uid="uid://c1hk2jlm14dwv" path="res://MainLev.png" id="1_7pr73"]
 [ext_resource type="Script" uid="uid://ccshsn5f3682j" path="res://MainWorld.cs" id="1_j7nbv"]
 [ext_resource type="PackedScene" uid="uid://drn73rfisnx5g" path="res://Scenes/Player.tscn" id="2_n3iha"]
+[ext_resource type="PackedScene" uid="uid://bssmtdwwycbpt" path="res://Scenes/Enemy.tscn" id="4_e7o1y"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n3iha"]
 texture = ExtResource("1_7pr73")
@@ -7438,3 +7439,16 @@ tile_map_data = PackedByteArray("AAAAAAAAAAAhADIAAAAAAAEAAAAhADMAAAAAAAIAAAAhADQ
 tile_set = SubResource("TileSet_j7nbv")
 
 [node name="Player" parent="." instance=ExtResource("2_n3iha")]
+position = Vector2(61, 118)
+
+[node name="Enemy" parent="." instance=ExtResource("4_e7o1y")]
+position = Vector2(430, 104)
+
+[node name="Enemy2" parent="." instance=ExtResource("4_e7o1y")]
+position = Vector2(212, 275)
+
+[node name="Enemy3" parent="." instance=ExtResource("4_e7o1y")]
+position = Vector2(230, 117)
+
+[node name="Enemy4" parent="." instance=ExtResource("4_e7o1y")]
+position = Vector2(514, 220)

@@ -15,7 +15,7 @@
         private float _currentHealth;
 
         public event Action<float>? CurrentHealthChanged;
-        public event Action? EntityDead;
+        public event Action? NoMoreHealth;
 
         public float MaxHealth => this[Parameter.Health].GetValue();
         public float HealthRecovery => this[Parameter.HealthRecovery].GetValue();
@@ -30,7 +30,7 @@
                 _currentHealth = clamped;
                 CurrentHealthChanged?.Invoke(_currentHealth);
                 if (_currentHealth <= 0f)
-                    EntityDead?.Invoke();
+                    NoMoreHealth?.Invoke();
             }
         }
 

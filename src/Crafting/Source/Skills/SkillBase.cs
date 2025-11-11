@@ -1,12 +1,12 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source.Skills
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
     using System.Linq;
-    using Core.Interfaces.Skills;
+    using Core.Enums;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Skills;
+    using Godot;
+    using Utilities;
 
     public abstract partial class SkillBase : Resource, ISkill
     {

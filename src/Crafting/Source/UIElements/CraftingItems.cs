@@ -14,7 +14,7 @@
     public partial class CraftingItems : Control, IInitializable, IClosable, IRequireServices
     {
         private const string UID = "uid://dot5loe7a27rt";
-        private TaskCompletionSource<IEnumerable<string>>? _selectedTcs;
+        private TaskCompletionSource<IEnumerable<string>>? _selectedItems;
         [Export] private ItemList? _items;
         [Export] private Button? _add, _cancel;
         private Dictionary<int, string> _resources = [];
@@ -43,7 +43,7 @@
         {
             // TODO: I need not only Essences.
             var inventoryItems = _inventory?.GetAllItemIdsWithTag("Essence");
-            foreach (var res in inventoryItems ?? [])
+            foreach (string res in inventoryItems ?? [])
                 AddItem(res);
 
             UpdateDisabled(disabledResources);
@@ -51,53 +51,45 @@
 
         public Task<IEnumerable<string>> WaitForSelectionAsync()
         {
-            _selectedTcs = new TaskCompletionSource<IEnumerable<string>>();
+            _selectedItems = new TaskCompletionSource<IEnumerable<string>>();
 
-            return _selectedTcs.Task;
+            return _selectedItems.Task;
         }
 
 
         private void OnCancelPressed()
         {
-            _selectedTcs?.TrySetResult([]);
+            _selectedItems?.TrySetResult([]);
             Close?.Invoke();
         }
 
         private void OnAddPressed()
         {
-            _selectedTcs?.TrySetResult(GetSelectedIds());
+            _selectedItems?.TrySetResult(GetSelectedIds());
             Close?.Invoke();
         }
 
         private void AddItem(string resourceId, bool selectable = true)
         {
-            if (_items != null)
-            {
-                var displayName = Localizator.Localize(resourceId);
-                var id = _items.AddItem(displayName, _itemDataProvider?.GetItemIcon(resourceId), selectable);
-                _resources.Add(id, resourceId);
-            }
+            if (_items == null) return;
+
+            string displayName = Localizator.Localize(resourceId);
+            int id = _items.AddItem(displayName, _itemDataProvider?.GetItemIcon(resourceId), selectable);
+            _resources.Add(id, resourceId);
         }
 
         private IEnumerable<string> GetSelectedIds()
         {
             List<string> result = [];
-            var selected = _items?.GetSelectedItems() ?? [];
-            for (int i = 0; i < selected.Length; i++)
-            {
-                result.Add(_resources[selected[i]]);
-            }
-
+            int[] selected = _items?.GetSelectedItems() ?? [];
+            result.AddRange(selected.Select(t => _resources[t]));
             return result;
         }
 
         private void UpdateDisabled(IEnumerable<string> disabled)
         {
-            foreach (var res in _resources)
-            {
-                if (disabled.Contains(res.Value))
-                    _items?.SetItemDisabled(res.Key, true);
-            }
+            foreach (var res in _resources.Where(res => disabled.Contains(res.Value)))
+                _items?.SetItemDisabled(res.Key, true);
         }
     }
 }

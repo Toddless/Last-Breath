@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://j6cqo6u0s83x"]
+[gd_scene load_steps=17 format=3 uid="uid://j6cqo6u0s83x"]
 
 [ext_resource type="Script" uid="uid://snamp6anmfft" path="res://Script/UI/View/BattleHUD.cs" id="1_mkgrk"]
 [ext_resource type="Texture2D" uid="uid://cswi8r0ktyxvx" path="res://Assets/graveBackground.png" id="2_y6srj"]
@@ -8,7 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://wrycjitbr00h" path="res://Assets/Mana.bmp" id="6_qn343"]
 [ext_resource type="Texture2D" uid="uid://dw4nn6k6cfbap" path="res://Assets/Combo.bmp" id="7_amp0p"]
 [ext_resource type="Texture2D" uid="uid://b02h28hf5wiqv" path="res://Assets/Fury.bmp" id="8_te0gi"]
-[ext_resource type="FontFile" uid="uid://dptlkk4cibfwp" path="res://Assets/UI MMORPG Dark Templar/Fonts/Berry Rotunda.ttf" id="9_hemsg"]
 [ext_resource type="Script" uid="uid://du3w1tmvgffcx" path="res://Script/UI/AbilityButtons.cs" id="10_w4upr"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nwaqx"]
@@ -173,7 +172,6 @@ columns = 11
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("9_hemsg")
 theme_override_font_sizes/font_size = 16
 text = "Escape"
 

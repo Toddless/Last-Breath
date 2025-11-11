@@ -9,8 +9,22 @@
 
     public class BattleHandler
     {
-        private enum State { AwaitingBattleToStart, TurnStartPhase, AttackingPhase, TurnEndPhase, TurnTransitionPhase, EndBattle }
-        private enum Trigger { AwaitForBattle, NextPhase, EndBattle }
+        private enum State
+        {
+            AwaitingBattleToStart,
+            TurnStartPhase,
+            AttackingPhase,
+            TurnEndPhase,
+            TurnTransitionPhase,
+            EndBattle
+        }
+
+        private enum Trigger
+        {
+            AwaitForBattle,
+            NextPhase,
+            EndBattle
+        }
 
         private readonly StateMachine<State, Trigger> _machine = new(State.AwaitingBattleToStart);
         private StateMachine<State, Trigger>.TriggerWithParameters<BattleResults>? _battleEnds;
@@ -62,7 +76,7 @@
 
         public void PlayerFailToEscapeBattle()
         {
-          // if (_currentAttacking is Player p && _machine.State == State.TurnStartPhase) NextPhase();
+            // if (_currentAttacking is Player p && _machine.State == State.TurnStartPhase) NextPhase();
         }
 
         public Type? GetTypeOfCurrentAttacker() => _currentAttacking?.GetType();
@@ -79,6 +93,7 @@
 
                 fighter.Dead -= OnFighterDeath;
             }
+
             _attackQueue.Clear();
             _fighters.Clear();
             _currentAttacking = null;
@@ -88,7 +103,7 @@
 
         private void PerformTurnTransition()
         {
-            // Set current character at the end of an queue, if he still alive
+            // Set current character at the end of a queue, if he still alive
             SetCurrentAttackerToEndOfQueue();
             SetNextFighter();
             NextPhase();
@@ -96,7 +111,7 @@
 
         private void SetCurrentAttackerToEndOfQueue()
         {
-            if (_currentAttacking != null && _currentAttacking.IsAlive)
+            if (_currentAttacking is { IsAlive: true })
                 _attackQueue.Enqueue(_currentAttacking);
         }
 
@@ -112,7 +127,8 @@
                     return;
                 }
             }
-            // no characters allive except one => battle ends (but probably we should end the battle way ealier)
+
+            // no characters alive except one => battle ends (but probably we should end the battle way earlier)
             CheckIfBattleShouldEnd();
         }
 
@@ -122,7 +138,7 @@
         }
 
 
-        // i cant delete character from attack queue on death (Queue<T> has no methods for this), so i made this workaround
+        // I cant delete character from attack queue on death (Queue<T> has no methods for this), so I made this workaround
         private void OnFighterDeath(IEntity character)
         {
             CheckIfBattleShouldEnd();
@@ -151,7 +167,7 @@
         {
             BattleEnd?.Invoke(results);
             _machine.Fire(Trigger.AwaitForBattle);
-           // UIEventBus.NextTurnPhase -= NextPhase;
+            // UIEventBus.NextTurnPhase -= NextPhase;
         }
 
         private void OnAllContextsHandled() => NextPhase();
@@ -161,7 +177,7 @@
             _battleEnds = _machine.SetTriggerParameters<BattleResults>(Trigger.EndBattle);
 
             _machine.Configure(State.AwaitingBattleToStart)
-                .OnExit(()=> GD.Print($"Leaving state: {_machine.State}"))
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
                 .Permit(Trigger.NextPhase, State.TurnStartPhase);
 
             _machine.Configure(State.TurnStartPhase)
@@ -190,10 +206,10 @@
 
 
             _machine.Configure(State.TurnEndPhase)
-                 .OnEntry(TurnEnds)
-                 .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
-                 .Permit(Trigger.EndBattle, State.EndBattle)
-                 .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
+                .OnEntry(TurnEnds)
+                .OnExit(() => GD.Print($"Leaving state: {_machine.State}"))
+                .Permit(Trigger.EndBattle, State.EndBattle)
+                .Permit(Trigger.NextPhase, State.TurnTransitionPhase);
 
             _machine.Configure(State.TurnTransitionPhase)
                 .OnEntry(PerformTurnTransition)

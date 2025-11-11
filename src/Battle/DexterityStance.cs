@@ -3,13 +3,9 @@
     using Core.Enums;
     using Core.Interfaces.Entity;
 
-    public class DexterityStance : StanceBase
+    public class DexterityStance(IEntity owner)
+        : StanceBase(owner, effect: new StanceActivationEffect(), Stance.Dexterity)
     {
-        public DexterityStance(IEntity owner) : base(owner, new ComboPoints(), effect: new StanceActivationEffect(), Stance.Dexterity)
-        {
-           // StanceSkillComponent = new StanceSkillComponent(this);
-        }
-
         public override void OnActivate()
         {
             base.OnActivate();

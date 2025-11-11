@@ -1,8 +1,8 @@
-﻿namespace Crafting.TestResources.Skills
+﻿namespace Crafting.Source.Skills
 {
+    using Core.Interfaces.Entity;
     using Godot;
     using Utilities;
-    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]

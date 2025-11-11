@@ -1,4 +1,4 @@
-﻿namespace Crafting.TestResources.Skills
+﻿namespace Crafting.Source.Skills
 {
     using Core.Interfaces.Entity;
     using Godot;
