@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Battle.Decorator
 {
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Battle.Module;
-    using Core.Interfaces.Entity;
+    using Enums;
+    using Module;
+    using Entity;
 
     public abstract class ActionModuleDecorator : IActionModule<IEntity>, IModuleDecorator<ActionModule, IActionModule<IEntity>>
     {

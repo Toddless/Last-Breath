@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Skills
 {
-    using Core.Enums;
-    using Core.Interfaces.Entity;
+    using Enums;
+    using Entity;
 
     public interface ISkill : IIdentifiable, IDisplayable
     {

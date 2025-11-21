@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Decorator;
 
-    public class IncreaseDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(parameter: Parameter.Damage, priority, "IncreaseDamageDecorator")
+    public class IncreaseDamageDecoratorTest(DecoratorPriority priority, float value) : StatModuleDecorator(abilityParameter: EntityParameter.Damage, priority, "IncreaseDamageDecorator")
     {
         private float _value = value;
         public override float GetValue() => base.GetValue() * _value;

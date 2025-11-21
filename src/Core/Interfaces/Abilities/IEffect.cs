@@ -1,21 +1,21 @@
 ﻿namespace Core.Interfaces.Abilities
 {
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Entity;
+    using Enums;
+    using Entity;
 
     public interface IEffect
     {
-        Effects Effect { get; }
-        IModifierInstance? Modifier { get; }
+        string Id { get; set; }
+        StatusEffects StatusEffect { get; set; }
         int Duration { get; set; }
         int Stacks { get; set; }
         bool Permanent { get; }
         bool Expired { get; }
 
-        void OnApply(IEntity character);
-        void OnTick(IEntity character);
-        void OnRemove(IEntity character);
+        void OnApply(IEntity target, IEntity source, AbilityContext context);
+        void OnTick(IEntity target);
+        void OnRemove(IEntity target);
         void OnStacks(IEffect newEffect);
+        IEffect Clone();
     }
 }

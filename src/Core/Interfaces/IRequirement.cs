@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces
 {
-    using Core.Enums;
+    using Enums;
 
     public interface IRequirement
     {

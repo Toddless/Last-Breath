@@ -3,13 +3,14 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Module;
 
-    public class CritModuleTest : IParameterModule
+    public class CritModuleTest : IParameterModule<EntityParameter>
     {
         private readonly Random _random = new();
-        public Parameter Parameter => Parameter.CriticalChance;
+        public EntityParameter Parameter => EntityParameter.CriticalChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => (float)_random.NextDouble();
+        public float ApplyDecorators(float value) => value;
     }
 }

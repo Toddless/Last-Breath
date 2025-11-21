@@ -1,14 +1,14 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Interfaces.Battle.Decorator;
+    using Battle.Decorator;
 
-    public interface IModuleManager<TKey, TModule, TDecorator>
+    public interface IModuleManager<TKey, out TModule, in TDecorator>
         where TKey : struct, Enum
         where TModule : class
         where TDecorator : IModuleDecorator<TKey, TModule>
     {
-        event Action<TKey, TModule>? ModuleDecoratorChanges;
+        event Action<TKey>? ModuleChanges;
 
         TModule GetModule(TKey key);
         void AddDecorator(TDecorator decorator);

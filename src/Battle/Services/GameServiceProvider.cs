@@ -4,7 +4,6 @@ namespace Battle.Services
     using Core.Interfaces.Data;
     using System.Collections.Generic;
     using Core.Interfaces;
-    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
     using Microsoft.Extensions.DependencyInjection;
     using Source;

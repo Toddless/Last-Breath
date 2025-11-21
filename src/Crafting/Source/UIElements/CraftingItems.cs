@@ -17,7 +17,7 @@
         private TaskCompletionSource<IEnumerable<string>>? _selectedItems;
         [Export] private ItemList? _items;
         [Export] private Button? _add, _cancel;
-        private Dictionary<int, string> _resources = [];
+        private readonly Dictionary<int, string> _resources = [];
         private IItemDataProvider? _itemDataProvider;
         private IInventory? _inventory;
 
@@ -26,12 +26,12 @@
 
         public override void _Ready()
         {
-            if (_add != null) _add.Pressed += OnAddPressed;
-            if (_cancel != null) _cancel.Pressed += OnCancelPressed;
+            _add?.Pressed += OnAddPressed;
+            _cancel?.Pressed += OnCancelPressed;
         }
 
 
-        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
+        public void InjectServices(IGameServiceProvider provider)
         {
             _itemDataProvider = provider.GetService<IItemDataProvider>();
             _inventory = provider.GetService<IInventory>();

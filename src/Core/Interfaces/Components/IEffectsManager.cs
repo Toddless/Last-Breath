@@ -1,16 +1,16 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using Core.Enums;
-    using Core.Interfaces.Abilities;
+    using Enums;
+    using Abilities;
 
     public interface IEffectsManager
     {
         void AddPermanentEffect(IEffect effect);
         void AddTemporaryEffect(IEffect effect);
         void ClearAllTemporaryEffects();
-        bool IsEffectApplied(Effects effect);
+        bool IsEffectApplied(StatusEffects statusEffect);
         void RemoveEffect(IEffect effect);
-        void RemoveEffectByType(Effects effect);
+        void RemoveEffectByType(StatusEffects statusEffect);
         void UpdateEffects();
     }
 }

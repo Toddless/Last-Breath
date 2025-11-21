@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Crafting
 {
-    using Core.Enums;
+    using Enums;
 
     public interface IUpgradingResource : IResource
     {

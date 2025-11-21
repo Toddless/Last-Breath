@@ -32,7 +32,7 @@
             Close?.Invoke();
         }
 
-        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
+        public void InjectServices(IGameServiceProvider provider)
         {
             _mediator = provider.GetService<IMediator>();
         }

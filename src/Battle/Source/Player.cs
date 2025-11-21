@@ -13,7 +13,6 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
     using Services;
 
     internal partial class Player : CharacterBody2D, IFightable, IRequireServices
@@ -49,13 +48,11 @@
 
         private IMediator? _mediator;
 
-        public IHealthComponent Health { get; private set; }
 
-        public IDamageComponent Damage { get; private set; }
-
-        public IDefenceComponent Defence { get; private set; }
-
+        public IEntityParametersComponent Parameters { get; } = new EntityParametersComponent();
         public IStance CurrentStance { get; private set; }
+
+        public IModifierManager ModifierManager { get; private set; }
 
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
@@ -71,37 +68,8 @@
         public override void _Ready()
         {
             GameServiceProvider.Instance.GetService<PlayerReference>().SetPlayerReference(this);
-            Health = new HealthComponent();
-            Damage = new DamageComponent();
-            Defence = new DefenseComponent();
             if (_interactionArea != null) _interactionArea.BodyEntered += OnBodyEnter;
             ConfigureStateMachine();
-        }
-
-        private void OnBodyEnter(Node2D body)
-        {
-            if (body is IFightable fightable)
-                _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
-        }
-
-        private void ConfigureStateMachine()
-        {
-            _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
-                .PermitReentry(Trigger.Idle)
-                .Permit(Trigger.Walk, State.Walk)
-                .Permit(Trigger.Fight, State.Fight);
-
-            _stateMachine.Configure(State.Walk)
-                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
-                .PermitReentry(Trigger.Walk)
-                .Permit(Trigger.Idle, State.Idle)
-                .Permit(Trigger.Fight, State.Fight);
-
-
-            _stateMachine.Configure(State.Fight)
-                .OnEntry(() => { })
-                .Permit(Trigger.Idle, State.Idle);
         }
 
         public override void _Process(double delta)
@@ -113,29 +81,6 @@
             MoveAndSlide();
         }
 
-        private void SwitchState(Vector2 direction)
-        {
-            if (direction == Vector2.Zero)
-            {
-                _stateMachine.Fire(Trigger.Idle);
-                return;
-            }
-
-            Direction newDirection = DefineDirection(direction);
-            _direction = newDirection;
-            _stateMachine.Fire(Trigger.Walk);
-        }
-
-        private Direction DefineDirection(Vector2 direction)
-        {
-            if (direction == Vector2.Zero)
-                return _direction;
-
-            if (Mathf.Abs(direction.Y) >= Mathf.Abs(direction.X))
-                return direction.Y < 0 ? Direction.Up : Direction.Down;
-            else
-                return direction.X < 0 ? Direction.Left : Direction.Right;
-        }
 
         public void AllAttacks()
         {
@@ -165,9 +110,58 @@
         {
         }
 
+
         public void InjectServices(IGameServiceProvider provider)
         {
             _mediator = provider.GetService<IMediator>();
+        }
+
+        private void ConfigureStateMachine()
+        {
+            _stateMachine.Configure(State.Idle)
+                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
+                .PermitReentry(Trigger.Idle)
+                .Permit(Trigger.Walk, State.Walk)
+                .Permit(Trigger.Fight, State.Fight);
+
+            _stateMachine.Configure(State.Walk)
+                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
+                .PermitReentry(Trigger.Walk)
+                .Permit(Trigger.Idle, State.Idle)
+                .Permit(Trigger.Fight, State.Fight);
+
+            _stateMachine.Configure(State.Fight)
+                .Permit(Trigger.Idle, State.Idle);
+        }
+
+        private void SwitchState(Vector2 direction)
+        {
+            if (direction == Vector2.Zero)
+            {
+                _stateMachine.Fire(Trigger.Idle);
+                return;
+            }
+
+            Direction newDirection = DefineDirection(direction);
+            _direction = newDirection;
+            _stateMachine.Fire(Trigger.Walk);
+        }
+
+        private Direction DefineDirection(Vector2 direction)
+        {
+            if (direction == Vector2.Zero)
+                return _direction;
+
+            if (Mathf.Abs(direction.Y) >= Mathf.Abs(direction.X))
+                return direction.Y < 0 ? Direction.Up : Direction.Down;
+            else
+                return direction.X < 0 ? Direction.Left : Direction.Right;
+        }
+
+        private void OnBodyEnter(Node2D body)
+        {
+            if (body is IFightable fightable)
+                _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
         }
     }
 }

@@ -23,7 +23,7 @@
             // here for example we can later call a service with player´s mastery to get minimum amount resources to return
             foreach (var res in item.UsedResources)
             {
-                int amount = Mathf.RoundToInt(res.Value * _craftingMastery.GetFinalResourceMultiplier());
+                int amount = Mathf.RoundToInt(res.Value * _craftingMastery.GetResourceMultiplier());
                 if (inventory.TryAddItemStacks(res.Key, amount)) continue;
 
                 var itemInstance = provider.CopyBaseItem(res.Key);

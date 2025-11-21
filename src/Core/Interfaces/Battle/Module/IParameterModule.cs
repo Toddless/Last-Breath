@@ -1,12 +1,15 @@
 ﻿namespace Core.Interfaces.Battle.Module
 {
+    using System;
     using Enums;
 
-    public interface IParameterModule
+    public interface IParameterModule<out TKey>
+        where TKey : struct, Enum
     {
-        Parameter Parameter { get; }
+        TKey Parameter { get; }
         DecoratorPriority Priority { get; }
 
         float GetValue();
+        float ApplyDecorators(float value);
     }
 }

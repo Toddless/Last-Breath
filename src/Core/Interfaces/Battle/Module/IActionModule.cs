@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Battle.Module
 {
-    using Core.Enums;
+    using Enums;
 
-    public interface IActionModule<T>
+    public interface IActionModule<in T>
     {
         ActionModule Parameter { get; }
         DecoratorPriority Priority { get; }

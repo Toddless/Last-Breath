@@ -2,7 +2,7 @@
 {
     using Godot;
     using System;
-    using Core.Interfaces.UI;
+    using UI;
 
     public interface IUIElementProvider
     {

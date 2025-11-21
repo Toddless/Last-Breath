@@ -1,11 +1,11 @@
 ﻿namespace Battle
 {
     using Godot;
+    using System;
+    using Utilities;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Mediator;
-    using System.Collections.Generic;
 
     public partial class BattleHud : Control, IInitializable, IRequireServices
     {
@@ -23,11 +23,14 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _mediator = provider.GetService<IMediator>();
-        }
-
-        public void SetFighterQueue(IEnumerable<IFightable> fighters)
-        {
+            try
+            {
+                _mediator = provider.GetService<IMediator>();
+            }
+            catch (Exception ex)
+            {
+                Tracker.TrackError("Failed to inject services.", ex);
+            }
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

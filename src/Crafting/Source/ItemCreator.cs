@@ -62,7 +62,7 @@
 
                 List<IModifierInstance> mods = [];
                 foreach (var mod in takenMods)
-                    mods.Add(ModifiersCreator.CreateModifierInstance(mod.Parameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierType, player), item));
+                    mods.Add(ModifiersCreator.CreateModifierInstance(mod.EntityParameter, mod.ModifierType, ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierType, player), item));
 
                 item.SetAdditionalModifiers(mods);
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
@@ -92,7 +92,7 @@
 
         private float ApplyPlayerMultiplier(float baseValue, ModifierType type, IEntity? player = default)
         {
-            float multiplier = _craftingMastery.GetFinalValueMultiplier();
+            float multiplier = _craftingMastery.GetValueMultiplier();
             if (type == ModifierType.Multiplicative)
                 return 1f + (baseValue - 1f) * multiplier;
             else

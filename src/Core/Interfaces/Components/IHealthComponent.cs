@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Battle.Decorator;
+    using Enums;
+    using Battle.Decorator;
 
     public interface IHealthComponent
     {
@@ -12,9 +12,9 @@
 
         event Action<float>? CurrentHealthChanged;
         event Action? NoMoreHealth;
-        event Action<Parameter, float> ParameterChanged;
+        event Action<EntityParameter, float> ParameterChanged;
 
-        void RemoveModuleDecorator(string id, Parameter key);
+        void RemoveModuleDecorator(string id, EntityParameter key);
         void AddModuleDecorator(StatModuleDecorator decorator);
         float CurrentHealthPercent();
         void Heal(float amount);

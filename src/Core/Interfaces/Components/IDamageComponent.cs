@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
+    using Enums;
 
     public interface IDamageComponent
     {
@@ -11,6 +11,8 @@
         float Damage { get; }
         float SpellDamage { get; }
 
-        event Action<Parameter, float> ParameterChanged;
+        event Action<EntityParameter, float> ParameterChanged;
+
+        float CalculateForBase(EntityParameter parameter, float baseValue);
     }
 }

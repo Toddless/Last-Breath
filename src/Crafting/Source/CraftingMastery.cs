@@ -8,8 +8,9 @@
     using System.Collections.Generic;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Events;
+    using Utilities;
 
-    public class CraftingMastery : ICraftingMastery
+    public class CraftingMastery(IMediator mediator, RandomNumberGenerator rnd) : ICraftingMastery
     {
         // TODO: Remove from here
         // ________________________________________________________
@@ -20,26 +21,33 @@
         private const float BaseValueMultiplier = 0.8f;
         private const float TargetValueMultiplier = 1.25f;
         private const float ExpFactor = 1.8f;
+        private const float MaxLevel = 25;
         private const int BaseExp = 50;
-        private const int MaxLevel = 25;
         // ---------------------------------------------------------
 
-        private int _currentLevel = 1, _bonusLevel = 0;
-
-        private readonly RandomNumberGenerator _rnd;
+        private int _currentLevel = 1;
 
         // TODO: Same
         // ________________________________________________________
         // Level one probabilities
         private readonly float[] _rarityBase = [65f, 24f, 10f, 1f];
+
         // Level 25 probabilities
         private readonly float[] _rarityTarget = [10f, 30f, 35f, 25f];
         // --------------------------------------------------------
 
 
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator = mediator;
 
-        public int CurrentExp { get; private set; } = 0;
+        public string Id { get; } = "Mastery_Crafting";
+        public string[] Tags { get; } = [];
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
+
+        public Texture2D? Icon { get; }
+        public string Description => Localizator.LocalizeDescription(Id);
+        public string DisplayName => Localizator.Localize(Id);
+
+        public int CurrentExperience { get; private set; } = 0;
 
         public int CurrentLevel
         {
@@ -49,30 +57,23 @@
 
         public int BonusLevel
         {
-            get => _bonusLevel;
+            get => field;
             private set
             {
-                if (value != _bonusLevel)
-                {
-                    _bonusLevel = value;
-                    BonusLevelChange?.Invoke(_bonusLevel);
-                }
+                if (value == field) return;
+
+                field = value;
+                BonusLevelChange?.Invoke(field);
             }
         }
 
-        public event Action<int>? ExpirienceChange, BonusLevelChange;
+        public event Action<int>? ExperienceChange, BonusLevelChange, CurrentLevelChange;
 
-        public CraftingMastery(IMediator mediator, RandomNumberGenerator rnd)
+        public void AddExperience(int amount)
         {
-            _mediator = mediator;
-            _rnd = rnd;
-        }
-
-        public void AddExpirience(int bonusAmount)
-        {
-            if (bonusAmount <= 0) return;
-            CurrentExp += bonusAmount;
-            ExpirienceChange?.Invoke(CurrentExp);
+            if (amount <= 0) return;
+            CurrentExperience += amount;
+            ExperienceChange?.Invoke(CurrentExperience);
             if (_currentLevel >= MaxLevel) return;
             CheckForLevelUp();
         }
@@ -82,32 +83,27 @@
 
         public int ExpToNextLevelRemain()
         {
-            if (_currentLevel >= MaxLevel) return 0;
-
-            return Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExp);
+            return _currentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExperience);
         }
 
-        public float GetFinalSkillChance(float skillBonus = default)
+        public float GetSkillChance(float skillBonus = default)
         {
-            float progress = GetProgressFactor();
-            float baseChance = Mathf.Lerp(BaseSkillChance, TargetSkillChance, progress);
+            float baseChance = CalculateBase(BaseSkillChance, TargetSkillChance, GetProgressFactor());
             float finalChance = baseChance * (1f + skillBonus);
             return Mathf.Clamp(finalChance, 0f, 1f);
         }
 
-        public float GetFinalValueMultiplier(float multiplierBonus = default)
+        public float GetValueMultiplier(float multiplierBonus = default)
         {
-            float progress = GetProgressFactor();
-            float baseChance = Mathf.Lerp(BaseValueMultiplier, TargetValueMultiplier, progress);
+            float baseChance = CalculateBase(BaseValueMultiplier, TargetValueMultiplier, GetProgressFactor());
             float chanceWithBonus = baseChance * (1f + multiplierBonus);
-            float finalChance = _rnd.RandfRange(chanceWithBonus * 0.9f, chanceWithBonus * 1.1f);
+            float finalChance = rnd.RandfRange(chanceWithBonus * 0.9f, chanceWithBonus * 1.1f);
             return Mathf.Min(finalChance, 1.9f);
         }
 
-        public float GetFinalResourceMultiplier(float resourceBonus = default)
+        public float GetResourceMultiplier(float resourceBonus = default)
         {
-            float progress = GetProgressFactor();
-            float baseMultiplier = Mathf.Lerp(BaseResourceReturn, TargetResourceReturn, progress);
+            float baseMultiplier = CalculateBase(BaseResourceReturn, TargetResourceReturn, GetProgressFactor());
             float finalMultiplier = baseMultiplier * (1f + resourceBonus);
             return Math.Min(finalMultiplier, 1.5f);
         }
@@ -115,7 +111,7 @@
         public Rarity RollRarity(float rarityBonus = default)
         {
             var probs = GetRarityProbabilities(rarityBonus);
-            float r = _rnd.Randf();
+            float r = rnd.Randf();
             float accumulated = 0;
 
             foreach (var kvp in probs.OrderBy(x => x.Key))
@@ -128,17 +124,18 @@
             return probs.OrderByDescending(x => x.Key).First().Key;
         }
 
+        private float CalculateBase(float baseValue, float targetValue, float progression) => Mathf.Lerp(baseValue, targetValue, progression);
+
         private void CheckForLevelUp()
         {
             while (_currentLevel < MaxLevel)
             {
                 int need = ExpToNextLevel(_currentLevel);
-                if (CurrentExp >= need)
+                if (CurrentExperience >= need)
                 {
-                    CurrentExp -= need;
+                    CurrentExperience -= need;
                     _currentLevel++;
-                    // EventBus
-                   // _mediator.Publish(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    _mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;
@@ -176,6 +173,7 @@
             {
                 result[(Rarity)i] = Mathf.Clamp(finalWeights[i], 0f, 1f);
             }
+
             return result;
         }
 
@@ -199,6 +197,7 @@
             return adjustedWeights;
         }
 
-        private float GetProgressFactor() => Mathf.Clamp((_currentLevel + BonusLevel - 1) / (float)(MaxLevel + BonusLevel - 1), 0f, 1f);
+        private float GetProgressFactor() =>
+            Mathf.Clamp((_currentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
     }
 }

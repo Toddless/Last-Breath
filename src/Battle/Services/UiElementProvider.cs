@@ -16,13 +16,8 @@
 
         private readonly IUIWindowPositionStorage _positionStorage = new UiWindowPositionStorage();
         private readonly Dictionary<Control, List<Control>> _instanceBySource = [];
-        private readonly IGameServiceProvider _serviceProvider;
+        private readonly IGameServiceProvider _serviceProvider = GameServiceProvider.Instance;
         private UiLayerManager? _uiLayer;
-
-        public UiElementProvider()
-        {
-            _serviceProvider = GameServiceProvider.Instance;
-        }
 
         public void Subscribe(Node layer)
         {

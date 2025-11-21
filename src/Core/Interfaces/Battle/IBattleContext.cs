@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
+    using Entity;
 
     public interface IBattleContext
     {

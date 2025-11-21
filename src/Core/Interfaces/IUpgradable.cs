@@ -3,7 +3,7 @@
     public interface IUpgradable
     {
         int MaxUpgradeLevel { get; }
-        int UpgradeLevel { get; }
+        int CurrentLevel { get; }
         bool IsUpgradable { get; }
     }
 }

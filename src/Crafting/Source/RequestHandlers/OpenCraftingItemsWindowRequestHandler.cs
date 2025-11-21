@@ -5,7 +5,7 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Mediator.Requests;
-    using Crafting.Source.UIElements;
+    using UIElements;
 
     public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {

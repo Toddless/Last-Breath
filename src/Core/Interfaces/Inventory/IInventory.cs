@@ -2,8 +2,8 @@
 {
     using Godot;
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Items;
+    using Enums;
+    using Items;
     using System.Collections.Generic;
 
     public interface IInventory

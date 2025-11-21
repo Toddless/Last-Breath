@@ -16,7 +16,7 @@
             var fighters = entities.ToList();
 
             foreach (var entity in fighters)
-                entity.Dead += OnEntityDead;
+                //entity.Dead += OnEntityDead;
 
             _entities.AddRange(entities as IEnumerable<IEntity> ?? []);
             DecideQueueOrder(fighters);
@@ -26,7 +26,7 @@
             where T : IEntity, IFightable
         {
             // TODO: Add to UI
-            entity.Dead += OnEntityDead;
+         //   entity.Dead += OnEntityDead;
             _entities.Add(entity);
             _queue.AddLast(entity);
         }
@@ -51,7 +51,7 @@
         private void OnEntityDead(IEntity entity)
         {
             // TODO: Remove from ui
-            entity.Dead -= OnEntityDead;
+           // entity.Dead -= OnEntityDead;
             _queue.Remove(entity);
         }
     }

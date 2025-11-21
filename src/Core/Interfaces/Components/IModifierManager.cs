@@ -1,17 +1,19 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
-    using Core.Interfaces;
+    using Enums;
+    using Interfaces;
     using System.Collections.Generic;
 
     public interface IModifierManager
     {
-        IReadOnlyDictionary<Parameter, List<IModifierInstance>> BattleModifiers { get; }
-        IReadOnlyDictionary<Parameter, List<IModifierInstance>> PermanentModifiers { get; }
-        IReadOnlyDictionary<Parameter, List<IModifierInstance>> TemporaryModifiers { get; }
+        IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> BattleModifiers { get; }
+        IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> PermanentModifiers { get; }
+        IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> TemporaryModifiers { get; }
 
         event EventHandler<IModifiersChangedEventArgs>? ParameterModifiersChanged;
+
+        IEnumerable<IModifierInstance> GetModifiers(EntityParameter parameter);
 
         void AddBattleModifier(IModifierInstance modifier);
         void AddPermanentModifier(IModifierInstance modifier);

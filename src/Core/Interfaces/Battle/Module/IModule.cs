@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Battle.Module
 {
-    using Core.Enums;
+    using Enums;
 
     public interface IModule : IIdentifiable, IDisplayable
     {

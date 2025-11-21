@@ -38,29 +38,12 @@
         public event Action? OnEnterStartPhase, OnExitStartPhase;
 
         public IReadOnlyList<IEntity> Fighters => _fighters;
-        public static BattleHandler? Instance { get; private set; }
 
         public BattleHandler()
         {
             _combatScheduler = new CombatScheduler();
-            Instance = this;
             ConfigureStateMachine();
         }
-
-        //public void Init(BattleContext context)
-        //{
-        //    _fighters.AddRange(context.Fighters);
-        //    foreach (var fighter in _fighters)
-        //    {
-        //        if (fighter is Player player)
-        //        {
-        //            player.Dead += OnPlayerDead;
-        //            continue;
-        //        }
-        //        fighter.Dead += OnFighterDeath;
-        //    }
-        //    DecideTurnsOrder();
-        //}
 
         public void BattleStart()
         {
@@ -91,7 +74,7 @@
                 //    continue;
                 //}
 
-                fighter.Dead -= OnFighterDeath;
+                //fighter.Dead -= OnFighterDeath;
             }
 
             _attackQueue.Clear();
@@ -121,11 +104,10 @@
             while (_attackQueue.Count > 1)
             {
                 var nextFighter = _attackQueue.Dequeue();
-                if (nextFighter.IsAlive)
-                {
-                    _currentAttacking = nextFighter;
-                    return;
-                }
+                if (!nextFighter.IsAlive) continue;
+
+                _currentAttacking = nextFighter;
+                return;
             }
 
             // no characters alive except one => battle ends (but probably we should end the battle way earlier)

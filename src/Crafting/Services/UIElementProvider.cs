@@ -6,8 +6,8 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.UI;
-    using Crafting.Source.UIElements;
-    using Crafting.TestResources.Layers;
+    using Source.UIElements;
+    using TestResources.Layers;
     using Godot;
     using Utilities;
 

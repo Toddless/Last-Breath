@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Entity
 {
-    using System;
-    using Core.Interfaces;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Components;
+    using Enums;
+    using Items;
+    using Components;
+    using Interfaces;
 
     public interface IEntity : IIdentifiable, IDisplayable, IFightable
     {
@@ -12,9 +12,9 @@
 
         IEntityGroup? Group { get; set; }
 
-        bool CanMove { get; set; }
+        StatusEffects StatusEffects { get; set; }
 
-        event Action<IEntity>? Dead;
+        bool CanMove { get; set; }
 
         void AddItemToInventory(IItem item);
     }

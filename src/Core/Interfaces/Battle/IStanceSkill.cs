@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using Core.Enums;
-    using Core.Interfaces.Skills;
+    using Enums;
+    using Skills;
 
     public interface IStanceSkill : ISkill
     {

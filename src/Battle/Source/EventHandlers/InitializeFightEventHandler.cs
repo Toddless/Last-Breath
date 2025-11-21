@@ -1,30 +1,30 @@
-﻿namespace Battle.Source.Handlers
+﻿namespace Battle.Source.EventHandlers
 {
     using System;
     using Utilities;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Interfaces.Data;
+    using System.Threading.Tasks;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
 
     public class InitializeFightEventHandler(
         IUIElementProvider uiElementProvider,
-        IGameServiceProvider gameServiceProvider)
+        IGameServiceProvider gameServiceProvider,
+        QueueScheduler queueScheduler)
         : IEventHandler<InitializeFightEvent<IEntity>>
     {
         public Task HandleAsync(InitializeFightEvent<IEntity> evnt)
         {
             try
             {
-                // TODO: What if we already have some main element?
+                // Что мы делаем:
+                // 1. Подготавливаем худ
+                // 2. Добавляем бойцов на сцену (определяем кто игрок, кто нпс)
+                // 3. Определяем очередность ходов в раунде
+                // 4. Начинаем бой
                 var battle = uiElementProvider.CreateAndShowMainElement<BattleHud>();
-                var fighters = evnt.Fighters.Where(x => x is not Player).ToList();
-                if (fighters.Count > 1)
-                    battle.SetFighterQueue(fighters);
-
-                var turnScheduler = gameServiceProvider.GetService<QueueScheduler>();
-                turnScheduler.AddMembers(fighters);
+                var fighters = evnt.Fighters;
+                queueScheduler.AddMembers(fighters);
             }
             catch (Exception e)
             {

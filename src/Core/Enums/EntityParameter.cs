@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum Parameter
+    public enum EntityParameter
     {
         Damage = 1,
         AllAttribute,

@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
+    using Enums;
 
     public interface IResource
     {

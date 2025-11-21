@@ -12,7 +12,7 @@
         public Task HandleAsync(GainCraftingExpirienceEvent evnt)
         {
             int bonusExp = Mathf.RoundToInt(GetRarityBonus(evnt.ItemRarity) * GetCraftingModeFactor(evnt.Action));
-            craftingMastery.AddExpirience(bonusExp);
+            craftingMastery.AddExperience(bonusExp);
             return Task.CompletedTask;
         }
 

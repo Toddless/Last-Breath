@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Events
 {
-    using Core.Interfaces.Items;
+    using Items;
 
     public record ItemCreatedEvent(IItem CreatedItem) : IEvent { }
 }

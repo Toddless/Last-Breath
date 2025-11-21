@@ -1,7 +1,7 @@
 ﻿namespace Core.Results
 {
     using System;
-    using Core.Interfaces;
+    using Interfaces;
 
     public class Result<T> : IResult<T>
         where T : struct, Enum

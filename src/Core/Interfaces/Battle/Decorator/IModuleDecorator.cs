@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Battle.Decorator
 {
+    using Enums;
     using System;
-    using Core.Enums;
 
-    public interface IModuleDecorator<TKey, TModule>
+    public interface IModuleDecorator<out TKey, in TModule>
         where TKey : struct, Enum
     {
         string Id { get; }

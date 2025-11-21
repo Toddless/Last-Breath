@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Battle.Decorator
 {
+    using Enums;
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Skills;
+    using Skills;
+    using Module;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle.Module;
 
     public abstract class SkillModuleDecorator : ISkillModule, IModuleDecorator<SkillType, ISkillModule>
     {
@@ -17,7 +17,7 @@
 
         public string Id => _id.Value;
 
-        public SkillModuleDecorator(SkillType type, DecoratorPriority priority)
+        protected SkillModuleDecorator(SkillType type, DecoratorPriority priority)
         {
             Parameter = type;
             Priority = priority;

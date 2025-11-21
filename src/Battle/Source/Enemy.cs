@@ -2,8 +2,6 @@
 {
     using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Components;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
@@ -12,7 +10,7 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Mediator.Requests;
+    using Utilities;
 
     internal partial class Enemy : CharacterBody2D, IFightable, IInitializable, IRequireServices
     {
@@ -29,6 +27,7 @@
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
 
+        public IEntityParametersComponent Parameters { get; } = new EntityParametersComponent();
         public IStance CurrentStance { get; set; }
 
         public IEntityGroup? Group { get; set; }
@@ -42,10 +41,6 @@
 
         public override void _Ready()
         {
-            Health = new HealthComponent();
-            Damage = new DamageComponent();
-            Defence = new DefenseComponent();
-
             // TODO: Необходимо определить кто начал файт. Как?
             _animatedSprite?.Play("Idle");
             if (_interactionArea != null)
@@ -90,12 +85,28 @@
 
         private void OnBodyEnter(Node2D body)
         {
-            if (body is Player player)
+            try
             {
-                var fighters = Group?.GetEntitiesInGroup<IFightable>() ?? [this];
-                if (!fighters.Contains(player))
-                    fighters.Add(player);
-                _mediator?.PublishAsync(new InitializeFightEvent<IFightable>(fighters));
+                ArgumentNullException.ThrowIfNull(_mediator);
+                switch (body)
+                {
+                    case Player player:
+                        {
+                            var fighters = Group?.GetEntitiesInGroup<IFightable>() ?? [this];
+                            if (!fighters.Contains(player))
+                                fighters.Add(player);
+                            _mediator.PublishAsync(new InitializeFightEvent<IFightable>(fighters));
+                            break;
+                        }
+                    case IFightable fighter:
+                        // TODO: Decide to begin fight or not
+                        break;
+                }
+                // TODO: Change state to "Fighting"
+            }
+            catch (Exception e)
+            {
+                Tracker.TrackException("Failed to handle body enter", e, this);
             }
         }
     }

@@ -1,34 +1,34 @@
 ﻿namespace Core.Modifiers
 {
     using System;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Data;
+    using Enums;
+    using Interfaces;
+    using Interfaces.Data;
     using System.Collections.Generic;
 
     public class ModifiersCreator
     {
-        private static readonly Dictionary<string, Parameter> s_parameterMapping = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, EntityParameter> s_parameterMapping = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Damage"] = Parameter.Damage,
-            ["AllAttribute"] = Parameter.AllAttribute,
-            ["Intelligence"] = Parameter.Intelligence,
-            ["Dexterity"] = Parameter.Dexterity,
-            ["Strength"] = Parameter.Strength,
-            ["CriticalChance"] = Parameter.CriticalChance,
-            ["CriticalDamage"] = Parameter.CriticalDamage,
-            ["AdditionalHitChance"] = Parameter.AdditionalHitChance,
-            ["Armor"] = Parameter.Armor,
-            ["Evade"] = Parameter.Evade,
-            ["EnergyBarrier"] = Parameter.Barrier,
-            ["SpellDamage"] = Parameter.SpellDamage,
-            ["ResourceRecovery"] = Parameter.ResourceRecovery,
-            ["Movespeed"] = Parameter.Movespeed,
-            ["Suppress"] = Parameter.Suppress,
-            ["Health"] = Parameter.Health,
-            ["MaxResource"] = Parameter.Resource,
-            ["MaxEvadeChance"] = Parameter.MaxEvadeChance,
-            ["MaxReduceDamage"] = Parameter.MaxReduceDamage,
+            ["Damage"] = EntityParameter.Damage,
+            ["AllAttribute"] = EntityParameter.AllAttribute,
+            ["Intelligence"] = EntityParameter.Intelligence,
+            ["Dexterity"] = EntityParameter.Dexterity,
+            ["Strength"] = EntityParameter.Strength,
+            ["CriticalChance"] = EntityParameter.CriticalChance,
+            ["CriticalDamage"] = EntityParameter.CriticalDamage,
+            ["AdditionalHitChance"] = EntityParameter.AdditionalHitChance,
+            ["Armor"] = EntityParameter.Armor,
+            ["Evade"] = EntityParameter.Evade,
+            ["EnergyBarrier"] = EntityParameter.Barrier,
+            ["SpellDamage"] = EntityParameter.SpellDamage,
+            ["ResourceRecovery"] = EntityParameter.ResourceRecovery,
+            ["Movespeed"] = EntityParameter.Movespeed,
+            ["Suppress"] = EntityParameter.Suppress,
+            ["Health"] = EntityParameter.Health,
+            ["MaxResource"] = EntityParameter.Resource,
+            ["MaxEvadeChance"] = EntityParameter.MaxEvadeChance,
+            ["MaxReduceDamage"] = EntityParameter.MaxReduceDamage,
         };
 
         private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
@@ -44,7 +44,7 @@
         public static List<IModifierInstance> CreateModifierInstances(List<IModifier> stats, object source)
         {
             List<IModifierInstance> modifiers = [];
-            stats.ForEach(mod => modifiers.Add(CreateModifierInstance(mod.Parameter, mod.ModifierType, mod.BaseValue, source)));
+            stats.ForEach(mod => modifiers.Add(CreateModifierInstance(mod.EntityParameter, mod.ModifierType, mod.BaseValue, source)));
             return modifiers;
         }
 
@@ -65,10 +65,10 @@
             return modifiers;
         }
 
-        public static IModifier CreateModifier(Parameter parameter, ModifierType type, float baseValue)
-            => new Modifier(type, parameter, baseValue);
+        public static IModifier CreateModifier(EntityParameter entityParameter, ModifierType type, float baseValue)
+            => new Modifier(type, entityParameter, baseValue);
 
-        public static IModifierInstance CreateModifierInstance(Parameter parameter, ModifierType modifierType, float value, object source, int priority = 10)
-            => new ModifierInstance(parameter, modifierType, value, source, priority);
+        public static IModifierInstance CreateModifierInstance(EntityParameter entityParameter, ModifierType modifierType, float value, object source, int priority = 10)
+            => new ModifierInstance(entityParameter, modifierType, value, source, priority);
     }
 }

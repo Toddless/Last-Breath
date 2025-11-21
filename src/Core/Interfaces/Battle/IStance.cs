@@ -1,26 +1,21 @@
 ﻿namespace Core.Interfaces.Battle
 {
+    using Enums;
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Battle.Decorator;
-    using Core.Interfaces.Battle.Module;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
+    using Entity;
+    using Components;
 
     public interface IStance
     {
+        int CurrentLevel { get; }
         IResource Resource { get; }
         Stance StanceType { get; }
-        IModuleManager<Parameter, IParameterModule, StatModuleDecorator> StatDecoratorManager { get; }
-        IModuleManager<ActionModule, IActionModule<IEntity>, ActionModuleDecorator> ActionDecoratorManager { get; }
-        IModuleManager<SkillType, ISkillModule, SkillModuleDecorator> SkillDecoratorManager { get; }
-        IStanceSkillComponent StanceSkillComponent { get; }
 
         event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
+
         void OnAttack(IEntity target);
         void OnReceiveAttack(IAttackContext context);
         void OnActivate();
         void OnDeactivate();
-        bool IsChainAttack();
     }
 }

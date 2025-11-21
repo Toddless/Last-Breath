@@ -3,12 +3,13 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Module;
 
-    public class DamageModuleTest(float value) : IParameterModule
+    public class DamageModuleTest(float value) : IParameterModule<EntityParameter>
     {
         private float _value = value;
-        public Parameter Parameter => Parameter.Damage;
+        public EntityParameter Parameter => EntityParameter.Damage;
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => _value;
+        public float ApplyDecorators(float value) => value;
     }
 }

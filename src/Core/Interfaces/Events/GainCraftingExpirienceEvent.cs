@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Events
 {
-    using Core.Enums;
+    using Enums;
 
     public record GainCraftingExpirienceEvent(CraftingMode Action, Rarity ItemRarity) : IEvent
     {
