@@ -11,7 +11,6 @@
         private static readonly Dictionary<string, EntityParameter> s_parameterMapping = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Damage"] = EntityParameter.Damage,
-            ["AllAttribute"] = EntityParameter.AllAttribute,
             ["Intelligence"] = EntityParameter.Intelligence,
             ["Dexterity"] = EntityParameter.Dexterity,
             ["Strength"] = EntityParameter.Strength,
@@ -27,8 +26,6 @@
             ["Suppress"] = EntityParameter.Suppress,
             ["Health"] = EntityParameter.Health,
             ["MaxResource"] = EntityParameter.Resource,
-            ["MaxEvadeChance"] = EntityParameter.MaxEvadeChance,
-            ["MaxReduceDamage"] = EntityParameter.MaxReduceDamage,
         };
 
         private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)

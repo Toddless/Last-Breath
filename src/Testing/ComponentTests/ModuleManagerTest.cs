@@ -105,12 +105,12 @@
             manager.AddDecorator(decorator);
             manager.AddDecorator(secondDecorator);
 
-            float finalValue = manager.GetModule(EntityParameter.Damage).ApplyDecorators(valueAsBase);
+            float finalValue = manager.GetModule(EntityParameter.Damage).ApplyDecoratorsForValue(valueAsBase);
 
             Assert.IsTrue(Math.Abs(finalValue - 65f) < float.Epsilon);
         }
 
-        private ModuleManager<EntityParameter, IParameterModule<EntityParameter>, StatModuleDecorator> CreateManager() => new(
+        private ModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator> CreateManager() => new(
             new Dictionary<EntityParameter, IParameterModule<EntityParameter>>
             {
                 [EntityParameter.Damage] = new DamageModuleTest(BaseValue), [EntityParameter.CriticalChance] = new CritModuleTest()

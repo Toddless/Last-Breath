@@ -10,14 +10,5 @@
     [TestClass]
     public class StanceTest
     {
-
-        private DexterityStanceTest CreateDexterity()
-        {
-            var character = new Mock<IEntity>();
-            var resource = new Mock<IResource>();
-            var activationEffect = new Mock<IStanceActivationEffect>();
-
-            return new(character.Object, resource.Object, activationEffect.Object, Stance.Dexterity);
-        }
     }
 }

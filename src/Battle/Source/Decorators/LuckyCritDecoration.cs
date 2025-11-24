@@ -4,7 +4,7 @@
     using Core.Enums;
     using Core.Interfaces.Battle.Decorator;
 
-    public class LuckyCritDecoration(DecoratorPriority priority) : StatModuleDecorator(abilityParameter: EntityParameter.CriticalChance, priority, "Lucky_Crit_Decorator")
+    public class LuckyCritDecoration(DecoratorPriority priority) : EntityParameterModuleDecorator(parameter: EntityParameter.CriticalChance, priority, "Lucky_Crit_Decorator")
     {
         public override float GetValue()
         {

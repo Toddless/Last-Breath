@@ -3,25 +3,22 @@
     public enum EntityParameter
     {
         Damage = 1,
-        AllAttribute,
         Intelligence,
         Dexterity,
         Strength,
-        CriticalChance,
-        CriticalDamage,
         BlockChance,
+        CriticalChance,
         AdditionalHitChance,
+        CriticalDamage,
+        SpellDamage,
         Armor,
         Evade,
         Barrier,
-        SpellDamage,
         Resource,
         ResourceRecovery,
         Movespeed,
         Suppress,
         Health,
         HealthRecovery,
-        MaxEvadeChance,
-        MaxReduceDamage
     }
 }

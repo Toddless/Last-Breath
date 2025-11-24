@@ -15,7 +15,7 @@
         event Action<EntityParameter, float> ParameterChanged;
 
         void RemoveModuleDecorator(string id, EntityParameter key);
-        void AddModuleDecorator(StatModuleDecorator decorator);
+        void AddModuleDecorator(EntityParameterModuleDecorator decorator);
         float CurrentHealthPercent();
         void Heal(float amount);
         void HealUpToMax();

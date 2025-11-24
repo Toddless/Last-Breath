@@ -10,6 +10,6 @@
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => _value;
-        public float ApplyDecorators(float value) => value;
+        public float ApplyDecoratorsForValue(float value) => value;
     }
 }

@@ -15,22 +15,16 @@
 
         public void ChainModule(IParameterModule<AbilityParameter> inner) => _decorated = inner;
 
-        /// <summary>
-        /// Get value from inner module.
-        ///
-        /// Throws <see cref="NullReferenceException"/> if inner module is null
-        /// </summary>
-        /// <returns></returns>
         public virtual float GetValue()
         {
             ArgumentNullException.ThrowIfNull(_decorated);
             return _decorated.GetValue();
         }
 
-        public virtual float ApplyDecorators(float value)
+        public virtual float ApplyDecoratorsForValue(float value)
         {
             ArgumentNullException.ThrowIfNull(_decorated);
-            return _decorated.ApplyDecorators(value);
+            return _decorated.ApplyDecoratorsForValue(value);
         }
     }
 }

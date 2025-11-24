@@ -18,15 +18,13 @@
         float Armor { get; }
         float Evade { get; }
         float MaxBarrier { get; }
-        float MaxReduceDamage { get; }
-        float MaxEvadeChance { get; }
 
         event Action<float>? CurrentBarrierChanged;
         event Action<float>? CurrentHealthChanged;
         event Action<EntityParameter, float>? ParameterChanged;
-        void AddModuleDecorator(StatModuleDecorator decorator);
+        void AddModuleDecorator(EntityParameterModuleDecorator decorator);
         void RemoveModuleDecorator(string id, EntityParameter param);
         float CalculateForBase(EntityParameter parameter, float baseValue);
-        void OnParameterChanges(object? sender, IModifiersChangedEventArgs args);
+        void OnModifiersChange(object? sender, IModifiersChangedEventArgs args);
     }
 }

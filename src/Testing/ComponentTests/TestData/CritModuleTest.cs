@@ -11,6 +11,6 @@
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => (float)_random.NextDouble();
-        public float ApplyDecorators(float value) => value;
+        public float ApplyDecoratorsForValue(float value) => value;
     }
 }

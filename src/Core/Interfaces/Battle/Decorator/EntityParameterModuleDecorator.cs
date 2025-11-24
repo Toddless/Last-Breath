@@ -4,13 +4,13 @@
     using System;
     using Module;
 
-    public abstract class StatModuleDecorator(EntityParameter abilityParameter, DecoratorPriority priority, string id)
+    public abstract class EntityParameterModuleDecorator(EntityParameter parameter, DecoratorPriority priority, string id)
         : IParameterModule<EntityParameter>, IModuleDecorator<EntityParameter, IParameterModule<EntityParameter>>
     {
         private IParameterModule<EntityParameter>? _module;
 
         public string Id { get; } = id;
-        public EntityParameter Parameter { get; } = abilityParameter;
+        public EntityParameter Parameter { get; } = parameter;
         public DecoratorPriority Priority { get; } = priority;
 
         public void ChainModule(IParameterModule<EntityParameter> module) => _module = module;
@@ -21,10 +21,10 @@
             return _module.GetValue();
         }
 
-        public virtual float ApplyDecorators(float value)
+        public virtual float ApplyDecoratorsForValue(float value)
         {
             ArgumentNullException.ThrowIfNull(_module);
-            return _module.ApplyDecorators(value);
+            return _module.ApplyDecoratorsForValue(value);
         }
     }
 }

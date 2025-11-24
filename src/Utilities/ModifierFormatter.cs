@@ -37,7 +37,6 @@
                 EntityParameter.CriticalChance => "%",
                 EntityParameter.CriticalDamage => "%",
                 EntityParameter.AdditionalHitChance => "%",
-                EntityParameter.MaxEvadeChance => "%",
                 _ => string.Empty,
             };
         }

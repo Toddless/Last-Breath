@@ -11,9 +11,9 @@
         IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> PermanentModifiers { get; }
         IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> TemporaryModifiers { get; }
 
-        event EventHandler<IModifiersChangedEventArgs>? ParameterModifiersChanged;
+        event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
 
-        IEnumerable<IModifierInstance> GetModifiers(EntityParameter parameter);
+        IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter);
 
         void AddBattleModifier(IModifierInstance modifier);
         void AddPermanentModifier(IModifierInstance modifier);
@@ -28,6 +28,7 @@
         void RemoveTemporaryModifierBySource(object source);
         void UpdateBattleModifier(IModifierInstance modifier);
         void UpdatePermanentModifier(IModifierInstance modifier);
+        void UpdatePermanentModifiers(IEnumerable<IModifierInstance> modifiers);
         void UpdateTemporaryModifier(IModifierInstance modifier);
     }
 }

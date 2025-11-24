@@ -9,7 +9,9 @@
     {
         public TKey Parameter { get; } = parameter;
         public DecoratorPriority Priority => DecoratorPriority.Base;
+
         public float GetValue() => value();
-        public float ApplyDecorators(float baseBalue) => baseBalue;
+
+        public float ApplyDecoratorsForValue(float baseBalue) => baseBalue;
     }
 }

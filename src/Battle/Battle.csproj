@@ -29,4 +29,9 @@
     <Folder Include="Source\Module\StatModules\" />
     <Folder Include="Source\RequestHandlers\" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="LastBreath">
+      <HintPath>..\Last Breath\.godot\mono\temp\bin\Debug\LastBreath.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

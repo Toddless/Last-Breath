@@ -60,7 +60,6 @@
         protected virtual void HandleReceivedAttack(IAttackContext context)
         {
             context.Armor = Owner.Parameters.Armor;
-            context.MaxReduceDamage = Owner.Parameters.MaxReduceDamage;
             Owner.TakeDamage(context.FinalDamage, context.IsCritical);
 
             HandleOnAttackSkills(context.PassiveSkills);
@@ -94,7 +93,7 @@
         {
             Resource.CurrentChanges += OnCurrentResourceChanges;
             Resource.MaximumChanges += OnMaximumResourceChanges;
-            Owner.Modifiers.ParameterModifiersChanged += Resource.OnParameterChanges;
+            Owner.Modifiers.ModifiersChanged += Resource.OnParameterChanges;
         }
 
         private void HandleEvadeReceivedAttack(IAttackContext context)
