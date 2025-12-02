@@ -1,4 +1,4 @@
-﻿namespace LastBreathTest.ComponentTests
+﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
     using Core.Interfaces;

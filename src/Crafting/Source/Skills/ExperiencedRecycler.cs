@@ -9,13 +9,13 @@
     public partial class ExperiencedRecycler : SkillBase
     {
         [Export] private int Percent { get; set; }
-        
+
         public override void Attach(IEntity owner)
         {
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }

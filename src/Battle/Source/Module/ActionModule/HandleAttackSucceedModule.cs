@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Module.ActionModule
 {
     using Core.Enums;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
 
     public class HandleAttackSucceedModule(IEntity owner) : IActionModule<IEntity>

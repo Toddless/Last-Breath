@@ -4,7 +4,7 @@
 
     public interface IAbilityCost
     {
-        public Costs Resource { get; }
-        public int Value { get; }
+        public Costs Type { get; }
+        public float Value { get; }
     }
 }

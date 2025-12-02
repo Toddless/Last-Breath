@@ -6,7 +6,6 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable
     {

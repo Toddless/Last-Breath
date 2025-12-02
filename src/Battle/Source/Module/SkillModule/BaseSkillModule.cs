@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Skills;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
 
     public abstract class BaseSkillModule(IEntity owner, SkillType type, DecoratorPriority priority) : ISkillModule

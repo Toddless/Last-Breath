@@ -1,21 +1,23 @@
 ﻿namespace Core.Interfaces.Abilities
 {
     using Enums;
+    using Battle;
     using Entity;
 
-    public interface IEffect
+    public interface IEffect : IIdentifiable, IDisplayable
     {
-        string Id { get; set; }
-        StatusEffects StatusEffect { get; set; }
+        StatusEffects Status { get; set; }
         int Duration { get; set; }
-        int Stacks { get; set; }
-        bool Permanent { get; }
-        bool Expired { get; }
+        int MaxStacks { get; set; }
+        object? Source { get; }
 
-        void OnApply(IEntity target, IEntity source, AbilityContext context);
-        void OnTick(IEntity target);
-        void OnRemove(IEntity target);
-        void OnStacks(IEffect newEffect);
+        void OnApply(EffectApplyingContext context);
+        void OnTurnEnd(IEntity target);
+        void OnTurnStart(IEntity target);
+        void OnBeforeAttack(IEntity target, IAttackContext context);
+        void OnAfterAttack(IEntity target, IAttackContext context);
+        bool IsStronger(IEffect otherEffect);
+        void Remove(IEntity target);
         IEffect Clone();
     }
 }

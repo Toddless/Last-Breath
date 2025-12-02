@@ -20,14 +20,14 @@
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }
 
         protected override string GetDescription()
         {
-            return Localizator.LocalizeDescriptionFormated(Id, [Localizator.Localize(MasteryId), CurrentBonusLevel]);
+            return Localizator.LocalizeDescriptionFormated(Id, Localizator.Localize(MasteryId), CurrentBonusLevel);
         }
 
         public override ISkill? Copy()

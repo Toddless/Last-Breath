@@ -1,48 +1,39 @@
 ﻿namespace Battle.TestData.Abilities.Effects
 {
-    using Godot;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
 
-    public class DamageOverTurnEffect : IEffect
+    public class DamageOverTurnEffect(
+        int duration,
+        int stacks,
+        float percentFromDamage = 0.7f,
+        StatusEffects statusEffect = StatusEffects.None,
+        string id = "Damage_Over_Turn_Effect")
+        : Effect(id, duration, stacks, statusEffect)
     {
-        public string Id { get; set; } = "Effect_Damage_Over_Turn";
-        public StatusEffects StatusEffect { get; set; } = StatusEffects.None;
-        public int Duration { get; set; } = 3;
-        public int Stacks { get; set; } = 3;
-        public bool Permanent => Duration <= 0;
-        public bool Expired => Duration == 0;
-
+        public float PercentFromBase { get; set; } = percentFromDamage;
         public float DamagePerTick { get; set; }
 
-
-        public void OnApply(IEntity target, IEntity source, AbilityContext context)
+        public override void OnApply(EffectApplyingContext context)
         {
+            DamagePerTick = context.Damage * PercentFromBase;
+            base.OnApply(context);
         }
 
-        public void OnTick(IEntity target)
+        public override void OnTurnEnd(IEntity target)
         {
-            target.TakeDamage(DamagePerTick * Mathf.Max(1, Stacks));
+            target.TakeDamage(DamagePerTick, Status.GetDamageType(), DamageSource.Effect);
+            base.OnTurnEnd(target);
         }
 
-        public void OnRemove(IEntity target)
+        public override bool IsStronger(IEffect otherEffect)
         {
+            if (otherEffect is not DamageOverTurnEffect other) return false;
+
+            return DamagePerTick > other.DamagePerTick;
         }
 
-        public void OnStacks(IEffect newEffect)
-        {
-            Stacks += newEffect.Stacks;
-            Duration = Mathf.Max(Duration, newEffect.Duration);
-        }
-
-        public IEffect Clone() => new DamageOverTurnEffect
-        {
-            Id = Id,
-            StatusEffect = StatusEffect,
-            Duration = Duration,
-            Stacks = Stacks,
-            DamagePerTick = DamagePerTick,
-        };
+        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxStacks, PercentFromBase, Status, Id);
     }
 }

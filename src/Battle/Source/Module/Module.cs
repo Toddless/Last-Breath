@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
 
     public class Module<TKey>(Func<float> value, TKey parameter) : IParameterModule<TKey>
         where TKey : struct, Enum

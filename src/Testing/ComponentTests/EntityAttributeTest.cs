@@ -1,12 +1,9 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
-    using Battle;
+    using TestData;
     using Core.Enums;
     using Core.Modifiers;
-    using Battle.Attribute;
-    using Battle.Components;
     using Battle.Source.Decorators;
-    using Core.Interfaces.Components;
 
     [TestClass]
     public class EntityAttributeTest
@@ -14,19 +11,19 @@
         [TestMethod]
         public void DefaultValueForDexterity_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
 
-            Assert.IsTrue(dexterity.Total == 1);
+            Assert.IsTrue(entity.Dexterity.Total == 1);
         }
 
 
         [TestMethod]
         public void IncreasingDexterityIncreaseCriticalChance_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
 
-            dexterity.IncreasePointsByAmount(3);
-            float criticalChanceWithIncreasedDex = component.CriticalChance;
+            entity.Dexterity.IncreasePointsByAmount(3);
+            float criticalChanceWithIncreasedDex = entity.Parameters.CriticalChance;
 
             Assert.IsTrue(Math.Abs(criticalChanceWithIncreasedDex - 0.06f) < 0.00001f, $"Value is: {criticalChanceWithIncreasedDex}");
         }
@@ -35,64 +32,64 @@
         [TestMethod]
         public void IncreaseDexterityChangeCriticalChanceValue_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
             var dexModifier = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Increase, 0.3f, this);
-            var dexModifierMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 1.2f, this);
-            manager.AddPermanentModifier(dexModifier);
-            manager.AddPermanentModifier(dexModifierMulti);
-            dexterity.IncreasePointsByAmount(5);
+            var dexModifierMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 0.2f, this);
+            entity.Modifiers.AddPermanentModifier(dexModifier);
+            entity.Modifiers.AddPermanentModifier(dexModifierMulti);
+            entity.Dexterity.IncreasePointsByAmount(5);
 
-            float criticalChance = component.CriticalChance;
+            float criticalChance = entity.Parameters.CriticalChance;
 
-            Assert.IsTrue(Math.Abs(criticalChance - 0.0725f) < 0.0001f, $"Value is: {criticalChance}, total dex: {dexterity.Total}");
+            Assert.IsTrue(Math.Abs(criticalChance - 0.0725f) < 0.0001f, $"Value is: {criticalChance}, total dex: {entity.Dexterity.Total}");
         }
 
         [TestMethod]
         public void ModifiersChangeTotalDex_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
 
             var dexModifierFlat = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Flat, 2f, this);
             var dexModifierInc = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Increase, 0.5f, this);
-            var dexModifierMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 1.2f, this);
+            var dexModifierMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 0.2f, this);
 
-            manager.AddPermanentModifier(dexModifierFlat);
-            manager.AddPermanentModifier(dexModifierInc);
-            manager.AddPermanentModifier(dexModifierMulti);
+            entity.Modifiers.AddPermanentModifier(dexModifierFlat);
+            entity.Modifiers.AddPermanentModifier(dexModifierInc);
+            entity.Modifiers.AddPermanentModifier(dexModifierMulti);
 
-            dexterity.IncreasePointsByAmount(7);
+            entity.Dexterity.IncreasePointsByAmount(7);
 
-            Assert.IsTrue(dexterity.Total == 18, $"Value is: {dexterity.Total}");
+            Assert.IsTrue(entity.Dexterity.Total == 18, $"Value is: {entity.Dexterity.Total}");
         }
 
         [TestMethod]
         public void DecoratorChangesTotalDex_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
 
-            var dexMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 1.5f, this);
-            manager.AddPermanentModifier(dexMulti);
-            dexterity.IncreasePointsByAmount(19);
+            var dexMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 0.5f, this);
+            entity.Modifiers.AddPermanentModifier(dexMulti);
+            entity.Dexterity.IncreasePointsByAmount(19);
 
             var decorator = new ChangeValueDecorator(EntityParameter.Dexterity, DecoratorPriority.Strong, "reduce_dexterity_by_80_percent_decorator", 0.2f);
-            component.AddModuleDecorator(decorator);
+            entity.Parameters.AddModuleDecorator(decorator);
 
-            Assert.IsTrue(dexterity.Total == 6, $"Value is: {dexterity.Total}");
+            Assert.IsTrue(entity.Dexterity.Total == 6, $"Value is: {entity.Dexterity.Total}");
         }
 
         [TestMethod]
         public void DecoratorChangesCriticalChance_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
+            var entity = new EntityTest();
 
-            var dexMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 1.5f, this);
-            manager.AddPermanentModifier(dexMulti);
-            dexterity.IncreasePointsByAmount(19);
-            float criticalChangeBefore = component.CriticalChance;
+            var dexMulti = new ModifierInstance(EntityParameter.Dexterity, ModifierType.Multiplicative, 0.5f, this);
+            entity.Modifiers.AddPermanentModifier(dexMulti);
+            entity.Dexterity.IncreasePointsByAmount(19);
+            float criticalChangeBefore = entity.Parameters.CriticalChance;
             var decorator = new ChangeValueDecorator(EntityParameter.Dexterity, DecoratorPriority.Strong, "reduce_dexterity_by_80_percent_decorator", 0.2f);
-            component.AddModuleDecorator(decorator);
+            entity.Parameters.AddModuleDecorator(decorator);
 
-            float criticalChangeAfter = component.CriticalChance;
+            float criticalChangeAfter = entity.Parameters.CriticalChance;
 
             Assert.IsTrue(Math.Abs(criticalChangeBefore - 0.125f) < 0.0001f, $"Critical chance before: {criticalChangeBefore} ");
             Assert.IsTrue(Math.Abs(criticalChangeAfter - 0.065f) < 0.0001f, $"Critical chance after: {criticalChangeAfter} ");
@@ -101,16 +98,16 @@
         [TestMethod]
         public void ReduceDexterityDoNotAffectCriticalChanceModifier_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
-            manager.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Flat, 0.05f, this));
-            manager.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Increase, 0.15f, this));
-            manager.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Increase, 0.2f, this));
-            manager.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Multiplicative, 1.2f, this));
-            dexterity.IncreasePointsByAmount(19);
-            float criticalChanceBefore = component.CriticalChance; // should be 0.282f
-            component.AddModuleDecorator(new ChangeValueDecorator(EntityParameter.Dexterity, DecoratorPriority.Strong, "reduce_dexterity_by_90_percent_decorator", 0.1f));
+            var entity = new EntityTest();
+            entity.Modifiers.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Flat, 0.05f, this));
+            entity.Modifiers.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Increase, 0.15f, this));
+            entity.Modifiers.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Increase, 0.2f, this));
+            entity.Modifiers.AddPermanentModifier(new ModifierInstance(EntityParameter.CriticalChance, ModifierType.Multiplicative, 0.2f, this));
+            entity.Dexterity.IncreasePointsByAmount(19);
+            float criticalChanceBefore = entity.Parameters.CriticalChance; // should be 0.282f
+            entity.Parameters.AddModuleDecorator(new ChangeValueDecorator(EntityParameter.Dexterity, DecoratorPriority.Strong, "reduce_dexterity_by_90_percent_decorator", 0.1f));
 
-            float criticalChanceAfter = component.CriticalChance; // should be 0.174f
+            float criticalChanceAfter = entity.Parameters.CriticalChance; // should be 0.174f
 
             Assert.IsTrue(MathF.Abs(criticalChanceBefore - 0.282f) < 0.00001f, $"Value before: {criticalChanceBefore} ");
             Assert.IsTrue(MathF.Abs(criticalChanceAfter - 0.174f) < 0.00001f, $"Value after: {criticalChanceAfter}");
@@ -119,13 +116,14 @@
         [TestMethod]
         public void ReduceOverallCriticalChange_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
-            dexterity.IncreasePointsByAmount(19);
-            float criticalChanceBefore = component.CriticalChance; // should be 0.10f
-            component.AddModuleDecorator(new ChangeValueDecorator(EntityParameter.CriticalChance, DecoratorPriority.Strong, "reduce_critical_chance_by_80_percent_decorator",
+            var entity = new EntityTest();
+            entity.Dexterity.IncreasePointsByAmount(19);
+            float criticalChanceBefore = entity.Parameters.CriticalChance; // should be 0.10f
+            entity.Parameters.AddModuleDecorator(new ChangeValueDecorator(EntityParameter.CriticalChance, DecoratorPriority.Strong,
+                "reduce_critical_chance_by_80_percent_decorator",
                 0.2f));
 
-            float criticalChange = component.CriticalChance; // should be 0.02
+            float criticalChange = entity.Parameters.CriticalChance; // should be 0.02
 
             Assert.IsTrue(MathF.Abs(criticalChange - 0.02f) < 0.0001f, $"Value before: {criticalChanceBefore}");
             Assert.IsTrue(MathF.Abs(criticalChanceBefore - 0.10f) < 0.0001f, $"Value after : {criticalChange}");
@@ -135,41 +133,15 @@
         [TestMethod]
         public void RemovingDexterityPointChangesCriticalChange_Test()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity);
-            dexterity.IncreasePointsByAmount(19);
-            float criticalChanceBefore = component.CriticalChance; // should be 0.10f
+            var entity = new EntityTest();
+            entity.Dexterity.IncreasePointsByAmount(19);
+            float criticalChanceBefore = entity.Parameters.CriticalChance; // should be 0.10f
 
-            dexterity.DecreasePointsByAmount(10);
-            float criticalChangeAfter = component.CriticalChance; // 0.75f
+            entity.Dexterity.DecreasePointsByAmount(10);
+            float criticalChangeAfter = entity.Parameters.CriticalChance; // 0.75f
 
             Assert.IsTrue(MathF.Abs(criticalChanceBefore - 0.10f) < 0.0001f, $"Value before: {criticalChanceBefore}");
             Assert.IsTrue(MathF.Abs(criticalChangeAfter - 0.075f) < 0.0001f, $"Value after: {criticalChangeAfter}");
-        }
-
-
-        private static void PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Dexterity dexterity)
-        {
-            manager = new ModifierManager();
-            component = new EntityParametersComponent();
-            manager.ModifiersChanged += component.OnModifiersChange;
-            dexterity = new Dexterity(manager);
-            component.ParameterChanged += dexterity.OnParameterChanges;
-            component.Initialize();
-
-            foreach (EntityParameter parameter in Enum.GetValues<EntityParameter>())
-            {
-                float value = parameter switch
-                {
-                    EntityParameter.CriticalChance => 0.05f,
-                    EntityParameter.CriticalDamage => 1.2f,
-                    EntityParameter.Damage => 50f,
-                    EntityParameter.Health => 250f,
-                    _ => 0,
-                };
-
-                if (value == 0) continue;
-                manager.AddPermanentModifier(new ModifierInstance(parameter, ModifierType.Flat, value, component));
-            }
         }
     }
 }

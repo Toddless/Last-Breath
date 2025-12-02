@@ -3,19 +3,18 @@
     using Godot;
     using System;
     using Stateless;
+    using Services;
     using Core.Enums;
     using Components;
     using Core.Constants;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Mediator;
-    using Services;
 
-    internal partial class Player : CharacterBody2D, IFightable, IRequireServices
+    internal partial class Player : CharacterBody2D, IRequireServices
     {
         private enum State
         {
@@ -52,10 +51,36 @@
         public IEntityParametersComponent Parameters { get; } = new EntityParametersComponent();
         public IStance CurrentStance { get; private set; }
 
-        public IModifierManager ModifierManager { get; private set; }
+        public IModifiersComponent ModifiersComponent { get; private set; }
 
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
+
+        public float CurrentHealth
+        {
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Max(0, Mathf.Min(value, Parameters.MaxHealth));
+                if (Mathf.Abs(clamped - field) < float.Epsilon) return;
+                field = clamped;
+                CurrentHealthChanged?.Invoke(field);
+            }
+        }
+
+        public float CurrentBarrier
+        {
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Max(0, Mathf.Min(value, Parameters.MaxHealth));
+                if (Mathf.Abs(clamped - field) < float.Epsilon) return;
+                field = clamped;
+                CurrentBarrierChanged?.Invoke(field);
+            }
+        }
+
+        public event Action<float>? CurrentBarrierChanged, CurrentHealthChanged;
 
 
         public event Action? TurnStart;
@@ -106,7 +131,7 @@
         {
         }
 
-        public void TakeDamage(float damage, bool isCrit = false)
+        public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
         }
 
@@ -160,8 +185,8 @@
 
         private void OnBodyEnter(Node2D body)
         {
-            if (body is IFightable fightable)
-                _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
+            // if (body is IFightable fightable)
+            //     _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
         }
     }
 }

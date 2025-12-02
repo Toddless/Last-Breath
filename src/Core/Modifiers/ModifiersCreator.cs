@@ -21,11 +21,11 @@
             ["Evade"] = EntityParameter.Evade,
             ["EnergyBarrier"] = EntityParameter.Barrier,
             ["SpellDamage"] = EntityParameter.SpellDamage,
-            ["ResourceRecovery"] = EntityParameter.ResourceRecovery,
-            ["Movespeed"] = EntityParameter.Movespeed,
+            ["ResourceRecovery"] = EntityParameter.ManaRecovery,
+            ["Movespeed"] = EntityParameter.MoveSpeed,
             ["Suppress"] = EntityParameter.Suppress,
             ["Health"] = EntityParameter.Health,
-            ["MaxResource"] = EntityParameter.Resource,
+            ["MaxResource"] = EntityParameter.Mana,
         };
 
         private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)

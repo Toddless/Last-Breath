@@ -14,8 +14,8 @@
         {
 
         }
-            
-        public override void Detach()
+
+        public override void Detach(IEntity owner)
         {
 
         }

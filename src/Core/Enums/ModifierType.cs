@@ -11,7 +11,7 @@
         /// </summary>
         Increase,
         /// <summary>
-        /// Percent values should be 1.3, 1.1 etc.
+        /// Percent values. Values should be 0.3, 0.1 etc.
         /// </summary>
         Multiplicative
     }

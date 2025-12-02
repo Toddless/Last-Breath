@@ -7,6 +7,7 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using TestData;
 
     public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType)
     {
@@ -37,10 +38,7 @@
         {
             if (!CanAttack(target)) return;
 
-            AttackContext context = new(Owner, target)
-            {
-                Damage = Owner.Parameters.Damage, CriticalDamageMultiplier = Owner.Parameters.CriticalDamage
-            };
+            AttackContext context = new(Owner, target, Owner.Parameters.Damage, new RndGodot());
 
             // create list with skills applied on attack
             ApplyPreAttackSkills(context);
@@ -59,10 +57,8 @@
 
         protected virtual void HandleReceivedAttack(IAttackContext context)
         {
-            context.Armor = Owner.Parameters.Armor;
-            Owner.TakeDamage(context.FinalDamage, context.IsCritical);
+            Owner.TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
 
-            HandleOnAttackSkills(context.PassiveSkills);
             context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
         }
 

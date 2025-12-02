@@ -1,12 +1,18 @@
 ﻿namespace Battle.TestData.Abilities.Effects
 {
+    using Core.Enums;
     using Core.Interfaces.Abilities;
 
-    public class CurseEffect : Effect
+    public class CurseEffect(int duration, int stacks, StatusEffects statusEffect = StatusEffects.None)
+        : Effect(id: "Curse_Effect", duration, stacks, statusEffect)
     {
-        public override IEffect Clone() => new CurseEffect
+        public override void OnApply(EffectApplyingContext context)
         {
-            Id = Id, Duration = Duration, Stacks = Stacks, StatusEffect = StatusEffect
-        };
+        }
+
+        public override IEffect Clone() => new CurseEffect
+        (
+            Duration, MaxStacks, Status
+        );
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
+    using Decorator;
     using Enums;
-    using Battle.Decorator;
 
     public interface IHealthComponent
     {

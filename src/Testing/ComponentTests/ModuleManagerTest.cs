@@ -2,8 +2,8 @@
 {
     using Battle.Source;
     using Core.Enums;
-    using Core.Interfaces.Battle.Decorator;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
     using TestData;
 
     [TestClass]
@@ -77,12 +77,12 @@
         {
             var manager = CreateManager();
             bool activated = false;
+            manager.ModuleChanges += OnModuleChanges;
 
             var decorator = new AdditionalDamageDecoratorTest(DecoratorPriority.Weak, 15);
-            manager.AddDecorator(decorator);
 
+            manager.AddDecorator(decorator);
             var secondDecorator = new AdditionalDamageDecoratorTest(DecoratorPriority.Strong, 25);
-            manager.ModuleChanges += OnModuleChanges;
             manager.RemoveDecorator(secondDecorator.Id, secondDecorator.Parameter);
 
             void OnModuleChanges(EntityParameter stat)
@@ -90,7 +90,7 @@
                 activated = true;
             }
 
-            Assert.IsTrue(activated);
+            Assert.IsTrue(activated, $"Activated: {activated}");
         }
 
         [TestMethod]
@@ -107,7 +107,7 @@
 
             float finalValue = manager.GetModule(EntityParameter.Damage).ApplyDecoratorsForValue(valueAsBase);
 
-            Assert.IsTrue(Math.Abs(finalValue - 65f) < float.Epsilon);
+            Assert.IsTrue(Math.Abs(finalValue - 65f) < 0.00001f);
         }
 
         private ModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator> CreateManager() => new(

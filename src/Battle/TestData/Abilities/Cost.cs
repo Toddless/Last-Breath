@@ -4,9 +4,14 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
-    public class Cost(Func<int> costModule, Func<int> cost) : IAbilityCost
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="costValue">Actual value</param>
+    /// <param name="resourceType">Define type of cost based on <see cref="Costs"/></param>
+    public class Cost(Func<float> costValue, Func<int> resourceType) : IAbilityCost
     {
-        public Costs Resource => (Costs)cost.Invoke();
-        public int Value => costModule.Invoke();
+        public Costs Type => (Costs)resourceType.Invoke();
+        public float Value => costValue.Invoke();
     }
 }

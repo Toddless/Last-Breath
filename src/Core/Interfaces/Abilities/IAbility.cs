@@ -1,28 +1,40 @@
 ﻿namespace Core.Interfaces.Abilities
 {
     using Enums;
+    using Entity;
     using System;
-    using Battle.Module;
-    using Battle.Decorator;
     using System.Collections.Generic;
+    using Components.Decorator;
+    using Components.Module;
 
-    public interface IAbility : IIdentifiable, IDisplayable
+    public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {
         float MaxTargets { get; }
         float AvailablePoints { get; set; }
         float Cooldown { get; }
-        IAbilityCost Cost { get; }
+        int CooldownLeft { get; }
+        int Cost { get; }
+        Costs Type { get; }
         List<IEffect> Effects { get; set; }
+        public List<IEffect> CasterEffects { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }
 
-        event Action<AbilityParameter> OnParameterChanged;
+        event Action<AbilityParameter>? OnParameterChanged;
+        event Action<IAbility>? OnCooldown;
 
-        void Activate(AbilityContext context);
+        void Activate(List<IEntity> targets);
 
         void AddParameterUpgrade<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
             where T : struct, Enum;
 
         void RemoveParameterUpgrade<T>(string id, T key)
             where T : struct, Enum;
+
+        bool IsEnoughResource();
+        void AddCondition(IConditionalModifier modifier);
+        void RemoveCondition(string id);
+        void ClearConditions();
+        void AddEffect(IEffect effect, bool targetEffect = true);
+        void RemoveEffect(string id, bool targetEffect = true);
     }
 }

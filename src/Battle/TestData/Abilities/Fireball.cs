@@ -1,6 +1,5 @@
 ﻿namespace Battle.TestData.Abilities
 {
-    using Godot;
     using Source;
     using Core.Enums;
     using Decorators;
@@ -10,51 +9,92 @@
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
 
-    public class Fireball(
-        float cooldown,
-        float targets,
-        float baseDamage,
-        float baseCriticalChance,
-        string id,
-        string[] tags,
-        int availablePoints,
-        Texture2D? icon,
-        List<IEffect> effects,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IAbilityCost cost,
-        IStanceMastery mastery) : Ability(id, tags, availablePoints, icon, effects, upgrades, cost, mastery)
+    public class Fireball : Ability
     {
-        private IEntity? _owner;
+        private readonly float _cooldown;
+        private readonly float _maxTargets;
+        private readonly float _baseDamage;
+        private readonly float _baseCriticalChance;
+        private readonly int _costValue;
+        private readonly Costs _costType;
 
-        // с ростом уровня мастерства мне необходимо апгрейдить базовые показатели способности (урон, шансы и т.п)
+        public float CriticalChanceDetermination => this[AbilityParameter.CriticalChanceDetermination];
+
         public float Damage => this[AbilityParameter.Damage];
 
-        // each ability has it own base critical chance, we take all increases and multipliers from entity
-        // and calculate it
-        public float CriticalChance => this[AbilityParameter.CriticalChance];
+        public float CriticalChanceValue => this[AbilityParameter.CriticalChanceValue];
 
-        public void SetOwner(IEntity? owner) => _owner = owner;
-
-        public override void Activate(AbilityContext context)
+        public Fireball(float cooldown,
+            float maxTargets,
+            float baseDamage,
+            float baseCriticalChance,
+            string[] tags,
+            int availablePoints,
+            int costValue,
+            List<IEffect> effects,
+            List<IEffect> casterEffects,
+            Dictionary<int, List<IAbilityUpgrade>> upgrades,
+            IStanceMastery mastery,
+            Costs costType = Costs.Mana) : base(id: "Ability_Fireball", tags, availablePoints, effects, casterEffects, upgrades, mastery)
         {
+            _cooldown = cooldown;
+            _maxTargets = maxTargets;
+            _baseDamage = baseDamage;
+            _baseCriticalChance = baseCriticalChance;
+            _costValue = costValue;
+            _costType = costType;
+            //Rnd.Randomize();
+        }
+
+        public void SetOwner(IEntity? owner) => Owner = owner;
+
+        public override void Activate(List<IEntity> targets)
+        {
+            if (Owner == null) return;
+
+            var context = new EffectApplyingContext { Caster = Owner, Source = this };
+
+            foreach (IEntity target in targets)
+            {
+                context.Target = target;
+                float damage = ApplyConditionalModifiers(context, AbilityParameter.Damage, Damage + Owner.Parameters.SpellDamage);
+                float criticalChance = ApplyConditionalModifiers(context, AbilityParameter.CriticalChanceValue, CriticalChanceValue);
+                bool isCritical = ApplyConditionalModifiers(context, AbilityParameter.CriticalChanceDetermination, CriticalChanceDetermination) <= criticalChance;
+                context.IsCritical = isCritical;
+                context.Damage = damage;
+
+                ApplyTargetEffects(context);
+
+                target.TakeDamage(damage, DamageType.Normal, DamageSource.Ability, isCritical);
+            }
+
+            ApplyCasterEffects(context);
+            StartCooldown();
+            ConsumeResource();
         }
 
         protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
             new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(
                 new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
                 {
-                    [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => Cost.Value, AbilityParameter.CostValue),
-                    [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)Cost.Resource, AbilityParameter.CostType),
-                    [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                    [AbilityParameter.Target] = new Module<AbilityParameter>(() => targets, AbilityParameter.Target),
-                    [AbilityParameter.Damage] = new Module<AbilityParameter>(() => Mastery.GetValueForParameter(baseDamage), AbilityParameter.Damage),
-                    [AbilityParameter.CriticalChance] = new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChance),
+                    [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => _costValue, AbilityParameter.CostValue),
+                    [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)_costType, AbilityParameter.CostType),
+                    [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => _cooldown, AbilityParameter.Cooldown),
+                    [AbilityParameter.Target] = new Module<AbilityParameter>(() => _maxTargets, AbilityParameter.Target),
+                    [AbilityParameter.Damage] = new Module<AbilityParameter>(() => _baseDamage, AbilityParameter.Damage),
+                    [AbilityParameter.CriticalChanceValue] = new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChanceValue),
+                    [AbilityParameter.CriticalChanceDetermination] = new Module<AbilityParameter>(() => (float)Rnd.NextDouble(), AbilityParameter.CriticalChanceDetermination),
                 });
 
+        private float GetCurrentCriticalChance() => Owner == null
+            ? _baseCriticalChance
+            : Owner.Parameters.CalculateForBase(EntityParameter.CriticalChance, _baseCriticalChance);
 
-        private float GetCurrentCriticalChance() =>
-            _owner == null ? baseCriticalChance : _owner.Parameters.CalculateForBase(EntityParameter.CriticalChance, Mastery.GetValueForParameter(baseCriticalChance));
+        // Not sure about this. Modifiers will be apply twice. Once for entity spell damage parameter and once for ability spell damage
+        private float GetCurrentDamage() => Owner == null
+            ? _baseDamage
+            : Owner.Parameters.CalculateForBase(EntityParameter.SpellDamage, _baseDamage);
     }
 }

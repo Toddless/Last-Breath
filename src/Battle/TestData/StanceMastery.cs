@@ -26,7 +26,7 @@
 
         public event Action<int>? BonusLevelChange, CurrentLevelChange, ExperienceChange;
 
-        public float GetValueForParameter(float baseValue) => baseValue * GetProgressFactor();
+        public float ScaleAbilityParameter(float baseValue) => baseValue * GetProgressFactor();
 
 
         public bool HasTag(string tag) => throw new NotImplementedException();

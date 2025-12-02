@@ -3,16 +3,16 @@
     using Godot;
     using System;
     using Components;
+    using Core.Enums;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Events;
     using Utilities;
 
-    internal partial class Enemy : CharacterBody2D, IFightable, IInitializable, IRequireServices
+    internal partial class Enemy : CharacterBody2D, IInitializable, IRequireServices
     {
         private const string UID = "uid://bssmtdwwycbpt";
         [Export] private AnimatedSprite2D? _animatedSprite;
@@ -31,6 +31,33 @@
         public IStance CurrentStance { get; set; }
 
         public IEntityGroup? Group { get; set; }
+
+        public float CurrentHealth
+        {
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Max(0, Mathf.Min(value, Parameters.MaxHealth));
+                if (Mathf.Abs(clamped - field) < float.Epsilon) return;
+                field = clamped;
+                CurrentHealthChanged?.Invoke(field);
+            }
+        }
+
+        public float CurrentBarrier
+        {
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Max(0, Mathf.Min(value,  Parameters.MaxHealth));
+                if (Mathf.Abs(clamped - field) < float.Epsilon) return;
+                field = clamped;
+                CurrentBarrierChanged?.Invoke(field);
+            }
+        }
+
+        public event Action<float>? CurrentBarrierChanged, CurrentHealthChanged;
+
 
         public event Action? TurnStart;
         public event Action? TurnEnd;
@@ -77,7 +104,7 @@
         {
         }
 
-        public void TakeDamage(float damage, bool isCrit = false)
+        public void TakeDamage(float damage, DamageType type, DamageSource source,bool isCrit = false)
         {
         }
 
@@ -91,13 +118,13 @@
                 switch (body)
                 {
                     case Player player:
-                        {
-                            var fighters = Group?.GetEntitiesInGroup<IFightable>() ?? [this];
-                            if (!fighters.Contains(player))
-                                fighters.Add(player);
-                            _mediator.PublishAsync(new InitializeFightEvent<IFightable>(fighters));
-                            break;
-                        }
+                        // {
+                        //     var fighters = Group?.GetEntitiesInGroup<IFightable>() ?? [this];
+                        //     if (!fighters.Contains(player))
+                        //         fighters.Add(player);
+                        //     _mediator.PublishAsync(new InitializeFightEvent<IFightable>(fighters));
+                        //     break;
+                        // }
                     case IFightable fighter:
                         // TODO: Decide to begin fight or not
                         break;

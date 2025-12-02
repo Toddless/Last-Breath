@@ -9,9 +9,7 @@
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Core.Modifiers;
     using Godot;
-    using Newtonsoft.Json;
     using TestResources;
     using Utilities;
 

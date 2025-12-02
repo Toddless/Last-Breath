@@ -3,23 +3,17 @@
     using System;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
-    using System.Collections.Generic;
+    using Core.Interfaces.Components;
 
-    public class AttackContext(IEntity attaker, IEntity target) : IAttackContext
+    public class AttackContext(IEntity attacker, IEntity target, float baseDamage, IRandomNumberGenerator rnd) : IAttackContext
     {
-        public IEntity Attacker { get; } = attaker;
+        public IRandomNumberGenerator Rnd { get; } = rnd;
+        public IEntity Attacker { get; } = attacker;
         public IEntity Target { get; } = target;
-        public float Damage { get; set; }
-        public float CriticalDamageMultiplier { get; set; }
-        public float Armor { get; set; }
-        public float MaxReduceDamage { get; set; }
+        public float BaseDamage { get; } = baseDamage;
         public float FinalDamage { get; set; }
         public bool IsCritical { get; set; }
-        public bool IgnoreEvade { get; set; }
-        public bool IgnoreArmor { get; set; }
-        public bool IgnoreBarrier { get; set; }
-        public List<ISkill> PassiveSkills { get; set; } = [];
+        public bool IsAttackSucceed { get; set; }
 
         public event Action<IAttackResult>? OnAttackResult;
         public event Action<IAttackContext>? OnAttackCanceled;

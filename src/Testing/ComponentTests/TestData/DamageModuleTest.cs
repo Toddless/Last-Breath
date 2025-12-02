@@ -1,7 +1,7 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
 
     public class DamageModuleTest(float value) : IParameterModule<EntityParameter>
     {

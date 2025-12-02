@@ -2,7 +2,7 @@
 {
     using Components;
 
-    public interface IStanceSkillComponent : IBaseSkillComponent<IStanceSkill>
+    public interface IStanceSkillComponent : ISkillComponent<IStanceSkill>
     {
     }
 }

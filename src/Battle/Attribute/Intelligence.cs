@@ -7,7 +7,8 @@
     using Core.Interfaces.Components;
     using System.Collections.Generic;
 
-    public class Intelligence(IModifierManager manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierType.Flat, EntityParameter.Intelligence, 1f))
+    public class Intelligence(IModifiersComponent manager) :
+        EntityAttribute(GetEffects(), manager,  new Modifier(ModifierType.Flat, EntityParameter.Intelligence, 0f))
     {
         public override int Total
         {
@@ -30,9 +31,11 @@
         {
             yield return new Modifier(ModifierType.Flat, EntityParameter.Barrier, 10);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.SpellDamage, 0.2f);
+            yield return new Modifier(ModifierType.Flat, EntityParameter.SpellDamage, 10f);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.ResourceRecovery, 0.1f);
+            yield return new Modifier(ModifierType.Flat, EntityParameter.ManaRecovery, 0.1f);
+
+            yield return new Modifier(ModifierType.Flat, EntityParameter.Mana, 0.1f);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
-    using Battle;
     using Core.Enums;
     using Core.Modifiers;
     using Core.Interfaces;
@@ -8,6 +7,7 @@
     using Battle.Components;
     using Battle.Source.Decorators;
     using Core.Interfaces.Components;
+    using TestData;
 
     [TestClass]
     public class EntityParametersComponentTest
@@ -15,7 +15,7 @@
         [TestMethod]
         public void AddedHealthBonuses()
         {
-            PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Strength strength);
+            PrepareEntities(out IModifiersComponent manager, out EntityParametersComponent component, out Strength strength);
 
             var healthPercent = new ChangeValueDecorator(EntityParameter.Health, DecoratorPriority.Weak, "reduce_health_by_10_percent", 0.9f);
             var second = new ChangeValueDecorator(EntityParameter.Health, DecoratorPriority.Weak, "increase_all_health_by_30_percent", 1.3f);
@@ -36,7 +36,7 @@
 
             var healthPercent = new ChangeValueDecorator(EntityParameter.Health, DecoratorPriority.Weak, "change_value", 0.9f);
             var second = new ChangeValueDecorator(EntityParameter.Health, DecoratorPriority.Weak, "second", 1.3f);
-            var modifiers = new List<IModifierInstance>()
+            var modifiers = new List<IModifierInstance>
             {
                 new ModifierInstance(EntityParameter.Health, ModifierType.Flat, 250, this),
                 new ModifierInstance(EntityParameter.Health, ModifierType.Increase, 0.3f, this),
@@ -55,14 +55,14 @@
             Assert.IsTrue(health < healthAfterModule);
         }
 
-        private static void PrepareEntities(out IModifierManager manager, out EntityParametersComponent component, out Strength strength)
+        private static void PrepareEntities(out IModifiersComponent manager, out EntityParametersComponent component, out Strength strength)
         {
-            manager = new ModifierManager();
+            manager = new ModifiersComponent();
             component = new EntityParametersComponent();
             manager.ModifiersChanged += component.OnModifiersChange;
             strength = new Strength(manager);
             component.ParameterChanged += strength.OnParameterChanges;
-            component.Initialize();
+            component.Initialize(manager.GetModifiers);
 
             foreach (EntityParameter parameter in Enum.GetValues<EntityParameter>())
             {
@@ -74,9 +74,9 @@
                     EntityParameter.Damage => 50f,
                     EntityParameter.Intelligence or EntityParameter.Strength => 1f,
                     EntityParameter.SpellDamage => 20f,
-                    EntityParameter.Resource => 50f,
-                    EntityParameter.ResourceRecovery => 5f,
-                    EntityParameter.Movespeed => 125f,
+                    EntityParameter.Mana => 50f,
+                    EntityParameter.ManaRecovery => 5f,
+                    EntityParameter.MoveSpeed => 125f,
                     EntityParameter.Health or EntityParameter.Armor or EntityParameter.Barrier or EntityParameter.Evade => 250f,
                     EntityParameter.HealthRecovery => 50f,
                     _ => 0,

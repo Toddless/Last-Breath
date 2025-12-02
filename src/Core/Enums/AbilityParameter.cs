@@ -7,6 +7,7 @@
         CostValue,
         Target,
         Damage,
-        CriticalChance,
+        CriticalChanceValue,
+        CriticalChanceDetermination
     }
 }

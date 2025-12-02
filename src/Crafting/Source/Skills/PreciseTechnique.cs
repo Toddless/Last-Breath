@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source.Skills
 {
-    using Core.Interfaces.Entity;
     using Godot;
     using Utilities;
+    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
@@ -17,7 +17,7 @@
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }

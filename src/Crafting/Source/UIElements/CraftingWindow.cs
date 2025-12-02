@@ -12,10 +12,10 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator.Requests;
 
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
@@ -30,7 +30,7 @@
         [Export] private HBoxContainer? _buttons;
         [Export] private TextureRect? _itemIcon;
 
-        private Recipies? _recipes;
+        private Recipes? _recipes;
         private IItemDataProvider? _dataProvider;
         private IMediator? _mediator;
         private IUIElementProvider? _uiElementProvider;
@@ -50,7 +50,7 @@
             _add.Pressed += OnAddPressedAsync;
             if (_uiElementProvider != null)
             {
-                _recipes = _uiElementProvider.CreateRequireServices<Recipies>();
+                _recipes = _uiElementProvider.CreateRequireServices<Recipes>();
                 _recipeContainer?.AddChild(_recipes);
                 _recipes.RecipeSelected += SetRecipe;
             }

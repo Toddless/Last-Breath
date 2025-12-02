@@ -4,8 +4,9 @@
     using Utilities;
     using System.Linq;
     using System.Collections.Generic;
+    using Core.Enums;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Components.Decorator;
 
     public class ModuleManager<TKey, TModule, TDecorator> : IModuleManager<TKey, TModule, TDecorator>
         where TKey : struct, Enum
@@ -40,20 +41,20 @@
             return tmpModule;
         }
 
-        public void AddDecorator(TDecorator decorator)
+        public void AddDecorator(TDecorator newDecorator)
         {
-            if (!_decorators.TryGetValue(decorator.Parameter, out var list))
+            if (!_decorators.TryGetValue(newDecorator.Parameter, out var list))
             {
-                Tracker.TrackNotFound($"List for {decorator.Parameter}", this);
+                Tracker.TrackNotFound($"List for {newDecorator.Parameter}", this);
                 list = [];
-                _decorators[decorator.Parameter] = list;
+                _decorators[newDecorator.Parameter] = list;
             }
 
             // Check if this type of decorator already in list
-            if (list.Any(x => x.Id == decorator.Id && x.Priority == decorator.Priority)) return;
-            list.Add(decorator);
+            if (list.Any(existingDecorator => existingDecorator.Id == newDecorator.Id || existingDecorator.Priority == DecoratorPriority.Absolute)) return;
+            list.Add(newDecorator);
             list.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-            RaiseModuleChanges(decorator.Parameter);
+            RaiseModuleChanges(newDecorator.Parameter);
         }
 
         public void RemoveDecorator(string decoratorId, TKey key)

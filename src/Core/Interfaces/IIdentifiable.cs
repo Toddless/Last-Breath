@@ -3,8 +3,5 @@
     public interface IIdentifiable
     {
         string Id { get; }
-        string[] Tags { get; }
-
-        bool HasTag(string tag);
     }
 }

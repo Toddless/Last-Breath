@@ -26,7 +26,6 @@
     <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Source\Module\StatModules\" />
     <Folder Include="Source\RequestHandlers\" />
   </ItemGroup>
   <ItemGroup>
