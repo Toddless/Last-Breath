@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dj86l1gr2ffle"]
+[gd_scene load_steps=4 format=3 uid="uid://dj86l1gr2ffle"]
 
 [ext_resource type="Script" uid="uid://bkjhhot1r0eiy" path="res://Main.cs" id="1_idj7w"]
 [ext_resource type="PackedScene" uid="uid://okfegogbrc05" path="res://Scenes/MainWorld.tscn" id="1_r150o"]
-[ext_resource type="PackedScene" uid="uid://dph8vnuwipwoc" path="res://Scenes/BattleArena.tscn" id="2_rgh2o"]
 [ext_resource type="Script" uid="uid://dvgyct0lq236k" path="res://UiLayerManager.cs" id="3_kln2b"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_layerManager")]
@@ -10,10 +9,7 @@ script = ExtResource("1_idj7w")
 _mainWorld = NodePath("MainWorld")
 _layerManager = NodePath("UILayerManager")
 
-[node name="BattleArena" parent="." instance=ExtResource("2_rgh2o")]
-
 [node name="MainWorld" parent="." instance=ExtResource("1_r150o")]
-visible = false
 
 [node name="UILayerManager" type="Node" parent="." node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_tooltipLayer", "_notificationLayer")]
 script = ExtResource("3_kln2b")

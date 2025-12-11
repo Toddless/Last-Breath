@@ -11,7 +11,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
+            owner.Events.Subscribe<TurnEndEvent>(OnTurnEnd);
         }
 
         private void OnTurnEnd(TurnEndEvent evnt)
@@ -21,7 +21,7 @@
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            owner.Events.Unsubscribe<TurnEndEvent>(OnTurnEnd);
         }
 
         public override ISkill Copy() => new RegenerationPassiveSkill(Id, RegenAmount);

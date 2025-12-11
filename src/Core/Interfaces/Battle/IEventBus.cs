@@ -2,7 +2,7 @@
 {
     using System;
 
-    public interface ICombatEventDispatcher
+    public interface IEventBus
     {
         void Publish<T>(T evnt);
         void Subscribe<T>(Action<T> handler);

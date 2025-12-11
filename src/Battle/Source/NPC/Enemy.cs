@@ -1,21 +1,24 @@
 ﻿namespace Battle.Source.NPC
 {
+    using Godot;
     using System;
-    using System.Threading.Tasks;
+    using Utilities;
     using Attribute;
     using Components;
-    using Abilities.PassiveSkills;
-    using CombatEvents;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
+    using CombatEvents;
     using Core.Interfaces.UI;
-    using Godot;
-    using Utilities;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Entity;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Battle;
+    using Abilities.PassiveSkills;
+    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using GameEvents;
+    using Stateless;
 
     internal partial class Enemy : CharacterBody2D, IInitializable, IRequireServices, IEntity
     {
@@ -24,6 +27,31 @@
         [Export] private Area2D? _interactionArea;
         private IMediator? _mediator;
 
+        public enum State
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
+
+        private enum Trigger
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
+
+        private enum Direction
+        {
+            Up,
+            Down,
+            Left,
+            Right
+        }
+
+        private Direction _direction;
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+        private float _baseSpeed = 500;
 
         public string Id { get; } = string.Empty;
         public string[] Tags { get; } = [];
@@ -35,8 +63,9 @@
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
-        public ICombatEventDispatcher CombatEvents { get; private set; }
+        public IEventBus Events { get; private set; }
         public IStance CurrentStance { get; private set; }
+        public ITargetChooser? TargetChooser { get; set; }
         public bool IsFighting { get; set; }
 
         public bool IsAlive => CurrentHealth > 0;
@@ -54,7 +83,7 @@
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                if (field <= 0) Dead?.Invoke(this);
+                if (field <= 0) CallDeath();
                 CurrentHealthChanged?.Invoke(field);
             }
         }
@@ -108,16 +137,39 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            CombatEvents = new CombatEventDispatcher();
+            Events = new CombatEventBus();
 
             var passive = new ChainAttackPassiveSkill("Chain");
             passive.Attach(this);
             var passiveTwo = new CounterAttackPassiveSkill("Counter");
             passiveTwo.Attach(this);
 
-            _animatedSprite?.Play("Idle");
-
+            ConfigureStateMachine();
             SetBaseValuesForParameters();
+        }
+
+
+        private void ConfigureStateMachine()
+        {
+            _stateMachine.Configure(State.Idle)
+                .OnEntry(() => { _animatedSprite?.Play($"Idle"); })
+                .PermitReentry(Trigger.Idle)
+                .Permit(Trigger.Walk, State.Walk)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Walk)
+                .PermitReentry(Trigger.Walk)
+                .Permit(Trigger.Idle, State.Idle)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Battle)
+                .OnEntry(() =>
+                {
+                    _animatedSprite?.Play("Idle");
+                    CanMove = false;
+                })
+                .OnExit(() => { CanMove = true; })
+                .Permit(Trigger.Idle, State.Idle);
         }
 
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
@@ -144,7 +196,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -152,7 +204,7 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
         }
 
@@ -171,43 +223,53 @@
         {
         }
 
-        public void Kill() => Dead?.Invoke(this);
+        public void Kill() => CallDeath();
 
         public void OnEvadeAttack()
         {
         }
 
+        public IEntity ChoseTarget(List<IEntity> targets)
+        {
+            TargetChooser ??= new ChoosePlayerAsTarget();
+
+            return TargetChooser.Choose(targets);
+        }
+
         public async Task ReceiveAttack(IAttackContext context)
         {
-            _animatedSprite?.Play("Hurt");
+            ArgumentNullException.ThrowIfNull(_animatedSprite);
+
+            _animatedSprite.Play("Hurt");
             TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
-            CombatEvents.Publish(new DamageTakenEvent(this, context));
-            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context.Attacker, context));
+            Events.Publish(new DamageTakenEvent(this, context));
+            context.Attacker.Events.Publish(new AfterAttackEvent(context.Attacker, context));
             await ToSignal(_animatedSprite, "animation_finished");
-            _animatedSprite?.Play("Idle");
+            _animatedSprite.Play("Idle");
         }
 
         public async Task Attack(IAttackContext context)
         {
+            ArgumentNullException.ThrowIfNull(_animatedSprite);
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             if (context.IsCritical)
                 context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
-            CombatEvents.Publish(new BeforeAttackEvent(this, context));
-            _animatedSprite?.Play("Attack");
+            Events.Publish(new BeforeAttackEvent(this, context));
+            _animatedSprite.Play("Attack");
             await ToSignal(_animatedSprite, "animation_finished");
-            _animatedSprite?.Play("Idle");
+            _animatedSprite.Play("Idle");
         }
 
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
+            Events.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
+            Events.Publish(new TurnStartEvent(this));
         }
 
         public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -218,21 +280,25 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
+        private void CallDeath()
+        {
+            Dead?.Invoke(this);
+        }
+
+
         private void OnBodyEnter(Node2D body)
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
                 switch (body)
                 {
                     case Player player:
-                    // {
-                    //     var fighters = Group?.GetEntitiesInGroup<IFightable>() ?? [this];
-                    //     if (!fighters.Contains(player))
-                    //         fighters.Add(player);
-                    //     _mediator.PublishAsync(new InitializeFightEvent<IFightable>(fighters));
-                    //     break;
-                    // }
+                        {
+                            var fighters = Group?.GetEntitiesInGroup<IEntity>() ?? [this];
+                            GameEventBus.Instance.Publish(new InitializeFightGameEvent(player, fighters));
+                            _stateMachine.Fire(Trigger.Battle);
+                            break;
+                        }
                     case IFightable fighter:
                         // TODO: Decide to begin fight or not
                         break;

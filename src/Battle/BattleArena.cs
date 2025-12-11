@@ -1,11 +1,9 @@
 ﻿namespace Battle
 {
     using Godot;
-    using System;
     using Source;
     using Services;
     using TestData;
-    using Source.NPC;
     using Godot.Collections;
     using Core.Interfaces.UI;
     using Core.Interfaces.Entity;
@@ -20,6 +18,7 @@
         private readonly RandomNumberGenerator _rnd = new();
         private readonly CombatScheduler _combatScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
+        private readonly Vector2 _playerPosition = new(320, 560);
         private IMediator _mediator = GameServiceProvider.Instance.GetService<IMediator>();
         private List<IEntity> _entities = [];
         private int _entitiesCount;
@@ -31,40 +30,35 @@
 
         private TaskCompletionSource<IEntity>? _playerTargetTcs;
 
-        public override async void _Ready()
+        public override void _Ready()
         {
-            try
-            {
-                _rnd.Randomize();
-                _queueScheduler.QueueEmpty += OnQueueEmpty;
-                _fightEnds = false;
-                foreach (EnemySpot enemySpot in _spots)
-                    enemySpot.EntityClicked += OnEntityClicked;
-                var entities = new List<IEntity>();
-                for (int i = 0; i < 3; i++)
-                {
-                    var instantiate = ResourceLoader.Load<PackedScene>("uid://j5vmixgbii5n").Instantiate<Enemy>();
-                    if (instantiate is not IEntity enemy) continue;
-                    entities.Add(enemy);
-                    _spots[i].SetEntity(enemy);
-                    enemy.Dead += OnFighterDead;
-                    await ToSignal(instantiate, Node.SignalName.Ready);
-                }
-
-                _player?.Dead += OnPlayerDead;
-
-                await StartFight(entities);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            _rnd.Randomize();
+            _queueScheduler.QueueEmpty += OnQueueEmpty;
+            _fightEnds = false;
+            foreach (EnemySpot enemySpot in _spots)
+                enemySpot.EntityClicked += OnEntityClicked;
         }
 
+        public void SetPlayer(IEntity player)
+        {
+            if (player is not Player p) return;
+            var asNode = player as CharacterBody2D;
+            CallDeferred(Node.MethodName.AddChild, asNode);
+            _player = p;
+            _player.Dead += OnPlayerDead;
+        }
 
         public async Task StartFight(List<IEntity> fighters)
         {
             int amount = fighters.Count;
+
+            for (int i = 0; i < amount; i++)
+            {
+                var enemy = fighters[i];
+                _entities.Add(enemy);
+                _spots[i].SetEntity(enemy);
+                enemy.Dead += OnFighterDead;
+            }
 
             _entitiesCount = amount;
 
@@ -82,6 +76,7 @@
         {
             while (!_fightEnds)
             {
+                if (_entitiesCount == 0) break;
                 _currentFighter = _queueScheduler.GetCurrentFighter();
                 if (_currentFighter is not { IsAlive: true }) continue;
 
@@ -112,10 +107,7 @@
             }
         }
 
-        private IEntity? GetEntityTarget()
-        {
-            throw new NotImplementedException();
-        }
+        private IEntity? GetEntityTarget() => _currentFighter?.ChoseTarget(_entities);
 
         private void OnQueueEmpty()
         {

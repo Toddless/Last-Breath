@@ -12,7 +12,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.Events.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(AfterAttackEvent evnt)
@@ -24,7 +24,7 @@
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.Events.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         public override ISkill Copy() => new VampireAttackPassiveSkill(Id, PercentToLeach);

@@ -16,6 +16,10 @@ config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameEventBus="*res://GameEventBus.cs"
+
 [display]
 
 window/size/viewport_width=1920

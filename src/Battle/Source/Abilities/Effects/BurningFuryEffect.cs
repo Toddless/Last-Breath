@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
     using Core.Enums;
-    using CombatEvents;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;

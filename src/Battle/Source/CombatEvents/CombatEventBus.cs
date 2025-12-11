@@ -5,7 +5,7 @@
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
 
-    public class CombatEventDispatcher : ICombatEventDispatcher
+    public class CombatEventBus : IEventBus
     {
         private readonly Dictionary<Type, List<Delegate>> _handlers = new();
 

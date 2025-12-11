@@ -9,7 +9,6 @@
 
     internal class Mediator : IMediator
     {
-        private Dictionary<Type, List<Delegate>> _handlers = new();
         public event Action? UpdateUi;
 
         public async Task<TResponce> Send<TRequest, TResponce>(TRequest request)

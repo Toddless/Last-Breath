@@ -25,16 +25,16 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<DamageTakenEvent>(OnDamageTaken);
-            owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnds);
-            owner.CombatEvents.Subscribe<CombatEndsEvent>(OnCombatEnds);
+            owner.Events.Subscribe<DamageTakenEvent>(OnDamageTaken);
+            owner.Events.Subscribe<TurnEndEvent>(OnTurnEnds);
+            owner.Events.Subscribe<CombatEndsEvent>(OnCombatEnds);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<DamageTakenEvent>(OnDamageTaken);
-            owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnds);
-            owner.CombatEvents.Unsubscribe<CombatEndsEvent>(OnCombatEnds);
+            owner.Events.Unsubscribe<DamageTakenEvent>(OnDamageTaken);
+            owner.Events.Unsubscribe<TurnEndEvent>(OnTurnEnds);
+            owner.Events.Unsubscribe<CombatEndsEvent>(OnCombatEnds);
         }
 
         public override ISkill Copy() => new EchoPassiveSkill(Id, PercentFromDamageToDealLater, Turns);

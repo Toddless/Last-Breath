@@ -24,7 +24,7 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public void SetMessage(string message) => _msgLabel.Text = message;
+        public void SetMessage(string message) => _msgLabel?.Text = message;
 
         public Task WaitForCloseAsync()
         {

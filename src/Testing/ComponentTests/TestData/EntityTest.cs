@@ -25,8 +25,9 @@
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }
-        public ICombatEventDispatcher CombatEvents { get; }
+        public IEventBus Events { get; }
         public IStance CurrentStance { get; }
+        public ITargetChooser? TargetChooser { get; set; }
         public ICombatScheduler? CombatScheduler { get; set; }
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
@@ -93,7 +94,7 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            CombatEvents = new CombatEventDispatcher();
+            Events = new CombatEventBus();
             SetBaseValuesForParameters();
         }
 
@@ -158,7 +159,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -166,7 +167,7 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
         }
 
@@ -201,13 +202,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
+            Events.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
+            Events.Publish(new TurnStartEvent(this));
         }
 
         public Task ReceiveAttack(IAttackContext context)
@@ -219,6 +220,8 @@
         {
             CurrentHealth -= damage;
         }
+
+        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
 
         public void AllAttacks() => throw new NotImplementedException();
         public void OnEvadeAttack() => throw new NotImplementedException();

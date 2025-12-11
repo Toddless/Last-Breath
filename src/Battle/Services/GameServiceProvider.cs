@@ -5,6 +5,7 @@ namespace Battle.Services
     using System.Collections.Generic;
     using Core.Interfaces;
     using Core.Interfaces.Mediator;
+    using Godot;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
 
@@ -25,6 +26,12 @@ namespace Battle.Services
         {
             var services = new ServiceCollection();
             services.AddSingleton<IMediator, Mediator>();
+            services.AddSingleton<RandomNumberGenerator>((_) =>
+            {
+                var instance = new RandomNumberGenerator();
+                instance.Randomize();
+                return instance;
+            });
             services.AddSingleton<IUIElementProvider, UiElementProvider>();
             services.AddSingleton<PlayerReference>();
             services.AddSingleton<IEntityProvider, EntityProvider>();

@@ -23,10 +23,10 @@
             _isDead = false;
             entity.Dead += OnEntityDead;
             _entity = entity is CharacterBody2D body ? body : null;
-            if (_entity != null)
-            {
-                CallDeferred(Node.MethodName.AddChild, _entity);
-            }
+            if (_entity == null)
+                return;
+            _entity.Position = new Vector2(0, 0);
+            CallDeferred(Node.MethodName.AddChild, _entity);
         }
 
         private void OnEntityDead(IFightable obj)

@@ -2,13 +2,15 @@
 {
     using Enums;
     using System;
+    using System.Collections.Generic;
     using Battle;
     using System.Threading.Tasks;
 
     public interface IFightable
     {
-        ICombatEventDispatcher CombatEvents { get; }
+        IEventBus Events { get; }
         IStance CurrentStance { get; }
+        ITargetChooser? TargetChooser { get; set; }
 
         bool IsFighting { get; set; }
         bool IsAlive { get; }
@@ -20,9 +22,7 @@
         void OnTurnStart();
         Task ReceiveAttack(IAttackContext context);
         void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false);
-        void AllAttacks();
-        void OnEvadeAttack();
-        void OnBlockAttack();
+        IEntity ChoseTarget(List<IEntity> targets);
         void Kill();
     }
 }

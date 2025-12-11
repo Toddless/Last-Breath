@@ -25,14 +25,14 @@
         {
             Idle,
             Walk,
-            Fight
+            Battle,
         }
 
         private enum Trigger
         {
             Idle,
             Walk,
-            Fight
+            Battle,
         }
 
         private enum Direction
@@ -43,6 +43,7 @@
             Right
         }
 
+        private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private float _baseSpeed = 500;
@@ -63,15 +64,16 @@
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
-        public ICombatEventDispatcher CombatEvents { get; private set; }
+        public IEventBus Events { get; private set; }
         public IStance CurrentStance { get; private set; }
+        public ITargetChooser? TargetChooser { get; set; }
         public bool IsFighting { get; set; }
         public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
         public IModifiersComponent Modifiers { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
-        public bool CanMove { get; set; }
+        public bool CanMove { get; set; } = true;
 
         public float CurrentHealth
         {
@@ -134,7 +136,7 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            CombatEvents = new CombatEventDispatcher();
+            Events = new CombatEventBus();
             SetBaseValuesForParameters();
             ConfigureStateMachine();
 
@@ -146,9 +148,12 @@
             trapped.Attach(this);
             var counter = new CounterAttackPassiveSkill("Counter");
             counter.Attach(this);
+        }
 
-            _animatedSprite?.Play("Fight_Idle");
-            CanMove = false;
+        public override void _EnterTree()
+        {
+            if (GetParent() is BattleArena) _stateMachine.Fire(Trigger.Battle);
+            if (GetParent() is MainWorld) _stateMachine.Fire(Trigger.Idle);
         }
 
         public override void _Process(double delta)
@@ -185,7 +190,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -193,7 +198,7 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
         }
 
@@ -206,6 +211,8 @@
         {
         }
 
+        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
+
         public void Kill() => Dead?.Invoke(this);
 
         public void OnEvadeAttack()
@@ -217,8 +224,8 @@
             if (_animatedSprite == null) return;
             _animatedSprite.Play("Fight_Hurt");
             TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit);
-            CombatEvents.Publish(new DamageTakenEvent(this, context));
-            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context.Attacker, context));
+            Events.Publish(new DamageTakenEvent(this, context));
+            context.Attacker.Events.Publish(new AfterAttackEvent(context.Attacker, context));
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
         }
@@ -228,7 +235,7 @@
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             if (context.IsCritical)
                 context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
-            CombatEvents.Publish(new BeforeAttackEvent(this, context));
+            Events.Publish(new BeforeAttackEvent(this, context));
             _animatedSprite.Play("Fight_Attack");
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
@@ -237,13 +244,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
+            Events.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
+            Events.Publish(new TurnStartEvent(this));
         }
 
         public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -264,15 +271,27 @@
                 .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
-                .Permit(Trigger.Fight, State.Fight);
+                .Permit(Trigger.Battle, State.Battle);
 
             _stateMachine.Configure(State.Walk)
                 .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Walk)
                 .Permit(Trigger.Idle, State.Idle)
-                .Permit(Trigger.Fight, State.Fight);
+                .Permit(Trigger.Battle, State.Battle);
 
-            _stateMachine.Configure(State.Fight)
+            _stateMachine.Configure(State.Battle)
+                .OnEntry(() =>
+                {
+                    _animatedSprite?.Play("Fight_Idle");
+                    CanMove = false;
+                    _lastPosition = Position;
+                    Position = new Vector2(320, 560);
+                })
+                .OnExit(() =>
+                {
+                    CanMove = true;
+                    Position = _lastPosition;
+                })
                 .Permit(Trigger.Idle, State.Idle);
         }
 
