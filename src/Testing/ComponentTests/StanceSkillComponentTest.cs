@@ -18,7 +18,6 @@
 
             var stanceSkill = new Mock<IStanceSkill>();
             stanceSkill.Setup(x => x.RequiredStance).Returns(Stance.Dexterity);
-            stanceSkill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {
                 isActivated = true;
@@ -41,7 +40,6 @@
             var stanceObject = stance.Object;
 
             var stanceSkill = new Mock<IStanceSkill>();
-            stanceSkill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
             stanceSkill.Setup(x => x.RequiredStance).Returns(Stance.Strength);
             stanceSkill.Setup(x => x.Activate(stanceObject)).Callback(new InvocationAction(invocation =>
             {

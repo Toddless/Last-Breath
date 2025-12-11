@@ -10,34 +10,24 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
 
-    public class ItemCreator : IItemCreator
+    public class ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
+        : IItemCreator
     {
-        private readonly RandomNumberGenerator _rnd;
-        private readonly IItemDataProvider _dataProvider;
-        private readonly ICraftingMastery _craftingMastery;
-
-        public ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
+        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, IEntity? player = null)
         {
-            _rnd = rnd;
-            _dataProvider = itemDataProvider;
-            _craftingMastery = craftingMastery;
-        }
-
-        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, IEntity? player = default)
-        {
-            var recipe = _dataProvider.GetRecipe(recipeId);
-            var (Mods, TotalWeight) = WeightedRandomPicker.CalculateWeights(resources);
-            if (recipe.HasTag("Generic"))
+            var recipe = itemDataProvider.GetRecipe(recipeId);
+            (List<WeightedObject<IMaterialModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
+            if (!recipe.HasTag("Generic"))
             {
-                var resultItemId = GetGenericItemId(recipe);
-                return Create(resultItemId, Mods, TotalWeight, player);
+                return Create(recipe.ResultItemId, mods, totalWeight, player);
             }
-            else
-                return Create(recipe.ResultItemId, Mods, TotalWeight, player);
+
+            string resultItemId = GetGenericItemId(recipe);
+            return Create(resultItemId, mods, totalWeight, player);
         }
 
         public IItem? CreateItem(string recipeId)
@@ -45,20 +35,20 @@
             return null;
         }
 
-        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, IEntity? player = default)
+        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, IEntity? player = null)
         {
             try
             {
-                var item = (IEquipItem)_dataProvider.CopyBaseItem(itemId);
+                var item = (IEquipItem)itemDataProvider.CopyBaseItem(itemId);
                 var itemRarity = GetRarity(player);
                 item.Rarity = itemRarity;
                 var baseStats = item.BaseModifiers;
-                var amountModifiers = GetAmountModifiers(item.Rarity);
+                int amountModifiers = GetAmountModifiers(item.Rarity);
 
                 var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid()).Take(amountModifiers)], item).ToHashSet();
                 item.SetBaseModifiers(statModifiers);
 
-                HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, _rnd);
+                HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, rnd);
 
                 List<IModifierInstance> mods = [];
                 foreach (var mod in takenMods)
@@ -92,7 +82,7 @@
 
         private float ApplyPlayerMultiplier(float baseValue, ModifierType type, IEntity? player = default)
         {
-            float multiplier = _craftingMastery.GetValueMultiplier();
+            float multiplier = craftingMastery.GetValueMultiplier();
             if (type == ModifierType.Multiplicative)
                 return 1f + (baseValue - 1f) * multiplier;
             else
@@ -120,7 +110,7 @@
         {
             // if (player == null) return GetRandomValueFallBack<Rarity>();
             // TODO: Later add call to players skill to get Rarity
-            return _craftingMastery.RollRarity();
+            return craftingMastery.RollRarity();
         }
 
         private AttributeType GetAttribute(IEntity? player = default)
@@ -133,16 +123,17 @@
                     attribute = GetRandomValueFallBack<AttributeType>();
                 return attribute;
             }
+
             // TODO: Later add call to players skill to get attribute
             return AttributeType.Dexterity;
         }
 
         private T GetRandomValueFallBack<T>()
-          where T : struct, Enum
+            where T : struct, Enum
         {
-            _rnd.Randomize();
+            rnd.Randomize();
             var values = Enum.GetValues<T>();
-            var idx = (byte)_rnd.RandiRange(0, values.Length - 1);
+            var idx = (byte)rnd.RandiRange(0, values.Length - 1);
             return values[idx];
         }
     }

@@ -5,11 +5,11 @@
         /// <summary>
         /// A skill type that modifies the attack context
         /// </summary>
-        PreAttack,
+        BeforeAttack,
         /// <summary>
         /// A skill type that applies to attacks
         /// </summary>
-        OnAttack,
+        AfterAttack,
         /// <summary>
         /// A skill type that works all the time. They need to be activated on earning.
         /// </summary>

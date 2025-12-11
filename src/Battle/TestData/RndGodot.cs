@@ -8,6 +8,10 @@
     {
         private readonly RandomNumberGenerator _rnd = new();
 
+        public RndGodot()
+        {
+            _rnd.Randomize();
+        }
         public float RandFloat() => _rnd.Randf();
         public float RandFloatRange(float min, float max) => _rnd.RandfRange(min, max);
         public float RandIntRange(int min, int max) => _rnd.RandiRange(min, max);

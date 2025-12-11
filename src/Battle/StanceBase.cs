@@ -1,134 +1,37 @@
 ﻿namespace Battle
 {
-    using System;
     using Core.Enums;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
+    using Core.Interfaces.Skills;
+    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using TestData;
 
-    public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType)
+    public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType) : IStance
     {
-        protected Dictionary<int, (ISkill Skill, bool Opened)> Skills { get; } = [];
+        private List<ISkill> _obtainedPassiveSkills = [];
+        private List<IAbility> _obtainedAbilities = [];
+
         protected IStanceActivationEffect ActivationEffect { get; } = effect;
         protected IEntity Owner { get; } = owner;
 
-        public IResource Resource { get; } = new ManaResource();
+        public int CurrentLevel { get; }
         public Stance StanceType { get; } = stanceType;
 
-        public event Action<float>? CurrentResourceChanges, MaximumResourceChanges;
+        public IReadOnlyList<ISkill> ObtainedPassiveSkills => _obtainedPassiveSkills;
+        public IReadOnlyList<IAbility> ObtainedAbilities => _obtainedAbilities;
 
         public virtual void OnActivate()
         {
             // I have to reset the modules so that I have the latest updates.
-            SetModules();
-            SubscribeEvents();
+            _obtainedPassiveSkills.ForEach(skill => skill.Attach(Owner));
             ActivationEffect.OnActivate(Owner);
         }
 
         public virtual void OnDeactivate()
         {
-            UnsubscribeEvents();
+            _obtainedPassiveSkills.ForEach(skill => skill.Detach(Owner));
             ActivationEffect.OnDeactivate(Owner);
-        }
-
-        public virtual void OnAttack(IEntity target)
-        {
-            if (!CanAttack(target)) return;
-
-            AttackContext context = new(Owner, target, Owner.Parameters.Damage, new RndGodot());
-
-            // create list with skills applied on attack
-            ApplyPreAttackSkills(context);
-
-            // why subscribe?
-            // I need the result to decide what to do next
-            context.OnAttackResult += OnAttackResult;
-            context.OnAttackCanceled += OnAttackCanceled;
-        }
-
-        public virtual void OnReceiveAttack(IAttackContext context)
-        {
-        }
-
-        protected bool CanAttack(IEntity target) => target.IsAlive && Owner.IsAlive;
-
-        protected virtual void HandleReceivedAttack(IAttackContext context)
-        {
-            Owner.TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
-
-            context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
-        }
-
-
-        protected virtual void OnAttackResult(IAttackResult result)
-        {
-            // I don't need this context anymore, unsubscribe
-            Unsubscribe(result);
-            // Handle skills, we may will getting from attacked target
-            HandleOnGettingAttackSkills(result.PassiveSkills);
-            // different reactions to attack results
-            HandleResult(result);
-        }
-
-        protected void ApplyPreAttackSkills(IAttackContext context)
-        {
-        }
-
-        protected virtual void HandleOnAttackSkills(List<ISkill> passiveSkills)
-        {
-        }
-
-        protected virtual void HandleOnGettingAttackSkills(List<ISkill> passiveSkills)
-        {
-        }
-
-        protected virtual void SubscribeEvents()
-        {
-            Resource.CurrentChanges += OnCurrentResourceChanges;
-            Resource.MaximumChanges += OnMaximumResourceChanges;
-            Owner.Modifiers.ModifiersChanged += Resource.OnParameterChanges;
-        }
-
-        private void HandleEvadeReceivedAttack(IAttackContext context)
-        {
-            Owner.OnEvadeAttack();
-            context.SetAttackResult(new AttackResult([], AttackResults.Evaded,
-                context));
-        }
-
-        private void CheckIfAllAttacksHandled()
-        {
-        }
-
-        private void HandleResult(IAttackResult result)
-        {
-            var target = result.Context.Target;
-        }
-
-        private void FlushQueue()
-        {
-        }
-
-        private void OnAttackCanceled(IAttackContext context)
-        {
-        }
-
-        private void Unsubscribe(IAttackResult result)
-        {
-        }
-
-        private void UnsubscribeEvents()
-        {
-        }
-
-        private void OnMaximumResourceChanges(float value) => MaximumResourceChanges?.Invoke(value);
-        private void OnCurrentResourceChanges(float value) => CurrentResourceChanges?.Invoke(value);
-
-        private void SetModules()
-        {
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
+    using Battle.Source.Abilities;
+    using Battle.Source.Abilities.Effects;
     using Moq;
     using TestData;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
-    using Battle.TestData.Abilities;
-    using Battle.TestData.Abilities.Effects;
 
     [TestClass]
     public class EffectsComponentTest

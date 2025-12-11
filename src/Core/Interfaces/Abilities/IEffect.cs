@@ -11,13 +11,13 @@
         int MaxStacks { get; set; }
         object? Source { get; }
 
-        void OnApply(EffectApplyingContext context);
-        void OnTurnEnd(IEntity target);
-        void OnTurnStart(IEntity target);
-        void OnBeforeAttack(IEntity target, IAttackContext context);
-        void OnAfterAttack(IEntity target, IAttackContext context);
+        void Apply(EffectApplyingContext context);
+        void Remove(IEntity source);
+        void TurnStart(IEntity source);
+        void TurnEnd(IEntity source);
+        void BeforeAttack(IEntity source, IAttackContext context);
+        void AfterAttack(IEntity source, IAttackContext context);
         bool IsStronger(IEffect otherEffect);
-        void Remove(IEntity target);
         IEffect Clone();
     }
 }

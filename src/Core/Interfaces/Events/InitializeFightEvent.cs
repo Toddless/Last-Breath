@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Entity;
 
-    public record InitializeFightEvent<T>(IEnumerable<T> Fighters) : IEvent
+    public record InitializeFightEvent<T>(IEntity Player, IEnumerable<T> Fighters) : IEvent
         where T : IFightable
     {
     }

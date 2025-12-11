@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Mediator
 {
     using System;
-    using System.Threading.Tasks;
     using Events;
+    using System.Threading.Tasks;
 
     public interface IMediator
     {

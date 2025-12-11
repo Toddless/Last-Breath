@@ -1,16 +1,20 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Battle.Attribute;
+    using Battle;
     using Godot;
     using Core.Enums;
+    using Battle.Attribute;
     using Battle.Components;
     using Core.Interfaces.Items;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
+    using Battle.Source.CombatEvents;
+    using Battle.TestData;
     using Core.Interfaces.Components;
 
     public class EntityTest : IEntity
     {
+        private IRandomNumberGenerator _rnd;
         public string Id { get; } = string.Empty;
         public string[] Tags { get; } = [];
         public Texture2D? Icon { get; } = null;
@@ -21,7 +25,9 @@
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }
+        public ICombatEventDispatcher CombatEvents { get; }
         public IStance CurrentStance { get; }
+        public ICombatScheduler? CombatScheduler { get; set; }
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
         public IEffectsComponent Effects { get; }
@@ -62,20 +68,15 @@
                 float clamped = Mathf.Clamp(value, 0, Parameters.Mana);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                CurrentResourceChanged?.Invoke(field);
+                CurrentManaChanged?.Invoke(field);
             }
         }
 
-        public event Action<float>? CurrentResourceChanged;
-
-        public event Action? TurnStart;
-        public event Action? TurnEnd;
-        public event Action<IAttackContext>? BeforeAttack;
-        public event Action<IAttackContext>? AfterAttack;
-        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
-        public event Action<IFightable>? Dead;
+        public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
+        public event Action<IFightable>? Dead;
+        public event Action<IAttackContext>? AttackPerformed;
 
         public EntityTest()
         {
@@ -92,6 +93,7 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
+            CombatEvents = new CombatEventDispatcher();
             SetBaseValuesForParameters();
         }
 
@@ -152,6 +154,22 @@
             }
         }
 
+        public bool TryApplyStatusEffect(StatusEffects statusEffect)
+        {
+            if ((StatusEffects & statusEffect) != 0) return false;
+            StatusEffects |= statusEffect;
+            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            return true;
+        }
+
+        public bool TryRemoveStatusEffect(StatusEffects statusEffect)
+        {
+            if ((StatusEffects & statusEffect) == 0) return false;
+            StatusEffects &= ~statusEffect;
+            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            return true;
+        }
+
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
         public void Heal(float amount) => CurrentHealth += amount;
 
@@ -171,12 +189,31 @@
             }
         }
 
-        public bool HasTag(string tag) => throw new NotImplementedException();
-        public Task Attack(IEntity target) => throw new NotImplementedException();
+        public Task Attack(IAttackContext target)
+        {
+            //var context = new AttackContext(this, target, this.Parameters.Damage, new RndGodot());
 
-        public void OnTurnEnd() => Effects.TriggerTurnEnd();
-        public void OnTurnStart() => throw new NotImplementedException();
-        public void OnReceiveAttack(IAttackContext context) => throw new NotImplementedException();
+        //    AttackPerformed?.Invoke(context);
+            return Task.CompletedTask;
+        }
+
+
+        public void OnTurnEnd()
+        {
+            Effects.TriggerTurnEnd();
+            CombatEvents.Publish(new TurnEndEvent(this));
+        }
+
+        public void OnTurnStart()
+        {
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+        }
+
+        public Task ReceiveAttack(IAttackContext context)
+        {
+            return Task.CompletedTask;
+        }
 
         public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
         {

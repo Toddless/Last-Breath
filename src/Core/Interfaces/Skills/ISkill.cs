@@ -5,8 +5,6 @@
 
     public interface ISkill : IIdentifiable, IDisplayable
     {
-        SkillType Type { get; }
-
         void Attach(IEntity owner);
         void Detach(IEntity owner);
 

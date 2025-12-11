@@ -1,54 +1,51 @@
 ﻿namespace Battle
 {
+    using Godot;
     using System;
+    using Core.Interfaces.Battle;
+    using System.Threading.Tasks;
     using System.Collections.Generic;
 
-    public class CombatScheduler
+    public class CombatScheduler : ICombatScheduler
     {
-        private readonly LinkedList<AttackContext> _attackQueue = [];
-        private bool _inProcess, _isCancelled;
-        public event Action? AllContextsHandled;
+        private readonly Queue<IAttackContext> _attackQueue = [];
+        private bool _isCancelled, _isProcessing;
 
-        public void Schedule(AttackContext context)
+        public void Schedule(IAttackContext context)
         {
-            if (_inProcess)
-                _attackQueue.AddFirst(context);
-            else
-                _attackQueue.AddLast(context);
+            _attackQueue.Enqueue(context);
         }
 
-        public void RunQueue()
+        public async Task RunQueue()
         {
-            _inProcess = true;
-            while (_attackQueue.Count > 0 && !_isCancelled)
+            try
             {
-                var context = _attackQueue.First?.Value;
-                if (context == null) break;
-                _attackQueue.RemoveFirst();
-                context.Target.OnReceiveAttack(context);
+                if (_isProcessing) return;
+                _isProcessing = true;
+                while (_attackQueue.Count > 0 && !_isCancelled)
+                {
+                    var context = _attackQueue.Dequeue();
+                    await context.Attacker.Attack(context);
+                    await context.Target.ReceiveAttack(context);
+                }
             }
-            _inProcess = false;
-            CheckQueueLeft();
+            catch (Exception ex)
+            {
+                GD.Print("Exception: " + ex.Message);
+            }
+            finally
+            {
+                _attackQueue.Clear();
+                _isProcessing = false;
+                _isCancelled = false;
+            }
         }
+
 
         public void CancelQueue()
         {
             _isCancelled = true;
-            while (_attackQueue.Count > 0)
-            {
-                var context = _attackQueue.First?.Value;
-                if (context == null) break;
-                _attackQueue.RemoveFirst();
-                context.CancelAttack();
-            }
-            _isCancelled = false;
-            CheckQueueLeft();
-        }
-
-        private void CheckQueueLeft()
-        {
-            if (_attackQueue.Count == 0)
-                AllContextsHandled?.Invoke();
+            _attackQueue.Clear();
         }
     }
 }

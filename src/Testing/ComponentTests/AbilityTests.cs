@@ -1,14 +1,14 @@
 ﻿namespace LastBreathTest.ComponentTests
 {
+    using Battle.Source.Abilities;
+    using Battle.Source.Abilities.Effects;
+    using Battle.Source.Abilities.Upgrades;
     using Moq;
     using TestData;
     using Core.Enums;
     using Core.Modifiers;
     using Core.Interfaces.Battle;
-    using Battle.TestData.Abilities;
     using Core.Interfaces.Abilities;
-    using Battle.TestData.Abilities.Effects;
-    using Battle.TestData.Abilities.Upgrades;
 
     [TestClass]
     public class AbilityTests
@@ -106,7 +106,7 @@
         {
             var entity = new EntityTest();
             var effect = new ParameterEqualsEffect("Health_Equals_One", 3, EntityParameter.Health, 1);
-            effect.OnApply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
 
             Assert.IsTrue(Math.Abs(entity.CurrentHealth - 1) < 0.00001f, $"Actual: {entity.CurrentHealth}");
         }
@@ -118,7 +118,7 @@
             entity.Dexterity.IncreasePointsByAmount(5);
 
             var effect = new ParameterEqualsEffect("Dexterity_Equals_One", 3, EntityParameter.Dexterity, 1);
-            effect.OnApply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
 
             Assert.IsTrue(Math.Abs(entity.Parameters.CriticalChance - 0.0525f) < 0.00001f, $"Actual: {entity.Parameters.CriticalChance}");
         }
@@ -132,7 +132,7 @@
 
             float healthWithStrength = entity.CurrentHealth;
             var effect = new ParameterEqualsEffect("Strength_Equals_One", 3, EntityParameter.Strength, 1);
-            effect.OnApply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
 
             Assert.IsTrue(MathF.Abs(healthWithStrength - 1610) < 0.00001f, $"Actual: {healthWithStrength}");
             Assert.IsTrue(MathF.Abs(entity.CurrentHealth - 610) < 0.00001f, $"Actual: {entity.CurrentHealth}");

@@ -20,7 +20,7 @@
         {
             object? source = effect.Source;
             if (source == null) return;
-            // TODO: Now we can have same effect multiple times if they have different sources
+            // we can have same effect multiple times if they have different sources
             if (!_effects.TryGetValue(source, out List<IEffect>? effects))
             {
                 effects = [];
@@ -70,25 +70,25 @@
         public void TriggerTurnEnd()
         {
             foreach (var effect in GetEffects())
-                effect.OnTurnEnd(owner);
+                effect.TurnEnd(owner);
         }
 
         public void TriggerTurnStart()
         {
             foreach (var effect in GetEffects())
-                effect.OnTurnStart(owner);
+                effect.TurnStart(owner);
         }
 
         public void TriggerBeforeAttack(IAttackContext context)
         {
             foreach (IEffect effect in GetEffects())
-                effect.OnBeforeAttack(owner, context);
+                effect.BeforeAttack(owner, context);
         }
 
         public void TriggerAfterAttack(IAttackContext context)
         {
             foreach (IEffect effect in GetEffects())
-                effect.OnAfterAttack(owner, context);
+                effect.AfterAttack(owner, context);
         }
 
         private List<IEffect> GetEffects()

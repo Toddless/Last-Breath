@@ -19,7 +19,7 @@
 
         IEntityGroup? Group { get; set; }
 
-        StatusEffects StatusEffects { get; set; }
+        StatusEffects StatusEffects { get; }
 
         bool CanMove { get; set; }
 
@@ -27,7 +27,7 @@
         float CurrentBarrier { get; set; }
         float CurrentMana { get; set; }
 
-        event Action<float>? CurrentResourceChanged;
+        event Action<float>? CurrentManaChanged;
         event Action<float>? CurrentBarrierChanged;
         event Action<float>? CurrentHealthChanged;
 
@@ -35,5 +35,7 @@
 
         void Heal(float amount);
         void ConsumeResource(Costs type, float amount);
+        bool TryApplyStatusEffect(StatusEffects statusEffect);
+        bool TryRemoveStatusEffect(StatusEffects statusEffect);
     }
 }

@@ -8,23 +8,15 @@
     using Core.Interfaces.Events;
 
     public class InitializeFightEventHandler(
-        IUIElementProvider uiElementProvider,
-        IGameServiceProvider gameServiceProvider,
-        QueueScheduler queueScheduler)
+        IGameServiceProvider gameServiceProvider)
         : IEventHandler<InitializeFightEvent<IEntity>>
     {
         public Task HandleAsync(InitializeFightEvent<IEntity> evnt)
         {
             try
             {
-                // Что мы делаем:
-                // 1. Подготавливаем худ
-                // 2. Добавляем бойцов на сцену (определяем кто игрок, кто нпс)
-                // 3. Определяем очередность ходов в раунде
-                // 4. Начинаем бой
-                var battle = uiElementProvider.CreateAndShowMainElement<BattleHud>();
-                var fighters = evnt.Fighters;
-                queueScheduler.AddMembers(fighters);
+                var battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
+
             }
             catch (Exception e)
             {

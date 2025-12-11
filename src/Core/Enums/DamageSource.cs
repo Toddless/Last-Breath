@@ -5,6 +5,7 @@
         Hit,
         Ability,
         Effect,
+        Passive,
         Item,
         Environment,
     }

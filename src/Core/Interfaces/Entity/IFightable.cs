@@ -7,19 +7,18 @@
 
     public interface IFightable
     {
+        ICombatEventDispatcher CombatEvents { get; }
         IStance CurrentStance { get; }
 
         bool IsFighting { get; set; }
-        bool IsAlive { get; set; }
+        bool IsAlive { get; }
 
-        event Action? TurnStart, TurnEnd;
-        event Action<IAttackContext>? BeforeAttack, AfterAttack;
         event Action<IFightable> Dead;
 
-        Task Attack(IEntity target);
+        Task Attack(IAttackContext context);
         void OnTurnEnd();
         void OnTurnStart();
-        void OnReceiveAttack(IAttackContext context);
+        Task ReceiveAttack(IAttackContext context);
         void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false);
         void AllAttacks();
         void OnEvadeAttack();

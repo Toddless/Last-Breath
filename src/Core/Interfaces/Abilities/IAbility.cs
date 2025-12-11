@@ -3,9 +3,9 @@
     using Enums;
     using Entity;
     using System;
-    using System.Collections.Generic;
-    using Components.Decorator;
     using Components.Module;
+    using Components.Decorator;
+    using System.Collections.Generic;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {

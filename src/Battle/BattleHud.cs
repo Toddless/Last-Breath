@@ -2,6 +2,7 @@
 {
     using Godot;
     using System;
+    using Services;
     using Utilities;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
@@ -15,10 +16,11 @@
         [Export] private GridContainer? _playerEffects;
         [Export] private HBoxContainer? _stanceButtons, _abilityButtons;
 
-        private IMediator? _mediator;
+        private IMediator _mediator = GameServiceProvider.Instance.GetService<IMediator>();
 
         public override void _Ready()
         {
+
         }
 
         public void InjectServices(IGameServiceProvider provider)

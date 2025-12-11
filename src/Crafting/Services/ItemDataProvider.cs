@@ -31,21 +31,18 @@
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
-            if (item is not ICraftingRecipe recipe) return [];
-            return recipe.MainResource;
+            return item is not ICraftingRecipe recipe ? [] : recipe.MainResource;
         }
 
         public string GetRecipeResultItemId(string recipeId)
         {
             var item = TryGetItem(recipeId);
-            if (item is not ICraftingRecipe recipe) return string.Empty;
-            return recipe.ResultItemId;
+            return item is not ICraftingRecipe recipe ? string.Empty : recipe.ResultItemId;
         }
 
         public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
         {
-            if (!_itemData.TryGetValue(id, out var res)) return [];
-            if (res is not ICraftingResource crafting) return [];
+            if (!_itemData.TryGetValue(id, out var res) || res is not ICraftingResource crafting) return [];
             return crafting.Material?.Modifiers ?? [];
         }
 
@@ -62,7 +59,7 @@
 
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
 
-       public async void LoadData()
+        public async void LoadData()
         {
             try
             {
@@ -115,14 +112,13 @@
 
             dir.ListDirEnd();
         }
+
         private IItem? TryGetItem(string id)
         {
-            if (!_itemData.TryGetValue(id, out var data))
-            {
-                Tracker.TrackNotFound($"Item with id: {id}", this);
-                return null;
-            }
-            return data;
+            if (_itemData.TryGetValue(id, out var data)) return data;
+
+            Tracker.TrackNotFound($"Item with id: {id}", this);
+            return null;
         }
     }
 }
