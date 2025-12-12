@@ -11,7 +11,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.Events.Subscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(AfterAttackEvent evnt)
@@ -24,7 +24,7 @@
 
         public override void Detach(IEntity owner)
         {
-            owner.Events.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         public override ISkill Copy() => new ExecutePassiveSkill(Id, PercentToKill);

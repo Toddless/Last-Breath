@@ -9,6 +9,7 @@
     using Components;
     using CombatEvents;
     using Core.Constants;
+    using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Battle;
@@ -18,6 +19,7 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
     internal partial class Player : CharacterBody2D, IRequireServices, IEntity
     {
@@ -43,16 +45,18 @@
             Right
         }
 
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+        private readonly Dictionary<Stance, IStance> _stances = [];
+        private readonly RandomNumberGenerator _rnd = new();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
-        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private float _baseSpeed = 500;
-        private readonly Dictionary<Stance, IStance> _stances = [];
         [Export] private AnimatedSprite2D? _animatedSprite;
         [Export] private Area2D? _interactionArea;
         [Export] private Godot.Collections.Dictionary<State, AnimatedSprite2D>? _animatedSprites = [];
 
-        private IMediator _mediator = GameServiceProvider.Instance.GetService<IMediator>();
+        private IGameEventBus? _gameEventBus;
+        private IGameEventBus? _battleEventBus;
 
         public string Id { get; }
         public Texture2D? Icon { get; }
@@ -64,7 +68,7 @@
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
-        public IEventBus Events { get; private set; }
+        public ICombatEventBus CombatEvents { get; private set; }
         public IStance CurrentStance { get; private set; }
         public ITargetChooser? TargetChooser { get; set; }
         public bool IsFighting { get; set; }
@@ -83,10 +87,11 @@
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                if (field <= 0) Dead?.Invoke(this);
-                CurrentHealthChanged?.Invoke(field);
+                if (field <= 0) NotifyShouldDie();
+                NotifyHealthChanges(field);
             }
         }
+
 
         public float CurrentBarrier
         {
@@ -96,7 +101,7 @@
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                CurrentBarrierChanged?.Invoke(field);
+                NotifyBarrierChanges(field);
             }
         }
 
@@ -108,7 +113,7 @@
                 float clamped = Mathf.Clamp(value, 0, Parameters.Mana);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                CurrentManaChanged?.Invoke(field);
+                NotifyManaChanges(field);
             }
         }
 
@@ -123,6 +128,7 @@
             GameServiceProvider.Instance.GetService<PlayerReference>().SetPlayerReference(this);
             if (_interactionArea != null) _interactionArea.BodyEntered += OnBodyEnter;
 
+            _rnd.Randomize();
             Parameters = new EntityParametersComponent();
             Modifiers = new ModifiersComponent();
             Parameters.Initialize(Modifiers.GetModifiers);
@@ -136,10 +142,10 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            Events = new CombatEventBus();
+            CombatEvents = new CombatEventBus();
             SetBaseValuesForParameters();
             ConfigureStateMachine();
-
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             var vampire = new VampireAttackPassiveSkill("Vampire_Skill", 0.1f);
             vampire.Attach(this);
             var passive = new ChainAttackPassiveSkill("Chain_Attack_Passive");
@@ -166,7 +172,17 @@
             MoveAndSlide();
         }
 
-        public void AddItemToInventory(IItem item) => throw new NotImplementedException();
+        public void AddItemToInventory(IItem item)
+        {
+        }
+
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+
+        public void SetupEventBus(IGameEventBus bus)
+        {
+            // TODO:
+            _battleEventBus = bus;
+        }
 
         public void Heal(float amount) => CurrentHealth += amount;
 
@@ -190,7 +206,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -198,7 +214,7 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
         }
 
@@ -224,18 +240,19 @@
             if (_animatedSprite == null) return;
             _animatedSprite.Play("Fight_Hurt");
             TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit);
-            Events.Publish(new DamageTakenEvent(this, context));
-            context.Attacker.Events.Publish(new AfterAttackEvent(context.Attacker, context));
+            CombatEvents.Publish(new DamageTakenEvent(this, context));
+            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context.Attacker, context));
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
         }
 
         public async Task Attack(IAttackContext context)
         {
+            if (_animatedSprite == null) return;
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             if (context.IsCritical)
                 context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
-            Events.Publish(new BeforeAttackEvent(this, context));
+            CombatEvents.Publish(new BeforeAttackEvent(this, context));
             _animatedSprite.Play("Fight_Attack");
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
@@ -244,13 +261,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            Events.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            Events.Publish(new TurnStartEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
         }
 
         public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -262,7 +279,7 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _mediator = provider.GetService<IMediator>();
+            _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
         private void ConfigureStateMachine()
@@ -324,12 +341,42 @@
             //     _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
         }
 
+        private void NotifyShouldDie()
+        {
+            Dead?.Invoke(this);
+            _gameEventBus?.Publish<PlayerDiedGameEvent>(new(this));
+            _battleEventBus?.Publish<PlayerDiedGameEvent>(new(this));
+        }
+
+        private void NotifyHealthChanges(float value)
+        {
+            CurrentHealthChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
+        }
+
+
+        private void NotifyBarrierChanges(float value)
+        {
+            CurrentHealthChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
+        }
+
+        private void NotifyManaChanges(float value)
+        {
+            CurrentManaChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
+        }
+
         private void OnParameterChanged(EntityParameter parameter, float value)
         {
             switch (parameter)
             {
                 case EntityParameter.Health:
                     CurrentHealth = value;
+                    _battleEventBus?.Publish<PlayerMaxHealthChanges>(new(this, value));
                     break;
                 case EntityParameter.Barrier:
                     CurrentBarrier = value;
@@ -350,7 +397,7 @@
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 7000;
+                        value = 1600;
                         break;
                     case EntityParameter.Mana:
                         value = 50;

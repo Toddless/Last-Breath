@@ -23,8 +23,6 @@
         IStanceMastery mastery)
         : IAbility
     {
-        // TODO: Change random to RandomNumberGenerator
-        protected readonly Random Rnd = new();
         protected IEntity? Owner;
         protected readonly IStanceMastery Mastery = mastery;
 

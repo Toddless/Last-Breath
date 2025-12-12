@@ -42,7 +42,7 @@
             target.Effects.AddEffect(this);
             // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status))
-                context.Caster.Events.Publish(new StatusEffectAppliedEvent(context.Caster, Status));
+                context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(context.Caster, Status));
         }
 
         public virtual void TurnEnd(IEntity source)

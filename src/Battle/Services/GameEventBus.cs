@@ -1,24 +1,16 @@
-﻿namespace Battle
+﻿namespace Battle.Services
 {
-    using Godot;
     using System;
     using System.Linq;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces;
     using System.Collections.Generic;
 
-    internal partial class GameEventBus : Node, IEventBus
+    internal class GameEventBus : IGameEventBus
     {
         private readonly Dictionary<Type, List<Delegate>> _handlers = new();
 
-        public static GameEventBus Instance { get; private set; }
-
-
-        public override void _Ready()
-        {
-            Instance = this;
-        }
-
         public void Publish<T>(T evnt)
+            where T : IGameEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
@@ -28,6 +20,7 @@
         }
 
         public void Subscribe<T>(Action<T> handler)
+            where T : IGameEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {
@@ -39,6 +32,7 @@
         }
 
         public void Unsubscribe<T>(Action<T> handler)
+            where T : IGameEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {

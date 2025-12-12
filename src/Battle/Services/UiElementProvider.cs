@@ -59,10 +59,10 @@
         public T CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
-            if (_singleInstances.TryGetValue(typeof(T), out var exist))
-                return (T)exist;
+            // if (_singleInstances.TryGetValue(typeof(T), out var exist))
+            //     return (T)exist;
             var instance = CreateRequireServices<T>();
-            _singleInstances.TryAdd(typeof(T), instance);
+          //  _singleInstances.TryAdd(typeof(T), instance);
             _uiLayer?.ShowMainElement(instance);
             return instance;
         }

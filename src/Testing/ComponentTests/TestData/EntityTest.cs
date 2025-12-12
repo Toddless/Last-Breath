@@ -10,6 +10,7 @@
     using Core.Interfaces.Battle;
     using Battle.Source.CombatEvents;
     using Battle.TestData;
+    using Core.Interfaces;
     using Core.Interfaces.Components;
 
     public class EntityTest : IEntity
@@ -25,7 +26,7 @@
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }
-        public IEventBus Events { get; }
+        public ICombatEventBus CombatEvents { get; }
         public IStance CurrentStance { get; }
         public ITargetChooser? TargetChooser { get; set; }
         public ICombatScheduler? CombatScheduler { get; set; }
@@ -94,7 +95,7 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            Events = new CombatEventBus();
+            CombatEvents = new CombatEventBus();
             SetBaseValuesForParameters();
         }
 
@@ -159,7 +160,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -167,11 +168,14 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
         }
 
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
+        public float GetDamage() => throw new NotImplementedException();
+        public void SetupEventBus(IGameEventBus bus) => throw new NotImplementedException();
+
         public void Heal(float amount) => CurrentHealth += amount;
 
         public void ConsumeResource(Costs type, float amount)
@@ -194,7 +198,7 @@
         {
             //var context = new AttackContext(this, target, this.Parameters.Damage, new RndGodot());
 
-        //    AttackPerformed?.Invoke(context);
+            //    AttackPerformed?.Invoke(context);
             return Task.CompletedTask;
         }
 
@@ -202,13 +206,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            Events.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            Events.Publish(new TurnStartEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
         }
 
         public Task ReceiveAttack(IAttackContext context)

@@ -12,7 +12,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.Events.Subscribe<DamageTakenEvent>(OnDamageTaken);
+            owner.CombatEvents.Subscribe<DamageTakenEvent>(OnDamageTaken);
         }
 
         private void OnDamageTaken(DamageTakenEvent evnt)

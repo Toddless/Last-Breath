@@ -1,19 +1,19 @@
 ﻿namespace Battle.Source.Abilities
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Source;
     using Module;
-    using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Decorators;
-    using Godot;
+    using Services;
     using Utilities;
+    using Core.Enums;
+    using Decorators;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components.Module;
 
     public class BerserkFury(
         float cooldown,
@@ -48,12 +48,13 @@
             {
                 if (Owner.CurrentHealth <= 1) return;
 
-                // foreach (IEntity target in targets)
-                //     Owner.Attack(target);
+                foreach (IEntity target in targets)
+                {
+                }
 
                 float chance = Mathf.Clamp(1f - (Owner.CurrentHealth / Owner.Parameters.MaxHealth), 0.05f, 0.7f);
 
-                if (Rnd.NextDouble() > chance)
+                if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
                     break;
             }
         }

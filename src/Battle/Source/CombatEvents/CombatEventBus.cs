@@ -5,11 +5,12 @@
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
 
-    public class CombatEventBus : IEventBus
+    public class CombatEventBus : ICombatEventBus
     {
         private readonly Dictionary<Type, List<Delegate>> _handlers = new();
 
         public void Publish<T>(T evnt)
+            where T : ICombatEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
@@ -19,6 +20,7 @@
         }
 
         public void Subscribe<T>(Action<T> handler)
+            where T : ICombatEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {
@@ -30,6 +32,7 @@
         }
 
         public void Unsubscribe<T>(Action<T> handler)
+            where T : ICombatEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {

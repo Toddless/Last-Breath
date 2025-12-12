@@ -39,6 +39,7 @@
         }
 
         public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
+        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
 
         public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
 

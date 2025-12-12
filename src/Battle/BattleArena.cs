@@ -2,29 +2,30 @@
 {
     using Godot;
     using Source;
-    using Services;
     using TestData;
+    using Core.Interfaces;
     using Godot.Collections;
     using Core.Interfaces.UI;
+    using Core.Interfaces.Data;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Mediator;
     using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
-    public partial class BattleArena : Node2D, IInitializable
+    public partial class BattleArena : Node2D, IInitializable, IRequireServices
     {
         private const string UID = "uid://dph8vnuwipwoc";
         private readonly RandomNumberGenerator _rnd = new();
         private readonly CombatScheduler _combatScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
         private readonly Vector2 _playerPosition = new(320, 560);
-        private IMediator _mediator = GameServiceProvider.Instance.GetService<IMediator>();
+        private IGameEventBus? _gameEventBus;
+        private IGameEventBus? _battleEventBus;
         private List<IEntity> _entities = [];
         private int _entitiesCount;
-        [Export] private BattleHud? _hud;
         [Export] private Array<EnemySpot> _spots = [];
-        [Export] private Player? _player;
+        private Player? _player;
         private IEntity? _currentFighter;
         private bool _fightEnds;
 
@@ -37,6 +38,16 @@
             _fightEnds = false;
             foreach (EnemySpot enemySpot in _spots)
                 enemySpot.EntityClicked += OnEntityClicked;
+        }
+
+        public void InjectServices(IGameServiceProvider provider)
+        {
+            _gameEventBus = provider.GetService<IGameEventBus>();
+        }
+
+        public void SetupEventBus(IGameEventBus battleEventBus)
+        {
+            _battleEventBus = battleEventBus;
         }
 
         public void SetPlayer(IEntity player)
@@ -80,6 +91,7 @@
                 _currentFighter = _queueScheduler.GetCurrentFighter();
                 if (_currentFighter is not { IsAlive: true }) continue;
 
+                _gameEventBus?.Publish<TurnStartGameEvent>(new());
                 _currentFighter.OnTurnStart();
                 if (_currentFighter is Player)
                 {
@@ -104,6 +116,7 @@
                 await _combatScheduler.RunQueue();
 
                 _currentFighter.OnTurnEnd();
+                _gameEventBus?.Publish<TurnEndGameEvent>(new());
             }
         }
 

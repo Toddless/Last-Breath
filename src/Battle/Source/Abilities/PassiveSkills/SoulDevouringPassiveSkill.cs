@@ -11,7 +11,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.Events.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
         }
 
         private void OnAbilityActivatedEvent(AbilityActivatedEvent evnt)
@@ -22,7 +22,7 @@
 
         public override void Detach(IEntity owner)
         {
-            owner.Events.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            owner.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
         }
 
         public override ISkill Copy() => new SoulDevouringPassiveSkill(Id, BarrierRecoveryAmount);

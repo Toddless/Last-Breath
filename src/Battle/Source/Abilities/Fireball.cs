@@ -10,6 +10,7 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Decorators;
+    using Services;
 
     public class Fireball : Ability
     {
@@ -85,7 +86,8 @@
                     [AbilityParameter.Target] = new Module<AbilityParameter>(() => _maxTargets, AbilityParameter.Target),
                     [AbilityParameter.Damage] = new Module<AbilityParameter>(() => _baseDamage, AbilityParameter.Damage),
                     [AbilityParameter.CriticalChanceValue] = new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChanceValue),
-                    [AbilityParameter.CriticalChanceDetermination] = new Module<AbilityParameter>(() => (float)Rnd.NextDouble(), AbilityParameter.CriticalChanceDetermination),
+                    [AbilityParameter.CriticalChanceDetermination] =
+                        new Module<AbilityParameter>(() => StaticRandomNumberGenerator.Rnd.Randf(), AbilityParameter.CriticalChanceDetermination),
                 });
 
         private float GetCurrentCriticalChance() => Owner == null

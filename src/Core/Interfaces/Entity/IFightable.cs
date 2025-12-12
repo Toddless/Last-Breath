@@ -8,7 +8,7 @@
 
     public interface IFightable
     {
-        IEventBus Events { get; }
+        ICombatEventBus CombatEvents { get; }
         IStance CurrentStance { get; }
         ITargetChooser? TargetChooser { get; set; }
 

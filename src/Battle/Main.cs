@@ -1,53 +1,40 @@
 ﻿namespace Battle
 {
     using Godot;
+    using Source;
     using System;
     using Services;
     using Utilities;
-    using System.Linq;
-    using Source.GameEvents;
+    using Core.Interfaces;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Events.GameEvents;
 
     public partial class Main : Node2D
     {
+        private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
+        private IUIElementProvider? _uiElementProvider;
+        private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
         [Export] private UiLayerManager? _layerManager;
 
         public override void _Ready()
         {
-            var provider = GameServiceProvider.Instance.GetService<IUIElementProvider>();
-            if (_layerManager != null) provider.Subscribe(_layerManager);
-            GameEventBus.Instance.Subscribe<InitializeFightGameEvent>(OnFightInitialized);
+            _uiElementProvider = _provider.GetService<IUIElementProvider>();
+            if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
+            _gameEventBus = _provider.GetService<IGameEventBus>();
+            _gameEventBus.Subscribe<BattleStartGameEvent>(OnBattleInitialized);
         }
 
-        private async void OnFightInitialized(InitializeFightGameEvent obj)
+        private async void OnBattleInitialized(BattleStartGameEvent evnt)
         {
             try
             {
-                var player = obj.Player;
-                var node = player as Node2D;
-                if (node != null)
-                    _mainWorld?.CallDeferred(Node.MethodName.RemoveChild, node);
-                var battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
-                battleArena.SetPlayer(player);
-
-                foreach (var asNode in obj.Entities.Select(objEntity => objEntity as Node2D))
-                {
-                    if (asNode != null)
-                        _mainWorld?.CallDeferred(Node.MethodName.RemoveChild, asNode);
-                }
-
-                CallDeferred(Node.MethodName.AddChild, battleArena);
+                ArgumentNullException.ThrowIfNull(_uiElementProvider);
+                ArgumentNullException.ThrowIfNull(_mainWorld);
+                var context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
                 await ToSignal(GetTree(), "process_frame");
-                await battleArena.StartFight(obj.Entities);
-
-                if (player.IsAlive)
-                {
-                    battleArena.CallDeferred(Node.MethodName.RemoveChild, node);
-                    _mainWorld?.CallDeferred(Node.MethodName.AddChild, node);
-                }
-
-                CallDeferred(Node.MethodName.RemoveChild, battleArena);
+                await context.RunBattleAsync();
+                context.Dispose();
             }
             catch (Exception es)
             {

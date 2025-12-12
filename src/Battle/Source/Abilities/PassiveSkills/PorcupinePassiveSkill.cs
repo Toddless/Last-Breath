@@ -16,7 +16,7 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.Events.Subscribe<DamageTakenEvent>(OnAfterAttack);
+            owner.CombatEvents.Subscribe<DamageTakenEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(DamageTakenEvent evnt)
@@ -30,7 +30,7 @@
 
         public override void Detach(IEntity owner)
         {
-            owner.Events.Unsubscribe<DamageTakenEvent>(OnAfterAttack);
+            owner.CombatEvents.Unsubscribe<DamageTakenEvent>(OnAfterAttack);
         }
 
         public override ISkill Copy() => new PorcupinePassiveSkill(Id, PercentToReturn, PercentArmorToDealAsDamage);

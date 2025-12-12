@@ -10,12 +10,12 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.Events.Subscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.Events.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(AfterAttackEvent evnt)

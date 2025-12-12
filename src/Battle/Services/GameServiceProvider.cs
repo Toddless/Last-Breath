@@ -1,13 +1,13 @@
 namespace Battle.Services
 {
-    using System;
-    using Core.Interfaces.Data;
-    using System.Collections.Generic;
-    using Core.Interfaces;
-    using Core.Interfaces.Mediator;
     using Godot;
-    using Microsoft.Extensions.DependencyInjection;
+    using System;
     using Source;
+    using Core.Interfaces;
+    using Core.Interfaces.Data;
+    using Core.Interfaces.Mediator;
+    using System.Collections.Generic;
+    using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider
     {
@@ -20,6 +20,7 @@ namespace Battle.Services
         }
 
         public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
+        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
         public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
 
         private ServiceProvider RegisterServices()
@@ -32,11 +33,10 @@ namespace Battle.Services
                 instance.Randomize();
                 return instance;
             });
+            services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IUIElementProvider, UiElementProvider>();
             services.AddSingleton<PlayerReference>();
             services.AddSingleton<IEntityProvider, EntityProvider>();
-            services.AddTransient<QueueScheduler>();
-            services.AddTransient<CombatScheduler>();
             return services.BuildServiceProvider();
         }
     }

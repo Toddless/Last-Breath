@@ -2,11 +2,13 @@
 {
     using Godot;
     using System;
+    using Stateless;
     using Utilities;
     using Attribute;
     using Components;
     using Core.Enums;
     using CombatEvents;
+    using Core.Interfaces;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
@@ -14,20 +16,20 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Abilities.PassiveSkills;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using GameEvents;
-    using Stateless;
+    using Core.Interfaces.Events.GameEvents;
+    using Services;
 
     internal partial class Enemy : CharacterBody2D, IInitializable, IRequireServices, IEntity
     {
         private const string UID = "uid://bssmtdwwycbpt";
         [Export] private AnimatedSprite2D? _animatedSprite;
         [Export] private Area2D? _interactionArea;
-        private IMediator? _mediator;
+        private IGameEventBus? _gameEventBus;
+        private IGameEventBus? _battleEventBus;
 
-        public enum State
+        private enum State
         {
             Idle,
             Walk,
@@ -50,8 +52,9 @@
         }
 
         private Direction _direction;
-        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private float _baseSpeed = 500;
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+        private readonly RandomNumberGenerator _rnd = new();
 
         public string Id { get; } = string.Empty;
         public string[] Tags { get; } = [];
@@ -63,7 +66,7 @@
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
-        public IEventBus Events { get; private set; }
+        public ICombatEventBus CombatEvents { get; private set; }
         public IStance CurrentStance { get; private set; }
         public ITargetChooser? TargetChooser { get; set; }
         public bool IsFighting { get; set; }
@@ -124,6 +127,7 @@
             if (_interactionArea != null)
                 _interactionArea.BodyEntered += OnBodyEnter;
 
+            _rnd.Randomize();
             Parameters = new EntityParametersComponent();
             Modifiers = new ModifiersComponent();
             Parameters.Initialize(Modifiers.GetModifiers);
@@ -137,15 +141,21 @@
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
-            Events = new CombatEventBus();
+            CombatEvents = new CombatEventBus();
 
             var passive = new ChainAttackPassiveSkill("Chain");
             passive.Attach(this);
             var passiveTwo = new CounterAttackPassiveSkill("Counter");
             passiveTwo.Attach(this);
 
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             ConfigureStateMachine();
             SetBaseValuesForParameters();
+        }
+
+        public void InjectServices(IGameServiceProvider provider)
+        {
+            _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
 
@@ -172,7 +182,17 @@
                 .Permit(Trigger.Idle, State.Idle);
         }
 
-        public void AddItemToInventory(IItem item) => throw new NotImplementedException();
+        public void AddItemToInventory(IItem item)
+        {
+        }
+
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+
+        public void SetupEventBus(IGameEventBus bus)
+        {
+            // TODO:
+            _battleEventBus = bus;
+        }
 
         public void Heal(float amount) => CurrentHealth += amount;
 
@@ -196,7 +216,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            Events.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
             return true;
         }
 
@@ -204,14 +224,8 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            Events.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
             return true;
-        }
-
-
-        public void InjectServices(IGameServiceProvider provider)
-        {
-            _mediator = provider.GetService<IMediator>();
         }
 
 
@@ -242,8 +256,8 @@
 
             _animatedSprite.Play("Hurt");
             TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
-            Events.Publish(new DamageTakenEvent(this, context));
-            context.Attacker.Events.Publish(new AfterAttackEvent(context.Attacker, context));
+            CombatEvents.Publish(new DamageTakenEvent(this, context));
+            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context.Attacker, context));
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Idle");
         }
@@ -254,7 +268,7 @@
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             if (context.IsCritical)
                 context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
-            Events.Publish(new BeforeAttackEvent(this, context));
+            CombatEvents.Publish(new BeforeAttackEvent(this, context));
             _animatedSprite.Play("Attack");
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Idle");
@@ -263,13 +277,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            Events.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            Events.Publish(new TurnStartEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
         }
 
         public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -295,8 +309,8 @@
                     case Player player:
                         {
                             var fighters = Group?.GetEntitiesInGroup<IEntity>() ?? [this];
-                            GameEventBus.Instance.Publish(new InitializeFightGameEvent(player, fighters));
                             _stateMachine.Fire(Trigger.Battle);
+                            _gameEventBus?.Publish(new BattleStartGameEvent(player, fighters));
                             break;
                         }
                     case IFightable fighter:
@@ -355,14 +369,14 @@
                         break;
                     case EntityParameter.CriticalChance:
                     case EntityParameter.AdditionalHitChance:
-                        value = 0.05f;
+                        value = 0.25f;
                         break;
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
-                        value = 50f;
+                        value = rnd.RandfRange(50, 300);
                         break;
                 }
 
