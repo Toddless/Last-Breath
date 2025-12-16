@@ -27,6 +27,7 @@
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
         public float CriticalChance => this[EntityParameter.CriticalChance];
         public float AdditionalHit => this[EntityParameter.AdditionalHitChance];
+        public float MulticastChance => this[EntityParameter.MulticastChance];
         public float SpellDamage => this[EntityParameter.SpellDamage];
         public float Armor => this[EntityParameter.Armor];
         public float Evade => this[EntityParameter.Evade];
@@ -35,6 +36,7 @@
         public float Mana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
+
 
         public event Action<EntityParameter, float>? ParameterChanged;
 

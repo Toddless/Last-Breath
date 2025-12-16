@@ -7,21 +7,20 @@
     using Stateless;
     using Core.Enums;
     using Components;
-    using CombatEvents;
     using Core.Constants;
     using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Abilities.PassiveSkills;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
 
-    internal partial class Player : CharacterBody2D, IRequireServices, IEntity
+    internal partial class Player : CharacterBody2D, IRequireServices, IEntity, ICameraFocus
     {
         public enum State
         {
@@ -56,9 +55,10 @@
         [Export] private Godot.Collections.Dictionary<State, AnimatedSprite2D>? _animatedSprites = [];
 
         private IGameEventBus? _gameEventBus;
-        private IGameEventBus? _battleEventBus;
+        private IBattleEventBus? _battleEventBus;
 
         public string Id { get; }
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; }
         public string Description { get; }
         public string DisplayName { get; }
@@ -121,6 +121,7 @@
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
         public event Action<IFightable>? Dead;
+        public event Action<float, DamageType, bool>? DamageTaken;
 
 
         public override void _Ready()
@@ -146,19 +147,11 @@
             SetBaseValuesForParameters();
             ConfigureStateMachine();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            var vampire = new VampireAttackPassiveSkill("Vampire_Skill", 0.1f);
-            vampire.Attach(this);
-            var passive = new ChainAttackPassiveSkill("Chain_Attack_Passive");
-            passive.Attach(this);
-            var trapped = new TrappedBeastPassiveSkill("Trapped", 0.01f, 0.01f);
-            trapped.Attach(this);
-            var counter = new CounterAttackPassiveSkill("Counter");
-            counter.Attach(this);
+            CurrentHealth = Parameters.MaxHealth;
         }
 
         public override void _EnterTree()
         {
-            if (GetParent() is BattleArena) _stateMachine.Fire(Trigger.Battle);
             if (GetParent() is MainWorld) _stateMachine.Fire(Trigger.Idle);
         }
 
@@ -178,10 +171,11 @@
 
         public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
 
-        public void SetupEventBus(IGameEventBus bus)
+        public void SetupEventBus(IBattleEventBus bus)
         {
             // TODO:
             _battleEventBus = bus;
+            _stateMachine.Fire(Trigger.Battle);
         }
 
         public void Heal(float amount) => CurrentHealth += amount;
@@ -206,7 +200,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectAppliedEvent(statusEffect));
             return true;
         }
 
@@ -214,7 +208,7 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectRemovedEvent(statusEffect));
             return true;
         }
 
@@ -239,9 +233,9 @@
         {
             if (_animatedSprite == null) return;
             _animatedSprite.Play("Fight_Hurt");
-            TakeDamage(context.FinalDamage, DamageType.Normal, DamageSource.Hit);
-            CombatEvents.Publish(new DamageTakenEvent(this, context));
-            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context.Attacker, context));
+            CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
+            TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
+            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
         }
@@ -252,7 +246,7 @@
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             if (context.IsCritical)
                 context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
-            CombatEvents.Publish(new BeforeAttackEvent(this, context));
+            CombatEvents.Publish(new BeforeAttackEvent(context));
             _animatedSprite.Play("Fight_Attack");
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Fight_Idle");
@@ -261,19 +255,25 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndGameEvent(this));
+            _battleEventBus?.Publish(new TurnEndGameEvent(this));
+            _gameEventBus?.Publish(new TurnEndGameEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
+            CombatEvents.Publish(new TurnStartGameEvent(this));
+            _battleEventBus?.Publish(new TurnStartGameEvent(this));
+            _gameEventBus?.Publish(new TurnStartGameEvent(this));
         }
 
-        public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public void TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
+            CombatEvents.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
+            _battleEventBus?.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
+            DamageTaken?.Invoke(damage, type,isCrit);
             CurrentHealth -= damage;
-            GD.Print($"Player get damage: {damage}");
         }
 
 
@@ -302,7 +302,6 @@
                     _animatedSprite?.Play("Fight_Idle");
                     CanMove = false;
                     _lastPosition = Position;
-                    Position = new Vector2(320, 560);
                 })
                 .OnExit(() =>
                 {
@@ -350,6 +349,7 @@
 
         private void NotifyHealthChanges(float value)
         {
+            GD.Print($"Health changed: {value}");
             CurrentHealthChanged?.Invoke(value);
             _gameEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
             _battleEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
@@ -358,7 +358,7 @@
 
         private void NotifyBarrierChanges(float value)
         {
-            CurrentHealthChanged?.Invoke(value);
+            CurrentBarrierChanged?.Invoke(value);
             _gameEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
             _battleEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
         }
@@ -375,14 +375,11 @@
             switch (parameter)
             {
                 case EntityParameter.Health:
-                    CurrentHealth = value;
                     _battleEventBus?.Publish<PlayerMaxHealthChanges>(new(this, value));
                     break;
                 case EntityParameter.Barrier:
-                    CurrentBarrier = value;
                     break;
                 case EntityParameter.Mana:
-                    CurrentMana = value;
                     break;
             }
         }
@@ -397,7 +394,7 @@
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 1600;
+                        value = 3600;
                         break;
                     case EntityParameter.Mana:
                         value = 50;
@@ -412,7 +409,7 @@
                         value = 200;
                         break;
                     case EntityParameter.CriticalChance:
-                        value = 0.05f;
+                        value = 0.25f;
                         break;
                     case EntityParameter.AdditionalHitChance:
                         value = 0.6f;
@@ -429,5 +426,7 @@
                 Parameters.SetBaseValueForParameter(entityParameter, value);
             }
         }
+
+        public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }

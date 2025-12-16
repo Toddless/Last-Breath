@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
-    using CombatEvents;
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
 
     public class PorcupinePassiveSkill(
         string id,
@@ -16,21 +16,23 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<DamageTakenEvent>(OnAfterAttack);
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<DamageTakenEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(DamageTakenEvent evnt)
         {
-            var owner = evnt.Source;
-            var attacker = evnt.Context.Attacker;
-            float armorAsDamage = owner.Parameters.Armor * PercentArmorToDealAsDamage;
-            float fromDamageTaken = evnt.Context.FinalDamage * PercentToReturn;
-            attacker.TakeDamage(armorAsDamage + fromDamageTaken, DamageType.Normal, DamageSource.Passive);
+            if (Owner == null) return;
+            var attacker = evnt.From;
+            float armorAsDamage = Owner.Parameters.Armor * PercentArmorToDealAsDamage;
+            float fromDamageTaken = evnt.Damage * PercentToReturn;
+            attacker.TakeDamage(attacker, armorAsDamage + fromDamageTaken, DamageType.Normal, DamageSource.Passive);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<DamageTakenEvent>(OnAfterAttack);
+            Owner?.CombatEvents.Unsubscribe<DamageTakenEvent>(OnAfterAttack);
+            Owner = null;
         }
 
         public override ISkill Copy() => new PorcupinePassiveSkill(Id, PercentToReturn, PercentArmorToDealAsDamage);

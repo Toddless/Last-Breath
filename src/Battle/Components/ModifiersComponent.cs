@@ -6,6 +6,7 @@
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Components;
+    using Godot;
 
     public class ModifiersComponent : IModifiersComponent
     {
@@ -126,7 +127,6 @@
             }
 
             list.Add(modifier);
-
             RaiseEvent(modifier.EntityParameter);
         }
 
@@ -138,12 +138,11 @@
                 return;
             }
 
-            list.Remove(modifier);
+            list.RemoveAll(x => x.InstanceId == modifier.InstanceId);
             if (list.Count == 0)
             {
                 category.Remove(modifier.EntityParameter);
             }
-
             RaiseEvent(modifier.EntityParameter);
         }
 

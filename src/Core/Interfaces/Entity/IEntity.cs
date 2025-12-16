@@ -3,7 +3,6 @@
     using Enums;
     using Items;
     using System;
-    using Battle;
     using Components;
     using Interfaces;
 
@@ -35,7 +34,7 @@
         void AddItemToInventory(IItem item);
 
         float GetDamage();
-        void SetupEventBus(IGameEventBus bus);
+
         void Heal(float amount);
         void ConsumeResource(Costs type, float amount);
         bool TryApplyStatusEffect(StatusEffects statusEffect);

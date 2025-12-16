@@ -13,16 +13,17 @@
 
         public event Action? QueueEmpty;
 
-        public void AddFighters(List<IEntity> fighters)
+        public List<IEntity> AddFighters(List<IEntity> fighters)
         {
-            foreach (var fighter in fighters.OrderBy(entity => entity.Dexterity.Total))
+            var orderedFighters = fighters.OrderBy(entity => entity.Dexterity.Total).ToList();
+            foreach (var fighter in orderedFighters)
             {
-                if (!fighter.IsAlive) continue;
-                if ((fighter.StatusEffects & _skipTurnEffect) != 0) continue;
+                if ((fighter.StatusEffects & _skipTurnEffect) != 0 || !fighter.IsAlive) continue;
                 FighterQueue.Enqueue(fighter);
             }
 
             if (FighterQueue.Count == 0) QueueEmpty?.Invoke();
+            return orderedFighters;
         }
 
         public IEntity? GetCurrentFighter()

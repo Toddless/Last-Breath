@@ -1,12 +1,13 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System;
     using Godot;
     using Utilities;
     using Core.Enums;
-    using CombatEvents;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Events.GameEvents;
 
     public abstract class Effect(
         string id,
@@ -14,7 +15,9 @@
         int stacks,
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
+        protected IEntity? Caster;
         public string Id { get; } = statusEffect == StatusEffects.None ? id : $"{id}_{statusEffect}";
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public Texture2D? Icon
         {
@@ -38,11 +41,19 @@
         public virtual void Apply(EffectApplyingContext context)
         {
             var target = context.Target;
+            Caster = context.Caster;
             Source = context.Source;
             target.Effects.AddEffect(this);
+            Caster.Dead += OnCasterDead;
             // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status))
-                context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(context.Caster, Status));
+                context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
+        }
+
+        private void OnCasterDead(IFightable obj)
+        {
+            Caster?.Dead -= OnCasterDead;
+            Caster = null;
         }
 
         public virtual void TurnEnd(IEntity source)

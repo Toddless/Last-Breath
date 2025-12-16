@@ -2,20 +2,13 @@
 {
     using Core.Enums;
     using Core.Interfaces.Entity;
+    using Core.Modifiers;
 
-    public class IntelligenceStance(IEntity owner) : StanceBase(owner, effect: new StanceActivationEffect(),
-        Stance.Intelligence)
+    public class IntelligenceStance(IEntity owner)
+        : StanceBase(owner, effect: new StanceActivationEffect(
+                [],
+                [new Modifier(ModifierType.Flat, EntityParameter.Intelligence, 15)]),
+            Stance.Intelligence)
     {
-        public override void OnActivate()
-        {
-            base.OnActivate();
-            ActivationEffect.OnActivate(Owner);
-        }
-
-        public override void OnDeactivate()
-        {
-            base.OnDeactivate();
-            ActivationEffect.OnDeactivate(Owner);
-        }
     }
 }

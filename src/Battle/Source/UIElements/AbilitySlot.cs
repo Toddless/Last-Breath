@@ -1,4 +1,4 @@
-﻿namespace Battle.TestData
+﻿namespace Battle.Source.UIElements
 {
     using Godot;
     using Stateless;
@@ -32,7 +32,6 @@
         private const string UID = "uid://dubbkx1imyqop";
         private IAbility? _ability;
         [Export] private TextureRect? _background, _icon, _frame;
-
 
         [Signal]
         public delegate void SelectingTargetsEventHandler();

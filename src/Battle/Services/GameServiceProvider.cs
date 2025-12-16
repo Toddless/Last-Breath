@@ -2,11 +2,11 @@ namespace Battle.Services
 {
     using Godot;
     using System;
-    using Source;
     using Core.Interfaces;
     using Core.Interfaces.Data;
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
+    using Core.Interfaces.Events;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider

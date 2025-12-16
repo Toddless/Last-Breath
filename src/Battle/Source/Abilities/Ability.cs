@@ -41,6 +41,7 @@
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
 
         public string Id { get; } = id;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
         public float AvailablePoints { get; set; } = availablePoints;
 
@@ -84,6 +85,7 @@
                 ApplyTargetEffects(context);
             }
 
+            //TODO:  ability activated event When??
             ApplyCasterEffects(context);
             StartCooldown();
             ConsumeResource();

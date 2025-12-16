@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.CombatEvents
+﻿namespace Battle.Source
 {
     using System;
     using System.Linq;

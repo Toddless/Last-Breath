@@ -5,8 +5,8 @@
     using System;
     using Services;
     using Utilities;
-    using Core.Interfaces;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class Main : Node2D

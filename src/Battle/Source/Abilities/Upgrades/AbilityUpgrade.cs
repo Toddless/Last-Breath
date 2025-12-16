@@ -8,6 +8,7 @@
     public abstract class AbilityUpgrade(string id, string[] tags,  int tier, int pointPerRank, int maxRank, int currentRank = 0) : IAbilityUpgrade
     {
         public string Id { get; } = id;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
 
         public Texture2D? Icon { get; }

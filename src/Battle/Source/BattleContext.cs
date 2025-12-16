@@ -2,37 +2,39 @@
 {
     using Godot;
     using Services;
-    using Core.Interfaces;
     using Core.Interfaces.Data;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
     using System.Collections.Generic;
 
     internal class BattleContext : IBattleContext
     {
-        private readonly IGameEventBus _localBus = new GameEventBus();
-        private readonly IEntity _player;
+        private readonly IBattleEventBus _localBus = new BattleEventBus();
+        private readonly IUIElementProvider _uiElementProvider;
+        private readonly BattleArena _battleArena;
         private readonly List<IEntity> _entities;
         private readonly MainWorld _mainWorld;
-        private readonly BattleHud _battleHud;
-        private readonly BattleArena _battleArena;
+        private readonly IEntity _player;
 
         public BattleContext(IEntity player, List<IEntity> entities, MainWorld mainWorld, IGameServiceProvider provider, Node2D parent)
         {
             _player = player;
             _entities = entities;
             _mainWorld = mainWorld;
-            var uiProvider = provider.GetService<IUIElementProvider>();
-            _battleHud = uiProvider.CreateAndShowMainElement<BattleHud>();
+            _uiElementProvider = provider.GetService<IUIElementProvider>();
+            var battleHud = _uiElementProvider.CreateAndShowMainElement<BattleHud>();
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
 
-            _battleArena.SetupEventBus(_localBus);
-            _battleHud.SetupEventBus(_localBus);
-            _battleHud.SetInitialValues(_player.Parameters.MaxHealth, _player.Parameters.Mana, _player.CurrentHealth, _player.CurrentMana);
-            _player.SetupEventBus(_localBus);
+            battleHud.SetupEventBus(_localBus);
+            battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.Mana, _player.CurrentHealth, _player.CurrentMana);
+            foreach (IEntity entity in entities)
+                battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.Mana, entity.CurrentHealth, entity.CurrentMana);
 
+            _battleArena.SetupEventBus(_localBus);
+            _player.SetupEventBus(_localBus);
             RemoveParticipantFromWorld();
         }
 
@@ -47,16 +49,18 @@
         {
             ReturnParticipantsToWorld();
             _battleArena.QueueFree();
-            _battleHud.QueueFree();
+            _uiElementProvider.HideMainElement<BattleHud>();
         }
 
         private void ReturnParticipantsToWorld()
         {
-            if (!_player.IsAlive || _player is not Node2D node)
-                return;
+            if (_player.IsAlive) _battleArena.RemovePlayerFromArena();
 
-            _battleArena.CallDeferred(Node.MethodName.RemoveChild, node);
-            _mainWorld.CallDeferred(Node.MethodName.AddChild, node);
+            foreach (var entity in _entities)
+            {
+                if (!entity.IsAlive || entity is not Node2D asNode) continue;
+                _mainWorld.CallDeferred(Node.MethodName.AddChild, asNode);
+            }
         }
 
         private void RemoveParticipantFromWorld()

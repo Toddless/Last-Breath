@@ -1,7 +1,6 @@
 ﻿namespace Core.Interfaces.Abilities
 {
     using Entity;
-    using System.Collections.Generic;
 
     public struct EffectApplyingContext
     {
@@ -10,7 +9,5 @@
         public float Damage { get; set; }
         public bool IsCritical { get; set; }
         public object? Source { get; set; }
-
-        public Dictionary<string, object> Metadata { get; set; }
     }
 }

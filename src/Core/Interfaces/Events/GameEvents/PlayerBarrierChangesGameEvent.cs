@@ -2,5 +2,5 @@
 {
     using Entity;
 
-    public record PlayerBarrierChangesGameEvent(IEntity Player, float Value) : IGameEvent;
+    public record PlayerBarrierChangesGameEvent(IEntity Player, float Value) : IGameEvent, IBattleEvent;
 }

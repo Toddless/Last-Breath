@@ -14,7 +14,7 @@
         [Export] public string[] Tags { get; private set; } = [];
         [Export] public Texture2D? Icon { get; private set; }
         [Export] public SkillType Type { get; private set; }
-
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string Description => GetDescription();
         public string DisplayName => Localizator.Localize(Id);
 

@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Abilities;
 
     public class DamageOverTurnEffect(
         int duration,
@@ -23,7 +23,8 @@
 
         public override void TurnEnd(IEntity source)
         {
-            source.TakeDamage(DamagePerTick, Status.GetDamageType(), DamageSource.Effect);
+            if (Caster == null) return;
+            source.TakeDamage(Caster, DamagePerTick, Status.GetDamageType(), DamageSource.Effect);
             base.TurnEnd(source);
         }
 

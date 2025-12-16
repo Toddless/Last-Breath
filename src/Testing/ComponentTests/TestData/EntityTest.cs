@@ -1,22 +1,22 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
-    using Battle;
     using Godot;
     using Core.Enums;
     using Battle.Attribute;
     using Battle.Components;
+    using Battle.Source;
     using Core.Interfaces.Items;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
-    using Battle.Source.CombatEvents;
-    using Battle.TestData;
-    using Core.Interfaces;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.Events.GameEvents;
 
     public class EntityTest : IEntity
     {
         private IRandomNumberGenerator _rnd;
         public string Id { get; } = string.Empty;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public Texture2D? Icon { get; } = null;
         public string Description { get; } = string.Empty;
@@ -78,6 +78,7 @@
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
         public event Action<IFightable>? Dead;
+        public event Action<float, DamageType, bool>? DamageTaken;
         public event Action<IAttackContext>? AttackPerformed;
 
         public EntityTest()
@@ -160,7 +161,7 @@
         {
             if ((StatusEffects & statusEffect) != 0) return false;
             StatusEffects |= statusEffect;
-            CombatEvents.Publish(new StatusEffectAppliedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectAppliedEvent(statusEffect));
             return true;
         }
 
@@ -168,13 +169,13 @@
         {
             if ((StatusEffects & statusEffect) == 0) return false;
             StatusEffects &= ~statusEffect;
-            CombatEvents.Publish(new StatusEffectRemovedEvent(this, statusEffect));
+            CombatEvents.Publish(new StatusEffectRemovedEvent(statusEffect));
             return true;
         }
 
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
         public float GetDamage() => throw new NotImplementedException();
-        public void SetupEventBus(IGameEventBus bus) => throw new NotImplementedException();
+        public void SetupEventBus(IBattleEventBus bus) => throw new NotImplementedException();
 
         public void Heal(float amount) => CurrentHealth += amount;
 
@@ -206,13 +207,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndGameEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
+            CombatEvents.Publish(new TurnStartGameEvent(this));
         }
 
         public Task ReceiveAttack(IAttackContext context)
@@ -220,7 +221,7 @@
             return Task.CompletedTask;
         }
 
-        public void TakeDamage(float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public void TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             CurrentHealth -= damage;
         }

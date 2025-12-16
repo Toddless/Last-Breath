@@ -2,13 +2,13 @@
 {
     using Godot;
     using System;
+    using Utilities;
     using Core.Enums;
     using System.Linq;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.Crafting;
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Utilities;
 
     public class CraftingMastery(IMediator mediator, RandomNumberGenerator rnd) : ICraftingMastery
     {
@@ -36,10 +36,8 @@
         private readonly float[] _rarityTarget = [10f, 30f, 35f, 25f];
         // --------------------------------------------------------
 
-
-        private readonly IMediator _mediator = mediator;
-
         public string Id { get; } = "Mastery_Crafting";
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
@@ -135,7 +133,7 @@
                 {
                     CurrentExperience -= need;
                     _currentLevel++;
-                    _mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;
@@ -154,7 +152,7 @@
         {
             float progress = GetProgressFactor();
 
-            var interpolatedWeights = new float[_rarityBase.Length];
+            float[] interpolatedWeights = new float[_rarityBase.Length];
             float sumWeights = 0f;
 
             for (int i = 0; i < interpolatedWeights.Length; i++)
@@ -166,7 +164,7 @@
             for (int i = 0; i < interpolatedWeights.Length; i++)
                 interpolatedWeights[i] /= sumWeights;
 
-            var finalWeights = ApplyRarityModifiers(interpolatedWeights, rarityBonus);
+            float[] finalWeights = ApplyRarityModifiers(interpolatedWeights, rarityBonus);
 
             var result = new Dictionary<Rarity, float>();
             for (int i = 0; i < finalWeights.Length; i++)

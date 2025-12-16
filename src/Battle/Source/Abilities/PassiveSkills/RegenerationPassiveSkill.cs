@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
-    using CombatEvents;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
     public class RegenerationPassiveSkill(string id, float regenAmount)
@@ -11,17 +11,19 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnd);
         }
 
-        private void OnTurnEnd(TurnEndEvent evnt)
+        private void OnTurnEnd(TurnEndGameEvent evnt)
         {
-            evnt.Source.Heal(RegenAmount);
+            Owner?.Heal(RegenAmount);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            Owner?.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner = null;
         }
 
         public override ISkill Copy() => new RegenerationPassiveSkill(Id, RegenAmount);

@@ -5,11 +5,9 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Modifiers;
-    using Godot;
 
     public class TrappedBeastPassiveSkill : Skill
     {
-        private IEntity? _owner;
         private IModifierInstance _increaseDamageModifier;
 
         public TrappedBeastPassiveSkill(string id, float percentHealth, float percentBonus) : base(id)
@@ -24,25 +22,25 @@
 
         public override void Attach(IEntity owner)
         {
-            _owner = owner;
-            owner.CurrentHealthChanged += OnCurrentHealthChanged;
+            Owner = owner;
+            Owner.CurrentHealthChanged += OnCurrentHealthChanged;
         }
 
         private void OnCurrentHealthChanged(float currentHealth)
         {
-            if (_owner == null) return;
-            float percentLost = 1 - (currentHealth / _owner.Parameters.MaxHealth);
+            if (Owner == null) return;
+            float percentLost = 1 - (currentHealth / Owner.Parameters.MaxHealth);
             int steps = (int)(percentLost / PercentBonus);
             float bonus = 1f + steps * PercentBonus;
             _increaseDamageModifier.Value = bonus;
-            _owner.Modifiers.UpdatePermanentModifier(_increaseDamageModifier);
+            Owner.Modifiers.UpdatePermanentModifier(_increaseDamageModifier);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.Modifiers.RemovePermanentModifier(_increaseDamageModifier);
-            owner.CurrentHealthChanged -= OnCurrentHealthChanged;
-            _owner = null;
+            Owner?.Modifiers.RemovePermanentModifier(_increaseDamageModifier);
+            Owner?.CurrentHealthChanged -= OnCurrentHealthChanged;
+            Owner = null;
         }
 
         public override ISkill Copy() => new TrappedBeastPassiveSkill(Id, PercentHealth, PercentBonus);

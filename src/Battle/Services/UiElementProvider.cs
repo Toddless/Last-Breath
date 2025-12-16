@@ -27,7 +27,7 @@
         public bool IsInstanceTypeExist(Type instanceType, out Control? exist) => _singleInstances.TryGetValue(instanceType, out exist);
 
         public T Create<T>()
-           where T : Control, IInitializable
+            where T : Control, IInitializable
         {
             var instance = T.Initialize().Instantiate<T>();
             return instance;
@@ -53,16 +53,21 @@
                     instance.QueueFree();
                 instance.Close -= Close;
             }
+
             return instance;
         }
 
         public T CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
-            // if (_singleInstances.TryGetValue(typeof(T), out var exist))
-            //     return (T)exist;
+            if (_singleInstances.TryGetValue(typeof(T), out var exist))
+            {
+                _uiLayer?.ShowMainElement(exist);
+                return (T)exist;
+            }
+
             var instance = CreateRequireServices<T>();
-          //  _singleInstances.TryAdd(typeof(T), instance);
+            _singleInstances.TryAdd(typeof(T), instance);
             _uiLayer?.ShowMainElement(instance);
             return instance;
         }
@@ -77,7 +82,7 @@
         }
 
         public void ShowMainElement<T>()
-             where T : Control, IInitializable, IRequireServices
+            where T : Control, IInitializable, IRequireServices
         {
             if (!_singleInstances.TryGetValue(typeof(T), out var exist))
                 ArgumentNullException.ThrowIfNull(exist);
@@ -163,6 +168,7 @@
                     closable.Close -= _uiLayer.CloseAllWindows;
                 instance.Value.QueueFree();
             }
+
             _singleInstances.Clear();
         }
 
@@ -231,6 +237,7 @@
             foreach (var ui in existList ?? [])
                 ui.QueueFree();
         }
+
         public T CreateSingleClosable<T>()
             where T : Control, IInitializable, IClosable
         {

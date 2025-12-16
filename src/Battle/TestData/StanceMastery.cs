@@ -16,6 +16,7 @@
         //
 
         public string Id { get; } = "Stance_Mastery";
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public Texture2D? Icon { get; }
         public int BonusLevel { get; } = 0;

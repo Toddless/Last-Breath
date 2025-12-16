@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-    using Core.Interfaces;
+    using Core.Interfaces.Events;
     using System.Collections.Generic;
 
     internal class GameEventBus : IGameEventBus

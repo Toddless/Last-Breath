@@ -68,7 +68,7 @@
 
                 ApplyTargetEffects(context);
 
-                target.TakeDamage(damage, DamageType.Normal, DamageSource.Ability, isCritical);
+                target.TakeDamage(Owner, damage, DamageType.Normal, DamageSource.Ability, isCritical);
             }
 
             ApplyCasterEffects(context);

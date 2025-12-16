@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
-    using CombatEvents;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
     public class SoulDevouringPassiveSkill(string id, float barrierRecoveryAmount)
@@ -11,18 +11,19 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<AbilityActivatedGameEvent>(OnAbilityActivatedEvent);
         }
 
-        private void OnAbilityActivatedEvent(AbilityActivatedEvent evnt)
+        private void OnAbilityActivatedEvent(AbilityActivatedGameEvent evnt)
         {
-            var owner = evnt.Source;
-            owner.CurrentBarrier += BarrierRecoveryAmount;
+            Owner?.CurrentBarrier += BarrierRecoveryAmount;
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            Owner?.CombatEvents.Unsubscribe<AbilityActivatedGameEvent>(OnAbilityActivatedEvent);
+            Owner = null; 
         }
 
         public override ISkill Copy() => new SoulDevouringPassiveSkill(Id, BarrierRecoveryAmount);

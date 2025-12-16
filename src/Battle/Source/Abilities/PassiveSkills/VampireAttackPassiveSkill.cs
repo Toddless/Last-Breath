@@ -1,9 +1,8 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
-    using CombatEvents;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
-    using Godot;
 
     public class VampireAttackPassiveSkill(string id, float percentToLeach)
         : Skill(id)
@@ -12,19 +11,20 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
             float toHeal = evnt.Context.FinalDamage * PercentToLeach;
-            evnt.Source.Heal(toHeal);
-            GD.Print($"Was leached: {toHeal}");
+            Owner?.Heal(toHeal);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+            Owner = null;
         }
 
         public override ISkill Copy() => new VampireAttackPassiveSkill(Id, PercentToLeach);

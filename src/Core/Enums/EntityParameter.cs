@@ -9,6 +9,7 @@
         BlockChance,
         CriticalChance,
         AdditionalHitChance,
+        MulticastChance,
         CriticalDamage,
         SpellDamage,
         Armor,

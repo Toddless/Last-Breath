@@ -2,5 +2,5 @@
 {
     using Entity;
 
-    public record EntityHealthChanges(IEntity Entity, float Value) : IGameEvent;
+    public record EntityHealthChanges(IEntity Entity, float Value) : IGameEvent, IBattleEvent;
 }

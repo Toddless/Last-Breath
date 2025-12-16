@@ -1,7 +1,6 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using System.Threading.Tasks;
-    using Entity;
 
     public interface ICombatScheduler
     {

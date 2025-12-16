@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dj86l1gr2ffle"]
+[gd_scene load_steps=5 format=3 uid="uid://dj86l1gr2ffle"]
 
 [ext_resource type="Script" uid="uid://bkjhhot1r0eiy" path="res://Main.cs" id="1_idj7w"]
 [ext_resource type="PackedScene" uid="uid://okfegogbrc05" path="res://Scenes/MainWorld.tscn" id="1_r150o"]
 [ext_resource type="Script" uid="uid://dvgyct0lq236k" path="res://UiLayerManager.cs" id="3_kln2b"]
+[ext_resource type="PackedScene" uid="uid://dg7d3dghfdevy" path="res://Scenes/DevPanel.tscn" id="4_rgh2o"]
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_layerManager")]
 script = ExtResource("1_idj7w")
@@ -25,3 +26,7 @@ _notificationLayer = NodePath("NotificationLayer")
 [node name="TooltipLayer" type="CanvasLayer" parent="UILayerManager"]
 
 [node name="NotificationLayer" type="CanvasLayer" parent="UILayerManager"]
+
+[node name="DevLayer" type="CanvasLayer" parent="UILayerManager"]
+
+[node name="Control" parent="UILayerManager/DevLayer" instance=ExtResource("4_rgh2o")]

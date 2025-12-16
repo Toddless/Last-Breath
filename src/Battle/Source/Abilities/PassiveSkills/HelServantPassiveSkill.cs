@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
-    using CombatEvents;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
     public class HelServantPassiveSkill(string id, float chance) : Skill(id)

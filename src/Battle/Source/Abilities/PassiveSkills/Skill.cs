@@ -1,13 +1,16 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
+    using Godot;
+    using System;
+    using Utilities;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
-    using Godot;
-    using Utilities;
 
     public abstract class Skill(string id) : ISkill
     {
+        protected IEntity? Owner;
         public string Id { get; } = id;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; }
         public string Description => Localizator.Localize(Id);
         public string DisplayName => Localizator.LocalizeDescription(Id);

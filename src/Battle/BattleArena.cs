@@ -10,21 +10,22 @@
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Events;
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
 
-    public partial class BattleArena : Node2D, IInitializable, IRequireServices
+    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus
     {
         private const string UID = "uid://dph8vnuwipwoc";
         private readonly RandomNumberGenerator _rnd = new();
         private readonly CombatScheduler _combatScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
-        private readonly Vector2 _playerPosition = new(320, 560);
         private IGameEventBus? _gameEventBus;
-        private IGameEventBus? _battleEventBus;
+        private IBattleEventBus? _battleEventBus;
         private List<IEntity> _entities = [];
         private int _entitiesCount;
-        [Export] private Array<EnemySpot> _spots = [];
+        [Export] private Array<EntitySpot> _spots = [];
+        [Export] private EntitySpot? _playerSpot;
         private Player? _player;
         private IEntity? _currentFighter;
         private bool _fightEnds;
@@ -36,8 +37,15 @@
             _rnd.Randomize();
             _queueScheduler.QueueEmpty += OnQueueEmpty;
             _fightEnds = false;
-            foreach (EnemySpot enemySpot in _spots)
+            foreach (EntitySpot enemySpot in _spots)
                 enemySpot.EntityClicked += OnEntityClicked;
+        }
+
+        public override void _ExitTree()
+        {
+            _battleEventBus?.Unsubscribe<PlayerDiedGameEvent>(OnPlayerDead);
+            _battleEventBus?.Unsubscribe<EntityDiedGameEvent>(OnEntityDead);
+            _battleEventBus = null;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -45,18 +53,19 @@
             _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
-        public void SetupEventBus(IGameEventBus battleEventBus)
+        public void SetupEventBus(IBattleEventBus battleEventBus)
         {
             _battleEventBus = battleEventBus;
+            _battleEventBus.Subscribe<PlayerDiedGameEvent>(OnPlayerDead);
+            _battleEventBus.Subscribe<EntityDiedGameEvent>(OnEntityDead);
         }
 
         public void SetPlayer(IEntity player)
         {
+            if (_playerSpot == null) return;
             if (player is not Player p) return;
-            var asNode = player as CharacterBody2D;
-            CallDeferred(Node.MethodName.AddChild, asNode);
+            _playerSpot.SetEntity(player);
             _player = p;
-            _player.Dead += OnPlayerDead;
         }
 
         public async Task StartFight(List<IEntity> fighters)
@@ -68,7 +77,6 @@
                 var enemy = fighters[i];
                 _entities.Add(enemy);
                 _spots[i].SetEntity(enemy);
-                enemy.Dead += OnFighterDead;
             }
 
             _entitiesCount = amount;
@@ -77,8 +85,20 @@
                 fighters.Add(_player);
             _entities = fighters;
 
-            _queueScheduler.AddFighters(fighters);
+            var entities = _queueScheduler.AddFighters(fighters);
+            _battleEventBus?.Publish<BattleQueueDefinedGameEvent>(new(entities));
             await ProcessTurnsAsync();
+        }
+
+        public void RemoveAliveEntitiesFromArena()
+        {
+            foreach (var spot in _spots)
+                spot.RemoveEntityFromSpot();
+        }
+
+        public void RemovePlayerFromArena()
+        {
+            _playerSpot?.RemoveEntityFromSpot();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -91,11 +111,9 @@
                 _currentFighter = _queueScheduler.GetCurrentFighter();
                 if (_currentFighter is not { IsAlive: true }) continue;
 
-                _gameEventBus?.Publish<TurnStartGameEvent>(new());
                 _currentFighter.OnTurnStart();
                 if (_currentFighter is Player)
                 {
-                    GD.Print("Player turn");
                     _playerTargetTcs = new TaskCompletionSource<IEntity>();
 
                     var target = await _playerTargetTcs.Task;
@@ -106,7 +124,6 @@
                 }
                 else
                 {
-                    GD.Print("Enemy turn");
                     var target = GetEntityTarget();
                     if (target == null) continue;
                     var context = CreateAttackContext(_currentFighter, target);
@@ -116,7 +133,6 @@
                 await _combatScheduler.RunQueue();
 
                 _currentFighter.OnTurnEnd();
-                _gameEventBus?.Publish<TurnEndGameEvent>(new());
             }
         }
 
@@ -130,7 +146,8 @@
                 return;
             }
 
-            _queueScheduler.AddFighters(_entities);
+            var entities = _queueScheduler.AddFighters(_entities);
+            _battleEventBus?.Publish<BattleQueueDefinedGameEvent>(new(entities));
         }
 
         private void OnEntityClicked(CharacterBody2D body)
@@ -145,15 +162,19 @@
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
             currentFighter.Parameters.Damage * _rnd.RandfRange(0.9f, 1.1f), new RndGodot(), _combatScheduler);
 
-        private void OnFighterDead(IFightable obj)
+        private void OnEntityDead(EntityDiedGameEvent obj)
         {
             _entitiesCount--;
             _combatScheduler.CancelQueue();
+            _entities.Remove(obj.Entity);
         }
 
-        private void OnPlayerDead(IFightable obj)
+        private void OnPlayerDead(PlayerDiedGameEvent evnt)
         {
             _fightEnds = true;
+            _combatScheduler.CancelQueue();
         }
+
+        public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }

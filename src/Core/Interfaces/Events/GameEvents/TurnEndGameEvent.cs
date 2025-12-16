@@ -1,4 +1,7 @@
 ﻿namespace Core.Interfaces.Events.GameEvents
 {
-    public record TurnEndGameEvent(): IGameEvent;
+    using Battle;
+    using Entity;
+
+    public record TurnEndGameEvent(IEntity CompletedTurn): IGameEvent, IBattleEvent, ICombatEvent;
 }

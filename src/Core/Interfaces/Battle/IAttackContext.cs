@@ -1,6 +1,5 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using System;
     using Entity;
     using Components;
 

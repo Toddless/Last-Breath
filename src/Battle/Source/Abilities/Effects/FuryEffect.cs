@@ -22,7 +22,7 @@
             float currentHealth = source.CurrentHealth;
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
-            source.TakeDamage(toBurn, Status.GetDamageType(), DamageSource.Effect);
+            source.TakeDamage(source, toBurn, Status.GetDamageType(), DamageSource.Effect);
             if ((currentHealth - toBurn) <= 1) source.Effects.RemoveEffect(this);
         }
 

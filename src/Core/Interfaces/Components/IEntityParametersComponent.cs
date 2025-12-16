@@ -12,6 +12,7 @@
         float CriticalChance { get; }
         float AdditionalHit { get; }
         float CriticalDamage { get; }
+        float MulticastChance { get; }
         float SpellDamage { get; }
         float Armor { get; }
         float Evade { get; }
@@ -23,8 +24,8 @@
         float MaxHealth { get; }
         float HealthRecovery { get; }
 
-
         event Action<EntityParameter, float>? ParameterChanged;
+
         void Initialize(Func<EntityParameter, IReadOnlyList<IModifier>> getModifiers);
         void AddModuleDecorator(EntityParameterModuleDecorator decorator);
         void RemoveModuleDecorator(string id, EntityParameter param);

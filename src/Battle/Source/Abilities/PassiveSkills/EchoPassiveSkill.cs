@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities.PassiveSkills
 {
     using System.Collections.Generic;
-    using CombatEvents;
     using Core.Enums;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
     public class EchoPassiveSkill(
@@ -25,16 +25,17 @@
 
         public override void Attach(IEntity owner)
         {
-            owner.CombatEvents.Subscribe<DamageTakenEvent>(OnDamageTaken);
-            owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnds);
-            owner.CombatEvents.Subscribe<CombatEndsEvent>(OnCombatEnds);
+            // TODO: i need another event for this passive
+            Owner = owner;
+            Owner.CombatEvents.Subscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
+            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnds);
         }
 
         public override void Detach(IEntity owner)
         {
-            owner.CombatEvents.Unsubscribe<DamageTakenEvent>(OnDamageTaken);
-            owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnds);
-            owner.CombatEvents.Unsubscribe<CombatEndsEvent>(OnCombatEnds);
+            owner.CombatEvents.Unsubscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
+            owner.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnds);
+            Owner = null;
         }
 
         public override ISkill Copy() => new EchoPassiveSkill(Id, PercentFromDamageToDealLater, Turns);
@@ -46,16 +47,9 @@
             return later.PercentFromDamageToDealLater > PercentFromDamageToDealLater;
         }
 
-        private void OnCombatEnds(CombatEndsEvent owner)
+        private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
-            _toRemove.Clear();
-            _damageSources.Clear();
-        }
-
-        private void OnDamageTaken(DamageTakenEvent damageTakenEvent)
-        {
-            var context = damageTakenEvent.Context;
-
+            var context = evnt.Context;
             float actualDamage = context.FinalDamage * PercentFromDamageToDealLater;
             float toDealLater = context.FinalDamage - actualDamage;
             context.FinalDamage = actualDamage;
@@ -68,9 +62,9 @@
             sources.Add(new DamageEntry { Turns = Turns, Damage = toDealLater });
         }
 
-        private void OnTurnEnds(TurnEndEvent turnEndEvent)
+        private void OnTurnEnds(TurnEndGameEvent turnEndEvent)
         {
-            if (_damageSources.Count == 0) return;
+            if (_damageSources.Count == 0 || Owner == null) return;
 
             _toRemove.Clear();
             float totalDamage = 0;
@@ -99,7 +93,7 @@
                     _toRemove.Add(source);
             }
 
-            turnEndEvent.Source.TakeDamage(totalDamage, DamageType.Pure, DamageSource.Passive);
+            Owner.TakeDamage(Owner, totalDamage, DamageType.Pure, DamageSource.Passive);
 
             foreach (IEntity entity in _toRemove)
                 _damageSources.Remove(entity);
