@@ -2,6 +2,7 @@
 {
     using Godot;
     using Services;
+    using UIElements;
     using Core.Interfaces.Data;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
@@ -20,24 +21,24 @@
 
         public BattleContext(IEntity player, List<IEntity> entities, MainWorld mainWorld, IGameServiceProvider provider, Node2D parent)
         {
+            _uiElementProvider = provider.GetService<IUIElementProvider>();
+            var battleHud = _uiElementProvider.CreateAndShowMainElement<BattleHud>();
             _player = player;
             _entities = entities;
             _mainWorld = mainWorld;
-            _uiElementProvider = provider.GetService<IUIElementProvider>();
-            var battleHud = _uiElementProvider.CreateAndShowMainElement<BattleHud>();
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
-            parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
+            _battleArena.SetupEventBus(_localBus);
 
+            parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             battleHud.SetupEventBus(_localBus);
             battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.Mana, _player.CurrentHealth, _player.CurrentMana);
-            foreach (IEntity entity in entities)
+            foreach (IEntity entity in _entities)
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.Mana, entity.CurrentHealth, entity.CurrentMana);
 
-            _battleArena.SetupEventBus(_localBus);
-            _player.SetupEventBus(_localBus);
+
+            _player.SetupBattleEventBus(_localBus);
             RemoveParticipantFromWorld();
         }
-
 
         public async Task RunBattleAsync()
         {
@@ -55,7 +56,7 @@
         private void ReturnParticipantsToWorld()
         {
             if (_player.IsAlive) _battleArena.RemovePlayerFromArena();
-
+            _battleArena.RemoveAliveEntitiesFromArena();
             foreach (var entity in _entities)
             {
                 if (!entity.IsAlive || entity is not Node2D asNode) continue;
@@ -70,7 +71,7 @@
 
             foreach (var entity in _entities)
             {
-                entity.SetupEventBus(_localBus);
+                entity.SetupBattleEventBus(_localBus);
                 if (entity is Node2D n)
                     _mainWorld.CallDeferred(Node.MethodName.RemoveChild, n);
             }

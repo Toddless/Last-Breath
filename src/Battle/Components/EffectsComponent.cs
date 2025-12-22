@@ -1,10 +1,13 @@
 ﻿namespace Battle.Components
 {
+    using Godot;
     using System;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
@@ -12,14 +15,21 @@
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {
         private readonly Dictionary<object, List<IEffect>> _effects = [];
-
+        private readonly List<DotTick> _dotTicks = [];
         public IReadOnlyList<IEffect> Effects => _effects.Values.SelectMany(x => x).ToList();
+        public event Action<IEffect>? EffectAdded;
+        public event Action<IEffect>? EffectRemoved;
+        public event Action? AllEffectsRemoved;
 
-        // TODO: Add an event when effect is removed??
+        public void RegisterDotTick(DotTick tick)
+        {
+            _dotTicks.Add(tick);
+        }
+
         public void AddEffect(IEffect effect)
         {
-            object? source = effect.Source;
-            if (source == null) return;
+            string source = effect.Source;
+            if (string.IsNullOrWhiteSpace(source)) return;
             // we can have same effect multiple times if they have different sources
             if (!_effects.TryGetValue(source, out List<IEffect>? effects))
             {
@@ -43,15 +53,17 @@
             }
 
             effects.Add(effect);
+            EffectAdded?.Invoke(effect);
         }
 
         public void RemoveEffect(IEffect effect)
         {
-            object? source = effect.Source;
-            if (source == null) return;
+            string source = effect.Source;
+            if (string.IsNullOrWhiteSpace(source)) return;
             _effects.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
-
+            _dotTicks.RemoveAll(x => x.Source.InstanceId == effect.InstanceId);
+            EffectRemoved?.Invoke(effect);
             if (effects?.Count == 0) _effects.Remove(source);
         }
 
@@ -64,31 +76,53 @@
         public void RemoveAllEffects()
         {
             foreach (var effect in _effects.Values.SelectMany(x => x))
-                effect.Remove(owner);
+                effect.Remove();
+            AllEffectsRemoved?.Invoke();
         }
 
-        public void TriggerTurnEnd()
+        public async void TriggerTurnEnd()
         {
-            foreach (var effect in GetEffects())
-                effect.TurnEnd(owner);
+            try
+            {
+                foreach (var effect in GetEffects())
+                    effect.TurnEnd();
+                await ApplyDotDamage();
+            }
+            catch (Exception exception)
+            {
+                GD.Print($"Exception: {exception.Message}");
+            }
+        }
+
+        private async Task ApplyDotDamage()
+        {
+            foreach (IGrouping<StatusEffects, DotTick> grouping in _dotTicks.GroupBy(dot => dot.Status))
+            {
+                var status = grouping.Key;
+                float totalDamage = grouping.Sum(dot => dot.Damage);
+                var from = grouping.Select(x => x.Source).First();
+                await owner.TakeDamage(from, totalDamage, status.GetDamageType(), DamageSource.Effect);
+            }
+
+            _dotTicks.Clear();
         }
 
         public void TriggerTurnStart()
         {
             foreach (var effect in GetEffects())
-                effect.TurnStart(owner);
+                effect.TurnStart();
         }
 
         public void TriggerBeforeAttack(IAttackContext context)
         {
             foreach (IEffect effect in GetEffects())
-                effect.BeforeAttack(owner, context);
+                effect.BeforeAttack(context);
         }
 
         public void TriggerAfterAttack(IAttackContext context)
         {
             foreach (IEffect effect in GetEffects())
-                effect.AfterAttack(owner, context);
+                effect.AfterAttack(context);
         }
 
         private List<IEffect> GetEffects()

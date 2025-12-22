@@ -1,12 +1,11 @@
 ﻿namespace Battle.Components
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Core.Enums;
+    using System.Linq;
     using Core.Interfaces;
+    using System.Collections.Generic;
     using Core.Interfaces.Components;
-    using Godot;
 
     public class ModifiersComponent : IModifiersComponent
     {

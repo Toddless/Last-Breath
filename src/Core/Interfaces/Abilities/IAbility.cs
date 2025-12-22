@@ -13,14 +13,15 @@
         float AvailablePoints { get; set; }
         float Cooldown { get; }
         int CooldownLeft { get; }
-        int Cost { get; }
-        Costs Type { get; }
+        int CostValue { get; }
+        Costs CostType { get; }
         List<IEffect> Effects { get; set; }
-        public List<IEffect> CasterEffects { get; }
+        List<IEffect> CasterEffects { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }
 
         event Action<AbilityParameter>? OnParameterChanged;
-        event Action<IAbility>? OnCooldown;
+        event Action<IAbility, bool>? AbilityResourceChanges;
+        event Action<IAbility, int>? CooldownLeftChanges;
 
         void Activate(List<IEntity> targets);
 
@@ -36,5 +37,7 @@
         void ClearConditions();
         void AddEffect(IEffect effect, bool targetEffect = true);
         void RemoveEffect(string id, bool targetEffect = true);
+        void SetOwner(IEntity owner);
+        void RemoveOwner();
     }
 }

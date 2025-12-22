@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
 
     public class ConfusionEffect(string id, int duration)
@@ -15,10 +14,10 @@
             target.TargetChooser = chooser;
         }
 
-        public override void Remove(IEntity source)
+        public override void Remove()
         {
-            base.Remove(source);
-            source.TargetChooser = null;
+            base.Remove();
+            Owner?.TargetChooser = null;
         }
 
         public override IEffect Clone() => new ConfusionEffect(Id, Duration);

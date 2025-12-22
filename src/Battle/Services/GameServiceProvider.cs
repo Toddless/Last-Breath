@@ -4,9 +4,9 @@ namespace Battle.Services
     using System;
     using Core.Interfaces;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
     using System.Collections.Generic;
-    using Core.Interfaces.Events;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider
@@ -35,7 +35,6 @@ namespace Battle.Services
             });
             services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IUIElementProvider, UiElementProvider>();
-            services.AddSingleton<PlayerReference>();
             services.AddSingleton<IEntityProvider, EntityProvider>();
             return services.BuildServiceProvider();
         }

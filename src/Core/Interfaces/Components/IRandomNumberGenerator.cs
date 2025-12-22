@@ -6,7 +6,7 @@
     {
         float RandFloat();
         float RandFloatRange(float min, float max);
-        float RandIntRange(int min, int max);
+        int RandIntRange(int min, int max);
         float RandFloatN(float mean, float deviation);
         uint RandInt();
         long RandWeighted(float[] weights);

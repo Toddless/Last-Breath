@@ -1,6 +1,5 @@
 ﻿namespace Battle.TestData
 {
-    using System.Linq;
     using Godot;
 
     [GlobalClass]

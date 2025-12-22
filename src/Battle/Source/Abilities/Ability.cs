@@ -10,6 +10,7 @@
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
 
@@ -42,6 +43,7 @@
 
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+
         public string[] Tags { get; } = tags;
         public float AvailablePoints { get; set; } = availablePoints;
 
@@ -57,9 +59,9 @@
 
         public int CooldownLeft { get; private set; }
 
-        public int Cost => (int)this[AbilityParameter.CostValue];
+        public int CostValue => (int)this[AbilityParameter.CostValue];
 
-        public Costs Type => (Costs)this[AbilityParameter.CostType];
+        public Costs CostType => (Costs)this[AbilityParameter.CostType];
 
         public List<IConditionalModifier> ConditionalModifiers { get; } = [];
         public List<IEffect> Effects { get; set; } = effects;
@@ -72,13 +74,14 @@
         public string DisplayName => string.Empty; //Localizator.Localize(Id);
 
         public event Action<AbilityParameter>? OnParameterChanged;
-        public event Action<IAbility>? OnCooldown;
+        public event Action<IAbility, int>? CooldownLeftChanges;
+        public event Action<IAbility, bool>? AbilityResourceChanges;
 
         public virtual void Activate(List<IEntity> targets)
         {
             if (Owner == null) return;
 
-            var context = new EffectApplyingContext { Caster = Owner, Source = this };
+            var context = new EffectApplyingContext { Caster = Owner, Source = InstanceId };
             foreach (IEntity target in targets)
             {
                 context.Target = target;
@@ -129,41 +132,70 @@
             }
         }
 
+        public virtual void SetOwner(IEntity owner)
+        {
+            Owner = owner;
+            Owner.CurrentHealthChanged += OnResourceChanges;
+            Owner.CurrentBarrierChanged += OnResourceChanges;
+            Owner.CurrentManaChanged += OnResourceChanges;
+            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnd);
+        }
+
+        public void RemoveOwner()
+        {
+            if (Owner == null) return;
+            Owner.CurrentManaChanged -= OnResourceChanges;
+            Owner.CurrentHealthChanged -= OnResourceChanges;
+            Owner.CurrentBarrierChanged -= OnResourceChanges;
+            Owner.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner = null;
+        }
+
 
         public virtual bool IsEnoughResource()
         {
             if (Owner == null) return false;
-            return Type switch
+            return CostType switch
             {
-                Costs.Mana => Owner.CurrentMana >= Cost,
-                Costs.Health => Owner.CurrentHealth >= Cost,
-                Costs.Barrier => Owner.CurrentBarrier >= Cost,
+                Costs.Mana => Owner.CurrentMana >= CostValue,
+                Costs.Health => Owner.CurrentHealth >= CostValue,
+                Costs.Barrier => Owner.CurrentBarrier >= CostValue,
                 _ => false
             };
         }
 
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
-        protected void ConsumeResource() => Owner?.ConsumeResource(Type, Cost);
+        protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
 
         protected void StartCooldown()
         {
             CooldownLeft = (int)Cooldown;
-            OnCooldown?.Invoke(this);
+            CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
         protected abstract IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager();
 
         protected void ApplyTargetEffects(EffectApplyingContext context)
         {
-            foreach (var clone in Effects.Select(abilityEffect => abilityEffect.Clone()))
+            foreach (var effect in Effects)
+            {
+                var clone = effect.Clone();
                 clone.Apply(context);
+            }
         }
 
         protected void ApplyCasterEffects(EffectApplyingContext context)
         {
-            foreach (var clone in CasterEffects.Select(abilityEffect => abilityEffect.Clone()))
+            if (Owner == null) return;
+            context.Target = Owner;
+            foreach (var effect in CasterEffects)
+            {
+                var clone = effect.Clone();
                 clone.Apply(context);
+            }
         }
 
         protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
@@ -197,5 +229,17 @@
 
         private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
         private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
+
+        private void OnTurnEnd(TurnEndGameEvent obj)
+        {
+            if (CooldownLeft == 0) return;
+            CooldownLeft--;
+            CooldownLeftChanges?.Invoke(this, CooldownLeft);
+        }
+
+        private void OnResourceChanges(float obj)
+        {
+            AbilityResourceChanges?.Invoke(this, IsEnoughResource());
+        }
     }
 }

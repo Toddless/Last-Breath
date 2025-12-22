@@ -4,5 +4,7 @@
     {
         string Id { get; }
         string InstanceId { get; }
+
+        bool IsSame(string otherId);
     }
 }

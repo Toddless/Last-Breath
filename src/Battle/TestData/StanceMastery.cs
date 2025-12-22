@@ -29,7 +29,7 @@
 
         public float ScaleAbilityParameter(float baseValue) => baseValue * GetProgressFactor();
 
-
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => throw new NotImplementedException();
 
         public void AddExperience(int experience) => throw new NotImplementedException();

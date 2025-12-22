@@ -55,7 +55,7 @@
         {
             if (Owner == null) return;
 
-            var context = new EffectApplyingContext { Caster = Owner, Source = this };
+            var context = new EffectApplyingContext { Caster = Owner, Source = InstanceId };
 
             foreach (IEntity target in targets)
             {

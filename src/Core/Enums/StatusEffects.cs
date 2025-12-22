@@ -55,5 +55,9 @@
         /// </summary>
         Confused = 1 << 11,
         Charmed = 1 << 12,
+        /// <summary>
+        /// Target cannot be selected
+        /// </summary>
+        Vanished = 1 << 13,
     }
 }

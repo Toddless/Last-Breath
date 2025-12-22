@@ -8,21 +8,20 @@
     using Attribute;
     using Components;
     using Core.Enums;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
-    using Abilities.PassiveSkills;
     using Core.Interfaces.Events;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using PassiveSkills;
 
-    internal partial class Enemy : CharacterBody2D, IInitializable, IRequireServices, IEntity
+    internal abstract partial class Enemy : CharacterBody2D, IRequireServices, IEntity
     {
-        private const string UID = "uid://bssmtdwwycbpt";
         [Export] private AnimatedSprite2D? _animatedSprite;
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
@@ -118,7 +117,7 @@
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IFightable>? Dead;
+        public event Action<IEntity>? Dead;
         public event Action<float, DamageType, bool>? DamageTaken;
 
 
@@ -128,6 +127,7 @@
             if (_interactionArea != null)
                 _interactionArea.BodyEntered += OnBodyEnter;
 
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _rnd.Randomize();
             Parameters = new EntityParametersComponent();
             Modifiers = new ModifiersComponent();
@@ -137,19 +137,21 @@
             Dexterity = new Dexterity(Modifiers);
             Strength = new Strength(Modifiers);
             Intelligence = new Intelligence(Modifiers);
+            Effects.EffectAdded += OnEffectAdded;
+            Effects.EffectRemoved += OnEffectRemoved;
+            Effects.AllEffectsRemoved += OnAllEffectsRemoved;
             Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-
-            var passive = new ChainAttackPassiveSkill("Chain");
+            var passive = new ChainAttackPassiveSkill();
             passive.Attach(this);
-            var passiveTwo = new CounterAttackPassiveSkill("Counter");
+            var passiveTwo = new CounterAttackPassiveSkill();
             passiveTwo.Attach(this);
-
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            var mana = new ManaBurnPassiveSkill(0.15f);
+            mana.Attach(this);
             ConfigureStateMachine();
             SetBaseValuesForParameters();
         }
@@ -193,7 +195,7 @@
 
         public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
 
-        public void SetupEventBus(IBattleEventBus bus)
+        public void SetupBattleEventBus(IBattleEventBus bus)
         {
             // TODO:
             _battleEventBus = bus;
@@ -218,6 +220,7 @@
                     break;
             }
         }
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
         public bool TryApplyStatusEffect(StatusEffects statusEffect)
         {
@@ -235,20 +238,7 @@
             return true;
         }
 
-
-        public void AllAttacks()
-        {
-        }
-
-        public void OnBlockAttack()
-        {
-        }
-
         public void Kill() => NotifyShouldDie();
-
-        public void OnEvadeAttack()
-        {
-        }
 
         public IEntity ChoseTarget(List<IEntity> targets)
         {
@@ -260,25 +250,29 @@
         public async Task ReceiveAttack(IAttackContext context)
         {
             ArgumentNullException.ThrowIfNull(_animatedSprite);
-
-            _animatedSprite.Play("Hurt");
+            CalculateFinalDamage(context);
             CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
-            TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
+            await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit, context.IsCritical);
             context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
-            await ToSignal(_animatedSprite, "animation_finished");
-            _animatedSprite.Play("Idle");
         }
 
         public async Task Attack(IAttackContext context)
         {
             ArgumentNullException.ThrowIfNull(_animatedSprite);
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
-            if (context.IsCritical)
-                context.FinalDamage = Parameters.Damage * Parameters.CriticalDamage;
             CombatEvents.Publish(new BeforeAttackEvent(context));
             _animatedSprite.Play("Attack");
             await ToSignal(_animatedSprite, "animation_finished");
             _animatedSprite.Play("Idle");
+        }
+
+        private void CalculateFinalDamage(IAttackContext context)
+        {
+            float baseDamage = context.BaseDamage;
+            float additionalDamage = context.AdditionalDamage;
+            context.FinalDamage = baseDamage + additionalDamage;
+            if (context.IsCritical)
+                context.FinalDamage *= context.Attacker.Parameters.CriticalDamage;
         }
 
         public void OnTurnEnd()
@@ -297,25 +291,35 @@
             _gameEventBus?.Publish(new TurnStartGameEvent(this));
         }
 
-        public void TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
+            _animatedSprite?.Play("Hurt");
             CombatEvents.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
             _battleEventBus?.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
             DamageTaken?.Invoke(damage, type, isCrit);
             CurrentHealth -= damage;
+            await ToSignal(_animatedSprite, "animation_finished");
+            _animatedSprite.Play("Idle");
         }
-
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private void OnBodyEnter(Node2D body)
         {
+            if (IsFighting) return;
             try
             {
                 switch (body)
                 {
                     case Player player:
                         {
-                            var fighters = Group?.GetEntitiesInGroup<IEntity>() ?? [this];
+                            List<IEntity> fighters = [];
+                            if (Group != null)
+                            {
+                                Group.NotifyAllInGroup(GroupNotification.Attacked);
+                                fighters.AddRange(Group.GetEntitiesInGroup<IEntity>());
+                            }
+                            else
+                                fighters.Add(this);
+
                             _stateMachine.Fire(Trigger.Battle);
                             _gameEventBus?.Publish(new BattleStartGameEvent(player, fighters));
                             break;
@@ -353,26 +357,40 @@
             _battleEventBus = null;
         }
 
+        private void OnAllEffectsRemoved()
+        {
+            _battleEventBus?.Publish<AllEffectRemoved>(new(this));
+        }
+
+        private void OnEffectRemoved(IEffect effect)
+        {
+            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
+        }
+
+        private void OnEffectAdded(IEffect effect)
+        {
+            _battleEventBus?.Publish<EffectAddedEvent>(new(effect,this));
+        }
 
         private void NotifyHealthChanges(float value)
         {
             CurrentHealthChanged?.Invoke(value);
-            _gameEventBus?.Publish<EntityHealthChanges>(new(this, value));
-            _battleEventBus?.Publish<EntityHealthChanges>(new(this, value));
+            _gameEventBus?.Publish<EntityHealthChangesGameEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityHealthChangesGameEvent>(new(this, value));
         }
 
         private void NotifyBarrierChanges(float value)
         {
             CurrentBarrierChanged?.Invoke(value);
-            _gameEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<EntityBarrierChanges>(new(this, value));
+            _battleEventBus?.Publish<EntityBarrierChanges>(new(this, value));
         }
 
         private void NotifyManaChanges(float value)
         {
             CurrentManaChanged?.Invoke(value);
-            _gameEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<EntityManaChangesGameEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityManaChangesGameEvent>(new(this, value));
         }
 
         private void NotifyShouldDie()
@@ -417,7 +435,7 @@
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
-                        value = rnd.RandfRange(50, 600);
+                        value = rnd.RandfRange(250, 600);
                         break;
                 }
 

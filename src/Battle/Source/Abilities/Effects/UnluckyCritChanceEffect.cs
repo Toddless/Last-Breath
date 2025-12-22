@@ -4,7 +4,6 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Entity;
 
     public class UnluckyCritChanceEffect(
         string id,
@@ -20,10 +19,10 @@
             context.Target.Parameters.AddModuleDecorator(_unluckyCritChanceDecorator);
         }
 
-        public override void Remove(IEntity source)
+        public override void Remove( )
         {
-            base.Remove(source);
-            source.Parameters.RemoveModuleDecorator(_unluckyCritChanceDecorator.Id, _unluckyCritChanceDecorator.Parameter);
+            Owner?.Parameters.RemoveModuleDecorator(_unluckyCritChanceDecorator.Id, _unluckyCritChanceDecorator.Parameter);
+            base.Remove();
         }
 
         public override IEffect Clone() => new UnluckyCritChanceEffect(Id, Duration, Status);

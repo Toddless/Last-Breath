@@ -57,7 +57,7 @@
 
             fireball.Activate([]);
 
-            Assert.IsTrue(Math.Abs(entity.CurrentMana - fireball.Cost) <= 25f, $"Entity mana: {entity.CurrentMana}");
+            Assert.IsTrue(Math.Abs(entity.CurrentMana - fireball.CostValue) <= 25f, $"Entity mana: {entity.CurrentMana}");
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@
             upgrade.ApplyUpgrade(fireball);
             fireball.Activate([]);
 
-            var type = fireball.Type;
+            var type = fireball.CostType;
             Assert.IsTrue(type == Costs.Health, $"Actual: {type}");
             Assert.IsTrue(Math.Abs(entity.CurrentHealth - 585) < 0.00001f, $"Entity health: {entity.CurrentHealth}");
         }
@@ -92,11 +92,11 @@
             var upgrade = new ChangeAbilityCostTypeUpgrade("Ability_Upgrade_Change_Cost_Type", [], Costs.Health, 3, 15, 1);
             upgrade.ApplyUpgrade(fireball);
 
-            var typeBefore = fireball.Type;
+            var typeBefore = fireball.CostType;
 
             upgrade.RemoveUpgrade(fireball);
             Assert.IsTrue(typeBefore == Costs.Health, $"Actual: {typeBefore}");
-            var typeAfter = fireball.Type;
+            var typeAfter = fireball.CostType;
             Assert.IsTrue(typeAfter == Costs.Mana, $"Actual type after: {typeAfter}");
         }
 
@@ -106,7 +106,7 @@
         {
             var entity = new EntityTest();
             var effect = new ParameterEqualsEffect("Health_Equals_One", 3, EntityParameter.Health, 1);
-            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity.InstanceId });
 
             Assert.IsTrue(Math.Abs(entity.CurrentHealth - 1) < 0.00001f, $"Actual: {entity.CurrentHealth}");
         }
@@ -118,7 +118,7 @@
             entity.Dexterity.IncreasePointsByAmount(5);
 
             var effect = new ParameterEqualsEffect("Dexterity_Equals_One", 3, EntityParameter.Dexterity, 1);
-            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source =  entity.InstanceId });
 
             Assert.IsTrue(Math.Abs(entity.Parameters.CriticalChance - 0.0525f) < 0.00001f, $"Actual: {entity.Parameters.CriticalChance}");
         }
@@ -132,7 +132,7 @@
 
             float healthWithStrength = entity.CurrentHealth;
             var effect = new ParameterEqualsEffect("Strength_Equals_One", 3, EntityParameter.Strength, 1);
-            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source = entity });
+            effect.Apply(new EffectApplyingContext { Caster = entity, Target = entity, Source =  entity.InstanceId });
 
             Assert.IsTrue(MathF.Abs(healthWithStrength - 1610) < 0.00001f, $"Actual: {healthWithStrength}");
             Assert.IsTrue(MathF.Abs(entity.CurrentHealth - 610) < 0.00001f, $"Actual: {entity.CurrentHealth}");

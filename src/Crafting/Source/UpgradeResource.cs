@@ -40,7 +40,7 @@
             Icon = icon;
             MaxStackSize = maxStackSize;
         }
-
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag);
         public T Copy<T>()
         {

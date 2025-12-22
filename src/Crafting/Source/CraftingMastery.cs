@@ -122,32 +122,6 @@
             return probs.OrderByDescending(x => x.Key).First().Key;
         }
 
-        private float CalculateBase(float baseValue, float targetValue, float progression) => Mathf.Lerp(baseValue, targetValue, progression);
-
-        private void CheckForLevelUp()
-        {
-            while (_currentLevel < MaxLevel)
-            {
-                int need = ExpToNextLevel(_currentLevel);
-                if (CurrentExperience >= need)
-                {
-                    CurrentExperience -= need;
-                    _currentLevel++;
-                    mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
-                }
-                else
-                    break;
-            }
-        }
-
-        private int ExpToNextLevel(int level)
-        {
-            if (level < 1) level = 1;
-            if (level >= MaxLevel) return int.MaxValue;
-            float value = BaseExp * Mathf.Pow(level, ExpFactor);
-            return Mathf.RoundToInt(value);
-        }
-
         public Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = default)
         {
             float progress = GetProgressFactor();
@@ -173,6 +147,33 @@
             }
 
             return result;
+        }
+
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+        private float CalculateBase(float baseValue, float targetValue, float progression) => Mathf.Lerp(baseValue, targetValue, progression);
+
+        private void CheckForLevelUp()
+        {
+            while (_currentLevel < MaxLevel)
+            {
+                int need = ExpToNextLevel(_currentLevel);
+                if (CurrentExperience >= need)
+                {
+                    CurrentExperience -= need;
+                    _currentLevel++;
+                    mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                }
+                else
+                    break;
+            }
+        }
+
+        private int ExpToNextLevel(int level)
+        {
+            if (level < 1) level = 1;
+            if (level >= MaxLevel) return int.MaxValue;
+            float value = BaseExp * Mathf.Pow(level, ExpFactor);
+            return Mathf.RoundToInt(value);
         }
 
         private float[] ApplyRarityModifiers(float[] baseWeights, float rarityBonus)

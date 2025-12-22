@@ -5,6 +5,7 @@
     using Source;
     using Module;
     using Services;
+    using TestData;
     using Utilities;
     using Core.Enums;
     using Decorators;
@@ -29,33 +30,36 @@
     {
         public override void Activate(List<IEntity> targets)
         {
+            base.Activate(targets);
+            PerformMultipleAttacks(targets);
+        }
+
+        private async void PerformMultipleAttacks(List<IEntity> targets)
+        {
             try
             {
-                base.Activate(targets);
+                if (Owner == null) return;
+                var scheduler = new AttackContextScheduler();
+                while (true)
+                {
+                    if (Owner.CurrentHealth <= 1) break;
+                    foreach (IEntity target in targets)
+                    {
+                        var context = new AttackContext(Owner, target, Owner.GetDamage(), new RndGodot(), scheduler);
+                        scheduler.Schedule(context);
+                        await scheduler.RunQueue();
+                        if (Owner.CurrentHealth <= 1) break;
+                    }
 
-                PerformMultipleAttacks(targets);
+                    // with lower hp we have lower chance for next cycle
+                    float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.7f);
+                    if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
+                        break;
+                }
             }
             catch (Exception ex)
             {
                 Tracker.TrackException("Failed to activate", ex, this);
-            }
-        }
-
-        private void PerformMultipleAttacks(List<IEntity> targets)
-        {
-            if (Owner == null) return;
-            while (true)
-            {
-                if (Owner.CurrentHealth <= 1) return;
-
-                foreach (IEntity target in targets)
-                {
-                }
-
-                float chance = Mathf.Clamp(1f - (Owner.CurrentHealth / Owner.Parameters.MaxHealth), 0.05f, 0.7f);
-
-                if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
-                    break;
             }
         }
 

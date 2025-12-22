@@ -1,10 +1,9 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
-    using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
     using Godot;
+    using Core.Enums;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Abilities;
 
     public class FuryEffect(
         string id,
@@ -16,14 +15,15 @@
         protected float HealthBurned;
         public float HealthPercent { get; } = healthPercent;
 
-        public override void BeforeAttack(IEntity source, IAttackContext context)
+        public override void BeforeAttack(IAttackContext context)
         {
-            float healthToBurn = source.Parameters.MaxHealth * HealthPercent;
-            float currentHealth = source.CurrentHealth;
+            if (Owner == null) return;
+            float healthToBurn = Owner.Parameters.MaxHealth * HealthPercent;
+            float currentHealth = Owner.CurrentHealth;
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
-            source.TakeDamage(source, toBurn, Status.GetDamageType(), DamageSource.Effect);
-            if ((currentHealth - toBurn) <= 1) source.Effects.RemoveEffect(this);
+            Owner.TakeDamage(Owner, toBurn, Status.GetDamageType(), DamageSource.Effect);
+            if ((currentHealth - toBurn) <= 1) Owner.Effects.RemoveEffect(this);
         }
 
         public override IEffect Clone() => new FuryEffect(Id, Duration, HealthPercent, Status);

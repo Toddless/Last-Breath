@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
 
     public class EvadeFirstDeath(
@@ -11,30 +10,29 @@
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id, duration, stacks: 1, statusEffect)
     {
-        private IEntity? _owner;
         public float PercentToRecover { get; } = percentToRecover;
 
         public override void Apply(EffectApplyingContext context)
         {
             base.Apply(context);
-            _owner = context.Target;
-            _owner.CurrentHealthChanged += OnCurrentHealthChanges;
+            Owner = context.Target;
+            Owner.CurrentHealthChanged += OnCurrentHealthChanges;
         }
 
         private void OnCurrentHealthChanges(float value)
         {
             if (value > 0) return;
-            if (_owner == null) return;
-            float toRecover = _owner.Parameters.MaxHealth * PercentToRecover;
-            _owner.Heal(toRecover);
-            Remove(_owner);
+            if (Owner == null) return;
+            float toRecover = Owner.Parameters.MaxHealth * PercentToRecover;
+            Owner.Heal(toRecover);
+            Remove();
         }
 
-        public override void Remove(IEntity source)
+        public override void Remove()
         {
-            base.Remove(source);
-            source.CurrentHealthChanged -= OnCurrentHealthChanges;
-            _owner = null;
+            base.Remove();
+            Owner?.CurrentHealthChanged -= OnCurrentHealthChanges;
+            Owner = null;
         }
 
         public override IEffect Clone() => new EvadeFirstDeath(Id, Duration, PercentToRecover);

@@ -28,5 +28,7 @@ _notificationLayer = NodePath("NotificationLayer")
 [node name="NotificationLayer" type="CanvasLayer" parent="UILayerManager"]
 
 [node name="DevLayer" type="CanvasLayer" parent="UILayerManager"]
+layer = 50
 
-[node name="Control" parent="UILayerManager/DevLayer" instance=ExtResource("4_rgh2o")]
+[node name="Control" parent="UILayerManager/DevLayer" node_paths=PackedStringArray("_mainWorld") instance=ExtResource("4_rgh2o")]
+_mainWorld = NodePath("../../../MainWorld")

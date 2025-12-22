@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
 
     public class DamageOverTurnEffect(
@@ -12,7 +12,7 @@
         string id = "Damage_Over_Turn_Effect")
         : Effect(id, duration, stacks, statusEffect)
     {
-        public float PercentFromBase { get; set; } = percentFromDamage;
+        public float PercentFromBase { get; } = percentFromDamage;
         public float DamagePerTick { get; set; }
 
         public override void Apply(EffectApplyingContext context)
@@ -21,11 +21,11 @@
             base.Apply(context);
         }
 
-        public override void TurnEnd(IEntity source)
+        public override void TurnEnd()
         {
-            if (Caster == null) return;
-            source.TakeDamage(Caster, DamagePerTick, Status.GetDamageType(), DamageSource.Effect);
-            base.TurnEnd(source);
+            if (Context.HasValue)
+                Owner?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Context.Value.Caster));
+            base.TurnEnd();
         }
 
         public override bool IsStronger(IEffect otherEffect)

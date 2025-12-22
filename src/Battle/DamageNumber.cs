@@ -11,14 +11,6 @@
         [Export] private float _rise = 25f;
         [Export] private float _duration = 0.5f;
 
-        public override void _Ready()
-        {
-            var tween = CreateTween();
-            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
-            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
-            tween.Finished += QueueFree;
-        }
-
         public void Play(int value, DamageType type, bool isCritical = false)
         {
             _label?.Text = value.ToString();
@@ -26,6 +18,11 @@
 
             if (isCritical)
                 Scale = Vector2.One * 1.2f;
+
+            var tween = CreateTween();
+            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
+            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
+            tween.Finished += QueueFree;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

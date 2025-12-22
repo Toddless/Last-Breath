@@ -38,6 +38,7 @@
             IsOpened = isOpened;
             MainResource= requirements;
         }
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public T Copy<T>()

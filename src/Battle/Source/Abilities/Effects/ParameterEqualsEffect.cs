@@ -3,7 +3,6 @@
     using Battle.Source.Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
 
     public class ParameterEqualsEffect(
         string id,
@@ -25,10 +24,10 @@
             context.Target.Parameters.AddModuleDecorator(decorator);
         }
 
-        public override void Remove(IEntity source)
+        public override void Remove()
         {
-            base.Remove(source);
-            source.Parameters.RemoveModuleDecorator(_id, Parameter);
+            base.Remove();
+            Owner?.Parameters.RemoveModuleDecorator(_id, Parameter);
         }
 
         public override IEffect Clone() => new ParameterEqualsEffect(Id, Duration, Parameter, Value, Status);

@@ -18,7 +18,7 @@
     {
         private const string UID = "uid://dph8vnuwipwoc";
         private readonly RandomNumberGenerator _rnd = new();
-        private readonly CombatScheduler _combatScheduler = new();
+        private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
@@ -37,15 +37,16 @@
             _rnd.Randomize();
             _queueScheduler.QueueEmpty += OnQueueEmpty;
             _fightEnds = false;
-            foreach (EntitySpot enemySpot in _spots)
-                enemySpot.EntityClicked += OnEntityClicked;
         }
 
         public override void _ExitTree()
         {
             _battleEventBus?.Unsubscribe<PlayerDiedGameEvent>(OnPlayerDead);
             _battleEventBus?.Unsubscribe<EntityDiedGameEvent>(OnEntityDead);
+            _battleEventBus?.Unsubscribe<AttackTargetSelectedGameEvent>(OnAttackTargetSelected);
             _battleEventBus = null;
+            foreach (EntitySpot entitySpot in _spots)
+                entitySpot.RemoveBattleEventBus();
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -58,7 +59,11 @@
             _battleEventBus = battleEventBus;
             _battleEventBus.Subscribe<PlayerDiedGameEvent>(OnPlayerDead);
             _battleEventBus.Subscribe<EntityDiedGameEvent>(OnEntityDead);
+            _battleEventBus.Subscribe<AttackTargetSelectedGameEvent>(OnAttackTargetSelected);
+            foreach (var spot in _spots)
+                spot.SetBattleEventBus(_battleEventBus);
         }
+
 
         public void SetPlayer(IEntity player)
         {
@@ -96,10 +101,7 @@
                 spot.RemoveEntityFromSpot();
         }
 
-        public void RemovePlayerFromArena()
-        {
-            _playerSpot?.RemoveEntityFromSpot();
-        }
+        public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -120,17 +122,17 @@
 
                     if (target is not { IsAlive: true }) continue;
                     var context = CreateAttackContext(_currentFighter, target);
-                    _combatScheduler.Schedule(context);
+                    _attackContextScheduler.Schedule(context);
                 }
                 else
                 {
                     var target = GetEntityTarget();
                     if (target == null) continue;
                     var context = CreateAttackContext(_currentFighter, target);
-                    _combatScheduler.Schedule(context);
+                    _attackContextScheduler.Schedule(context);
                 }
 
-                await _combatScheduler.RunQueue();
+                await _attackContextScheduler.RunQueue();
 
                 _currentFighter.OnTurnEnd();
             }
@@ -150,29 +152,29 @@
             _battleEventBus?.Publish<BattleQueueDefinedGameEvent>(new(entities));
         }
 
-        private void OnEntityClicked(CharacterBody2D body)
+
+        private void OnAttackTargetSelected(AttackTargetSelectedGameEvent obj)
         {
             if (_currentFighter is not Player) return;
-            if (body is not IEntity entity) return;
             if (_playerTargetTcs == null || _playerTargetTcs.Task.IsCompleted) return;
 
-            _playerTargetTcs.TrySetResult(entity);
+            _playerTargetTcs.SetResult(obj.Target);
         }
 
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
-            currentFighter.Parameters.Damage * _rnd.RandfRange(0.9f, 1.1f), new RndGodot(), _combatScheduler);
+            currentFighter.GetDamage(), new RndGodot(), _attackContextScheduler);
 
         private void OnEntityDead(EntityDiedGameEvent obj)
         {
             _entitiesCount--;
-            _combatScheduler.CancelQueue();
+            _attackContextScheduler.CancelQueue();
             _entities.Remove(obj.Entity);
         }
 
         private void OnPlayerDead(PlayerDiedGameEvent evnt)
         {
             _fightEnds = true;
-            _combatScheduler.CancelQueue();
+            _attackContextScheduler.CancelQueue();
         }
 
         public Vector2 GetCameraPosition() => GlobalPosition;

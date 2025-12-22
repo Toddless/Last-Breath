@@ -30,6 +30,7 @@
         event Action<float>? CurrentManaChanged;
         event Action<float>? CurrentBarrierChanged;
         event Action<float>? CurrentHealthChanged;
+        event Action<IEntity>? Dead;
 
         void AddItemToInventory(IItem item);
 

@@ -1,8 +1,6 @@
 ﻿namespace Battle
 {
     using Godot;
-    using Core.Interfaces;
-    using Services;
 
     internal partial class MainWorld : Node2D
     {

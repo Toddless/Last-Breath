@@ -54,6 +54,7 @@
             var duplicate = (ICraftingResource)DuplicateDeep(DeepDuplicateMode.All);
             return (T)duplicate;
         }
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
 }

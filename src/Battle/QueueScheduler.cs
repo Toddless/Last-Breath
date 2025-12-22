@@ -21,8 +21,6 @@
                 if ((fighter.StatusEffects & _skipTurnEffect) != 0 || !fighter.IsAlive) continue;
                 FighterQueue.Enqueue(fighter);
             }
-
-            if (FighterQueue.Count == 0) QueueEmpty?.Invoke();
             return orderedFighters;
         }
 

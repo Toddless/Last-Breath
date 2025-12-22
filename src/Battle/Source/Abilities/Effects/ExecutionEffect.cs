@@ -3,7 +3,6 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
 
     public class ExecutionEffect(
         string id,
@@ -15,7 +14,7 @@
     {
         public float Percentage { get; } = percentage;
 
-        public override void AfterAttack(IEntity source, IAttackContext context)
+        public override void AfterAttack( IAttackContext context)
         {
             float healthAsPercentLeft = context.Target.CurrentHealth / context.Target.Parameters.MaxHealth;
 

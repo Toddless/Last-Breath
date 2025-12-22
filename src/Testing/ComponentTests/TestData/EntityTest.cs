@@ -29,7 +29,7 @@
         public ICombatEventBus CombatEvents { get; }
         public IStance CurrentStance { get; }
         public ITargetChooser? TargetChooser { get; set; }
-        public ICombatScheduler? CombatScheduler { get; set; }
+        public IAttackContextScheduler? CombatScheduler { get; set; }
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
         public IEffectsComponent Effects { get; }
@@ -77,9 +77,8 @@
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IFightable>? Dead;
+        public event Action<IEntity>? Dead;
         public event Action<float, DamageType, bool>? DamageTaken;
-        public event Action<IAttackContext>? AttackPerformed;
 
         public EntityTest()
         {
@@ -157,6 +156,8 @@
             }
         }
 
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+
         public bool TryApplyStatusEffect(StatusEffects statusEffect)
         {
             if ((StatusEffects & statusEffect) != 0) return false;
@@ -175,7 +176,7 @@
 
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
         public float GetDamage() => throw new NotImplementedException();
-        public void SetupEventBus(IBattleEventBus bus) => throw new NotImplementedException();
+        public void SetupBattleEventBus(IBattleEventBus bus) => throw new NotImplementedException();
 
         public void Heal(float amount) => CurrentHealth += amount;
 
@@ -221,9 +222,10 @@
             return Task.CompletedTask;
         }
 
-        public void TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             CurrentHealth -= damage;
+            return Task.CompletedTask;
         }
 
         public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();

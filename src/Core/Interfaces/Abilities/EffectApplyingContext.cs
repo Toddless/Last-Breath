@@ -8,6 +8,6 @@
         public IEntity Target { get; set; }
         public float Damage { get; set; }
         public bool IsCritical { get; set; }
-        public object? Source { get; set; }
+        public string Source { get; set; }
     }
 }

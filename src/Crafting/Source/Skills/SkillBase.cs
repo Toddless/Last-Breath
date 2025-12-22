@@ -23,6 +23,7 @@
         public abstract void Detach(IEntity owner);
 
         protected abstract string GetDescription();
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         public virtual bool IsStronger(ISkill skill) => false;
     }

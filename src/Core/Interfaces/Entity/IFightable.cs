@@ -16,15 +16,14 @@
         bool IsFighting { get; set; }
         bool IsAlive { get; }
 
-        event Action<IFightable> Dead;
         event Action<float, DamageType, bool> DamageTaken;
 
         Task Attack(IAttackContext context);
-        void SetupEventBus(IBattleEventBus bus);
+        void SetupBattleEventBus(IBattleEventBus bus);
         void OnTurnEnd();
         void OnTurnStart();
         Task ReceiveAttack(IAttackContext context);
-        void TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false);
+        Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false);
         IEntity ChoseTarget(List<IEntity> targets);
         void Kill();
     }

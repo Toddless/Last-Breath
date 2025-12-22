@@ -1,7 +1,9 @@
 ﻿namespace Battle.Source.UIElements
 {
     using Godot;
+    using System.Linq;
     using Core.Interfaces.UI;
+    using Core.Interfaces.Abilities;
 
     [GlobalClass]
     [Tool]
@@ -32,6 +34,24 @@
         public void UpdateMana(float value) => ManaBar?.Value = value;
         public void UpdateMaxHealth(float value) => HealthBar?.MaxValue = value;
         public void UpdateMaxMana(float value) => ManaBar?.MaxValue = value;
+
+        public void AddEffect(IEffect effect)
+        {
+            var slot = EffectSlot.Initialize().Instantiate<EffectSlot>();
+            CharacterEffects?.CallDeferred(Node.MethodName.AddChild, slot);
+            slot.AddEffect(effect);
+        }
+
+        public void RemoveEffect(IEffect effect)
+        {
+            CharacterEffects?.GetChildren().Cast<EffectSlot>().FirstOrDefault(x => x.HasEffect(effect))?.RemoveEffect();
+        }
+
+        public void ClearEffects()
+        {
+            foreach (var child in CharacterEffects?.GetChildren() ?? [])
+                child?.QueueFree();
+        }
 
         public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, Texture2D? icon = null)
         {

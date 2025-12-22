@@ -8,8 +8,9 @@
         IRandomNumberGenerator Rnd { get; }
         IEntity Attacker { get; }
         IEntity Target { get; }
-        ICombatScheduler CombatScheduler { get; }
+        IAttackContextScheduler AttackContextScheduler { get; }
         float BaseDamage { get; }
+        float AdditionalDamage { get; set; }
         float FinalDamage { get; set; }
         bool IsCritical { get; set; }
         bool IsAttackSucceed { get; set; }

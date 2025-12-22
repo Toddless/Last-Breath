@@ -9,6 +9,8 @@
     {
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+
+
         public string[] Tags { get; } = tags;
 
         public Texture2D? Icon { get; }
@@ -20,6 +22,8 @@
         public string DisplayName => Localizator.Localize(Id);
 
         public event Action? AbilityUpgradeChanged;
+
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
         public virtual bool TryUpgradeRank(IAbility ability)
         {

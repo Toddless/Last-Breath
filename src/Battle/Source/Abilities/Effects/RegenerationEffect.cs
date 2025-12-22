@@ -2,19 +2,22 @@
 {
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
 
-    public class RegenerationEffect(string id, int duration, int stacks, StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks, statusEffect)
+    public class RegenerationEffect(
+        float amount,
+        int duration,
+        int stacks,
+        StatusEffects statusEffect = StatusEffects.Regeneration)
+        : Effect(id:"Effect_Regeneration", duration, stacks, statusEffect)
     {
-        public float Amount { get; set; }
+        public float Amount { get; } = amount;
 
-        public override void TurnEnd(IEntity source)
+        public override void TurnEnd()
         {
-            source.Heal(Amount);
-            base.TurnEnd(source);
+            Owner?.Heal(Amount);
+            base.TurnEnd();
         }
 
-        public override IEffect Clone() => new RegenerationEffect(Id, Duration, MaxStacks, Status) { Amount = Amount };
+        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
     }
 }

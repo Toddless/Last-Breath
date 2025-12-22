@@ -2,93 +2,121 @@
 {
     using Godot;
     using System;
-    using Services;
+    using Source;
     using Core.Enums;
+    using Source.NPC;
     using Core.Modifiers;
     using Core.Interfaces;
-    using Core.Interfaces.Entity;
-    using System.Collections.Generic;
+    using Core.Interfaces.UI;
     using Core.Interfaces.Skills;
-    using Source.Abilities.PassiveSkills;
+    using Core.Interfaces.Entity;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using Source.PassiveSkills;
 
     [GlobalClass]
-    [Tool]
-    public partial class DevPanel : Control
+    public partial class DevPanel : Control, IInitializable
     {
+        private const string UID = "uid://dg7d3dghfdevy";
         private IEntity? _player;
         private ModifierType _modifierType = ModifierType.Flat;
-        private EntityParameter _entityParameter = EntityParameter.Armor;
+        private EntityParameter _entityParameter = EntityParameter.Damage;
         private DamageType _selectedDamageType = DamageType.Normal;
         private DamageSource _selectedDamageSource = DamageSource.Hit;
+        private EntityType _selectedEntityType = EntityType.Regular;
+        private Fractions _selectedFraction = Fractions.Undead;
         private Dictionary<int, IModifierInstance> _addedModifiers = new();
+        private Dictionary<EntityParameter, Label> _parameterValues = [];
         private Dictionary<int, string> _passives = new();
         private long _selectedModifier;
         private string _selectedPassiveSkill;
         private string _passiveToRemove;
+        private string _npcCategorySelected = "Necromancer";
         private bool _isCritical;
+        [Export] private MainWorld? _mainWorld;
         [Export] private Button? _add, _remove, _flat, _percent, _multiplier, _removeAll;
         [Export] private ItemList? _modifiers;
-        [Export] private LineEdit? _amount;
-        [Export] private Button? _addPassive, _removePassive, _removeAllPassives;
+        [Export] private Button? _removeAllPassives;
         [Export] private ItemList? _availablePassives, _obtainedPassives;
         [Export] private Button? _heal, _healFull, _dealDamage, _kill;
-        [Export] private SpinBox? _healAmount, _damageAmount;
+        [Export] private SpinBox? _healAmount, _damageAmount, _modifierValue;
         [Export] private OptionButton? _damageType, _damageSource, _parameters;
         [Export] private CheckButton? _critButton;
+        [Export] private Button? _addNpc;
+        [Export] private OptionButton? _npcType, _npcFraction, _npcCategory;
+        [Export] private CheckBox? _isInGroup;
+        [Export] private SpinBox? _amountNpc;
+        [Export] private VBoxContainer? _statsContainer;
+        private TaskCompletionSource<Vector2>? _setPoint;
 
 
         public override void _Ready()
         {
-            _player = GameServiceProvider.Instance.GetService<PlayerReference>().GetPlayer();
-            _player.PassiveSkills.SkillAdded += OnSkillAdded;
+            _player = Player.Instance;
+            _player?.PassiveSkills.SkillAdded += OnPlayerSkillAdded;
+            _player?.Parameters.ParameterChanged += OnPlayerParametersChanges;
+            _player?.CurrentHealthChanged += (t) =>
+            {
+                _parameterValues.TryGetValue(EntityParameter.Health, out var label);
+                label?.Text = $"{t}";
+            };
             _add?.Pressed += OnAddPressed;
             _flat?.Pressed += () => _modifierType = ModifierType.Flat;
             _percent?.Pressed += () => _modifierType = ModifierType.Increase;
             _multiplier?.Pressed += () => _modifierType = ModifierType.Multiplicative;
-            _parameters?.ItemSelected += OnParameterSelected;
+            _parameters?.ItemSelected += (t) =>
+            {
+                string text = _parameters?.GetItemText((int)t) ?? string.Empty;
+                Enum.TryParse(text, true, out EntityParameter param);
+                _entityParameter = param;
+            };
             _modifiers?.ItemSelected += (idx) => _selectedModifier = idx;
             _availablePassives?.ItemSelected += OnPassiveSelected;
             _obtainedPassives?.ItemSelected += OnObtainedPassiveSelected;
             _remove?.Pressed += OnRemovePressed;
             _removeAll?.Pressed += OnRemoveAll;
-            _addPassive?.Pressed += OnAddPassivePressed;
-            _healFull?.Pressed += () => _player.Heal(99999999);
-            _kill?.Pressed += () => _player.Kill();
+            _healFull?.Pressed += () => _player?.Heal(99999999);
+            _kill?.Pressed += () => _player?.Kill();
             _heal?.Pressed += OnHealPressed;
             _dealDamage?.Pressed += OnDamagePressed;
-            _damageType?.ItemSelected += OnDamageTypeSelected;
-            _damageSource?.ItemSelected += OnDamageSourceSelected;
+            _addNpc?.Pressed += OnAddNpcPressed;
+            _npcCategory?.ItemSelected += (t) =>
+            {
+                string text = _npcCategory.GetItemText((int)t);
+                _npcCategorySelected = text;
+            };
+            _npcType?.ItemSelected += (t) =>
+            {
+                Enum.TryParse(_npcType.GetItemText((int)t), out EntityType type);
+                _selectedEntityType = type;
+            };
+            _damageType?.ItemSelected += (t) =>
+            {
+                string item = _damageType.GetItemText((int)t);
+                Enum.TryParse(item, out DamageType damageType);
+                _selectedDamageType = damageType;
+            };
+            _damageSource?.ItemSelected += (t) =>
+            {
+                string item = _damageSource.GetItemText((int)t);
+                Enum.TryParse(item, out DamageSource damageSource);
+                _selectedDamageSource = damageSource;
+            };
+            _npcFraction?.ItemSelected += (t) =>
+            {
+                Enum.TryParse(_npcFraction.GetItemText((int)t), out Fractions fraction);
+                _selectedFraction = fraction;
+            };
             _critButton?.Toggled += (t) => _isCritical = t;
             Visible = false;
-            SetParameters();
-            SetPassiveSkills();
-            SetDamageTypes();
-            SetDamageSource();
-        }
 
-        public override void _UnhandledInput(InputEvent @event)
-        {
-            if (@event is not InputEventKey { CtrlPressed: true, Keycode: Key.Q, Pressed: true })
-                return;
-            Visible = !Visible;
-            AcceptEvent();
-        }
+            AddTypes<EntityType>(_npcType);
+            AddTypes<DamageType>(_damageType);
+            AddTypes<DamageSource>(_damageSource);
+            AddTypes<EntityParameter>(_parameters);
+            AddTypes<Fractions>(_npcFraction);
 
-        private void SetDamageSource()
-        {
-            foreach (DamageSource damageSource in Enum.GetValues<DamageSource>())
-                _damageSource?.AddItem(damageSource.ToString());
-        }
-
-        private void SetDamageTypes()
-        {
-            foreach (DamageType damageType in Enum.GetValues<DamageType>())
-                _damageType?.AddItem(damageType.ToString());
-        }
-
-        private void SetPassiveSkills()
-        {
-            if (_availablePassives == null) return;
+            AddNpcCategory();
 
             foreach (var skill in PassiveFactory.Skills)
             {
@@ -96,28 +124,101 @@
                 int idx = _availablePassives.AddItem(key);
                 _passives.Add(idx, key);
             }
+
+            foreach (ISkill passiveSkillsSkill in _player?.PassiveSkills.Skills ?? [])
+                _obtainedPassives?.AddItem(passiveSkillsSkill.Id);
+
+            foreach (var param in Enum.GetValues<EntityParameter>())
+            {
+                foreach (IModifierInstance modifierInstance in _player?.Modifiers.GetModifiers(param) ?? [])
+                {
+                    _modifiers?.AddItem($"{modifierInstance.EntityParameter}, {modifierInstance.ModifierType}, {modifierInstance.Value}");
+                }
+            }
+
+            CreateLabels();
         }
 
-        private void SetParameters()
+        private void CreateLabels()
         {
             foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
-                _parameters?.AddItem(entityParameter.ToString());
+            {
+                var hbox = new HBoxContainer();
+                var parameterName = new Label();
+                var parameterValue = new Label();
+                hbox.AddChild(parameterName);
+                hbox.AddChild(parameterValue);
+                _statsContainer?.AddChild(hbox);
+                parameterName.Text = entityParameter.ToString();
+                _parameterValues[entityParameter] = parameterValue;
+            }
         }
 
-        private void OnDamageSourceSelected(long index)
+        private void OnPlayerParametersChanges(EntityParameter parameter, float value)
         {
-            if (_damageSource == null) return;
-            string item = _damageSource.GetItemText((int)index);
-            Enum.TryParse(item, out DamageSource damageSource);
-            _selectedDamageSource = damageSource;
+            _parameterValues.TryGetValue(parameter, out var label);
+            label?.Text = value.ToString();
         }
 
-        private void OnDamageTypeSelected(long index)
+        private void OnPlayerSkillAdded(ISkill obj)
         {
-            if (_damageType == null) return;
-            string item = _damageType.GetItemText((int)index);
-            Enum.TryParse(item, out DamageType damageType);
-            _selectedDamageType = damageType;
+            _obtainedPassives?.AddItem(obj.Id);
+        }
+
+        private void AddNpcCategory()
+        {
+            _npcCategory?.AddItem($"{nameof(Necromancer)}");
+            _npcCategory?.AddItem($"{nameof(Bat)}");
+        }
+
+        private async void OnAddNpcPressed()
+        {
+            try
+            {
+                if (_amountNpc == null) return;
+                int amount = (int)_amountNpc.Value;
+
+                var group = new EntityGroup(amount);
+                _setPoint = new TaskCompletionSource<Vector2>();
+
+                var spawnPoint = await _setPoint.Task;
+
+                for (int i = 0; i < amount; i++)
+                {
+                    var npc = NpcFactory.CreateEntity(_npcCategorySelected);
+                    if (npc is not INpc s) continue;
+                    s.EntityType = _selectedEntityType;
+                    s.Fraction = _selectedFraction;
+                    if (npc is IEntity entity && _isInGroup.ButtonPressed)
+                        group.TryAddToGroup(entity);
+                    npc.Position = new Vector2(spawnPoint.X + 50 * i, spawnPoint.Y + 50 * i);
+                    _mainWorld?.CallDeferred(Node.MethodName.AddChild, npc);
+                }
+
+                _setPoint = null;
+            }
+            catch (Exception exception)
+            {
+                GD.Print($"{exception.Message}");
+            }
+        }
+
+        private void AddTypes<TKey>(OptionButton? button)
+            where TKey : struct, Enum
+        {
+            foreach (var key in Enum.GetValues<TKey>())
+                button?.AddItem(key.ToString());
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (_setPoint is { Task.IsCompleted: false } && @event is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true })
+                _setPoint.SetResult(GetGlobalMousePosition());
+
+            if (@event is not InputEventKey { CtrlPressed: true, Keycode: Key.Q, Pressed: true })
+                return;
+            Visible = !Visible;
+            AcceptEvent();
         }
 
         private void OnDamagePressed()
@@ -137,29 +238,15 @@
         {
             if (_obtainedPassives == null) return;
             string key = _obtainedPassives.GetItemText((int)index);
-            var skill = PassiveFactory.GetSkill(key);
-            _player?.PassiveSkills.RemoveSkill(skill.Id);
-            _passiveToRemove = string.Empty;
-        }
-
-        private void OnAddPassivePressed()
-        {
-            var skill = PassiveFactory.GetSkill(_selectedPassiveSkill);
-            _player?.PassiveSkills.AddSkill(skill);
+            _player?.PassiveSkills.RemoveSkill(key);
+            _obtainedPassives.RemoveItem((int)index);
         }
 
         private void OnPassiveSelected(long index)
         {
-            _selectedPassiveSkill = _availablePassives?.GetItemText((int)index) ?? string.Empty;
+            var skill = PassiveFactory.GetSkill(_availablePassives?.GetItemText((int)index) ?? string.Empty);
+            _player?.PassiveSkills.AddSkill(skill);
         }
-
-        private void OnSkillAdded(ISkill obj)
-        {
-            _obtainedPassives?.AddItem(obj.Id);
-        }
-
-
-
 
         private void OnRemoveAll()
         {
@@ -168,6 +255,8 @@
                 _modifiers?.RemoveItem(modifierInstance.Key);
                 _player?.Modifiers.RemovePermanentModifier(modifierInstance.Value);
             }
+
+            _addedModifiers.Clear();
         }
 
         private void OnRemovePressed()
@@ -179,12 +268,13 @@
             _addedModifiers.Remove((int)_selectedModifier);
         }
 
-
         private void OnAddPressed()
         {
-            if (_modifiers == null) return;
-            if (!int.TryParse(_amount?.Text, out int amount))
-                return;
+            if (_modifiers == null || _modifierValue == null) return;
+
+            float amount = (float)_modifierValue.Value;
+            if (_modifierType is ModifierType.Increase or ModifierType.Multiplicative)
+                amount /= 100;
 
             var modifier = new ModifierInstance(_entityParameter, _modifierType, amount, this);
             _player?.Modifiers.AddPermanentModifier(modifier);
@@ -192,14 +282,6 @@
             _addedModifiers.Add(idx, modifier);
         }
 
-
-        private void OnParameterSelected(long index)
-        {
-            string text = _parameters?.GetItemText((int)index) ?? string.Empty;
-            Enum.TryParse(text, true, out EntityParameter param);
-            _entityParameter = param;
-        }
-
-
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }
 }

@@ -1,9 +1,10 @@
 ﻿namespace Core.Interfaces.Entity
 {
-    using Components;
+    using Enums;
 
     public interface INpc
     {
-        public IEntityAttribute Attribute { get; }
+        EntityType EntityType { get; set; }
+        Fractions Fraction { get; set; }
     }
 }
