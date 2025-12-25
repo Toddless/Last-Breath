@@ -59,7 +59,7 @@
             if (_entity is not { IsAlive: true }) return;
             _entity.Dead -= OnEntityDead;
             _entity.DamageTaken -= OnDamageTaken;
-            var node = _entity as Node2D;
+            var node = _entity as Node;
             CallDeferred(Node.MethodName.RemoveChild, node);
         }
 
@@ -75,9 +75,6 @@
 
         public void RemoveBattleEventBus()
         {
-            _eventBus?.Unsubscribe<PlayerSelectingTargetForAbilityEvent>(OnPlayerSelectingAbilityTarget);
-            _eventBus?.Unsubscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
-            _eventBus?.Unsubscribe<CancelSelectionEvent>(OnSelectionCancel);
             _eventBus = null;
         }
 

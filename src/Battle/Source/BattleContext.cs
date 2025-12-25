@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source
 {
+    using System;
     using Godot;
     using Services;
     using UIElements;
@@ -9,6 +10,7 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
     internal class BattleContext : IBattleContext
     {
@@ -35,7 +37,6 @@
             foreach (IEntity entity in _entities)
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.Mana, entity.CurrentHealth, entity.CurrentMana);
 
-
             _player.SetupBattleEventBus(_localBus);
             RemoveParticipantFromWorld();
         }
@@ -50,17 +51,27 @@
         {
             ReturnParticipantsToWorld();
             _battleArena.QueueFree();
+            _localBus.Dispose();
             _uiElementProvider.HideMainElement<BattleHud>();
         }
 
         private void ReturnParticipantsToWorld()
         {
-            if (_player.IsAlive) _battleArena.RemovePlayerFromArena();
-            _battleArena.RemoveAliveEntitiesFromArena();
-            foreach (var entity in _entities)
+            try
             {
-                if (!entity.IsAlive || entity is not Node2D asNode) continue;
-                _mainWorld.CallDeferred(Node.MethodName.AddChild, asNode);
+                _battleArena.RemoveAliveEntitiesFromArena();
+                _battleArena.RemovePlayerFromArena();
+                foreach (var entity in _entities)
+                {
+                    if (!entity.IsAlive || entity is not Node2D asNode) continue;
+                    _mainWorld.CallDeferred(Node.MethodName.AddChild, asNode);
+                }
+
+                _localBus.Publish<BattleEndGameEvent>(new());
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"{ex.Message}, {ex.StackTrace}");
             }
         }
 

@@ -6,9 +6,9 @@
     public class RegenerationEffect(
         float amount,
         int duration,
-        int stacks,
+        int maxStacks,
         StatusEffects statusEffect = StatusEffects.Regeneration)
-        : Effect(id:"Effect_Regeneration", duration, stacks, statusEffect)
+        : Effect(id:"Effect_Regeneration", duration, maxStacks, statusEffect)
     {
         public float Amount { get; } = amount;
 
@@ -18,6 +18,6 @@
             base.TurnEnd();
         }
 
-        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
+        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxMaxStacks, Status);
     }
 }

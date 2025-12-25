@@ -1,6 +1,8 @@
 ﻿namespace Core.Interfaces.Events
 {
-    public interface IBattleEventBus : IEventBus<IBattleEvent>
+    using System;
+
+    public interface IBattleEventBus : IEventBus<IBattleEvent>, IDisposable
     {
     }
 }

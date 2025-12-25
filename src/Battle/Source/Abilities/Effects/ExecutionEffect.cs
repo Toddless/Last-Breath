@@ -7,10 +7,10 @@
     public class ExecutionEffect(
         string id,
         int duration,
-        int stacks,
+        int maxStacks,
         float percentage,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks, statusEffect)
+        : Effect(id, duration, maxStacks, statusEffect)
     {
         public float Percentage { get; } = percentage;
 
@@ -21,7 +21,7 @@
             if (healthAsPercentLeft <= Percentage) context.Target.Kill();
         }
 
-        public override IEffect Clone() => new ExecutionEffect(Id, Duration, MaxStacks, Percentage, Status);
+        public override IEffect Clone() => new ExecutionEffect(Id, Duration, MaxMaxStacks, Percentage, Status);
 
         public override bool IsStronger(IEffect otherEffect)
         {

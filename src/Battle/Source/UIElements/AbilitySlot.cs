@@ -156,7 +156,6 @@
         {
             _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
             _ability?.CooldownLeftChanges -= OnCooldownChanges;
-            _battleEventBus?.Unsubscribe<BattleEndGameEvent>(OnBattleEnd);
             _ability = null;
             _battleEventBus = null;
         }

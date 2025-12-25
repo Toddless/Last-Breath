@@ -41,5 +41,11 @@
             if (handlers.Count == 0)
                 _handlers.Remove(typeof(T));
         }
+
+        public void Dispose()
+        {
+            _handlers.Clear();
+            GC.SuppressFinalize(this);
+        }
     }
 }

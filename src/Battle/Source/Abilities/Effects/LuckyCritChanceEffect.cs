@@ -9,7 +9,7 @@
         string id,
         int duration,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id, duration, maxStacks: 1, statusEffect)
     {
         private readonly EntityParameterModuleDecorator _luckyCritChanceDecorator = new LuckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 

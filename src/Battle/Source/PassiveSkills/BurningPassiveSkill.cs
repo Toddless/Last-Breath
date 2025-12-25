@@ -36,7 +36,7 @@
             float damage = context.FinalDamage;
             var target = context.Target;
             var burning = _damageOverTurnEffect.Clone();
-            var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = InstanceId };
+            var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = Id };
             burning.Apply(applyContext);
         }
 

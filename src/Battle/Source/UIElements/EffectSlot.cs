@@ -9,34 +9,40 @@
         private const string UID = "uid://mrcrwvwn0w25";
         private IEffect? _effect;
         [Export] private TextureRect? _effectIcon;
-        [Export] private Label? _effectDuration;
+        [Export] private Label? _effectStacks;
 
+        public int Stacks
+        {
+            get;
+            set
+            {
+                if(field == value)return;
+                field = value;
+                UpdateStacks();
+            }
+        }
 
         // TODO: Custom popup
 
         public void AddEffect(IEffect effect)
         {
-            if (_effect != null)
-                _effect.DurationChanged -= OnEffectDurationChanges;
             _effect = effect;
-            _effect.DurationChanged += OnEffectDurationChanges;
             _effectIcon?.Texture = _effect.Icon;
-            _effectDuration?.Text = $"{_effect.Duration}";
+            _effectStacks?.Text = string.Empty;
         }
 
         public void RemoveEffect()
         {
-            _effect?.DurationChanged -= OnEffectDurationChanges;
-            _effectDuration?.Text = string.Empty;
+            _effectStacks?.Text = string.Empty;
             _effectIcon?.Texture = null;
             _effect = null;
             QueueFree();
         }
 
-        public bool HasEffect(IEffect effect) => (!effect.InstanceId.Equals(_effect?.InstanceId));
+        public bool HasEffect(IEffect effect) => effect.Id.Equals(_effect?.Id);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnEffectDurationChanges(int obj) => _effectDuration?.Text = obj < 2 ? string.Empty : $"{obj}";
+        private void UpdateStacks() => _effectStacks?.Text = Stacks <= 1 ? string.Empty : $"{Stacks}";
     }
 }

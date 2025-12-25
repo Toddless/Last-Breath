@@ -6,10 +6,9 @@
     using Core.Interfaces.Components.Decorator;
 
     public class UnluckyCritChanceEffect(
-        string id,
         int duration,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id:"Effect_Unlucky_Critical_Chance", duration, maxStacks: 1, statusEffect)
     {
         private readonly EntityParameterModuleDecorator _unluckyCritChanceDecorator = new UnluckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 
@@ -25,6 +24,6 @@
             base.Remove();
         }
 
-        public override IEffect Clone() => new UnluckyCritChanceEffect(Id, Duration, Status);
+        public override IEffect Clone() => new UnluckyCritChanceEffect(Duration, Status);
     }
 }

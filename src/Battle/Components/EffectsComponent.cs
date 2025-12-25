@@ -14,46 +14,26 @@
 
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {
-        private readonly Dictionary<object, List<IEffect>> _effects = [];
+        private readonly Dictionary<string, List<IEffect>> _effects = [];
         private readonly List<DotTick> _dotTicks = [];
         public IReadOnlyList<IEffect> Effects => _effects.Values.SelectMany(x => x).ToList();
         public event Action<IEffect>? EffectAdded;
         public event Action<IEffect>? EffectRemoved;
-        public event Action? AllEffectsRemoved;
 
-        public void RegisterDotTick(DotTick tick)
-        {
-            _dotTicks.Add(tick);
-        }
+        public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effects.Values.ToList().SelectMany(list => list.Where(predicate));
 
-        public void AddEffect(IEffect effect)
+        public void RegisterDotTick(DotTick tick) => _dotTicks.Add(tick);
+
+        public void AddEffect(IEffect newEffect)
         {
-            string source = effect.Source;
+            string source = newEffect.Source;
             if (string.IsNullOrWhiteSpace(source)) return;
-            // we can have same effect multiple times if they have different sources
-            if (!_effects.TryGetValue(source, out List<IEffect>? effects))
-            {
-                effects = [];
-                _effects[source] = effects;
-            }
 
-            var sameEffects = _effects.Values
-                .SelectMany(list => list)
-                .Where(existingEffect => existingEffect.Id == effect.Id)
-                .OrderBy(x => x.Duration)
-                .ToList();
+            var effects = GetEffectsForSource(source);
 
-            int maxStacks = Math.Max(sameEffects.DefaultIfEmpty().Max(x => x?.MaxStacks ?? 0), effect.MaxStacks);
+            var sameEffects = FindSameEffects(newEffect.Id, effects);
 
-            // replace oldest or weakest effect
-            if (sameEffects.Count == maxStacks)
-            {
-                var oldest = effects.FirstOrDefault(old => old.Duration < effect.Duration && effect.IsStronger(old)) ?? effects.First();
-                effects.Remove(oldest);
-            }
-
-            effects.Add(effect);
-            EffectAdded?.Invoke(effect);
+            ProcessEffectStacking(effects, sameEffects, newEffect);
         }
 
         public void RemoveEffect(IEffect effect)
@@ -62,22 +42,31 @@
             if (string.IsNullOrWhiteSpace(source)) return;
             _effects.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
-            _dotTicks.RemoveAll(x => x.Source.InstanceId == effect.InstanceId);
+            _dotTicks.RemoveAll(dot => dot.Source == effect.Id);
+            if(effects?.Count == 0) _effects.Remove(source);
             EffectRemoved?.Invoke(effect);
-            if (effects?.Count == 0) _effects.Remove(source);
         }
 
         public void RemoveEffectByStatus(StatusEffects status)
         {
-            foreach (var list in _effects.Values)
-                list.RemoveAll(x => x.Status == status);
+            foreach (var effect in _effects.Values.SelectMany(x => x).Where(x => x.Status == status))
+                effect.Remove();
+        }
+
+        public void RemoveEffectBySource(string source)
+        {
+            _effects.TryGetValue(source, out List<IEffect>? effects);
+            foreach (var effect in effects ?? [])
+                effect.Remove();
         }
 
         public void RemoveAllEffects()
         {
-            foreach (var effect in _effects.Values.SelectMany(x => x))
+            foreach (var effect in _effects.Values.SelectMany(x => x).ToList())
                 effect.Remove();
-            AllEffectsRemoved?.Invoke();
+
+            _effects.Clear();
+            _dotTicks.Clear();
         }
 
         public async void TriggerTurnEnd()
@@ -87,24 +76,12 @@
                 foreach (var effect in GetEffects())
                     effect.TurnEnd();
                 await ApplyDotDamage();
+
             }
             catch (Exception exception)
             {
                 GD.Print($"Exception: {exception.Message}");
             }
-        }
-
-        private async Task ApplyDotDamage()
-        {
-            foreach (IGrouping<StatusEffects, DotTick> grouping in _dotTicks.GroupBy(dot => dot.Status))
-            {
-                var status = grouping.Key;
-                float totalDamage = grouping.Sum(dot => dot.Damage);
-                var from = grouping.Select(x => x.Source).First();
-                await owner.TakeDamage(from, totalDamage, status.GetDamageType(), DamageSource.Effect);
-            }
-
-            _dotTicks.Clear();
         }
 
         public void TriggerTurnStart()
@@ -131,6 +108,78 @@
             foreach (var permanentEffect in _effects.Values)
                 effects.AddRange(permanentEffect);
 
+            return effects;
+        }
+
+        private async Task ApplyDotDamage()
+        {
+            foreach (IGrouping<StatusEffects, DotTick> grouping in _dotTicks.GroupBy(dot => dot.Status))
+            {
+                var from = grouping.Select(x => x.From).First();
+                if (!from.IsAlive) continue;
+                var status = grouping.Key;
+                float totalDamage = grouping.Sum(dot => dot.Damage);
+                await owner.TakeDamage(from, totalDamage, status.GetDamageType(), DamageSource.Effect);
+            }
+
+            _dotTicks.Clear();
+        }
+
+        private void ProcessEffectStacking(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
+        {
+            bool isSingleStack = newEffect.MaxMaxStacks <= 1;
+
+            if (isSingleStack) HandleSingleStack(effects, sameEffects, newEffect);
+            else HandleMultipleStacks(effects, sameEffects, newEffect);
+        }
+
+        private void HandleMultipleStacks(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
+        {
+            bool hasReachedMaxStacks = sameEffects.Count >= newEffect.MaxMaxStacks;
+
+            if (!hasReachedMaxStacks)
+            {
+                AddNewEffectAndNotify(effects, newEffect);
+                return;
+            }
+
+            int oldestIndex = effects.FindIndex(x => x.Id == newEffect.Id);
+            if (oldestIndex < 0) return;
+
+            var oldEffect = effects[oldestIndex];
+            oldEffect.Remove();
+            AddNewEffectAndNotify(effects, newEffect);
+        }
+
+        private void HandleSingleStack(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
+        {
+            if (sameEffects.Count == 0)
+                return;
+
+            IEffect existingEffect = sameEffects[0];
+
+            if (newEffect.IsStronger(existingEffect))
+            {
+                existingEffect.Remove();
+                AddNewEffectAndNotify(effects, newEffect);
+            }
+            else existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
+        }
+
+        private void AddNewEffectAndNotify(List<IEffect> effects, IEffect newEffect)
+        {
+            effects.Add(newEffect);
+            EffectAdded?.Invoke(newEffect);
+        }
+
+        private static List<IEffect> FindSameEffects(string newEffectId, List<IEffect> effects) => effects.Where(x => x.Id == newEffectId).ToList();
+
+        private List<IEffect> GetEffectsForSource(string source)
+        {
+            if (_effects.TryGetValue(source, out List<IEffect>? effects)) return effects;
+
+            effects = [];
+            _effects[source] = effects;
             return effects;
         }
     }

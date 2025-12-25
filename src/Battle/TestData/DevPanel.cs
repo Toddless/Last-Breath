@@ -12,6 +12,7 @@
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using System.Collections.Generic;
+    using Core.Interfaces.Abilities;
     using Source.PassiveSkills;
 
     [GlobalClass]
@@ -27,6 +28,7 @@
         private Fractions _selectedFraction = Fractions.Undead;
         private Dictionary<int, IModifierInstance> _addedModifiers = new();
         private Dictionary<EntityParameter, Label> _parameterValues = [];
+        private Dictionary<string, int> _effectsInstances = [];
         private Dictionary<int, string> _passives = new();
         private long _selectedModifier;
         private string _selectedPassiveSkill;
@@ -47,14 +49,17 @@
         [Export] private CheckBox? _isInGroup;
         [Export] private SpinBox? _amountNpc;
         [Export] private VBoxContainer? _statsContainer;
+        [Export] private ItemList? _effectsApplied, _effectsManager;
+        [Export] private Button? _updateEffects;
         private TaskCompletionSource<Vector2>? _setPoint;
-
 
         public override void _Ready()
         {
             _player = Player.Instance;
             _player?.PassiveSkills.SkillAdded += OnPlayerSkillAdded;
             _player?.Parameters.ParameterChanged += OnPlayerParametersChanges;
+            _player?.Effects.EffectAdded += OnEffectAdded;
+            _player?.Effects.EffectRemoved += OnEffectRemoved;
             _player?.CurrentHealthChanged += (t) =>
             {
                 _parameterValues.TryGetValue(EntityParameter.Health, out var label);
@@ -80,6 +85,7 @@
             _heal?.Pressed += OnHealPressed;
             _dealDamage?.Pressed += OnDamagePressed;
             _addNpc?.Pressed += OnAddNpcPressed;
+            _updateEffects?.Pressed += OnUpdatePressed;
             _npcCategory?.ItemSelected += (t) =>
             {
                 string text = _npcCategory.GetItemText((int)t);
@@ -137,6 +143,36 @@
             }
 
             CreateLabels();
+        }
+
+        private void OnUpdatePressed() => UpdateEffectManager();
+
+        private void OnEffectRemoved(IEffect obj)
+        {
+            if (_effectsApplied == null) return;
+            if (!_effectsInstances.TryGetValue(obj.InstanceId, out int idx))
+                return;
+
+            _effectsApplied.RemoveItem(idx);
+            _effectsInstances.Remove(obj.InstanceId);
+            UpdateEffectManager();
+        }
+
+        private void OnEffectAdded(IEffect obj)
+        {
+            if (_effectsApplied == null) return;
+            int indx = _effectsApplied.AddItem($"{obj.Id}, {obj.Status}, {obj.Duration}");
+            _effectsInstances.Add(obj.InstanceId, indx);
+            UpdateEffectManager();
+        }
+
+        private void UpdateEffectManager()
+        {
+            var effects = _player?.Effects.Effects;
+            if (effects == null || _effectsManager == null) return;
+            _effectsManager.Clear();
+            foreach (var effect in effects)
+                _effectsManager.AddItem($"{effect.Id}, {effect.Status}, {effect.Duration}");
         }
 
         private void CreateLabels()

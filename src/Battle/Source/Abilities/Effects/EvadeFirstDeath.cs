@@ -8,7 +8,7 @@
         int duration,
         float percentToRecover,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id, duration, maxStacks: 1, statusEffect)
     {
         public float PercentToRecover { get; } = percentToRecover;
 

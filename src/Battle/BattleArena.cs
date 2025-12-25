@@ -41,9 +41,6 @@
 
         public override void _ExitTree()
         {
-            _battleEventBus?.Unsubscribe<PlayerDiedGameEvent>(OnPlayerDead);
-            _battleEventBus?.Unsubscribe<EntityDiedGameEvent>(OnEntityDead);
-            _battleEventBus?.Unsubscribe<AttackTargetSelectedGameEvent>(OnAttackTargetSelected);
             _battleEventBus = null;
             foreach (EntitySpot entitySpot in _spots)
                 entitySpot.RemoveBattleEventBus();

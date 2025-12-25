@@ -139,7 +139,6 @@
             Intelligence = new Intelligence(Modifiers);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
-            Effects.AllEffectsRemoved += OnAllEffectsRemoved;
             Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
@@ -152,6 +151,10 @@
             passiveTwo.Attach(this);
             var mana = new ManaBurnPassiveSkill(0.15f);
             mana.Attach(this);
+            var burning = new BurningPassiveSkill(0.3f, 3, 3);
+            burning.Attach(this);
+            var regen = new RegenerationPassiveSkill(500);
+            regen.Attach(this);
             ConfigureStateMachine();
             SetBaseValuesForParameters();
         }
@@ -353,13 +356,8 @@
         private void OnBattleEnd(BattleEndGameEvent obj)
         {
             _stateMachine.Fire(Trigger.Idle);
-            _battleEventBus?.Unsubscribe<BattleEndGameEvent>(OnBattleEnd);
+            Effects.RemoveAllEffects();
             _battleEventBus = null;
-        }
-
-        private void OnAllEffectsRemoved()
-        {
-            _battleEventBus?.Publish<AllEffectRemoved>(new(this));
         }
 
         private void OnEffectRemoved(IEffect effect)

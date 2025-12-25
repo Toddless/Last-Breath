@@ -12,7 +12,7 @@
     public abstract class Effect(
         string id,
         int duration,
-        int stacks,
+        int maxStacks,
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         protected EffectApplyingContext? Context { get; private set; }
@@ -33,7 +33,7 @@
 
         public StatusEffects Status { get; set; } = statusEffect;
         public int Duration { get; set; } = duration;
-        public int MaxStacks { get; set; } = stacks;
+        public int MaxMaxStacks { get; set; } = maxStacks;
         public string Source { get; private set; } = string.Empty;
         public bool Expired => Duration == 0;
         public string Description => Localizator.LocalizeDescription(Id);
@@ -49,30 +49,15 @@
             Owner = target;
             Source = context.Source;
             target.Effects.AddEffect(this);
-            Owner.Dead += OnOwnerDead;
-            caster.Dead += OnCasterDead;
             // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status)) caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
         }
 
-        private void OnCasterDead(IEntity target)
-        {
-            if (Context.HasValue) Context.Value.Caster.Dead -= OnCasterDead;
-            Owner?.Effects.RemoveEffect(this);
-            Context = null;
-        }
-
-        private void OnOwnerDead(IFightable owner)
-        {
-            Owner?.Dead -= OnOwnerDead;
-            Owner = null;
-        }
-
         public virtual void TurnEnd()
         {
+            if (Expired) Remove();
             Duration--;
             DurationChanged?.Invoke(Duration);
-            if (Expired) Remove();
         }
 
         public virtual void TurnStart()
@@ -98,6 +83,8 @@
             // effect will be removed form "us" here, so we are publishing event within TryRemoveStatusEffect
             Owner?.TryRemoveStatusEffect(Status);
             Owner?.Effects.RemoveEffect(this);
+            Owner = null;
+            Context = null;
         }
     }
 }

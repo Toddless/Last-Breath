@@ -10,7 +10,7 @@
         int duration,
         float healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id, duration, maxStacks: 1, statusEffect)
     {
         protected float HealthBurned;
         public float HealthPercent { get; } = healthPercent;

@@ -10,7 +10,7 @@
         EntityParameter parameter,
         float value,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id, duration, maxStacks: 1, statusEffect)
     {
         private string _id = string.Empty;
         public EntityParameter Parameter { get; } = parameter;

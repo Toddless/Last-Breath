@@ -15,7 +15,7 @@
             new ServantHellPassiveSkill(0.05f),
             new LuckyCriticalChancePassiveSkill(),
             new MulticastPassiveSkill(),
-            new PoisonedClaws(0.3f, 5, 3),
+            new PoisonedClaws(0.3f, 3, 3),
             new PorcupinePassiveSkill(0.3f, 0.1f),
             new RegenerationPassiveSkill(0.05f),
             new SoulDevouringPassiveSkill(200f),

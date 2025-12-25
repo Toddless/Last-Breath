@@ -36,7 +36,7 @@
             var target = obj.Context.Target;
             float damage = obj.Context.FinalDamage;
             var poison = _damageOverTurnEffect.Clone();
-            poison.Apply(new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = InstanceId });
+            poison.Apply(new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = Id });
         }
 
         public override void Detach(IEntity owner)

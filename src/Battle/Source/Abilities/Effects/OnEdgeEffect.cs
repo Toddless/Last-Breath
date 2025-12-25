@@ -7,7 +7,7 @@
         string id,
         int duration,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, stacks: 1, statusEffect)
+        : Effect(id, duration, maxStacks: 1, statusEffect)
     {
 
         public override void Apply(EffectApplyingContext context)

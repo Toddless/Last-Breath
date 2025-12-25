@@ -3,5 +3,5 @@
     using Enums;
     using Interfaces.Entity;
 
-    public record DotTick(float Damage, StatusEffects Status, IEntity Source);
+    public record DotTick(float Damage, StatusEffects Status, string Source, IEntity From);
 }

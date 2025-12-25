@@ -143,7 +143,6 @@
             Intelligence = new Intelligence(Modifiers);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
-            Effects.AllEffectsRemoved += OnAllEffectsRemoved;
             Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
@@ -155,13 +154,6 @@
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.Mana;
             Instance = this;
-        }
-
-
-
-        public override void _EnterTree()
-        {
-            if (GetParent() is MainWorld) _stateMachine.Fire(Trigger.Idle);
         }
 
         public override void _Process(double delta)
@@ -184,6 +176,7 @@
         {
             _battleEventBus = bus;
             _stateMachine.Fire(Trigger.Battle);
+            _battleEventBus.Subscribe<BattleEndGameEvent>(OnBattleEnds);
         }
 
         public void Heal(float amount) => CurrentHealth += amount;
@@ -307,7 +300,6 @@
                     CanMove = true;
                     Position = _lastPosition;
                 })
-                .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Idle, State.Idle);
         }
 
@@ -349,11 +341,6 @@
             //     _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
         }
 
-        private void OnAllEffectsRemoved()
-        {
-            _battleEventBus?.Publish<AllEffectRemoved>(new(this));
-        }
-
         private void OnEffectRemoved(IEffect effect)
         {
             _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
@@ -361,7 +348,14 @@
 
         private void OnEffectAdded(IEffect effect)
         {
-            _battleEventBus?.Publish<EffectAddedEvent>(new(effect,this));
+            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
+        }
+
+        private void OnBattleEnds(BattleEndGameEvent obj)
+        {
+            Effects.RemoveAllEffects();
+            _stateMachine.Fire(Trigger.Idle);
+            _battleEventBus = null;
         }
 
         private void NotifyShouldDie()
@@ -442,7 +436,7 @@
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
-                        value = 380f;
+                        value = 100;
                         break;
                 }
 

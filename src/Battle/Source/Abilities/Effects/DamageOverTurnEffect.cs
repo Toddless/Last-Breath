@@ -6,11 +6,10 @@
 
     public class DamageOverTurnEffect(
         int duration,
-        int stacks,
+        int maxStacks,
         float percentFromDamage = 0.7f,
-        StatusEffects statusEffect = StatusEffects.None,
-        string id = "Damage_Over_Turn_Effect")
-        : Effect(id, duration, stacks, statusEffect)
+        StatusEffects statusEffect = StatusEffects.None)
+        : Effect(id: "Damage_Over_Turn_Effect", duration, maxStacks, statusEffect)
     {
         public float PercentFromBase { get; } = percentFromDamage;
         public float DamagePerTick { get; set; }
@@ -23,8 +22,7 @@
 
         public override void TurnEnd()
         {
-            if (Context.HasValue)
-                Owner?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Context.Value.Caster));
+            if (Context.HasValue) Owner?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Id, Context.Value.Caster));
             base.TurnEnd();
         }
 
@@ -35,6 +33,6 @@
             return DamagePerTick > other.DamagePerTick;
         }
 
-        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxStacks, PercentFromBase, Status, Id);
+        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxMaxStacks, PercentFromBase, Status);
     }
 }

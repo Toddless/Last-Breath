@@ -4,6 +4,7 @@
     using System.Linq;
     using Core.Interfaces.UI;
     using Core.Interfaces.Abilities;
+    using System.Collections.Generic;
 
     [GlobalClass]
     [Tool]
@@ -37,20 +38,32 @@
 
         public void AddEffect(IEffect effect)
         {
-            var slot = EffectSlot.Initialize().Instantiate<EffectSlot>();
-            CharacterEffects?.CallDeferred(Node.MethodName.AddChild, slot);
-            slot.AddEffect(effect);
+            var slots = GetEffectSlots().ToList();
+            var alreadyExistInSlot = slots.FirstOrDefault(x => x.HasEffect(effect));
+            if (alreadyExistInSlot == null)
+            {
+                var slot = EffectSlot.Initialize().Instantiate<EffectSlot>();
+                CharacterEffects?.CallDeferred(Node.MethodName.AddChild, slot);
+                slot.AddEffect(effect);
+                slot.Stacks++;
+            }
+            else alreadyExistInSlot.Stacks++;
         }
 
         public void RemoveEffect(IEffect effect)
         {
-            CharacterEffects?.GetChildren().Cast<EffectSlot>().FirstOrDefault(x => x.HasEffect(effect))?.RemoveEffect();
+            var slots = GetEffectSlots().ToList();
+            var existing = slots.FirstOrDefault(x => x.HasEffect(effect));
+            if (existing == null) return;
+
+            if (existing.Stacks > 1) existing.Stacks--;
+            else existing.RemoveEffect();
         }
 
         public void ClearEffects()
         {
-            foreach (var child in CharacterEffects?.GetChildren() ?? [])
-                child?.QueueFree();
+            foreach (var child in CharacterEffects?.GetChildren().Cast<EffectSlot>() ?? [])
+                child?.RemoveEffect();
         }
 
         public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, Texture2D? icon = null)
@@ -63,6 +76,8 @@
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private IEnumerable<EffectSlot> GetEffectSlots() => CharacterEffects?.GetChildren().Cast<EffectSlot>() ?? [];
 
         private void FlipElements()
         {

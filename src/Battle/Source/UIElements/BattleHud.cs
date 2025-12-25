@@ -36,26 +36,10 @@
 
         public override void _ExitTree()
         {
-            _battleEventBus?.Unsubscribe<PlayerHealthChangesGameEvent>(OnPlayerHealthChanges);
-            _battleEventBus?.Unsubscribe<PlayerManaChangesGameEvent>(OnPlayerManaChanges);
-            _battleEventBus?.Unsubscribe<PlayerMaxManaChangesGameEvent>(OnPlayerMaxManaChanges);
-            _battleEventBus?.Unsubscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
-
-            _battleEventBus?.Unsubscribe<EntityHealthChangesGameEvent>(OnEntityHealthChanges);
-            _battleEventBus?.Unsubscribe<EntityMaxHealthChangesGameEvent>(OnEntityMaxHealthChanges);
-            _battleEventBus?.Unsubscribe<EntityManaChangesGameEvent>(OnEntityManaChanges);
-            _battleEventBus?.Unsubscribe<EntityMaxManaChangesGameEvent>(OnEntityMaxManaChanges);
-
-            _battleEventBus?.Unsubscribe<EffectAddedEvent>(OnEffectAdded);
-            _battleEventBus?.Unsubscribe<EffectRemovedEvent>(OnEffectRemoved);
-            _battleEventBus?.Unsubscribe<AllEffectRemoved>(OnAllEffectRemoved);
-
-            _battleEventBus?.Unsubscribe<BattleQueueDefinedGameEvent>(OnQueueDefined);
-            _battleEventBus?.Unsubscribe<TurnStartGameEvent>(OnTurnStart);
-            _battleEventBus?.Unsubscribe<TurnEndGameEvent>(OnTurnEnd);
             _battleEventBus = null;
             _characterBars.Clear();
             _queueSlots.Clear();
+            _playerBars?.ClearEffects();
             foreach (Node child in _queue?.GetChildren() ?? [])
                 child.QueueFree();
             foreach (var node in _entityBars?.GetChildren() ?? [])
@@ -77,7 +61,6 @@
 
             _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
-            _battleEventBus.Subscribe<AllEffectRemoved>(OnAllEffectRemoved);
 
             _battleEventBus.Subscribe<BattleQueueDefinedGameEvent>(OnQueueDefined);
             _battleEventBus.Subscribe<TurnStartGameEvent>(OnTurnStart);
@@ -155,13 +138,6 @@
         private void OnEntityMaxHealthChanges(EntityMaxHealthChangesGameEvent obj)
         {
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMaxHealth(obj.Value);
-        }
-
-        private void OnAllEffectRemoved(AllEffectRemoved obj)
-        {
-            var target = obj.Target;
-            if (target is Player) _playerBars?.ClearEffects();
-            else GetCharacterBar(target.InstanceId)?.ClearEffects();
         }
 
         private void OnEffectRemoved(EffectRemovedEvent obj)

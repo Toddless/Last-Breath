@@ -8,7 +8,7 @@
     {
         StatusEffects Status { get; set; }
         int Duration { get; set; }
-        int MaxStacks { get; set; }
+        int MaxMaxStacks { get; set; }
         string Source { get; }
 
         event Action<int>? DurationChanged;

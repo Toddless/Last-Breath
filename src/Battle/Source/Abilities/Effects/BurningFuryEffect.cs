@@ -5,11 +5,10 @@
     using Core.Interfaces.Abilities;
 
     public class BurningFuryEffect(
-        string id,
         int duration,
         float healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury)
-        : FuryEffect(id, duration, healthPercent, statusEffect)
+        : FuryEffect(id: "Effect_Burning_Fury", duration, healthPercent, statusEffect)
     {
         public float HealthAsDamageMultiplier { get; set; }
         public int BurningMaxStacks { get; set; }
@@ -29,7 +28,7 @@
                 Target = context.Target,
                 Caster = Owner,
                 Damage = HealthBurned,
-                Source = Source,
+                Source = Id,
                 IsCritical = false
             });
         }
@@ -40,7 +39,7 @@
             return HealthAsDamageMultiplier > fury.HealthAsDamageMultiplier;
         }
 
-        public override IEffect Clone() => new BurningFuryEffect(Id, Duration, HealthPercent, Status)
+        public override IEffect Clone() => new BurningFuryEffect( Duration, HealthPercent, Status)
         {
             HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };
