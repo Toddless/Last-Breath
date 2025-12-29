@@ -1,64 +1,62 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
-    using Source;
     using Module;
     using Services;
-    using TestData;
     using Core.Enums;
     using Decorators;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
     using Core.Interfaces.Battle;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
     using Core.Interfaces.Components.Module;
 
-    public class BerserkFury(
-        float cooldown,
-        float maxTargets,
+    public class IncreasingPressure(
         string[] tags,
         int availablePoints,
         int costValue,
+        int cooldown,
         List<IEffect> effects,
         List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, availablePoints, effects, casterEffects, upgrades, mastery)
+        Costs costType = Costs.Mana)
+        : Ability(id: "Ability_Increasing_Pressure", tags, availablePoints, effects, casterEffects, upgrades, mastery)
     {
         public override async Task Activate(List<IEntity> targets)
         {
             await base.Activate(targets);
-            await PerformMultipleAttacks(targets);
+            await PerformAttacks(targets);
         }
 
-        private async Task PerformMultipleAttacks(List<IEntity> targets)
+        private async Task PerformAttacks(List<IEntity> targets)
         {
             if (Owner == null) return;
-            var scheduler = new AttackContextScheduler();
-            while (true)
+            foreach (IEntity target in targets)
             {
-                if (Owner.CurrentHealth <= 1) break;
-                foreach (IEntity target in targets)
+                float increase = 1f;
+                // TODO: Can this ability have more then 5 attacks??
+                for (int i = 0; i < 5; i++)
                 {
-                    var context = new AttackContext(Owner, target, Owner.GetDamage(), new RndGodot(), scheduler);
-                    scheduler.Schedule(context);
-                    await scheduler.RunQueue();
-                    if (Owner.CurrentHealth <= 1) break;
+                    if (!target.IsAlive) return;
+                    float damage = Owner.GetDamage();
+                    damage += Owner.Parameters.SpellDamage;
+                    damage *= increase;
+                    float chance = StaticRandomNumberGenerator.Rnd.Randf();
+                    bool isCrit = chance <= Owner.Parameters.CriticalChance;
+                    if (isCrit)
+                        damage *= Owner.Parameters.CriticalDamage;
+                    await target.TakeDamage(Owner, damage, DamageType.Normal, DamageSource.Ability, isCrit);
+                    // TODO: this increase can have different values??
+                    increase += 0.2f;
                 }
-
-                // with lower hp we have lower chance for next cycle
-                float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.80f);
-                if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
-                    break;
             }
         }
 
         protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
             new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
             {
-                [AbilityParameter.Target] = new Module<AbilityParameter>(() => maxTargets, AbilityParameter.Target),
                 [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
                 [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
                 [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType)

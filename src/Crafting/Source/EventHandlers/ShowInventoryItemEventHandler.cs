@@ -8,7 +8,7 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
 
-    public class ShowInventoryItemEventHandler(IInventory inventory, IUIElementProvider uiElementProvider)
+    public class ShowInventoryItemEventHandler(IInventory inventory, IUiElementProvider uiElementProvider)
         : IEventHandler<ShowInventoryItemEvent>
     {
         public Task HandleAsync(ShowInventoryItemEvent evnt)

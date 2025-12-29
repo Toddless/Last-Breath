@@ -33,7 +33,7 @@
         public float Evade => this[EntityParameter.Evade];
         public float MaxBarrier => this[EntityParameter.Barrier];
         public float Suppress => this[EntityParameter.Suppress];
-        public float Mana => this[EntityParameter.Mana];
+        public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
 

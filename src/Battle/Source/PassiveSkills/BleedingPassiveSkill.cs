@@ -7,21 +7,23 @@
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
 
-    public class BurningPassiveSkill : Skill
+    public class BleedingPassiveSkill : Skill
     {
         private readonly DamageOverTurnEffect _damageOverTurnEffect;
 
-        public BurningPassiveSkill(float percentFromDamage, int burningDuration, int burningStacks) : base(id: "Passive_Skill_Burning")
+        public BleedingPassiveSkill(float percentFromDamage,
+            int bleedDuration,
+            int maxStack) : base(id: "Passive_Skill_Bleeding")
         {
             PercentFromDamage = percentFromDamage;
-            BurningDuration = burningDuration;
-            BurningStacks = burningStacks;
-            _damageOverTurnEffect = new DamageOverTurnEffect(BurningDuration, BurningStacks, PercentFromDamage, StatusEffects.Burning);
+            MaxStack = maxStack;
+            BleedDuration = bleedDuration;
+            _damageOverTurnEffect = new DamageOverTurnEffect(BleedDuration, MaxStack, PercentFromDamage, StatusEffects.Bleed);
         }
 
         public float PercentFromDamage { get; }
-        public int BurningDuration { get; }
-        public int BurningStacks { get; }
+        public int MaxStack { get; }
+        public int BleedDuration { get; }
 
         public override void Attach(IEntity owner)
         {
@@ -35,9 +37,9 @@
             var context = obj.Context;
             float damage = context.FinalDamage;
             var target = context.Target;
-            var burning = _damageOverTurnEffect.Clone();
+            var bleed = _damageOverTurnEffect.Clone();
             var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = Id };
-            burning.Apply(applyContext);
+            bleed.Apply(applyContext);
         }
 
         public override void Detach(IEntity owner)
@@ -46,12 +48,14 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new BurningPassiveSkill(PercentFromDamage, BurningDuration, BurningStacks);
+        public override ISkill Copy() => new BleedingPassiveSkill(PercentFromDamage, BleedDuration, MaxStack);
+
 
         public override bool IsStronger(ISkill skill)
         {
-            if (skill is not BurningPassiveSkill burning) return false;
-            return burning.PercentFromDamage > PercentFromDamage;
+            if (skill is not BleedingPassiveSkill bleed) return false;
+
+            return BleedDuration > bleed.BleedDuration && MaxStack > bleed.MaxStack;
         }
     }
 }

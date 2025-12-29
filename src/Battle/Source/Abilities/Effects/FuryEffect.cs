@@ -6,10 +6,10 @@
     using Core.Interfaces.Abilities;
 
     public class FuryEffect(
-        string id,
         int duration,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury)
+        StatusEffects statusEffect = StatusEffects.Fury,
+        string id = "Effect")
         : Effect(id, duration, maxStacks: 1, statusEffect)
     {
         protected float HealthBurned;
@@ -26,6 +26,6 @@
             if ((currentHealth - toBurn) <= 1) Owner.Effects.RemoveEffect(this);
         }
 
-        public override IEffect Clone() => new FuryEffect(Id, Duration, HealthPercent, Status);
+        public override IEffect Clone() => new FuryEffect(Duration, HealthPercent, Status);
     }
 }

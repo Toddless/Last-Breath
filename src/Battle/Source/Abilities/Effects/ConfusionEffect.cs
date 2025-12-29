@@ -3,8 +3,8 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
-    public class ConfusionEffect(string id, int duration)
-        : Effect(id, duration, maxStacks: 1, statusEffect: StatusEffects.Confused)
+    public class ConfusionEffect(int duration)
+        : Effect(id: "Effect", duration, maxStacks: 1, statusEffect: StatusEffects.Confused)
     {
         public override void Apply(EffectApplyingContext context)
         {
@@ -20,6 +20,6 @@
             Owner?.TargetChooser = null;
         }
 
-        public override IEffect Clone() => new ConfusionEffect(Id, Duration);
+        public override IEffect Clone() => new ConfusionEffect(Duration);
     }
 }

@@ -17,7 +17,7 @@
         float Armor { get; }
         float Evade { get; }
         float MaxBarrier { get; }
-        float Mana { get; }
+        float MaxMana { get; }
         float ManaRecovery { get; }
         float MoveSpeed { get; }
         float Suppress { get; }

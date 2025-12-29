@@ -9,7 +9,7 @@
         int maxStacks,
         float percentFromDamage = 0.7f,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Damage_Over_Turn_Effect", duration, maxStacks, statusEffect)
+        : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect)
     {
         public float PercentFromBase { get; } = percentFromDamage;
         public float DamagePerTick { get; set; }

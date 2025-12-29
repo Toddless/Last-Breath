@@ -1,64 +1,56 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
-    using Source;
     using Module;
-    using Services;
-    using TestData;
     using Core.Enums;
     using Decorators;
+    using Core.Modifiers;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Events.GameEvents;
 
-    public class BerserkFury(
-        float cooldown,
-        float maxTargets,
+    public class ManaDevour(
         string[] tags,
         int availablePoints,
         int costValue,
+        float cooldown,
+        float percentManaToConsume,
+        float increaseBonusPerManaConsumed,
         List<IEffect> effects,
         List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, availablePoints, effects, casterEffects, upgrades, mastery)
+        Costs costType = Costs.Mana,
+        AbilityType type = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, availablePoints, effects, casterEffects, upgrades, mastery, type)
     {
+        public float PercentToConsume { get; } = percentManaToConsume;
+        public float IncreaseBonusPerManaConsumed { get; } = increaseBonusPerManaConsumed;
+
         public override async Task Activate(List<IEntity> targets)
         {
+            if (Owner == null) return;
+
+            float manaConsumed = Owner.CurrentMana * PercentToConsume;
+            float increase = manaConsumed / 100 / IncreaseBonusPerManaConsumed;
+            var modifier = new ModifierInstance(EntityParameter.SpellDamage, ModifierType.Increase, increase, Id);
+            Owner.Modifiers.AddPermanentModifier(modifier);
+            Owner.CombatEvents.Subscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
             await base.Activate(targets);
-            await PerformMultipleAttacks(targets);
         }
 
-        private async Task PerformMultipleAttacks(List<IEntity> targets)
+        private void OnAbilityActivated(AbilityActivatedGameEvent obj)
         {
-            if (Owner == null) return;
-            var scheduler = new AttackContextScheduler();
-            while (true)
-            {
-                if (Owner.CurrentHealth <= 1) break;
-                foreach (IEntity target in targets)
-                {
-                    var context = new AttackContext(Owner, target, Owner.GetDamage(), new RndGodot(), scheduler);
-                    scheduler.Schedule(context);
-                    await scheduler.RunQueue();
-                    if (Owner.CurrentHealth <= 1) break;
-                }
-
-                // with lower hp we have lower chance for next cycle
-                float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.80f);
-                if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
-                    break;
-            }
+            Owner?.CombatEvents.Unsubscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            Owner?.Modifiers.RemovePermanentModifierBySource(Id);
         }
 
         protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
             new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
             {
-                [AbilityParameter.Target] = new Module<AbilityParameter>(() => maxTargets, AbilityParameter.Target),
                 [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
                 [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
                 [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType)

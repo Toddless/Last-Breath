@@ -23,6 +23,7 @@
         public string DisplayName { get; } = string.Empty;
         public IEntityParametersComponent Parameters { get; }
         public IPassiveSkillsComponent PassiveSkills { get; }
+        public IAnimationsComponent Animations { get; }
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }
@@ -67,7 +68,7 @@
             get => Mathf.Max(0, field);
             set
             {
-                float clamped = Mathf.Clamp(value, 0, Parameters.Mana);
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxMana);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
                 CurrentManaChanged?.Invoke(field);

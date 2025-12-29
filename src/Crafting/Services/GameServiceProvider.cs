@@ -49,7 +49,7 @@
             services.AddSingleton<IMediator, Mediator>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemCreator, ItemCreator>();
-            services.AddSingleton<IUIElementProvider, UIElementProvider>();
+            services.AddSingleton<IUiElementProvider, UIElementProvider>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>((_) =>

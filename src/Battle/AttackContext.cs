@@ -1,5 +1,6 @@
 ﻿namespace Battle
 {
+    using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Components;
@@ -15,7 +16,7 @@
         public float FinalDamage { get; set; } = baseDamage;
         public IAttackContextScheduler AttackContextScheduler { get; } = attackContextScheduler;
         public bool IsCritical { get; set; }
-        public bool IsAttackSucceed { get; set; }
+        public AttackResults Result { get; set; }
 
         public void Schedule() => AttackContextScheduler.Schedule(this);
     }

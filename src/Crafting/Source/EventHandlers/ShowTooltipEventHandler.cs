@@ -5,7 +5,7 @@
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
 
-    public class ShowTooltipEventHandler(IUIElementProvider uIElementProvider)
+    public class ShowTooltipEventHandler(IUiElementProvider uIElementProvider)
         : IEventHandler<ShowInventorySlotButtonsTooltipEvent>
     {
         public Task HandleAsync(ShowInventorySlotButtonsTooltipEvent evnt)

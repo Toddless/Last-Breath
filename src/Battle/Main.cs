@@ -12,14 +12,14 @@
     public partial class Main : Node2D
     {
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
-        private IUIElementProvider? _uiElementProvider;
+        private IUiElementProvider? _uiElementProvider;
         private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
         [Export] private UiLayerManager? _layerManager;
 
         public override void _Ready()
         {
-            _uiElementProvider = _provider.GetService<IUIElementProvider>();
+            _uiElementProvider = _provider.GetService<IUiElementProvider>();
             if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleStartGameEvent>(OnBattleInitialized);
@@ -38,6 +38,7 @@
             }
             catch (Exception es)
             {
+                GD.Print($"Exception: {es.Message}, Stack Trace: {es.StackTrace}");
                 Tracker.TrackException("Failed to instantiate BattleArena", es, this);
             }
         }

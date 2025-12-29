@@ -43,7 +43,7 @@
             _effects.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
             _dotTicks.RemoveAll(dot => dot.Source == effect.Id);
-            if(effects?.Count == 0) _effects.Remove(source);
+            if (effects?.Count == 0) _effects.Remove(source);
             EffectRemoved?.Invoke(effect);
         }
 
@@ -76,7 +76,6 @@
                 foreach (var effect in GetEffects())
                     effect.TurnEnd();
                 await ApplyDotDamage();
-
             }
             catch (Exception exception)
             {
@@ -153,17 +152,18 @@
 
         private void HandleSingleStack(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
         {
-            if (sameEffects.Count == 0)
-                return;
-
-            IEffect existingEffect = sameEffects[0];
-
-            if (newEffect.IsStronger(existingEffect))
+            if (sameEffects.Count == 0) AddNewEffectAndNotify(effects, newEffect);
+            else
             {
-                existingEffect.Remove();
-                AddNewEffectAndNotify(effects, newEffect);
+                IEffect existingEffect = sameEffects[0];
+
+                if (newEffect.IsStronger(existingEffect))
+                {
+                    existingEffect.Remove();
+                    AddNewEffectAndNotify(effects, newEffect);
+                }
+                else existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
             }
-            else existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
         }
 
         private void AddNewEffectAndNotify(List<IEffect> effects, IEffect newEffect)

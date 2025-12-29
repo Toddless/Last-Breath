@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Inventory;
 
-    public class ItemCreatedEventHandler(IUIElementProvider provider, IInventory inventory)
+    public class ItemCreatedEventHandler(IUiElementProvider provider, IInventory inventory)
         : IEventHandler<ItemCreatedEvent>
     {
         public Task HandleAsync(ItemCreatedEvent evnt)

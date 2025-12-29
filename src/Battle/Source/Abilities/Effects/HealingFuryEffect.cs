@@ -5,18 +5,18 @@
     using Core.Interfaces.Battle;
 
     public class HealingFuryEffect(
-        string id,
         int duration,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury)
-        : FuryEffect(id, duration, healthPercent, statusEffect)
+        StatusEffects statusEffect = StatusEffects.Fury,
+        string id = "Effect_Healing_Fury")
+        : FuryEffect(duration, healthPercent, statusEffect, id)
     {
         private float _damageDealt;
         public float HealAmount { get; set; }
 
-        public override void AfterAttack( IAttackContext context)
+        public override void AfterAttack(IAttackContext context)
         {
-            if (!context.IsAttackSucceed) return;
+            if (context.Result is not AttackResults.Succeed) return;
 
             _damageDealt += context.FinalDamage;
         }
@@ -35,6 +35,6 @@
             return HealAmount > healing.HealAmount;
         }
 
-        public override IEffect Clone() => new HealingFuryEffect(Id, Duration, HealthPercent, Status) { HealAmount = HealAmount };
+        public override IEffect Clone() => new HealingFuryEffect(Duration, HealthPercent, Status, Id) { HealAmount = HealAmount };
     }
 }

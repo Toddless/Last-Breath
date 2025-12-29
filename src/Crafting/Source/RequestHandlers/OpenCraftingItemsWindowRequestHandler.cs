@@ -9,9 +9,9 @@
 
     public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {
-        private readonly IUIElementProvider _uIElementProvider;
+        private readonly IUiElementProvider _uIElementProvider;
 
-        public OpenCraftingItemsWindowRequestHandler(IUIElementProvider uIElementProvider)
+        public OpenCraftingItemsWindowRequestHandler(IUiElementProvider uIElementProvider)
         {
             _uIElementProvider = uIElementProvider;
         }

@@ -17,8 +17,8 @@
             new DamageOverTurnEffect(3, 3, default, StatusEffects.Bleed),
             new DamageOverTurnEffect(3, 3, default, StatusEffects.Poison),
             new DamageOverTurnEffect(3, 3, default, StatusEffects.Burning),
-            new ExecutionEffect("Effect_Execution", 3, 3, 0.15f),
-            new LuckyCritChanceEffect("Effect_Lucky_Crit_Chance", 3)
+            new ExecutionEffect(3, 3, 0.15f),
+            new LuckyCritChanceEffect(3)
         ];
 
         public float Chance { get; } = chance;

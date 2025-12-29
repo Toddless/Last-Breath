@@ -20,7 +20,6 @@
         private readonly RandomNumberGenerator _rnd = new();
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
-        private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
         private List<IEntity> _entities = [];
         private int _entitiesCount;
@@ -48,7 +47,6 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
         public void SetupEventBus(IBattleEventBus battleEventBus)
@@ -104,34 +102,40 @@
 
         private async Task ProcessTurnsAsync()
         {
-            while (!_fightEnds)
+            try
             {
-                if (_entitiesCount == 0) break;
-                _currentFighter = _queueScheduler.GetCurrentFighter();
-                if (_currentFighter is not { IsAlive: true }) continue;
-
-                _currentFighter.OnTurnStart();
-                if (_currentFighter is Player)
+                while (!_fightEnds)
                 {
-                    _playerTargetTcs = new TaskCompletionSource<IEntity>();
+                    if (_entitiesCount == 0) break;
+                    _currentFighter = _queueScheduler.GetCurrentFighter();
+                    if (_currentFighter is not { IsAlive: true }) continue;
 
-                    var target = await _playerTargetTcs.Task;
+                    _currentFighter.OnTurnStart();
+                    if (_currentFighter is Player)
+                    {
+                        _playerTargetTcs = new TaskCompletionSource<IEntity>();
 
-                    if (target is not { IsAlive: true }) continue;
-                    var context = CreateAttackContext(_currentFighter, target);
-                    _attackContextScheduler.Schedule(context);
+                        var target = await _playerTargetTcs.Task;
+
+                        if (target is not { IsAlive: true }) continue;
+                        var context = CreateAttackContext(_currentFighter, target);
+                        _attackContextScheduler.Schedule(context);
+                    }
+                    else
+                    {
+                        var target = GetEntityTarget();
+                        if (target == null) continue;
+                        var context = CreateAttackContext(_currentFighter, target);
+                        _attackContextScheduler.Schedule(context);
+                    }
+
+                    await _attackContextScheduler.RunQueue();
+
+                    _currentFighter.OnTurnEnd();
                 }
-                else
-                {
-                    var target = GetEntityTarget();
-                    if (target == null) continue;
-                    var context = CreateAttackContext(_currentFighter, target);
-                    _attackContextScheduler.Schedule(context);
-                }
-
-                await _attackContextScheduler.RunQueue();
-
-                _currentFighter.OnTurnEnd();
+            }
+            catch (TaskCanceledException)
+            {
             }
         }
 
@@ -166,6 +170,7 @@
             _entitiesCount--;
             _attackContextScheduler.CancelQueue();
             _entities.Remove(obj.Entity);
+            if (_entitiesCount == 0 && _currentFighter is Player && _playerTargetTcs is { Task.IsCompleted: false }) _playerTargetTcs?.SetCanceled();
         }
 
         private void OnPlayerDead(PlayerDiedGameEvent evnt)

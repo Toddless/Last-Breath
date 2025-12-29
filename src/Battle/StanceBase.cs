@@ -7,10 +7,10 @@
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
 
-    public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType) : IStance
+    public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType, List<IAbility> abilities) : IStance
     {
-        private List<ISkill> _obtainedPassiveSkills = [];
-        private List<IAbility> _obtainedAbilities = [];
+        protected List<ISkill> _obtainedPassiveSkills = [];
+        protected List<IAbility> _obtainedAbilities = abilities;
 
         protected IStanceActivationEffect ActivationEffect { get; } = effect;
         protected IEntity Owner { get; } = owner;
@@ -23,14 +23,15 @@
 
         public virtual void OnActivate()
         {
-            // I have to reset the modules so that I have the latest updates.
             _obtainedPassiveSkills.ForEach(skill => skill.Attach(Owner));
+            _obtainedAbilities.ForEach(ability => ability.SetOwner(Owner));
             ActivationEffect.OnActivate(Owner);
         }
 
         public virtual void OnDeactivate()
         {
             _obtainedPassiveSkills.ForEach(skill => skill.Detach(Owner));
+            _obtainedAbilities.ForEach(ability => ability.RemoveOwner());
             ActivationEffect.OnDeactivate(Owner);
         }
     }

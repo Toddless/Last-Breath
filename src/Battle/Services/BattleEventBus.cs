@@ -14,7 +14,7 @@
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
 
-            foreach (var handler in handlers.Cast<Action<T>>())
+            foreach (var handler in handlers.Cast<Action<T>>().ToList())
                 handler(evnt);
         }
 

@@ -15,12 +15,14 @@
         public object Source { get; } = source;
         public float Weight { get; }
 
+        public IModifierInstance Copy() => new ModifierInstance(EntityParameter, ModifierType, Value, Source, Priority);
+
         public override bool Equals(object? obj)
         {
             if (obj is not IModifier other) return false;
             return EntityParameter == other.EntityParameter && ModifierType == other.ModifierType;
         }
 
-        public override int GetHashCode() => System.HashCode.Combine(EntityParameter, ModifierType);
+        public override int GetHashCode() => HashCode.Combine(EntityParameter, ModifierType);
     }
 }

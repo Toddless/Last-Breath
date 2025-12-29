@@ -33,7 +33,7 @@
         private Recipes? _recipes;
         private IItemDataProvider? _dataProvider;
         private IMediator? _mediator;
-        private IUIElementProvider? _uiElementProvider;
+        private IUiElementProvider? _uiElementProvider;
         private IUIResourcesProvider? _uiResourcesProvider;
 
         private CraftingMode _craftingMode;
@@ -84,7 +84,7 @@
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
             _mediator = provider.GetService<IMediator>();
-            _uiElementProvider = provider.GetService<IUIElementProvider>();
+            _uiElementProvider = provider.GetService<IUiElementProvider>();
             _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
             _mediator.UpdateUi += UpdateRequiredResourcesAsync;
         }

@@ -5,6 +5,7 @@
     using System;
     using Components.Module;
     using Components.Decorator;
+    using System.Threading.Tasks;
     using System.Collections.Generic;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
@@ -15,6 +16,7 @@
         int CooldownLeft { get; }
         int CostValue { get; }
         Costs CostType { get; }
+        AbilityType Type { get; }
         List<IEffect> Effects { get; set; }
         List<IEffect> CasterEffects { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }
@@ -23,7 +25,7 @@
         event Action<IAbility, bool>? AbilityResourceChanges;
         event Action<IAbility, int>? CooldownLeftChanges;
 
-        void Activate(List<IEntity> targets);
+        Task Activate(List<IEntity> targets);
 
         void AddParameterUpgrade<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
             where T : struct, Enum;

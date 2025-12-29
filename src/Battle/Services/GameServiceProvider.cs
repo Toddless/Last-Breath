@@ -34,7 +34,7 @@ namespace Battle.Services
                 return instance;
             });
             services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IUIElementProvider, UiElementProvider>();
+            services.AddSingleton<IUiElementProvider, UiElementProvider>();
             services.AddSingleton<IEntityProvider, EntityProvider>();
             return services.BuildServiceProvider();
         }

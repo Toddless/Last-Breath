@@ -49,6 +49,7 @@
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
             var context = evnt.Context;
+            if (context.Result is not AttackResults.Succeed) return;
             float actualDamage = context.FinalDamage * PercentFromDamageToDealLater;
             float toDealLater = context.FinalDamage - actualDamage;
             context.FinalDamage = actualDamage;

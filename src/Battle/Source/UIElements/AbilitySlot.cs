@@ -3,6 +3,7 @@
     using Godot;
     using System;
     using Stateless;
+    using Core.Enums;
     using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using Core.Interfaces.Entity;
@@ -28,6 +29,7 @@
             Ready,
             SelectingTargets,
             Activate,
+            NotAvailable,
         }
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
@@ -50,24 +52,24 @@
         public override void _GuiInput(InputEvent @event)
         {
             // TODO: Shortcuts
-            if (!_isMouseInside || _ability == null || !CanActivate()) return;
-            // TODO: Something usefully on RMB?
+            if (!_isMouseInside || _ability == null || _stateMachine.State is State.NotAvailable) return;
+            //  Something usefully on RMB?
             if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
-            {
-                switch (_stateMachine.State)
-                {
-                    case State.Ready:
-                        _stateMachine.Fire(Trigger.SelectingTargets);
-                        break;
-                    case State.SelectingTargets:
-                        _stateMachine.Fire(Trigger.Activate);
-                        break;
-                    case State.NotAvailable:
-                    case State.Activate:
-                        return;
-                }
+                TryActivateAbility();
+        }
 
-                AcceptEvent();
+        private void TryActivateAbility()
+        {
+            switch (_stateMachine.State)
+            {
+                case State.Ready:
+                    _stateMachine.Fire(_ability!.Type is AbilityType.SelfCast ? Trigger.Activate : Trigger.SelectingTargets);
+                    AcceptEvent();
+                    return;
+                case State.SelectingTargets:
+                    _stateMachine.Fire(Trigger.Activate);
+                    AcceptEvent();
+                    break;
             }
         }
 
@@ -94,8 +96,8 @@
             _ability = ability;
             _ability.CooldownLeftChanges += OnCooldownChanges;
             _ability.AbilityResourceChanges += OnAbilityResourceChanges;
-            if (_ability.IsEnoughResource()) _isEnoughResources = true;
-            if (_ability.CooldownLeft > 0) _isOnCooldown = true;
+            _icon?.Texture = _ability.Icon;
+            CheckAbilityAvailable();
         }
 
         private void CancelTargetSelecting()
@@ -110,12 +112,9 @@
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Ready)
-                .OnEntry(() =>
-                {
-                    // TODO: Change frame to show ability is ready
-                })
-                .PermitReentry(Trigger.Ready)
-                .PermitIf(Trigger.SelectingTargets, State.SelectingTargets, CanActivate);
+                .Permit(Trigger.NotAvailable, State.NotAvailable)
+                .Permit(Trigger.Activate, State.Activate)
+                .Permit(Trigger.SelectingTargets, State.SelectingTargets);
 
             _stateMachine.Configure(State.SelectingTargets)
                 .OnEntry(() =>
@@ -133,19 +132,34 @@
                     if (_ability == null) return;
                     var targets = new List<IEntity>();
                     _battleEventBus?.Publish<AbilityActivatedGameEvent>(new(_ability, targets));
-                    _ability.Activate(targets);
                     _selectionId = string.Empty;
+                    _ability.Activate(targets);
                 })
-                .Permit(Trigger.Ready, State.Ready);
+                .Permit(Trigger.NotAvailable, State.NotAvailable);
 
             _stateMachine.Configure(State.NotAvailable)
-                .OnEntry(() => { })
+                .OnEntry(() => { _frame?.SetModulate(new Color(1, 1, 1, 0.7f)); })
+                .OnExit(() => { _frame?.SetModulate(new Color(1, 1, 1, 0)); })
                 .Permit(Trigger.Ready, State.Ready);
         }
 
-        private bool CanActivate()
+        private bool CheckAbilityAvailable()
         {
-            return _isEnoughResources && !_isOnCooldown;
+            if (_ability == null) return false;
+            bool isAvailable = _ability.IsEnoughResource() && _ability.CooldownLeft == 0;
+            switch (isAvailable)
+            {
+                case true when _stateMachine.State is not State.Ready:
+                    if (_stateMachine.CanFire(Trigger.Ready))
+                        _stateMachine.Fire(Trigger.Ready);
+                    break;
+                case false when _stateMachine.State is not State.NotAvailable:
+                    if (_stateMachine.CanFire(Trigger.NotAvailable))
+                        _stateMachine.Fire(Trigger.NotAvailable);
+                    break;
+            }
+
+            return isAvailable;
         }
 
         private void OnMouseExit() => _isMouseInside = false;
@@ -163,14 +177,14 @@
         private void OnCooldownChanges(IAbility abi, int cooldown)
         {
             if (abi.InstanceId != _ability?.InstanceId) return;
-            GD.Print($"Ability cooldown left:{cooldown}");
-            if (cooldown == 0) _isOnCooldown = false;
+            CallDeferred(nameof(CheckAbilityAvailable));
         }
 
         private void OnAbilityResourceChanges(IAbility obj, bool isEnough)
         {
             if (obj.InstanceId != _ability?.InstanceId) return;
             _isEnoughResources = isEnough;
+            CallDeferred(nameof(CheckAbilityAvailable));
         }
     }
 }

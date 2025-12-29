@@ -4,7 +4,7 @@
     using Core.Interfaces.Data;
     using Core.Interfaces.Events;
 
-    public class ClearUiElementsEventHandler(IUIElementProvider provider) : IEventHandler<ClearUiElementsEvent>
+    public class ClearUiElementsEventHandler(IUiElementProvider provider) : IEventHandler<ClearUiElementsEvent>
     {
         public Task HandleAsync(ClearUiElementsEvent evnt)
         {

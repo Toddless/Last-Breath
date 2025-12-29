@@ -6,7 +6,7 @@
     using Core.Interfaces.Events;
     using System.Collections.Generic;
 
-    public class SendNotificationMessageEventHandler(IUIElementProvider uIElementProvider)
+    public class SendNotificationMessageEventHandler(IUiElementProvider uIElementProvider)
         : IEventHandler<SendNotificationMessageEvent>
     {
         private readonly Queue<string> _msgQueue = [];

@@ -3,11 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Interfaces.Data;
     using Core.Interfaces.UI;
     using Godot;
 
-    internal class UiElementProvider : IUIElementProvider
+    internal class UiElementProvider : IUiElementProvider
     {
         private const float MouseOffset = 15;
         private const float WindowMargin = 20f;
@@ -57,18 +58,20 @@
             return instance;
         }
 
-        public T CreateAndShowMainElement<T>()
+        public async Task<T> CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
             {
                 _uiLayer?.ShowMainElement(exist);
+                await exist.ToSignal(exist, "tree_entered");
                 return (T)exist;
             }
 
             var instance = CreateRequireServices<T>();
             _singleInstances.TryAdd(typeof(T), instance);
             _uiLayer?.ShowMainElement(instance);
+            await instance.ToSignal(instance, "ready");
             return instance;
         }
 

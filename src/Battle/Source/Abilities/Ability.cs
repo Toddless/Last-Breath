@@ -7,6 +7,7 @@
     using System.Linq;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
@@ -21,11 +22,12 @@
         List<IEffect> effects,
         List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery mastery)
+        IStanceMastery? mastery = null,
+        AbilityType type = AbilityType.Target)
         : IAbility
     {
         protected IEntity? Owner;
-        protected readonly IStanceMastery Mastery = mastery;
+        protected readonly IStanceMastery? Mastery = mastery;
 
         protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> ModuleManager
         {
@@ -49,12 +51,12 @@
 
         public Texture2D? Icon
         {
-            get;
-            // {
-            //     // if (field != null) return field;
-            //     // field = ResourceLoader.Load<Texture2D>($"Abilities/{Id}.png");
-            //     return field;
-            // }
+            get
+            {
+                if (field != null) return field;
+                field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/{Id}.png");
+                return field;
+            }
         }
 
         public int CooldownLeft { get; private set; }
@@ -62,6 +64,7 @@
         public int CostValue => (int)this[AbilityParameter.CostValue];
 
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
+        public AbilityType Type { get; } = type;
 
         public List<IConditionalModifier> ConditionalModifiers { get; } = [];
         public List<IEffect> Effects { get; set; } = effects;
@@ -77,21 +80,21 @@
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
-        public virtual void Activate(List<IEntity> targets)
+        public virtual async Task Activate(List<IEntity> targets)
         {
             if (Owner == null) return;
 
-            var context = new EffectApplyingContext { Caster = Owner, Source = InstanceId };
+            var context = new EffectApplyingContext { Caster = Owner, Source = Id };
             foreach (IEntity target in targets)
             {
                 context.Target = target;
                 ApplyTargetEffects(context);
             }
 
-            //TODO:  ability activated event When??
             ApplyCasterEffects(context);
             StartCooldown();
             ConsumeResource();
+            await Owner.Animations.PlayAnimationAsync(Id);
         }
 
         public void AddParameterUpgrade<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
@@ -180,22 +183,16 @@
 
         protected void ApplyTargetEffects(EffectApplyingContext context)
         {
-            foreach (var effect in Effects)
-            {
-                var clone = effect.Clone();
+            foreach (var clone in Effects.Select(effect => effect.Clone()))
                 clone.Apply(context);
-            }
         }
 
         protected void ApplyCasterEffects(EffectApplyingContext context)
         {
             if (Owner == null) return;
             context.Target = Owner;
-            foreach (var effect in CasterEffects)
-            {
-                var clone = effect.Clone();
+            foreach (var clone in CasterEffects.Select(effect => effect.Clone()))
                 clone.Apply(context);
-            }
         }
 
         protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
@@ -227,19 +224,15 @@
             return ((baseValue + additiveBonus) * increasedBonus) * multiplyBonus;
         }
 
-        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
         private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
+        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
+        private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
 
-        private void OnTurnEnd(TurnEndGameEvent obj)
+        protected virtual void OnTurnEnd(TurnEndGameEvent obj)
         {
             if (CooldownLeft == 0) return;
             CooldownLeft--;
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
-        }
-
-        private void OnResourceChanges(float obj)
-        {
-            AbilityResourceChanges?.Invoke(this, IsEnoughResource());
         }
     }
 }

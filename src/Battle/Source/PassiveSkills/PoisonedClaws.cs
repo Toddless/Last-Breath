@@ -33,6 +33,7 @@
         private void OnAfterAttack(AfterAttackEvent obj)
         {
             if (Owner == null) return;
+            if (obj.Context.Result is not AttackResults.Succeed) return;
             var target = obj.Context.Target;
             float damage = obj.Context.FinalDamage;
             var poison = _damageOverTurnEffect.Clone();

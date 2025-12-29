@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.UI;
@@ -11,7 +12,7 @@
     using Godot;
     using Utilities;
 
-    internal class UIElementProvider : IUIElementProvider
+    internal class UIElementProvider : IUiElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
@@ -49,7 +50,7 @@
             return instance;
         }
 
-        public T CreateAndShowMainElement<T>()
+        public async Task<T> CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
@@ -57,6 +58,7 @@
             var instance = CreateRequireServices<T>();
             _singleInstances.TryAdd(typeof(T), instance);
             _uiLayer?.ShowMainElement(instance);
+            await instance.ToSignal(instance, "ready");
             return instance;
         }
 

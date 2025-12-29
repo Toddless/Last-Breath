@@ -22,13 +22,12 @@
 
         public Texture2D? Icon
         {
-            get;
-            // {
-            //     // TODO: I think I should change it later
-            //    if (field != null) return field;
-            //     field = ResourceLoader.Load<Texture2D>($"Abilities/Effects/{Id}.png");
-            //     return field;
-            // }
+            get
+            {
+                if (field != null) return field;
+                field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/Effects/{Id}.png");
+                return field;
+            }
         }
 
         public StatusEffects Status { get; set; } = statusEffect;

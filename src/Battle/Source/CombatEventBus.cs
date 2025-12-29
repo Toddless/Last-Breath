@@ -15,7 +15,7 @@
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
 
-            foreach (var handler in handlers.Cast<Action<T>>())
+            foreach (var handler in handlers.Cast<Action<T>>().ToList())
                 handler(evnt);
         }
 
@@ -43,6 +43,12 @@
             handlers.Remove(handler);
             if (handlers.Count == 0)
                 _handlers.Remove(typeof(T));
+        }
+
+        public void Dispose()
+        {
+            _handlers.Clear();
+            GC.SuppressFinalize(this);
         }
     }
 }

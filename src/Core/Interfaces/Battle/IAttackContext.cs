@@ -2,6 +2,7 @@
 {
     using Entity;
     using Components;
+    using Enums;
 
     public interface IAttackContext
     {
@@ -13,7 +14,7 @@
         float AdditionalDamage { get; set; }
         float FinalDamage { get; set; }
         bool IsCritical { get; set; }
-        bool IsAttackSucceed { get; set; }
+        AttackResults Result { get; set; }
 
         void Schedule();
     }

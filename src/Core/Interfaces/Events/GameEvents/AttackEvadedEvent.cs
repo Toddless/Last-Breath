@@ -2,7 +2,5 @@
 {
     using Battle;
 
-    public record AttackEvadedEvent(IAttackContext Context) : ICombatEvent
-    {
-    }
+    public record AttackEvadedEvent(IAttackContext Context) : ICombatEvent, IBattleEvent;
 }

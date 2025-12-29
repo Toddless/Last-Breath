@@ -4,7 +4,7 @@
     using Core.Interfaces.Abilities;
 
     public class CurseEffect(int duration, int maxStacks, StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Curse_Effect", duration, maxStacks, statusEffect)
+        : Effect(id: "Effect_Curse", duration, maxStacks, statusEffect)
     {
         public override void Apply(EffectApplyingContext context)
         {

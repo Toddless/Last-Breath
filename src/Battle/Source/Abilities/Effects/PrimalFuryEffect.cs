@@ -5,11 +5,11 @@
     using Core.Interfaces.Battle;
 
     public class PrimalFuryEffect(
-        string id,
         int duration,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury)
-        : FuryEffect(id, duration, healthPercent, statusEffect)
+        StatusEffects statusEffect = StatusEffects.Fury,
+        string id = "Effect_Primal_Fury")
+        : FuryEffect(duration, healthPercent, statusEffect, id)
     {
         public float DamageMultiplier { get; set; }
 
@@ -19,6 +19,6 @@
             base.BeforeAttack(context);
         }
 
-        public override IEffect Clone() => new PrimalFuryEffect(Id, Duration, HealthPercent, Status) { DamageMultiplier = DamageMultiplier };
+        public override IEffect Clone() => new PrimalFuryEffect(Duration, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };
     }
 }

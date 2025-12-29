@@ -4,11 +4,10 @@
     using Core.Interfaces.Abilities;
 
     public class EvadeFirstDeath(
-        string id,
         int duration,
         float percentToRecover,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id, duration, maxStacks: 1, statusEffect)
+        : Effect(id:"Effect_Evade_First_Death", duration, maxStacks: 1, statusEffect)
     {
         public float PercentToRecover { get; } = percentToRecover;
 
@@ -35,6 +34,6 @@
             Owner = null;
         }
 
-        public override IEffect Clone() => new EvadeFirstDeath(Id, Duration, PercentToRecover);
+        public override IEffect Clone() => new EvadeFirstDeath(Duration, PercentToRecover);
     }
 }

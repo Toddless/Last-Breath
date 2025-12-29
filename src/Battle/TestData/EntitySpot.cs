@@ -40,17 +40,14 @@
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.CanBeSelected)
-                .OnEntry(() => { })
                 .PermitReentry(Trigger.CanBeSelected)
                 .Permit(Trigger.CannotBeSelected, State.CannotBeSelected)
                 .Permit(Trigger.SelectForAbility, State.SelectedForAbility);
 
             _stateMachine.Configure(State.SelectedForAbility)
-                .OnEntry(() => { })
                 .Permit(Trigger.CanBeSelected, State.CanBeSelected);
 
             _stateMachine.Configure(State.CannotBeSelected)
-                .OnEntry(() => { })
                 .Permit(Trigger.CanBeSelected, State.CanBeSelected);
         }
 
@@ -60,7 +57,7 @@
             _entity.Dead -= OnEntityDead;
             _entity.DamageTaken -= OnDamageTaken;
             var node = _entity as Node;
-            CallDeferred(Node.MethodName.RemoveChild, node);
+            RemoveChild(node);
         }
 
         public void SetEntity(IEntity entity)

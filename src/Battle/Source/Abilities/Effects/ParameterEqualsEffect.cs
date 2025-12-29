@@ -19,7 +19,7 @@
         public override void Apply(EffectApplyingContext context)
         {
             base.Apply(context);
-            var decorator = new ParameterValueEqualsDecorator(Value, Parameter, $"Equals_{Value}");
+            var decorator = new ParameterValueEqualsDecorator(Value, Parameter, $"Effect_Parameter_{Parameter}_Equals_{Value}");
             _id = decorator.Id;
             context.Target.Parameters.AddModuleDecorator(decorator);
         }

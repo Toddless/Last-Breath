@@ -13,5 +13,7 @@
         /// Value
         /// </summary>
         object Source { get; }
+
+        IModifierInstance Copy();
     }
 }

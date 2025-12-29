@@ -9,7 +9,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Inventory;
 
-    public class OpenCraftingWindowEventHandler(IUIElementProvider provider, IInventory inventory)
+    public class OpenCraftingWindowEventHandler(IUiElementProvider provider, IInventory inventory)
         : IEventHandler<OpenCraftingWindowEvent>
     {
         public Task HandleAsync(OpenCraftingWindowEvent evnt)

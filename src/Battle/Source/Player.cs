@@ -5,6 +5,7 @@
     using Services;
     using Attribute;
     using Stateless;
+    using Utilities;
     using Core.Enums;
     using Components;
     using Core.Constants;
@@ -45,12 +46,14 @@
         }
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+
         private readonly Dictionary<Stance, IStance> _stances = [];
+
         private readonly RandomNumberGenerator _rnd = new();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private float _baseSpeed = 500;
-        [Export] private AnimatedSprite2D? _animatedSprite;
+        [Export] private AnimationsComponent? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Godot.Collections.Dictionary<State, AnimatedSprite2D>? _animatedSprites = [];
 
@@ -66,11 +69,12 @@
         public string[] Tags { get; } = [];
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
+        public IAnimationsComponent Animations => _animationsComponent;
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
         public ICombatEventBus CombatEvents { get; private set; }
-        public IStance CurrentStance { get; private set; }
+        public IStance? CurrentStance { get; private set; }
         public ITargetChooser? TargetChooser { get; set; }
         public bool IsFighting { get; set; }
         public bool IsAlive => CurrentHealth > 0;
@@ -113,7 +117,7 @@
             get => Mathf.Max(0, field);
             set
             {
-                float clamped = Mathf.Clamp(value, 0, Parameters.Mana);
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxMana);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
                 NotifyManaChanges(field);
@@ -152,8 +156,12 @@
             SetBaseValuesForParameters();
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
-            CurrentMana = Parameters.Mana;
+            CurrentMana = Parameters.MaxMana;
             Instance = this;
+
+            _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
+            _stances.Add(Stance.Strength, new StrengthStance(this));
+            _stances.Add(Stance.Dexterity, new DexterityStance(this));
         }
 
         public override void _Process(double delta)
@@ -177,6 +185,14 @@
             _battleEventBus = bus;
             _stateMachine.Fire(Trigger.Battle);
             _battleEventBus.Subscribe<BattleEndGameEvent>(OnBattleEnds);
+            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnStanceChanges);
+        }
+
+        private void OnStanceChanges(PlayerChangesStanceEvent obj)
+        {
+            CurrentStance?.OnDeactivate();
+            CurrentStance = _stances.GetValueOrDefault(obj.Stance);
+            CurrentStance?.OnActivate();
         }
 
         public void Heal(float amount) => CurrentHealth += amount;
@@ -218,27 +234,45 @@
 
         public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
 
-        public void Kill() => Dead?.Invoke(this);
+        public void Kill() => NotifyShouldDie();
 
         public async Task ReceiveAttack(IAttackContext context)
         {
-            if (_animatedSprite == null) return;
-            CalculateFinalDamage(context);
-            CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
-            await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
-            context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
-            context.Attacker.Effects.TriggerAfterAttack(context);
+            try
+            {
+                Calculations.CalculateHitSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateFinalDamage(context);
+                        CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
+                        await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Fight_Blocked");
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Fight_Evaded");
+                        break;
+                }
+
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                context.Attacker.Effects.TriggerAfterAttack(context);
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
         }
 
         public async Task Attack(IAttackContext context)
         {
-            if (_animatedSprite == null) return;
             context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
             Effects.TriggerBeforeAttack(context);
-            _animatedSprite.Play("Fight_Attack");
-            await ToSignal(_animatedSprite, "animation_finished");
-            _animatedSprite.Play("Fight_Idle");
+            await Animations.PlayAnimationAsync("Fight_Attack");
         }
 
         public void OnTurnEnd()
@@ -259,15 +293,12 @@
 
         public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
-            _animatedSprite?.Play("Fight_Hurt");
             CombatEvents.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
             _battleEventBus?.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
             DamageTaken?.Invoke(damage, type, isCrit);
             CurrentHealth -= damage;
-            await ToSignal(_animatedSprite, "animation_finished");
-            _animatedSprite.Play("Fight_Idle");
+            await Animations.PlayAnimationAsync("Fight_Hurt");
         }
-
 
         public void InjectServices(IGameServiceProvider provider)
         {
@@ -277,13 +308,13 @@
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
                 .Permit(Trigger.Battle, State.Battle);
 
             _stateMachine.Configure(State.Walk)
-                .OnEntry(() => { _animatedSprite?.Play($"{_stateMachine.State}_{_direction}"); })
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Walk)
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Battle, State.Battle);
@@ -291,7 +322,7 @@
             _stateMachine.Configure(State.Battle)
                 .OnEntry(() =>
                 {
-                    _animatedSprite?.Play("Fight_Idle");
+                    Animations.PlayAnimation("Idle");
                     CanMove = false;
                     _lastPosition = Position;
                 })
@@ -301,15 +332,6 @@
                     Position = _lastPosition;
                 })
                 .Permit(Trigger.Idle, State.Idle);
-        }
-
-        private void CalculateFinalDamage(IAttackContext context)
-        {
-            float baseDamage = context.BaseDamage;
-            float additionalDamage = context.AdditionalDamage;
-            context.FinalDamage = baseDamage + additionalDamage;
-            if (context.IsCritical)
-                context.FinalDamage *= context.Attacker.Parameters.CriticalDamage;
         }
 
         private void SwitchState(Vector2 direction)
@@ -353,6 +375,8 @@
 
         private void OnBattleEnds(BattleEndGameEvent obj)
         {
+            _battleEventBus?.Unsubscribe<BattleEndGameEvent>(OnBattleEnds);
+            _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
             Effects.RemoveAllEffects();
             _stateMachine.Fire(Trigger.Idle);
             _battleEventBus = null;
@@ -360,9 +384,11 @@
 
         private void NotifyShouldDie()
         {
-            Dead?.Invoke(this);
             _gameEventBus?.Publish<PlayerDiedGameEvent>(new(this));
             _battleEventBus?.Publish<PlayerDiedGameEvent>(new(this));
+
+            Animations.PlayAnimation("Dead");
+            Dead?.Invoke(this);
         }
 
         private void NotifyHealthChanges(float value)
@@ -393,10 +419,8 @@
                 case EntityParameter.Health:
                     _battleEventBus?.Publish<PlayerMaxHealthChanges>(new(this, value));
                     break;
-                case EntityParameter.Barrier:
-                    _battleEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
-                    break;
                 case EntityParameter.Mana:
+                    _battleEventBus?.Publish<PlayerMaxManaChangesGameEvent>(new(value));
                     break;
             }
         }

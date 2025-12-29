@@ -1,13 +1,14 @@
 ﻿namespace Core.Interfaces.Data
 {
+    using UI;
     using Godot;
     using System;
-    using UI;
+    using System.Threading.Tasks;
 
-    public interface IUIElementProvider
+    public interface IUiElementProvider
     {
         T Create<T>() where T : Control, IInitializable;
-        T CreateAndShowMainElement<T>() where T : Control, IInitializable, IRequireServices;
+        Task<T>  CreateAndShowMainElement<T>() where T : Control, IInitializable, IRequireServices;
         T CreateAndShowWindowElement<T>() where T : Control, IInitializable, IRequireServices, IClosable;
         T CreateClosableForSource<T>(Control source) where T : Control, IInitializable, IClosable, IRequireServices;
         T CreateRequireServices<T>() where T : Control, IInitializable, IRequireServices;

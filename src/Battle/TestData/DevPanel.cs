@@ -38,10 +38,10 @@
         [Export] private MainWorld? _mainWorld;
         [Export] private Button? _add, _remove, _flat, _percent, _multiplier, _removeAll;
         [Export] private ItemList? _modifiers;
-        [Export] private Button? _removeAllPassives;
+        [Export] private Button? _removeAllPassives, _manaFull, _mana;
         [Export] private ItemList? _availablePassives, _obtainedPassives;
         [Export] private Button? _heal, _healFull, _dealDamage, _kill;
-        [Export] private SpinBox? _healAmount, _damageAmount, _modifierValue;
+        [Export] private SpinBox? _healAmount, _damageAmount, _modifierValue, _manaAmount;
         [Export] private OptionButton? _damageType, _damageSource, _parameters;
         [Export] private CheckButton? _critButton;
         [Export] private Button? _addNpc;
@@ -86,6 +86,12 @@
             _dealDamage?.Pressed += OnDamagePressed;
             _addNpc?.Pressed += OnAddNpcPressed;
             _updateEffects?.Pressed += OnUpdatePressed;
+            _manaFull?.Pressed += () => { _player?.CurrentMana += 9999; };
+            _mana?.Pressed += () =>
+            {
+                double toRecover = _manaAmount?.Value ?? 0;
+                _player?.CurrentMana += (float)toRecover;
+            };
             _npcCategory?.ItemSelected += (t) =>
             {
                 string text = _npcCategory.GetItemText((int)t);
@@ -149,13 +155,20 @@
 
         private void OnEffectRemoved(IEffect obj)
         {
-            if (_effectsApplied == null) return;
-            if (!_effectsInstances.TryGetValue(obj.InstanceId, out int idx))
-                return;
+            try
+            {
+                if (_effectsApplied == null) return;
+                if (!_effectsInstances.TryGetValue(obj.InstanceId, out int idx))
+                    return;
 
-            _effectsApplied.RemoveItem(idx);
-            _effectsInstances.Remove(obj.InstanceId);
-            UpdateEffectManager();
+                _effectsApplied.RemoveItem(idx);
+                _effectsInstances.Remove(obj.InstanceId);
+                UpdateEffectManager();
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"{ex.Message}, {ex.StackTrace}");
+            }
         }
 
         private void OnEffectAdded(IEffect obj)
@@ -306,16 +319,23 @@
 
         private void OnAddPressed()
         {
-            if (_modifiers == null || _modifierValue == null) return;
+            try
+            {
+                if (_modifiers == null || _modifierValue == null) return;
 
-            float amount = (float)_modifierValue.Value;
-            if (_modifierType is ModifierType.Increase or ModifierType.Multiplicative)
-                amount /= 100;
+                float amount = (float)_modifierValue.Value;
+                if (_modifierType is ModifierType.Increase or ModifierType.Multiplicative)
+                    amount /= 100;
 
-            var modifier = new ModifierInstance(_entityParameter, _modifierType, amount, this);
-            _player?.Modifiers.AddPermanentModifier(modifier);
-            int idx = _modifiers.AddItem($"{modifier.EntityParameter}, {modifier.ModifierType}, {modifier.Value}");
-            _addedModifiers.Add(idx, modifier);
+                var modifier = new ModifierInstance(_entityParameter, _modifierType, amount, this);
+                _player?.Modifiers.AddPermanentModifier(modifier);
+                int idx = _modifiers.AddItem($"{modifier.EntityParameter}, {modifier.ModifierType}, {modifier.Value}");
+                _addedModifiers.Add(idx, modifier);
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"{ex.Message}, {ex.StackTrace}");
+            }
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

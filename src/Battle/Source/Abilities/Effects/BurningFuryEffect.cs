@@ -7,8 +7,9 @@
     public class BurningFuryEffect(
         int duration,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury)
-        : FuryEffect(id: "Effect_Burning_Fury", duration, healthPercent, statusEffect)
+        StatusEffects statusEffect = StatusEffects.Fury,
+        string id = "Effect_Burning_Fury")
+        : FuryEffect(duration, healthPercent, statusEffect, id)
     {
         public float HealthAsDamageMultiplier { get; set; }
         public int BurningMaxStacks { get; set; }
@@ -39,7 +40,7 @@
             return HealthAsDamageMultiplier > fury.HealthAsDamageMultiplier;
         }
 
-        public override IEffect Clone() => new BurningFuryEffect( Duration, HealthPercent, Status)
+        public override IEffect Clone() => new BurningFuryEffect(Duration, HealthPercent, Status, Id)
         {
             HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };

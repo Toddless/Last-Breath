@@ -15,7 +15,7 @@
     internal class BattleContext : IBattleContext
     {
         private readonly IBattleEventBus _localBus = new BattleEventBus();
-        private readonly IUIElementProvider _uiElementProvider;
+        private readonly IUiElementProvider _uiElementProvider;
         private readonly BattleArena _battleArena;
         private readonly List<IEntity> _entities;
         private readonly MainWorld _mainWorld;
@@ -23,26 +23,25 @@
 
         public BattleContext(IEntity player, List<IEntity> entities, MainWorld mainWorld, IGameServiceProvider provider, Node2D parent)
         {
-            _uiElementProvider = provider.GetService<IUIElementProvider>();
-            var battleHud = _uiElementProvider.CreateAndShowMainElement<BattleHud>();
+            _uiElementProvider = provider.GetService<IUiElementProvider>();
             _player = player;
             _entities = entities;
             _mainWorld = mainWorld;
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
             _battleArena.SetupEventBus(_localBus);
-
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
-            battleHud.SetupEventBus(_localBus);
-            battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.Mana, _player.CurrentHealth, _player.CurrentMana);
-            foreach (IEntity entity in _entities)
-                battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.Mana, entity.CurrentHealth, entity.CurrentMana);
-
             _player.SetupBattleEventBus(_localBus);
             RemoveParticipantFromWorld();
         }
 
         public async Task RunBattleAsync()
         {
+            var battleHud = await _uiElementProvider.CreateAndShowMainElement<BattleHud>();
+            battleHud.SetupEventBus(_localBus);
+            battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
+            foreach (IEntity entity in _entities)
+                battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);
+
             _battleArena.SetPlayer(_player);
             await _battleArena.StartFight(_entities);
         }
@@ -64,7 +63,7 @@
                 foreach (var entity in _entities)
                 {
                     if (!entity.IsAlive || entity is not Node2D asNode) continue;
-                    _mainWorld.CallDeferred(Node.MethodName.AddChild, asNode);
+                    _mainWorld.AddChild(asNode);
                 }
 
                 _localBus.Publish<BattleEndGameEvent>(new());

@@ -3,6 +3,7 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Enums;
     using System.Linq;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
@@ -14,10 +15,12 @@
     {
         private const string UID = "uid://2w3t3maumkh6";
         private IBattleEventBus? _battleEventBus;
-        private IUIElementProvider? _uiElementProvider;
+        private IUiElementProvider? _uiElementProvider;
         private Dictionary<string, CharacterBar> _characterBars = [];
         private Dictionary<string, QueueSlot> _queueSlots = [];
+        private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[9];
         [Export] private Button? _returnButton;
+        [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
         [Export] private HBoxContainer? _stanceButtons, _abilityButtons;
         [Export] private GridContainer? _entityBars;
@@ -31,6 +34,17 @@
             {
                 var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
                 _abilitySlots?.AddChild(slot);
+                _abilitySlotsInstances[i] = slot;
+            }
+
+            var buttonGroup = new ButtonGroup { AllowUnpress = false };
+
+            for (int i = 0; i < 3; i++)
+            {
+                var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
+                slot.SetStance((Stance)i);
+                slot.ButtonGroup = buttonGroup;
+                _stanceButtons?.AddChild(slot);
             }
         }
 
@@ -40,6 +54,8 @@
             _characterBars.Clear();
             _queueSlots.Clear();
             _playerBars?.ClearEffects();
+            foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
+                stanceSlot.RemoveBattleEventBus();
             foreach (Node child in _queue?.GetChildren() ?? [])
                 child.QueueFree();
             foreach (var node in _entityBars?.GetChildren() ?? [])
@@ -65,8 +81,21 @@
             _battleEventBus.Subscribe<BattleQueueDefinedGameEvent>(OnQueueDefined);
             _battleEventBus.Subscribe<TurnStartGameEvent>(OnTurnStart);
             _battleEventBus.Subscribe<TurnEndGameEvent>(OnTurnEnd);
-            foreach (AbilitySlot slot in _abilitySlots?.GetChildren().Cast<AbilitySlot>() ?? [])
+            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);
+
+            foreach (AbilitySlot slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
+            foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
+                stanceSlot.SetBattleEventBus(_battleEventBus);
+        }
+
+        private void OnPlayerChanceStance(PlayerChangesStanceEvent obj)
+        {
+            var player = Player.Instance;
+            if (player == null) return;
+            var skills = player.CurrentStance?.ObtainedAbilities ?? [];
+            for (int i = 0; i < skills.Count; i++)
+                _abilitySlotsInstances[i].SetAbility(skills[i]);
         }
 
         public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana)
@@ -88,7 +117,7 @@
         {
             try
             {
-                _uiElementProvider = provider.GetService<IUIElementProvider>();
+                _uiElementProvider = provider.GetService<IUiElementProvider>();
             }
             catch (Exception ex)
             {
@@ -167,6 +196,8 @@
 
         private void OnTurnStart(TurnStartGameEvent obj)
         {
+            if (obj.StartedTurn is Player) _buttonsContainer?.Show();
+            else _buttonsContainer?.Hide();
         }
 
         private void OnQueueDefined(BattleQueueDefinedGameEvent obj)
