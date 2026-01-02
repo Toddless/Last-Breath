@@ -2,6 +2,8 @@
 {
     using Godot;
     using System;
+    using Module;
+    using Utilities;
     using Decorators;
     using Core.Enums;
     using System.Linq;
@@ -18,13 +20,15 @@
     public abstract class Ability(
         string id,
         string[] tags,
-        int availablePoints,
+        int cooldown,
+        int costValue,
+        float maxTargets,
         List<IEffect> effects,
         List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
-        AbilityType type = AbilityType.Target)
-        : IAbility
+        Costs costType = Costs.Mana,
+        AbilityType abilityType = AbilityType.Target) : IAbility
     {
         protected IEntity? Owner;
         protected readonly IStanceMastery? Mastery = mastery;
@@ -47,7 +51,7 @@
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public string[] Tags { get; } = tags;
-        public float AvailablePoints { get; set; } = availablePoints;
+        public float SpendAbilityPoints { get; set; }
 
         public Texture2D? Icon
         {
@@ -64,7 +68,7 @@
         public int CostValue => (int)this[AbilityParameter.CostValue];
 
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
-        public AbilityType Type { get; } = type;
+        public AbilityType AbilityType { get; } = abilityType;
 
         public List<IConditionalModifier> ConditionalModifiers { get; } = [];
         public List<IEffect> Effects { get; set; } = effects;
@@ -73,8 +77,8 @@
 
         public float MaxTargets => this[AbilityParameter.Target];
         public float Cooldown => this[AbilityParameter.Cooldown];
-        public string Description => string.Empty; //Localizator.LocalizeDescription(Id);
-        public string DisplayName => string.Empty; //Localizator.Localize(Id);
+        public string Description => FormatDescription();
+        public string DisplayName => Localization.Localize(Id);
 
         public event Action<AbilityParameter>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
@@ -141,7 +145,7 @@
             Owner.CurrentHealthChanged += OnResourceChanges;
             Owner.CurrentBarrierChanged += OnResourceChanges;
             Owner.CurrentManaChanged += OnResourceChanges;
-            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
         }
 
         public void RemoveOwner()
@@ -150,7 +154,7 @@
             Owner.CurrentManaChanged -= OnResourceChanges;
             Owner.CurrentHealthChanged -= OnResourceChanges;
             Owner.CurrentBarrierChanged -= OnResourceChanges;
-            Owner.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
             Owner = null;
         }
 
@@ -179,7 +183,6 @@
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
-        protected abstract IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager();
 
         protected void ApplyTargetEffects(EffectApplyingContext context)
         {
@@ -224,15 +227,26 @@
             return ((baseValue + additiveBonus) * increasedBonus) * multiplyBonus;
         }
 
-        private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
-        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
-        private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
+        protected virtual string FormatDescription() => Localization.LocalizeDescriptionFormated(Id);
 
-        protected virtual void OnTurnEnd(TurnEndGameEvent obj)
+        protected virtual void OnTurnEnd(TurnEndEvent obj)
         {
             if (CooldownLeft == 0) return;
             CooldownLeft--;
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
+
+        private IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
+            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
+            {
+                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
+                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
+                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
+                [AbilityParameter.Target] = new Module<AbilityParameter>(() => maxTargets, AbilityParameter.Target)
+            });
+
+        private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
+        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
+        private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
     }
 }

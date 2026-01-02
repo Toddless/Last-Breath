@@ -35,19 +35,27 @@
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
         private bool _isMouseInside = false, _isOnCooldown = false, _isEnoughResources = false;
         private IAbility? _ability;
+        private Key _slotNumber;
         private string _selectionId = string.Empty;
         private IBattleEventBus? _battleEventBus;
         [Export] private TextureRect? _background, _icon, _frame;
+        [Export] private Label? _number;
 
         public override void _Input(InputEvent @event)
         {
             if (_ability == null) return;
-            if (@event is InputEventKey { Keycode: Key.Escape, Pressed: true } && _stateMachine.State is State.SelectingTargets)
+            switch (true)
             {
-                CancelTargetSelecting();
-                AcceptEvent();
+                case var _ when @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && _stateMachine.State is State.SelectingTargets:
+                    CancelTargetSelecting();
+                    AcceptEvent();
+                    break;
+                case var _ when @event is InputEventKey { Pressed: true } input && input.Keycode == _slotNumber:
+                    TryActivateAbility();
+                    break;
             }
         }
+
 
         public override void _GuiInput(InputEvent @event)
         {
@@ -58,21 +66,6 @@
                 TryActivateAbility();
         }
 
-        private void TryActivateAbility()
-        {
-            switch (_stateMachine.State)
-            {
-                case State.Ready:
-                    _stateMachine.Fire(_ability!.Type is AbilityType.SelfCast ? Trigger.Activate : Trigger.SelectingTargets);
-                    AcceptEvent();
-                    return;
-                case State.SelectingTargets:
-                    _stateMachine.Fire(Trigger.Activate);
-                    AcceptEvent();
-                    break;
-            }
-        }
-
         public override void _Ready()
         {
             MouseEntered += OnMouseEnter;
@@ -81,12 +74,21 @@
             ConfigureStateMachine();
         }
 
+        public override GodotObject? _MakeCustomTooltip(string forText)
+        {
+            if (_ability == null) return null;
+
+            var abilityDescription = AbilityDescription.Initialize().Instantiate<AbilityDescription>();
+            abilityDescription.SetupFullAbilityDescription(_ability);
+            return abilityDescription;
+        }
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public void SetBattleEventBus(IBattleEventBus battleEventBus)
         {
             _battleEventBus = battleEventBus;
-            _battleEventBus.Subscribe<BattleEndGameEvent>(OnBattleEnd);
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
         public void SetAbility(IAbility ability)
@@ -98,6 +100,27 @@
             _ability.AbilityResourceChanges += OnAbilityResourceChanges;
             _icon?.Texture = _ability.Icon;
             CheckAbilityAvailable();
+        }
+
+        public void SetNumber(int numbr)
+        {
+            _slotNumber = numbr.GetKeyAssociatedWithNumber();
+            _number?.Text = numbr.ToString();
+        }
+
+        private void TryActivateAbility()
+        {
+            switch (_stateMachine.State)
+            {
+                case State.Ready:
+                    _stateMachine.Fire(_ability!.AbilityType is AbilityType.SelfCast ? Trigger.Activate : Trigger.SelectingTargets);
+                    break;
+                case State.SelectingTargets:
+                    _stateMachine.Fire(Trigger.Activate);
+                    break;
+            }
+
+            AcceptEvent();
         }
 
         private void CancelTargetSelecting()
@@ -131,7 +154,7 @@
                 {
                     if (_ability == null) return;
                     var targets = new List<IEntity>();
-                    _battleEventBus?.Publish<AbilityActivatedGameEvent>(new(_ability, targets));
+                    _battleEventBus?.Publish<AbilityActivatedEvent>(new(_ability, targets));
                     _selectionId = string.Empty;
                     _ability.Activate(targets);
                 })
@@ -166,7 +189,7 @@
 
         private void OnMouseEnter() => _isMouseInside = true;
 
-        private void OnBattleEnd(BattleEndGameEvent obj)
+        private void OnBattleEnd(BattleEndEvent obj)
         {
             _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
             _ability?.CooldownLeftChanges -= OnCooldownChanges;

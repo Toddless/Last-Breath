@@ -5,5 +5,5 @@
     using Battle;
     using Entity;
 
-    public record AbilityActivatedGameEvent(IAbility Ability, List<IEntity> Targets) : ICombatEvent, IGameEvent, IBattleEvent;
+    public record AbilityActivatedEvent(IAbility Ability, List<IEntity> Targets) : ICombatEvent, IGameEvent, IBattleEvent;
 }

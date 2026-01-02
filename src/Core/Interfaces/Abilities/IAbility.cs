@@ -11,12 +11,12 @@
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {
         float MaxTargets { get; }
-        float AvailablePoints { get; set; }
+        float SpendAbilityPoints { get; set; }
         float Cooldown { get; }
         int CooldownLeft { get; }
         int CostValue { get; }
         Costs CostType { get; }
-        AbilityType Type { get; }
+        AbilityType AbilityType { get; }
         List<IEffect> Effects { get; set; }
         List<IEffect> CasterEffects { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }

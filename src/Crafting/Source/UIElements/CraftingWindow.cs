@@ -220,9 +220,9 @@
         {
             return _craftingMode switch
             {
-                CraftingMode.Create => Localizator.Localize("CraftingCreateButton"),
-                CraftingMode.Upgrade => Localizator.Localize("CraftingUpgradeButton"),
-                CraftingMode.Ascend => Localizator.Localize("CraftingAscendButton"),
+                CraftingMode.Create => Localization.Localize("CraftingCreateButton"),
+                CraftingMode.Upgrade => Localization.Localize("CraftingUpgradeButton"),
+                CraftingMode.Ascend => Localization.Localize("CraftingAscendButton"),
                 _ => string.Empty
             };
         }
@@ -376,7 +376,7 @@
                     await _mediator.Send<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(
                         new(_equpItem?.InstanceId ?? string.Empty, hash, _usedResources));
                 if (result.IsSuccess)
-                    source.UpdateSelectedItem((Localizator.Format(result.Param), result.Param!.GetHashCode()));
+                    source.UpdateSelectedItem((Localization.Format(result.Param), result.Param!.GetHashCode()));
             }
             catch (Exception ex)
             {
@@ -392,7 +392,7 @@
 
             var modsWithHash = new List<(string Mod, int Hash)>();
             foreach (var mod in modifiers)
-                modsWithHash.Add((Localizator.Format(mod), mod.GetHashCode()));
+                modsWithHash.Add((Localization.Format(mod), mod.GetHashCode()));
 
             modifiersList.AddModifiersToList(modsWithHash, labelSettings);
             modifiersList.SetItemsSelectable(false);
@@ -410,7 +410,7 @@
         private void UpdateModifiersInList(IReadOnlyList<IModifier> modifiers, ItemModifierList? list)
         {
             foreach (var modifier in modifiers)
-                list?.UpdateModifierText(modifier.GetHashCode(), Localizator.Format(modifier));
+                list?.UpdateModifierText(modifier.GetHashCode(), Localization.Format(modifier));
         }
 
         private void SetSkill()
@@ -476,7 +476,7 @@
                     var resourceId = resource.GetResourceId();
                     result.TryGetValue(resourceId, out var amount);
                     _usedResources.TryGetValue(resourceId, out var need);
-                    resource.SetText(Localizator.Localize(resourceId), amount, need);
+                    resource.SetText(Localization.Localize(resourceId), amount, need);
                 }
             }
             catch (Exception ex)
@@ -533,8 +533,8 @@
 
         private void SetDisplayableData(string id)
         {
-            _itemName.Text = Localizator.Localize(id);
-            _description.Text = Localizator.LocalizeDescription(id);
+            _itemName.Text = Localization.Localize(id);
+            _description.Text = Localization.LocalizeDescription(id);
             _itemIcon.Texture = GetChachedIcon(id);
             _itemUpgradeLevel.Text = GetUpdateLevel();
         }
@@ -562,7 +562,7 @@
             var reqItem = ClickableResource.Initialize().Instantiate<ClickableResource>();
             reqItem.SetResourceId(resourceId);
             reqItem.SetIcon(_dataProvider?.GetItemIcon(resourceId));
-            reqItem.SetText(Localizator.Localize(resourceId), have, need);
+            reqItem.SetText(Localization.Localize(resourceId), have, need);
             return reqItem;
         }
 

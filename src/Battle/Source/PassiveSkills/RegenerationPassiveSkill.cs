@@ -12,10 +12,10 @@
         public override void Attach(IEntity owner)
         {
             Owner = owner;
-            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
         }
 
-        private void OnTurnEnd(TurnEndGameEvent evnt)
+        private void OnTurnEnd(TurnEndEvent evnt)
         {
             float healAmount = Owner.Parameters.MaxHealth * RegenAmount;
             Owner?.Heal(healAmount);
@@ -23,7 +23,7 @@
 
         public override void Detach(IEntity owner)
         {
-            Owner?.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnd);
+            Owner?.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
             Owner = null;
         }
 

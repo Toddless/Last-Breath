@@ -3,5 +3,5 @@
     using System.Collections.Generic;
     using Entity;
 
-    public record BattleQueueDefinedGameEvent(List<IEntity> Entities) : IBattleEvent;
+    public record BattleQueueDefinedEvent(List<IEntity> Entities) : IBattleEvent;
 }

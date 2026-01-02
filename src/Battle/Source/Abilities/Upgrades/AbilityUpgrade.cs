@@ -18,8 +18,8 @@
         public int PointPerRank { get; } = pointPerRank;
         public int MaxRank { get; } = maxRank;
         public int CurrentRank { get; protected set; } = currentRank;
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
 
         public event Action? AbilityUpgradeChanged;
 
@@ -28,10 +28,10 @@
         public virtual bool TryUpgradeRank(IAbility ability)
         {
             if (CurrentRank == MaxRank) return false;
-            float available = ability.AvailablePoints - PointPerRank;
+            float available = ability.SpendAbilityPoints - PointPerRank;
             if (available < 0 || available < PointPerRank) return false;
             CurrentRank++;
-            ability.AvailablePoints -= PointPerRank;
+            ability.SpendAbilityPoints -= PointPerRank;
             AbilityUpgradeChanged?.Invoke();
             return true;
         }
@@ -40,14 +40,14 @@
         {
             if (CurrentRank == 0) return;
             CurrentRank--;
-            ability.AvailablePoints += PointPerRank;
+            ability.SpendAbilityPoints += PointPerRank;
             AbilityUpgradeChanged?.Invoke();
         }
 
         public virtual void RemoveUpgrade(IAbility ability)
         {
             if (CurrentRank == 0) return;
-            ability.AvailablePoints += PointPerRank * CurrentRank;
+            ability.SpendAbilityPoints += PointPerRank * CurrentRank;
             CurrentRank = 0;
             AbilityUpgradeChanged?.Invoke();
         }

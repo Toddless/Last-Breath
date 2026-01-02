@@ -25,6 +25,7 @@
                 while (_attackQueue.Count > 0 && !_isCancelled)
                 {
                     var context = _attackQueue.Dequeue();
+                    if (!context.IsValid) continue;
                     await context.Attacker.Attack(context);
                     await context.Target.ReceiveAttack(context);
                 }

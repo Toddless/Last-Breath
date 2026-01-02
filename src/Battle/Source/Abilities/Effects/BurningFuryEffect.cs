@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using Utilities;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
@@ -39,6 +40,8 @@
             if (otherEffect is not BurningFuryEffect fury) return false;
             return HealthAsDamageMultiplier > fury.HealthAsDamageMultiplier;
         }
+
+        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent, HealthAsDamageMultiplier);
 
         public override IEffect Clone() => new BurningFuryEffect(Duration, HealthPercent, Status, Id)
         {

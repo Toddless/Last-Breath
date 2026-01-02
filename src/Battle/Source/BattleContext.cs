@@ -66,7 +66,7 @@
                     _mainWorld.AddChild(asNode);
                 }
 
-                _localBus.Publish<BattleEndGameEvent>(new());
+                _localBus.Publish<BattleEndEvent>(new());
             }
             catch (Exception ex)
             {

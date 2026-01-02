@@ -15,7 +15,8 @@
         float FinalDamage { get; set; }
         bool IsCritical { get; set; }
         AttackResults Result { get; set; }
+        bool IsValid { get; }
 
-        void Schedule();
+        bool Schedule();
     }
 }

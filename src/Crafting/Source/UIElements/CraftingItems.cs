@@ -73,7 +73,7 @@
         {
             if (_items == null) return;
 
-            string displayName = Localizator.Localize(resourceId);
+            string displayName = Localization.Localize(resourceId);
             int id = _items.AddItem(displayName, _itemDataProvider?.GetItemIcon(resourceId), selectable);
             _resources.Add(id, resourceId);
         }

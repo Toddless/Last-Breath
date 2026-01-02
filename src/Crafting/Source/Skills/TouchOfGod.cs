@@ -24,6 +24,6 @@
 
         }
 
-        protected override string GetDescription() => Localizator.LocalizeDescriptionFormated(Id, [HealAmount]);
+        protected override string GetDescription() => Localization.LocalizeDescriptionFormated(Id, [HealAmount]);
     }
 }

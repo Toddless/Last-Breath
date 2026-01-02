@@ -22,8 +22,8 @@
         public int BonusLevel { get; } = 0;
         public int CurrentExperience { get; } = 0;
         public int CurrentLevel { get; } = 1;
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
 
         public event Action<int>? BonusLevelChange, CurrentLevelChange, ExperienceChange;
 

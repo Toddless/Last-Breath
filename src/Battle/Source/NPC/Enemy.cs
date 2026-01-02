@@ -206,7 +206,7 @@
         {
             // TODO:
             _battleEventBus = bus;
-            _battleEventBus.Subscribe<BattleEndGameEvent>(OnBattleEnd);
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
         public void Heal(float amount) => CurrentHealth += amount;
@@ -295,17 +295,17 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndGameEvent(this));
-            _battleEventBus?.Publish(new TurnEndGameEvent(this));
-            _gameEventBus?.Publish(new TurnEndGameEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
+            _battleEventBus?.Publish(new TurnEndEvent(this));
+            _gameEventBus?.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartGameEvent(this));
-            _battleEventBus?.Publish(new TurnStartGameEvent(this));
-            _gameEventBus?.Publish(new TurnStartGameEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
         public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -337,7 +337,7 @@
                                 fighters.Add(this);
 
                             _stateMachine.Fire(Trigger.Battle);
-                            _gameEventBus?.Publish(new BattleStartGameEvent(player, fighters));
+                            _gameEventBus?.Publish(new BattleStartEvent(player, fighters));
                             break;
                         }
                     case IFightable fighter:
@@ -355,20 +355,20 @@
             switch (parameter)
             {
                 case EntityParameter.Health:
-                    _battleEventBus?.Publish<EntityMaxHealthChangesGameEvent>(new(this, value));
+                    _battleEventBus?.Publish<EntityMaxHealthChangesEvent>(new(this, value));
                     break;
                 case EntityParameter.Barrier:
                     break;
                 case EntityParameter.Mana:
-                    _battleEventBus?.Publish<EntityMaxManaChangesGameEvent>(new(this, value));
+                    _battleEventBus?.Publish<EntityMaxManaChangesEvent>(new(this, value));
                     break;
             }
         }
 
-        private void OnBattleEnd(BattleEndGameEvent obj)
+        private void OnBattleEnd(BattleEndEvent obj)
         {
-            _stateMachine.Fire(Trigger.Idle);
             Effects.RemoveAllEffects();
+            if (IsAlive) _stateMachine.Fire(Trigger.Idle);
             _battleEventBus = null;
         }
 
@@ -385,8 +385,8 @@
         private void NotifyHealthChanges(float value)
         {
             CurrentHealthChanged?.Invoke(value);
-            _gameEventBus?.Publish<EntityHealthChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<EntityHealthChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<EntityHealthChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityHealthChangesEvent>(new(this, value));
         }
 
         private void NotifyBarrierChanges(float value)
@@ -399,14 +399,14 @@
         private void NotifyManaChanges(float value)
         {
             CurrentManaChanged?.Invoke(value);
-            _gameEventBus?.Publish<EntityManaChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<EntityManaChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<EntityManaChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityManaChangesEvent>(new(this, value));
         }
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<EntityDiedGameEvent>(new(this));
-            _battleEventBus?.Publish<EntityDiedGameEvent>(new(this));
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
 
             Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);

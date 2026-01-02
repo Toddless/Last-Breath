@@ -5,6 +5,7 @@
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class EntitySpot : Node2D
@@ -12,18 +13,19 @@
         private enum State
         {
             CanBeSelected,
-            SelectedForAbility,
+            CandidateForAbility,
             CannotBeSelected
         }
 
         private enum Trigger
         {
-            CanBeSelected,
-            SelectForAbility,
-            CannotBeSelected
+            SetCanBeSelected,
+            SetAsCandidateForAbility,
+            SetCannotBeSelected
         }
 
-        private StateMachine<State, Trigger> _stateMachine = new(State.CanBeSelected);
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.CanBeSelected);
+        private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> _candidateForAbility = new(Trigger.SetAsCandidateForAbility);
         private bool _mouseInside;
         private IEntity? _entity;
         private string _selectionId = string.Empty;
@@ -40,22 +42,26 @@
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.CanBeSelected)
-                .PermitReentry(Trigger.CanBeSelected)
-                .Permit(Trigger.CannotBeSelected, State.CannotBeSelected)
-                .Permit(Trigger.SelectForAbility, State.SelectedForAbility);
+                .PermitReentry(Trigger.SetCanBeSelected)
+                .Permit(Trigger.SetCannotBeSelected, State.CannotBeSelected)
+                .Permit(Trigger.SetAsCandidateForAbility, State.CandidateForAbility);
 
-            _stateMachine.Configure(State.SelectedForAbility)
-                .Permit(Trigger.CanBeSelected, State.CanBeSelected);
+            _stateMachine.Configure(State.CandidateForAbility)
+                .OnEntryFrom(_candidateForAbility, id => { _selectionId = id; })
+                .OnExit(() => { _selectionId = string.Empty; })
+                .PermitReentry(Trigger.SetAsCandidateForAbility)
+                .Permit(Trigger.SetCanBeSelected, State.CanBeSelected);
 
             _stateMachine.Configure(State.CannotBeSelected)
-                .Permit(Trigger.CanBeSelected, State.CanBeSelected);
+                .Permit(Trigger.SetCanBeSelected, State.CanBeSelected);
         }
 
         public void RemoveEntityFromSpot()
         {
-            if (_entity is not { IsAlive: true }) return;
+            if (_entity == null) return;
             _entity.Dead -= OnEntityDead;
             _entity.DamageTaken -= OnDamageTaken;
+            _entity.Effects.EffectAdded -= OnEffectAdded;
             var node = _entity as Node;
             RemoveChild(node);
         }
@@ -64,10 +70,16 @@
         {
             entity.Dead += OnEntityDead;
             entity.DamageTaken += OnDamageTaken;
+            entity.Effects.EffectAdded += OnEffectAdded;
             var body = entity as CharacterBody2D;
             _entity = entity;
             body?.Position = Vector2.Zero;
             CallDeferred(Node.MethodName.AddChild, body);
+        }
+
+        private void OnEffectAdded(IEffect obj)
+        {
+            _stateMachine.Fire((_entity!.StatusEffects & StatusEffects.Vanished) != 0 ? Trigger.SetCannotBeSelected : Trigger.SetCanBeSelected);
         }
 
         public void RemoveBattleEventBus()
@@ -79,33 +91,29 @@
         {
             _eventBus = battleEventBus;
             _eventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnPlayerSelectingAbilityTarget);
-            _eventBus.Subscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            _eventBus.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
             _eventBus.Subscribe<CancelSelectionEvent>(OnSelectionCancel);
         }
 
         private void OnSelectionCancel(CancelSelectionEvent obj)
         {
-            if (string.IsNullOrWhiteSpace(_selectionId) || obj.SelectionId != _selectionId) return;
-            _stateMachine.Fire(Trigger.CanBeSelected);
-            _selectionId = string.Empty;
+            if (_stateMachine.State is not State.CandidateForAbility || _selectionId != obj.SelectionId) return;
+            _stateMachine.Fire(Trigger.SetCanBeSelected);
         }
 
-        private void OnAbilityActivated(AbilityActivatedGameEvent obj)
+        private void OnAbilityActivated(AbilityActivatedEvent obj)
         {
-            if (_entity == null || _stateMachine.State is not State.SelectedForAbility) return;
-            if (obj.Targets.Contains(_entity)) return;
+            if (_entity == null || _stateMachine.State is not State.CandidateForAbility) return;
+            if (obj.Targets.Contains(_entity) || obj.Targets.Count == (int)obj.Ability.MaxTargets) return;
             obj.Targets.Add(_entity);
-            _selectionId = string.Empty;
-            _stateMachine.Fire(Trigger.CanBeSelected);
+            _stateMachine.Fire(Trigger.SetCanBeSelected);
         }
 
         private void OnPlayerSelectingAbilityTarget(PlayerSelectingTargetForAbilityEvent evnt)
         {
-            if (_entity == null) return;
-            var ability = evnt.Ability;
-            _selectionId = evnt.SelectionId;
-            if (_stateMachine.State is not State.CanBeSelected)
-                _stateMachine.Fire(Trigger.CanBeSelected);
+            if (_entity == null || _stateMachine.State is State.CannotBeSelected) return;
+            if (evnt.Ability.AbilityType is AbilityType.SelfCast) return;
+            _stateMachine.Fire(_candidateForAbility, evnt.SelectionId);
         }
 
         private void OnDamageTaken(float damage, DamageType type, bool isCrit)
@@ -117,32 +125,24 @@
 
         private void OnEntityDead(IFightable obj)
         {
+            _stateMachine.Fire(Trigger.SetCannotBeSelected);
             _entity?.DamageTaken -= OnDamageTaken;
             _entity?.Dead -= OnEntityDead;
             _entity = null;
-            _selectionId = string.Empty;
         }
 
         public override void _UnhandledInput(InputEvent @event)
         {
             if (_stateMachine.State is State.CannotBeSelected || _entity == null || !_mouseInside) return;
             if (@event is not InputEventMouseButton { Pressed : true, ButtonIndex: MouseButton.Left }) return;
+            if (!string.IsNullOrWhiteSpace(_selectionId)) return;
 
-            if (string.IsNullOrWhiteSpace(_selectionId))
-                _eventBus?.Publish<AttackTargetSelectedGameEvent>(new(_entity));
-            else
-                _stateMachine.Fire(Trigger.SelectForAbility);
+            _eventBus?.Publish<AttackTargetSelectedEvent>(new(_entity));
             GetViewport().SetInputAsHandled();
         }
 
-        private void OnMouseEntered()
-        {
-            _mouseInside = true;
-        }
+        private void OnMouseEntered() => _mouseInside = true;
 
-        private void OnMouseExited()
-        {
-            _mouseInside = false;
-        }
+        private void OnMouseExited() => _mouseInside = false;
     }
 }

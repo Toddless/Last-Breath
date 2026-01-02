@@ -22,7 +22,7 @@
 
         protected override string GetDescription()
         {
-            return Localizator.LocalizeDescriptionFormated(Id, [Percent]);
+            return Localization.LocalizeDescriptionFormated(Id, [Percent]);
         }
     }
 }

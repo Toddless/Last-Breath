@@ -20,6 +20,6 @@
 
         }
 
-        protected override string GetDescription() => Localizator.LocalizeDescriptionFormated(Id, [Percent]);
+        protected override string GetDescription() => Localization.LocalizeDescriptionFormated(Id, [Percent]);
     }
 }

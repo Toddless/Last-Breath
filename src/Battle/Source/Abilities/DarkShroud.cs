@@ -1,17 +1,12 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Module;
     using Core.Enums;
-    using Decorators;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Core.Interfaces.Components.Module;
 
     public class DarkShroud(
         string[] tags,
-        int availablePoints,
         int cooldown,
         int costValue,
         List<IEffect> effects,
@@ -19,15 +14,8 @@
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
         Costs costType = Costs.Mana,
-        AbilityType type = AbilityType.SelfCast) : Ability(id: "Ability_Dark_Shroud", tags, availablePoints, effects, casterEffects, upgrades, mastery, type)
+        AbilityType abilityType = AbilityType.SelfCast)
+        : Ability(id: "Ability_Dark_Shroud", tags, cooldown, costValue, maxTargets: 1, effects, casterEffects, upgrades, mastery, costType, abilityType)
     {
-
-        protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-            {
-                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType)
-            });
     }
 }

@@ -71,8 +71,8 @@
         }
 
 
-        private static Fireball CreateAbility() => new(3f, 1f, 10, 0f, [], 50,25,
-            [new DamageOverTurnEffect(3, 4, 0.7f, StatusEffects.Burning)], [], [],
+        private static Fireball CreateAbility() => new([], 5, 100, 0.07f, 50, [],
+            [new DamageOverTurnEffect(3, 4, 0.7f, StatusEffects.Burning)], [],
             new Mock<IStanceMastery>().Object);
 
         private static IEntity Entity(out Fireball fireball)

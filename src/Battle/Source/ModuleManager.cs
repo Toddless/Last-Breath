@@ -24,6 +24,8 @@
 
         public event Action<TKey>? ModuleChanges;
 
+        public bool AddBaseModule(TKey key, TModule module) => _baseModules.TryAdd(key, module);
+
         public TModule GetModule(TKey key)
         {
             if (_cache.TryGetValue(key, out var cachedModule)) return cachedModule;

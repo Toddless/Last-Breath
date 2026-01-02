@@ -209,13 +209,13 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndGameEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartGameEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
         }
 
         public Task ReceiveAttack(IAttackContext context)

@@ -22,6 +22,6 @@
 
         }
 
-        protected override string GetDescription() => Localizator.LocalizeDescription(Id);
+        protected override string GetDescription() => Localization.LocalizeDescription(Id);
     }
 }

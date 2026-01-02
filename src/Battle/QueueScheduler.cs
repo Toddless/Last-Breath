@@ -8,10 +8,10 @@
 
     public class QueueScheduler
     {
-        private StatusEffects _skipTurnEffect = StatusEffects.Stun | StatusEffects.Freeze;
+        private readonly StatusEffects _skipTurnEffect = StatusEffects.Stun | StatusEffects.Freeze;
         private Queue<IEntity> FighterQueue { get; } = new();
 
-        public event Action? QueueEmpty;
+        public event Action? QueueContainLessThenTwoFighters;
 
         public List<IEntity> AddFighters(List<IEntity> fighters)
         {
@@ -21,22 +21,30 @@
                 if ((fighter.StatusEffects & _skipTurnEffect) != 0 || !fighter.IsAlive) continue;
                 FighterQueue.Enqueue(fighter);
             }
+
             return orderedFighters;
         }
 
-        public IEntity? GetCurrentFighter()
+        public List<IEntity> RefillIfEmpty(List<IEntity> fighters)
         {
-            try
-            {
-                IEntity fighter = FighterQueue.Dequeue();
+            if (FighterQueue.Count > 0) return [];
 
-                return fighter;
-            }
-            catch (InvalidOperationException)
+            if (fighters.Count >= 2) return AddFighters(fighters);
+
+            QueueContainLessThenTwoFighters?.Invoke();
+            return [];
+        }
+
+        public bool TryGetNextFighter(out IEntity? fighter)
+        {
+            if (FighterQueue.Count == 0)
             {
-                QueueEmpty?.Invoke();
-                return null;
+                fighter = null;
+                return false;
             }
+
+            fighter = FighterQueue.Dequeue();
+            return true;
         }
     }
 }

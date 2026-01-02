@@ -5,6 +5,7 @@
     using Core.Modifiers;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using Utilities;
 
     public class LifeGivingShadeEffect : Effect
     {
@@ -44,6 +45,8 @@
             Owner?.Modifiers.RemovePermanentModifierBySource(Id);
             base.Remove();
         }
+
+        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, _modifier.Value, Activations, LifeToRecover);
 
         public override IEffect Clone() => new LifeGivingShadeEffect(LifeToRecover, Duration, Activations, Status);
     }

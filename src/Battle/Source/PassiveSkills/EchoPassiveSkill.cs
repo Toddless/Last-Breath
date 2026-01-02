@@ -27,13 +27,13 @@
             // TODO: i need another event for this passive
             Owner = owner;
             Owner.CombatEvents.Subscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
-            Owner.CombatEvents.Subscribe<TurnEndGameEvent>(OnTurnEnds);
+            Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnds);
         }
 
         public override void Detach(IEntity owner)
         {
             owner.CombatEvents.Unsubscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
-            owner.CombatEvents.Unsubscribe<TurnEndGameEvent>(OnTurnEnds);
+            owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnds);
             Owner = null;
         }
 
@@ -62,7 +62,7 @@
             sources.Add(new DamageEntry { Turns = Turns, Damage = toDealLater });
         }
 
-        private void OnTurnEnds(TurnEndGameEvent turnEndEvent)
+        private void OnTurnEnds(TurnEndEvent turnEndEvent)
         {
             if (_damageSources.Count == 0 || Owner == null) return;
 

@@ -184,7 +184,7 @@
         {
             _battleEventBus = bus;
             _stateMachine.Fire(Trigger.Battle);
-            _battleEventBus.Subscribe<BattleEndGameEvent>(OnBattleEnds);
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnStanceChanges);
         }
 
@@ -278,17 +278,17 @@
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndGameEvent(this));
-            _battleEventBus?.Publish(new TurnEndGameEvent(this));
-            _gameEventBus?.Publish(new TurnEndGameEvent(this));
+            CombatEvents.Publish(new TurnEndEvent(this));
+            _battleEventBus?.Publish(new TurnEndEvent(this));
+            _gameEventBus?.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
             Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartGameEvent(this));
-            _battleEventBus?.Publish(new TurnStartGameEvent(this));
-            _gameEventBus?.Publish(new TurnStartGameEvent(this));
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
         public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
@@ -373,9 +373,9 @@
             _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
         }
 
-        private void OnBattleEnds(BattleEndGameEvent obj)
+        private void OnBattleEnds(BattleEndEvent obj)
         {
-            _battleEventBus?.Unsubscribe<BattleEndGameEvent>(OnBattleEnds);
+            _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
             Effects.RemoveAllEffects();
             _stateMachine.Fire(Trigger.Idle);
@@ -384,8 +384,8 @@
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<PlayerDiedGameEvent>(new(this));
-            _battleEventBus?.Publish<PlayerDiedGameEvent>(new(this));
+            _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
+            _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
 
             Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
@@ -394,22 +394,22 @@
         private void NotifyHealthChanges(float value)
         {
             CurrentHealthChanged?.Invoke(value);
-            _gameEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<PlayerHealthChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<PlayerHealthChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerHealthChangesEvent>(new(this, value));
         }
 
         private void NotifyBarrierChanges(float value)
         {
             CurrentBarrierChanged?.Invoke(value);
-            _gameEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<PlayerBarrierChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<PlayerBarrierChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerBarrierChangesEvent>(new(this, value));
         }
 
         private void NotifyManaChanges(float value)
         {
             CurrentManaChanged?.Invoke(value);
-            _gameEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
-            _battleEventBus?.Publish<PlayerManaChangesGameEvent>(new(this, value));
+            _gameEventBus?.Publish<PlayerManaChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerManaChangesEvent>(new(this, value));
         }
 
         private void OnParameterChanged(EntityParameter parameter, float value)
@@ -420,7 +420,7 @@
                     _battleEventBus?.Publish<PlayerMaxHealthChanges>(new(this, value));
                     break;
                 case EntityParameter.Mana:
-                    _battleEventBus?.Publish<PlayerMaxManaChangesGameEvent>(new(value));
+                    _battleEventBus?.Publish<PlayerMaxManaChangesEvent>(new(value));
                     break;
             }
         }

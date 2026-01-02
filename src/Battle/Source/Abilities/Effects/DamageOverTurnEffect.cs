@@ -1,7 +1,10 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using Godot;
+    using Utilities;
     using Core.Data;
     using Core.Enums;
+    using System.Linq;
     using Core.Interfaces.Abilities;
 
     public class DamageOverTurnEffect(
@@ -31,6 +34,12 @@
             if (otherEffect is not DamageOverTurnEffect other) return false;
 
             return DamagePerTick > other.DamagePerTick;
+        }
+
+        protected override string FormatDescription()
+        {
+            float damage = Owner?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
+            return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
         }
 
         public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxMaxStacks, PercentFromBase, Status);

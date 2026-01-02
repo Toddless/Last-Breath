@@ -16,7 +16,7 @@
         [Export] public SkillType Type { get; private set; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string Description => GetDescription();
-        public string DisplayName => Localizator.Localize(Id);
+        public string DisplayName => Localization.Localize(Id);
 
         public abstract void Attach(IEntity owner);
         public virtual ISkill? Copy() => (ISkill)DuplicateDeep();

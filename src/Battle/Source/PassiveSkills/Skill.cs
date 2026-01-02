@@ -12,8 +12,8 @@
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; }
-        public string Description => Localizator.Localize(Id);
-        public string DisplayName => Localizator.LocalizeDescription(Id);
+        public string Description => Localization.Localize(Id);
+        public string DisplayName => Localization.LocalizeDescription(Id);
 
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);

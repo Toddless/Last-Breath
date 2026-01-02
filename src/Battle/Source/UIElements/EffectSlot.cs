@@ -16,13 +16,17 @@
             get;
             set
             {
-                if(field == value)return;
+                if (field == value) return;
                 field = value;
                 UpdateStacks();
             }
         }
 
-        // TODO: Custom popup
+        public override GodotObject _MakeCustomTooltip(string forText)
+        {
+            var richText = new RichTextLabel { Text = _effect?.Description, AutowrapMode = TextServer.AutowrapMode.Off, FitContent = true, BbcodeEnabled = true};
+            return richText;
+        }
 
         public void AddEffect(IEffect effect)
         {
@@ -40,6 +44,7 @@
         }
 
         public bool HasEffect(IEffect effect) => effect.Id.Equals(_effect?.Id);
+        public bool HasOwner() => _effect?.Owner != null;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

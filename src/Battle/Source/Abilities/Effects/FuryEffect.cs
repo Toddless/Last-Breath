@@ -4,6 +4,7 @@
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
+    using Utilities;
 
     public class FuryEffect(
         int duration,
@@ -25,6 +26,8 @@
             Owner.TakeDamage(Owner, toBurn, Status.GetDamageType(), DamageSource.Effect);
             if ((currentHealth - toBurn) <= 1) Owner.Effects.RemoveEffect(this);
         }
+
+        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);
 
         public override IEffect Clone() => new FuryEffect(Duration, HealthPercent, Status);
     }

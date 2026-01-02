@@ -18,8 +18,8 @@
         [Export] public Rarity Rarity { get; set; } = Rarity.Rare;
         public IMaterial? Material => _material;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
 
 
         /// <summary>

@@ -33,6 +33,7 @@
             for (int i = 0; i < 9; i++)
             {
                 var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
+                slot.SetNumber(i + 1);
                 _abilitySlots?.AddChild(slot);
                 _abilitySlotsInstances[i] = slot;
             }
@@ -65,22 +66,22 @@
         public void SetupEventBus(IBattleEventBus battleEventBus)
         {
             _battleEventBus = battleEventBus;
-            _battleEventBus.Subscribe<PlayerManaChangesGameEvent>(OnPlayerManaChanges);
-            _battleEventBus.Subscribe<PlayerMaxManaChangesGameEvent>(OnPlayerMaxManaChanges);
-            _battleEventBus.Subscribe<PlayerHealthChangesGameEvent>(OnPlayerHealthChanges);
+            _battleEventBus.Subscribe<PlayerManaChangesEvent>(OnPlayerManaChanges);
+            _battleEventBus.Subscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
+            _battleEventBus.Subscribe<PlayerHealthChangesEvent>(OnPlayerHealthChanges);
             _battleEventBus.Subscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
 
-            _battleEventBus.Subscribe<EntityHealthChangesGameEvent>(OnEntityHealthChanges);
-            _battleEventBus.Subscribe<EntityMaxHealthChangesGameEvent>(OnEntityMaxHealthChanges);
-            _battleEventBus.Subscribe<EntityManaChangesGameEvent>(OnEntityManaChanges);
-            _battleEventBus.Subscribe<EntityMaxManaChangesGameEvent>(OnEntityMaxManaChanges);
+            _battleEventBus.Subscribe<EntityHealthChangesEvent>(OnEntityHealthChanges);
+            _battleEventBus.Subscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
+            _battleEventBus.Subscribe<EntityManaChangesEvent>(OnEntityManaChanges);
+            _battleEventBus.Subscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
 
             _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
-            _battleEventBus.Subscribe<BattleQueueDefinedGameEvent>(OnQueueDefined);
-            _battleEventBus.Subscribe<TurnStartGameEvent>(OnTurnStart);
-            _battleEventBus.Subscribe<TurnEndGameEvent>(OnTurnEnd);
+            _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+            _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
+            _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);
 
             foreach (AbilitySlot slot in _abilitySlotsInstances)
@@ -129,7 +130,7 @@
 
         private CharacterBar? GetCharacterBar(string id) => _characterBars.GetValueOrDefault(id);
 
-        private void OnPlayerMaxManaChanges(PlayerMaxManaChangesGameEvent obj)
+        private void OnPlayerMaxManaChanges(PlayerMaxManaChangesEvent obj)
         {
             _playerBars?.UpdateMaxMana(obj.Value);
         }
@@ -139,32 +140,32 @@
             _playerBars?.UpdateMaxHealth(obj.Value);
         }
 
-        private void OnPlayerHealthChanges(PlayerHealthChangesGameEvent obj)
+        private void OnPlayerHealthChanges(PlayerHealthChangesEvent obj)
         {
             _playerBars?.UpdateHealth(obj.Value);
         }
 
-        private void OnPlayerManaChanges(PlayerManaChangesGameEvent obj)
+        private void OnPlayerManaChanges(PlayerManaChangesEvent obj)
         {
             _playerBars?.UpdateMana(obj.Value);
         }
 
-        private void OnEntityManaChanges(EntityManaChangesGameEvent obj)
+        private void OnEntityManaChanges(EntityManaChangesEvent obj)
         {
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMana(obj.Value);
         }
 
-        private void OnEntityHealthChanges(EntityHealthChangesGameEvent obj)
+        private void OnEntityHealthChanges(EntityHealthChangesEvent obj)
         {
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateHealth(obj.Value);
         }
 
-        private void OnEntityMaxManaChanges(EntityMaxManaChangesGameEvent obj)
+        private void OnEntityMaxManaChanges(EntityMaxManaChangesEvent obj)
         {
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMaxMana(obj.Value);
         }
 
-        private void OnEntityMaxHealthChanges(EntityMaxHealthChangesGameEvent obj)
+        private void OnEntityMaxHealthChanges(EntityMaxHealthChangesEvent obj)
         {
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMaxHealth(obj.Value);
         }
@@ -187,20 +188,20 @@
             else GetCharacterBar(target.InstanceId)?.AddEffect(effect);
         }
 
-        private void OnTurnEnd(TurnEndGameEvent obj)
+        private void OnTurnEnd(TurnEndEvent obj)
         {
             var entity = obj.CompletedTurn;
             _queueSlots.TryGetValue(entity.InstanceId, out QueueSlot? slot);
             if (slot != null) _queue?.CallDeferred(Node.MethodName.RemoveChild, slot);
         }
 
-        private void OnTurnStart(TurnStartGameEvent obj)
+        private void OnTurnStart(TurnStartEvent obj)
         {
             if (obj.StartedTurn is Player) _buttonsContainer?.Show();
             else _buttonsContainer?.Hide();
         }
 
-        private void OnQueueDefined(BattleQueueDefinedGameEvent obj)
+        private void OnQueueDefined(BattleQueueDefinedEvent obj)
         {
             if (_uiElementProvider == null) return;
             var queue = obj.Entities;

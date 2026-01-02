@@ -3,5 +3,5 @@
     using Entity;
     using System.Collections.Generic;
 
-    public record BattleStartGameEvent(IEntity Player, List<IEntity> Entities) : IGameEvent;
+    public record BattleStartEvent(IEntity Player, List<IEntity> Entities) : IGameEvent;
 }

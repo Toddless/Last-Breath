@@ -1,22 +1,18 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Module;
-    using Decorators;
+    using Utilities;
     using Core.Enums;
     using Core.Modifiers;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Events.GameEvents;
 
     public class Sacrifice(
         string[] tags,
-        int availablePoints,
-        float costValue,
+        int costValue,
         int cooldown,
         float percentHealthToSacrifice,
         List<IEffect> effects,
@@ -24,8 +20,8 @@
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
         Costs costType = Costs.Mana,
-        AbilityType type = AbilityType.SelfCast)
-        : Ability(id: "Ability_Sacrifice", tags, availablePoints, effects, casterEffects, upgrades, mastery, type)
+        AbilityType abilityType = AbilityType.SelfCast)
+        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, maxTargets: 1, effects, casterEffects, upgrades, mastery, costType, abilityType)
     {
         public float PercentHealthToSacrifice { get; } = percentHealthToSacrifice;
 
@@ -41,18 +37,12 @@
             await base.Activate(targets);
         }
 
+        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentHealthToSacrifice * 100);
+
         private void OnAfterAttack(AfterAttackEvent obj)
         {
             Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner?.Modifiers.RemovePermanentModifierBySource(Id);
         }
-
-        protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-            {
-                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType)
-            });
     }
 }

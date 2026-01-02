@@ -14,10 +14,10 @@
         private readonly List<IEffect> _effects =
         [
             new RegenerationEffect(150, 3, 5),
-            new DamageOverTurnEffect(3, 3, default, StatusEffects.Bleed),
-            new DamageOverTurnEffect(3, 3, default, StatusEffects.Poison),
-            new DamageOverTurnEffect(3, 3, default, StatusEffects.Burning),
-            new ExecutionEffect(3, 3, 0.15f),
+            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Bleed),
+            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Poison),
+            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Burning),
+            new ExecutionEffect(3, 1, 0.15f),
             new LuckyCritChanceEffect(3)
         ];
 
@@ -29,14 +29,14 @@
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
-        private void OnAfterAttack(AfterAttackEvent obj)
+        private void OnAfterAttack(AfterAttackEvent evnt)
         {
-            var rnd = obj.Context.Rnd;
-            if ((rnd.RandFloat() > Chance)) return;
+            var rnd = evnt.Context.Rnd;
+            if (rnd.RandFloat() > Chance) return;
 
             int number = rnd.RandIntRange(0, _effects.Count - 1);
             var effect = _effects[number].Clone();
-            effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = obj.Context.FinalDamage, Source = InstanceId, Target = Owner! });
+            effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = evnt.Context.FinalDamage, Source = Id, Target = Owner! });
         }
 
         public override void Detach(IEntity owner)

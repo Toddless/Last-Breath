@@ -64,14 +64,14 @@
             {
                 var selectable = new InteractiveLabel();
                 selectable.SetSelectable(false);
-                selectable.SetText(Localizator.Format(item));
+                selectable.SetText(Localization.Format(item));
                 itemDetails.SetItemBaseStats(selectable);
             }
 
             foreach (var modifier in equip.AdditionalModifiers)
             {
                 var stat = new InteractiveLabel();
-                stat.SetText(Localizator.Format(modifier));
+                stat.SetText(Localization.Format(modifier));
                 stat.SetSelectable(false);
                 itemDetails.SetItemAdditionalStats(stat);
             }

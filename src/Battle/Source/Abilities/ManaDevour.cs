@@ -1,23 +1,19 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Module;
+    using Utilities;
     using Core.Enums;
-    using Decorators;
     using Core.Modifiers;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Events.GameEvents;
 
     public class ManaDevour(
         string[] tags,
-        int availablePoints,
         int costValue,
-        float cooldown,
+        int cooldown,
         float percentManaToConsume,
         float increaseBonusPerManaConsumed,
         List<IEffect> effects,
@@ -25,7 +21,8 @@
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         IStanceMastery? mastery = null,
         Costs costType = Costs.Mana,
-        AbilityType type = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, availablePoints, effects, casterEffects, upgrades, mastery, type)
+        AbilityType abilityType = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, cooldown, costValue, maxTargets: 1, effects, casterEffects, upgrades,
+        mastery, costType, abilityType)
     {
         public float PercentToConsume { get; } = percentManaToConsume;
         public float IncreaseBonusPerManaConsumed { get; } = increaseBonusPerManaConsumed;
@@ -38,22 +35,16 @@
             float increase = manaConsumed / 100 / IncreaseBonusPerManaConsumed;
             var modifier = new ModifierInstance(EntityParameter.SpellDamage, ModifierType.Increase, increase, Id);
             Owner.Modifiers.AddPermanentModifier(modifier);
-            Owner.CombatEvents.Subscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            Owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
             await base.Activate(targets);
         }
 
-        private void OnAbilityActivated(AbilityActivatedGameEvent obj)
+        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
+
+        private void OnAbilityActivated(AbilityActivatedEvent obj)
         {
-            Owner?.CombatEvents.Unsubscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            Owner?.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivated);
             Owner?.Modifiers.RemovePermanentModifierBySource(Id);
         }
-
-        protected override IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-            {
-                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType)
-            });
     }
 }

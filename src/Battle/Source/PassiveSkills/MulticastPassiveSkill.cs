@@ -12,10 +12,10 @@
         public override void Attach(IEntity owner)
         {
             Owner = owner;
-            owner.CombatEvents.Subscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
         }
 
-        private void OnAbilityActivated(AbilityActivatedGameEvent obj)
+        private void OnAbilityActivated(AbilityActivatedEvent obj)
         {
             if (Owner == null) return;
             var ability = obj.Ability;
@@ -44,7 +44,7 @@
         public override void Detach(IEntity owner)
         {
             Owner = null;
-            owner.CombatEvents.Unsubscribe<AbilityActivatedGameEvent>(OnAbilityActivated);
+            owner.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivated);
         }
 
         public override ISkill Copy() => new MulticastPassiveSkill();

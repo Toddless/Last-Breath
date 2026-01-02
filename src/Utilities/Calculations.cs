@@ -6,7 +6,6 @@
     using Core.Interfaces;
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
-    using Core.Interfaces.Events.GameEvents;
 
     public static class Calculations
     {

@@ -27,10 +27,10 @@
 
         protected override string GetDescription()
         {
-            return Localizator.LocalizeDescriptionFormated(Id, Localizator.Localize(MasteryId), CurrentBonusLevel);
+            return Localization.LocalizeDescriptionFormated(Id, Localization.Localize(MasteryId), CurrentBonusLevel);
         }
 
-        public override ISkill? Copy()
+        public override ISkill Copy()
         {
             using var rnd = new RandomNumberGenerator();
             rnd.Randomize();

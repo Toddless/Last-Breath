@@ -10,8 +10,8 @@
     public class DexterityStance(IEntity owner)
         : StanceBase(owner, effect: new StanceActivationEffect([new ChainAttackPassiveSkill()],
             [new Modifier(ModifierType.Flat, EntityParameter.Dexterity, 15)]), Stance.Dexterity, [
-            new IncreasingPressure([], 50, 50, 4, [], [], []),
-            new DarkShroud([], 50, 5, 50, [], [new LifeGivingShadeEffect(300, 3, 3)], [])
+            new IncreasingPressure([], 50, 4, [], [], []),
+            new DarkShroud([], 50, 5, [], [new LifeGivingShadeEffect(300, 3, 3)], [])
         ])
     {
     }

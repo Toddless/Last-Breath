@@ -34,4 +34,7 @@
       <HintPath>..\Last Breath\.godot\mono\temp\bin\Debug\LastBreath.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\Localization\en.po" />
+  </ItemGroup>
 </Project>

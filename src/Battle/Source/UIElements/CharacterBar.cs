@@ -47,7 +47,12 @@
                 slot.AddEffect(effect);
                 slot.Stacks++;
             }
-            else alreadyExistInSlot.Stacks++;
+            else
+            {
+                if (!alreadyExistInSlot.HasOwner())
+                    alreadyExistInSlot.AddEffect(effect);
+                alreadyExistInSlot.Stacks++;
+            }
         }
 
         public void RemoveEffect(IEffect effect)

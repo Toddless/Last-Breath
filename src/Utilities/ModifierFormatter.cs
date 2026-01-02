@@ -8,8 +8,6 @@
     public class ModifierFormatter(Func<string, string> localize)
     {
         // _localize here is public static string GetLokalizedName(string id) => TranslationServer.Translate(id); from lokalizator
-        private readonly Func<string, string> _localize = localize;
-
         public string FormatModifier(IModifier modifier)
         {
             ArgumentNullException.ThrowIfNull(modifier);
@@ -27,7 +25,7 @@
         {
             string number = FormatSignedNumber(value);
             string percentSign = GetPercentSigh(entityParameter);
-            return $"{number + percentSign} {_localize.Invoke("Flat")} {_localize.Invoke(entityParameter.ToString())}";
+            return $"{number + percentSign} {localize.Invoke("Flat")} {localize.Invoke(entityParameter.ToString())}";
         }
 
         private string GetPercentSigh(EntityParameter entityParameter)
@@ -44,14 +42,14 @@
         private string FormatIncrease(float value, EntityParameter entityParameter)
         {
             string percent = FormatSignedPercent(value * 100f);
-            return $"{percent} {_localize.Invoke("Increase")} {_localize.Invoke(entityParameter.ToString())}";
+            return $"{percent} {localize.Invoke("Increase")} {localize.Invoke(entityParameter.ToString())}";
         }
 
         private string FormatMultiplicative(float value, EntityParameter entityParameter)
         {
             float deltaPercent = (value - 1f) * 100f;
             string percent = FormatSignedPercent(deltaPercent);
-            return $"{percent} {_localize.Invoke("Multiplicative")} {_localize.Invoke(entityParameter.ToString())}";
+            return $"{percent} {localize.Invoke("Multiplicative")} {localize.Invoke(entityParameter.ToString())}";
         }
 
         private string FormatFallback(float value, EntityParameter entityParameter)

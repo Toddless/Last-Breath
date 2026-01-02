@@ -18,6 +18,14 @@
         public bool IsCritical { get; set; }
         public AttackResults Result { get; set; }
 
-        public void Schedule() => AttackContextScheduler.Schedule(this);
+        public bool IsValid => Target.IsAlive && Attacker.IsAlive;
+
+        public bool Schedule()
+        {
+            if (!Attacker.IsAlive || !Target.IsAlive) return false;
+
+            AttackContextScheduler.Schedule(this);
+            return true;
+        }
     }
 }

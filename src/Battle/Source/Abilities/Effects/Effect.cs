@@ -16,7 +16,7 @@
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         protected EffectApplyingContext? Context { get; private set; }
-        protected IEntity? Owner;
+        public IEntity? Owner { get; protected set; }
         public string Id { get; } = statusEffect == StatusEffects.None ? id : $"{id}_{statusEffect}";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
@@ -35,8 +35,8 @@
         public int MaxMaxStacks { get; set; } = maxStacks;
         public string Source { get; private set; } = string.Empty;
         public bool Expired => Duration == 0;
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
+        public string Description => FormatDescription();
+        public string DisplayName => Localization.Localize(Id);
 
         public event Action<int>? DurationChanged;
 
@@ -85,5 +85,7 @@
             Owner = null;
             Context = null;
         }
+
+        protected virtual string FormatDescription() => Localization.LocalizeDescription(Id);
     }
 }

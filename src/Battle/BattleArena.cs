@@ -21,20 +21,20 @@
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
         private IBattleEventBus? _battleEventBus;
-        private List<IEntity> _entities = [];
-        private int _entitiesCount;
+        private List<IEntity> _fighters = [];
+        private int _playerEnemiesCount;
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
         private Player? _player;
         private IEntity? _currentFighter;
         private bool _fightEnds;
 
-        private TaskCompletionSource<IEntity>? _playerTargetTcs;
+        private TaskCompletionSource<IEntity?>? _playerTargetTcs;
 
         public override void _Ready()
         {
             _rnd.Randomize();
-            _queueScheduler.QueueEmpty += OnQueueEmpty;
+            _queueScheduler.QueueContainLessThenTwoFighters += OnQueueContainLessThenTwoFighters;
             _fightEnds = false;
         }
 
@@ -52,9 +52,9 @@
         public void SetupEventBus(IBattleEventBus battleEventBus)
         {
             _battleEventBus = battleEventBus;
-            _battleEventBus.Subscribe<PlayerDiedGameEvent>(OnPlayerDead);
-            _battleEventBus.Subscribe<EntityDiedGameEvent>(OnEntityDead);
-            _battleEventBus.Subscribe<AttackTargetSelectedGameEvent>(OnAttackTargetSelected);
+            _battleEventBus.Subscribe<PlayerDiedEvent>(OnPlayerDead);
+            _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDead);
+            _battleEventBus.Subscribe<AttackTargetSelectedEvent>(OnAttackTargetSelected);
             foreach (var spot in _spots)
                 spot.SetBattleEventBus(_battleEventBus);
         }
@@ -70,23 +70,23 @@
 
         public async Task StartFight(List<IEntity> fighters)
         {
-            int amount = fighters.Count;
+            int enemiesCount = fighters.Count;
 
-            for (int i = 0; i < amount; i++)
+            for (int i = 0; i < enemiesCount; i++)
             {
-                var enemy = fighters[i];
-                _entities.Add(enemy);
-                _spots[i].SetEntity(enemy);
+                var npc = fighters[i];
+                _fighters.Add(npc);
+                _spots[i].SetEntity(npc);
             }
 
-            _entitiesCount = amount;
+            _playerEnemiesCount = enemiesCount;
 
             if (_player != null)
                 fighters.Add(_player);
-            _entities = fighters;
+            _fighters = fighters;
 
-            var entities = _queueScheduler.AddFighters(fighters);
-            _battleEventBus?.Publish<BattleQueueDefinedGameEvent>(new(entities));
+            var fightersQueue = _queueScheduler.AddFighters(fighters);
+            _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
             await ProcessTurnsAsync();
         }
 
@@ -102,59 +102,48 @@
 
         private async Task ProcessTurnsAsync()
         {
-            try
+            while (!_fightEnds && _playerEnemiesCount > 0)
             {
-                while (!_fightEnds)
+                if (!_queueScheduler.TryGetNextFighter(out _currentFighter)) break;
+
+                if (_currentFighter is not { IsAlive: true }) continue;
+
+                _currentFighter.OnTurnStart();
+                if (_currentFighter is Player)
                 {
-                    if (_entitiesCount == 0) break;
-                    _currentFighter = _queueScheduler.GetCurrentFighter();
-                    if (_currentFighter is not { IsAlive: true }) continue;
+                    _playerTargetTcs = new TaskCompletionSource<IEntity?>();
 
-                    _currentFighter.OnTurnStart();
-                    if (_currentFighter is Player)
-                    {
-                        _playerTargetTcs = new TaskCompletionSource<IEntity>();
+                    var target = await _playerTargetTcs.Task;
 
-                        var target = await _playerTargetTcs.Task;
-
-                        if (target is not { IsAlive: true }) continue;
-                        var context = CreateAttackContext(_currentFighter, target);
-                        _attackContextScheduler.Schedule(context);
-                    }
-                    else
-                    {
-                        var target = GetEntityTarget();
-                        if (target == null) continue;
-                        var context = CreateAttackContext(_currentFighter, target);
-                        _attackContextScheduler.Schedule(context);
-                    }
-
-                    await _attackContextScheduler.RunQueue();
-
-                    _currentFighter.OnTurnEnd();
+                    if (target is not { IsAlive: true }) continue;
+                    var context = CreateAttackContext(_currentFighter, target);
+                    _attackContextScheduler.Schedule(context);
                 }
-            }
-            catch (TaskCanceledException)
-            {
+                else
+                {
+                    var target = GetEntityTarget();
+                    if (target is not { IsAlive: true }) continue;
+                    var context = CreateAttackContext(_currentFighter, target);
+                    _attackContextScheduler.Schedule(context);
+                }
+
+                await _attackContextScheduler.RunQueue();
+
+                _currentFighter.OnTurnEnd();
+
+                var queue = _queueScheduler.RefillIfEmpty(_fighters);
+                if (queue.Count > 1) _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(queue));
             }
         }
 
-        private IEntity? GetEntityTarget() => _currentFighter?.ChoseTarget(_entities);
+        private IEntity? GetEntityTarget() => _currentFighter?.ChoseTarget(_fighters);
 
-        private void OnQueueEmpty()
+        private void OnQueueContainLessThenTwoFighters()
         {
-            if (_entitiesCount == 0)
-            {
-                _fightEnds = true;
-                return;
-            }
-
-            var entities = _queueScheduler.AddFighters(_entities);
-            _battleEventBus?.Publish<BattleQueueDefinedGameEvent>(new(entities));
+            _fightEnds = true;
         }
 
-
-        private void OnAttackTargetSelected(AttackTargetSelectedGameEvent obj)
+        private void OnAttackTargetSelected(AttackTargetSelectedEvent obj)
         {
             if (_currentFighter is not Player) return;
             if (_playerTargetTcs == null || _playerTargetTcs.Task.IsCompleted) return;
@@ -165,18 +154,20 @@
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
             currentFighter.GetDamage(), new RndGodot(), _attackContextScheduler);
 
-        private void OnEntityDead(EntityDiedGameEvent obj)
+        private void OnEntityDead(EntityDiedEvent obj)
         {
-            _entitiesCount--;
-            _attackContextScheduler.CancelQueue();
-            _entities.Remove(obj.Entity);
-            if (_entitiesCount == 0 && _currentFighter is Player && _playerTargetTcs is { Task.IsCompleted: false }) _playerTargetTcs?.SetCanceled();
+            _playerEnemiesCount--;
+            _fighters.Remove(obj.Entity);
+            if (_playerEnemiesCount <= 0 && _currentFighter is Player && _playerTargetTcs is { Task.IsCompleted: false })
+            {
+                _playerTargetTcs?.SetResult(null);
+                _fightEnds = true;
+            }
         }
 
-        private void OnPlayerDead(PlayerDiedGameEvent evnt)
+        private void OnPlayerDead(PlayerDiedEvent evnt)
         {
             _fightEnds = true;
-            _attackContextScheduler.CancelQueue();
         }
 
         public Vector2 GetCameraPosition() => GlobalPosition;

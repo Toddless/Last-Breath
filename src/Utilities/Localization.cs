@@ -7,11 +7,11 @@
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
-    public static partial class Localizator
+    public static class Localization
     {
-        private static ModifierFormatter s_modifierFormatter;
+        private static readonly ModifierFormatter s_modifierFormatter;
 
-        static Localizator()
+        static Localization()
         {
             s_modifierFormatter = new ModifierFormatter(Localize);
         }
@@ -22,8 +22,6 @@
             {
                 case var _ when obj is IModifier modifier:
                     return s_modifierFormatter.FormatModifier(modifier);
-                default:
-                    break;
             }
 
             return string.Empty;
@@ -33,16 +31,10 @@
         public static string LocalizeDescription(string id) => TranslationServer.Translate(id + "_Description");
         public static string LocalizeDescriptionFormated(string id, params object[] args)
         {
-            var template = LocalizeDescription(id);
+            string template = LocalizeDescription(id);
 
             return ContainsNamedPlaceholder(template) ? FormatNamed(template, BuildNamedDictFromArgs(args)) : FormatNumbered(template, args);
 
-        }
-
-        private static string LocalizeFormatNamed(string id, IDictionary<string, object> values)
-        {
-            var template = Localize(id);
-            return FormatNamed(template, values);
         }
 
         private static string FormatNumbered(string template, object[] args)
@@ -62,30 +54,27 @@
         private static string FormatNamed(string template, IDictionary<string, object> values)
         {
             if (string.IsNullOrWhiteSpace(template)) return string.Empty;
-            values ??= new Dictionary<string, object>();
 
-            const string L_MARK = "\uFFF0";
-            const string R_MARK = "\uFFF1";
-            template = template.Replace("{{", L_MARK).Replace("}}", R_MARK);
+            const string LMark = "\uFFF0";
+            const string RMark = "\uFFF1";
+            template = template.Replace("{{", LMark).Replace("}}", RMark);
 
-            var res = Regex.Replace(template, @"\{(?<name>[^\}\{]+)\}", match =>
+            string res = Regex.Replace(template, @"\{(?<name>[^\}\{]+)\}", match =>
             {
-                var name = match.Groups["name"].Value;
+                string name = match.Groups["name"].Value;
                 if (int.TryParse(name, out _))
                     return match.Value;
 
-                if (values.TryGetValue(name, out var val))
+                if (values.TryGetValue(name, out object? val))
                 {
-                    return val?.ToString() ?? string.Empty;
+                    return val.ToString() ?? string.Empty;
                 }
-                else
-                {
-                    GD.PrintErr($"Lokalizator: missing named placeholder '{name}' for template '{template}'");
-                    return match.Value;
-                }
+
+                GD.PrintErr($"Localization: missing named placeholder '{name}' for template '{template}'");
+                return match.Value;
             });
 
-            res = res.Replace(L_MARK, "{").Replace(R_MARK, "}");
+            res = res.Replace(LMark, "{").Replace(RMark, "}");
 
             return res;
         }
@@ -101,7 +90,7 @@
         private static IDictionary<string, object> BuildNamedDictFromArgs(object[] args)
         {
             var dict = new Dictionary<string, object>();
-            if (args == null) return dict;
+            if (args.Length == 0) return dict;
             for (int i = 0; i + 1 < args.Length; i += 2)
             {
                 if (args[i] is string key)

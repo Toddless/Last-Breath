@@ -22,10 +22,10 @@
             _uiElementProvider = _provider.GetService<IUiElementProvider>();
             if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
             _gameEventBus = _provider.GetService<IGameEventBus>();
-            _gameEventBus.Subscribe<BattleStartGameEvent>(OnBattleInitialized);
+            _gameEventBus.Subscribe<BattleStartEvent>(OnBattleInitialized);
         }
 
-        private async void OnBattleInitialized(BattleStartGameEvent evnt)
+        private async void OnBattleInitialized(BattleStartEvent evnt)
         {
             try
             {
