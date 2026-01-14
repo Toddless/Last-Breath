@@ -1,7 +1,0 @@
-﻿namespace LastBreath.Script.Helpers.Extensions
-{
-    public static class SignalNameExtension
-    {
-        public static string Completed => nameof(Completed);
-    }
-}
