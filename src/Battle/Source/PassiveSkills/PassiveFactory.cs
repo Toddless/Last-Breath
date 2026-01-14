@@ -23,7 +23,8 @@
             new VampireAttackPassiveSkill(0.15f),
             new ManaBurnPassiveSkill(0.15f),
             new BurningPassiveSkill(0.1f, 3, 5),
-            new GiftFromTheGoddessPassiveSkill(0.5f)
+            new GiftFromTheGoddessPassiveSkill(0.5f),
+            new BleedingPassiveSkill(0.8f, 3, 3)
         ];
 
         public static ISkill GetSkill(string skillId) => Skills.First(skill => skill.Id == skillId);

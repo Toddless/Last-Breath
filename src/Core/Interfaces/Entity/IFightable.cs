@@ -1,7 +1,6 @@
 ﻿namespace Core.Interfaces.Entity
 {
     using Enums;
-    using System;
     using System.Collections.Generic;
     using Battle;
     using System.Threading.Tasks;
@@ -15,8 +14,6 @@
 
         bool IsFighting { get; set; }
         bool IsAlive { get; }
-
-        event Action<float, DamageType, bool> DamageTaken;
 
         Task Attack(IAttackContext context);
         void SetupBattleEventBus(IBattleEventBus bus);

@@ -12,6 +12,9 @@
         IAttackContextScheduler AttackContextScheduler { get; }
         float BaseDamage { get; }
         float AdditionalDamage { get; set; }
+        /// <summary>
+        /// Final damage to deal without armor
+        /// </summary>
         float FinalDamage { get; set; }
         bool IsCritical { get; set; }
         AttackResults Result { get; set; }

@@ -45,7 +45,7 @@
                 var baseStats = item.BaseModifiers;
                 int amountModifiers = GetAmountModifiers(item.Rarity);
 
-                var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid()).Take(amountModifiers)], item).ToHashSet();
+                var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid())], item);
                 item.SetBaseModifiers(statModifiers);
 
                 HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, rnd);
@@ -74,7 +74,7 @@
             var attribute = GetAttribute();
             return true switch
             {
-                var _ when recipe.HasTag("Belt") || recipe.HasTag("Cloak") || recipe.HasTag("Amulet") || recipe.HasTag("Weapong") => recipe.ResultItemId,
+                _ when recipe.HasTag("Belt") || recipe.HasTag("Cloak") || recipe.HasTag("Amulet") || recipe.HasTag("Weapon") => recipe.ResultItemId,
                 _ => $"{recipe.ResultItemId}_{attribute}_Generic"
             };
         }
@@ -85,8 +85,8 @@
             float multiplier = craftingMastery.GetValueMultiplier();
             if (type == ModifierType.Multiplicative)
                 return 1f + (baseValue - 1f) * multiplier;
-            else
-                return baseValue * multiplier;
+
+            return baseValue * multiplier;
         }
 
         private ISkill? GetRandomSkill()

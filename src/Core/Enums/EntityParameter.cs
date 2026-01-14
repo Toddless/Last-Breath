@@ -11,6 +11,8 @@
         AdditionalHitChance,
         MulticastChance,
         CriticalDamage,
+        ArmorPenetration,
+        Accuracy,
         SpellDamage,
         Armor,
         Evade,

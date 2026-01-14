@@ -21,16 +21,6 @@
 					"parameter": "Armor",
 					"modifierType": "multi",
 					"value": 1.1
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "multi",
-					"value": 1.1
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "multi",
-					"value": 1.1
 				}
 			],
 			"additionalModifiers": []

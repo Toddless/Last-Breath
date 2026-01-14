@@ -1,5 +1,6 @@
 ﻿namespace Battle
 {
+    using System;
     using Godot;
     using Source;
     using TestData;
@@ -55,8 +56,6 @@
             _battleEventBus.Subscribe<PlayerDiedEvent>(OnPlayerDead);
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDead);
             _battleEventBus.Subscribe<AttackTargetSelectedEvent>(OnAttackTargetSelected);
-            foreach (var spot in _spots)
-                spot.SetBattleEventBus(_battleEventBus);
         }
 
 
@@ -70,6 +69,7 @@
 
         public async Task StartFight(List<IEntity> fighters)
         {
+            ArgumentNullException.ThrowIfNull(_battleEventBus);
             int enemiesCount = fighters.Count;
 
             for (int i = 0; i < enemiesCount; i++)
@@ -85,8 +85,15 @@
                 fighters.Add(_player);
             _fighters = fighters;
 
+            foreach (var spot in _spots)
+            {
+                if(!spot.HasEntityInit()) continue;
+                spot.SetBattleEventBus(_battleEventBus);
+            }
+            _playerSpot?.SetBattleEventBus(_battleEventBus);
+
             var fightersQueue = _queueScheduler.AddFighters(fighters);
-            _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
+            _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
             await ProcessTurnsAsync();
         }
 

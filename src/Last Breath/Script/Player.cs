@@ -17,7 +17,6 @@
     using LastBreath.Resource.Quests;
     using LastBreath.Script;
     using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.BattleSystem;
     using LastBreath.Script.Items;
     using LastBreath.Script.QuestSystem;
     using Utilities;

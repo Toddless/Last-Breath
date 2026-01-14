@@ -127,7 +127,6 @@
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<float, DamageType, bool>? DamageTaken;
         public event Action<IEntity>? Dead;
 
 
@@ -195,7 +194,12 @@
             CurrentStance?.OnActivate();
         }
 
-        public void Heal(float amount) => CurrentHealth += amount;
+        public void Heal(float amount)
+        {
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
 
         public void ConsumeResource(Costs type, float amount)
         {
@@ -293,9 +297,8 @@
 
         public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
-            CombatEvents.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
-            _battleEventBus?.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
-            DamageTaken?.Invoke(damage, type, isCrit);
+            CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             CurrentHealth -= damage;
             await Animations.PlayAnimationAsync("Fight_Hurt");
         }
@@ -447,7 +450,8 @@
                         break;
                     case EntityParameter.Evade:
                     case EntityParameter.Armor:
-                        value = 200;
+                    case EntityParameter.Accuracy:
+                        value = 500;
                         break;
                     case EntityParameter.CriticalChance:
                         value = 0.25f;

@@ -14,14 +14,11 @@
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using LastBreath.Script.Inventory;
-    using Core.Interfaces.Mediator.Events;
     using LastBreath.DIComponents.Mediator;
     using LastBreath.DIComponents.Services;
     using Core.Interfaces.Mediator.Requests;
-    using Crafting.Source.MediatorHandlers;
     using LastBreath.DIComponents.MediatorHandlers;
     using Microsoft.Extensions.DependencyInjection;
-    using Crafting.Source.MediatorHandlers.EventHandlers;
 
     public class GameServiceProvider : IGameServiceProvider
     {

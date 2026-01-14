@@ -27,6 +27,7 @@
         [Export] private HBoxContainer? _queue;
         [Export] private HBoxContainer? _abilitySlots;
 
+        //TODO: Remove entity bars (health, mana) from this interface???
 
         public override void _Ready()
         {

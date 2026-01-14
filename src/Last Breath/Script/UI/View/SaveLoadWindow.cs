@@ -3,7 +3,6 @@
     using Godot;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
 
     public partial class SaveLoadWindow : Window, IInitializable, IRequireServices
     {

@@ -13,6 +13,7 @@
         public override void Attach(IEntity owner)
         {
             Owner = owner;
+            // Срабатываение пассивки происходит когда ЦЕЛЬ увернулась. Однако данная пассивка должна срабатывать когда уворачивается ВЛАДЕЛЕЦ
             Owner.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 
@@ -21,6 +22,7 @@
             try
             {
                 ArgumentNullException.ThrowIfNull(Owner);
+                if (evnt.Context.Target.InstanceId != Owner.InstanceId) return;
                 if (evnt.Context.Rnd.RandFloat() <= Chance) return;
                 var context = new AttackContext(Owner, evnt.Context.Attacker, Owner.GetDamage(), new RndGodot(), evnt.Context.AttackContextScheduler);
                 context.Schedule();

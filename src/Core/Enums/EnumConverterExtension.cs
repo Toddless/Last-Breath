@@ -16,7 +16,7 @@
                 EquipmentType.Helmet => EquipmentCategory.Armor,
                 EquipmentType.Amulet or EquipmentType.Belt or EquipmentType.Ring => EquipmentCategory.Jewellery,
                 EquipmentType.Weapon => EquipmentCategory.Weapon,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(equipment))
+                _ => throw new ArgumentOutOfRangeException(nameof(equipment))
             };
         }
 

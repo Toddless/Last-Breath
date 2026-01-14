@@ -5,7 +5,6 @@
     using Utilities;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Mediator;
     using LastBreath.Script.Helpers;
     using Core.Constants;
 

@@ -1,6 +1,5 @@
 ﻿namespace LastBreath.Components
 {
-    using Core.Enums;
     using Core.Interfaces.Components;
     using Godot;
     using Utilities;

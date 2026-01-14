@@ -14,23 +14,13 @@
 			"baseModifiers": [
 				{
 					"parameter": "Health",
-					"modifierType": "multiplicative",
-					"value": 1.2
+					"modifierType": "flat",
+					"value": 600
 				},
 				{
 					"parameter": "Armor",
-					"modifierType": "multiplicative",
-					"value": 1.2
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "multiplicative",
-					"value": 1.2
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "multiplicative",
-					"value": 1.2
+					"modifierType": "flat",
+					"value": 500
 				}
 			],
 			"additionalModifiers": []
@@ -49,23 +39,13 @@
 			"baseModifiers": [
 				{
 					"parameter": "Health",
-					"modifierType": "multiplicative",
-					"value": 1.4
+					"modifierType": "flat",
+					"value": 500
 				},
 				{
 					"parameter": "Evade",
-					"modifierType": "multiplicative",
-					"value": 1.4
-				},
-				{
-					"parameter": "Damage",
-					"modifierType": "multiplicative",
-					"value": 1.4
-				},
-				{
-					"parameter": "CriticalChance",
-					"modifierType": "multiplicative",
-					"value": 1.4
+					"modifierType": "flat",
+					"value": 800
 				}
 			],
 			"additionalModifiers": []

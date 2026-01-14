@@ -2,7 +2,6 @@
 {
     using Godot;
     using System;
-    using Core.Enums;
     using LastBreath.Script.Helpers;
     using Core.Interfaces.Components;
     using Utilities;

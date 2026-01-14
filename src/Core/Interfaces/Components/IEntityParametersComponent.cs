@@ -14,7 +14,9 @@
         float CriticalDamage { get; }
         float MulticastChance { get; }
         float SpellDamage { get; }
+        float Accuracy { get; }
         float Armor { get; }
+        float ArmorPenetration { get; }
         float Evade { get; }
         float MaxBarrier { get; }
         float MaxMana { get; }
@@ -26,6 +28,7 @@
 
         event Action<EntityParameter, float>? ParameterChanged;
 
+        float GetValueForParameter(EntityParameter parameter);
         void Initialize(Func<EntityParameter, IReadOnlyList<IModifier>> getModifiers);
         void AddModuleDecorator(EntityParameterModuleDecorator decorator);
         void RemoveModuleDecorator(string id, EntityParameter param);

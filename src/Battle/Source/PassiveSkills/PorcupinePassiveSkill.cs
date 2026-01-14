@@ -35,6 +35,7 @@
         }
 
         public override ISkill Copy() => new PorcupinePassiveSkill(PercentToReturn, PercentArmorToDealAsDamage);
+
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not PorcupinePassiveSkill porcupine) return false;

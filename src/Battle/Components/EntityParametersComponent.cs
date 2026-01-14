@@ -23,16 +23,18 @@
         public float MaxHealth => this[EntityParameter.Health];
         public float HealthRecovery => this[EntityParameter.HealthRecovery];
         public float Damage => this[EntityParameter.Damage];
-        public float BlockChance => this[EntityParameter.BlockChance];
+        public float BlockChance => Mathf.Clamp(this[EntityParameter.BlockChance], 0f, 0.9f);
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
-        public float CriticalChance => this[EntityParameter.CriticalChance];
-        public float AdditionalHit => this[EntityParameter.AdditionalHitChance];
-        public float MulticastChance => this[EntityParameter.MulticastChance];
+        public float CriticalChance => Mathf.Clamp(this[EntityParameter.CriticalChance], 0f, 1f);
+        public float AdditionalHit => Mathf.Clamp(this[EntityParameter.AdditionalHitChance], 0f, 1f);
+        public float MulticastChance => Mathf.Clamp(this[EntityParameter.MulticastChance], 0f, 1f);
         public float SpellDamage => this[EntityParameter.SpellDamage];
+        public float Accuracy => this[EntityParameter.Accuracy];
         public float Armor => this[EntityParameter.Armor];
+        public float ArmorPenetration => Mathf.Clamp(this[EntityParameter.ArmorPenetration], 0f, 1f);
         public float Evade => this[EntityParameter.Evade];
         public float MaxBarrier => this[EntityParameter.Barrier];
-        public float Suppress => this[EntityParameter.Suppress];
+        public float Suppress => Mathf.Clamp(this[EntityParameter.Suppress], 0f, 1f);
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
@@ -45,6 +47,8 @@
             _moduleManager = new ModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator>(_parameterValues.ToDictionary(kv => kv.Key,
                 IParameterModule<EntityParameter> (kv) => new Module<EntityParameter>(() => _parameterValues[kv.Key].Current, kv.Key)));
         }
+
+        public float GetValueForParameter(EntityParameter parameter) => this[parameter];
 
         public void Initialize(Func<EntityParameter, IReadOnlyList<IModifier>> getModifiers)
         {

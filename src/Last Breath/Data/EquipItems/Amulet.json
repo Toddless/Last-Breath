@@ -16,24 +16,14 @@
 			"maxUpdateLevel": 12,
 			"baseModifiers": [
 				{
-					"parameter": "Resource",
+					"parameter": "Mana",
 					"modifierType": "flat",
-					"value": 15
+					"value": 50
 				},
 				{
-					"parameter": "ResourceRecovery",
+					"parameter": "ManaRecovery",
 					"modifierType": "flat",
-					"value": 120
-				},
-				{
-					"parameter": "AllAttribute",
-					"modifierType": "flat",
-					"value": 15
-				},
-				{
-					"parameter": "AllAttribute",
-					"modifierType": "inc",
-					"value": 0.1
+					"value": 12
 				}
 			],
 			"additionalModifiers": []
@@ -51,13 +41,13 @@
 			"baseModifiers": [
 				{
 					"parameter": "Armor",
-					"modifierType": "inc",
-					"value": 2
+					"modifierType": "flat",
+					"value": 200
 				},
 				{
-					"parameter": "Armor",
-					"modifierType": "multi",
-					"value": 3
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 300
 				}
 			],
 			"additionalModifiers": []

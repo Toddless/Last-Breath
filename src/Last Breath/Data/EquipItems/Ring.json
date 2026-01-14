@@ -24,16 +24,6 @@
 					"parameter": "Armor",
 					"modifierType": "flat",
 					"value": 100
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 200
-				},
-				{
-					"parameter": "Damage",
-					"modifierType": "flat",
-					"value": 20
 				}
 			],
 			"additionalModifiers": []
@@ -62,16 +52,6 @@
 					"parameter": "Evade",
 					"modifierType": "flat",
 					"value": 120
-				},
-				{
-					"parameter": "AdditionalHitChance",
-					"modifierType": "increase",
-					"value": 0.04
-				},
-				{
-					"parameter": "CriticalDamage",
-					"modifierType": "flat",
-					"value": 20
 				}
 			],
 			"additionalModifiers": []
@@ -100,16 +80,6 @@
 					"parameter": "Barrier",
 					"modifierType": "flat",
 					"value": 100
-				},
-				{
-					"parameter": "ResourceRecovery",
-					"modifierType": "flat",
-					"value": 15
-				},
-				{
-					"parameter": "SpellDamage",
-					"modifierType": "flat",
-					"value": 15
 				}
 			],
 			"additionalModifiers": []
@@ -138,16 +108,6 @@
 					"parameter": "Damage",
 					"modifierType": "flat",
 					"value": 100
-				},
-				{
-					"parameter": "CriticalDamage",
-					"modifierType": "flat",
-					"value": 20
-				},
-				{
-					"parameter": "CriticalChance",
-					"modifierType": "flat",
-					"value": 3
 				}
 			],
 			"additionalModifiers": []

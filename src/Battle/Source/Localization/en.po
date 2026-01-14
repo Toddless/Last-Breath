@@ -27,19 +27,19 @@ msgid "Effect_Damage_Over_Turn_Bleed"
 msgstr "Bleed"
 
 msgid "Effect_Damage_Over_Turn_Bleed_Description"
-msgstr "Deal {0} damage as [color=red]Bleed[/color] per Turn."
+msgstr "Deal {0} damage as [color=#d6152f]Bleed[/color] per Turn."
 
 msgid "Effect_Damage_Over_Turn_Burning"
 msgstr "Burning"
 
 msgid "Effect_Damage_Over_Turn_Burning_Description"
-msgstr "Deal {0} damage as [color=orange]Burning[/color] per Turn."
+msgstr "Deal {0} damage as [color=#de5931]Burning[/color] per Turn."
 
 msgid "Effect_Damage_Over_Turn_Poison"
 msgstr "Poison"
 
 msgid "Effect_Damage_Over_Turn_Poison_Description"
-msgstr "Deal {0} damage as [color=green]Poison[/color] per Turn."
+msgstr "Deal {0} damage as [color=#63ad18]Poison[/color] per Turn."
 
 msgid "Effect_Life_Giving_Shade_Regeneration"
 msgstr "Life Giving Shade"

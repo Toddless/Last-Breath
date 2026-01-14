@@ -154,7 +154,7 @@
             mana.Attach(this);
             var burning = new BurningPassiveSkill(0.3f, 3, 3);
             burning.Attach(this);
-            var regen = new RegenerationPassiveSkill(500);
+            var regen = new RegenerationPassiveSkill(0.05f);
             regen.Attach(this);
             ConfigureStateMachine();
             SetBaseValuesForParameters();
@@ -209,7 +209,12 @@
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
-        public void Heal(float amount) => CurrentHealth += amount;
+        public void Heal(float amount)
+        {
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
 
         public void ConsumeResource(Costs type, float amount)
         {
@@ -311,9 +316,8 @@
         public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             // TODO: Here i need to calculate final damage with armor/resistance etc
-            CombatEvents.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
-            _battleEventBus?.Publish(new DamageTakenEvent(from, damage, type, source, isCrit));
-            DamageTaken?.Invoke(damage, type, isCrit);
+            CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             CurrentHealth -= damage;
             await Animations.PlayAnimationAsync("Hurt");
         }
@@ -434,7 +438,6 @@
                     case EntityParameter.Dexterity:
                         value = rnd.RandfRange(1, 5);
                         break;
-                    case EntityParameter.Evade:
                     case EntityParameter.Armor:
                         value = 200;
                         break;
@@ -448,6 +451,10 @@
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
                         value = rnd.RandfRange(50, 250);
+                        break;
+                    case EntityParameter.Accuracy:
+                    case EntityParameter.Evade:
+                        value = rnd.RandfRange(50, 500);
                         break;
                 }
 

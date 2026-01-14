@@ -4,10 +4,10 @@
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
-    public class RegenerationPassiveSkill(float regenAmount)
+    public class RegenerationPassiveSkill(float percentFromMaxHealth)
         : Skill(id: "Passive_Skill_Regeneration")
     {
-        private float RegenAmount { get; } = regenAmount;
+        private float PercentFromMaxHealth { get; } = percentFromMaxHealth;
 
         public override void Attach(IEntity owner)
         {
@@ -17,7 +17,7 @@
 
         private void OnTurnEnd(TurnEndEvent evnt)
         {
-            float healAmount = Owner.Parameters.MaxHealth * RegenAmount;
+            float healAmount = Owner.Parameters.MaxHealth * PercentFromMaxHealth;
             Owner?.Heal(healAmount);
         }
 
@@ -27,13 +27,13 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new RegenerationPassiveSkill(RegenAmount);
+        public override ISkill Copy() => new RegenerationPassiveSkill(PercentFromMaxHealth);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not RegenerationPassiveSkill regenerationPassiveSkill) return false;
 
-            return RegenAmount > regenerationPassiveSkill.RegenAmount;
+            return PercentFromMaxHealth > regenerationPassiveSkill.PercentFromMaxHealth;
         }
     }
 }

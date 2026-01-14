@@ -24,16 +24,6 @@
 					"parameter": "Movespeed",
 					"modifierType": "flat",
 					"value": 15
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 120
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "increase",
-					"value": 0.08
 				}
 			],
 			"additionalModifiers": []
@@ -62,16 +52,6 @@
 					"parameter": "Movespeed",
 					"modifierType": "flat",
 					"value": 15
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 500
-				},
-				{
-					"parameter": "MaxEvadeChance",
-					"modifierType": "increase",
-					"value": 0.03
 				}
 			],
 			"additionalModifiers": []
@@ -98,16 +78,6 @@
 				},
 				{
 					"parameter": "Movespeed",
-					"modifierType": "flat",
-					"value": 15
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 120
-				},
-				{
-					"parameter": "Resource",
 					"modifierType": "flat",
 					"value": 15
 				}
@@ -138,16 +108,6 @@
 					"parameter": "Movespeed",
 					"modifierType": "flat",
 					"value": 25
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 600
-				},
-				{
-					"parameter": "Dexterity",
-					"modifierType": "flat",
-					"value": 15
 				}
 			],
 			"additionalModifiers": []

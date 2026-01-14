@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core.Enums;
-    using Core.Interfaces.Components;
     using Core.Interfaces.Skills;
 
     public abstract class BaseSkillComponent<T> : IBaseSkillComponent<T>

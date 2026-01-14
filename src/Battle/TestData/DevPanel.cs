@@ -199,6 +199,7 @@
                 hbox.AddChild(parameterValue);
                 _statsContainer?.AddChild(hbox);
                 parameterName.Text = entityParameter.ToString();
+                parameterValue.Text = $"{_player.Parameters.GetValueForParameter(entityParameter):##.##}";
                 _parameterValues[entityParameter] = parameterValue;
             }
         }

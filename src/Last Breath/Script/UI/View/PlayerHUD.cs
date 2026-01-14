@@ -3,8 +3,6 @@
     using Godot;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Events;
 
     public partial class PlayerHUD : Control, IInitializable, IRequireServices
     {

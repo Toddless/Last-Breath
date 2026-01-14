@@ -5,7 +5,6 @@
     using Utilities;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
 
     public class OpenWindowEventHandler<TEvent, TWindow> : IEventHandler<TEvent>
         where TEvent : IEvent

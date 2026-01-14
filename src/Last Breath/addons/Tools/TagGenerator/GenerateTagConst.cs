@@ -1,12 +1,9 @@
 namespace LastBreath.Addons.Tools.TagGenerator
 {
-	using System.IO;
-	using System.Linq;
-	using System.Text;
+    using System.Text;
 	using Core;
-	using Godot;
 
-	public partial class GenerateTagConst /*: EditorScript*/
+    public partial class GenerateTagConst /*: EditorScript*/
 	{
 		private string _path = FilePaths.TagResourcePath;
 

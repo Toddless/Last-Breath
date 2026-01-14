@@ -60,7 +60,6 @@
         {
             if (_entity == null) return;
             _entity.Dead -= OnEntityDead;
-            _entity.DamageTaken -= OnDamageTaken;
             _entity.Effects.EffectAdded -= OnEffectAdded;
             var node = _entity as Node;
             RemoveChild(node);
@@ -69,13 +68,14 @@
         public void SetEntity(IEntity entity)
         {
             entity.Dead += OnEntityDead;
-            entity.DamageTaken += OnDamageTaken;
             entity.Effects.EffectAdded += OnEffectAdded;
             var body = entity as CharacterBody2D;
             _entity = entity;
             body?.Position = Vector2.Zero;
             CallDeferred(Node.MethodName.AddChild, body);
         }
+
+        public bool HasEntityInit() => _entity != null;
 
         private void OnEffectAdded(IEffect obj)
         {
@@ -93,6 +93,19 @@
             _eventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnPlayerSelectingAbilityTarget);
             _eventBus.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
             _eventBus.Subscribe<CancelSelectionEvent>(OnSelectionCancel);
+            _eventBus.Subscribe<DamageTakenEvent>(OnDamageTaken);
+            _eventBus.Subscribe<EntityHealedEvent>(OnHealed);
+        }
+
+        private void OnHealed(EntityHealedEvent obj)
+        {
+            // TODO: Why some character after evade attack them self?
+            if (_entity?.InstanceId != obj.Healed.InstanceId) return;
+            int healed = Mathf.RoundToInt(obj.Amount);
+
+            var numbers = FlyNumbers.Initialize().Instantiate<FlyNumbers>();
+            numbers.PlayHealNumbers(healed);
+            CallDeferred(Node.MethodName.AddChild, numbers);
         }
 
         private void OnSelectionCancel(CancelSelectionEvent obj)
@@ -116,17 +129,21 @@
             _stateMachine.Fire(_candidateForAbility, evnt.SelectionId);
         }
 
-        private void OnDamageTaken(float damage, DamageType type, bool isCrit)
+        private void OnDamageTaken(DamageTakenEvent evnt)
         {
-            var damageNumber = DamageNumber.Initialize().Instantiate<DamageNumber>();
-            damageNumber.Play(Mathf.RoundToInt(damage), type, isCrit);
-            CallDeferred(Node.MethodName.AddChild, damageNumber);
+            if (_entity?.InstanceId != evnt.DamageTaken.InstanceId) return;
+            float damage = evnt.Damage;
+            var type = evnt.Type;
+            bool isCrit = evnt.IsCritical;
+
+            var flyNumbers = FlyNumbers.Initialize().Instantiate<FlyNumbers>();
+            flyNumbers.PlayDamageNumbers(Mathf.RoundToInt(damage), type, isCrit);
+            CallDeferred(Node.MethodName.AddChild, flyNumbers);
         }
 
         private void OnEntityDead(IFightable obj)
         {
             _stateMachine.Fire(Trigger.SetCannotBeSelected);
-            _entity?.DamageTaken -= OnDamageTaken;
             _entity?.Dead -= OnEntityDead;
             _entity = null;
         }

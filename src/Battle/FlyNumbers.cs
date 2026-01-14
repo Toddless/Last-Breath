@@ -4,14 +4,14 @@
     using Core.Enums;
     using Core.Interfaces.UI;
 
-    public partial class DamageNumber : Node2D, IInitializable
+    public partial class FlyNumbers : Node2D, IInitializable
     {
         private const string UID = "uid://crckxdaqepep8";
         [Export] private Label? _label;
         [Export] private float _rise = 25f;
         [Export] private float _duration = 0.5f;
 
-        public void Play(int value, DamageType type, bool isCritical = false)
+        public void PlayDamageNumbers(int value, DamageType type, bool isCritical = false)
         {
             _label?.Text = value.ToString();
             _label?.Modulate = DefineColor(type, isCritical);
@@ -22,6 +22,18 @@
             var tween = CreateTween();
             tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
             tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
+            tween.Finished += QueueFree;
+        }
+
+        public void PlayHealNumbers(int value)
+        {
+            _label?.Text = value.ToString();
+            _label?.Modulate = Colors.LawnGreen;
+
+            var tween = CreateTween();
+            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
+            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
+            tween.Parallel().TweenProperty(this, "scale", Vector2.One * 1.3f, _duration);
             tween.Finished += QueueFree;
         }
 

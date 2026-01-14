@@ -1,10 +1,8 @@
 ﻿namespace LastBreath.Components
 {
     using System;
-    using Core.Enums;
     using Core.Interfaces;
     using LastBreath.Components.Interfaces;
-    using LastBreath.Script.Attribute;
 
     public class AttributeComponent
     {

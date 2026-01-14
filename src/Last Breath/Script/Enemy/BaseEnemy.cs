@@ -11,7 +11,6 @@ namespace LastBreath
     using LastBreath.Script.Enemy;
     using System.Collections.Generic;
     using Core.Interfaces.Components;
-    using LastBreath.Script.BattleSystem;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Utilities;
     using Core.Interfaces.Entity;

@@ -4,7 +4,6 @@
     using System;
     using System.Linq;
     using Core.Interfaces.UI;
-    using LastBreath.Script.UI;
     using Core.Interfaces.Data;
     using System.Collections.Generic;
     using LastBreath.Script.UI.Layers;
