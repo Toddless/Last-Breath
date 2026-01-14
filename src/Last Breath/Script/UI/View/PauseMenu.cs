@@ -4,7 +4,6 @@
     using System;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
     using Core.Constants;
 
     public partial class PauseMenu : Control, IInitializable, IRequireServices, IClosable

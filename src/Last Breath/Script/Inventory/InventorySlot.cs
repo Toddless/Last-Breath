@@ -4,9 +4,7 @@
     using System;
     using Core.Enums;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator.Events;
 
     public partial class InventorySlot : Slot, IInventorySlot
     {

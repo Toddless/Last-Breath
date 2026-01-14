@@ -1,15 +1,13 @@
 ﻿namespace Core.Interfaces.Skills
 {
-    using Core.Enums;
-    using Core.Interfaces.Entity;
+    using Entity;
 
     public interface ISkill : IIdentifiable, IDisplayable
     {
-        SkillType Type { get; }
-
         void Attach(IEntity owner);
-        void Detach();
+        void Detach(IEntity owner);
 
-        ISkill? Copy();
+        ISkill Copy();
+        bool IsStronger(ISkill skill);
     }
 }

@@ -4,7 +4,6 @@
     using System;
     using Utilities;
     using Core.Enums;
-    using System.Linq;
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
 
@@ -17,8 +16,8 @@
         [Export] public Texture2D? Icon { get; private set; }
         [Export] public int MaxStackSize { get; private set; } = 1;
 
-        public string Description => Localizator.LocalizeDescription(Id);
-        public string DisplayName => Localizator.Localize(Id);
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public UpgradeResource()
@@ -41,7 +40,7 @@
             Icon = icon;
             MaxStackSize = maxStackSize;
         }
-
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag);
         public T Copy<T>()
         {

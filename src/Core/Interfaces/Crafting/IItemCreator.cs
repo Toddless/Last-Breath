@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Crafting
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Items;
+    using Entity;
+    using Items;
     using System.Collections.Generic;
 
     public interface IItemCreator

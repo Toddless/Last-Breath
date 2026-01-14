@@ -11,7 +11,6 @@ namespace LastBreath
     using LastBreath.Script.Enemy;
     using System.Collections.Generic;
     using Core.Interfaces.Components;
-    using LastBreath.Script.BattleSystem;
     using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Utilities;
     using Core.Interfaces.Entity;
@@ -288,7 +287,6 @@ namespace LastBreath
         private void SetEvents()
         {
             _area!.BodyEntered += PlayerEntered;
-            Modifiers.ParameterModifiersChanged += Damage.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
             Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
             Health.EntityDead += OnEntityDead;

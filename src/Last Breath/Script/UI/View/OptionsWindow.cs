@@ -7,7 +7,6 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
     using LastBreath.Script.UI;
-    using Core.Interfaces.Mediator;
     using LastBreath.Script.Helpers;
     using Core.Constants;
 

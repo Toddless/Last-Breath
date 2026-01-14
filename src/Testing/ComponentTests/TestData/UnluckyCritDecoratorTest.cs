@@ -1,9 +1,9 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using Core.Interfaces.Battle.Decorator;
+    using Core.Interfaces.Components.Decorator;
 
-    public class UnluckyCritDecoratorTest(DecoratorPriority priority) : StatModuleDecorator(type: StatModule.CritChance, priority)
+    public class UnluckyCritDecoratorTest(DecoratorPriority priority) : EntityParameterModuleDecorator(parameter: EntityParameter.CriticalChance, priority, "UnluckyCritDecorator")
     {
         public override float GetValue()
         {

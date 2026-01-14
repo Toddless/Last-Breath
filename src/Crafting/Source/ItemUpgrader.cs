@@ -95,7 +95,7 @@
 
                 if (newMod != null && !item.AdditionalModifiers.Any(x => x.GetHashCode() == newMod.GetHashCode()))
                 {
-                    modifier = ModifiersCreator.CreateModifierInstance(newMod.Parameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
+                    modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
                     item.AddAdditionalModifier(modifier);
                 }
             }

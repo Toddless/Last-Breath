@@ -1,9 +1,9 @@
-﻿namespace Crafting.TestResources.Skills
+﻿namespace Crafting.Source.Skills
 {
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Skills;
     using Godot;
     using Utilities;
-    using Core.Interfaces.Skills;
-    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
@@ -20,17 +20,17 @@
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }
 
         protected override string GetDescription()
         {
-            return Localizator.LocalizeDescriptionFormated(Id, [Localizator.Localize(MasteryId), CurrentBonusLevel]);
+            return Localization.LocalizeDescriptionFormated(Id, Localization.Localize(MasteryId), CurrentBonusLevel);
         }
 
-        public override ISkill? Copy()
+        public override ISkill Copy()
         {
             using var rnd = new RandomNumberGenerator();
             rnd.Randomize();

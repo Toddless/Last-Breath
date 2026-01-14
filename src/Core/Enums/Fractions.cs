@@ -2,10 +2,12 @@
 {
     public enum Fractions : byte
     {
-        None = 0,
         Elf,
         Dwarf,
         Human,
-        Undead
+        Undead,
+        Demon,
+        Animal,
+        MysticalCreature,
     }
 }

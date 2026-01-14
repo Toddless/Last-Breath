@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using System.Collections.Generic;
-    using Core.Interfaces.Entity;
+    using System.Threading.Tasks;
 
     public interface IBattleContext
     {
-        List<IEntity> Fighters { get; }
+        Task RunBattleAsync();
+        void Dispose();
     }
 }

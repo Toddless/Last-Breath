@@ -7,7 +7,6 @@
     using Core.Interfaces.Data;
     using LastBreath.Script.UI;
     using LastBreath.DIComponents;
-    using Core.Interfaces.Mediator;
     using LastBreath.Script.ScenesHandlers;
 
     public partial class MainMenu : Control, IInitializable

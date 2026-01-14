@@ -3,9 +3,9 @@
     using Godot;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator.Events;
+    using Core.Interfaces.Mediator;
 
     public partial class InventoryWindow : Panel, IInitializable, IRequireServices
     {
@@ -14,8 +14,8 @@
         [Export] private Button? _craftingButton, _allStatsButton, _sortButton, _destroyButton;
         [Export] private GridContainer? _inventoryGrid;
 
+        private IMediator? _mediator;
         private IInventory? _inventory;
-        private IUiMediator? _uiMediator;
         private IItemDataProvider? _itemDataProvider;
 
         public override void _Ready()
@@ -24,20 +24,25 @@
             if (_craftingButton != null)
                 _craftingButton.Pressed += OnCraftingButtonPressed;
 
-            using (var rnd = new RandomNumberGenerator())
-                foreach (var resource in _itemDataProvider?.GetAllResources() ?? [])
-                    _inventory?.TryAddItem(resource, 100);
+            using var rnd = new RandomNumberGenerator();
+            foreach (var resource in _itemDataProvider?.GetAllResources() ?? [])
+                _inventory?.TryAddItem(resource, 100);
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _uiMediator = provider.GetService<IUiMediator>();
             _inventory = provider.GetService<IInventory>();
             _itemDataProvider = provider.GetService<IItemDataProvider>();
+            _mediator = provider.GetService<IMediator>();
+        }
+
+        private void OnInventoryFull(InventoryFullEvent obj)
+        {
+
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnCraftingButtonPressed() => _uiMediator?.Publish(new OpenCraftingWindowEvent(string.Empty));
+        private void OnCraftingButtonPressed() => _mediator?.PublishAsync(new OpenCraftingWindowEvent(string.Empty));
     }
 }

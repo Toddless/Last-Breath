@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using Core.Enums;
-    using Core.Interfaces.Entity;
+    using Enums;
+    using Entity;
 
     public interface IOnGettingAttackEventArgs
     {

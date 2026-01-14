@@ -24,16 +24,6 @@
 					"parameter": "Armor",
 					"modifierType": "flat",
 					"value": 500
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "increase",
-					"value": 0.5
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "increase",
-					"value": 0.7
 				}
 			],
 			"additionalModifiers": []
@@ -62,16 +52,6 @@
 					"parameter": "Evade",
 					"modifierType": "increase",
 					"value": 0.5
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 250
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "increase",
-					"value": 0.1
 				}
 			],
 			"additionalModifiers": []
@@ -92,24 +72,14 @@
 			"maxUpdateLevel": 12,
 			"baseModifiers": [
 				{
-					"parameter": "Health",
+					"parameter": "Barrier",
 					"modifierType": "flat",
 					"value": 210
 				},
 				{
-					"parameter": "Health",
+					"parameter": "Barrier",
 					"modifierType": "increase",
 					"value": 0.3
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 500
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "increase",
-					"value": 0.5
 				}
 			],
 			"additionalModifiers": []
@@ -138,16 +108,6 @@
 					"parameter": "Armor",
 					"modifierType": "flat",
 					"value": 500
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "increase",
-					"value": 0.5
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "increase",
-					"value": 0.5
 				}
 			],
 			"additionalModifiers": []

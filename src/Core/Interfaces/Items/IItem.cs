@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Items
 {
-    using Core.Enums;
+    using Enums;
 
-    public interface IItem : IIdentifiable, IDisplayable, IStackable
+    public interface IItem : IIdentifiable, IDisplayable, IStackable, ITaggable
     {
         string InstanceId { get; }
         Rarity Rarity { get; set; }

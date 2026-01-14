@@ -1,29 +1,25 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using System;
-    using System.Collections.Generic;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
+    using Entity;
+    using Components;
+    using Enums;
 
     public interface IAttackContext
     {
-        float Armor { get; set; }
+        IRandomNumberGenerator Rnd { get; }
         IEntity Attacker { get; }
-        float CriticalDamageMultiplier { get; set; }
-        float Damage { get; set; }
-        float FinalDamage { get; set; }
-        bool IgnoreArmor { get; set; }
-        bool IgnoreBarrier { get; set; }
-        bool IgnoreEvade { get; set; }
-        bool IsCritical { get; set; }
-        float MaxReduceDamage { get; set; }
-        List<ISkill> PassiveSkills { get; set; }
         IEntity Target { get; }
+        IAttackContextScheduler AttackContextScheduler { get; }
+        float BaseDamage { get; }
+        float AdditionalDamage { get; set; }
+        /// <summary>
+        /// Final damage to deal without armor
+        /// </summary>
+        float FinalDamage { get; set; }
+        bool IsCritical { get; set; }
+        AttackResults Result { get; set; }
+        bool IsValid { get; }
 
-        event Action<IAttackContext>? OnAttackCanceled;
-        event Action<IAttackResult>? OnAttackResult;
-
-        void CancelAttack();
-        void SetAttackResult(IAttackResult result);
+        bool Schedule();
     }
 }

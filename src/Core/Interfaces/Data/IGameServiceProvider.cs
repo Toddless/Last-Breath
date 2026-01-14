@@ -6,5 +6,6 @@
     {
         T GetService<T>();
         IEnumerable<T> GetServices<T>();
+        T GetKeyedService<T>(string key);
     }
 }

@@ -1,28 +1,28 @@
-﻿namespace Crafting.TestResources.Skills
+﻿namespace Crafting.Source.Skills
 {
+    using Core.Interfaces.Entity;
     using Godot;
     using Utilities;
-    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]
     public partial class ExperiencedRecycler : SkillBase
     {
         [Export] private int Percent { get; set; }
-        
+
         public override void Attach(IEntity owner)
         {
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }
 
         protected override string GetDescription()
         {
-            return Localizator.LocalizeDescriptionFormated(Id, [Percent]);
+            return Localization.LocalizeDescriptionFormated(Id, [Percent]);
         }
     }
 }

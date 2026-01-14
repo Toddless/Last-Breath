@@ -5,5 +5,6 @@
     [GlobalClass]
     public partial class QuestItem : Item
     {
+
     }
 }

@@ -1,11 +1,11 @@
 ﻿namespace Core.Interfaces
 {
-    using Core.Enums;
+    using Enums;
 
     public interface IModifier
     {
         ModifierType ModifierType { get; }
-        Parameter Parameter { get; }
+        EntityParameter EntityParameter { get; }
         float BaseValue { get; }
         float Value { get; set; }
     }

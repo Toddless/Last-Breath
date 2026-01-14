@@ -1,13 +1,13 @@
 ﻿namespace Core.Modifiers
 {
-    using Core.Enums;
-    using Core.Interfaces;
+    using Enums;
+    using Interfaces;
 
-    public class Modifier(ModifierType type, Parameter parameter, float baseValue) : IModifier
+    public class Modifier(ModifierType type, EntityParameter entityParameter, float baseValue) : IModifier
     {
         public ModifierType ModifierType { get; } = type;
 
-        public Parameter Parameter { get; } = parameter;
+        public EntityParameter EntityParameter { get; } = entityParameter;
 
         public float BaseValue { get; } = baseValue;
 

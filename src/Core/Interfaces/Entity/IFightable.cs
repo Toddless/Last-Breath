@@ -1,17 +1,27 @@
 ﻿namespace Core.Interfaces.Entity
 {
-    using System;
-    using Core.Interfaces.Components;
+    using Enums;
+    using System.Collections.Generic;
+    using Battle;
+    using System.Threading.Tasks;
+    using Events;
 
     public interface IFightable
     {
-        IHealthComponent Health {  get; }
-        IDamageComponent Damage {  get; }
-        IDefenceComponent Defence {  get; }
+        ICombatEventBus CombatEvents { get; }
+        IStance CurrentStance { get; }
+        ITargetChooser? TargetChooser { get; set; }
 
         bool IsFighting { get; set; }
-        bool IsAlive {  get; set; }
+        bool IsAlive { get; }
 
-        event Action? TurnStart, TurnEnd;
+        Task Attack(IAttackContext context);
+        void SetupBattleEventBus(IBattleEventBus bus);
+        void OnTurnEnd();
+        void OnTurnStart();
+        Task ReceiveAttack(IAttackContext context);
+        Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false);
+        IEntity ChoseTarget(List<IEntity> targets);
+        void Kill();
     }
 }

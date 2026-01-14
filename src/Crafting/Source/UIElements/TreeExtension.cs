@@ -8,7 +8,7 @@
         public static void UpdateText(this TreeItem treeItem, int amount)
         {
             var id = treeItem.GetMetadata(0).AsString();
-            var text = $"{Localizator.Localize(id)}";
+            var text = $"{Localization.Localize(id)}";
             if (amount > 0)
                 text += $" ({amount})";
             treeItem.SetText(0, text);

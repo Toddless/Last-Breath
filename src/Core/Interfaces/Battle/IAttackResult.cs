@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using System.Collections.Generic;
-    using Core.Enums;
-    using Core.Interfaces.Skills;
+    using Enums;
+    using Skills;
 
     public interface IAttackResult
     {

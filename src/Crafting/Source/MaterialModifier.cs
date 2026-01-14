@@ -10,7 +10,7 @@
     {
         private float _value;
         private bool _initialized = false;
-        [Export] public Parameter Parameter { get; private set; }
+        [Export] public EntityParameter EntityParameter { get; private set; }
         [Export] public ModifierType ModifierType { get; private set; }
         [Export] public float BaseValue { get; private set; }
         [Export] public float Weight { get; private set; }
@@ -19,11 +19,12 @@
         {
             get
             {
-                if (!_initialized)
-                {
-                    _value = BaseValue;
-                    _initialized = true;
-                }
+                if (_initialized)
+                    return _value;
+
+                _value = BaseValue;
+                _initialized = true;
+
                 return _value;
             }
             set => _value = value;
@@ -32,12 +33,11 @@
 
         public MaterialModifier()
         {
-
         }
 
-        public MaterialModifier(Parameter parameter, ModifierType type, float value, float weight)
+        public MaterialModifier(EntityParameter entityParameter, ModifierType type, float value, float weight)
         {
-            Parameter = parameter;
+            EntityParameter = entityParameter;
             ModifierType = type;
             BaseValue = value;
             Weight = weight;
@@ -46,11 +46,10 @@
 
         public override bool Equals(object? obj)
         {
-            if (obj == null) return false;
             if (obj is not IModifier other) return false;
-            return Parameter == other.Parameter && ModifierType == other.ModifierType;
+            return EntityParameter == other.EntityParameter && ModifierType == other.ModifierType;
         }
 
-        public override int GetHashCode() => System.HashCode.Combine(Parameter, ModifierType);
+        public override int GetHashCode() => System.HashCode.Combine(EntityParameter, ModifierType);
     }
 }

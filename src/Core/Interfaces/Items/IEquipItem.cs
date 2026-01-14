@@ -1,11 +1,11 @@
 ﻿namespace Core.Interfaces.Items
 {
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Skills;
-    using Core.Interfaces.Crafting;
+    using Enums;
+    using Skills;
+    using Entity;
+    using Crafting;
+    using Interfaces;
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
 
     public interface IEquipItem : IItem
     {

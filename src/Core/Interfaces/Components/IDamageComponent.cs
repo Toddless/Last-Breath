@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
+    using Enums;
 
     public interface IDamageComponent
     {
@@ -9,14 +9,10 @@
         float CriticalChance { get; }
         float CriticalDamage { get; }
         float Damage { get; }
-        float MaxAdditionalHit { get; }
-        float MaxCriticalChance { get; }
+        float SpellDamage { get; }
 
-        event Action<Parameter, float>? PropertyValueChanges;
+        event Action<EntityParameter, float> ParameterChanged;
 
-        void AddOverrideFuncForParameter(Func<float, IModifiersChangedEventArgs, float> newFunc, Parameter parameter);
-        void ChangeStrategy(IDamageStrategy strategy);
-        void OnParameterChanges(object? sender, IModifiersChangedEventArgs args);
-        void RemoveOverrideFuncForParameter(Parameter parameter);
+        float CalculateForBase(EntityParameter parameter, float baseValue);
     }
 }

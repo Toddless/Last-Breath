@@ -3,8 +3,8 @@
     public interface IIdentifiable
     {
         string Id { get; }
-        string[] Tags { get; }
+        string InstanceId { get; }
 
-        bool HasTag(string tag);
+        bool IsSame(string otherId);
     }
 }

@@ -1,7 +1,6 @@
 ﻿namespace LastBreath.Script.UI
 {
     using Godot;
-    using Utilities;
 
     [GlobalClass]
     public partial class LocalizableLabel : Label

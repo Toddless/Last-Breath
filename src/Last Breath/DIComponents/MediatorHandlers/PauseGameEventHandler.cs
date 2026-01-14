@@ -4,9 +4,6 @@
     using System;
     using Utilities;
     using LastBreath.Script.UI;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Events;
 
     internal class PauseGameEventHandler : IEventHandler<PauseGameEvent>
     {

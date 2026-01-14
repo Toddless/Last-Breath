@@ -1,29 +1,45 @@
 ﻿namespace Core.Interfaces.Entity
 {
+    using Enums;
+    using Items;
     using System;
-    using Core.Interfaces;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
+    using Components;
+    using Interfaces;
 
     public interface IEntity : IIdentifiable, IDisplayable, IFightable
     {
-        IEffectsManager Effects { get; }
-        IModifierManager Modifiers { get; }
+        IEffectsComponent Effects { get; }
+        IModifiersComponent Modifiers { get; }
+        IEntityParametersComponent Parameters { get; }
+        IPassiveSkillsComponent PassiveSkills { get; }
+        IAnimationsComponent Animations { get; }
+
+        IEntityAttribute Dexterity { get; }
+        IEntityAttribute Strength { get; }
+        IEntityAttribute Intelligence { get; }
+
+        IEntityGroup? Group { get; set; }
+
+        StatusEffects StatusEffects { get; }
 
         bool CanMove { get; set; }
 
-        event Action<IEntity>? Dead;
-        event Action<IAttackContext>? BeforeAttack, AfterAttack;
-        event Action<IOnGettingAttackEventArgs>? GettingAttack;
+        float CurrentHealth { get; set; }
+        float CurrentBarrier { get; set; }
+        float CurrentMana { get; set; }
 
-        void OnTurnEnd();
-        void OnTurnStart();
+        event Action<float>? CurrentManaChanged;
+        event Action<float>? CurrentBarrierChanged;
+        event Action<float>? CurrentHealthChanged;
+        event Action<IEntity>? Dead;
+
         void AddItemToInventory(IItem item);
-        void OnReceiveAttack(IAttackContext context);
-        void TakeDamage(float damage, bool isCrit = false);
-        void AllAttacks();
-        void OnEvadeAttack();
-        void OnBlockAttack();
+
+        float GetDamage();
+
+        void Heal(float amount);
+        void ConsumeResource(Costs type, float amount);
+        bool TryApplyStatusEffect(StatusEffects statusEffect);
+        bool TryRemoveStatusEffect(StatusEffects statusEffect);
     }
 }

@@ -1,11 +1,9 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Core.Enums;
 
     public interface IResource
     {
-        ResourceType ResourceType { get; }
         float Current { get; }
         float MaximumAmount { get; }
         float RecoveryAmount { get; }

@@ -4,16 +4,14 @@
     using System;
     using Core.Interfaces.UI;
     using Core.Interfaces.Data;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Events;
-    using Core.Interfaces.Mediator.Requests;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable
     {
         private const string UID = "uid://dor0kden4oc1j";
         [Export] private Button? _equip, _update, _destroy, _favorite;
-        private ISystemMediator? _systemMediator;
-        private IUiMediator? _uiMediator;
+        private IMediator? _mediator;
         private string _itemInstance = string.Empty;
 
         public event Action? Close;
@@ -29,31 +27,32 @@
 
         public override void _ExitTree()
         {
-            _uiMediator?.RaiseUpdateUi();
+            _mediator?.RaiseUpdateUi();
             Close?.Invoke();
         }
 
-        public void InjectServices(Core.Interfaces.Data.IGameServiceProvider provider)
+        public void InjectServices(IGameServiceProvider provider)
         {
-            _systemMediator = provider.GetService<ISystemMediator>();
-            _uiMediator = provider.GetService<IUiMediator>();
+            _mediator = provider.GetService<IMediator>();
         }
 
         public void SetItemInstanceId(string instanceId) => _itemInstance = instanceId;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnFavoritePressed() { }
+        private void OnFavoritePressed()
+        {
+        }
 
         private void OnDestroyPressed()
         {
-            _systemMediator?.Publish(new DestroyItemEvent(_itemInstance));
+            _mediator?.PublishAsync(new DestroyItemEvent(_itemInstance));
             Close?.Invoke();
         }
 
         private void OnUpdatePressed()
         {
-            _uiMediator?.Publish(new OpenCraftingWindowEvent(_itemInstance, true));
+            _mediator?.PublishAsync(new OpenCraftingWindowEvent(_itemInstance, true));
             Close?.Invoke();
         }
 

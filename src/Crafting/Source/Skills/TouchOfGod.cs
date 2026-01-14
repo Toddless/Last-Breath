@@ -1,9 +1,9 @@
-﻿namespace Crafting.TestResources.TestSkills
+﻿namespace Crafting.Source.Skills
 {
-    using Godot;
     using Core.Enums;
-    using Utilities;
     using Core.Interfaces.Entity;
+    using Godot;
+    using Utilities;
 
     [Tool]
     [GlobalClass]
@@ -19,11 +19,11 @@
 
         }
 
-        public override void Detach()
+        public override void Detach(IEntity owner)
         {
 
         }
 
-        protected override string GetDescription() => Localizator.LocalizeDescriptionFormated(Id, [HealAmount]);
+        protected override string GetDescription() => Localization.LocalizeDescriptionFormated(Id, [HealAmount]);
     }
 }

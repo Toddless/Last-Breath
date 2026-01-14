@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    public interface ICraftingRecipe : IIdentifiable, IDisplayable
+    public interface ICraftingRecipe : IIdentifiable, IDisplayable, ITaggable
     {
         string ResultItemId {  get; }
         bool IsOpened { get; }

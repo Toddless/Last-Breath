@@ -13,6 +13,10 @@
         /// <summary>
         /// The most powerful decorators. They should be outside the chain.
         /// </summary>
-        Strong
+        Strong,
+        /// <summary>
+        /// Only one decorator of this type can exist within the chain
+        /// </summary>
+        Absolute
     }
 }

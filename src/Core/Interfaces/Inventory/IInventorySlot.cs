@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Inventory
 {
     using System;
-    using Core.Enums;
-    using Core.Interfaces.Items;
+    using Enums;
+    using Items;
 
     public interface IInventorySlot : IMouseExitable
     {

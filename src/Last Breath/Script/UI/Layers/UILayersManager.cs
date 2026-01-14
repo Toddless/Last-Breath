@@ -2,8 +2,6 @@
 {
     using Godot;
     using LastBreath.DIComponents;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Events;
     using Core.Constants;
 
     public partial class UILayersManager : Node

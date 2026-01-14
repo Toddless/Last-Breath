@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces
 {
-    using Core.Enums;
-    using Core.Interfaces.Data;
+    using Enums;
+    using Data;
 
     public interface IRequirementEvaluator
     {

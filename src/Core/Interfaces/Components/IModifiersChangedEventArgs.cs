@@ -1,12 +1,12 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System.Collections.Generic;
-    using Core.Enums;
-    using Core.Interfaces;
+    using Enums;
+    using Interfaces;
 
     public interface IModifiersChangedEventArgs
     {
         IReadOnlyList<IModifierInstance> Modifiers { get; }
-        Parameter Parameter { get; }
+        EntityParameter EntityParameter { get; }
     }
 }

@@ -6,7 +6,6 @@
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
 

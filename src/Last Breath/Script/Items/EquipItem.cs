@@ -2,15 +2,14 @@
 {
     using Godot;
     using System;
-    using Utilities;
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
 
     [Tool]
     [GlobalClass]

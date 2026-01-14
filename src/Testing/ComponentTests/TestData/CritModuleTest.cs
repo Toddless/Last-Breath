@@ -1,15 +1,16 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using Core.Interfaces.Battle.Module;
+    using Core.Interfaces.Components.Module;
 
-    public class CritModuleTest : IStatModule
+    public class CritModuleTest : IParameterModule<EntityParameter>
     {
         private readonly Random _random = new();
-        public StatModule SkillType => StatModule.CritChance;
+        public EntityParameter Parameter => EntityParameter.CriticalChance;
 
         public DecoratorPriority Priority => DecoratorPriority.Base;
 
         public float GetValue() => (float)_random.NextDouble();
+        public float ApplyDecoratorsForValue(float value) => value;
     }
 }

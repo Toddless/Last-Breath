@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using Core.Interfaces.Entity;
+    using Entity;
 
     public interface IStanceActivationEffect
     {
