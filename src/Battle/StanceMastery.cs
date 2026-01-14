@@ -1,4 +1,4 @@
-﻿namespace Battle.TestData
+﻿namespace Battle
 {
     using Godot;
     using System;

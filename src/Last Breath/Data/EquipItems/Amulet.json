@@ -1,0 +1,56 @@
+{
+	"items": [
+		{
+			"id": "Amulet",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "Amulet.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Amulet",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Mana",
+					"modifierType": "flat",
+					"value": 50
+				},
+				{
+					"parameter": "ManaRecovery",
+					"modifierType": "flat",
+					"value": 12
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Of_Defence",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "AmuletOfDefence.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 200
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 300
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

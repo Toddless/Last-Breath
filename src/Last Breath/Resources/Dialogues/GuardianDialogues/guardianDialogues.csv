@@ -1,0 +1,11 @@
+keys,ru,en
+"dialogGuardianFirstMeetingText1","Стоять. Кто ты и куда направляешься?","Stop. Who are you and where are you going?"
+"dialogGuardianFirstMeetingOption1","(Ложь). Я торговец.","(Lie). I'm a merchant."
+"dialogGuardianFirstMeetingOption2","(Частичная правда). Меня ограбили.","(Partial truth). I was robbed."
+"dialogGuardianSecondMeetingPlayerHasItemsText1","О, оборванец. Я смотрю дела более менее наладились? По крайней мере ты больше не голый, да и оружие при себе имеется.","Oh, ragamuffin. Things are looking up, aren't they? At least you're not naked anymore, and you're carrying a gun."
+"dialogGuardianSecondMeetingPlayerHasItemsOption1","Перевести в шутку","Turn it into a joke"
+"dialogGuardianSecondMeetingPlayerHasItemsOption2","Обидиться","Get offended"
+"dialogGuardianSecondMeetingPlayerHasItemsOption3","Проигнорировать","Ignore"
+"dialogGuardianReqularMeetingText1","Приветствую. Чем могу помочь?","Greetings. Can I help you?"
+"dialogGuardianAnswerDirectionText1","Ну то что вещей нет я уже заметил. Ступай дальше прямо по тропе через лес, никуда не сворачивая и выйдешь прямиком к деревне. Советую сразу сходить к старейшине.","Well, I've already noticed that there's no stuff. Follow the path through the woods without turning off and you'll come straight to the village. I suggest you go straight to the elder."
+"dialogGuardianAnswerDirectionOption1","Поблагодарить","Thank you"

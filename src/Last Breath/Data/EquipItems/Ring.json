@@ -1,0 +1,116 @@
+{
+	"items": [
+		{
+			"id": "Ring_Strength_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingStrengthGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 100
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Dexterity_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingDexterityGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 120
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Intelligence_Generic",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingIntelligenceGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 15
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 100
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Creators_Ring",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "TestRing.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "AllAttribute",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Damage",
+					"modifierType": "flat",
+					"value": 100
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

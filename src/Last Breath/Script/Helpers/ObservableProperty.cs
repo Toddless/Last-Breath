@@ -1,0 +1,13 @@
+﻿namespace LastBreath.Script.Helpers
+{
+    public class ObservableProperty
+    {
+        public static bool SetProperty<T>(ref T field, T value)
+        {
+            if (Equals(field, value))
+                return false;
+            field = value;
+            return true;
+        }
+    }
+}

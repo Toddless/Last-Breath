@@ -1,0 +1,17 @@
+﻿namespace LastBreath.Script.UI
+{
+    using Godot;
+
+    [GlobalClass]
+    public partial class LocalizableButton : Button
+    {
+        [Export] private string _id = string.Empty;
+
+        public override void _Ready()
+        {
+            Text = Localizator.Localize(_id);
+        }
+
+        public void UpdateButtonText() => Text = Localizator.Localize(_id);
+    }
+}

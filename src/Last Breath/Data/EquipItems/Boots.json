@@ -1,0 +1,116 @@
+{
+	"items": [
+		{
+			"id": "Boots_Strength_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsStrengthGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Dexterity_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsDexterityGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Intelligence_Generic",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "BootsIntelligenceGeneric.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 100
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Boots",
+			"equipmentPart": "Boots",
+			"maxStackSize": 1,
+			"icon": "TestBoots.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 300
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

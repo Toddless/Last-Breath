@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cu84nn5t5mqwt"
+
+[deps]
+
+files=["res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
+
+source_file="res://Resources/Dialogues/PlayerDialogues/playerDialogues.csv"
+dest_files=["res://Resources/Dialogues/PlayerDialogues/playerDialogues.ru.translation", "res://Resources/Dialogues/PlayerDialogues/playerDialogues.en.translation"]
+
+[params]
+
+compress=true
+delimiter=0

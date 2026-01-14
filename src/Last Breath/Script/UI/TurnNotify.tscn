@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://b0s0mdo0r753n"]
+
+[ext_resource type="Texture2D" uid="uid://dwp4uta3e30qy" path="res://Assets/UIElements/TextLabel.png" id="1_mfv2n"]
+[ext_resource type="Script" uid="uid://dap7a0wbydyqh" path="res://Script/UI/TurnNotifier.cs" id="2_bc3yp"]
+[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Assets/UI/Fonts/BaseFonts20Pix.tres" id="2_g3bvy"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bc3yp"]
+texture = ExtResource("1_mfv2n")
+
+[node name="Texture" type="Panel" node_paths=PackedStringArray("_textLabel")]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_right = 100.0
+offset_bottom = 125.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bc3yp")
+script = ExtResource("2_bc3yp")
+_textLabel = NodePath("Label")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("2_g3bvy")

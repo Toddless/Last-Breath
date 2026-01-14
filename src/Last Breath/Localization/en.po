@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+# ------------------------------
+# Parameters
+# ------------------------------
+
+#. Player damage stat
+msgid "Damage"
+msgstr "Damage"
+
+#. Player health stat
+msgid "Health"
+msgstr "Health"
+
+#. Player critical chance
+msgid "CriticalChance"
+msgstr "Critical Hit Chance"
+
+#. Maximum possible critical chance
+msgid "MaxCriticalChance"
+msgstr "Max. Critical Hit Chance"
+
+#. Critical damage multiplier
+msgid "CriticalDamage"
+msgstr "Critical Damage Multiplier"
+
+#. Additional hit chance
+msgid "AdditionalHitChance"
+msgstr "Additional Hit Chance"
+
+#. Maximum additional hit chance
+msgid "MaxAdditionalHitChance"
+msgstr "Max. Additional Hit Chance"
+
+#. Current health value
+msgid "CurrentHealth"
+msgstr "Current Health"
+
+#. Maximum health
+msgid "MaxHealth"
+msgstr "Max. Health"
+
+#. Dexterity attribute
+msgid "Dexterity"
+msgstr "Dexterity"
+
+#. Strength attribute
+msgid "Strength"
+msgstr "Strength"
+
+#. Intelligence attribute
+msgid "Intelligence"
+msgstr "Intelligence"
+
+#. Armor stat
+msgid "Armor"
+msgstr "Armor"
+
+#. Evasion stat
+msgid "Evade"
+msgstr "Evade"
+
+#. Magical barrier
+msgid "EnergyBarrier"
+msgstr "Energy Barrier"
+
+#. Spell damage stat
+msgid "SpellDamage"
+msgstr "Spell Damage"
+
+#. Maximum resource (mana, energy etc.)
+msgid "ResourceMax"
+msgstr "Max. Resource"
+
+#. Resource recovery per turn
+msgid "ResourceRecovery"
+msgstr "Resource Recovery"
+
+#. Maximum damage reduction cap
+msgid "MaxReduceDamage"
+msgstr "Max. Damage Reduction"
+
+#. Movement speed
+msgid "Movespeed"
+msgstr "Movespeed"
+
+#. Maximum evade chance
+msgid "MaxEvadeChance"
+msgstr "Max. Evade Chance"
+
+#. Suppression stat
+msgid "Suppress"
+msgstr "Suppress"
+
+#. All attributes (universal modifier)
+msgid "AllAttribute"
+msgstr "All Attributes"
+
+# ------------------------------
+# Modifier Types
+# ------------------------------
+
+#. Flat modifier: +300 HP, +15 Def, etc.
+msgid "Flat"
+msgstr "to"
+
+#. Increase modifier: percent values like 0.1, 0.3
+msgid "Increase"
+msgstr "Increased"
+
+#. Multiplicative modifier: values like 1.3, 1.1
+msgid "Multiplicative"
+msgstr "More"
+
+# ------------------------------
+# Modifier Format String
+# ------------------------------
+
+#. Template for showing modifiers: {0} = parameter, {1} = value
+msgid "modifier.format"
+msgstr "{0}: {1}"
+
+# -----------------------------
+# Extra stats
+# -----------------------------
+
+# Extra Health
+msgid "ExtraHealth"
+msgstr "Extra Health"
+
+# Extra Armor
+msgid "ExtraArmor"
+msgstr "Extra Armor"
+
+# Extra Energy Barrier
+msgid "ExtraEnergyBarrier"
+msgstr "Extra Energy Barrier"
+
+# Extra Evade
+msgid "ExtraEvade"
+msgstr "Extra Evade"
+
+# Extra Damage
+msgid "ExtraDamage"
+msgstr "Extra Damage"
+
+# Extra Suppress
+msgid "ExtraSuppress"
+msgstr "Extra Suppress"
+
+# 
+msgid "ExtraSpellDamage"
+msgstr "Extra Spell Damage"
+
+# -----------------------
+# Items
+# -----------------------
+
+msgid ""
+msgstr ""
+
+# -----------------------
+# Equip items
+# -----------------------
+
+msgid ""
+msgstr ""
+
+msgid "Test_Boots"
+msgstr "The Creator's Boots"
+
+msgid "Test_Boots_Description"
+msgstr "Quite worn, consisting mostly of patches. It is impossible to determine the original color."
+
+msgid "Test_Gloves"
+msgstr "The Creator's Gloves"
+
+msgid "Test_Gloves_Description"
+msgstr "Although, can two pieces of fabric sewn together with holes for the fingers really be called gloves?"
+
+msgid "Test_Belt"
+msgstr "The Creator's Belt"
+
+msgid "Test_Belt_Description"
+msgstr "Worn through to the point of having holes, peeling in places. Something is scratched on the back."
+
+msgid "Test_Ring"
+msgstr "The Creator`s Ring"
+
+msgid "Test_Ring_Description"
+msgstr "An ancient artifact that has absorbed the power of the creator himself."
+
+msgid "Test_Body_Four_Mods"
+msgstr "The Creator`s Armor"
+
+msgid "Test_Body_Four_Mods_Description"
+msgstr ""
+
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+
+
+# -----------------------
+# Crafting Resources
+# -----------------------
+
+# Upgrades
+# ----------------------
+
+msgid "Upgrade_Resource_Blacksmith_Rune"
+msgstr "Blacksmith Rune"
+
+msgid "Upgrade_Resource_Jeweler_Rune"
+msgstr "Jeweler`s Rune"
+
+msgid "Upgrade_Resource_Weapon_Rune"
+msgstr "Weapon`s Rune"
+
+msgid "Upgrade_Resource_Armor_Dust"
+msgstr "Armor Dust"
+
+msgid "Upgrade_Resource_Jewellery_Dust"
+msgstr "Jewellery Dust"
+
+msgid "Upgrade_Resource_Weapon_Dust"
+msgstr "Weapon Dust"
+
+
+msgid ""
+msgstr ""
+
+# Resources
+# -----------------------
+
+
+msgid "Crafting_Resource_Deer_Leather"
+msgstr "Deer`s Leather"
+
+msgid "Crafting_Resource_Wild_Boar_Leather"
+msgstr "Wild Boar`s Leather"
+
+msgid "Crafting_Resource_Emerald_Gem"
+msgstr "Emerald"
+
+msgid "Crafting_Resource_Ruby_Gem"
+msgstr "Ruby"
+
+msgid "Crafting_Resource_Diamond_Gem"
+msgstr "Diamong"
+
+msgid "Crafting_Resource_Iron_Ore"
+msgstr "Iron Ore"
+
+msgid "Crafting_Resource_Gold_Ore"
+msgstr "Gold Ore"
+
+msgid "Crafting_Resource_Cooper_Ore"
+msgstr "Cooper Ore"
+
+msgid "Crafting_Resource_Silk_Fabric"
+msgstr "Silk"
+
+msgid "Crafting_Resource_Linen_Fabric"
+msgstr "Linen"
+
+msgid ""
+msgstr ""
+
+
+# -----------------------
+# Essences
+# -----------------------
+msgid "Crafting_Resource_Armor_Essence"
+msgstr "Essence of Defence"
+
+msgid "Crafting_Resource_Crit_Essence"
+msgstr "Essence of Death"
+
+msgid "Crafting_Resource_Damage_Essence"
+msgstr "Essence of Attack"
+
+msgid "Crafting_Resource_Life_Essence"
+msgstr "Essence of Life"
+
+msgid "Crafting_Resource_Evade_Essence"
+msgstr "Essence of Evasion"
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+# -----------------------
+# Crafting Recipes
+# -----------------------
+
+msgid "Recipe_Test_Gloves"
+msgstr "The Creator's Gloves"
+
+msgid "Recipe_Test_Belt"
+msgstr "The Creator's Belt"
+
+msgid "Recipe_Test_Boots"
+msgstr "The Creator's Boots"
+
+msgid "Recipe_Test_Ring"
+msgstr "The Creator`s Ring"
+
+msgid "Recipe_Generic_Boots"
+msgstr "Random Boots"
+
+msgid "Recipe_Body_Four_Mods"
+msgstr "The Creator`s Armor"
+
+msgid "Recipe_Generic_Ring"
+msgstr "Random Ring"
+
+msgid "Recipe_Generic_Belt"
+msgstr "Random Belt"
+
+msgid "Recipe_Generic_Gloves"
+msgstr "Random Gloves"
+
+
+# ------------------------
+# Categories
+# ------------------------
+
+msgid "BodyArmor"
+msgstr ""
+
+msgid "Belt"
+msgstr ""
+
+msgid "Gloves"
+msgstr ""
+
+msgid "Boots"
+msgstr ""
+
+msgid "Helmet"
+msgstr ""
+
+msgid "Amulet"
+msgstr ""
+
+msgid "Cloak"
+msgstr ""
+
+msgid "Weapon"
+msgstr ""
+
+msgid "Ring"
+msgstr ""
+
+msgid "Consumable"
+msgstr ""
+
+msgid "Quest"
+msgstr ""
+
+# -----------------------
+# Texts
+# -----------------------
+
+msgid "RandomStats"
+msgstr "Random Stats"
+
+msgid "BaseStats"
+msgstr "Base Stats"
+
+msgid "GameTitle"
+msgstr "Last Breath"
+
+msgid "VideoSettings"
+msgstr "Video"
+
+msgid "ResolutionSetting"
+msgstr "Resolution"
+
+msgid "WindowModeSetting"
+msgstr "Window Mode"
+
+msgid "SoundSettings"
+msgstr "Sound"
+
+msgid "MasterVolumeSetting"
+msgstr "Master Volume"
+
+msgid "MusicVolumeSetting"
+msgstr "Music Volume"
+
+msgid "SFXVolumeSetting"
+msgstr "SFX Volume"
+
+msgid "UISettings"
+msgstr "UI"
+
+msgid "LanguageSetting"
+msgstr "Language"
+
+msgid "SaveLoadLabel"
+msgstr "Save/Load"
+
+
+# ------------------------
+# Buttons
+# ------------------------
+
+msgid "CraftingCreateBtn"
+msgstr "Create"
+
+msgid "CraftingUpgradeBtn"
+msgstr "Upgrade"
+
+msgid "CraftingAscendBtn"
+msgstr "Ascend"
+
+msgid "NewGameBtn"
+msgstr "New Game"
+
+msgid "LoadGameBtn"
+msgstr "Load"
+
+msgid "OptionsBtn"
+msgstr "Options"
+
+msgid "QuitBtn"
+msgstr "Quit"
+
+msgid "ContinueBtn"
+msgstr "Continue"
+
+msgid "MainMenuBtn"
+msgstr "Main Menu"
+
+msgid "CharacterBtn"
+msgstr "Character"
+
+msgid "InventoryBtn"
+msgstr "Inventory"
+
+msgid "CraftingBtn"
+msgstr "Crafting"
+
+msgid "QuestsBtn"
+msgstr "Quests"
+
+msgid "ApplyBtn"
+msgstr "Apply"
+
+msgid "ReturnBtn"
+msgstr "Return"
+
+msgid "DeleteBtn"
+msgstr "Delete"
+
+msgid "LoadBtn"
+msgstr "Load"
+
+# ------------------------
+# Skills
+# ------------------------
+
+msgid "Passive_Skill_Precise_Technique"
+msgstr "Precise Technique"
+
+msgid "Passive_Skill_Touch_Of_God"
+msgstr "Touch of God"
+
+msgid "Passive_Skill_Touch_Of_God_Description"
+msgstr "Feel the touch of God. When receiving fatal damage, heals {0}% of maximum health."
+
+msgid "Passive_Skill_Precise_Technique_Description"
+msgstr "No one can escape. It is impossible to dodge your attacks."
+
+msgid "Passive_Skill_Master_Apprentice"
+msgstr "Master`s Apprentice"
+
+msgid "Passive_Skill_Master_Apprentice_Description"
+msgstr "Increases the chance of creating higher-tier equipment by {0}%."
+
+msgid "Passive_Skill_Enhanced_Mastery"
+msgstr "Enhanced Mastery"
+
+msgid "Passive_Skill_Enhanced_Mastery_Description"
+msgstr "Increases skill level {0} by {1}."
+
+msgid "Passive_Skill_Experienced_Recycler"
+msgstr "Experienced Recycler"
+
+msgid "Passive_Skill_Experienced_Recycler_Description"
+msgstr "You gain {0}% increased resources from shattering items."
+
+msgid "Passive_Skill_Crafting_Mastery"
+msgstr "Crafting Mastery"
+
+msgid "Passive_Skill_Sword_Mastery"
+msgstr "Sword Mastery"
+
+msgid "Passive_Skill_Fishing_Mastery"
+msgstr "Fishing Mastery"
+
+msgid "Passive_Skill_Battle_Mastery"
+msgstr "Battle Mastery"

@@ -1,0 +1,197 @@
+[gd_scene load_steps=3 format=3 uid="uid://eh2wvi8x5l80"]
+
+[ext_resource type="Script" uid="uid://c2fipqliahv3c" path="res://Script/UI/View/DialogueWindow.cs" id="1_q0bu3"]
+[ext_resource type="LabelSettings" uid="uid://cj8qeb6jo6im5" path="res://Assets/UI/Fonts/BaseFonts20Pix.tres" id="2_p6x8j"]
+
+[node name="DialogueWindow" type="Control" node_paths=PackedStringArray("_options", "_buttonsContainer", "_questsContainer", "_text", "_playerIcon", "_questAdded", "_questOptions", "_skip", "_moreSpeed", "_lessSpeed", "_default", "_quests", "_quit", "_back", "_accept", "_completedQuests", "_completeQuest")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q0bu3")
+_options = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/Options")
+_buttonsContainer = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer")
+_questsContainer = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/Quests")
+_text = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer/Text")
+_playerIcon = NodePath("MarginContainer/VBoxContainer/HBoxContainer/Player/Avatar")
+_questAdded = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer/Label")
+_questOptions = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer/QuestsBtn")
+_skip = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer/Skip")
+_moreSpeed = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer/MoreSpeed")
+_lessSpeed = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer/LessSpeed")
+_default = NodePath("MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer/Default")
+_quests = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer/QuestsBtn")
+_quit = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer/Quit")
+_back = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/Back")
+_accept = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/Accept")
+_completedQuests = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer/CompletedQuests")
+_completeQuest = NodePath("MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/CompleteQuest")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="QuestOptionsElement" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/separation = 15
+
+[node name="Player" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="Avatar" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/Player"]
+layout_mode = 2
+
+[node name="TextContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="Skip" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "Skip"
+
+[node name="MoreSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "Text Speed +"
+
+[node name="LessSpeed" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "Text Speed -"
+
+[node name="Default" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "Default"
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "New quest added to Journal"
+label_settings = ExtResource("2_p6x8j")
+
+[node name="TextPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 10
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel"]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Text" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer"]
+clip_contents = false
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+scroll_following = true
+
+[node name="OptionsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(500, 300)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Options" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="QuestsBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "I need a job."
+
+[node name="CompletedQuests" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "About your quest..."
+
+[node name="Quit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Quit"
+
+[node name="Quests" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Accept" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Accept"
+
+[node name="CompleteQuest" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Complete"
+
+[node name="Back" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/OptionsPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "Back
+"
+
+[connection signal="gui_input" from="MarginContainer/VBoxContainer/HBoxContainer/TextContainer/TextPanel/MarginContainer/Text" to="." method="OnTextClicked"]

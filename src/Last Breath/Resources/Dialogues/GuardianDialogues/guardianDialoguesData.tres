@@ -1,0 +1,194 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=32 format=3 uid="uid://srjitriqp2jg"]
+
+[ext_resource type="Script" uid="uid://uywgsrrxxqx1" path="res://Localization/DialogueNode.cs" id="1_dvrwy"]
+[ext_resource type="Script" uid="uid://ciwpxedfvild" path="res://Script/QuestSystem/Condition.cs" id="2_4bkck"]
+[ext_resource type="Script" uid="uid://cyvkrnhly51mt" path="res://Localization/DialogueOption.cs" id="2_gkm0q"]
+[ext_resource type="Script" uid="uid://uct5wx6u2cu4" path="res://Localization/LocalizedString.cs" id="3_4bkck"]
+[ext_resource type="Script" uid="uid://bio3h5r26ydx1" path="res://Localization/DialogueData.cs" id="4_7b34w"]
+
+[sub_resource type="Resource" id="Resource_rdma4"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianAnswerDirectionOption1"
+
+[sub_resource type="Resource" id="Resource_1pgh0"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_rdma4")
+TargetNode = "ThanksAndEnd"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_h8ie0"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianAnswerDirectionText1"
+
+[sub_resource type="Resource" id="Resource_0jsvc"]
+script = ExtResource("1_dvrwy")
+Texts = Array[ExtResource("3_4bkck")]([SubResource("Resource_h8ie0")])
+Options = Array[ExtResource("2_gkm0q")]([SubResource("Resource_1pgh0")])
+DialogueId = "GuardianAnswerDirection"
+ReturnToPrevious = false
+Quests = Array[String]([])
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_k3w38"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianFirstMeetingOption1"
+
+[sub_resource type="Resource" id="Resource_nwscw"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_k3w38")
+TargetNode = "PlayerMerchantLie"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_l3030"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianFirstMeetingOption2"
+
+[sub_resource type="Resource" id="Resource_565i8"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_l3030")
+TargetNode = "PlayerPartialLie"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_fw462"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianFirstMeetingText1"
+
+[sub_resource type="Resource" id="Resource_dgraq"]
+script = ExtResource("1_dvrwy")
+Texts = Array[ExtResource("3_4bkck")]([SubResource("Resource_fw462")])
+Options = Array[ExtResource("2_gkm0q")]([SubResource("Resource_nwscw"), SubResource("Resource_565i8")])
+DialogueId = "GuardianFirstMeeting"
+ReturnToPrevious = false
+Quests = Array[String]([])
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_oyae5"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianReqularMeetingOption1"
+
+[sub_resource type="Resource" id="Resource_p10ah"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_oyae5")
+TargetNode = "GuardianQuests"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_fuwlv"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianReqularMeetingOption2"
+
+[sub_resource type="Resource" id="Resource_ndbkv"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_fuwlv")
+TargetNode = "GuardianInformation"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_qerdk"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianReqularMeetingOption3"
+
+[sub_resource type="Resource" id="Resource_uph8x"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_qerdk")
+TargetNode = "End"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_rg7sy"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianReqularMeetingText1"
+
+[sub_resource type="Resource" id="Resource_kxmqf"]
+script = ExtResource("1_dvrwy")
+Texts = Array[ExtResource("3_4bkck")]([SubResource("Resource_rg7sy")])
+Options = Array[ExtResource("2_gkm0q")]([SubResource("Resource_p10ah"), SubResource("Resource_ndbkv"), SubResource("Resource_uph8x")])
+DialogueId = "GuardianReqularMeeting"
+ReturnToPrevious = false
+Quests = Array[String]([])
+IsDialogMatterForQuest = false
+
+[sub_resource type="Resource" id="Resource_638je"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption1"
+
+[sub_resource type="Resource" id="Resource_yeemm"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_638je")
+TargetNode = "PlayerJokeAnswer"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_a5ei2"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption2"
+
+[sub_resource type="Resource" id="Resource_0irx8"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_a5ei2")
+TargetNode = "PlayerOffensiveAnswer"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_h0olo"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsOption3"
+
+[sub_resource type="Resource" id="Resource_j6enb"]
+script = ExtResource("2_gkm0q")
+OptionName = SubResource("Resource_h0olo")
+TargetNode = "PlayerIgnoreJoke"
+RelationEffect = 0
+UsePlayerSource = true
+Conditions = Array[ExtResource("2_4bkck")]([])
+AllConditionsMustMet = false
+MinimumConditionsRequirement = 0
+
+[sub_resource type="Resource" id="Resource_vgye3"]
+script = ExtResource("3_4bkck")
+Key = "dialogGuardianSecondMeetingPlayerHasItemsText1"
+
+[sub_resource type="Resource" id="Resource_0ywxp"]
+script = ExtResource("1_dvrwy")
+Texts = Array[ExtResource("3_4bkck")]([SubResource("Resource_vgye3")])
+Options = Array[ExtResource("2_gkm0q")]([SubResource("Resource_yeemm"), SubResource("Resource_0irx8"), SubResource("Resource_j6enb")])
+DialogueId = "GuardianSecondMeetingPlayerHasItems"
+ReturnToPrevious = false
+Quests = Array[String]([])
+IsDialogMatterForQuest = false
+
+[resource]
+script = ExtResource("4_7b34w")
+Dialogs = {
+"GuardianAnswerDirection": SubResource("Resource_0jsvc"),
+"GuardianFirstMeeting": SubResource("Resource_dgraq"),
+"GuardianReqularMeeting": SubResource("Resource_kxmqf"),
+"GuardianSecondMeetingPlayerHasItems": SubResource("Resource_0ywxp")
+}
