@@ -26,15 +26,6 @@
     <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Source\EventHandlers\" />
-    <Folder Include="Source\RequestHandlers\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="LastBreath">
-      <HintPath>..\Last Breath\.godot\mono\temp\bin\Debug\LastBreath.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Source\Localization\en.po" />
   </ItemGroup>
 </Project>
