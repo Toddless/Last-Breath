@@ -1,6 +1,8 @@
-namespace LootGeneration
+namespace LootGeneration.Source
 {
-    internal class Main
+    using Godot;
+
+    internal partial class Main : Node2D
     {
     }
 }
