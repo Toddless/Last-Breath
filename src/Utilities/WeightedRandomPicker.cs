@@ -3,8 +3,8 @@
     using Godot;
     using System.Linq;
     using Core.Interfaces;
-    using Core.Interfaces.Data;
     using System.Collections.Generic;
+    using Core.Data;
 
     public class WeightedRandomPicker
     {

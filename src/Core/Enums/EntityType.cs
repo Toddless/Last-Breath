@@ -3,7 +3,7 @@
     public enum EntityType
     {
         Regular,
-        Rare,
+        Special,
         Elit,
         Unique,
         Boss,

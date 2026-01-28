@@ -3,9 +3,9 @@
     using Godot;
     using Source;
     using System;
+    using Core.Data;
     using Services;
     using Utilities;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
 

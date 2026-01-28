@@ -5,10 +5,10 @@
     using Utilities;
     using System.Linq;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using System.Threading.Tasks;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using Core.Data;
 
     [GlobalClass]
     public partial class CraftingItems : Control, IInitializable, IClosable, IRequireServices

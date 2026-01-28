@@ -1,9 +1,9 @@
-﻿namespace Core.Interfaces.Data
+﻿namespace Core.Data
 {
-    using UI;
-    using Godot;
     using System;
     using System.Threading.Tasks;
+    using Core.Interfaces.UI;
+    using Godot;
 
     public interface IUiElementProvider
     {

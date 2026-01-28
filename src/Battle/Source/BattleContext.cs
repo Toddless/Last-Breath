@@ -4,12 +4,12 @@
     using Godot;
     using Services;
     using UIElements;
-    using Core.Interfaces.Data;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Events.GameEvents;
 
     internal class BattleContext : IBattleContext

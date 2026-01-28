@@ -106,8 +106,8 @@
 				},
 				{
 					"parameter": "CriticalChance",
-					"modifierType": "increase",
-					"value": 0.5
+					"modifierType": "flat",
+					"value": 0.05
 				}
 			],
 			"additionalModifiers": []

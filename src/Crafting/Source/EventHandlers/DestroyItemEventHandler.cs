@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using Godot;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
 

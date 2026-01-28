@@ -1,12 +1,12 @@
-﻿namespace Battle.TestData
+﻿namespace Battle
 {
-    using Godot;
-    using Stateless;
     using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using Godot;
+    using Stateless;
 
     public partial class EntitySpot : Node2D
     {

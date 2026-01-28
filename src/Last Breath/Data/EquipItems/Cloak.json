@@ -15,12 +15,12 @@
 				{
 					"parameter": "Health",
 					"modifierType": "multi",
-					"value": 1.1
+					"value": 0.1
 				},
 				{
 					"parameter": "Armor",
 					"modifierType": "multi",
-					"value": 1.1
+					"value": 0.1
 				}
 			],
 			"additionalModifiers": []

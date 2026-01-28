@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;

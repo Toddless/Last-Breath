@@ -7,12 +7,12 @@
     using Core.Interfaces;
     using Godot.Collections;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus

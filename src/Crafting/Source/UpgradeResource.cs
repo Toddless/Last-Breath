@@ -30,14 +30,12 @@
             string[] tags,
             Rarity rarity,
             EquipmentCategory category,
-            Texture2D? icon,
             int maxStackSize)
         {
             Id = id;
             Tags = tags;
             Rarity = rarity;
             Category = category;
-            Icon = icon;
             MaxStackSize = maxStackSize;
         }
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);

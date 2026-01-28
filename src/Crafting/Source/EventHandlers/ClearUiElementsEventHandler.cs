@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Data;
+    using Core.Data;
     using Core.Interfaces.Events;
 
     public class ClearUiElementsEventHandler(IUiElementProvider provider) : IEventHandler<ClearUiElementsEvent>

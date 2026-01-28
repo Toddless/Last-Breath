@@ -9,13 +9,13 @@
     using Core.Constants;
     using Core.Interfaces;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Mediator.Requests;
 
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
@@ -415,11 +415,11 @@
 
         private void SetSkill()
         {
-            var skill = _equpItem?.Skill;
-            if (skill == null) return;
+            string? skill = _equpItem?.ItemEffect;
+            if (string.IsNullOrWhiteSpace(skill)) return;
             var skillDescription = _uiElementProvider?.Create<SkillDescription>();
-            skillDescription?.SetSkillName(skill.DisplayName);
-            skillDescription?.SetSkillDescription(skill.Description);
+            // skillDescription?.SetSkillName(Localization.Localize(item));
+            // skillDescription?.SetSkillDescription(skill.Description);
             _skill?.AddChild(skillDescription);
         }
 

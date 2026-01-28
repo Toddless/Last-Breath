@@ -40,7 +40,6 @@
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
-
         public Texture2D? Icon { get; }
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);

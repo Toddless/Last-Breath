@@ -28,12 +28,11 @@
 
         }
 
-        public CraftingRecipe(string id, string resultItemId, string[] tags, Texture2D? icon, Rarity rarity, List<IResourceRequirement> requirements, bool isOpened = false)
+        public CraftingRecipe(string id, string resultItemId, string[] tags,  Rarity rarity, List<IResourceRequirement> requirements, bool isOpened = false)
         {
             Id = id;
             ResultItemId = resultItemId;
             Tags = tags;
-            Icon = icon;
             Rarity = rarity;
             IsOpened = isOpened;
             MainResource= requirements;

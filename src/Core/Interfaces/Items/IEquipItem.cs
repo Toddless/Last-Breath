@@ -1,7 +1,6 @@
 ﻿namespace Core.Interfaces.Items
 {
     using Enums;
-    using Skills;
     using Entity;
     using Crafting;
     using Interfaces;
@@ -13,7 +12,7 @@
         public IReadOnlyList<IModifier> AdditionalModifiers { get; }
         public EquipmentType EquipmentPart { get; }
         public AttributeType AttributeType { get; }
-        public ISkill? Skill { get; }
+        public string ItemEffect { get; }
         int UpdateLevel { get; }
         int MaxUpdateLevel { get; }
         IReadOnlyDictionary<string, int> UsedResources { get; }
@@ -21,7 +20,7 @@
 
         void SetBaseModifiers(IEnumerable<IModifier> modifiers);
         void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
-        void SetSkill(ISkill skill);
+        void SetItemEffect(string effectId);
         void OnEquip(IEntity owner);
         void OnUnequip();
         bool Upgrade(int upgradeLevel = 1);

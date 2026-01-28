@@ -1,29 +1,26 @@
 {
 	"items": [
 		{
-			"id": "Amulet",
+			"id": "Amulet_Of_Recovery",
 			"equipmentPart": "Amulet",
 			"maxStackSize": 1,
 			"icon": "Amulet.png",
 			"rarity": "Uncommon",
-			"tags": [
-				"Amulet",
-				"Equipment"
-			],
+			"tags": [],
 			"attributeType": "None",
 			"skill": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"baseModifiers": [
 				{
-					"parameter": "Mana",
+					"parameter": "HealthRecovery",
 					"modifierType": "flat",
 					"value": 50
 				},
 				{
 					"parameter": "ManaRecovery",
 					"modifierType": "flat",
-					"value": 12
+					"value": 25
 				}
 			],
 			"additionalModifiers": []
@@ -45,12 +42,216 @@
 					"value": 200
 				},
 				{
-					"parameter": "Health",
+					"parameter": "Evade",
 					"modifierType": "flat",
 					"value": 300
 				}
 			],
 			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Eternal_Ravage",
+			"equipmentPart": "Amulet_Eternal_Ravage",
+			"maxStackSize": 1,
+			"icon": "AmuletEternalRavage.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Dexterity_Strength",
+			"equipmentPart": "Amulet_Dexterity_Strength",
+			"maxStackSize": 1,
+			"icon": "AmuletDexterityStrength.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Dexterity_Intelligence",
+			"equipmentPart": "Amulet_Dexterity_Intelligence",
+			"maxStackSize": 1,
+			"icon": "AmuletDexterityIntelligence.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Of_Power",
+			"equipmentPart": "Amulet_Of_Power",
+			"maxStackSize": 1,
+			"icon": "AmuletOfPower.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 35
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "inc",
+					"value": 0.25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Of_Wisdom",
+			"equipmentPart": "Amulet_Of_Wisdom",
+			"maxStackSize": 1,
+			"icon": "AmuletOfWisdom.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 35
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "inc",
+					"value": 0.25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Of_Dexterity",
+			"equipmentPart": "Amulet_Of_Dexterity",
+			"maxStackSize": 1,
+			"icon": "AmuletOfDexterity.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 35
+				},
+				{
+					"parameter": "Dexterity",
+					"modifierType": "inc",
+					"value": 0.25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Mana_Health",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "AmuletManaHealth.png",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 505
+				},
+				{
+					"parameter": "Mana",
+					"modifierType": "flat",
+					"value": 400
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Amulet_Goliath_Sign",
+			"equipmentPart": "Amulet",
+			"maxStackSize": 1,
+			"icon": "AmuletOfDefence.png",
+			"rarity": "Unique",
+			"tags": [],
+			"attributeType": "None",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 900
+				}
+			],
+			"additionalModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.30
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "inc",
+					"value": 0.30
+				},
+				{
+					"parameter": "HealthRecovery",
+					"modifierType": "flat",
+					"value": 0.05
+				}
+			]
 		}
 	]
 }

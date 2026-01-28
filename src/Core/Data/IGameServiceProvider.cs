@@ -1,4 +1,4 @@
-﻿namespace Core.Interfaces.Data
+﻿namespace Core.Data
 {
     using System.Collections.Generic;
 

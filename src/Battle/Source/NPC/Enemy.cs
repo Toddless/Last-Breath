@@ -9,7 +9,6 @@
     using Components;
     using Core.Enums;
     using PassiveSkills;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
@@ -17,6 +16,7 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
 

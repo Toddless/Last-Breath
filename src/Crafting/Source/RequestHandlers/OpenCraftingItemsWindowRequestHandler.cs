@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Core.Interfaces.Data;
+    using Core.Data;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Mediator.Requests;
     using UIElements;

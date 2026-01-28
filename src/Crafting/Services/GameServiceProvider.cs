@@ -6,7 +6,6 @@
     using Core.Results;
     using Core.Interfaces;
     using Source.EventHandlers;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using TestResources.Inventory;
@@ -14,6 +13,7 @@
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Mediator.Requests;
     using Microsoft.Extensions.DependencyInjection;
     using Source.RequestHandlers;

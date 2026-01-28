@@ -1,9 +1,9 @@
-﻿namespace Core.Interfaces.Data
+﻿namespace Core.Data
 {
-    using Godot;
-    using Items;
-    using Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Godot;
 
     public interface IItemDataProvider
     {

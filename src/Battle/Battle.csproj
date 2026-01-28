@@ -15,14 +15,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Stateless" Version="5.19.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Update="GodotSharp" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>

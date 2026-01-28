@@ -7,12 +7,12 @@
     using System.Linq;
     using Core.Modifiers;
     using Core.Interfaces;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Data;
 
     public class ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         : IItemCreator
@@ -58,8 +58,6 @@
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
 
                 // TODO : Change to get random effect/ability
-                var skill = GetRandomSkill();
-                if (skill != null) item.SetSkill(skill);
                 return item;
             }
             catch (ArgumentNullException ex)

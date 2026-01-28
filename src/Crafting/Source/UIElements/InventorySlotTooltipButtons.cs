@@ -2,8 +2,8 @@
 {
     using Godot;
     using System;
+    using Core.Data;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
 

@@ -10,7 +10,6 @@
     using Components;
     using Core.Constants;
     using Core.Interfaces;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using Core.Interfaces.Battle;
@@ -18,6 +17,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
 

@@ -3,8 +3,8 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;

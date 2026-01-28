@@ -1,10 +1,10 @@
 {
 	"items": [
 		{
-			"id": "Ring_Strength_Generic",
+			"id": "Ring_Strength",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingStrengthGeneric.png",
+			"icon": "RingStrength.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -18,21 +18,21 @@
 				{
 					"parameter": "Strength",
 					"modifierType": "flat",
-					"value": 15
+					"value": 25
 				},
 				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 100
+					"parameter": "Strength",
+					"modifierType": "inc",
+					"value": 0.25
 				}
 			],
 			"additionalModifiers": []
 		},
 		{
-			"id": "Ring_Dexterity_Generic",
+			"id": "Ring_Dexterity",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingDexterityGeneric.png",
+			"icon": "RingDexterity.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -46,21 +46,21 @@
 				{
 					"parameter": "Dexterity",
 					"modifierType": "flat",
-					"value": 15
+					"value": 25
 				},
 				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 120
+					"parameter": "Dexterity",
+					"modifierType": "inc",
+					"value": 0.25
 				}
 			],
 			"additionalModifiers": []
 		},
 		{
-			"id": "Ring_Intelligence_Generic",
+			"id": "Ring_Intelligence",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingIntelligenceGeneric.png",
+			"icon": "RingIntelligence.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -74,18 +74,158 @@
 				{
 					"parameter": "Intelligence",
 					"modifierType": "flat",
-					"value": 15
+					"value": 25
 				},
 				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 100
+					"parameter": "Intelligence",
+					"modifierType": "inc",
+					"value": 0.25
 				}
 			],
 			"additionalModifiers": []
 		},
 		{
-			"id": "Creators_Ring",
+			"id": "Ring_Intelligence_Multicast",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingIntelligenceMulticast.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Multicast",
+					"modifierType": "flat",
+					"value": 0.15
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Dexterity_Critical_Chance",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingDexterityCriticalChance.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "flat",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Dexterity_Additional_Hit_Chance",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingDexterityAdditionalHitChance.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "AdditionalHitChance",
+					"modifierType": "flat",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Dexterity_Accuracy",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingDexterityAccuracy.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Accuracy",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Strength_Block_Chance",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "RingStrengthBlockChance.png",
+			"rarity": "Uncommon",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"skill": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "BlockChance",
+					"modifierType": "flat",
+					"value": 0.1
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_of_Creators",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
 			"icon": "TestRing.png",
@@ -100,7 +240,17 @@
 			"maxUpdateLevel": 12,
 			"baseModifiers": [
 				{
-					"parameter": "AllAttribute",
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Strength",
 					"modifierType": "flat",
 					"value": 25
 				},
@@ -111,6 +261,55 @@
 				}
 			],
 			"additionalModifiers": []
+		},
+		{
+			"id": "Ring_Hell_Servant",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"icon": "HellServant.png",
+			"rarity": "Unuqie",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "Passive_Skill_Servant_Hell",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "inc",
+					"value": 0.15
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "inc",
+					"value": 0.15
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "inc",
+					"value": 0.15
+				}
+			]
 		}
 	]
 }

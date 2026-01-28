@@ -6,13 +6,13 @@
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Mediator.Requests;
 
     [GlobalClass]

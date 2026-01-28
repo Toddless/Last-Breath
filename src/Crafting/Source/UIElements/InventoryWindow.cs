@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Core.Data;
     using Godot;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Mediator;

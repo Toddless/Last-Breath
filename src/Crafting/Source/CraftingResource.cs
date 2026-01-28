@@ -27,7 +27,6 @@
         /// </summary>
         public CraftingResource()
         {
-
         }
 
         /// <summary>
@@ -36,14 +35,18 @@
         /// <param name="id"></param>
         /// <param name="maxStackSize"></param>
         /// <param name="tags"></param>
-        /// <param name="icon"></param>
         /// <param name="material"></param>
-        public CraftingResource(string id, int maxStackSize, string[] tags, Texture2D? icon, IMaterial material, Rarity rarity)
+        /// <param name="rarity"></param>
+        public CraftingResource(
+            string id,
+            int maxStackSize,
+            string[] tags,
+            IMaterial material,
+            Rarity rarity)
         {
             Id = id;
             MaxStackSize = maxStackSize;
             Tags = tags;
-            Icon = icon;
             InstanceId = Guid.NewGuid().ToString();
             Rarity = rarity;
             _material = (MaterialType)material;
@@ -54,6 +57,7 @@
             var duplicate = (ICraftingResource)DuplicateDeep(DeepDuplicateMode.All);
             return (T)duplicate;
         }
+
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
