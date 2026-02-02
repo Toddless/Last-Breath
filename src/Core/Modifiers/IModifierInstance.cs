@@ -1,6 +1,6 @@
-﻿namespace Core.Interfaces
+﻿namespace Core.Modifiers
 {
-    public interface IModifierInstance : IModifier, IWeighable
+    public interface IModifierInstance : IModifier
     {
         /// <summary>
         /// Determines the order in which modifiers are applied. Lower number => higher priority. Use <see cref="ModifierPriorities"/> when creating a new modifier to set this property.

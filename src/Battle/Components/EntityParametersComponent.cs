@@ -7,11 +7,11 @@
     using Core.Enums;
     using System.Linq;
     using Source.Module;
-    using Core.Interfaces;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Modifiers;
 
     public class EntityParametersComponent : IEntityParametersComponent
     {

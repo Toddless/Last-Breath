@@ -2,8 +2,7 @@
 {
     using Enums;
     using Entity;
-    using Crafting;
-    using Interfaces;
+    using Modifiers;
     using System.Collections.Generic;
 
     public interface IEquipItem : IItem
@@ -11,12 +10,12 @@
         public IReadOnlyList<IModifier> BaseModifiers { get; }
         public IReadOnlyList<IModifier> AdditionalModifiers { get; }
         public EquipmentType EquipmentPart { get; }
-        public AttributeType AttributeType { get; }
+        AttributeType AttributeType { get; set; }
         public string ItemEffect { get; }
-        int UpdateLevel { get; }
-        int MaxUpdateLevel { get; }
+        int UpdateLevel { get; set; }
+        int MaxUpdateLevel { get; set; }
         IReadOnlyDictionary<string, int> UsedResources { get; }
-        IReadOnlyList<IMaterialModifier> ModifiersPool { get; }
+        IReadOnlyList<IModifier> ModifiersPool { get; }
 
         void SetBaseModifiers(IEnumerable<IModifier> modifiers);
         void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
@@ -26,7 +25,7 @@
         bool Upgrade(int upgradeLevel = 1);
         bool Downgrade(int downgradeLevel = 1);
         void ReplaceAdditionalModifier(int hash, IModifier newModifier);
-        void SaveModifiersPool(IEnumerable<IMaterialModifier> modifiers);
+        void SaveModifiersPool(IEnumerable<IModifier> modifiers);
         void SaveUsedResources(Dictionary<string, int> resources);
         void RemoveAdditionalModifier(int hash);
         void AddAdditionalModifier(IModifier modifier);

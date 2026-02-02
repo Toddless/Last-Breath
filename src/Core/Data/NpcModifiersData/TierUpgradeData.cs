@@ -4,7 +4,7 @@ namespace Core.Data.NpcModifiersData
 
     public record TierUpgradeData : NpcModifierData
     {
-        [JsonProperty("tierUpgradeChance")] public float TierUpgradeChance { get; init; }
+        [JsonProperty("upgradeMultiplier")] public float UpgradeMultiplier { get; init; }
         [JsonProperty("upgradeBy")] public int UpgradeBy { get; init; }
     }
 }

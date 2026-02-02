@@ -1,9 +1,9 @@
 namespace Core.Data.NpcModifiersData
 {
-    using Core.Enums;
+    using Enums;
     using Newtonsoft.Json;
 
-    public record RarityUpgradeData : NpcModifierData
+    public record MinRarityModifierData : NpcModifierData
     {
         [JsonProperty("rarity")] public Rarity Rarity { get; init; }
     }

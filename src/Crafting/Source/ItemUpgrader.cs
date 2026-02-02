@@ -83,7 +83,7 @@
             return newRequrements;
         }
 
-        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IMaterialModifier> modifiers, IEntity? player = default)
+        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers, IEntity? player = default)
         {
             var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
 

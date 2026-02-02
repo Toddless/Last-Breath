@@ -1,8 +1,7 @@
 namespace Core.Interfaces.Entity
 {
-    public interface ITierMultiplierModifier: INpcModifier
+    public interface ITierMultiplierModifier : INpcModifier, IChangeableChances
     {
         float BaseMultiplier { get; }
-        float CurrentMultiplier { get; set; }
     }
 }

@@ -2,10 +2,10 @@
 {
     using Godot;
     using System;
-    using Core.Interfaces;
     using System.Globalization;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
+    using Core.Modifiers;
 
     public static class Localization
     {

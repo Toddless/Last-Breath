@@ -1,8 +1,9 @@
 namespace Core.Interfaces.Entity
 {
-    public interface INpcModifier : IIdentifiable, IDisplayable, IWeighable
+    public interface INpcModifier : IIdentifiable, IDisplayable, IWeightable
     {
-        float DifficultyMultiplier { get; }
+        float BaseDifficultyMultiplier { get; }
+        float DifficultyMultiplier { get; set; }
         bool IsUnique { get; }
         string NpcBuffId { get; }
 

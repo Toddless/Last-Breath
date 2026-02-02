@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces;
+    using Core.Modifiers;
     using Godot;
 
     public class ModifierFormatter(Func<string, string> localize)

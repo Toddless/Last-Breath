@@ -7,7 +7,6 @@
     using System.Linq;
     using Core.Results;
     using Core.Constants;
-    using Core.Interfaces;
     using Core.Interfaces.UI;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
@@ -17,6 +16,7 @@
     using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces.Mediator.Requests;
+    using Core.Modifiers;
 
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
     {

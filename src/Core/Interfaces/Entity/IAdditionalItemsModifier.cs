@@ -1,9 +1,10 @@
 namespace Core.Interfaces.Entity
 {
     using System.Collections.Generic;
+    using Data.LootTable;
 
     public interface IAdditionalItemsModifier : INpcModifier
     {
-        Dictionary<int, string> Items { get; }
+        Dictionary<int, List<TableRecord>> Items { get; }
     }
 }

@@ -5,7 +5,7 @@
     using Core.Interfaces.Skills;
 
     public class ExecutePassiveSkill( float percentToKill)
-        : Skill(id:"Passive_Skill_Execute")
+        : Skill(id: "Passive_Skill_Execute")
     {
         public float PercentToKill { get; } = percentToKill;
 

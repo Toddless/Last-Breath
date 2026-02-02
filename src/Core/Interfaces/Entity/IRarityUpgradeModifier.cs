@@ -1,9 +1,7 @@
 namespace Core.Interfaces.Entity
 {
-    using Enums;
-
-    public interface IRarityUpgradeModifier : INpcModifier
+    public interface IRarityUpgradeModifier : INpcModifier, IChangeableChances
     {
-        Rarity MinRarity { get; }
+        float BaseMultiplier { get; }
     }
 }

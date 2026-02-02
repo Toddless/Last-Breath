@@ -1,7 +1,7 @@
 namespace Core.Data.NpcModifiersData
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
+    using Interfaces.Entity;
 
     public interface INpcModifiersFactory
     {

@@ -1,9 +1,10 @@
 ﻿namespace Core.Data
 {
-    using System.Collections.Generic;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
     using Godot;
+    using Interfaces.Items;
+    using Interfaces.Crafting;
+    using System.Collections.Generic;
+    using Modifiers;
 
     public interface IItemDataProvider
     {
@@ -14,8 +15,10 @@
         ICraftingRecipe GetRecipe(string recipeId);
         List<IResourceRequirement> GetRecipeRequirements(string id);
         string GetRecipeResultItemId(string recipeId);
-        IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id);
+        IReadOnlyList<IModifier> GetResourceModifiers(string id);
         bool IsItemHasTag(string id, string tag);
         void LoadData();
+        List<IModifier> GetEquipItemModifierPool(string id);
+        Dictionary<string, int> GetEquipItemResources(string itemId);
     }
 }

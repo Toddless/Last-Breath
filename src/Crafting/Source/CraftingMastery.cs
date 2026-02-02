@@ -105,20 +105,20 @@
             return Math.Min(finalMultiplier, 1.5f);
         }
 
-        public Rarity RollRarity(float rarityBonus = default)
+        public Rarity RollRarity(float rarityBonus = 0)
         {
-            var probs = GetRarityProbabilities(rarityBonus);
-            float r = rnd.Randf();
+            var rarityProbabilities = GetRarityProbabilities(rarityBonus);
+            float rarity = rnd.Randf();
             float accumulated = 0;
 
-            foreach (var kvp in probs.OrderBy(x => x.Key))
+            foreach (var kvp in rarityProbabilities.OrderBy(x => x.Key))
             {
                 accumulated += kvp.Value;
-                if (r <= accumulated)
+                if (rarity <= accumulated)
                     return kvp.Key;
             }
 
-            return probs.OrderByDescending(x => x.Key).First().Key;
+            return rarityProbabilities.OrderByDescending(x => x.Key).First().Key;
         }
 
         public Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = default)

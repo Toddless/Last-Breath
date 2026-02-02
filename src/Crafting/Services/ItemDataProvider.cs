@@ -7,12 +7,12 @@
     using System.IO;
     using System.Linq;
     using TestResources;
-    using Core.Interfaces;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
     using Core.Data;
+    using Core.Modifiers;
 
     internal class ItemDataProvider(string itemDataPath) : IItemDataProvider
     {
@@ -29,6 +29,8 @@
             return [.. data];
         }
 
+        public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
+
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
@@ -41,7 +43,7 @@
             return item is not ICraftingRecipe recipe ? string.Empty : recipe.ResultItemId;
         }
 
-        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
+        public IReadOnlyList<IModifier> GetResourceModifiers(string id)
         {
             if (!_itemData.TryGetValue(id, out var res) || res is not ICraftingResource crafting) return [];
             return crafting.Material?.Modifiers ?? [];
@@ -95,8 +97,8 @@
                     {
                         case var _ when dataPath.EndsWith("EquipItems"):
                             data = await DataParser.ParseEquipItems(jsonContent,
-                                (equipType, id, rarity, tags, baseModifiers, addModifiers, effectId, attributeType) =>
-                                    new TestEquipItem(equipType, id, rarity, tags, baseModifiers, addModifiers, effectId, attributeType));
+                                (equipType, id, tags) =>
+                                    new TestEquipItem(equipType, id, tags));
                             break;
                         case var _ when dataPath.EndsWith("Recipes"):
                             var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,

@@ -3,13 +3,13 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Core.Interfaces.Mediator;
     using Core.Interfaces.Mediator.Requests;
+    using Core.Modifiers;
 
     public class
         RecraftEquipItemModifierRequestHandler(
@@ -25,7 +25,7 @@
             var item = inventory.GetItem<IEquipItem>(request.ItemInstanceID);
             if (item == null)
                 return Task.FromResult(new RequestResult<IModifierInstance>(false, "Item was not fount", null));
-            var modifiers = new List<IMaterialModifier>();
+            var modifiers = new List<IModifier>();
             foreach (var resource in request.Resources)
                 modifiers.AddRange(itemDataProvider.GetResourceModifiers(resource.Key));
 

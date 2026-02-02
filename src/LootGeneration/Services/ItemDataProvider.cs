@@ -5,14 +5,13 @@ namespace LootGeneration.Services
     using System;
     using Utilities;
     using System.IO;
+    using Core.Data;
     using System.Linq;
     using Core.Modifiers;
-    using Core.Interfaces;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Data;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider
@@ -20,6 +19,7 @@ namespace LootGeneration.Services
         private const string DataPath = "res://Data/";
         private readonly Dictionary<string, IItem> _itemData = [];
         private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
 
         public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
@@ -39,13 +39,16 @@ namespace LootGeneration.Services
             return item is not ICraftingRecipe recipe ? [] : recipe.MainResource;
         }
 
+        public Dictionary<string, int> GetEquipItemResources(string itemId) =>
+            _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
+
         public string GetRecipeResultItemId(string recipeId)
         {
             var item = TryGetItem(recipeId);
             return item is not ICraftingRecipe recipe ? string.Empty : recipe.ResultItemId;
         }
 
-        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
+        public IReadOnlyList<IModifier> GetResourceModifiers(string id)
         {
             if (!_itemData.TryGetValue(id, out var res) || res is not ICraftingResource crafting) return [];
             return crafting.Material?.Modifiers ?? [];
@@ -76,6 +79,15 @@ namespace LootGeneration.Services
             }
         }
 
+        private async Task LoadDataFromDirectory(string dataPath)
+        {
+            await LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => await ParseEquipItems(s));
+            await LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => await ParseRecipes(s));
+            await LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
+            await LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
+            await LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => await ParseEquipItemResources(s));
+        }
+
         private static async Task LoadDataFromJson(string path, Func<string, Task> loadDataFunc)
         {
             var dir = DirAccess.Open(path);
@@ -103,28 +115,21 @@ namespace LootGeneration.Services
             }
         }
 
-        private async Task LoadDataFromDirectory(string dataPath)
-        {
-            await LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => await ParseEquipItems(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => await ParseRecipes(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
-        }
-
-
         private async Task ParseEquipItems(string jsonContent)
         {
             List<IItem> data = await DataParser.ParseEquipItems(jsonContent,
-                (equipType, id, rarity, tags, baseModifiers, addModifiers, effectId, attributeType) =>
-                    new ExampleEquipItem(equipType, id, rarity, tags, baseModifiers, addModifiers, effectId, attributeType));
+                (equipType, id, tags) =>
+                    new ExampleEquipItem(equipType, id, tags));
             lock (_itemData)
                 data.ForEach(item => _itemData.TryAdd(item.Id, item));
         }
 
+        private async Task ParseEquipItemResources(string jsonContent) => _equipItemsResources = await DataParser.ParseEquipItemResources(jsonContent);
+
 
         private async Task ParseModifiersPool(string jsonContent) =>
             await DataParser.ParseEquipItemModifierPools(jsonContent, ref _equipItemModifierPools,
-                (parameter, type, value) => new Modifier(type, parameter, value));
+                (parameter, type, value, weight) => new Modifier(type, parameter, value, weight));
 
         private async Task ParseResources(string jsonContent)
         {

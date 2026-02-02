@@ -4,7 +4,7 @@
     using System;
     using Battle;
     using Abilities;
-    using Core.Data;
+    using Data;
     using System.Collections.Generic;
 
     public interface IEffectsComponent

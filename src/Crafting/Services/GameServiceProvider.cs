@@ -4,7 +4,6 @@
     using Source;
     using System;
     using Core.Results;
-    using Core.Interfaces;
     using Source.EventHandlers;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
@@ -15,6 +14,7 @@
     using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces.Mediator.Requests;
+    using Core.Modifiers;
     using Microsoft.Extensions.DependencyInjection;
     using Source.RequestHandlers;
 

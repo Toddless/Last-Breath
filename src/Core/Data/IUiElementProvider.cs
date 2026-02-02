@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Core.Interfaces.UI;
+    using Interfaces.UI;
     using Godot;
 
     public interface IUiElementProvider

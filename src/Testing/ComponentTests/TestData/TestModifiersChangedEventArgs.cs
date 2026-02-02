@@ -1,8 +1,8 @@
 ﻿namespace LastBreathTest.ComponentTests.TestData
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Components;
+    using Core.Modifiers;
 
     public class TestModifiersChangedEventArgs(EntityParameter parameter, IReadOnlyList<IModifierInstance> modifiers) : EventArgs, IModifiersChangedEventArgs
     {

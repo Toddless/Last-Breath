@@ -1,21 +1,20 @@
 ﻿namespace Utilities
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Core.Data.CraftingData;
-    using Core.Data.EquipData;
-    using Core.Data.LootTable;
-    using Core.Data.NpcModifiersData;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
+    using System.Linq;
     using Core.Modifiers;
     using Newtonsoft.Json;
+    using Core.Data.EquipData;
+    using Core.Data.LootTable;
     using Newtonsoft.Json.Linq;
+    using Core.Interfaces.Items;
+    using System.Threading.Tasks;
+    using Core.Data.CraftingData;
+    using Core.Interfaces.Crafting;
+    using Core.Data.NpcModifiersData;
+    using System.Collections.Generic;
     using Newtonsoft.Json.Serialization;
 
     public abstract class DataParser
@@ -63,6 +62,15 @@
             return Task.CompletedTask;
         }
 
+
+        public static Task<Dictionary<string, Dictionary<string, int>>> ParseEquipItemResources(string json)
+        {
+            var data = JsonConvert.DeserializeObject<EquipItemResourcesData>(json) ?? throw new InvalidOperationException();
+            var resources = data.Resources.ToDictionary(equipItemResources => equipItemResources.ItemId,
+                equipItemResources => equipItemResources.Resources.ToDictionary(id => id.ResourceId, amount => amount.Amount));
+            return Task.FromResult(resources);
+        }
+
         public static Task<Dictionary<string, List<NpcModifierData>>> ParseNpcModifiers(string json)
         {
             var data = JsonConvert.DeserializeObject<ModifiersData>(json) ?? throw new InvalidOperationException();
@@ -77,7 +85,8 @@
                     "guaranteedItems" => CreateModifier<GuaranteedItemsData>(allMods),
                     "tierMultiplier" => CreateModifier<TierMultiplierData>(allMods),
                     "itemEffects" => CreateModifier<ItemEffectData>(allMods),
-                    "rarityUpgrade" => CreateModifier<RarityUpgradeData>(allMods),
+                    "minRarity" => CreateModifier<MinRarityModifierData>(allMods),
+                    "rarityUpgrade" => CreateModifier<RarityUpgradeModifierData>(allMods),
                     _ => []
                 };
                 modifiers.Add(npcModifiers.Key, mods);
@@ -89,9 +98,9 @@
         public static Task ParseEquipItemModifierPools(
             string json,
             ref Dictionary<string, List<IModifier>> equipItemModifierPools,
-            Func<EntityParameter, ModifierType, float, IModifier> modifierFactory)
+            Func<EntityParameter, ModifierType, float, float, IModifier> modifierFactory)
         {
-            var data = JsonConvert.DeserializeObject<EquipModifiersPoolRoot>(json, s_settings) ?? throw new FileNotFoundException();
+            var data = JsonConvert.DeserializeObject<EquipModifiersPoolRoot>(json, s_settings) ?? throw new InvalidOperationException();
             foreach (var modifierPool in data.Root)
             {
                 List<IModifier> itemModifiers = [];
@@ -99,7 +108,7 @@
                 {
                     ParseEnum(modifier.Parameter, out EntityParameter param);
                     ParseEnum(modifier.ModifierType, out ModifierType type);
-                    itemModifiers.Add(modifierFactory(param, type, modifier.Value));
+                    itemModifiers.Add(modifierFactory(param, type, modifier.Value, modifier.Weight));
                 }
 
                 equipItemModifierPools.TryAdd(modifierPool.Id, itemModifiers);
@@ -110,10 +119,10 @@
 
         public static async Task<List<IItem>> ParseResources<TCategory>(
             string json,
-            Func<List<IMaterialModifier>, string, TCategory> categoryCreator,
+            Func<List<IModifier>, string, TCategory> categoryCreator,
             Func<string, string[], Rarity, EquipmentCategory, int, IUpgradingResource> upgradeResourceFactory,
-            Func<EntityParameter, ModifierType, float, float, IMaterialModifier> materialModifierFactory,
-            Func<List<IMaterialModifier>, IMaterialCategory, IMaterial> materialFactory,
+            Func<EntityParameter, ModifierType, float, float, IModifier> materialModifierFactory,
+            Func<List<IModifier>, IMaterialCategory, IMaterial> materialFactory,
             Func<string, int, string[], IMaterial, Rarity, ICraftingResource> craftingResourceFactory)
             where TCategory : class, IMaterialCategory
         {
@@ -123,7 +132,7 @@
 
             foreach (var categoryData in data?.MaterialCategories ?? [])
             {
-                List<IMaterialModifier> modifiers = await LoadMaterialsModifiers(categoryData, materialModifierFactory);
+                List<IModifier> modifiers = await LoadMaterialsModifiers(categoryData, materialModifierFactory);
 
                 var category = categoryCreator.Invoke(modifiers, categoryData.Id);
                 materialCategories.Add(category);
@@ -177,9 +186,7 @@
             return await Task.FromResult(recipes);
         }
 
-        public static async Task<List<IItem>> ParseEquipItems(
-            string json,
-            Func<EquipmentType, string, Rarity, string[], List<IModifier>, List<IModifier>, string, AttributeType, IEquipItem> itemCreator)
+        public static async Task<List<IItem>> ParseEquipItems(string json, Func<EquipmentType, string, string[], IEquipItem> itemCreator)
         {
             var data = JsonConvert.DeserializeObject<EquipItemDataList>(json, s_settings);
 
@@ -193,16 +200,14 @@
                 ParseEnum<EquipmentType>(item.EquipmentPart, out var equipmentType);
                 ParseEnum<AttributeType>(item.AttributeType, out var attributeType);
 
-                var newItem = itemCreator.Invoke(
-                    equipmentType,
-                    item.Id,
-                    rarity,
-                    item.Tags,
-                    baseModifiers,
-                    additionalModifiers,
-                    item.EffectId,
-                    attributeType);
-
+                var newItem = itemCreator.Invoke(equipmentType, item.Id, item.Tags);
+                newItem.AttributeType = attributeType;
+                newItem.Rarity = rarity;
+                newItem.UpdateLevel = item.UpdateLevel;
+                newItem.MaxUpdateLevel = item.MaxUpdateLevel;
+                newItem.SetItemEffect(item.EffectId);
+                newItem.SetBaseModifiers(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem));
+                newItem.SetAdditionalModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem));
                 items.Add(newItem);
             }
 
@@ -250,8 +255,8 @@
         private static Task<List<ICraftingResource>> LoadCraftingResources(
             Dictionary<string, IMaterialCategory> categories,
             List<CraftingResourceData> resourceData,
-            Func<EntityParameter, ModifierType, float, float, IMaterialModifier> materialModifierFactory,
-            Func<List<IMaterialModifier>, IMaterialCategory, IMaterial> materialCategoryFactory,
+            Func<EntityParameter, ModifierType, float, float, IModifier> materialModifierFactory,
+            Func<List<IModifier>, IMaterialCategory, IMaterial> materialCategoryFactory,
             Func<string, int, string[], IMaterial, Rarity, ICraftingResource> craftingResourceFactory)
         {
             var items = new List<ICraftingResource>();
@@ -264,7 +269,7 @@
                     continue;
                 }
 
-                var materialModifiers = new List<IMaterialModifier>();
+                var materialModifiers = new List<IModifier>();
 
                 foreach (var modifierData in materialData.Modifiers)
                 {
@@ -291,11 +296,11 @@
             return Task.FromResult(items);
         }
 
-        private static async Task<List<IMaterialModifier>> LoadMaterialsModifiers(
+        private static async Task<List<IModifier>> LoadMaterialsModifiers(
             MaterialCategoryData categoryData,
-            Func<EntityParameter, ModifierType, float, float, IMaterialModifier> materialModifierFactory)
+            Func<EntityParameter, ModifierType, float, float, IModifier> materialModifierFactory)
         {
-            var modifiers = new List<IMaterialModifier>();
+            var modifiers = new List<IModifier>();
             foreach (var modifierData in categoryData.Modifiers)
             {
                 ParseEnum<EntityParameter>(modifierData.Parameter, out var parameter);

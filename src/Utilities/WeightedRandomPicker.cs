@@ -1,16 +1,16 @@
 ﻿namespace Utilities
 {
     using Godot;
+    using Core.Data;
     using System.Linq;
     using Core.Interfaces;
     using System.Collections.Generic;
-    using Core.Data;
 
-    public class WeightedRandomPicker
+    public abstract class WeightedRandomPicker
     {
         // We are fine until we have fewer than 10k elements in the list.
         public static (List<WeightedObject<T>> WeightedObjects, float TotalWeight) CalculateWeights<T>(IEnumerable<T> objects)
-            where T : IWeighable
+            where T : IWeightable
         {
             List<WeightedObject<T>> weightedObjs = [];
             float currentMaxWeight = 0;
@@ -32,24 +32,24 @@
             return elements.First(x => rNumb >= x.From && rNumb < x.To).Obj;
         }
 
-        public static HashSet<T> PickRandomMultipleWithoutDublicate<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, RandomNumberGenerator rnd)
+        public static HashSet<T> PickRandomMultipleWithoutDuplicate<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, RandomNumberGenerator rnd)
             where T : class
         {
             HashSet<T> taken = [];
-            const int maxAttemps = 15;
-
+            const int MaxAttempts = 15;
+            var toPickFrom = elements.ToList();
             while (requestedCount > 0)
             {
-                TryTakeOne(maxAttemps);
+                TryTakeOne(MaxAttempts);
 
-                void TryTakeOne(int attemp)
+                void TryTakeOne(int attempts)
                 {
-                    while (attemp > 0)
+                    while (attempts > 0)
                     {
-                        if (taken.Add(PickRandom(elements, totalWeight, rnd))) return;
-                        attemp--;
+                        if (taken.Add(PickRandom(toPickFrom, totalWeight, rnd))) return;
+                        attempts--;
                     }
-                    PickAnyCallBack(taken, elements);
+                    PickAnyCallBack(taken, toPickFrom);
                 }
                 requestedCount--;
             }

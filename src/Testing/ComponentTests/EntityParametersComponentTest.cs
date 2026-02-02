@@ -2,7 +2,6 @@
 {
     using Core.Enums;
     using Core.Modifiers;
-    using Core.Interfaces;
     using Battle.Attribute;
     using Battle.Components;
     using Battle.Source.Decorators;

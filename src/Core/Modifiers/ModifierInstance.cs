@@ -2,9 +2,8 @@
 {
     using Enums;
     using System;
-    using Interfaces;
 
-    public class ModifierInstance(EntityParameter entityParameter, ModifierType type, float value, object source, int priority = 0) : IModifierInstance
+    public class ModifierInstance(EntityParameter entityParameter, ModifierType type, float value, object source, int priority = 0, float weight = 0) : IModifierInstance
     {
         public EntityParameter EntityParameter { get; } = entityParameter;
         public ModifierType ModifierType { get; } = type;
@@ -13,9 +12,9 @@
         public float Value { get; set; } = value;
         public float BaseValue { get; } = value;
         public object Source { get; } = source;
-        public float Weight { get; }
+        public float Weight { get; set; } = weight;
 
-        public IModifierInstance Copy() => new ModifierInstance(EntityParameter, ModifierType, Value, Source, Priority);
+        public IModifierInstance Copy() => new ModifierInstance(EntityParameter, ModifierType, Value, Source, Priority, Weight);
 
         public override bool Equals(object? obj)
         {

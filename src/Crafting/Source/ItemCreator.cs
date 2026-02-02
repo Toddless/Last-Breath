@@ -3,24 +3,23 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
     using Core.Modifiers;
-    using Core.Interfaces;
     using Core.Interfaces.Items;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Data;
 
     public class ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         : IItemCreator
     {
-        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, IEntity? player = null)
+        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IModifier> resources, IEntity? player = null)
         {
             var recipe = itemDataProvider.GetRecipe(recipeId);
-            (List<WeightedObject<IMaterialModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
+            (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
             if (!recipe.HasTag("Generic"))
             {
                 return Create(recipe.ResultItemId, mods, totalWeight, player);
@@ -35,7 +34,7 @@
             return null;
         }
 
-        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, IEntity? player = null)
+        private IEquipItem Create(string itemId, List<WeightedObject<IModifier>> modifiers, float totalWeight, IEntity? player = null)
         {
             try
             {
@@ -43,12 +42,12 @@
                 var itemRarity = GetRarity(player);
                 item.Rarity = itemRarity;
                 var baseStats = item.BaseModifiers;
-                int amountModifiers = GetAmountModifiers(item.Rarity);
+                int amountModifiers = item.Rarity.ConvertRarityToItemModifierAmount();
 
                 var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid())], item);
                 item.SetBaseModifiers(statModifiers);
 
-                HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, rnd);
+                HashSet<IModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(modifiers, totalWeight, amountModifiers, rnd);
 
                 List<IModifierInstance> mods = [];
                 foreach (var mod in takenMods)
@@ -102,8 +101,6 @@
             _ => "Passive_Skill_Master_Apprentice"
         };
 
-        private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
-
         private Rarity GetRarity(IEntity? player = default)
         {
             // if (player == null) return GetRandomValueFallBack<Rarity>();
@@ -131,7 +128,7 @@
         {
             rnd.Randomize();
             var values = Enum.GetValues<T>();
-            var idx = (byte)rnd.RandiRange(0, values.Length - 1);
+            byte idx = (byte)rnd.RandiRange(0, values.Length - 1);
             return values[idx];
         }
     }

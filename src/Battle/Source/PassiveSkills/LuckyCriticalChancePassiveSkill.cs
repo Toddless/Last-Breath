@@ -6,7 +6,7 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public class LuckyCriticalChancePassiveSkill() : Skill(id:"Passive_Skill_LuckyCriticalChance")
+    public class LuckyCriticalChancePassiveSkill() : Skill(id: "Passive_Skill_LuckyCriticalChance")
     {
         private readonly EntityParameterModuleDecorator _luckyCriticalChanceDecorator = new LuckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 
