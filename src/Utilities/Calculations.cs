@@ -49,7 +49,7 @@
             context.Result = AttackResults.Succeed;
         }
 
-        public static float[] CalculateChances<TModifier>(List<INpcModifier> modifiers, float[] chances)
+        public static float[] CalculateChances<TModifier>(IReadOnlyList<INpcModifier> modifiers, float[] chances)
             where TModifier : class, IWeightable, IChangeableChances
         {
             var sortedModifiers = modifiers.OfType<TModifier>().OrderBy(x => x.Weight).ToList();

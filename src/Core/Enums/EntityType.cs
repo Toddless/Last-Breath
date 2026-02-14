@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum EntityType
+    public enum EntityType : byte
     {
         Regular,
         Special,

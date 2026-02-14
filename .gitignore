@@ -133,14 +133,12 @@ paket-files/
 /Properties
 /icon.svg
 /icon.svg.import
-/Item.tres
 /TestResults/
 /project.godot
-/addons
-/src/Last Breath/Assets
 /src/Testing/bin
 /src/Testing/obj
 /src/Crafting/TestResources
 /src/Core/FilePaths.cs
 /src/LootGeneration/Test/
 /src/Battle/TestData/
+/src/LootGeneration/temp/

@@ -1,12 +1,12 @@
 ﻿namespace Crafting.Source.RequestHandlers
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
 
     public class CheckAllRequirementsFulfilRequestHandler : IRequestHandler<CheckAllRequirementsFulfillRequest, bool>
     {
-        public Task<bool> Handle(CheckAllRequirementsFulfillRequest request)
+        public Task<bool> HandleRequest(CheckAllRequirementsFulfillRequest request)
         {
             return Task.FromResult(true);
         }

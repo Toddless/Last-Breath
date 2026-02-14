@@ -7,10 +7,10 @@
     using System.Linq;
     using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Mediator;
     using System.Collections.Generic;
+    using Core.Interfaces.MessageBus;
 
-    public class CraftingMastery(IMediator mediator, RandomNumberGenerator rnd) : ICraftingMastery
+    public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery
     {
         // TODO: Remove from here
         // ________________________________________________________
@@ -160,7 +160,7 @@
                 {
                     CurrentExperience -= need;
                     _currentLevel++;
-                    mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    gameMessageBus.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;

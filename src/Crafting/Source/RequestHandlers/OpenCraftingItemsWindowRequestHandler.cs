@@ -3,8 +3,8 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
     using UIElements;
 
     public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
@@ -16,7 +16,7 @@
             _uIElementProvider = uIElementProvider;
         }
 
-        public async Task<IEnumerable<string>> Handle(OpenCraftingItemsWindowRequest request)
+        public async Task<IEnumerable<string>> HandleRequest(OpenCraftingItemsWindowRequest request)
         {
             var craftingItems = _uIElementProvider.CreateSingleClosable<CraftingItems>();
             craftingItems.Setup(request.TakenResources);

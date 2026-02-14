@@ -13,7 +13,6 @@
         IEntityParametersComponent Parameters { get; }
         IPassiveSkillsComponent PassiveSkills { get; }
         IAnimationsComponent Animations { get; }
-
         IEntityAttribute Dexterity { get; }
         IEntityAttribute Strength { get; }
         IEntityAttribute Intelligence { get; }

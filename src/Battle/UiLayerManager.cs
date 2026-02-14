@@ -1,20 +1,20 @@
 ﻿namespace Battle
 {
+    using Core.Interfaces.MessageBus;
     using Godot;
     using Services;
     using TestData;
-    using Core.Interfaces.Mediator;
 
     internal partial class UiLayerManager : Node
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _tooltipLayer, _notificationLayer;
 
-        private IMediator? _mediator;
+        private IGameMessageBus? _mediator;
 
         public override void _Ready()
         {
             var serviceProvider = GameServiceProvider.Instance;
-            _mediator = serviceProvider.GetService<IMediator>();
+            _mediator = serviceProvider.GetService<IGameMessageBus>();
             var devPanel = DevPanel.Initialize().Instantiate<DevPanel>();
         }
 

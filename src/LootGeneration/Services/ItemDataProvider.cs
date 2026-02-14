@@ -1,6 +1,5 @@
 namespace LootGeneration.Services
 {
-    using Test;
     using Godot;
     using System;
     using Utilities;
@@ -12,6 +11,14 @@ namespace LootGeneration.Services
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using ExampleCraftingRecipe = temp.ExampleCraftingRecipe;
+    using ExampleCraftingResource = temp.ExampleCraftingResource;
+    using ExampleEquipItem = temp.ExampleEquipItem;
+    using ExampleMaterialCategory = temp.ExampleMaterialCategory;
+    using ExampleMaterialModifier = temp.ExampleMaterialModifier;
+    using ExampleMaterialType = temp.ExampleMaterialType;
+    using ExampleResourceRequirement = temp.ExampleResourceRequirement;
+    using ExampleUpgradeResource = temp.ExampleUpgradeResource;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider
@@ -29,7 +36,10 @@ namespace LootGeneration.Services
         {
             // Each item category has its own basic modifier pool. The first word in the ID represents the item category.
             string category = id.Split('_').First();
-            if (!_equipItemModifierPools.TryGetValue(category, out List<IModifier>? modifiers) || !_equipItemModifierPools.TryGetValue(id, out var pool)) return [];
+            if (!_equipItemModifierPools.TryGetValue(category, out List<IModifier>? modifiers))
+                modifiers = [];
+            if (!_equipItemModifierPools.TryGetValue(id, out var pool))
+                pool = [];
             return modifiers.Concat(pool).ToList();
         }
 
@@ -81,11 +91,13 @@ namespace LootGeneration.Services
 
         private async Task LoadDataFromDirectory(string dataPath)
         {
-            await LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => await ParseEquipItems(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => await ParseRecipes(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
-            await LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => await ParseEquipItemResources(s));
+            var equip = LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => await ParseEquipItems(s));
+            var recipes = LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => await ParseRecipes(s));
+            var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
+            var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
+            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => await ParseEquipItemResources(s));
+
+            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, modifiers);
         }
 
         private static async Task LoadDataFromJson(string path, Func<string, Task> loadDataFunc)
@@ -160,6 +172,7 @@ namespace LootGeneration.Services
             if (_itemData.TryGetValue(id, out var data)) return data;
 
             Tracker.TrackNotFound($"Item with id: {id}", this);
+            GD.Print($"Item with id: {id} not found");
             return null;
         }
     }

@@ -5,20 +5,20 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
     using Core.Results;
 
-    public class UpgradeEquipItemRequestHandler(IInventory inventory, IItemUpgrader itemUpgrader, IMediator mediator)
+    public class UpgradeEquipItemRequestHandler(IInventory inventory, IItemUpgrader itemUpgrader, IGameMessageBus gameMessageBus)
         : IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>
     {
-        public Task<ItemUpgradeResult> Handle(UpgradeEquipItemRequest request)
+        public Task<ItemUpgradeResult> HandleRequest(UpgradeEquipItemRequest request)
         {
             var item = inventory.GetItem<IEquipItem>(request.InstanceId);
             if (item == null) return Task.FromResult(ItemUpgradeResult.Failure);
-            mediator.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
+            gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
             // Later, I need to pass the used resources to the TryUpgradeItem method (some of these resources influence the result).
-            mediator.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Upgrade, item.Rarity));
+            gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Upgrade, item.Rarity));
             return Task.FromResult(itemUpgrader.TryUpgradeItem(item));
         }
     }

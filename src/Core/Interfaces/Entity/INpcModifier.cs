@@ -3,7 +3,7 @@ namespace Core.Interfaces.Entity
     public interface INpcModifier : IIdentifiable, IDisplayable, IWeightable
     {
         float BaseDifficultyMultiplier { get; }
-        float DifficultyMultiplier { get; set; }
+        float DifficultyMultiplier { get; }
         bool IsUnique { get; }
         string NpcBuffId { get; }
 

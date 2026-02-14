@@ -1,13 +1,16 @@
 namespace LootGeneration.Services
 {
-    using Test;
+    using System;
     using Utilities;
+    using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Data.NpcModifiersData;
+    using Godot;
 
-    public class NpcModifierProvider(INpcModifiersFactory factory)
+    public class NpcModifierProvider(INpcModifiersFactory factory) : INpcModifierProvider
     {
         private const string NpcModifierData = "res://Data/NpcModifiers/";
         private readonly Dictionary<string, INpcModifier> _npcModifiers = [];
@@ -17,9 +20,21 @@ namespace LootGeneration.Services
             : modifier.Copy();
 
 
-        public async Task LoadDataAsync()
+        public List<string> GetAllModifierIds() => _npcModifiers.Keys.ToList();
+
+        public IReadOnlyList<INpcModifier> GetAllModifiers() => _npcModifiers.Values.ToList();
+
+        public async void LoadDataAsync()
         {
-            await DataLoader.LoadDataFromJson(NpcModifierData, async s => await ParseNpcModifiers(s));
+            try
+            {
+                await DataLoader.LoadDataFromJson(NpcModifierData, async s => await ParseNpcModifiers(s));
+            }
+            catch (Exception exception)
+            {
+                GD.Print($"Failed to load npc modifier data. {exception.Message},  {exception.StackTrace}");
+                Tracker.TrackException($"Failed to load npc modifier data.", exception, this);
+            }
         }
 
         private async Task ParseNpcModifiers(string json)

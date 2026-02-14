@@ -7,15 +7,15 @@
     <LangVersion>14</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="GodotSharp" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
+    <PackageReference Update="Godot.SourceGenerators" />
+    <PackageReference Update="GodotSharp" />
+    <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
 </Project>

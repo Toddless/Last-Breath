@@ -7,8 +7,8 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
     using Core.Modifiers;
 
     public class
@@ -16,11 +16,11 @@
             IInventory inventory,
             IItemUpgrader itemUpgrader,
             IItemDataProvider itemDataProvider,
-            IMediator mediator)
+            IGameMessageBus gameMessageBus)
         : IRequestHandler<RecraftEquipItemModifierRequest,
             RequestResult<IModifierInstance>>
     {
-        public Task<RequestResult<IModifierInstance>> Handle(RecraftEquipItemModifierRequest request)
+        public Task<RequestResult<IModifierInstance>> HandleRequest(RecraftEquipItemModifierRequest request)
         {
             var item = inventory.GetItem<IEquipItem>(request.ItemInstanceID);
             if (item == null)
@@ -30,8 +30,8 @@
                 modifiers.AddRange(itemDataProvider.GetResourceModifiers(resource.Key));
 
             var mode = itemUpgrader.TryRecraftModifier(item, request.ModifierHash, modifiers);
-            mediator.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
-            mediator.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Recraft, item.Rarity));
+            gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
+            gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Recraft, item.Rarity));
             return Task.FromResult(new RequestResult<IModifierInstance>(true, string.Empty, mode));
         }
     }

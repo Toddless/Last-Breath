@@ -5,7 +5,6 @@ namespace Core.Data.NpcModifiersData
     public record NpcModifierData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
-        [JsonProperty("icon")] public string Icon { get; init; } = string.Empty;
         [JsonProperty("npcBuffId")] public string NpcBuffId { get; init; } = string.Empty;
         [JsonProperty("weight")] public float Weight { get; init; }
         [JsonProperty("difficulty")] public float Difficulty { get; init; }

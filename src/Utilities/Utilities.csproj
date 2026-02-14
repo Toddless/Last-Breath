@@ -6,19 +6,26 @@
     <LangVersion>latestmajor</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Serilog" Version="4.3.1" />
+    <PackageReference Update="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
+    <PackageReference Update="Godot.SourceGenerators" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="GodotSharp" Version="4.5.0" />
+    <PackageReference Update="GodotSharp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
+    <PackageReference Update="GodotSharpEditor" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Newtonsoft.Json" />
   </ItemGroup>
 </Project>

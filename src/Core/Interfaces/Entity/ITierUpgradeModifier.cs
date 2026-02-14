@@ -1,9 +1,9 @@
 namespace Core.Interfaces.Entity
 {
-    public interface ITierUpgradeModifier: INpcModifier
+    public interface ITierUpgradeModifier : INpcModifier
     {
         float BaseMultiplier { get; }
-        float CurrentMultiplier { get; set; }
+        float CurrentMultiplier { get; }
         int UpgradeBy { get; }
     }
 }

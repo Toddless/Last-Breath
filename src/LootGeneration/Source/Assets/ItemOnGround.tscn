@@ -1,0 +1,103 @@
+[gd_scene load_steps=14 format=3 uid="uid://d4u6h8h88ft4"]
+
+[ext_resource type="Shader" uid="uid://dmpa45qo2kco7" path="res://Source/Assets/ItemOnGround.tres" id="1_xwcmp"]
+[ext_resource type="Texture2D" uid="uid://c1e7tkjhxk88x" path="res://Source/Assets/LootDropEffect.png" id="2_65rwn"]
+[ext_resource type="Script" uid="uid://b4oekikujebkf" path="res://Source/ItemOnGround.cs" id="5_gwjaa"]
+[ext_resource type="Texture2D" uid="uid://ctiqrv1nre10y" path="res://Source/Assets/DropIcon.png" id="5_h4cdb"]
+[ext_resource type="Texture2D" uid="uid://bqdyhp2n0j715" path="res://Source/Assets/Illustration.png" id="5_txkrn"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_65rwn"]
+shader = ExtResource("1_xwcmp")
+shader_parameter/MainColor = Color(0.827451, 0, 0, 1)
+shader_parameter/Transparance_Texture = ExtResource("2_65rwn")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_txkrn"]
+atlas = ExtResource("5_h4cdb")
+region = Rect2(89, 145.5, 124, 159)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gwjaa"]
+resource_local_to_scene = true
+shader = ExtResource("1_xwcmp")
+shader_parameter/MainColor = Color(0, 0, 0, 1)
+shader_parameter/Transparance_Texture = ExtResource("2_65rwn")
+
+[sub_resource type="QuadMesh" id="QuadMesh_ku4sf"]
+resource_local_to_scene = true
+size = Vector2(2.5, 2.5)
+center_offset = Vector3(0.045, 0.855, 0)
+
+[sub_resource type="Curve" id="Curve_v78hy"]
+_data = [Vector2(0, 0.9520886), 0.0, -5.5755525, 0, 0, Vector2(0.9904154, 0.033783913), -3.7490768, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_txkrn"]
+curve = SubResource("Curve_v78hy")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qlect"]
+resource_local_to_scene = true
+particle_flag_disable_z = true
+emission_shape_scale = Vector3(0.1, 0.2, 0)
+emission_shape = 6
+emission_ring_axis = Vector3(5, 5, 0)
+emission_ring_height = 5.0
+emission_ring_radius = 5.0
+emission_ring_inner_radius = 3.0
+emission_ring_cone_angle = 0.0
+direction = Vector3(0, -1, 0)
+spread = 5.0
+initial_velocity_min = 0.099999994
+initial_velocity_max = 0.9
+gravity = Vector3(0, -143, 0)
+linear_accel_min = -180.0
+linear_accel_max = -2.2351742e-06
+scale_min = 0.0
+scale_max = 0.099999994
+scale_curve = SubResource("CurveTexture_txkrn")
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_65rwn"]
+radius = 4.3806624
+height = 30.664637
+
+[node name="ItemOnGround" type="Node2D" node_paths=PackedStringArray("_interactionArea", "_lootIcon", "_itemBeam", "_lootParticle")]
+material = SubResource("ShaderMaterial_65rwn")
+script = ExtResource("5_gwjaa")
+_interactionArea = NodePath("Area2D")
+_colors = Dictionary[int, Color]({
+0: Color(0.6346619, 0.15464666, 0.057616346, 1),
+1: Color(0.37976483, 0.06982753, 0.44939244, 1),
+2: Color(0.13725491, 0.10980392, 0.93333334, 1),
+3: Color(0, 0.3372549, 0, 1),
+10: Color(0.40651846, 0.012942672, 0, 1),
+11: Color(0.92941177, 0.40784314, 0.77254903, 1)
+})
+_lootIcon = NodePath("Sprite2D")
+_itemBeam = NodePath("Sprite2D/MeshInstance2D")
+_lootParticle = NodePath("Sprite2D/MeshInstance2D/GPUParticles2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.15, 0.15)
+texture = SubResource("AtlasTexture_txkrn")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Sprite2D"]
+material = SubResource("ShaderMaterial_gwjaa")
+rotation = -3.1415925
+scale = Vector2(250, 250)
+mesh = SubResource("QuadMesh_ku4sf")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="Sprite2D/MeshInstance2D"]
+rotation = 3.1415925
+texture = ExtResource("5_txkrn")
+lifetime = 1.4
+speed_scale = 0.8
+explosiveness = 0.1
+randomness = 0.1
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_qlect")
+
+[node name="Area2D" type="Area2D" parent="."]
+scale = Vector2(-1.8799853, 0.243204)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+visible = false
+scale = Vector2(1.6787152, 3.3822763)
+shape = SubResource("CapsuleShape2D_65rwn")

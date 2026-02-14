@@ -232,17 +232,17 @@
 
                 var spawnPoint = await _setPoint.Task;
 
-                for (int i = 0; i < amount; i++)
-                {
-                    var npc = NpcFactory.CreateEntity(_npcCategorySelected);
-                    if (npc is not INpc s) continue;
-                    s.EntityType = _selectedEntityType;
-                    s.Fraction = _selectedFraction;
-                    if (npc is IEntity entity && _isInGroup.ButtonPressed)
-                        group.TryAddToGroup(entity);
-                    npc.Position = new Vector2(spawnPoint.X + 50 * i, spawnPoint.Y + 50 * i);
-                    _mainWorld?.CallDeferred(Node.MethodName.AddChild, npc);
-                }
+                // for (int i = 0; i < amount; i++)
+                // {
+                //     var npc = NpcFactory.CreateEntity(_npcCategorySelected);
+                //     if (npc is not INpc s) continue;
+                //     s.EntityType = _selectedEntityType;
+                //     s.Fraction = _selectedFraction;
+                //     if (npc is IEntity entity && _isInGroup.ButtonPressed)
+                //         group.TryAddToGroup(entity);
+                //     npc.Position = new Vector2(spawnPoint.X + 50 * i, spawnPoint.Y + 50 * i);
+                //     _mainWorld?.CallDeferred(Node.MethodName.AddChild, npc);
+                // }
 
                 _setPoint = null;
             }

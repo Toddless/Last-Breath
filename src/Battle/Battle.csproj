@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk/4.5.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.5.0">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -10,16 +10,10 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Stateless" Version="5.19.0" />
-    <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
-    <PackageReference Update="GodotSharp" Version="4.5.0" />
-    <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
+    <Content Include="Source\Localization\en.po" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Source\Localization\en.po" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+    <PackageReference Include="Stateless" Version="5.20.1" />
   </ItemGroup>
 </Project>

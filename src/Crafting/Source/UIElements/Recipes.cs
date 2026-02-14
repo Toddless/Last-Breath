@@ -9,11 +9,11 @@
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
     using Core.Data;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
 
     [GlobalClass]
     public partial class Recipes : PanelContainer, IInitializable, IRequireServices
@@ -23,7 +23,7 @@
         [Export] private RecipeTree? _recipeTree;
 
         private IItemDataProvider? _dataProvider;
-        private IMediator? _mediator;
+        private IGameMessageBus? _mediator;
 
         [Signal]
         public delegate void RecipeSelectedEventHandler(string id);
@@ -42,17 +42,17 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IMediator>();
+            _mediator = provider.GetService<IGameMessageBus>();
         }
 
         public override void _EnterTree()
         {
-            if (_mediator != null) _mediator.UpdateUi += UpdateRecipeTree;
+            //if (_mediator != null) _mediator.UpdateUi += UpdateRecipeTree;
         }
 
         public override void _ExitTree()
         {
-            if (_mediator != null) _mediator.UpdateUi -= UpdateRecipeTree;
+           // if (_mediator != null) _mediator.UpdateUi -= UpdateRecipeTree;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

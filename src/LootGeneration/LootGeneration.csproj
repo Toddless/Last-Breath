@@ -6,12 +6,19 @@
     <LangVersion>14</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
-    <PackageReference Update="GodotSharp" Version="4.5.0" />
-    <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Godot.SourceGenerators" />
+    <PackageReference Update="GodotSharp" />
+    <PackageReference Update="GodotSharpEditor" />
+    <PackageReference Update="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Assets\" />
   </ItemGroup>
 </Project>

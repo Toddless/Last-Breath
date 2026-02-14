@@ -11,11 +11,11 @@
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
     using Core.Data;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
     using Core.Modifiers;
 
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
@@ -32,7 +32,7 @@
 
         private Recipes? _recipes;
         private IItemDataProvider? _dataProvider;
-        private IMediator? _mediator;
+        private IGameMessageBus? _mediator;
         private IUiElementProvider? _uiElementProvider;
         private IUIResourcesProvider? _uiResourcesProvider;
 
@@ -60,14 +60,14 @@
 
         public override void _EnterTree()
         {
-            if (_mediator != null) _mediator.UpdateUi += UpdateRequiredResourcesAsync;
+           // if (_mediator != null) _mediator.UpdateUi += UpdateRequiredResourcesAsync;
             if (DragArea != null) DragArea.GuiInput += DragWindow;
             UpdateRequiredResourcesAsync();
         }
 
         public override void _ExitTree()
         {
-            if (_mediator != null) _mediator.UpdateUi -= UpdateRequiredResourcesAsync;
+            //if (_mediator != null) _mediator.UpdateUi -= UpdateRequiredResourcesAsync;
             if (DragArea != null) DragArea.GuiInput -= DragWindow;
         }
 
@@ -83,10 +83,10 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IMediator>();
+            _mediator = provider.GetService<IGameMessageBus>();
             _uiElementProvider = provider.GetService<IUiElementProvider>();
             _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
-            _mediator.UpdateUi += UpdateRequiredResourcesAsync;
+          //  _mediator.UpdateUi += UpdateRequiredResourcesAsync;
         }
 
         public void SetRecipe(string recipeId)
