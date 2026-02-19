@@ -7,8 +7,10 @@ namespace LootGeneration.Services
     using Core.Data;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Microsoft.Extensions.DependencyInjection;
+    using temp;
 
     internal class GameServiceProvider : IGameServiceProvider
     {
@@ -45,9 +47,8 @@ namespace LootGeneration.Services
                 rnd.Randomize();
                 return rnd;
             });
+            services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();
-            GD.Print($"{typeof(ServiceDescriptor).Assembly.FullName}");
-            GD.Print($"{typeof(ServiceCollection).Assembly.FullName}");
             return services.BuildServiceProvider();
         }
     }

@@ -26,7 +26,7 @@
                 int amount = Mathf.RoundToInt(res.Value * _craftingMastery.GetResourceMultiplier());
                 if (inventory.TryAddItemStacks(res.Key, amount)) continue;
 
-                var itemInstance = provider.CopyBaseItem(res.Key);
+                var itemInstance = provider.CopyItem(res.Key);
                 inventory.TryAddItem(itemInstance, amount);
             }
 

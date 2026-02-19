@@ -8,7 +8,6 @@
     using System.Linq;
     using Core.Modifiers;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Skills;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
@@ -38,7 +37,7 @@
         {
             try
             {
-                var item = (IEquipItem)itemDataProvider.CopyBaseItem(itemId);
+                var item = (IEquipItem)itemDataProvider.CopyItem(itemId);
                 var itemRarity = GetRarity(player);
                 item.Rarity = itemRarity;
                 var baseStats = item.BaseModifiers;
@@ -86,29 +85,14 @@
             return baseValue * multiplier;
         }
 
-        private ISkill? GetRandomSkill()
-        {
-            //if (_rnd.Randf() <= _craftingMastery.GetFinalSkillChance())
-            //    return new PassiveSkillProvider().CreateSkill(GetSkillId(_rnd.RandiRange(1, 4)));
-            return null;
-        }
-
-        private string GetSkillId(int number) => number switch
-        {
-            1 => "Passive_Skill_Touch_Of_God",
-            2 => "Passive_Skill_Precise_Technique",
-            3 => "Passive_Skill_Enhanced_Mastery",
-            _ => "Passive_Skill_Master_Apprentice"
-        };
-
-        private Rarity GetRarity(IEntity? player = default)
+        private Rarity GetRarity(IEntity? player = null)
         {
             // if (player == null) return GetRandomValueFallBack<Rarity>();
             // TODO: Later add call to players skill to get Rarity
             return craftingMastery.RollRarity();
         }
 
-        private AttributeType GetAttribute(IEntity? player = default)
+        private AttributeType GetAttribute(IEntity? player = null)
         {
             // TODO: Sometime i can get from this call AttributeType.None.
             if (player == null)

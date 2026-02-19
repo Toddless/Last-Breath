@@ -8,7 +8,7 @@
 
     public interface IItemDataProvider
     {
-        IItem CopyBaseItem(string id);
+        IItem CopyItem(string id);
         IEnumerable<IItem> GetAllResources();
         IEnumerable<ICraftingRecipe> GetCraftingRecipes();
         Texture2D? GetItemIcon(string id);

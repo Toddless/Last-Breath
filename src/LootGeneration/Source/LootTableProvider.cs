@@ -29,14 +29,7 @@ namespace LootGeneration.Source
                 _ => null
             };
 
-            if (table != null)
-            {
-                return table.ToList();
-            }
-
-            Tracker.TrackError("Could not find loot table for " + key);
-            GD.Print("Could not find loot table for " + key);
-            return [];
+            return table != null ? table.ToList() : [];
         }
 
         public async void LoadData()

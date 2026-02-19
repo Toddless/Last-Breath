@@ -60,7 +60,7 @@
 
         public override void _EnterTree()
         {
-           // if (_mediator != null) _mediator.UpdateUi += UpdateRequiredResourcesAsync;
+            // if (_mediator != null) _mediator.UpdateUi += UpdateRequiredResourcesAsync;
             if (DragArea != null) DragArea.GuiInput += DragWindow;
             UpdateRequiredResourcesAsync();
         }
@@ -86,7 +86,7 @@
             _mediator = provider.GetService<IGameMessageBus>();
             _uiElementProvider = provider.GetService<IUiElementProvider>();
             _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
-          //  _mediator.UpdateUi += UpdateRequiredResourcesAsync;
+            //  _mediator.UpdateUi += UpdateRequiredResourcesAsync;
         }
 
         public void SetRecipe(string recipeId)
@@ -190,18 +190,13 @@
         {
             ArgumentNullException.ThrowIfNull(_mediator);
             var item = await _mediator.Send<CreateEquipItemRequest, IEquipItem?>(new(id, _usedResources));
-            if (item != null)
-            {
-                _mediator?.PublishAsync(new ItemCreatedEvent(item));
-            }
+            if (item != null) _mediator?.PublishAsync(new ItemCreatedEvent(item));
         }
 
         private async void UpgradeEquipItemAsync()
         {
             ArgumentNullException.ThrowIfNull(_mediator);
-            var result =
-                await _mediator.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(
-                    new(_equpItem?.InstanceId ?? string.Empty, _usedResources));
+            var result = await _mediator.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_equpItem?.InstanceId ?? string.Empty, _usedResources));
             switch (result)
             {
                 case ItemUpgradeResult.Success:

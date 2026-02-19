@@ -1,9 +1,11 @@
 namespace LootGeneration.Source
 {
+    using Godot;
     using Services;
     using Core.Data;
     using Core.Enums;
     using NpcModifiers;
+    using Core.Interfaces;
     using Core.Data.LootTable;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
@@ -30,11 +32,12 @@ namespace LootGeneration.Source
             services.AddSingleton<ILootGenerationService, LootGenerationService>(provider =>
                 {
                     var instance = new LootGenerationService(
-                        provider.GetService<IItemDataProvider>(),
+                        provider.GetService<RandomNumberGenerator>(),
                         provider.GetService<IGameEventBus>(),
                         provider.GetService<IGameMessageBus>(),
+                        provider.GetService<IItemCreationService>(),
                         new LootConfiguration(
-                            [500, 350, 100, 25],
+                            [600, 200, 50, 3],
                             [0.004f, 0.006f, 0.3f, 0.6f],
                             [0.003f, 0.15f, 0.27f, 0.55f],
                             0.35f,
@@ -55,8 +58,7 @@ namespace LootGeneration.Source
                                 [Rarity.Legendary] = 1.45f,
                                 [Rarity.Unique] = 2f,
                                 [Rarity.Mythic] = 4f,
-                            }),
-                        provider.GetService<IItemEffectProvider>());
+                            }));
                     return instance;
                 }
             );

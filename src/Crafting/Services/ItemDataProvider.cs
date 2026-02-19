@@ -19,7 +19,7 @@
         private readonly Dictionary<string, IItem> _itemData = [];
         private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
 
-        public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
+        public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 

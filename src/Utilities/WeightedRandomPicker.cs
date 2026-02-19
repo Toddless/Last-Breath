@@ -8,7 +8,6 @@
 
     public abstract class WeightedRandomPicker
     {
-        // We are fine until we have fewer than 10k elements in the list.
         public static (List<WeightedObject<T>> WeightedObjects, float TotalWeight) CalculateWeights<T>(IEnumerable<T> objects)
             where T : IWeightable
         {
@@ -20,7 +19,6 @@
                 currentMaxWeight += obj.Weight;
                 weightedObjs.Add(new(obj, from, currentMaxWeight, obj.Weight));
                 from = currentMaxWeight;
-              //  DebugLogger.LogDebug($"Percent: {MathF.Round(obj.Weight / currentMaxWeight * 100),2}% object: {obj.GetType().Name}");
             }
             return (weightedObjs, currentMaxWeight);
         }
@@ -28,7 +26,7 @@
         public static T PickRandom<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, RandomNumberGenerator rnd)
             where T : class
         {
-            var rNumb = rnd.RandfRange(0, totalWeight);
+            float rNumb = rnd.RandfRange(0, totalWeight);
             return elements.First(x => rNumb >= x.From && rNumb < x.To).Obj;
         }
 
@@ -42,6 +40,9 @@
             {
                 TryTakeOne(MaxAttempts);
 
+                requestedCount--;
+                continue;
+
                 void TryTakeOne(int attempts)
                 {
                     while (attempts > 0)
@@ -51,7 +52,6 @@
                     }
                     PickAnyCallBack(taken, toPickFrom);
                 }
-                requestedCount--;
             }
 
             return taken;

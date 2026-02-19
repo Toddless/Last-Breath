@@ -28,7 +28,7 @@ namespace LootGeneration.Services
         private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
         private Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
 
-        public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
+        public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
