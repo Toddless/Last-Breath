@@ -1,0 +1,207 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+
+
+#_________________________
+# Effects
+#_________________________
+
+
+msgid "Effect_Fury"
+msgstr "Fury"
+
+msgid "Effect_Fury_Description"
+msgstr "Burn {0}% health with attack."
+
+msgid "Effect_Burning_Fury"
+msgstr "Burning Fury"
+
+msgid "Effect_Burning_Fury_Description"
+msgstr "Burn {0}% health with attack. Apply Burning dealing {1}% burned health per Turn."
+
+msgid "Effect_Damage_Over_Turn_Bleed"
+msgstr "Bleed"
+
+msgid "Effect_Damage_Over_Turn_Bleed_Description"
+msgstr "Deal {0} damage as [color=#d6152f]Bleed[/color] per Turn."
+
+msgid "Effect_Damage_Over_Turn_Burning"
+msgstr "Burning"
+
+msgid "Effect_Damage_Over_Turn_Burning_Description"
+msgstr "Deal {0} damage as [color=#de5931]Burning[/color] per Turn."
+
+msgid "Effect_Damage_Over_Turn_Poison"
+msgstr "Poison"
+
+msgid "Effect_Damage_Over_Turn_Poison_Description"
+msgstr "Deal {0} damage as [color=#63ad18]Poison[/color] per Turn."
+
+msgid "Effect_Life_Giving_Shade_Regeneration"
+msgstr "Life Giving Shade"
+
+msgid "Effect_Life_Giving_Shade_Regeneration_Description"
+msgstr "Increase Evade by {0}%. Apply {1} stacks.\n After each evade consume one stack and Regenerate {2} health."
+
+msgid "Effect_Regeneration"
+msgstr "Regeneration"
+
+msgid "Effect_Regeneration_Description"
+msgstr "Regenerate {0} health."
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+#__________________________
+# Passives
+#__________________________
+
+msgid "Passive_Skill_Chain_Attack"
+msgstr ""
+
+msgid "Passive_Skill_Counter_Attack"
+msgstr ""
+
+msgid "Passive_Skill_Echo"
+msgstr ""
+
+msgid "Passive_Skill_Execute"
+msgstr ""
+
+msgid "Passive_Skill_Servant_Hell"
+msgstr ""
+
+msgid "Passive_Skill_LuckyCriticalChance"
+msgstr ""
+
+msgid "Passive_Skill_Multicast"
+msgstr ""
+
+msgid "Passive_Skill_Poisoned_Claws"
+msgstr ""
+
+msgid "Passive_Skill_Porcupine"
+msgstr ""
+
+msgid "Passive_Skill_Regeneration"
+msgstr ""
+
+msgid "Passive_Skill_SoulDevouring"
+msgstr ""
+
+msgid "Passive_Skill_Trapped_Beast"
+msgstr ""
+
+msgid "Passive_Skill_Vampier"
+msgstr ""
+
+msgid "Passive_Skill_Mana_Burn"
+msgstr ""
+
+msgid "Passive_Skill_Burning"
+msgstr ""
+
+msgid "Passive_Skill_Gift_From_The_Goddess"
+msgstr ""
+
+msgid "Passive_Skill_Bleeding"
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+msgid ""
+msgstr ""
+
+#__________________________
+# Abilities
+#__________________________
+
+
+
+msgid "Ability_Berserk_Fury"
+msgstr "Berserk Fury"
+
+msgid "Ability_Berserk_Fury_Description"
+msgstr "Applies Fury upon activation. Attacks all targets.\n After each series of attacks, there is a chance to start \n a new one—the higher your current health level, the higher the chance.\n You cannot die from this ability."
+
+msgid "Ability_Dark_Shroud"
+msgstr "Dark Shroud"
+
+msgid "Ability_Dark_Shroud_Description"
+msgstr "Apply Life Giving Shade effect."
+
+msgid "Ability_Fireball"
+msgstr "Fireball"
+
+msgid "Ability_Fireball_Description"
+msgstr "Deal {0} damage to the Target."
+
+msgid "Ability_Increasing_Pressure"
+msgstr "Increasing Pressure"    
+
+msgid "Ability_Increasing_Pressure_Description"
+msgstr "Deal {0} hits in a row.\n After each hit increses damage by {1}% for the next one."
+
+msgid "Ability_Mana_Devour"
+msgstr "Mana Devour"
+
+msgid "Ability_Mana_Devour_Description"
+msgstr "Consume {0}% from current mana.\n For each mana cosumed give {1}% increased Spell Damage."
+
+msgid "Ability_Sacrifice"
+msgstr "Sacrifice"
+
+msgid "Ability_Sacrifice_Description"
+msgstr "Sacrifice {0}% from current health and give sacrificed health as bonus damage."
+
+
+#__________________________
+# Ability parameters
+#__________________________
+
+msgid "Type"
+msgstr "Type:"
+
+msgid "Cost"
+msgstr "Cost:"
+
+msgid "Resource"
+msgstr "Resource:"
+
+msgid "Cooldown"
+msgstr "Cooldown:"
+
+msgid "MaxTargets"
+msgstr "Max Targets:"
+
+msgid "Mana"
+msgstr "Mana"
+
+msgid "Health"
+msgstr "Health"
+
+msgid "Barrier"
+msgstr "Barrier"
+
+msgid "Target"
+msgstr "Target"
+
+msgid "Selfcast"
+msgstr "Selfcast"

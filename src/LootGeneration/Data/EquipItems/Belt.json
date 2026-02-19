@@ -1,0 +1,50 @@
+{
+	"items": [
+		{
+			"id": "Belt",
+			"equipmentPart": "Belt",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Test_Belt",
+			"equipmentPart": "Belt",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 800
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

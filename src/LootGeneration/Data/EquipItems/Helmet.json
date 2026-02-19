@@ -1,0 +1,238 @@
+{
+	"items": [
+		{
+			"id": "Helmet_Strength_Stoneheart",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 375
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Strength_Iron_Bastion",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "inc",
+					"value": 0.3
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 600
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Strength_Vital_Core",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Dexterity_Shadowstep",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "increase",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Dexterity_Hunters_Dream",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 375
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Dexterity_Feral_Instinct",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "inc",
+					"value": 0.4
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 375
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Intelligence_Eternal_Reserve",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 263
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "increase",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Intelligence_Arcane_Bulwark",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 375
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "increase",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Helmet_Intelligence_Aegis",
+			"equipmentPart": "Helmet",
+			"rarity": "Uncommon",
+			"tags": [
+				"Helmet",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 263
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 375
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

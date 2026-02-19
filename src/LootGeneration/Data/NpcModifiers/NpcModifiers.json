@@ -1,0 +1,295 @@
+{
+    "mods": [
+        {
+            "key": "scale",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Scale_Double_Health",
+                    "npcBuffId": "Npc_Buff_Double_Health",
+                    "weight": 25,
+                    "difficulty": 1.9,
+                    "scale": 1.5,
+                    "isUnique": true
+                },
+                {
+                    "id": "Npc_Modifier_Scale_Double_Damage",
+                    "npcBuffId": "Npc_Buff_Double_Damage",
+                    "weight": 50,
+                    "difficulty": 1.7,
+                    "scale": 1.2,
+                    "isUnique": true
+                },
+                {
+                    "id": "Npc_Modifier_Scale_Double_Defence",
+                    "npcBuffId": "Npc_Buff_Double_Defence",
+                    "weight": 50,
+                    "difficulty": 1.7,
+                    "scale": 1.2,
+                    "isUnique": true
+                },
+                {
+                    "id": "Npc_Modifier_Scale_Double_Health_Recovery",
+                    "npcBuffId": "Npc_Buff_Double_Health_Recovery",
+                    "weight": 50,
+                    "difficulty": 1.7,
+                    "scale": 1.2,
+                    "isUnique": true
+                }
+            ]
+        },
+        {
+            "key": "tierUpgrade",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Tier_Upgrade_To_Maximum",
+                    "npcBuffId": "Npc_Buff_Tier_Upgrade_To_Maximum",
+                    "weight": 1,
+                    "difficulty": 0.9,
+                    "isUnique": false,
+                    "tierUpgradeChance": 0.2,
+                    "upgradeBy": 99
+                },
+                {
+                    "id": "Npc_Modifier_Tier_Upgrade_By_Two",
+                    "npcBuffId": "Npc_Buff_Tier_Upgrade_By_Two",
+                    "weight": 5,
+                    "difficulty": 0.7,
+                    "isUnique": false,
+                    "tierUpgradeChance": 0.3,
+                    "upgradeBy": 2
+                },
+                {
+                    "id": "Npc_Modifier_Tier_Upgrade_By_One",
+                    "npcBuffId": "Npc_Buff_Tier_Upgrade_By_One",
+                    "weight": 15,
+                    "difficulty": 0.5,
+                    "isUnique": false,
+                    "tierUpgradeChance": 0.5,
+                    "upgradeBy": 1
+                }
+            ]
+        },
+        {
+            "key": "guaranteedItems",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Guaranteed_Items_Crafting_Resource",
+                    "npcBuffId": "Npc_Buff_Guaranteed_Items_Crafting_Resource",
+                    "weight": 50,
+                    "difficulty": 0.1,
+                    "items": [
+                        "Crafting_Resource_Cooper_Ore",
+                        "Crafting_Resource_Deer_Leather",
+                        "Crafting_Resource_Diamond_Gem",
+                        "Crafting_Resource_Linen_Fabric"
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade",
+                    "npcBuffId": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
+                    "weight": 25,
+                    "difficulty": 0.3,
+                    "items": [
+                        "Upgrade_Resource_Weapon_Rune",
+                        "Upgrade_Resource_Jeweler_Rune",
+                        "Upgrade_Resource_Blacksmith_Rune"
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Guaranteed_Items_Equip",
+                    "npcBuffId": "Npc_Buff_Guaranteed_Items_Equip",
+                    "weight": 15,
+                    "difficulty": 0.4,
+                    "items": [
+                        "Body_Strength_Stoneheart",
+                        "Gloves_Strength_Stoneheart",
+                        "Boots_Strength_Stoneheart"
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Guaranteed_Items_Essence",
+                    "npcBuffId": "Npc_Buff_Guaranteed_Items_Essence",
+                    "weight": 5,
+                    "difficulty": 0.6,
+                    "items": [
+                        "Crafting_Resource_Essence_Barrier",
+                        "Crafting_Resource_Essence_Evade",
+                        "Crafting_Resource_Essence_Armor"
+                    ],
+                    "isUnique": false
+                }
+            ]
+        },
+        {
+            "key": "tierMultiplier",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Tier_Multiplier_Huge",
+                    "npcBuffId": "Npc_Buff_Tier_Multiplier_Huge",
+                    "weight": 5,
+                    "difficulty": 0.3,
+                    "multiplier": 0.6,
+                    "affectedTiers": [
+                        0
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Tier_Multiplier_Big",
+                    "npcBuffId": "Npc_Buff_Tier_Multiplier_Big",
+                    "weight": 15,
+                    "difficulty": 0.2,
+                    "multiplier": 0.45,
+                    "affectedTiers": [
+                        0,
+                        1
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Tier_Multiplier_Mid",
+                    "npcBuffId": "Npc_Buff_Tier_Multiplier_Mid",
+                    "weight": 25,
+                    "difficulty": 0.1,
+                    "multiplier": 0.30,
+                    "affectedTiers": [
+                        1,
+                        2
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Tier_Multiplier_Small",
+                    "npcBuffId": "Npc_Buff_Tier_Multiplier_Small",
+                    "weight": 50,
+                    "difficulty": 0.05,
+                    "multiplier": 0.25,
+                    "affectedTiers": [
+                        2
+                    ],
+                    "isUnique": false
+                }
+            ]
+        },
+        {
+            "key": "itemEffects",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Item_Effect_Execution",
+                    "npcBuffId": "Npc_Buff_Item_Effect_Execution",
+                    "weight": 5,
+                    "difficulty": 0.4,
+                    "effectId": "Passive_Skill_Execution",
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Item_Effect_Vampire",
+                    "npcBuffId": "Npc_Buff_Item_Effect_Vampire",
+                    "weight": 25,
+                    "difficulty": 0.3,
+                    "effectId": "Passive_Skill_Vampire",
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Item_Effect_Poisoned_Claw",
+                    "npcBuffId": "Npc_Buff_Item_Effect_Poisoned_Claw",
+                    "weight": 50,
+                    "difficulty": 0.25,
+                    "effectId": "Passive_Skill_Poisoned_Claw",
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Item_Effect_Burning",
+                    "npcBuffId": "Npc_Buff_Item_Effect_Burning",
+                    "weight": 50,
+                    "difficulty": 0.25,
+                    "effectId": "Passive_Skill_Burning",
+                    "isUnique": false
+                }
+            ]
+        },
+        {
+            "key": "rarityUpgrade",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Rarity_Upgrade_Huge",
+                    "npcBuffId": "Npc_Buff_Rarity_Upgrade_Huge",
+                    "weight": 5,
+                    "difficulty": 0.3,
+                    "multiplier": 0.6,
+                    "affectedRarity": [
+                        1
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Rarity_Upgrade_Big",
+                    "npcBuffId": "Npc_Buff_Rarity_Upgrade_Big",
+                    "weight": 15,
+                    "difficulty": 0.2,
+                    "multiplier": 0.45,
+                    "affectedRarity": [
+                        1,
+                        2
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Rarity_Upgrade_Mid",
+                    "npcBuffId": "Npc_Buff_Rarity_Upgrade_Mid",
+                    "weight": 25,
+                    "difficulty": 0.1,
+                    "multiplier": 0.30,
+                    "affectedRarity": [
+                        2
+                    ],
+                    "isUnique": false
+                },
+                {
+                    "id": "Npc_Modifier_Rarity_Upgrade_Small",
+                    "npcBuffId": "Npc_Buff_Rarity_Upgrade_Small",
+                    "weight": 50,
+                    "difficulty": 0.05,
+                    "multiplier": 0.25,
+                    "affectedRarity": [
+                        2,
+                        3
+                    ],
+                    "isUnique": false
+                }
+            ]
+        },
+        {
+            "key": "minRarity",
+            "modifiers": [
+                {
+                    "id": "Npc_Modifier_Min_Rarity_Legend",
+                    "npcBuffId": "Npc_Buff_Min_Rarity_Legend",
+                    "weight": 5,
+                    "difficulty": 0.5,
+                    "rarity": "Legendary",
+                    "isUnique": true
+                },
+                {
+                    "id": "Npc_Modifier_Min_Rarity_Epic",
+                    "npcBuffId": "Npc_Buff_Min_Rarity_Epic",
+                    "weight": 15,
+                    "difficulty": 0.3,
+                    "rarity": "Epic",
+                    "isUnique": true
+                },
+                {
+                    "id": "Npc_Modifier_Min_Rarity_Rare",
+                    "npcBuffId": "Npc_Buff_Min_Rarity_Rare",
+                    "weight": 25,
+                    "difficulty": 0.1,
+                    "rarity": "Rare",
+                    "isUnique": true
+                }
+            ]
+        }
+    ]
+}

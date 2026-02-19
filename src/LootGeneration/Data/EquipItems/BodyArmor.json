@@ -1,0 +1,316 @@
+{
+	"items": [
+		{
+			"id": "Body_Strength_Stoneheart",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Strength_Iron_Bastion",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "inc",
+					"value": 0.3
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 800
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Strength_Vital_Core",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Dexterity_Shadowstep",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "increase",
+					"value": 0.5
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Dexterity_Hunters_Dream",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 800
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Dexterity_Feral_Instinct",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "inc",
+					"value": 0.4
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Intelligence_Eternal_Reserve",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "increase",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Intelligence_Arcane_Bulwark",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "increase",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Intelligence_Aegis",
+			"equipmentPart": "Body",
+			"rarity": "Uncommon",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_Porcupine",
+			"equipmentPart": "Body",
+			"rarity": "Unique",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_No_Way_Back",
+			"equipmentPart": "Body",
+			"rarity": "Unique",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Body_All_Evade_To_Armor",
+			"equipmentPart": "Body",
+			"rarity": "Mythic",
+			"tags": [
+				"Body",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}
