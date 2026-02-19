@@ -1,9 +1,9 @@
 ﻿namespace Core.Enums
 {
-    public enum EntityType
+    public enum EntityType : byte
     {
         Regular,
-        Rare,
+        Special,
         Elit,
         Unique,
         Boss,

@@ -4,8 +4,8 @@
     using Utilities;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
     using System.Collections.Generic;
+    using Core.Modifiers;
 
     public class AllAttributeCalculator : IParameterCalculator
     {

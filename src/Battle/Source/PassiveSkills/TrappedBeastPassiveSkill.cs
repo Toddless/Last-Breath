@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Modifiers;

@@ -1,12 +1,15 @@
 ﻿namespace Utilities
 {
+    using Godot;
     using System;
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Modifiers;
 
     public static class Calculations
     {
@@ -44,6 +47,62 @@
             }
 
             context.Result = AttackResults.Succeed;
+        }
+
+        public static float[] CalculateChances<TModifier>(IReadOnlyList<INpcModifier> modifiers, float[] chances)
+            where TModifier : class, IWeightable, IChangeableChances
+        {
+            var sortedModifiers = modifiers.OfType<TModifier>().OrderBy(x => x.Weight).ToList();
+
+            sortedModifiers.ForEach(x => ApplyModifier(chances, x));
+
+            NormalizeChances(chances);
+            return chances;
+        }
+
+        private static void ApplyModifier(float[] chances, IChangeableChances changeableChancesModifier)
+        {
+            float totalIncrease = changeableChancesModifier.ChancesAffected.Sum(affectedTier => chances[affectedTier] * changeableChancesModifier.Multiplier);
+
+            int minAffectedTier = changeableChancesModifier.ChancesAffected.Min();
+
+            float totalLowerChances = 0f;
+            for (int i = minAffectedTier + 1; i < chances.Length; i++)
+                totalLowerChances += chances[i];
+
+            float actualDecrease = Mathf.Min(totalIncrease, totalLowerChances);
+
+            float remainingDecrease = actualDecrease;
+
+            for (int i = minAffectedTier + 1; i < chances.Length && remainingDecrease > 0.0001f; i++)
+            {
+                float proportion = chances[i] / totalLowerChances;
+                float decrease = actualDecrease * proportion;
+
+                decrease = Mathf.Min(decrease, chances[i]);
+                decrease = Mathf.Min(decrease, remainingDecrease);
+
+                chances[i] -= decrease;
+                remainingDecrease -= decrease;
+            }
+
+            float increaseRatio = actualDecrease / totalIncrease;
+
+            foreach (int affectedTier in changeableChancesModifier.ChancesAffected)
+            {
+                float originalIncrease = chances[affectedTier] * changeableChancesModifier.Multiplier;
+                float adjustedIncrease = originalIncrease * increaseRatio;
+                chances[affectedTier] += adjustedIncrease;
+            }
+        }
+
+        private static void NormalizeChances(float[] tierChances)
+        {
+            float sum = tierChances.Sum();
+            if (!(Mathf.Abs(sum - 1.0f) > 0.0001f)) return;
+
+            for (int i = 0; i < tierChances.Length; i++)
+                tierChances[i] /= sum;
         }
 
         private static bool ChanceSuccessful(float chance, float randomNumber) => randomNumber <= chance;

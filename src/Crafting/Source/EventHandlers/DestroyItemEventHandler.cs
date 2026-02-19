@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using Godot;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
 
@@ -26,7 +26,7 @@
                 int amount = Mathf.RoundToInt(res.Value * _craftingMastery.GetResourceMultiplier());
                 if (inventory.TryAddItemStacks(res.Key, amount)) continue;
 
-                var itemInstance = provider.CopyBaseItem(res.Key);
+                var itemInstance = provider.CopyItem(res.Key);
                 inventory.TryAddItem(itemInstance, amount);
             }
 

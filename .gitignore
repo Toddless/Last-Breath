@@ -94,6 +94,7 @@ bld/
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
+.idea/
 
 # Windows Store app package directories and files
 AppPackages/
@@ -132,12 +133,12 @@ paket-files/
 /Properties
 /icon.svg
 /icon.svg.import
-/Item.tres
 /TestResults/
 /project.godot
-/addons
-/src/Last Breath/Assets
 /src/Testing/bin
 /src/Testing/obj
 /src/Crafting/TestResources
 /src/Core/FilePaths.cs
+/src/LootGeneration/Test/
+/src/Battle/TestData/
+/src/LootGeneration/temp/

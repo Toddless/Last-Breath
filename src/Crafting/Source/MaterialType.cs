@@ -4,10 +4,11 @@
     using System.Linq;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Modifiers;
 
     public partial class MaterialType : Resource, IMaterial
     {
-        private IReadOnlyList<IMaterialModifier>? _cached;
+        private IReadOnlyList<IModifier>? _cached;
         [Export] private MaterialCategory? _category;
         [Export] private MaterialModifier[] _modifiers = [];
 
@@ -16,14 +17,14 @@
         /// <summary>
         /// Combined modifiers
         /// </summary>
-        public IReadOnlyList<IMaterialModifier> Modifiers
+        public IReadOnlyList<IModifier> Modifiers
         {
             get
             {
                 if (_cached != null) return _cached;
-                var list = new List<IMaterialModifier>();
+                var list = new List<IModifier>();
 
-                if (MaterialCategory?.Modifiers is IReadOnlyList<IMaterialModifier> mods)
+                if (MaterialCategory?.Modifiers is IReadOnlyList<IModifier> mods)
                     list.AddRange(mods);
 
                 if (_modifiers.Length > 0)
@@ -51,7 +52,7 @@
         /// </summary>
         /// <param name="modifiers"></param>
         /// <param name="category"></param>
-        public MaterialType(List<IMaterialModifier> modifiers, IMaterialCategory category)
+        public MaterialType(List<IModifier> modifiers, IMaterialCategory category)
         {
             _modifiers = [.. modifiers.Cast<MaterialModifier>()];
             _category = (MaterialCategory)category;

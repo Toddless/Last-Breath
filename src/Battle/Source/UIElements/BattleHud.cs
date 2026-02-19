@@ -6,9 +6,9 @@
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class BattleHud : Control, IInitializable, IRequireServices

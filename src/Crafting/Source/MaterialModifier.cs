@@ -2,18 +2,17 @@
 {
     using Godot;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Crafting;
+    using Core.Modifiers;
 
     [GlobalClass]
-    public partial class MaterialModifier : Resource, IMaterialModifier
+    public partial class MaterialModifier : Resource, IModifier
     {
         private float _value;
         private bool _initialized = false;
         [Export] public EntityParameter EntityParameter { get; private set; }
         [Export] public ModifierType ModifierType { get; private set; }
         [Export] public float BaseValue { get; private set; }
-        [Export] public float Weight { get; private set; }
+        [Export] public float Weight { get; set; }
 
         public float Value
         {

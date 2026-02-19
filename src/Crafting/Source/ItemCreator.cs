@@ -3,13 +3,11 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
     using Core.Modifiers;
-    using Core.Interfaces;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Skills;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
@@ -17,10 +15,10 @@
     public class ItemCreator(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         : IItemCreator
     {
-        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IMaterialModifier> resources, IEntity? player = null)
+        public IEquipItem CreateEquipItem(string recipeId, IEnumerable<IModifier> resources, IEntity? player = null)
         {
             var recipe = itemDataProvider.GetRecipe(recipeId);
-            (List<WeightedObject<IMaterialModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
+            (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
             if (!recipe.HasTag("Generic"))
             {
                 return Create(recipe.ResultItemId, mods, totalWeight, player);
@@ -35,20 +33,20 @@
             return null;
         }
 
-        private IEquipItem Create(string itemId, List<WeightedObject<IMaterialModifier>> modifiers, float totalWeight, IEntity? player = null)
+        private IEquipItem Create(string itemId, List<WeightedObject<IModifier>> modifiers, float totalWeight, IEntity? player = null)
         {
             try
             {
-                var item = (IEquipItem)itemDataProvider.CopyBaseItem(itemId);
+                var item = (IEquipItem)itemDataProvider.CopyItem(itemId);
                 var itemRarity = GetRarity(player);
                 item.Rarity = itemRarity;
                 var baseStats = item.BaseModifiers;
-                int amountModifiers = GetAmountModifiers(item.Rarity);
+                int amountModifiers = item.Rarity.ConvertRarityToItemModifierAmount();
 
                 var statModifiers = ModifiersCreator.CreateModifierInstances([.. baseStats.OrderBy(_ => Guid.NewGuid())], item);
                 item.SetBaseModifiers(statModifiers);
 
-                HashSet<IMaterialModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDublicate(modifiers, totalWeight, amountModifiers, rnd);
+                HashSet<IModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(modifiers, totalWeight, amountModifiers, rnd);
 
                 List<IModifierInstance> mods = [];
                 foreach (var mod in takenMods)
@@ -58,8 +56,6 @@
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
 
                 // TODO : Change to get random effect/ability
-                var skill = GetRandomSkill();
-                if (skill != null) item.SetSkill(skill);
                 return item;
             }
             catch (ArgumentNullException ex)
@@ -89,31 +85,14 @@
             return baseValue * multiplier;
         }
 
-        private ISkill? GetRandomSkill()
-        {
-            //if (_rnd.Randf() <= _craftingMastery.GetFinalSkillChance())
-            //    return new PassiveSkillProvider().CreateSkill(GetSkillId(_rnd.RandiRange(1, 4)));
-            return null;
-        }
-
-        private string GetSkillId(int number) => number switch
-        {
-            1 => "Passive_Skill_Touch_Of_God",
-            2 => "Passive_Skill_Precise_Technique",
-            3 => "Passive_Skill_Enhanced_Mastery",
-            _ => "Passive_Skill_Master_Apprentice"
-        };
-
-        private int GetAmountModifiers(Rarity rarity) => (int)rarity + 1;
-
-        private Rarity GetRarity(IEntity? player = default)
+        private Rarity GetRarity(IEntity? player = null)
         {
             // if (player == null) return GetRandomValueFallBack<Rarity>();
             // TODO: Later add call to players skill to get Rarity
             return craftingMastery.RollRarity();
         }
 
-        private AttributeType GetAttribute(IEntity? player = default)
+        private AttributeType GetAttribute(IEntity? player = null)
         {
             // TODO: Sometime i can get from this call AttributeType.None.
             if (player == null)
@@ -133,7 +112,7 @@
         {
             rnd.Randomize();
             var values = Enum.GetValues<T>();
-            var idx = (byte)rnd.RandiRange(0, values.Length - 1);
+            byte idx = (byte)rnd.RandiRange(0, values.Length - 1);
             return values[idx];
         }
     }

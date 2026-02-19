@@ -2,8 +2,8 @@
 {
     using Core.Enums;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
+    using Core.Interfaces.Events.GameEvents;
 
     public class PorcupinePassiveSkill(
         float percentFromTakenDamageToBeReturned,

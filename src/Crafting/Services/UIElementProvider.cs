@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Data;
+    using Core.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.UI;
     using Source.UIElements;
@@ -307,14 +307,14 @@
                 itemDetails.SetItemAdditionalStats(stat);
             }
 
-            if (equip.Skill != null)
-            {
-                var skill = equip.Skill;
-                var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
-                skillDescription.SetSkillName(skill.DisplayName);
-                skillDescription.SetSkillDescription(skill.Description);
-                itemDetails.SetSkillDescription(skillDescription);
-            }
+            // if (equip.ItemEffect != null)
+            // {
+            //     var skill = equip.ItemEffect;
+            //     var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
+            //     skillDescription.SetSkillName(skill.DisplayName);
+            //     skillDescription.SetSkillDescription(skill.Description);
+            //     itemDetails.SetSkillDescription(skillDescription);
+            // }
 
             return itemDetails;
         }

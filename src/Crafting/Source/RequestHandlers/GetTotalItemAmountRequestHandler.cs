@@ -3,8 +3,8 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
 
     public class GetTotalItemAmountRequestHandler : IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>
     {
@@ -16,7 +16,7 @@
         }
 
 
-        public Task<Dictionary<string, int>> Handle(GetTotalItemAmountRequest request)
+        public Task<Dictionary<string, int>> HandleRequest(GetTotalItemAmountRequest request)
         {
             Dictionary<string, int> totalAmount = [];
             foreach (var item in request.ItemsId)

@@ -3,21 +3,21 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
     using Utilities;
 
     public class CreateEquipItemRequestHandler(
         IItemCreator creator,
-        IMediator mediator,
+        IGameMessageBus gameMessageBus,
         IItemDataProvider itemDataProvider)
         : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
     {
-        public Task<IEquipItem?> Handle(CreateEquipItemRequest request)
+        public Task<IEquipItem?> HandleRequest(CreateEquipItemRequest request)
         {
             try
             {
@@ -25,8 +25,8 @@
                     request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
                 var item = creator.CreateEquipItem(request.RecipeId, modifiers);
                 item.SaveUsedResources(request.UsedResources.ToDictionary());
-                mediator.PublishAsync(new ConsumeResourcesInInventoryEvent(request.UsedResources));
-                mediator.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Create, item.Rarity));
+                gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.UsedResources));
+                gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Create, item.Rarity));
                 return Task.FromResult<IEquipItem?>(item);
             }
             catch (InvalidOperationException ex)

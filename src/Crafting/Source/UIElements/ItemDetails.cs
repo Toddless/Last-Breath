@@ -2,9 +2,9 @@
 {
     using Godot;
     using System;
+    using Core.Data;
     using Godot.Collections;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
 
     public partial class ItemDetails : Control, IInitializable, IClosable, IRequireServices, IRequireReposition
     {

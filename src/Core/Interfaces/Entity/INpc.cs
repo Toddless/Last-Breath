@@ -2,9 +2,12 @@
 {
     using Enums;
 
-    public interface INpc
+    public interface INpc : IEntity
     {
-        EntityType EntityType { get; set; }
-        Fractions Fraction { get; set; }
+        int Level { get; }
+        Rarity Rarity { get; }
+        EntityType EntityType { get; }
+        Fractions Fraction { get; }
+        INpcModifiersComponent NpcModifiers { get; }
     }
 }

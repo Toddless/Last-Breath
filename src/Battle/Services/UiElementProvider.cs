@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Data;
+    using Core.Data;
     using Core.Interfaces.UI;
     using Godot;
 

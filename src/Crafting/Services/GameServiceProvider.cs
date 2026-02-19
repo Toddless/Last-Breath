@@ -4,17 +4,17 @@
     using Source;
     using System;
     using Core.Results;
-    using Core.Interfaces;
     using Source.EventHandlers;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using TestResources.Inventory;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Data;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
+    using Core.Modifiers;
     using Microsoft.Extensions.DependencyInjection;
     using Source.RequestHandlers;
 
@@ -46,19 +46,19 @@
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
-            services.AddSingleton<IMediator, Mediator>();
+            services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemCreator, ItemCreator>();
             services.AddSingleton<IUiElementProvider, UIElementProvider>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>((_) =>
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
             {
                 var instance = new ItemDataProvider("res://TestResources/RecipeAndResources/");
                 instance.LoadData();
                 return instance;
             });
-            services.AddSingleton((_) =>
+            services.AddSingleton(_ =>
             {
                 var instance = new RandomNumberGenerator();
                 instance.Randomize();
@@ -67,6 +67,7 @@
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
+
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
             services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
             services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();

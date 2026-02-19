@@ -3,8 +3,8 @@ namespace Crafting.Source
     using Godot;
     using Utilities;
     using System.IO;
-    using Core.Interfaces.Data;
     using System.Collections.Generic;
+    using Core.Data;
 
     public class UIResourcesProvider : IUIResourcesProvider
     {

@@ -14,26 +14,26 @@
     <Folder Include="Script\Items\ItemData\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Stateless" Version="5.19.0" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Serilog.Settings.Configuration"/>
+    <PackageReference Include="Stateless" />
+    <PackageReference Include="System.Reflection"/>
+    <PackageReference Include="System.Text.Json"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" Version="4.5.0" />
+    <PackageReference Update="Godot.SourceGenerators" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="GodotSharp" Version="4.5.0" />
+    <PackageReference Update="GodotSharp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="GodotSharpEditor" Version="4.5.0" />
+    <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
 </Project>

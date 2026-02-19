@@ -1,7 +1,6 @@
 ﻿namespace Battle
 {
     using Core.Modifiers;
-    using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;

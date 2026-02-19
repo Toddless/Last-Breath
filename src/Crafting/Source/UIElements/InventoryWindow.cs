@@ -1,11 +1,11 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Core.Data;
     using Godot;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.Mediator;
+    using Core.Interfaces.MessageBus;
 
     public partial class InventoryWindow : Panel, IInitializable, IRequireServices
     {
@@ -14,7 +14,7 @@
         [Export] private Button? _craftingButton, _allStatsButton, _sortButton, _destroyButton;
         [Export] private GridContainer? _inventoryGrid;
 
-        private IMediator? _mediator;
+        private IGameMessageBus? _mediator;
         private IInventory? _inventory;
         private IItemDataProvider? _itemDataProvider;
 
@@ -33,7 +33,7 @@
         {
             _inventory = provider.GetService<IInventory>();
             _itemDataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IMediator>();
+            _mediator = provider.GetService<IGameMessageBus>();
         }
 
         private void OnInventoryFull(InventoryFullEvent obj)

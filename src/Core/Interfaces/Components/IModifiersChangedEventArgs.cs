@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using Enums;
-    using Interfaces;
+    using Modifiers;
 
     public interface IModifiersChangedEventArgs
     {

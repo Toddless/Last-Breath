@@ -1,9 +1,9 @@
 ﻿namespace Battle.Services
 {
+    using Core.Data;
     using Godot;
     using Core.Interfaces;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
 
     public class EntityProvider(IGameServiceProvider gameServiceProvider) : IEntityProvider
     {

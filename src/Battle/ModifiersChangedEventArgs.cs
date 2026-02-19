@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Interfaces.Components;
+    using Core.Modifiers;
 
     internal class ModifiersChangedEventArgs (EntityParameter parameter, IReadOnlyList<IModifierInstance> modifiers): IModifiersChangedEventArgs
     {

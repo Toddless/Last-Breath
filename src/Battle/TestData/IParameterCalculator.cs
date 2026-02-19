@@ -2,8 +2,8 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces;
     using System.Collections.Generic;
+    using Core.Modifiers;
 
     public interface IParameterCalculator
     {

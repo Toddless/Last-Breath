@@ -8,7 +8,7 @@
     public class UnluckyCritChanceEffect(
         int duration,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id:"Effect_Unlucky_Critical_Chance", duration, maxStacks: 1, statusEffect)
+        : Effect(id: "Effect_Unlucky_Critical_Chance", duration, maxStacks: 1, statusEffect)
     {
         private readonly EntityParameterModuleDecorator _unluckyCritChanceDecorator = new UnluckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 
@@ -18,7 +18,7 @@
             context.Target.Parameters.AddModuleDecorator(_unluckyCritChanceDecorator);
         }
 
-        public override void Remove( )
+        public override void Remove()
         {
             Owner?.Parameters.RemoveModuleDecorator(_unluckyCritChanceDecorator.Id, _unluckyCritChanceDecorator.Parameter);
             base.Remove();

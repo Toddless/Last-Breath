@@ -3,10 +3,10 @@
     using System;
     using Utilities;
     using UIElements;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Inventory;
 
     public class OpenCraftingWindowEventHandler(IUiElementProvider provider, IInventory inventory)

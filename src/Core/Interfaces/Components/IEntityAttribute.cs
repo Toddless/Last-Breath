@@ -2,6 +2,7 @@
 {
     using Enums;
     using System.Collections.Generic;
+    using Modifiers;
 
     public interface IEntityAttribute
     {

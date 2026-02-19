@@ -2,10 +2,10 @@
 {
     using UIElements;
     using Utilities;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Inventory;
 
     public class ItemCreatedEventHandler(IUiElementProvider provider, IInventory inventory)
@@ -76,14 +76,14 @@
                 itemDetails.SetItemAdditionalStats(stat);
             }
 
-            if (equip.Skill != null)
-            {
-                var skill = equip.Skill;
-                var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
-                skillDescription.SetSkillName(skill.DisplayName);
-                skillDescription.SetSkillDescription(skill.Description);
-                itemDetails.SetSkillDescription(skillDescription);
-            }
+            // if (equip.ItemEffect != null)
+            // {
+            //     var skill = equip.ItemEffect;
+            //     var skillDescription = SkillDescription.Initialize().Instantiate<SkillDescription>();
+            //     skillDescription.SetSkillName(skill.DisplayName);
+            //     skillDescription.SetSkillDescription(skill.Description);
+            //     itemDetails.SetSkillDescription(skillDescription);
+            // }
 
             return itemDetails;
         }

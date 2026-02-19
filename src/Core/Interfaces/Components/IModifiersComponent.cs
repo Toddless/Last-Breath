@@ -2,8 +2,8 @@
 {
     using System;
     using Enums;
-    using Interfaces;
     using System.Collections.Generic;
+    using Modifiers;
 
     public interface IModifiersComponent
     {

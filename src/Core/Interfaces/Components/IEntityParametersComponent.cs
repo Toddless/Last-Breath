@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Decorator;
     using Enums;
+    using Modifiers;
 
     public interface IEntityParametersComponent
     {

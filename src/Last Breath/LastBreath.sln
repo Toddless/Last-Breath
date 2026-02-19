@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "..\Utilities\U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battle", "..\Battle\Battle.csproj", "{0273A84C-A333-DD6B-DBCD-4AF477484F38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LootGeneration", "..\LootGeneration\LootGeneration.csproj", "{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,12 @@ Global
 		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{0273A84C-A333-DD6B-DBCD-4AF477484F38}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{0CE1EA14-BBF4-275C-B67D-320992DC5FF9}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

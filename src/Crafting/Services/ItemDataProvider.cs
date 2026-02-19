@@ -1,32 +1,35 @@
 ﻿namespace Crafting.Services
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Source;
+    using Utilities;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
-    using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Items;
-    using Godot;
     using TestResources;
-    using Utilities;
+    using Core.Interfaces.Items;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
+    using Core.Data;
+    using Core.Modifiers;
 
     internal class ItemDataProvider(string itemDataPath) : IItemDataProvider
     {
         private readonly Dictionary<string, IItem> _itemData = [];
-        private readonly Dictionary<string, List<IModifier>> _itemBaseStatsData = [];
+        private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
 
-        public IItem CopyBaseItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
+        public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
-        public List<IModifier> GetItemBaseStats(string id)
+        public List<IModifier> GetEquipItemModifierPool(string id)
         {
-            if (!_itemBaseStatsData.TryGetValue(id, out var data)) return [];
+            if (!_equipItemModifierPools.TryGetValue(id, out var data)) return [];
             return [.. data];
         }
+
+        public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
@@ -40,7 +43,7 @@
             return item is not ICraftingRecipe recipe ? string.Empty : recipe.ResultItemId;
         }
 
-        public IReadOnlyList<IMaterialModifier> GetResourceModifiers(string id)
+        public IReadOnlyList<IModifier> GetResourceModifiers(string id)
         {
             if (!_itemData.TryGetValue(id, out var res) || res is not ICraftingResource crafting) return [];
             return crafting.Material?.Modifiers ?? [];
@@ -87,20 +90,30 @@
                 else
                 {
                     if (!filePath.EndsWith(".json")) continue;
-                    using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ??
-                                     throw new FileLoadException();
+                    using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
                     string jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
                     List<IItem> data = [];
                     switch (true)
                     {
                         case var _ when dataPath.EndsWith("EquipItems"):
-                            data = await DataParser.ParseEquipItems(jsonContent);
+                            data = await DataParser.ParseEquipItems(jsonContent,
+                                (equipType, id, tags) =>
+                                    new TestEquipItem(equipType, id, tags));
                             break;
                         case var _ when dataPath.EndsWith("Recipes"):
-                            data = await DataParser.ParseRecipes(jsonContent);
+                            var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
+                                (type, s, arg3) => new ResourceRequirement(type, s, arg3),
+                                (id, resultItem, tags, rarity, requirements, isOpened) => new CraftingRecipe(id, resultItem, tags, rarity, requirements, isOpened));
+                            data = recipes.Cast<IItem>().ToList();
                             break;
                         case var _ when dataPath.EndsWith("Resources"):
-                            data = await DataParser.ParseResources(jsonContent);
+                            data = await DataParser.ParseResources<MaterialCategory>(
+                                jsonContent,
+                                (list, id) => new MaterialCategory(list, id),
+                                (id, tags, rarity, equipmentCategory, stackSize) => new UpgradeResource(id, tags, rarity, equipmentCategory, stackSize),
+                                (parameter, modifierType, baseValue, weight) => new MaterialModifier(parameter, modifierType, baseValue, weight),
+                                (materialModifiers, materialCategory) => new MaterialType(materialModifiers, materialCategory),
+                                (id, maxStackSize, tags, materialCategory, rarity) => new CraftingResource(id, maxStackSize, tags, materialCategory, rarity));
                             break;
                     }
 

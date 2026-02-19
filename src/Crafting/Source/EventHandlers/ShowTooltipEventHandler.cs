@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using UIElements;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Data;
 
     public class ShowTooltipEventHandler(IUiElementProvider uIElementProvider)
         : IEventHandler<ShowInventorySlotButtonsTooltipEvent>

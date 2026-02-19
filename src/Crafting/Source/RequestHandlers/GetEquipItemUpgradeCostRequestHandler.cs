@@ -6,8 +6,8 @@
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
-    using Core.Interfaces.Mediator;
-    using Core.Interfaces.Mediator.Requests;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
 
     public class GetEquipItemUpgradeCostRequestHandler : IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>
     {
@@ -20,7 +20,7 @@
             _inventory = inventory;
         }
 
-        public Task<IEnumerable<IResourceRequirement>> Handle(GetEquipItemUpgradeCostRequest request)
+        public Task<IEnumerable<IResourceRequirement>> HandleRequest(GetEquipItemUpgradeCostRequest request)
         {
             var item = _inventory.GetItem<IEquipItem>(request.ItemInstanceId);
             if (item == null) return Task.FromResult<IEnumerable<IResourceRequirement>>([]);

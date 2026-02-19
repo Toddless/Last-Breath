@@ -3,9 +3,9 @@
     using System;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
     using System.Collections.Generic;
     using Core.Interfaces.Components;
+    using Core.Modifiers;
 
     public class ModifiersComponent : IModifiersComponent
     {

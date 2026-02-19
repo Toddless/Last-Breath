@@ -2,38 +2,37 @@
 {
     using Godot;
     using System;
+    using Core.Data;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Mediator;
+    using Core.Interfaces.MessageBus;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable
     {
         private const string UID = "uid://dor0kden4oc1j";
         [Export] private Button? _equip, _update, _destroy, _favorite;
-        private IMediator? _mediator;
+        private IGameMessageBus? _mediator;
         private string _itemInstance = string.Empty;
 
         public event Action? Close;
 
         public override void _Ready()
         {
-            // TODO: Not sure if i need this tooltipbuttons at all
-            if (_equip != null) _equip.Pressed += OnEquipPressed;
-            if (_update != null) _update.Pressed += OnUpdatePressed;
-            if (_destroy != null) _destroy.Pressed += OnDestroyPressed;
-            if (_favorite != null) _favorite.Pressed += OnFavoritePressed;
+            _equip?.Pressed += OnEquipPressed;
+            _update?.Pressed += OnUpdatePressed;
+            _destroy?.Pressed += OnDestroyPressed;
+            _favorite?.Pressed += OnFavoritePressed;
         }
 
         public override void _ExitTree()
         {
-            _mediator?.RaiseUpdateUi();
+            // _mediator?.RaiseUpdateUi();
             Close?.Invoke();
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _mediator = provider.GetService<IMediator>();
+            _mediator = provider.GetService<IGameMessageBus>();
         }
 
         public void SetItemInstanceId(string instanceId) => _itemInstance = instanceId;

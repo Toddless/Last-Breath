@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using UIElements;
-    using Core.Interfaces.Data;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
 
     public class SendNotificationMessageEventHandler(IUiElementProvider uIElementProvider)
         : IEventHandler<SendNotificationMessageEvent>

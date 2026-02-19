@@ -7,10 +7,10 @@
     using System.Linq;
     using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Mediator;
     using System.Collections.Generic;
+    using Core.Interfaces.MessageBus;
 
-    public class CraftingMastery(IMediator mediator, RandomNumberGenerator rnd) : ICraftingMastery
+    public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery
     {
         // TODO: Remove from here
         // ________________________________________________________
@@ -40,7 +40,6 @@
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
-
         public Texture2D? Icon { get; }
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
@@ -106,20 +105,20 @@
             return Math.Min(finalMultiplier, 1.5f);
         }
 
-        public Rarity RollRarity(float rarityBonus = default)
+        public Rarity RollRarity(float rarityBonus = 0)
         {
-            var probs = GetRarityProbabilities(rarityBonus);
-            float r = rnd.Randf();
+            var rarityProbabilities = GetRarityProbabilities(rarityBonus);
+            float rarity = rnd.Randf();
             float accumulated = 0;
 
-            foreach (var kvp in probs.OrderBy(x => x.Key))
+            foreach (var kvp in rarityProbabilities.OrderBy(x => x.Key))
             {
                 accumulated += kvp.Value;
-                if (r <= accumulated)
+                if (rarity <= accumulated)
                     return kvp.Key;
             }
 
-            return probs.OrderByDescending(x => x.Key).First().Key;
+            return rarityProbabilities.OrderByDescending(x => x.Key).First().Key;
         }
 
         public Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = default)
@@ -161,7 +160,7 @@
                 {
                     CurrentExperience -= need;
                     _currentLevel++;
-                    mediator.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    gameMessageBus.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;
