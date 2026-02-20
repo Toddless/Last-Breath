@@ -3,8 +3,10 @@
     using Godot;
     using System;
     using Core.Enums;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Items;
     using Core.Interfaces.Inventory;
+    using Core.Interfaces.MessageBus;
 
     public partial class InventorySlot : Slot, IInventorySlot
     {
@@ -13,7 +15,7 @@
         private bool _isMouseInside, _rmbWasPressed, _detailsShowing;
         [Export] protected Label? QuantityLabel;
 
-        private IUiMediator? _uiMediator;
+        private IGameMessageBus? _gameMessageBus;
         public Func<string, IItem?>? GetItemInstance;
         public event Action<IInventorySlot, MouseInteractions>? ItemInteraction;
 
@@ -72,17 +74,15 @@
             }
         }
 
-        public void SetUIElementProvider(IUiMediator mediator)
+        public void SetUIElementProvider(IGameMessageBus mediator)
         {
-            _uiMediator = mediator;
-            _uiMediator.UpdateUi += Clear;
+            _gameMessageBus = mediator;
         }
 
         private void Clear()
         {
             _rmbWasPressed = false;
             _detailsShowing = false;
-            _uiMediator?.Publish(new ClearUiElementsEvent(this));
         }
 
         private void RaiseEvent(MouseInteractions interaction) => ItemInteraction?.Invoke(this, interaction);
@@ -103,7 +103,7 @@
 
             if (_isMouseInside && CurrentItem != null)
             {
-                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem, this));
+                _gameMessageBus?.PublishAsync(new ShowInventoryItemEvent(CurrentItem, this));
                 _detailsShowing = true;
             }
         }
@@ -113,15 +113,15 @@
             _isMouseInside = false;
             if (_rmbWasPressed) return;
             _detailsShowing = false;
-            _uiMediator?.Publish(new ClearUiElementsEvent(this));
+            _gameMessageBus?.PublishAsync(new ClearUiElementsEvent(this));
         }
 
         private void ShowButtonsTooltip()
         {
             _rmbWasPressed = true;
             if (!_detailsShowing)
-                _uiMediator?.Publish(new ShowInventoryItemEvent(CurrentItem!, this));
-            _uiMediator?.Publish(new ShowInventorySlotButtonsTooltipEvent(this, CurrentItem!.InstanceId));
+                _gameMessageBus?.PublishAsync(new ShowInventoryItemEvent(CurrentItem!, this));
+            _gameMessageBus?.PublishAsync(new ShowInventorySlotButtonsTooltipEvent(this, CurrentItem!.InstanceId));
         }
     }
 }

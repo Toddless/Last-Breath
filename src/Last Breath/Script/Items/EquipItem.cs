@@ -10,90 +10,110 @@
     using Core.Interfaces.Skills;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Modifiers;
+    using Utilities;
 
     [Tool]
     [GlobalClass]
-    public partial class EquipItem : Resource, IEquipItem, IItem
+    public partial class EquipItem :  Resource, IEquipItem, IAscendable
     {
         private float _currentUpdateMultiplier = 1f;
-        private int _maxUpdateLevel = 12;
-        private int _currentUpdateLevel = 0;
         private HashSet<IModifier> _baseModifiers = [];
         private HashSet<IModifier> _additionalModifiers = [];
-        private List<IMaterialModifier> _modifiersPool = [];
+        private List<IModifier> _modifiersPool = [];
         private Dictionary<string, int> _usedResources = [];
         private IEntity? _owner;
 
         [Export] public EquipmentType EquipmentPart { get; set; }
-        [Export] public string Id { get; set; } = string.Empty;
-        [Export] public int MaxStackSize { get; set; }
+        [Export] public string Id { get; private set; } = string.Empty;
+        [Export] public int Quantity { get; set; } = 1;
+        [Export] public int MaxStackSize { get; set; } = 1;
+
         [Export] public Texture2D? Icon { get; set; }
-        [Export] public Rarity Rarity { get; set; }
+        // {
+        //     get
+        //     {
+        //         if (field != null) return field;
+        //         field = ResourceLoader.Load<Texture2D>($"res://Source/Items/{Id.Replace("_", "")}.png");
+        //         return field;
+        //     }
+        //     private set;
+        // }
+
+        [Export] public Rarity Rarity { get; set; } = Rarity.Uncommon;
         [Export] public string[] Tags { get; set; } = [];
         [Export] public AttributeType AttributeType { get; set; } = AttributeType.None;
-        public ISkill? Skill { get; private set; }
+        [Export] public int UpdateLevel { get; set; } = 0;
+        [Export] public int MaxUpdateLevel { get; set; } = 12;
+        [Export] public string ItemEffect { get; private set; } = string.Empty;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string Description => Localizator.Localize(Id + "_Description");
-        public string DisplayName => Localizator.Localize(Id);
-        public int UpdateLevel => _currentUpdateLevel;
-        public int MaxUpdateLevel => _maxUpdateLevel;
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
+
         public IReadOnlyList<IModifier> AdditionalModifiers => [.. _additionalModifiers];
         public IReadOnlyList<IModifier> BaseModifiers => [.. _baseModifiers];
-        public IReadOnlyList<IMaterialModifier> ModifiersPool => _modifiersPool;
+        public IReadOnlyList<IModifier> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
-
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= 12;
+
 
         public EquipItem()
         {
-
         }
 
-        public EquipItem(EquipmentType part,
-            string id,
-            Texture2D? icon,
-            Rarity rarity,
-            string[] tags,
-            List<IModifier> baseModifiers,
-            List<IModifier> addModifiers,
-            AttributeType attributeType = default, int maxStackSize = 1, ISkill? skill = default)
+        public EquipItem(EquipmentType part, string id, string[] tags)
         {
             EquipmentPart = part;
             Id = id;
-            Icon = icon;
-            Rarity = rarity;
             Tags = tags;
-            AttributeType = attributeType;
-            MaxStackSize = maxStackSize;
-            _baseModifiers = [..baseModifiers];
-            _additionalModifiers = [.. addModifiers];
-            Skill = skill;
         }
 
         public T Copy<T>()
         {
-            var duplicate = (IEquipItem)DuplicateDeep(DeepDuplicateMode.All);
-            duplicate.SetBaseModifiers([.. _baseModifiers]);
-            duplicate.SetAdditionalModifiers([.._additionalModifiers]);
-            return (T)duplicate;
+            var copy = (IEquipItem)DuplicateDeep();
+            copy.SetBaseModifiers(_baseModifiers.ToHashSet());
+            copy.SetAdditionalModifiers(_additionalModifiers.ToHashSet());
+            copy.SaveUsedResources(_usedResources.ToDictionary());
+            copy.SaveModifiersPool(_modifiersPool.ToList());
+            return (T)copy;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Id, InstanceId, Rarity);
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not IEquipItem other) return false;
+            return Id == other.Id;
         }
 
         public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
-        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_additionalModifiers, modifiers);
-        public void SetSkill(ISkill skill) => Skill = skill;
-        public void RemoveAdditionalModifier(int hash) => _additionalModifiers.RemoveWhere(m => m.GetHashCode() == hash);
-        public void AddAdditionalModifier(IModifier modifier) => SetModifier(_additionalModifiers, modifier);
+
+        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) =>
+            SetModifiers(_additionalModifiers, modifiers);
+
+        public void SetItemEffect(string effectId) => ItemEffect = effectId;
+
+        public void RemoveAdditionalModifier(int hash) =>
+            _additionalModifiers.RemoveWhere(m => m.GetHashCode() == hash);
+
+        public void AddAdditionalModifier(IModifier modifier)
+        {
+            modifier.Value = modifier.BaseValue * _currentUpdateMultiplier;
+            _additionalModifiers.Add(modifier);
+        }
+
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
         public bool Upgrade(int upgradeLevel = 1)
         {
             if (UpdateLevel >= 12) return false;
             // I should change it later
-            var canUpgrade = _maxUpdateLevel - UpdateLevel;
+            int canUpgrade = MaxUpdateLevel - UpdateLevel;
             int appliedUpgrade = Mathf.Min(upgradeLevel, canUpgrade);
             float upgradeAmount = appliedUpgrade / 10f;
             _currentUpdateMultiplier += upgradeAmount;
-            _currentUpdateLevel += appliedUpgrade;
+            UpdateLevel += appliedUpgrade;
             UpdateModifiersValue();
 
             return true;
@@ -103,9 +123,9 @@
         {
             // cant downgrade
             if (UpdateLevel == 0) return false;
-            float downgradeAmount = Mathf.Min(downgradeLevel, _maxUpdateLevel) / 10f;
+            float downgradeAmount = Mathf.Min(downgradeLevel, MaxUpdateLevel) / 10f;
             _currentUpdateMultiplier = Mathf.Max(1f, _currentUpdateMultiplier - downgradeAmount);
-            _currentUpdateLevel = Mathf.Max(0, _currentUpdateLevel - downgradeLevel);
+            UpdateLevel = Mathf.Max(0, UpdateLevel - downgradeLevel);
             UpdateModifiersValue();
             return true;
         }
@@ -120,18 +140,20 @@
         {
             //foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
             //    _owner?.Modifiers.RemovePermanentModifier(mod);
-            _owner = null;
+            //_owner = null;
         }
 
         public void OnEquip(IEntity owner)
         {
-            _owner = owner;
+            //_owner = owner;
             //var modifiers = _baseModifiers.Concat(_additionalModifiers);
             //foreach (var mod in _baseModifiers.Concat(_additionalModifiers))
             //    _owner.Modifiers.AddPermanentModifier(mod);
-            Skill?.Attach(_owner);
+            //Skill?.Attach(_owner);
         }
-        public void SaveModifiersPool(IEnumerable<IMaterialModifier> modifiers) => _modifiersPool.AddRange(modifiers);
+
+        public void SaveModifiersPool(IEnumerable<IModifier> modifiers) => _modifiersPool.AddRange(modifiers);
+
         public void SaveUsedResources(Dictionary<string, int> resources)
         {
             foreach (var res in resources)
@@ -147,13 +169,10 @@
         {
             itemModifiers.Clear();
             foreach (var modifier in newModifiers)
-                SetModifier(itemModifiers, modifier);
-        }
-
-        private void SetModifier(HashSet<IModifier> itemModifiers, IModifier newModifier)
-        {
-            newModifier.Value = newModifier.BaseValue * _currentUpdateMultiplier;
-            itemModifiers.Add(newModifier);
+            {
+                modifier.Value = modifier.BaseValue * _currentUpdateMultiplier;
+                itemModifiers.Add(modifier);
+            }
         }
 
         private void UpdateModifiersValue()

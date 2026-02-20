@@ -3,16 +3,17 @@
     using Godot;
     using System;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Constants;
+    using Core.Data;
+    using Core.Interfaces.MessageBus;
 
     public partial class PauseMenu : Control, IInitializable, IRequireServices, IClosable
     {
         private const string UID = "uid://b03h1pcqbp3iw";
-        [Export] private LocalizableButton? _continueBtn, _saveLoadBtn, _optionsBtn, _mainMenuBtn, _exitBtn;
+        [Export] private Button? _continueBtn, _saveLoadBtn, _optionsBtn, _mainMenuBtn, _exitBtn;
 
-        private IUIElementProvider? _uiElementProvider;
-        private IUiMediator? _uiMediator;
+        private IUiElementProvider? _uiElementProvider;
+        private IGameMessageBus? _uiMediator;
         public event Action? Close;
 
         public override void _Ready()
@@ -24,19 +25,7 @@
             _exitBtn.Pressed += () => GetTree().Quit();
         }
 
-        public override void _EnterTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateUI;
-        }
 
-        private void UpdateUI()
-        {
-            _continueBtn?.UpdateButtonText();
-            _saveLoadBtn?.UpdateButtonText();
-            _optionsBtn?.UpdateButtonText();
-            _mainMenuBtn?.UpdateButtonText();
-            _exitBtn?.UpdateButtonText();
-        }
 
         public override void _UnhandledInput(InputEvent @event)
         {
@@ -47,15 +36,12 @@
             }
         }
 
-        public override void _ExitTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
-        }
+
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _uiElementProvider = provider.GetService<IUIElementProvider>();
-            _uiMediator = provider.GetService<IUiMediator>();
+            _uiElementProvider = provider.GetService<IUiElementProvider>();
+            _uiMediator = provider.GetService<IGameMessageBus>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Script.UI
 {
+    using Core.Data;
     using Godot;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
-    using LastBreath.Script.Helpers;
-    using LastBreath.Script.UI.View;
+    using Helpers;
+    using View;
 
     public partial class CharacterWindow : Window, IInitializable
     {

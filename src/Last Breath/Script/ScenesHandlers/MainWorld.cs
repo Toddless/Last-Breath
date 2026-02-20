@@ -2,15 +2,12 @@ namespace LastBreath
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using Godot;
-    using LastBreath.Script;
-    using LastBreath.Script.Enemy;
-    using LastBreath.Script.ScenesHandlers;
-    using LastBreath.Script.Helpers;
-    using LastBreath.Script.NPC;
-    using Core.Interfaces.Entity;
+    using Script;
+    using Script.Enemy;
+    using Script.Helpers;
+    using Script.NPC;
 
     public partial class MainWorld : ObservableNode2D
     {
@@ -18,15 +15,8 @@ namespace LastBreath
         private readonly List<BaseNPC> _npcs = [];
         private readonly List<BaseOpenableObject> _openableObjects = [];
         private Area2D? _area2D;
-        private ObservableCollection<BaseEnemy>? _enemies = [];
         private IEnemySpawner? _enemySpawner;
         private List<Vector2>? _enemiesRespawnPosition;
-
-        public ObservableCollection<BaseEnemy>? Enemies
-        {
-            get => _enemies;
-            set => SetProperty(ref _enemies, value);
-        }
 
         public IEnemySpawner? EnemySpawner
         {
@@ -44,8 +34,6 @@ namespace LastBreath
         public List<BaseNPC> NPCs => _npcs;
         public event Action<string>? CutScene;
 
-        public event Action<BattleContext>? InitializeFight;
-
         public override void _Ready()
         {
             _area2D = GetNode<Area2D>(nameof(Area2D));
@@ -55,13 +43,6 @@ namespace LastBreath
             AddNpcsToList();
             AddOpenableObjects();
             InitializeEnemies();
-        }
-
-        public void InitializingFight(IEntity enemy)
-        {
-            if (_isBattleActive) return;
-            InitializeFight?.Invoke(new BattleContext([enemy, GameManager.Instance.Player!]));
-            _isBattleActive = true;
         }
 
         public void ResetBattleState() => _isBattleActive = false;
@@ -99,11 +80,7 @@ namespace LastBreath
 
         private void OnEnterArea(Node2D body)
         {
-            if (body is Player p && p.FirstSpawn)
-            {
-                CutScene?.Invoke("Awaking");
-                p.FirstSpawn = false;
-            }
+
         }
 
         private void InitializeEnemies()

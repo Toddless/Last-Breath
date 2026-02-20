@@ -6,12 +6,12 @@
     using Core.Interfaces.Events.GameEvents;
 
     public class PorcupinePassiveSkill(
-        float percentFromTakenDamageToBeReturned,
-        float percentArmorToDealAsDamage)
+        float damagePercentFromTakenDamageToBeReturned,
+        float additionalDamageFromArmor)
         : Skill(id: "Passive_Skill_Porcupine")
     {
-        public float PercentToReturn { get; } = percentFromTakenDamageToBeReturned;
-        public float PercentArmorToDealAsDamage { get; } = percentArmorToDealAsDamage;
+        public float DamagePercentToReturn { get; } = damagePercentFromTakenDamageToBeReturned;
+        public float AdditionalDamageFromArmor { get; } = additionalDamageFromArmor;
 
         public override void Attach(IEntity owner)
         {
@@ -23,8 +23,8 @@
         {
             if (Owner == null) return;
             var attacker = evnt.From;
-            float armorAsDamage = Owner.Parameters.Armor * PercentArmorToDealAsDamage;
-            float fromDamageTaken = evnt.Damage * PercentToReturn;
+            float armorAsDamage = Owner.Parameters.Armor * AdditionalDamageFromArmor;
+            float fromDamageTaken = evnt.Damage * DamagePercentToReturn;
             attacker.TakeDamage(attacker, armorAsDamage + fromDamageTaken, DamageType.Normal, DamageSource.Passive);
         }
 
@@ -34,12 +34,12 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new PorcupinePassiveSkill(PercentToReturn, PercentArmorToDealAsDamage);
+        public override ISkill Copy() => new PorcupinePassiveSkill(DamagePercentToReturn, AdditionalDamageFromArmor);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not PorcupinePassiveSkill porcupine) return false;
-            return PercentToReturn > porcupine.PercentToReturn;
+            return DamagePercentToReturn > porcupine.DamagePercentToReturn;
         }
     }
 }

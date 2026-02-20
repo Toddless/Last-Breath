@@ -1,14 +1,14 @@
 namespace LootGeneration.Services
 {
     using System;
-    using Utilities;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
-    using System.Collections.Generic;
     using Core.Data;
     using Core.Data.NpcModifiersData;
+    using Core.Interfaces.Entity;
     using Godot;
+    using Utilities;
 
     public class NpcModifierProvider(INpcModifiersFactory factory) : INpcModifierProvider
     {

@@ -6,8 +6,8 @@ namespace LastBreath.Addons.Tools.TagGenerator
 	[Tool]
 	public partial class GenerateTags /*: EditorScript*/
     {
-		private const string InputPath = FilePaths.TagJsonPath;
-		private const string OutputPath = FilePaths.TagResourceOutputPath;
+		//private const string InputPath = FilePaths.TagJsonPath;
+		//private const string OutputPath = FilePaths.TagResourceOutputPath;
 
 		//public override void _Run()
 		//{

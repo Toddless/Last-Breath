@@ -1,33 +1,33 @@
 ﻿namespace Battle.Source
 {
-    using System;
     using Godot;
-    using Services;
+    using System;
+    using Core.Data;
     using UIElements;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using Core.Data;
     using Core.Interfaces.Events.GameEvents;
 
     internal class BattleContext : IBattleContext
     {
-        private readonly IBattleEventBus _localBus = new BattleEventBus();
+        private readonly IBattleEventBus _localBus;
         private readonly IUiElementProvider _uiElementProvider;
         private readonly BattleArena _battleArena;
         private readonly List<IEntity> _entities;
-        private readonly MainWorld _mainWorld;
+        private readonly Node2D _mainWorld;
         private readonly IEntity _player;
 
-        public BattleContext(IEntity player, List<IEntity> entities, MainWorld mainWorld, IGameServiceProvider provider, Node2D parent)
+        public BattleContext(IEntity player, List<IEntity> entities, Node2D mainWorld, IGameServiceProvider provider, Node2D parent)
         {
             _uiElementProvider = provider.GetService<IUiElementProvider>();
             _player = player;
             _entities = entities;
             _mainWorld = mainWorld;
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
+            _localBus = new BattleEventBus();
             _battleArena.SetupEventBus(_localBus);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);

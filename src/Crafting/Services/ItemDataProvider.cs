@@ -107,7 +107,7 @@
                             data = recipes.Cast<IItem>().ToList();
                             break;
                         case var _ when dataPath.EndsWith("Resources"):
-                            data = await DataParser.ParseResources<MaterialCategory>(
+                            data = await DataParser.ParseResources(
                                 jsonContent,
                                 (list, id) => new MaterialCategory(list, id),
                                 (id, tags, rarity, equipmentCategory, stackSize) => new UpgradeResource(id, tags, rarity, equipmentCategory, stackSize),

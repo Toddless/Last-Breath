@@ -5,11 +5,12 @@
 
     public class EvadeFirstDeath(
         int duration,
-        float percentToRecover,
+        int maxStacks,
+        float percentHealthToRecover,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Effect_Evade_First_Death", duration, maxStacks: 1, statusEffect)
+        : Effect(id: "Effect_Evade_First_Death", duration, maxStacks, statusEffect)
     {
-        public float PercentToRecover { get; } = percentToRecover;
+        public float PercentHealthToRecover { get; } = percentHealthToRecover;
 
         public override void Apply(EffectApplyingContext context)
         {
@@ -22,7 +23,7 @@
         {
             if (value > 0) return;
             if (Owner == null) return;
-            float toRecover = Owner.Parameters.MaxHealth * PercentToRecover;
+            float toRecover = Owner.Parameters.MaxHealth * PercentHealthToRecover;
             Owner.Heal(toRecover);
             Remove();
         }
@@ -34,6 +35,6 @@
             Owner = null;
         }
 
-        public override IEffect Clone() => new EvadeFirstDeath(Duration, PercentToRecover);
+        public override IEffect Clone() => new EvadeFirstDeath(Duration, MaxMaxStacks, PercentHealthToRecover);
     }
 }

@@ -11,7 +11,7 @@
         int duration,
         int maxStacks,
         StatusEffects statusEffect = StatusEffects.Regeneration)
-        : Effect(id: "Effect", duration, maxStacks, statusEffect)
+        : Effect(id: "Effect_Regeneration", duration, maxStacks, statusEffect)
     {
         public float Amount { get; } = amount;
 

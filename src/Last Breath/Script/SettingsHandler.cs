@@ -7,6 +7,7 @@
     using Core.Interfaces;
     using LastBreath.Script.Helpers;
     using Core.Constants;
+    using Core.Interfaces.MessageBus;
 
     public class SettingsHandler : ISettingsHandler
     {
@@ -16,9 +17,9 @@
         private readonly Vector2I[] _resolution = [new(1366, 768), new(1920, 1080), new(2560, 1440)];
         private readonly string[] _windowMods = ["Full-Screen", "Window", "Borderless Window"];
         private readonly string[] _resolutins = ["1366 x 768", "1920 x 1080", "2560 x 1440"];
-        private readonly IUiMediator _uiMediator;
+        private readonly IGameMessageBus _uiMediator;
 
-        public SettingsHandler(IUiMediator uiMediator)
+        public SettingsHandler(IGameMessageBus uiMediator)
         {
             if (!FileAccess.FileExists(ConfigFilePath))
             {
@@ -93,7 +94,6 @@
             var result = SaveSettings(SettingsSection.UI, Settings.Language, index);
             if (result != Error.Ok)
                 Tracker.TrackError($"Failed to save Language setting. Error: {result}", this);
-            _uiMediator.RaiseUpdateUi();
         }
 
         public void SetSoundBus(SoundBus bus, double value)

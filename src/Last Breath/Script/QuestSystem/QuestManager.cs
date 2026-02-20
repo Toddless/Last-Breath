@@ -38,8 +38,8 @@
         {
             if (quest.Conditions.Count == 0) return true;
             if (quest.RequiredConditions > quest.Conditions.Count) return false;
-
-            return quest.Conditions.Count(x => x.IsMet(_player!.Progress)) >= quest.RequiredConditions;
+            return true;
+            //return quest.Conditions.Count(x => x.IsMet(_player!.Prog)) >= quest.RequiredConditions;
         }
 
         public void Initialize()
@@ -52,7 +52,7 @@
         {
             _activeQuests.Remove(quest);
             _completedQuests.Add(quest);
-            _player?.OnQuestCompleted(quest);
+       //     _player?.OnQuestCompleted(quest);
             QuestCompleted?.Invoke(quest);
 
         }
@@ -81,9 +81,9 @@
         private void SetEvents()
         {
             _player ??= GameManager.Instance.Player;
-            _player.ItemCollected += OnItemCollected;
-            _player.EnemyKilled += OnEnemyKilled;
-            _player.LocationVisited += OnLocationVisited;
+           // _player.ItemCollected += OnItemCollected;
+            //_player.EnemyKilled += OnEnemyKilled;
+            //_player.LocationVisited += OnLocationVisited;
         }
 
         private void SetStatusCompleted(Quest quest) => quest.QuestStatus = QuestStatus.Completed;

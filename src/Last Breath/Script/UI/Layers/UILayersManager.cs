@@ -3,17 +3,19 @@
     using Godot;
     using LastBreath.DIComponents;
     using Core.Constants;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.MessageBus;
 
     public partial class UILayersManager : Node
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _tooltipLayer, _notificationLayer;
 
-        private IUiMediator? _uiMediator;
+        private IGameMessageBus? _gameMessageBus;
 
         public override void _Ready()
         {
             var serviceProvider = GameServiceProvider.Instance;
-            _uiMediator = serviceProvider.GetService<IUiMediator>();
+            _gameMessageBus = serviceProvider.GetService<IGameMessageBus>();
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -21,20 +23,21 @@
             switch (true)
             {
                 case var _ when @event.IsActionPressed(Settings.Inventory):
-                    _uiMediator?.Publish(new OpenInventoryWindowEvent());
+                    _gameMessageBus?.PublishAsync(new OpenInventoryWindowEvent());
                     break;
                 case var _ when @event.IsActionPressed(Settings.Quests):
-                    _uiMediator?.Publish(new OpenQuestWindowEvent());
+                    _gameMessageBus?.PublishAsync(new OpenQuestWindowEvent());
                     break;
                 case var _ when @event.IsActionPressed(Settings.Character):
-                    _uiMediator?.Publish(new OpenCharacterWindowEvent());
+                    _gameMessageBus?.PublishAsync(new OpenCharacterWindowEvent());
                     break;
                 case var _ when @event.IsActionPressed(Settings.Cancel):
                     CloseAllWindows();
-                    _uiMediator?.Publish(new PauseGameEvent());
+                    _gameMessageBus?.PublishAsync(new PauseGameEvent());
                     break;
                 default: return;
             }
+
             GetViewport().SetInputAsHandled();
         }
 

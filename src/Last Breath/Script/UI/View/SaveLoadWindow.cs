@@ -1,15 +1,16 @@
 ﻿namespace LastBreath.Script.UI
 {
+    using Core.Data;
+    using Core.Interfaces.MessageBus;
     using Godot;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
 
     public partial class SaveLoadWindow : Window, IInitializable, IRequireServices
     {
         private const string UID = "uid://cserxppd6wiui";
-        [Export] private LocalizableButton? _returnButton, _loadBtn, _deleteBtn;
+        [Export] private Button? _returnButton, _loadBtn, _deleteBtn;
 
-        private IUiMediator? _uiMediator;
+        private IGameMessageBus? _gameMessageBus;
 
         public override void _Ready()
         {
@@ -17,23 +18,12 @@
 
         }
 
-        public override void _ExitTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
-        }
-
         public override void InjectServices(IGameServiceProvider provider)
         {
-            _uiMediator = provider.GetService<IUiMediator>();
-            _uiMediator.UpdateUi += UpdateUI;
+            _gameMessageBus = provider.GetService<IGameMessageBus>();
         }
 
-        private void UpdateUI()
-        {
-            _returnButton?.UpdateButtonText();
-            _loadBtn?.UpdateButtonText();
-            _deleteBtn?.UpdateButtonText();
-        }
+
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
     }

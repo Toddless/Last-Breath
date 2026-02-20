@@ -7,8 +7,9 @@
 
     public class UnluckyCritChanceEffect(
         int duration,
+        int maxStacks,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Effect_Unlucky_Critical_Chance", duration, maxStacks: 1, statusEffect)
+        : Effect(id: "Effect_Unlucky_Critical_Chance", duration, maxStacks, statusEffect)
     {
         private readonly EntityParameterModuleDecorator _unluckyCritChanceDecorator = new UnluckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 
@@ -24,6 +25,6 @@
             base.Remove();
         }
 
-        public override IEffect Clone() => new UnluckyCritChanceEffect(Duration, Status);
+        public override IEffect Clone() => new UnluckyCritChanceEffect(Duration, MaxMaxStacks, Status);
     }
 }

@@ -5,7 +5,7 @@
     using Core.Interfaces.Skills;
 
     public class SoulDevouringPassiveSkill(float barrierRecoveryAmount)
-        : Skill(id: "Passive_Skill_SoulDevouring")
+        : Skill(id: "Passive_Skill_Soul_Devouring")
     {
         public float BarrierRecoveryAmount { get; } = barrierRecoveryAmount;
 

@@ -9,15 +9,15 @@
     {
         private IModifierInstance _increaseDamageModifier;
 
-        public TrappedBeastPassiveSkill(float percentHealth, float percentBonus) : base(id: "Passive_Skill_Trapped_Beast")
+        public TrappedBeastPassiveSkill(float healthPercent, float damageBonus) : base(id: "Passive_Skill_Trapped_Beast")
         {
-            PercentHealth = percentHealth;
-            PercentBonus = percentBonus;
+            HealthPercent = healthPercent;
+            DamageBonus = damageBonus;
             _increaseDamageModifier = new ModifierInstance(EntityParameter.Damage, ModifierType.Increase, 0f, this);
         }
 
-        public float PercentHealth { get; }
-        public float PercentBonus { get; }
+        public float HealthPercent { get; }
+        public float DamageBonus { get; }
 
         public override void Attach(IEntity owner)
         {
@@ -29,8 +29,8 @@
         {
             if (Owner == null) return;
             float percentLost = 1 - (currentHealth / Owner.Parameters.MaxHealth);
-            int steps = (int)(percentLost / PercentBonus);
-            float bonus = 1f + steps * PercentBonus;
+            int steps = (int)(percentLost / DamageBonus);
+            float bonus = 1f + steps * DamageBonus;
             _increaseDamageModifier.Value = bonus;
             Owner.Modifiers.UpdatePermanentModifier(_increaseDamageModifier);
         }
@@ -42,13 +42,13 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new TrappedBeastPassiveSkill(PercentHealth, PercentBonus);
+        public override ISkill Copy() => new TrappedBeastPassiveSkill(HealthPercent, DamageBonus);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not TrappedBeastPassiveSkill beast) return false;
 
-            return beast.PercentHealth > PercentHealth;
+            return beast.HealthPercent > HealthPercent;
         }
     }
 }

@@ -1,18 +1,20 @@
 ﻿namespace LastBreath.Script.UI
 {
     using Godot;
+    using Core.Data;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.MessageBus;
 
     public partial class PlayerHUD : Control, IInitializable, IRequireServices
     {
         private const string UID = "uid://boqqyrt0sfpve";
 
-        [Export] private LocalizableButton? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
+        [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
         [Export] private TextureProgressBar? _playerHealth;
         [Export] private GridContainer? _playerEffects;
 
-        private IUiMediator? _uiMediator;
+        private IGameMessageBus? _gameMessageBus;
 
         public override void _Ready()
         {
@@ -22,32 +24,14 @@
             _craftingBtn.Pressed += OnCraftingBtnPressed;
         }
 
-        public override void _EnterTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi += UpdateUI;
-        }
-
-        public override void _ExitTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
-        }
-
-        private void OnCraftingBtnPressed() => _uiMediator?.Publish(new OpenCraftingWindowEvent(string.Empty));
-        private void OnQuestBtnPressed() => _uiMediator?.Publish(new OpenQuestWindowEvent());
-        private void OnIntenoryBtnPressed() => _uiMediator?.Publish(new OpenInventoryWindowEvent());
-        private void OnCharacterBtnPressed() => _uiMediator?.Publish(new OpenCharacterWindowEvent());
+        private void OnCraftingBtnPressed() => _gameMessageBus?.PublishAsync(new OpenCraftingWindowEvent(string.Empty));
+        private void OnQuestBtnPressed() => _gameMessageBus?.PublishAsync(new OpenQuestWindowEvent());
+        private void OnIntenoryBtnPressed() => _gameMessageBus?.PublishAsync(new OpenInventoryWindowEvent());
+        private void OnCharacterBtnPressed() => _gameMessageBus?.PublishAsync(new OpenCharacterWindowEvent());
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _uiMediator = provider.GetService<IUiMediator>();
-        }
-
-        private void UpdateUI()
-        {
-            _characterBtn?.UpdateButtonText();
-            _inventoryBtn?.UpdateButtonText();
-            _questsBtn?.UpdateButtonText();
-            _craftingBtn?.UpdateButtonText();
+            _gameMessageBus = provider.GetService<IGameMessageBus>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

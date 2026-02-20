@@ -1,9 +1,8 @@
 ﻿namespace Battle
 {
-    using Core.Interfaces.MessageBus;
     using Godot;
     using Services;
-    using TestData;
+    using Core.Interfaces.MessageBus;
 
     internal partial class UiLayerManager : Node
     {
@@ -15,7 +14,6 @@
         {
             var serviceProvider = GameServiceProvider.Instance;
             _mediator = serviceProvider.GetService<IGameMessageBus>();
-            var devPanel = DevPanel.Initialize().Instantiate<DevPanel>();
         }
 
         public void ShowMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.AddChild, hud);

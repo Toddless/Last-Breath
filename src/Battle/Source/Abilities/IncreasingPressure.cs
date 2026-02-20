@@ -1,6 +1,5 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Services;
     using Utilities;
     using Core.Enums;
     using Core.Interfaces.Battle;
@@ -8,6 +7,7 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Godot;
 
     public class IncreasingPressure(
         string[] tags,
@@ -33,6 +33,8 @@
         private async Task PerformAttacks(List<IEntity> targets)
         {
             if (Owner == null) return;
+            var rnd = new RndGodot();
+            rnd.Randomize();
             foreach (IEntity target in targets)
             {
                 float increase = 1f;
@@ -43,7 +45,7 @@
                     float damage = Owner.GetDamage();
                     damage += Owner.Parameters.SpellDamage;
                     damage *= increase;
-                    float chance = StaticRandomNumberGenerator.Rnd.Randf();
+                    float chance = rnd.RandFloat();
                     bool isCrit = chance <= Owner.Parameters.CriticalChance;
                     if (isCrit)
                         damage *= Owner.Parameters.CriticalDamage;

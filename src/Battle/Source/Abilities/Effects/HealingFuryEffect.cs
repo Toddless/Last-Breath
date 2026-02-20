@@ -6,10 +6,10 @@
 
     public class HealingFuryEffect(
         int duration,
+        int maxStacks,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury,
-        string id = "Effect_Healing_Fury")
-        : FuryEffect(duration, healthPercent, statusEffect, id)
+        StatusEffects statusEffect = StatusEffects.Fury)
+        : FuryEffect(duration, maxStacks, healthPercent, statusEffect, id: "Effect_Healing_Fury")
     {
         private float _damageDealt;
         public float HealAmount { get; set; }
@@ -35,6 +35,6 @@
             return HealAmount > healing.HealAmount;
         }
 
-        public override IEffect Clone() => new HealingFuryEffect(Duration, HealthPercent, Status, Id) { HealAmount = HealAmount };
+        public override IEffect Clone() => new HealingFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status) { HealAmount = HealAmount };
     }
 }

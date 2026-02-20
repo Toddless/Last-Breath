@@ -3,8 +3,8 @@
     using Godot;
     using System;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using Core.Constants;
+    using Core.Data;
 
     public abstract partial class Window : Control, IRequireServices, IClosable
     {

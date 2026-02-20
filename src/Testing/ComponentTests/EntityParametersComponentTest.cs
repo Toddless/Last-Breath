@@ -7,6 +7,7 @@
     using Battle.Source.Decorators;
     using Core.Interfaces.Components;
     using TestData;
+    using Battle.Attribute.Components;
 
     [TestClass]
     public class EntityParametersComponentTest

@@ -1,15 +1,15 @@
 ﻿namespace LastBreath.Script.UI
 {
-    using Godot;
-    using Core.Enums;
-    using Godot.Collections;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
-    using Core.Interfaces.Inventory;
-    using LastBreath.Script.Helpers;
-    using LastBreath.Script.Inventory;
     using System;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Godot.Collections;
+    using Helpers;
+    using Inventory;
 
     public partial class InventoryWindow : Window, IInitializable
     {

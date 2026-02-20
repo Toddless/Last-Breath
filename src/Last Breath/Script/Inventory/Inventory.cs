@@ -8,11 +8,12 @@
     using Core.Interfaces.Items;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using Core.Interfaces.MessageBus;
 
     public class Inventory : IInventory
     {
         private readonly Dictionary<string, IItem> _itemInstances = [];
-        private readonly IUiMediator _uiMediator;
+        private readonly IGameMessageBus _uiMessageBus;
         protected List<IInventorySlot> Slots { get; } = [];
 
         public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
@@ -21,9 +22,9 @@
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
-        public Inventory(IUiMediator mediator)
+        public Inventory(IGameMessageBus messageBus)
         {
-            _uiMediator = mediator;
+            _uiMessageBus = messageBus;
         }
 
         public void Initialize(int amount, GridContainer? container)
@@ -37,7 +38,7 @@
                     inventorySlot.GetItemInstance = (GetItem<IItem>);
                     inventorySlot.GetItemIcon = GetItemIcon;
                     inventorySlot.ItemInteraction += OnItemInteraction;
-                    inventorySlot.SetUIElementProvider(_uiMediator);
+                    inventorySlot.SetUIElementProvider(_uiMessageBus);
                     container.AddChild(inventorySlot);
                     Slots.Add(inventorySlot);
                 }

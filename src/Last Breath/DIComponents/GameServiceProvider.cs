@@ -1,23 +1,26 @@
 ﻿namespace LastBreath.DIComponents
 {
     using Godot;
+    using Script;
     using System;
+    using Services;
+    using Core.Data;
     using Core.Results;
-    using Core.Interfaces;
+    using Battle.Source;
+    using Core.Modifiers;
     using Crafting.Source;
-    using LastBreath.Script;
-    using LastBreath.Script.UI;
-    using Core.Interfaces.Data;
+    using Core.Interfaces;
+    using Script.Inventory;
+    using LootGeneration.Source;
     using Core.Interfaces.Items;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
-    using Core.Interfaces.Mediator;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
-    using LastBreath.Script.Inventory;
-    using LastBreath.DIComponents.Mediator;
-    using LastBreath.DIComponents.Services;
-    using Core.Interfaces.Mediator.Requests;
-    using LastBreath.DIComponents.MediatorHandlers;
+    using Core.Interfaces.MessageBus;
+    using Crafting.Source.EventHandlers;
+    using Crafting.Source.RequestHandlers;
+    using Core.Interfaces.MessageBus.Requests;
     using Microsoft.Extensions.DependencyInjection;
 
     public class GameServiceProvider : IGameServiceProvider
@@ -34,33 +37,31 @@
         public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
 
         public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
+        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
 
         private ServiceProvider RegisterServices()
         {
-            // i need to figure out how to add all services from another projects 
             var services = new ServiceCollection();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>((provider) =>
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
             {
-                var instance = new ItemDataProvider("res://Data/");
+                var instance = new ItemDataProvider();
                 return instance;
             });
-            services.AddSingleton<IUIElementProvider, UIElementProvider>();
+            services.AddSingleton<IUiElementProvider, UIElementProvider>();
             services.AddSingleton<IInventory, Inventory>();
-            services.AddSingleton<IUiMediator, UIMediator>();
-            services.AddSingleton<ISystemMediator, SystemMediator>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IItemCreator, ItemCreator>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
-            services.AddSingleton((provider) =>
+            services.AddSingleton(_ =>
             {
                 var instance = new RandomNumberGenerator();
                 instance.Randomize();
                 return instance;
             });
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
-
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
-
+            services.AddBattleSystemModuleDependencies();
+            services.AddLootGenerationServices();
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
             services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
@@ -70,7 +71,6 @@
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
 
             services.AddSingleton<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
-            services.AddSingleton<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExpirienceEventHandler>();
             services.AddSingleton<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
             services.AddSingleton<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
             services.AddSingleton<IEventHandler<ShowInventoryItemEvent>, ShowInventoryItemEventHandler>();
@@ -80,12 +80,7 @@
             services.AddSingleton<IEventHandler<OpenCraftingWindowEvent>, OpenCraftingWindowEventHandler>();
 
 
-            services.AddSingleton<IEventHandler<OpenInventoryWindowEvent>, OpenWindowEventHandler<OpenInventoryWindowEvent, InventoryWindow>>();
-            services.AddSingleton<IEventHandler<OpenQuestWindowEvent>, OpenWindowEventHandler<OpenQuestWindowEvent, QuestsWindow>>();
-            services.AddSingleton<IEventHandler<OpenCharacterWindowEvent>, OpenWindowEventHandler<OpenCharacterWindowEvent, CharacterWindow>>();
-            services.AddSingleton<IEventHandler<PauseGameEvent>, PauseGameEventHandler>();
             return services.BuildServiceProvider();
         }
-
     }
 }

@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System;
-    using TestData;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Events.GameEvents;
@@ -13,7 +12,6 @@
         public override void Attach(IEntity owner)
         {
             Owner = owner;
-            // Срабатываение пассивки происходит когда ЦЕЛЬ увернулась. Однако данная пассивка должна срабатывать когда уворачивается ВЛАДЕЛЕЦ
             Owner.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 

@@ -7,7 +7,7 @@
     using Core.Interfaces.Skills;
 
     public class EchoPassiveSkill(
-        float percentFromDamageToDealLater,
+        float delayedDamagePercent,
         int turns)
         : Skill(id: "Passive_Skill_Echo")
     {
@@ -19,7 +19,7 @@
 
         private readonly List<IEntity> _toRemove = [];
         private readonly Dictionary<IEntity, List<DamageEntry>> _damageSources = new();
-        public float PercentFromDamageToDealLater { get; } = percentFromDamageToDealLater;
+        public float DelayedDamagePercent { get; } = delayedDamagePercent;
         public int Turns { get; } = turns;
 
         public override void Attach(IEntity owner)
@@ -37,20 +37,20 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new EchoPassiveSkill(PercentFromDamageToDealLater, Turns);
+        public override ISkill Copy() => new EchoPassiveSkill(DelayedDamagePercent, Turns);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not EchoPassiveSkill later) return false;
 
-            return later.PercentFromDamageToDealLater > PercentFromDamageToDealLater;
+            return later.DelayedDamagePercent > DelayedDamagePercent;
         }
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
             var context = evnt.Context;
             if (context.Result is not AttackResults.Succeed) return;
-            float actualDamage = context.FinalDamage * PercentFromDamageToDealLater;
+            float actualDamage = context.FinalDamage * DelayedDamagePercent;
             float toDealLater = context.FinalDamage - actualDamage;
             context.FinalDamage = actualDamage;
             if (!_damageSources.TryGetValue(context.Attacker, out List<DamageEntry>? sources))

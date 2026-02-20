@@ -9,6 +9,7 @@
     using Core.Interfaces.Events;
     using System.Collections.Generic;
     using Core.Data;
+    using Core.Interfaces;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class BattleHud : Control, IInitializable, IRequireServices
@@ -93,11 +94,11 @@
 
         private void OnPlayerChanceStance(PlayerChangesStanceEvent obj)
         {
-            var player = Player.Instance;
-            if (player == null) return;
-            var skills = player.CurrentStance?.ObtainedAbilities ?? [];
-            for (int i = 0; i < skills.Count; i++)
-                _abilitySlotsInstances[i].SetAbility(skills[i]);
+            // var player = IPlayer.;
+            // if (player == null) return;
+            // var skills = player.CurrentStance?.ObtainedAbilities ?? [];
+            // for (int i = 0; i < skills.Count; i++)
+            //     _abilitySlotsInstances[i].SetAbility(skills[i]);
         }
 
         public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana)
@@ -176,7 +177,7 @@
             var target = obj.Target;
             var effect = obj.Effect;
 
-            if (target is Player) _playerBars?.RemoveEffect(effect);
+            if (target is IPlayer) _playerBars?.RemoveEffect(effect);
             else GetCharacterBar(target.InstanceId)?.RemoveEffect(effect);
         }
 
@@ -185,7 +186,7 @@
             var target = obj.Target;
             var effect = obj.Effect;
 
-            if (target is Player) _playerBars?.AddEffect(effect);
+            if (target is IPlayer) _playerBars?.AddEffect(effect);
             else GetCharacterBar(target.InstanceId)?.AddEffect(effect);
         }
 
@@ -198,7 +199,7 @@
 
         private void OnTurnStart(TurnStartEvent obj)
         {
-            if (obj.StartedTurn is Player) _buttonsContainer?.Show();
+            if (obj.StartedTurn is IPlayer) _buttonsContainer?.Show();
             else _buttonsContainer?.Hide();
         }
 

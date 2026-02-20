@@ -2,6 +2,7 @@
 {
     using Godot;
     using System;
+    using Core.Data;
     using Utilities;
     using LastBreath.Script.UI;
     using LastBreath.DIComponents;
@@ -20,8 +21,7 @@
                 ArgumentNullException.ThrowIfNull(_uiLayerManager);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
                 var serviceProvider = GameServiceProvider.Instance;
-                serviceProvider.GetService<IUIElementProvider>().Subscribe(_uiLayerManager);
-                serviceProvider.GetService<IUIElementProvider>().CreateAndShowMainElement<PlayerHUD>();
+                serviceProvider.GetService<IUiElementProvider>().Subscribe(_uiLayerManager);
             }
             catch (Exception ex)
             {

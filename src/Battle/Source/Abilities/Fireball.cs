@@ -1,19 +1,19 @@
 ﻿namespace Battle.Source.Abilities
 {
     using Module;
-    using Services;
+    using Utilities;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Utilities;
 
     public class Fireball : Ability
     {
         private readonly float _baseDamage;
         private readonly float _baseCriticalChance;
+        private readonly RndGodot _rnd;
 
         public Fireball(string[] tags,
             int cooldown,
@@ -29,9 +29,11 @@
         {
             _baseDamage = baseDamage;
             _baseCriticalChance = baseCriticalChance;
+            _rnd = new RndGodot();
+            _rnd.Randomize();
             ModuleManager.AddBaseModule(AbilityParameter.Damage, new Module<AbilityParameter>(() => baseDamage, AbilityParameter.Damage));
             ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceDetermination,
-                new Module<AbilityParameter>(() => StaticRandomNumberGenerator.Rnd.Randf(), AbilityParameter.CriticalChanceDetermination));
+                new Module<AbilityParameter>(() => _rnd.RandFloat(), AbilityParameter.CriticalChanceDetermination));
             ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceValue, new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChanceValue));
         }
 

@@ -8,10 +8,11 @@
 
     public class FuryEffect(
         int duration,
+        int maxStacks,
         float healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury,
-        string id = "Effect")
-        : Effect(id, duration, maxStacks: 1, statusEffect)
+        string id = "Effect_Fury")
+        : Effect(id, duration, maxStacks, statusEffect)
     {
         protected float HealthBurned;
         public float HealthPercent { get; } = healthPercent;
@@ -29,6 +30,6 @@
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);
 
-        public override IEffect Clone() => new FuryEffect(Duration, HealthPercent, Status);
+        public override IEffect Clone() => new FuryEffect(Duration, MaxMaxStacks, HealthPercent, Status);
     }
 }

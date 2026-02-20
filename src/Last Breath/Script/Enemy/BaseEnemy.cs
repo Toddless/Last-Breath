@@ -3,377 +3,470 @@ namespace LastBreath
     using Godot;
     using System;
     using Core.Enums;
-    using System.Linq;
-    using LastBreath.Components;
     using Core.Interfaces.Items;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Skills;
-    using LastBreath.Script.Enemy;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Battle.Source;
+    using Battle.Source.Attribute;
+    using Battle.Source.Components;
+    using Battle.Source.PassiveSkills;
+    using Core.Data;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
-    using LastBreath.Script.LootGenerator.BasedOnRarityLootGenerator;
     using Utilities;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.Events.GameEvents;
+    using Stateless;
 
     public partial class BaseEnemy : CharacterBody2D, IEntity
     {
-        #region Components
-        private readonly AttributeComponent _enemyAttribute = new();
-        private readonly IModifierManager _modifierManager = new ModifierManager();
-        private IEffectsManager? _effectsManager;
-        private IHealthComponent? _enemyHealth;
-        private IDamageComponent? _enemyDamage;
-        private IDefenceComponent? _enemyDefense;
-        private SkillsComponent? _enemySkills;
-        #endregion
+       [Export] private Area2D? _interactionArea;
+        private Vector2 _lastPosition = Vector2.Zero;
+        private IGameEventBus? _gameEventBus;
+        private IBattleEventBus? _battleEventBus;
 
-        private bool _enemyFight = false, _playerEncounter = false, _canMove;
-        private int _level;
-        private string? _enemyId;
-        private IBasedOnRarityLootTable? _lootTable;
-        private CollisionShape2D? _enemiesCollisionShape;
-        private NavigationAgent2D? _navigationAgent2D;
-        private CollisionShape2D? _areaCollisionShape;
-        private RandomNumberGenerator _rnd = new();
-        private AnimatedSprite2D? _sprite;
-        private Vector2 _respawnPosition;
-        private Area2D? _area;
-        private AttributeType? _enemyAttributeType;
-        private Core.Enums.Rarity _rarity;
-        private EnemyType _enemyType;
-        private IStance? _currentStance;
+        private enum State
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
 
-        #region UI
-        private Node2D? _inventoryNode;
-        private Panel? _inventoryWindow;
-        private GridContainer? _inventoryContainer;
-        #endregion
+        private enum Trigger
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
 
+        private enum Direction
+        {
+            Up,
+            Down,
+            Left,
+            Right
+        }
 
-        #region Properties
-        protected SkillsComponent Skills => _enemySkills ??= new(this);
-
-        public EnemyType EnemyType => _enemyType;
-        public AttributeType? AttributeType => _enemyAttributeType;
-        public string CharacterName { get; private set; } = "Enemy";
+        private Direction _direction;
+        private float _baseSpeed = 500;
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+        private readonly RandomNumberGenerator _rnd = new();
 
         [Export] public string Id { get; private set; } = string.Empty;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
+        [Export] public string[] Tags { get; private set; } = [];
+        public Texture2D? Icon { get; } = null;
+        public string Description { get; } = string.Empty;
+        public string DisplayName { get; } = string.Empty;
+        public IEntityParametersComponent Parameters { get; private set; }
+        public IPassiveSkillsComponent PassiveSkills { get; private set; }
+        public IAnimationsComponent Animations { get; private set; }
+        public IEntityAttribute Dexterity { get; private set; }
+        public IEntityAttribute Strength { get; private set; }
+        public IEntityAttribute Intelligence { get; private set; }
+        public ICombatEventBus CombatEvents { get; private set; }
+        public IStance CurrentStance { get; private set; }
+        public ITargetChooser? TargetChooser { get; set; }
+        public bool IsFighting { get; set; }
+        public bool IsAlive => CurrentHealth > 0;
+        public IEffectsComponent Effects { get; private set; }
+        public IModifiersComponent Modifiers { get; private set; }
+        public IEntityGroup? Group { get; set; }
+        public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
+        public bool CanMove { get; set; }
 
-        [Export] public string[] Tags { get; set; } = [];
-
-        [Export] public Texture2D? Icon { get; set; }
-
-        public string Description => Localizator.LocalizeDescription(Id);
-
-        public string DisplayName => Localizator.Localize(Id);
-
-        public bool IsFighting
+        public float CurrentHealth
         {
-            get => _enemyFight;
-            set => _enemyFight = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                if (field <= 0) NotifyShouldDie();
+                NotifyHealthChanges(field);
+            }
         }
 
-        public bool CanMove
+        public float CurrentBarrier
         {
-            get => _canMove;
-            set => _canMove = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                NotifyBarrierChanges(field);
+            }
         }
 
-        public NavigationAgent2D? NavigationAgent2D
+        public float CurrentMana
         {
-            get => _navigationAgent2D;
-            set => _navigationAgent2D = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxMana);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                NotifyManaChanges(field);
+            }
         }
 
-        public Area2D? Area
-        {
-            get => _area;
-        }
+        public event Action<float>? CurrentManaChanged;
+        public event Action<float>? CurrentBarrierChanged;
+        public event Action<float>? CurrentHealthChanged;
+        public event Action<IEntity>? Dead;
+        public event Action<float, DamageType, bool>? DamageTaken;
 
-        public RandomNumberGenerator Rnd
-        {
-            get => _rnd;
-            set => _rnd = value;
-        }
-
-        public Vector2 RespawnPosition
-        {
-            get => _respawnPosition;
-        }
-
-        public Core.Enums.Rarity Rarity
-        {
-            get => _rarity;
-            set => _rarity = value;
-
-        }
-
-        protected IBasedOnRarityLootTable? LootTable
-        {
-            get => _lootTable;
-            set => _lootTable = value;
-        }
-        [Export]
-        public Fractions Fraction { get; set; }
-
-        [Export]
-        public string NpcName { get; set; } = string.Empty;
-
-        public string EnemyId => _enemyId ??= SetId();
-
-        public IDamageComponent Damage => _enemyDamage ??= new DamageComponent(new UnarmedDamageStrategy());
-        public IHealthComponent Health => _enemyHealth ??= new HealthComponent();
-        public IDefenceComponent Defence => _enemyDefense ??= new DefenseComponent();
-        public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
-        public IModifierManager Modifiers => _modifierManager;
-
-        public IStance CurrentStance => _currentStance ??= SetStance(_enemyAttributeType);
-
-        public bool IsAlive { get; set; }
-
-
-
-        public event Action<IEntity>? Dead, InitializeFight;
-        public event Action? AllAttacksFinished;
-        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
-        public event Action? TurnStart;
-        public event Action? TurnEnd;
-        public event Action<IAttackContext>? BeforeAttack;
-        public event Action<IAttackContext>? AfterAttack;
-
-        #endregion
 
         public override void _Ready()
         {
-            _effectsManager = new EffectsManager(this);
-            _enemyHealth = new HealthComponent();
-            _enemyDefense = new DefenseComponent();
-            _enemySkills = new(this);
-            // later i need strategy for enemies
-            _enemyDamage = new DamageComponent(new UnarmedDamageStrategy());
-            var parentNode = GetParent().GetNode<BaseEnemy>($"{Name}");
-            _inventoryNode = parentNode.GetNode<Node2D>("Inventory");
-            _inventoryWindow = _inventoryNode.GetNode<Panel>("InventoryWindow");
-            _inventoryContainer = _inventoryWindow.GetNode<GridContainer>("InventoryContainer");
-            _sprite = parentNode.GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _navigationAgent2D = parentNode.GetNode<NavigationAgent2D>(nameof(NavigationAgent2D));
-            _area = parentNode.GetNode<Area2D>(nameof(Area2D));
-            _areaCollisionShape = _area.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _enemiesCollisionShape = parentNode.GetNode<CollisionShape2D>(nameof(CollisionShape2D));
-            _inventoryNode.Hide();
-            SetEvents();
-            SetStats();
-            // SpawnItems();
-            Health?.HealUpToMax();
+            Animations.PlayAnimation("Idle");
+            if (_interactionArea != null)
+                _interactionArea.BodyEntered += OnBodyEnter;
+
+            _rnd.Randomize();
+            Parameters = new EntityParametersComponent();
+            Modifiers = new ModifiersComponent();
+            Parameters.Initialize(Modifiers.GetModifiers);
+            Effects = new EffectsComponent(this);
+            PassiveSkills = new PassiveSkillsComponent(this);
+            Dexterity = new Dexterity(Modifiers);
+            Strength = new Strength(Modifiers);
+            Intelligence = new Intelligence(Modifiers);
+            Effects.EffectAdded += OnEffectAdded;
+            Effects.EffectRemoved += OnEffectRemoved;
+            Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
+            Parameters.ParameterChanged += OnParameterChanged;
+            Parameters.ParameterChanged += Dexterity.OnParameterChanges;
+            Parameters.ParameterChanged += Strength.OnParameterChanges;
+            Parameters.ParameterChanged += Intelligence.OnParameterChanges;
+            CombatEvents = new CombatEventBus();
+            var passive = new ChainAttackPassiveSkill();
+            passive.Attach(this);
+            var passiveTwo = new CounterAttackPassiveSkill();
+            passiveTwo.Attach(this);
+            var mana = new ManaBurnPassiveSkill(0.15f);
+            mana.Attach(this);
+            var burning = new BurningPassiveSkill(0.3f, 3, 3);
+            burning.Attach(this);
+            var regen = new RegenerationPassiveSkill(0.05f);
+            regen.Attach(this);
+            ConfigureStateMachine();
+            SetBaseValuesForParameters();
+
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
         }
 
-        public void OnGettingKill()
+        public void InjectServices(IGameServiceProvider provider)
         {
-            IsFighting = false;
-            CanMove = false;
-            // TODO: Turn "death" state on in witch enemy lay down for N time befor reincarnated
-            // change sprite and animation
-            Area?.Hide();
+            _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
-        public void TakeDamage(float damage, bool isCrit = false)
+        private void ConfigureStateMachine()
         {
-            Health.TakeDamage(damage);
-            GD.Print($"{this.Name} taked: {damage} damage");
-            GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
+            _stateMachine.Configure(State.Idle)
+                .OnEntry(() => { Animations.PlayAnimation($"Idle"); })
+                .PermitReentry(Trigger.Idle)
+                .Permit(Trigger.Walk, State.Walk)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Walk)
+                .PermitReentry(Trigger.Walk)
+                .Permit(Trigger.Idle, State.Idle)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Battle)
+                .OnEntry(() =>
+                {
+                    Animations.PlayAnimation("Idle");
+                    CanMove = false;
+                    _lastPosition = Position;
+                })
+                .OnExit(() =>
+                {
+                    CanMove = true;
+                    Position = _lastPosition;
+                })
+                .Permit(Trigger.Idle, State.Idle);
+        }
+
+        public void AddItemToInventory(IItem item)
+        {
+        }
+
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+
+        public void SetupBattleEventBus(IBattleEventBus bus)
+        {
+            // TODO:
+            _battleEventBus = bus;
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
+        }
+
+        public void Heal(float amount)
+        {
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
+
+        public void ConsumeResource(Costs type, float amount)
+        {
+            switch (type)
+            {
+                case Costs.Barrier:
+                    CurrentBarrier -= amount;
+                    break;
+                case Costs.Health:
+                    CurrentHealth -= amount;
+                    break;
+                case Costs.Mana:
+                    CurrentMana -= amount;
+                    break;
+            }
+        }
+
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+
+        public bool TryApplyStatusEffect(StatusEffects statusEffect)
+        {
+            if ((StatusEffects & statusEffect) != 0) return false;
+            StatusEffects |= statusEffect;
+            CombatEvents.Publish(new StatusEffectAppliedEvent(statusEffect));
+            return true;
+        }
+
+        public bool TryRemoveStatusEffect(StatusEffects statusEffect)
+        {
+            if ((StatusEffects & statusEffect) == 0) return false;
+            StatusEffects &= ~statusEffect;
+            CombatEvents.Publish(new StatusEffectRemovedEvent(statusEffect));
+            return true;
+        }
+
+        public void Kill() => NotifyShouldDie();
+
+        public IEntity ChoseTarget(List<IEntity> targets)
+        {
+            TargetChooser ??= new ChoosePlayerAsTarget();
+
+            return TargetChooser.Choose(targets);
+        }
+
+        public async Task ReceiveAttack(IAttackContext context)
+        {
+            try
+            {
+                Calculations.CalculateHitSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateFinalDamage(context);
+                        CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
+                        await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Blocked");
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Evaded");
+                        break;
+                }
+
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                context.Attacker.Effects.TriggerAfterAttack(context);
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
+        }
+
+        public async Task Attack(IAttackContext context)
+        {
+            context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+            await Animations.PlayAnimationAsync("Attack");
+        }
+
+        public void OnTurnEnd()
+        {
+            Effects.TriggerTurnEnd();
+            CombatEvents.Publish(new TurnEndEvent(this));
+            _battleEventBus?.Publish(new TurnEndEvent(this));
+            _gameEventBus?.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
-            var handler = BattleHandler.Instance;
-            if (handler != null)
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
+        }
+
+        public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        {
+            // TODO: Here i need to calculate final damage with armor/resistance etc
+            CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            CurrentHealth -= damage;
+            await Animations.PlayAnimationAsync("Hurt");
+        }
+
+        private void OnBodyEnter(Node2D body)
+        {
+            if (IsFighting) return;
+            try
             {
-                var target = handler.Fighters.FirstOrDefault(x => x is Player);
-                if (target == null)
+                switch (body)
                 {
-                    return;
+                    case IPlayer player:
+                        {
+                            List<IEntity> fighters = [];
+                            if (Group != null)
+                            {
+                                Group.NotifyAllInGroup(GroupNotification.Attacked);
+                                fighters.AddRange(Group.GetEntitiesInGroup<IEntity>());
+                            }
+                            else
+                                fighters.Add(this);
+
+                            _stateMachine.Fire(Trigger.Battle);
+                            _gameEventBus?.Publish(new BattleStartEvent(player, fighters));
+                            break;
+                        }
+                    case IFightable fighter:
+                        break;
                 }
-                CurrentStance?.OnAttack(target);
             }
-            //UIEventBus.PublishNextPhase();
-        }
-
-        public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
-        public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
-
-        public void OnTurnEnd()
-        {
-            //Effects.UpdateEffects();
-        }
-
-        public void OnReceiveAttack(IAttackContext context)
-        {
-            if (_currentStance == null)
+            catch (Exception e)
             {
-
-                HandleSkills(context.PassiveSkills);
-                // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = this.Defence.BarrierAbsorbDamage(reducedByArmorDamage);
-
-                if (damageLeftAfterBarrierabsorption > 0)
-                {
-                    this.Health.TakeDamage(damageLeftAfterBarrierabsorption);
-                    GD.Print($"Character: {GetName()} take damage: {damageLeftAfterBarrierabsorption}");
-                }
-
-                context.SetAttackResult(new AttackResult([], AttackResults.Succeed, context));
-                return;
+                Tracker.TrackException("Failed to handle body enter", e, this);
             }
-            _currentStance.OnReceiveAttack(context);
         }
-        public void AllAttacks() => AllAttacksFinished?.Invoke();
 
-        public void AddSkill(ISkill skill)
+        private void OnParameterChanged(EntityParameter parameter, float value)
         {
-            // NPC should only get abilities that work with in their main stance
-            if (skill is IStanceSkill stanceSkill)
+            switch (parameter)
             {
-                if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillComponent.AddSkill(stanceSkill);
+                case EntityParameter.Health:
+                    _battleEventBus?.Publish<EntityMaxHealthChangesEvent>(new(this, value));
+                    break;
+                case EntityParameter.Barrier:
+                    break;
+                case EntityParameter.Mana:
+                    _battleEventBus?.Publish<EntityMaxManaChangesEvent>(new(this, value));
+                    break;
             }
-            else
-                Skills.AddSkill(skill);
         }
 
-        public void RemoveSkill(ISkill skill)
+        private void OnBattleEnd(BattleEndEvent obj)
         {
-            if (skill is IStanceSkill stanceSkill)
-            {
-                if (CurrentStance.StanceType == stanceSkill.RequiredStance)
-                    CurrentStance.StanceSkillComponent.RemoveSkill(stanceSkill);
-            }
-            else Skills.RemoveSkill(skill);
+            Effects.RemoveAllEffects();
+            if (IsAlive) _stateMachine.Fire(Trigger.Idle);
+            _battleEventBus = null;
         }
 
-        public List<ISkill> GetSkills(SkillType type) => Skills.GetSkills(type);
-
-        public void AddItemToInventory(IItem item)
+        private void OnEffectRemoved(IEffect effect)
         {
-
+            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
         }
 
-        protected void SpawnItems()
+        private void OnEffectAdded(IEffect effect)
         {
-            // _inventory?.AddItem(LootTable?.GetRandomItem());
+            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
         }
 
-        private void HandleSkills(List<ISkill> passiveSkills)
+        private void NotifyHealthChanges(float value)
         {
-
+            CurrentHealthChanged?.Invoke(value);
+            _gameEventBus?.Publish<EntityHealthChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityHealthChangesEvent>(new(this, value));
         }
 
-
-        private void SetStats()
+        private void NotifyBarrierChanges(float value)
         {
-            _enemyAttributeType = SetRandomEnemyType(Rnd!.RandiRange(1, 2));
-            _respawnPosition = Position;
-            Rarity = EnemyRarity();
-            _level = Rnd.RandiRange(1, 300);
-            var points = SetAttributesDependsOnType(_enemyAttributeType);
-            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Dexterity, points.Dexterity);
-            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Strength, points.Strength);
-            _enemyAttribute.IncreaseAttributeByAmount(Parameter.Intelligence, points.Intelligence);
-            SetAnimation();
-            _currentStance = SetStance(_enemyAttributeType);
-            _currentStance.OnActivate();
+            CurrentBarrierChanged?.Invoke(value);
+            _gameEventBus?.Publish<EntityBarrierChanges>(new(this, value));
+            _battleEventBus?.Publish<EntityBarrierChanges>(new(this, value));
         }
 
-        private void SetEvents()
+        private void NotifyManaChanges(float value)
         {
-            _area!.BodyEntered += PlayerEntered;
-            Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
-            Health.EntityDead += OnEntityDead;
+            CurrentManaChanged?.Invoke(value);
+            _gameEventBus?.Publish<EntityManaChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<EntityManaChangesEvent>(new(this, value));
         }
 
-        private void OnEntityDead()
+        private void NotifyShouldDie()
         {
-            IsFighting = false;
-            IsAlive = false;
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
+
+            Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
-            GD.Print($"Dead: {GetType().Name}");
         }
 
-        private IStance SetStance(AttributeType? enemyAttributeType)
+        private void SetBaseValuesForParameters()
         {
-            return enemyAttributeType switch
+            var rnd = new RandomNumberGenerator();
+            rnd.Randomize();
+            foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
             {
-                Core.Enums.AttributeType.Dexterity => new DexterityStance(this),
-                Core.Enums.AttributeType.Intelligence => new IntelligenceStance(this),
-                Core.Enums.AttributeType.Strength => new StrengthStance(this),
-                _ => throw new ArgumentOutOfRangeException(nameof(enemyAttributeType)),
-            };
-        }
+                float value = 0;
 
-        private Core.Enums.Rarity EnemyRarity()
-        {
-            return Core.Enums.Rarity.Uncommon;
-        }
+                switch (entityParameter)
+                {
+                    case EntityParameter.Health:
+                    case EntityParameter.Barrier:
+                        value = 10000;
+                        break;
+                    case EntityParameter.Mana:
+                        value = 50;
+                        break;
+                    case EntityParameter.Intelligence:
+                    case EntityParameter.Strength:
+                    case EntityParameter.Dexterity:
+                        value = rnd.RandfRange(1, 5);
+                        break;
+                    case EntityParameter.Armor:
+                        value = 200;
+                        break;
+                    case EntityParameter.CriticalChance:
+                    case EntityParameter.AdditionalHitChance:
+                        value = 0.25f;
+                        break;
+                    case EntityParameter.CriticalDamage:
+                        value = 1.5f;
+                        break;
+                    case EntityParameter.Damage:
+                    case EntityParameter.SpellDamage:
+                        value = rnd.RandfRange(50, 250);
+                        break;
+                    case EntityParameter.Accuracy:
+                    case EntityParameter.Evade:
+                        value = rnd.RandfRange(50, 500);
+                        break;
+                }
 
-        private void SetAnimation()
-        {
-            switch (Rarity)
-            {
-                case Core.Enums.Rarity.Rare:
-                    _sprite!.Play("Bat_Rare");
-                    break;
-                case Core.Enums.Rarity.Epic:
-                    _sprite!.Play("Bat_Epic");
-                    break;
-                case Core.Enums.Rarity.Legendary:
-                    _sprite!.Play("Bat_Legend");
-                    break;
-                case Core.Enums.Rarity.Mythic:
-                    _sprite!.Play("Bat_Myth");
-                    break;
-                default:
-                    _sprite!.Play("Bat_Uncomm");
-                    break;
+                Parameters.SetBaseValueForParameter(entityParameter, value);
             }
         }
 
-        private void PlayerEntered(Node2D body)
+        protected override void Dispose(bool disposing)
         {
-            if (body is Player s && _area!.OverlapsBody(s))
-            {
-                InitializeFight?.Invoke(this);
-                IsFighting = false;
-            }
+            if (!disposing) return;
+
+            _battleEventBus = null;
+            _gameEventBus = null;
         }
-
-        private (int Strength, int Dexterity, int Intelligence) SetAttributesDependsOnType(AttributeType? enemyType)
-        {
-            var totalAttributes = _level + ((int)_rarity * (int)_rarity);
-
-            var dominantAttribute = Mathf.RoundToInt(totalAttributes * 0.8f);
-            var secondaryAttribute = Mathf.RoundToInt(totalAttributes * 0.1f);
-
-            return enemyType switch
-            {
-                Core.Enums.AttributeType.Dexterity => (secondaryAttribute, dominantAttribute, secondaryAttribute),
-                Core.Enums.AttributeType.Strength => (dominantAttribute, secondaryAttribute, secondaryAttribute),
-                Core.Enums.AttributeType.Intelligence => (secondaryAttribute, secondaryAttribute, dominantAttribute),
-                _ => (1, 1, 1)
-            };
-        }
-
-        private AttributeType SetRandomEnemyType(int index)
-        {
-            return index switch
-            {
-                1 => Core.Enums.AttributeType.Dexterity,
-                2 => Core.Enums.AttributeType.Strength,
-                _ => Core.Enums.AttributeType.Intelligence,
-            };
-        }
-
-        private string SetId() => $"{NpcName}_{Fraction}";
-        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
     }
 }

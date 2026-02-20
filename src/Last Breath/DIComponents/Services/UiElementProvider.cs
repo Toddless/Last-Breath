@@ -4,11 +4,12 @@
     using System;
     using System.Linq;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
     using System.Collections.Generic;
-    using LastBreath.Script.UI.Layers;
+    using System.Threading.Tasks;
+    using Core.Data;
+    using Script.UI.Layers;
 
-    internal class UIElementProvider : IUIElementProvider
+    internal class UIElementProvider : IUiElementProvider
     {
         private const float MOUSE_OFFSET = 15;
         private const float WINDOW_MARGIN = 20f;
@@ -33,7 +34,7 @@
         public bool IsInstanceTypeExist(Type instanceType, out Control? exist) => _singleInstances.TryGetValue(instanceType, out exist);
 
         public T Create<T>()
-           where T : Control, IInitializable
+            where T : Control, IInitializable
         {
             var instance = T.Initialize().Instantiate<T>();
             return instance;
@@ -59,18 +60,19 @@
                     instance.QueueFree();
                 instance.Close -= Close;
             }
+
             return instance;
         }
 
-        public T CreateAndShowMainElement<T>()
+        public Task<T> CreateAndShowMainElement<T>()
             where T : Control, IInitializable, IRequireServices
         {
             if (_singleInstances.TryGetValue(typeof(T), out var exist))
-                return (T)exist;
+                return Task.FromResult((T)exist);
             var instance = CreateRequireServices<T>();
             _singleInstances.TryAdd(typeof(T), instance);
             _uiLayers?.ShowMainElement(instance);
-            return instance;
+            return Task.FromResult(instance);
         }
 
         public void HideMainElement<T>()
@@ -83,7 +85,7 @@
         }
 
         public void ShowMainElement<T>()
-             where T : Control, IInitializable, IRequireServices
+            where T : Control, IInitializable, IRequireServices
         {
             if (!_singleInstances.TryGetValue(typeof(T), out var exist))
                 ArgumentNullException.ThrowIfNull(exist);
@@ -169,6 +171,7 @@
                     closable.Close -= _uiLayers.CloseAllWindows;
                 instance.Value.QueueFree();
             }
+
             _singleInstances.Clear();
         }
 
@@ -237,6 +240,7 @@
             foreach (var ui in existList ?? [])
                 ui.QueueFree();
         }
+
         public T CreateSingleClosable<T>()
             where T : Control, IInitializable, IClosable
         {

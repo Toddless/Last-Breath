@@ -2,7 +2,6 @@ namespace LootGeneration.Source
 {
     using Godot;
     using System;
-    using Internal;
     using Utilities;
     using Core.Enums;
     using System.Linq;
@@ -47,7 +46,6 @@ namespace LootGeneration.Source
             if (diedEntity is not INpc npc) return [];
 
             float budget = CalculateBudget(npc);
-            _gameEventBus.Publish(new BudgetCalculatedEvent(budget));
 
             // same npc can die multiple times per battle
             if (!_tableCache.TryGetValue(npc.InstanceId, out Dictionary<int, List<TableRecord>>? baseTable))
@@ -120,7 +118,6 @@ namespace LootGeneration.Source
             var rarityAmount = Enum.GetValues<Rarity>().ToDictionary(x => x, _ => 0);
             try
             {
-                _gameEventBus.Publish<ChosenItemIds>(new(chosenItemsIds.ToList()));
                 foreach (string id in chosenItemsIds)
                 {
                     if (string.IsNullOrWhiteSpace(id)) continue;

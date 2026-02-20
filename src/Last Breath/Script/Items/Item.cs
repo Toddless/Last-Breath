@@ -5,6 +5,7 @@
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces.Items;
+    using Utilities;
 
     [Tool]
     [GlobalClass]
@@ -18,13 +19,14 @@
         [Export] public string[] Tags { get; protected set; } = [];
 
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string DisplayName => Localizator.Localize(Id);
+        public bool IsSame(string otherId) => throw new NotImplementedException();
 
-        public string Description => Localizator.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
+
+        public string Description => Localization.LocalizeDescription(Id);
 
         public Item()
         {
-
         }
 
         public Item(string id,
@@ -48,6 +50,7 @@
             {
                 return false;
             }
+
             return Id.Equals(other.Id) && MaxStackSize == other.MaxStackSize;
         }
 
@@ -57,6 +60,7 @@
             {
                 return false;
             }
+
             return Equals((IItem)obj);
         }
 

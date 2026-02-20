@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Script.UI
 {
-    using Godot;
-    using Core.Enums;
     using System.Linq;
+    using Core.Data;
+    using Core.Enums;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
-    using LastBreath.Script.UI.View;
-    using LastBreath.Resource.Quests;
+    using Godot;
+    using Resource.Quests;
+    using View;
 
     public partial class QuestsWindow : Window, IInitializable
     {
@@ -17,7 +17,7 @@
 
         public override void _Ready()
         {
-            
+
         }
 
         public override void InjectServices(IGameServiceProvider provider)

@@ -6,10 +6,11 @@
 
     public class PrimalFuryEffect(
         int duration,
+        int maxMaxStacks,
         float healthPercent,
         StatusEffects statusEffect = StatusEffects.Fury,
         string id = "Effect_Primal_Fury")
-        : FuryEffect(duration, healthPercent, statusEffect, id)
+        : FuryEffect(duration, maxMaxStacks, healthPercent, statusEffect, id)
     {
         public float DamageMultiplier { get; set; }
 
@@ -19,6 +20,6 @@
             base.BeforeAttack(context);
         }
 
-        public override IEffect Clone() => new PrimalFuryEffect(Duration, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };
+        public override IEffect Clone() => new PrimalFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };
     }
 }

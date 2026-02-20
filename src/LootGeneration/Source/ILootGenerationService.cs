@@ -1,6 +1,5 @@
 namespace LootGeneration.Source
 {
-    using Internal;
     using System.Threading.Tasks;
     using Core.Interfaces.Entity;
     using System.Collections.Generic;

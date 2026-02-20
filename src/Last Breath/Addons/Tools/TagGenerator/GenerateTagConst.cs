@@ -5,9 +5,9 @@ namespace LastBreath.Addons.Tools.TagGenerator
 
     public partial class GenerateTagConst /*: EditorScript*/
 	{
-		private string _path = FilePaths.TagResourcePath;
+		//private string _path = FilePaths.TagResourcePath;
 
-		private string _outputPath = FilePaths.TagConstPath;
+		//private string _outputPath = FilePaths.TagConstPath;
 
 		//public override void _Run()
 		//{

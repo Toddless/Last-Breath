@@ -5,10 +5,10 @@
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.UI;
-    using Core.Interfaces.Data;
-    using LastBreath.Script.UI;
-    using LastBreath.Script.Helpers;
+    using Helpers;
     using Core.Constants;
+    using Core.Data;
+    using Core.Interfaces.MessageBus;
 
     public partial class OptionsWindow : UI.Window, IInitializable, IRequireServices
     {
@@ -16,11 +16,11 @@
 
         [Export] private HSlider? _music, _sfx, _master;
         [Export] private OptionButton? _languange, _windowMode, _windowResolution;
-        [Export] private LocalizableButton? _returnButton;
-        [Export] private LocalizableLabel[] _labels = [];
+        [Export] private Button? _returnButton;
+        [Export] private Label[] _labels = [];
 
         private ISettingsHandler? _settings;
-        private IUiMediator? _uiMediator;
+        private IGameMessageBus? _gameMessageBus;
 
         public override void _Ready()
         {
@@ -37,30 +37,17 @@
             _languange.ItemSelected += OnLanguageSelected;
             _windowMode.ItemSelected += OnWindowModeSelected;
             _windowResolution.ItemSelected += OnWindowResolurionSelected;
-            UpdateUI();
         }
 
 
         public override void InjectServices(IGameServiceProvider provider)
         {
             _settings = provider.GetService<ISettingsHandler>();
-            _uiMediator = provider.GetService<IUiMediator>();
-            _uiMediator.UpdateUi += UpdateUI;
+            _gameMessageBus = provider.GetService<IGameMessageBus>();
         }
 
-        public override void _ExitTree()
-        {
-            if (_uiMediator != null) _uiMediator.UpdateUi -= UpdateUI;
-        }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        private void UpdateUI()
-        {
-            _returnButton?.UpdateButtonText();
-            foreach (var label in _labels)
-                label.UpdateLabelText();
-        }
 
 
         private void SetSavedSettingsValues()

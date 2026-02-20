@@ -1,323 +1,478 @@
 ﻿namespace LastBreath
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Constants;
-    using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Skills;
     using Godot;
-    using LastBreath.Components;
-    using LastBreath.Localization;
-    using LastBreath.Resource.Quests;
-    using LastBreath.Script;
-    using LastBreath.Script.Abilities.Interfaces;
-    using LastBreath.Script.Items;
-    using LastBreath.Script.QuestSystem;
+    using System;
+    using Stateless;
     using Utilities;
+    using Core.Data;
+    using Core.Enums;
+    using DIComponents;
+    using Battle.Source;
+    using Core.Constants;
+    using Core.Interfaces;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
+    using System.Threading.Tasks;
+    using Battle.Source.Attribute;
+    using Battle.Source.Components;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
-    public partial class Player : CharacterBody2D, IEntity
+    public partial class Player : CharacterBody2D, IPlayer
     {
-        #region Private fields
-        private const int BaseSpeed = 600;
-        private bool _canMove = true, _canFight = true, _isPlayerRunning = false, _isAlive = true;
-        private float _moveProgress = 0f;
-        private int _exp, _gold;
-        private IStance? _currentStance;
-        private AnimatedSprite2D? _sprite;
-        private Vector2 _targetPosition, _startPosition;
-        private IInventory? _equipInventory, _questItemsInventory;
-        private readonly Dictionary<string, DialogueNode> _dialogs = [];
-        private IDefenceComponent? _playerDefense;
-        private IEffectsManager? _effectsManager;
-        private IHealthComponent? _playerHealth;
-        private IDamageComponent? _playerDamage;
-        private SkillsComponent? _playerSkills;
-        private readonly ModifierManager _modifierManager = new();
-        private readonly AttributeComponent _attribute = new();
-        private readonly PlayerProgress _progress = new();
+        public enum State
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
+
+        private enum Trigger
+        {
+            Idle,
+            Walk,
+            Battle,
+        }
+
+        private enum Direction
+        {
+            Up,
+            Down,
+            Left,
+            Right
+        }
+
+        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+
         private readonly Dictionary<Stance, IStance> _stances = [];
-        #endregion
 
-        #region Properties
-        protected IStance this[Stance stance] => _stances[stance];
+        private readonly RandomNumberGenerator _rnd = new();
+        private Vector2 _lastPosition = Vector2.Zero;
+        private Direction _direction;
+        private float _baseSpeed = 500;
+        [Export] private AnimationsComponent? _animationsComponent;
+        [Export] private Area2D? _interactionArea;
+        [Export] private Godot.Collections.Dictionary<State, AnimatedSprite2D>? _animatedSprites = [];
 
-        [Export] public string Id { get; private set; } = string.Empty;
+        private IGameEventBus? _gameEventBus;
+        private IBattleEventBus? _battleEventBus;
 
-        [Export] public string[] Tags { get; set; } = [];
+        public string Id { get; }
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
 
-        [Export] public Texture2D? Icon { get; set; }
+        public Texture2D? Icon { get; }
+        public string Description { get; }
+        public string DisplayName { get; }
+        public string[] Tags { get; } = [];
+        public IEntityParametersComponent Parameters { get; private set; }
+        public IPassiveSkillsComponent PassiveSkills { get; private set; }
+        public IAnimationsComponent Animations => _animationsComponent;
+        public IEntityAttribute Dexterity { get; private set; }
+        public IEntityAttribute Strength { get; private set; }
+        public IEntityAttribute Intelligence { get; private set; }
+        public ICombatEventBus CombatEvents { get; private set; }
+        public IStance? CurrentStance { get; private set; }
+        public ITargetChooser? TargetChooser { get; set; }
+        public bool IsFighting { get; set; }
+        public bool IsAlive => CurrentHealth > 0;
+        public IEffectsComponent Effects { get; private set; }
+        public IModifiersComponent Modifiers { get; private set; }
+        public IEntityGroup? Group { get; set; }
+        public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
+        public bool CanMove { get; set; } = true;
+        public string Name { get; private set; } = string.Empty;
+        public static Player? Instance { get; private set; }
 
-        public string Description => Localizator.LocalizeDescription(Id);
-
-        public string DisplayName => Localizator.Localize(Id);
-
-        public bool CanMove
+        public float CurrentHealth
         {
-            get => _canMove;
-            set => _canMove = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                if (field <= 0) NotifyShouldDie();
+                NotifyHealthChanges(field);
+            }
         }
 
-        public bool IsFighting
+
+        public float CurrentBarrier
         {
-            get => _canFight;
-            set => _canFight = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                NotifyBarrierChanges(field);
+            }
         }
 
-        public IStance? CurrentStance
+        public float CurrentMana
         {
-            get => _currentStance;
-            set => _currentStance = value;
+            get => Mathf.Max(0, field);
+            set
+            {
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxMana);
+                if (Mathf.Abs(clamped - field) < 0.0001f) return;
+                field = clamped;
+                NotifyManaChanges(field);
+            }
         }
 
-        [Export]
-        public bool FirstSpawn { get; set; } = true;
-        [Export]
-        public int Speed { get; private set; } = BaseSpeed;
-        public PlayerProgress Progress => _progress;
-
-        public IDefenceComponent Defence => _playerDefense ??= new DefenseComponent();
-        public IHealthComponent Health => _playerHealth ??= new HealthComponent();
-        public IDamageComponent Damage => _playerDamage ??= new DamageComponent(new UnarmedDamageStrategy());
-        public IEffectsManager Effects => _effectsManager ??= new EffectsManager(this);
-        public IModifierManager Modifiers => _modifierManager;
-
-        public bool IsAlive
-        {
-            get => _isAlive;
-            set => _isAlive = value;
-        }
-        #endregion
-
-        #region Events and Signals
-        public event Action<string>? ItemCollected, QuestCompleted, LocationVisited, DialogueCompleted;
-        public event Action<EnemyKilledEventArgs>? EnemyKilled;
-        public event Action<List<IAbility>>? SetAvailableAbilities;
+        public event Action<float>? CurrentManaChanged;
+        public event Action<float>? CurrentBarrierChanged;
+        public event Action<float>? CurrentHealthChanged;
         public event Action<IEntity>? Dead;
-        public event Action? AllAttacksFinished;
-        public event Action<IOnGettingAttackEventArgs>? GettingAttack;
-        public event Action? TurnStart;
-        public event Action? TurnEnd;
-        public event Action<IAttackContext>? BeforeAttack;
-        public event Action<IAttackContext>? AfterAttack;
 
-        [Signal]
-        public delegate void PlayerEnterTheBattleEventHandler();
-
-        [Signal]
-        public delegate void PlayerExitedTheBattleEventHandler();
-        #endregion
 
         public override void _Ready()
         {
-            _playerDamage = new DamageComponent(new UnarmedDamageStrategy());
-            _effectsManager = new EffectsManager(this);
-            _playerHealth = new HealthComponent();
-            _playerDefense = new DefenseComponent();
-            _sprite = GetNode<AnimatedSprite2D>(nameof(AnimatedSprite2D));
-            _sprite.Play("Idle_down");
-            _playerSkills = new(this);
-            LoadDialogues();
-            SetEvents();
-            _attribute.IncreaseAttributeByAmount(Parameter.Dexterity, 5);
-            _attribute.IncreaseAttributeByAmount(Parameter.Strength, 5);
-            Health.HealUpToMax();
-            _stances.Add(Stance.Dexterity, new DexterityStance(this));
-            _stances.Add(Stance.Strength, new StrengthStance(this));
+            if (_interactionArea != null) _interactionArea.BodyEntered += OnBodyEnter;
+
+            _rnd.Randomize();
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            Parameters = new EntityParametersComponent();
+            Modifiers = new ModifiersComponent();
+            Parameters.Initialize(Modifiers.GetModifiers);
+            Effects = new EffectsComponent(this);
+            PassiveSkills = new PassiveSkillsComponent(this);
+            Dexterity = new Dexterity(Modifiers);
+            Strength = new Strength(Modifiers);
+            Intelligence = new Intelligence(Modifiers);
+            Effects.EffectAdded += OnEffectAdded;
+            Effects.EffectRemoved += OnEffectRemoved;
+            Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
+            Parameters.ParameterChanged += OnParameterChanged;
+            Parameters.ParameterChanged += Dexterity.OnParameterChanges;
+            Parameters.ParameterChanged += Strength.OnParameterChanges;
+            Parameters.ParameterChanged += Intelligence.OnParameterChanges;
+            CombatEvents = new CombatEventBus();
+            SetBaseValuesForParameters();
+            ConfigureStateMachine();
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+            Instance = this;
+
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
-            GameManager.Instance.Player = this;
+            _stances.Add(Stance.Strength, new StrengthStance(this));
+            _stances.Add(Stance.Dexterity, new DexterityStance(this));
         }
 
-        public override void _PhysicsProcess(double delta)
+        public override void _Process(double delta)
         {
-            if (_isPlayerRunning)
-            {
-                _moveProgress += (float)delta;
-                float t = Mathf.Clamp(_moveProgress / 0.06f, 0f, 6f);
-                Position = _targetPosition.Lerp(_startPosition, t);
-                if (t >= 6f)
-                {
-                    _canMove = true;
-                    _canFight = true;
-                    _isPlayerRunning = false;
-                }
-            }
-
-            if (!_canMove) return;
-
-            Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
-            Velocity = inputDirection * Speed;
+            if (!CanMove) return;
+            Vector2 inputDirection =
+                Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
+            Velocity = inputDirection * _baseSpeed;
+            SwitchState(inputDirection);
             MoveAndSlide();
         }
 
-        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
-
         public void AddItemToInventory(IItem item)
         {
-            if (item is IEquipItem)
-                _equipInventory?.TryAddItem(item);
+        }
 
-            // if (item is CraftingItem)
-            // _craftingInventory?.AddItem(item);
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
 
-            if (item is QuestItem)
+        public void SetupBattleEventBus(IBattleEventBus bus)
+        {
+            _battleEventBus = bus;
+            _stateMachine.Fire(Trigger.Battle);
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnds);
+            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnStanceChanges);
+        }
+
+        private void OnStanceChanges(PlayerChangesStanceEvent obj)
+        {
+            CurrentStance?.OnDeactivate();
+            CurrentStance = _stances.GetValueOrDefault(obj.Stance);
+            CurrentStance?.OnActivate();
+        }
+
+        public void Heal(float amount)
+        {
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
+
+        public void ConsumeResource(Costs type, float amount)
+        {
+            switch (type)
             {
-                _questItemsInventory?.TryAddItem(item);
-                Progress.OnQuestItemCollected(item);
+                case Costs.Barrier:
+                    CurrentBarrier -= amount;
+                    break;
+                case Costs.Health:
+                    CurrentHealth -= amount;
+                    break;
+                case Costs.Mana:
+                    CurrentMana -= amount;
+                    break;
             }
         }
 
-        public void OnRunAway(Vector2 enemyPosition)
+        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+
+
+        public bool TryApplyStatusEffect(StatusEffects statusEffect)
         {
-            _targetPosition = enemyPosition;
-            _startPosition = Position;
-            _moveProgress = 0;
-            _isPlayerRunning = true;
+            if ((StatusEffects & statusEffect) != 0) return false;
+            StatusEffects |= statusEffect;
+            CombatEvents.Publish(new StatusEffectAppliedEvent(statusEffect));
+            return true;
         }
 
-        public void OnEnemyKilled(BaseEnemy enemy) => EnemyKilled?.Invoke(new EnemyKilledEventArgs(enemy.EnemyId, enemy.EnemyType));
-        public void OnLocationVisited(string id) => LocationVisited?.Invoke(id);
-
-        public void SetDexterityStance()
+        public bool TryRemoveStatusEffect(StatusEffects statusEffect)
         {
-            _currentStance = _stances[Stance.Dexterity];
-            _currentStance.OnActivate();
+            if ((StatusEffects & statusEffect) == 0) return false;
+            StatusEffects &= ~statusEffect;
+            CombatEvents.Publish(new StatusEffectRemovedEvent(statusEffect));
+            return true;
         }
 
-        public void SetStrengthStance()
+        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
+
+        public void Kill() => NotifyShouldDie();
+
+        public async Task ReceiveAttack(IAttackContext context)
         {
-            _currentStance = _stances[Stance.Strength];
-            _currentStance.OnActivate();
+            try
+            {
+                Calculations.CalculateHitSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateFinalDamage(context);
+                        CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
+                        await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Fight_Blocked");
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        await Animations.PlayAnimationAsync("Fight_Evaded");
+                        break;
+                }
+
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                context.Attacker.Effects.TriggerAfterAttack(context);
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
         }
 
-        public void SetIntelligenceStance()
+        public async Task Attack(IAttackContext context)
         {
-            _currentStance = _stances[Stance.Intelligence];
-            _currentStance.OnActivate();
-        }
-
-        public void OnDialogueCompleted(string id)
-        {
-            Progress.OnDialogueCompleted(id);
-            DialogueCompleted?.Invoke(id);
-        }
-
-        public void OnQuestCompleted(Quest quest)
-        {
-            Progress?.OnQuestCompleted(quest.Id);
-            AcceptReward(quest.GetReward());
-            QuestCompleted?.Invoke(quest.Id);
+            context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+            Effects.TriggerBeforeAttack(context);
+            await Animations.PlayAnimationAsync("Fight_Attack");
         }
 
         public void OnTurnEnd()
         {
-            Effects.UpdateEffects();
-            UpdateAbilityCoodowns();
+            Effects.TriggerTurnEnd();
+            CombatEvents.Publish(new TurnEndEvent(this));
+            _battleEventBus?.Publish(new TurnEndEvent(this));
+            _gameEventBus?.Publish(new TurnEndEvent(this));
         }
 
         public void OnTurnStart()
         {
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
-        public void OnReceiveAttack(IAttackContext context)
+        public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
-            if (_currentStance == null)
-            {
-                HandleSkills(context.PassiveSkills);
-                // TODO: Own method
-                var reducedByArmorDamage = Calculations.DamageReduceByArmor(context);
-                var damageLeftAfterBarrierabsorption = Defence.BarrierAbsorbDamage(reducedByArmorDamage);
+            CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
+            CurrentHealth -= damage;
+            await Animations.PlayAnimationAsync("Fight_Hurt");
+        }
 
-                if (damageLeftAfterBarrierabsorption > 0)
+        public void InjectServices(IGameServiceProvider provider)
+        {
+            _gameEventBus = provider.GetService<IGameEventBus>();
+        }
+
+        private void ConfigureStateMachine()
+        {
+            _stateMachine.Configure(State.Idle)
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                .PermitReentry(Trigger.Idle)
+                .Permit(Trigger.Walk, State.Walk)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Walk)
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                .PermitReentry(Trigger.Walk)
+                .Permit(Trigger.Idle, State.Idle)
+                .Permit(Trigger.Battle, State.Battle);
+
+            _stateMachine.Configure(State.Battle)
+                .OnEntry(() =>
                 {
-                    Health.TakeDamage(damageLeftAfterBarrierabsorption);
-                }
+                    Animations.PlayAnimation("Idle");
+                    CanMove = false;
+                    _lastPosition = Position;
+                })
+                .OnExit(() =>
+                {
+                    CanMove = true;
+                    Position = _lastPosition;
+                })
+                .Permit(Trigger.Idle, State.Idle);
+        }
+
+        private void SwitchState(Vector2 direction)
+        {
+            if (direction == Vector2.Zero)
+            {
+                _stateMachine.Fire(Trigger.Idle);
                 return;
             }
-            _currentStance.OnReceiveAttack(context);
+
+            Direction newDirection = DefineDirection(direction);
+            _direction = newDirection;
+            _stateMachine.Fire(Trigger.Walk);
         }
 
-        public void AllAttacks() => AllAttacksFinished?.Invoke();
-        public void OnEvadeAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Evaded));
-        public void OnBlockAttack() => GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Blocked));
+        private Direction DefineDirection(Vector2 direction)
+        {
+            if (direction == Vector2.Zero)
+                return _direction;
 
-        public void TakeDamage(float damage, bool isCrit = false)
-        {
-            // some actions like sound, animation etc.
-            Health.TakeDamage(damage);
-            GettingAttack?.Invoke(new OnGettingAttackEventArgs(this, AttackResults.Succeed, damage, isCrit));
+            if (Mathf.Abs(direction.Y) >= Mathf.Abs(direction.X))
+                return direction.Y < 0 ? Direction.Up : Direction.Down;
+            return direction.X < 0 ? Direction.Left : Direction.Right;
         }
-        private void OnPlayerDead()
+
+        private void OnBodyEnter(Node2D body)
         {
+            // if (body is IFightable fightable)
+            //     _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
+        }
+
+        private void OnEffectRemoved(IEffect effect)
+        {
+            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
+        }
+
+        private void OnEffectAdded(IEffect effect)
+        {
+            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
+        }
+
+        private void OnBattleEnds(BattleEndEvent obj)
+        {
+            _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnds);
+            _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
+            Effects.RemoveAllEffects();
+            _stateMachine.Fire(Trigger.Idle);
+            _battleEventBus = null;
+        }
+
+        private void NotifyShouldDie()
+        {
+            _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
+            _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
+
+            Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
-            IsFighting = false;
-            IsAlive = false;
         }
 
-        private void OnParameterChanges(object? sender, IModifiersChangedEventArgs args)
+        private void NotifyHealthChanges(float value)
         {
-
+            CurrentHealthChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerHealthChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerHealthChangesEvent>(new(this, value));
         }
 
-        private void UpdateAbilityStates()
+        private void NotifyBarrierChanges(float value)
         {
-            //foreach (var abilityList in _abilities)
-            //{
-            //    abilityList.Value.ForEach(x => x.UpdateState());
-            //}
+            CurrentBarrierChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerBarrierChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerBarrierChangesEvent>(new(this, value));
         }
 
-        private void UpdateAbilityCoodowns()
+        private void NotifyManaChanges(float value)
         {
-            //foreach (var abilityList in _abilities)
-            //{
-            //    abilityList.Value.ForEach(x => x.UpdateCooldown());
-            //}
+            CurrentManaChanged?.Invoke(value);
+            _gameEventBus?.Publish<PlayerManaChangesEvent>(new(this, value));
+            _battleEventBus?.Publish<PlayerManaChangesEvent>(new(this, value));
         }
 
-        private void AcceptReward(Reward? reward)
+        private void OnParameterChanged(EntityParameter parameter, float value)
         {
-            if (reward == null) return;
-            if (reward.Items.Count > 0)
+            switch (parameter)
             {
-                foreach (var item in reward.Items)
+                case EntityParameter.Health:
+                    _battleEventBus?.Publish<PlayerMaxHealthChanges>(new(this, value));
+                    break;
+                case EntityParameter.Mana:
+                    _battleEventBus?.Publish<PlayerMaxManaChangesEvent>(new(value));
+                    break;
+            }
+        }
+
+        private void SetBaseValuesForParameters()
+        {
+            foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
+            {
+                float value = 0;
+
+                switch (entityParameter)
                 {
-                    AddItemToInventory(item);
+                    case EntityParameter.Health:
+                    case EntityParameter.Barrier:
+                        value = 3600;
+                        break;
+                    case EntityParameter.Mana:
+                        value = 500;
+                        break;
+                    case EntityParameter.Intelligence:
+                    case EntityParameter.Strength:
+                    case EntityParameter.Dexterity:
+                        value = 5f;
+                        break;
+                    case EntityParameter.Evade:
+                    case EntityParameter.Armor:
+                    case EntityParameter.Accuracy:
+                        value = 500;
+                        break;
+                    case EntityParameter.CriticalChance:
+                        value = 0.25f;
+                        break;
+                    case EntityParameter.AdditionalHitChance:
+                        value = 0.6f;
+                        break;
+                    case EntityParameter.CriticalDamage:
+                        value = 1.5f;
+                        break;
+                    case EntityParameter.Damage:
+                    case EntityParameter.SpellDamage:
+                        value = 100;
+                        break;
                 }
-            }
-            _exp += reward.Exp;
-            _gold += reward.Gold;
-        }
 
-        private void HandleSkills(List<ISkill> passiveSkills)
-        {
-
-        }
-
-        private void SetEvents()
-        {
-            Modifiers.ParameterModifiersChanged += Health.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += Defence.OnParameterChanges;
-            Modifiers.ParameterModifiersChanged += OnParameterChanges;
-            Health.EntityDead += OnPlayerDead;
-            _attribute.CallModifierManager = _modifierManager.UpdatePermanentModifier;
-        }
-
-
-        private void LoadDialogues()
-        {
-            var dialogueData = ResourceLoader.Load<DialogueData>("res://Resources/Dialogues/PlayerDialogues/playerDialoguesData.tres");
-            if (dialogueData.Dialogs == null) return;
-            foreach (var item in dialogueData.Dialogs)
-            {
-                _dialogs.Add(item.Key, item.Value);
+                Parameters.SetBaseValueForParameter(entityParameter, value);
             }
         }
 
+        public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }

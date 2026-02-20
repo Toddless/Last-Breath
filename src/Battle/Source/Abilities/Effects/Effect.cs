@@ -17,7 +17,7 @@
     {
         protected EffectApplyingContext? Context { get; private set; }
         public IEntity? Owner { get; protected set; }
-        public string Id { get; } = statusEffect == StatusEffects.None ? id : $"{id}_{statusEffect}";
+        public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public Texture2D? Icon

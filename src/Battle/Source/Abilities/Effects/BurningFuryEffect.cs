@@ -7,10 +7,10 @@
 
     public class BurningFuryEffect(
         int duration,
+        int maxStacks,
         float healthPercent,
-        StatusEffects statusEffect = StatusEffects.Fury,
-        string id = "Effect_Burning_Fury")
-        : FuryEffect(duration, healthPercent, statusEffect, id)
+        StatusEffects statusEffect = StatusEffects.Fury)
+        : FuryEffect(duration, maxStacks, healthPercent, statusEffect, id: "Effect_Burning_Fury")
     {
         public float HealthAsDamageMultiplier { get; set; }
         public int BurningMaxStacks { get; set; }
@@ -43,7 +43,7 @@
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent, HealthAsDamageMultiplier);
 
-        public override IEffect Clone() => new BurningFuryEffect(Duration, HealthPercent, Status, Id)
+        public override IEffect Clone() => new BurningFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status)
         {
             HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };

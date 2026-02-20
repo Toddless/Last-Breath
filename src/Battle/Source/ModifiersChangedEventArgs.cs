@@ -1,0 +1,13 @@
+﻿namespace Battle.Source
+{
+    using System.Collections.Generic;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using Core.Modifiers;
+
+    internal class ModifiersChangedEventArgs (EntityParameter parameter, IReadOnlyList<IModifierInstance> modifiers): IModifiersChangedEventArgs
+    {
+        public IReadOnlyList<IModifierInstance> Modifiers { get; } = modifiers;
+        public EntityParameter EntityParameter { get; } = parameter;
+    }
+}

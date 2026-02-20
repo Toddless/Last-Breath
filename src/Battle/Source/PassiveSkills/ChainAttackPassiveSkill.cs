@@ -1,6 +1,5 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using TestData;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Events.GameEvents;

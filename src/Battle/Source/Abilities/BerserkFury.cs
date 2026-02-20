@@ -1,8 +1,6 @@
 ﻿namespace Battle.Source.Abilities
 {
     using Godot;
-    using Services;
-    using TestData;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
@@ -32,12 +30,14 @@
         {
             if (Owner == null) return;
             var scheduler = new AttackContextScheduler();
+            var rnd = new RndGodot();
+            rnd.Randomize();
             while (true)
             {
                 if (Owner.CurrentHealth <= 1) break;
                 foreach (IEntity target in targets)
                 {
-                    var context = new AttackContext(Owner, target, Owner.GetDamage(), new RndGodot(), scheduler);
+                    var context = new AttackContext(Owner, target, Owner.GetDamage(), rnd, scheduler);
                     scheduler.Schedule(context);
                     await scheduler.RunQueue();
                     if (Owner.CurrentHealth <= 1) break;
@@ -45,7 +45,7 @@
 
                 // with lower hp we have lower chance for next cycle
                 float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.80f);
-                if (StaticRandomNumberGenerator.Rnd.Randf() > chance)
+                if (rnd.RandFloat() > chance)
                     break;
             }
         }

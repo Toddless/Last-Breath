@@ -19,6 +19,8 @@
 
     public abstract class DataParser
     {
+        private static readonly JsonSerializerSettings s_settings = new() { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } };
+
         private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
         {
             ["flat"] = ModifierType.Flat,
@@ -30,8 +32,6 @@
             ["multiplicative"] = ModifierType.Multiplicative,
             ["multi"] = ModifierType.Multiplicative
         };
-
-        private static readonly JsonSerializerSettings s_settings = new() { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } };
 
         public static Task ParseLootTables(string json,
             ref Dictionary<Fractions, List<LootTableTierData>> fractionsTables,
@@ -117,38 +117,7 @@
             return Task.CompletedTask;
         }
 
-        public static async Task<List<IItem>> ParseResources<TCategory>(
-            string json,
-            Func<List<IModifier>, string, TCategory> categoryCreator,
-            Func<string, string[], Rarity, EquipmentCategory, int, IUpgradingResource> upgradeResourceFactory,
-            Func<EntityParameter, ModifierType, float, float, IModifier> materialModifierFactory,
-            Func<List<IModifier>, IMaterialCategory, IMaterial> materialFactory,
-            Func<string, int, string[], IMaterial, Rarity, ICraftingResource> craftingResourceFactory)
-            where TCategory : class, IMaterialCategory
-        {
-            var data = JsonConvert.DeserializeObject<ResourcesData>(json, s_settings);
-            List<IMaterialCategory> materialCategories = [];
-            var categoryDic = new Dictionary<string, IMaterialCategory>();
 
-            foreach (var categoryData in data?.MaterialCategories ?? [])
-            {
-                List<IModifier> modifiers = await LoadMaterialsModifiers(categoryData, materialModifierFactory);
-
-                var category = categoryCreator.Invoke(modifiers, categoryData.Id);
-                materialCategories.Add(category);
-                categoryDic[categoryData.Id] = category;
-            }
-
-            var items = new List<IItem>();
-
-            var upgrades = await LoadUpgradeResources(data?.UpgradeResources ?? [], upgradeResourceFactory);
-            var craftingResources = await LoadCraftingResources(categoryDic, data?.CraftingResources ?? [], materialModifierFactory, materialFactory, craftingResourceFactory);
-
-            items.AddRange(upgrades.Cast<IItem>());
-            items.AddRange(craftingResources.Cast<IItem>());
-
-            return await Task.FromResult(items);
-        }
 
         public static async Task<List<TRecipe>> ParseRecipes<TRecipe>(
             string json,
@@ -214,6 +183,8 @@
             return await Task.FromResult(items);
         }
 
+
+
         private static Task<List<IModifier>> LoadModifiers(List<ItemModifier> modifiers)
         {
             var modifiersList = new List<IModifier>();
@@ -227,6 +198,40 @@
             }
 
             return Task.FromResult(modifiersList);
+        }
+
+          public static async Task<List<IItem>> ParseResources<TCategory>(
+            string json,
+            Func<List<IModifier>, string, TCategory> categoryCreator,
+            Func<string, string[], Rarity, EquipmentCategory, int, IUpgradingResource> upgradeResourceFactory,
+            Func<EntityParameter, ModifierType, float, float, IModifier> materialModifierFactory,
+            Func<List<IModifier>, IMaterialCategory, IMaterial> materialFactory,
+            Func<string, int, string[], IMaterial, Rarity, ICraftingResource> craftingResourceFactory)
+            where TCategory : class, IMaterialCategory
+        {
+            var data = JsonConvert.DeserializeObject<ResourcesData>(json,
+                new JsonSerializerSettings { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } });
+            List<IMaterialCategory> materialCategories = [];
+            var categoryDic = new Dictionary<string, IMaterialCategory>();
+
+            foreach (var categoryData in data?.MaterialCategories ?? [])
+            {
+                List<IModifier> modifiers = await LoadMaterialsModifiers(categoryData, materialModifierFactory);
+
+                var category = categoryCreator.Invoke(modifiers, categoryData.Id);
+                materialCategories.Add(category);
+                categoryDic[categoryData.Id] = category;
+            }
+
+            var items = new List<IItem>();
+
+            var upgrades = await LoadUpgradeResources(data?.UpgradeResources ?? [], upgradeResourceFactory);
+            var craftingResources = await LoadCraftingResources(categoryDic, data?.CraftingResources ?? [], materialModifierFactory, materialFactory, craftingResourceFactory);
+
+            items.AddRange(upgrades.Cast<IItem>());
+            items.AddRange(craftingResources.Cast<IItem>());
+
+            return await Task.FromResult(items);
         }
 
         private static Task<List<IUpgradingResource>> LoadUpgradeResources(
