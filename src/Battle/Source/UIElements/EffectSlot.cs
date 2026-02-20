@@ -6,7 +6,7 @@
 
     public partial class EffectSlot : Control, IInitializable
     {
-        private const string UID = "uid://mrcrwvwn0w25";
+        private const string UID = "uid://5n5bfrh72v8s";
         private IEffect? _effect;
         [Export] private TextureRect? _effectIcon;
         [Export] private Label? _effectStacks;

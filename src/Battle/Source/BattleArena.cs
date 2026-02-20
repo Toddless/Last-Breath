@@ -1,21 +1,21 @@
 ﻿namespace Battle.Source
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Core.Data;
     using Core.Interfaces;
+    using Godot.Collections;
+    using Core.Interfaces.UI;
+    using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
+    using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
-    using Godot;
-    using Godot.Collections;
 
     public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus
     {
-        private const string UID = "uid://dph8vnuwipwoc";
+        private const string UID = "uid://bcj35twqggu1d";
         private readonly RandomNumberGenerator _rnd = new();
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();

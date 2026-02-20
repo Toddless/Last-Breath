@@ -14,7 +14,7 @@
     [GlobalClass]
     public partial class AbilitySlot : Control, IInitializable
     {
-        private const string UID = "uid://dubbkx1imyqop";
+        private const string UID = "uid://bcq7vkx5c2o4";
 
         private enum State
         {

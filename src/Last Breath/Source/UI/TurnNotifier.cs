@@ -1,0 +1,44 @@
+﻿namespace LastBreath.Source.UI
+{
+    using Godot;
+    using Script.Helpers;
+    using Core.Interfaces.Entity;
+
+    public partial class TurnNotifier : Panel
+    {
+        private const int Offset = 25;
+        [Export] private Label? _textLabel;
+
+        [Signal] public delegate void CompletedEventHandler();
+
+        public async void ShowMessage(IEntity character)
+        {
+            if (_textLabel == null)
+            {
+                EmitSignal(SignalName.Completed);
+                QueueFree();
+                return;
+            }
+
+            var screenSize = GetViewportRect().Size;
+            Position = new Vector2((screenSize.X - Size.X) / 2, Offset);
+
+            Modulate = new Color(Modulate, 0);
+            var tween = CreateTween();
+
+            tween.TweenProperty(this, "modulate:a", 1.0f, 0.4f);
+            await ToSignal(tween, "finished");
+
+            await ToSignal(GetTree().CreateTimer(1.5), "timeout");
+
+            tween = CreateTween();
+
+            tween.TweenProperty(this, "modulate:a", 0.0f, 0.4f);
+            await ToSignal(tween, "finished");
+            EmitSignal(SignalName.Completed);
+            QueueFree();
+        }
+
+        public static PackedScene InitializeAsPackedScene() => ResourceLoader.Load<PackedScene>(ScenePath.TurnNotifier);
+    }
+}

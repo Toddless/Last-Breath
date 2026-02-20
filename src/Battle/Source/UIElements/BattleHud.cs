@@ -14,7 +14,7 @@
 
     public partial class BattleHud : Control, IInitializable, IRequireServices
     {
-        private const string UID = "uid://2w3t3maumkh6";
+        private const string UID = "uid://6d0sr4hy4gg2";
         private IBattleEventBus? _battleEventBus;
         private IUiElementProvider? _uiElementProvider;
         private Dictionary<string, CharacterBar> _characterBars = [];
@@ -23,12 +23,10 @@
         [Export] private Button? _returnButton;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
-        [Export] private HBoxContainer? _stanceButtons, _abilityButtons;
+        [Export] private HBoxContainer? _stanceButtons;
         [Export] private GridContainer? _entityBars;
         [Export] private HBoxContainer? _queue;
         [Export] private HBoxContainer? _abilitySlots;
-
-        //TODO: Remove entity bars (health, mana) from this interface???
 
         public override void _Ready()
         {

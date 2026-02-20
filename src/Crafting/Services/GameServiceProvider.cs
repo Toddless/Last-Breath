@@ -64,27 +64,6 @@
                 instance.Randomize();
                 return instance;
             });
-            services.AddSingleton<ICraftingMastery, CraftingMastery>();
-
-            services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
-
-            services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
-            services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
-            services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();
-            services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
-            services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
-            services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
-
-            services.AddSingleton<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
-            services.AddSingleton<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExperienceEventHandler>();
-            services.AddSingleton<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
-            services.AddSingleton<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
-            services.AddSingleton<IEventHandler<ShowInventoryItemEvent>, ShowInventoryItemEventHandler>();
-            services.AddSingleton<IEventHandler<ConsumeResourcesInInventoryEvent>, ConsumeResourcesWithinInventoryEventHandler>();
-            services.AddSingleton<IEventHandler<ClearUiElementsEvent>, ClearUiElementsEventHandler>();
-            services.AddSingleton<IEventHandler<ItemCreatedEvent>, ItemCreatedEventHandler>();
-            services.AddSingleton<IEventHandler<OpenCraftingWindowEvent>, OpenCraftingWindowEventHandler>();
-
             return services.BuildServiceProvider();
         }
     }

@@ -10,8 +10,8 @@
     [Tool]
     public partial class CharacterBar : Control, IInitializable
     {
-        private const string UID = "uid://jq1fymsa6a8n";
-
+        private const string UID = "uid://cv5svhrugien6";
+        private Tween? _tween;
         [Export] private Control? MainContainer { get; set; }
         [Export] private TextureProgressBar? ManaBar { get; set; }
         [Export] private TextureProgressBar? HealthBar { get; set; }
@@ -78,30 +78,26 @@
             HealthBar?.MaxValue = maxHealth;
             HealthBar?.Value = currentHealth;
             if (icon != null) Icon?.Texture = icon;
+            _tween = new Tween();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private IEnumerable<EffectSlot> GetEffectSlots() => CharacterEffects?.GetChildren().Cast<EffectSlot>() ?? [];
 
+        private void AnimateValueChange(TextureProgressBar progressBar, float newValue, bool isMaxValue = false)
+        {
+            string propertyName = isMaxValue ? "max_value" : "value";
+            _tween?.TweenProperty(progressBar, propertyName, isMaxValue ? progressBar.MaxValue : progressBar.Value, newValue);
+        }
+
         private void FlipElements()
         {
-            if (FlipH)
-            {
-                LayoutDirection = LayoutDirectionEnum.Rtl;
-                Icon?.FlipH = true;
-                MainTexture?.FlipH = true;
-                ManaBar?.FillMode = 1;
-                HealthBar?.FillMode = 1;
-            }
-            else
-            {
-                LayoutDirection = LayoutDirectionEnum.Ltr;
-                Icon?.FlipH = false;
-                MainTexture?.FlipH = false;
-                ManaBar?.FillMode = 0;
-                HealthBar?.FillMode = 0;
-            }
+            LayoutDirection = FlipH ? LayoutDirectionEnum.Rtl : LayoutDirectionEnum.Ltr;
+            Icon?.FlipH = FlipH;
+            MainTexture?.FlipH = FlipH;
+            ManaBar?.FillMode = FlipH ? 1 : 0;
+            HealthBar?.FillMode = FlipH ? 1 : 0;
         }
     }
 }
