@@ -32,14 +32,14 @@
 
         public static void CalculateHitSucceeded(IAttackContext context)
         {
-            if (ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.Attacker.Parameters.Accuracy), context.Rnd.RandFloat()))
+            if (ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.Attacker.Parameters.Accuracy), context.Rnd.Randf()))
             {
                 context.Result = AttackResults.Evaded;
                 context.Attacker.CombatEvents.Publish<TargetEvadedAttackEvent>(new(context));
                 if (context.Result is AttackResults.Evaded) return;
             }
 
-            if (ChanceSuccessful(context.Target.Parameters.BlockChance, context.Rnd.RandFloat()))
+            if (ChanceSuccessful(context.Target.Parameters.BlockChance, context.Rnd.Randf()))
             {
                 context.Result = AttackResults.Blocked;
                 context.Attacker.CombatEvents.Publish<TargetBlockedAttackEvent>(new(context));

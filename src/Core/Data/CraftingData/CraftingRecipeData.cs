@@ -1,12 +1,16 @@
 namespace Core.Data.CraftingData
 {
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
-    public record CraftingRecipeData(
-        string Id,
-        string ResultItemId,
-        string[] Tags,
-        string Rarity,
-        bool IsOpened,
-        List<ResourceRequirementData> MainResources);
+    public record CraftingRecipeData
+    {
+        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("resultItemId")] public string ResultItemId { get; init; } = string.Empty;
+        [JsonProperty("tags")] public string[] Tags { get; init; } = [];
+        [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
+        [JsonProperty("isOpened")] public bool IsOpened { get; init; }
+        [JsonProperty("itemType")] public string ItemType { get; init; } = string.Empty;
+        [JsonProperty("mainResources")] public List<ResourceRequirementData> MainResources { get; init; } = [];
+    }
 }

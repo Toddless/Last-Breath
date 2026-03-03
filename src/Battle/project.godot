@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Battle"
+run/main_scene="uid://bq1xb76glxis1"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"

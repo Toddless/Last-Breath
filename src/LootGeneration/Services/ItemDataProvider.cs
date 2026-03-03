@@ -32,16 +32,9 @@ namespace LootGeneration.Services
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
-        public List<IModifier> GetEquipItemModifierPool(string id)
-        {
-            // Each item category has its own basic modifier pool. The first word in the ID represents the item category.
-            string category = id.Split('_').First();
-            if (!_equipItemModifierPools.TryGetValue(category, out List<IModifier>? modifiers))
-                modifiers = [];
-            if (!_equipItemModifierPools.TryGetValue(id, out var pool))
-                pool = [];
-            return modifiers.Concat(pool).ToList();
-        }
+        public List<IModifier> GetEquipItemBaseModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id.Split('_').First(), out var modifiersPool) ? [] : modifiersPool;
+
+        public List<IModifier> GetEquipItemModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool;
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
@@ -160,7 +153,7 @@ namespace LootGeneration.Services
         {
             var recipes = await DataParser.ParseRecipes<ExampleCraftingRecipe>(jsonContent,
                 (type, s, arg3) => new ExampleResourceRequirement(type, s, arg3),
-                (id, resultItem, tags, rarity, requirements, isOpened) => new ExampleCraftingRecipe(id, resultItem, tags, rarity, requirements, isOpened));
+                (id, resultItem, tags, rarity, requirements, itemType, isOpened) => new ExampleCraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
             List<IItem> data = recipes.Cast<IItem>().ToList();
             lock (_itemData)
                 data.ForEach(item => _itemData.TryAdd(item.Id, item));

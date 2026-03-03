@@ -8,6 +8,7 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Events.GameEvents;
@@ -30,22 +31,29 @@
 
         public override void _Ready()
         {
-            for (int i = 0; i < 9; i++)
+            try
             {
-                var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
-                slot.SetNumber(i + 1);
-                _abilitySlots?.AddChild(slot);
-                _abilitySlotsInstances[i] = slot;
+                for (int i = 0; i < 9; i++)
+                {
+                    var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
+                    slot.SetNumber(i + 1);
+                    _abilitySlots?.AddChild(slot);
+                    _abilitySlotsInstances[i] = slot;
+                }
+
+                var buttonGroup = new ButtonGroup { AllowUnpress = false };
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
+                    slot.SetStance((Stance)i);
+                    slot.ButtonGroup = buttonGroup;
+                    _stanceButtons?.AddChild(slot);
+                }
             }
-
-            var buttonGroup = new ButtonGroup { AllowUnpress = false };
-
-            for (int i = 0; i < 3; i++)
+            catch (Exception ex)
             {
-                var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
-                slot.SetStance((Stance)i);
-                slot.ButtonGroup = buttonGroup;
-                _stanceButtons?.AddChild(slot);
+                GD.Print($"Failed to initialize: {ex.Message}, {ex.StackTrace}");
             }
         }
 
@@ -57,14 +65,15 @@
             _playerBars?.ClearEffects();
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.RemoveBattleEventBus();
-            foreach (Node child in _queue?.GetChildren() ?? [])
-                child.QueueFree();
+            // foreach (Node child in _queue?.GetChildren() ?? [])
+            //     child.QueueFree();
             foreach (var node in _entityBars?.GetChildren() ?? [])
                 node.QueueFree();
         }
 
-        public void SetupEventBus(IBattleEventBus battleEventBus)
+        public async Task SetupEventBus(IBattleEventBus battleEventBus)
         {
+            if (!IsNodeReady()) await ToSignal(this, Node.SignalName.Ready);
             _battleEventBus = battleEventBus;
             _battleEventBus.Subscribe<PlayerManaChangesEvent>(OnPlayerManaChanges);
             _battleEventBus.Subscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
@@ -79,7 +88,7 @@
             _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
-            _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+         //   _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
             _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);

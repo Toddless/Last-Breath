@@ -15,6 +15,7 @@
     using Core.Interfaces.Crafting;
     using Core.Data.NpcModifiersData;
     using System.Collections.Generic;
+    using Core.Data.ItemData;
     using Newtonsoft.Json.Serialization;
 
     public abstract class DataParser
@@ -118,11 +119,10 @@
         }
 
 
-
         public static async Task<List<TRecipe>> ParseRecipes<TRecipe>(
             string json,
             Func<RequirementType, string, int, IResourceRequirement> resourceRequirementFactory,
-            Func<string, string, string[], Rarity, List<IResourceRequirement>, bool, TRecipe> recipeFactory)
+            Func<string, string, string[], Rarity, List<IResourceRequirement>, ItemType, bool, TRecipe> recipeFactory)
             where TRecipe : class, ICraftingRecipe, IItem
         {
             var data = JsonConvert.DeserializeObject<RecipeData>(json, s_settings);
@@ -140,6 +140,7 @@
                     requirements.Add(requirement);
                 }
 
+                var itemType = Enum.Parse<ItemType>(recipeData.ItemType);
                 var rarity = Enum.Parse<Rarity>(recipeData.Rarity);
                 var recipe = recipeFactory.Invoke(
                     recipeData.Id,
@@ -147,6 +148,7 @@
                     recipeData.Tags,
                     rarity,
                     requirements,
+                    itemType,
                     recipeData.IsOpened);
 
                 recipes.Add(recipe);
@@ -155,7 +157,22 @@
             return await Task.FromResult(recipes);
         }
 
-        public static async Task<List<IItem>> ParseEquipItems(string json, Func<EquipmentType, string, string[], IEquipItem> itemCreator)
+        public static async Task<List<IItem>> ParseItems(string jsonContent, Func<string, Rarity, int, string[], IItem> itemFactory)
+        {
+            var data = JsonConvert.DeserializeObject<ItemDataList>(jsonContent, s_settings);
+            var items = new List<IItem>();
+
+            foreach (var item in data?.Items ?? [])
+            {
+                ParseEnum<Rarity>(item.Rarity, out var rarity);
+                var newItem = itemFactory(item.Id, rarity, item.MaxStackSize, item.Tags);
+                items.Add(newItem);
+            }
+
+            return await Task.FromResult(items);
+        }
+
+        public static async Task<List<IItem>> ParseEquipItems(string json, Func<EquipmentType, string, string[], IEquipItem> itemFactory)
         {
             var data = JsonConvert.DeserializeObject<EquipItemDataList>(json, s_settings);
 
@@ -169,7 +186,7 @@
                 ParseEnum<EquipmentType>(item.EquipmentPart, out var equipmentType);
                 ParseEnum<AttributeType>(item.AttributeType, out var attributeType);
 
-                var newItem = itemCreator.Invoke(equipmentType, item.Id, item.Tags);
+                var newItem = itemFactory.Invoke(equipmentType, item.Id, item.Tags);
                 newItem.AttributeType = attributeType;
                 newItem.Rarity = rarity;
                 newItem.UpdateLevel = item.UpdateLevel;
@@ -182,7 +199,6 @@
 
             return await Task.FromResult(items);
         }
-
 
 
         private static Task<List<IModifier>> LoadModifiers(List<ItemModifier> modifiers)
@@ -200,7 +216,7 @@
             return Task.FromResult(modifiersList);
         }
 
-          public static async Task<List<IItem>> ParseResources<TCategory>(
+        public static async Task<List<IItem>> ParseResources<TCategory>(
             string json,
             Func<List<IModifier>, string, TCategory> categoryCreator,
             Func<string, string[], Rarity, EquipmentCategory, int, IUpgradingResource> upgradeResourceFactory,

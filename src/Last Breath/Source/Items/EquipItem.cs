@@ -1,24 +1,24 @@
 ﻿namespace LastBreath.Source.Items
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Items;
-    using Core.Modifiers;
     using Godot;
+    using System;
     using Utilities;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Modifiers;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Entity;
+    using System.Collections.Generic;
 
     [Tool]
     [GlobalClass]
     public partial class EquipItem :  Resource, IEquipItem, IAscendable
     {
+        private readonly HashSet<IModifier> _baseModifiers = [];
+        private readonly HashSet<IModifier> _additionalModifiers = [];
+        private readonly List<IModifier> _modifiersPool = [];
+        private readonly Dictionary<string, int> _usedResources = [];
         private float _currentUpdateMultiplier = 1f;
-        private HashSet<IModifier> _baseModifiers = [];
-        private HashSet<IModifier> _additionalModifiers = [];
-        private List<IModifier> _modifiersPool = [];
-        private Dictionary<string, int> _usedResources = [];
         private IEntity? _owner;
 
         [Export] public EquipmentType EquipmentPart { get; set; }

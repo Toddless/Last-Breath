@@ -1,8 +1,9 @@
-﻿namespace Battle.Source.Components
+﻿namespace LastBreath.Source.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Battle.Source;
     using Core.Enums;
     using Core.Interfaces.Components;
     using Core.Modifiers;

@@ -27,7 +27,6 @@
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.CanBeSelected);
         private readonly StateMachine<State, Trigger>.TriggerWithParameters<string> _candidateForAbility = new(Trigger.SetAsCandidateForAbility);
-        private bool _mouseInside;
         private IEntity? _entity;
         private string _selectionId = string.Empty;
         private IBattleEventBus? _eventBus;
@@ -35,9 +34,27 @@
 
         public override void _Ready()
         {
-            _spotArea?.MouseEntered += OnMouseEntered;
-            _spotArea?.MouseExited += OnMouseExited;
+            _spotArea?.InputEvent += OnInputEvent;
             ConfigureStateMachine();
+        }
+
+        private void OnInputEvent(Node viewport, InputEvent @event, long shapeIdx)
+        {
+            if (@event is not InputEventMouseButton { Pressed : true, ButtonIndex: MouseButton.Left }) return;
+            if (_stateMachine.State is State.CannotBeSelected || _entity == null)
+            {
+                GD.Print($"First if return. State: {_stateMachine.State}, entity is null: {_entity}");
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_selectionId))
+            {
+                GD.Print($"Second if return. Selection id is null: {string.IsNullOrWhiteSpace(_selectionId)}");
+                return;
+            }
+
+            _eventBus?.Publish<AttackTargetSelectedEvent>(new(_entity));
+            GetViewport().SetInputAsHandled();
         }
 
         private void ConfigureStateMachine()
@@ -148,19 +165,5 @@
             _entity?.Dead -= OnEntityDead;
             _entity = null;
         }
-
-        public override void _UnhandledInput(InputEvent @event)
-        {
-            if (_stateMachine.State is State.CannotBeSelected || _entity == null || !_mouseInside) return;
-            if (@event is not InputEventMouseButton { Pressed : true, ButtonIndex: MouseButton.Left }) return;
-            if (!string.IsNullOrWhiteSpace(_selectionId)) return;
-
-            _eventBus?.Publish<AttackTargetSelectedEvent>(new(_entity));
-            GetViewport().SetInputAsHandled();
-        }
-
-        private void OnMouseEntered() => _mouseInside = true;
-
-        private void OnMouseExited() => _mouseInside = false;
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace Core.Interfaces.Battle
 {
     using Entity;
-    using Components;
     using Enums;
+    using Godot;
 
     public interface IAttackContext
     {
-        IRandomNumberGenerator Rnd { get; }
+        RandomNumberGenerator Rnd { get; }
         IEntity Attacker { get; }
         IEntity Target { get; }
         IAttackContextScheduler AttackContextScheduler { get; }

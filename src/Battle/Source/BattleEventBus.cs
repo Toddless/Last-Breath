@@ -9,7 +9,7 @@
     {
         private readonly Dictionary<Type, List<Delegate>> _handlers = new();
 
-        public void Publish<T>(T evnt) where T : notnull, IBattleEvent
+        public void Publish<T>(T evnt) where T : IBattleEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
@@ -18,7 +18,7 @@
                 handler(evnt);
         }
 
-        public void Subscribe<T>(Action<T> handler) where T : notnull, IBattleEvent
+        public void Subscribe<T>(Action<T> handler) where T : IBattleEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {
@@ -29,11 +29,11 @@
             handlers.Add(handler);
         }
 
-        public void Unsubscribe<T>(Action<T> handler) where T : notnull, IBattleEvent
+        public void Unsubscribe<T>(Action<T> handler) where T : IBattleEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
             {
-                // TODO: Tracker
+                // TODO: Tracker/Logger
                 return;
             }
 

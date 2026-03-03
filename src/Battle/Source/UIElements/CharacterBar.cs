@@ -78,7 +78,7 @@
             HealthBar?.MaxValue = maxHealth;
             HealthBar?.Value = currentHealth;
             if (icon != null) Icon?.Texture = icon;
-            _tween = new Tween();
+            //_tween = CreateTween();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

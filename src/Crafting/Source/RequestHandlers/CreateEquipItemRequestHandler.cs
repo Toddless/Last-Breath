@@ -1,18 +1,19 @@
 ﻿namespace Crafting.Source.RequestHandlers
 {
     using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
+    using Utilities;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces;
     using Core.Interfaces.Items;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
-    using Utilities;
 
     public class CreateEquipItemRequestHandler(
-        IItemCreator creator,
+        IItemCreationService creationService,
         IGameMessageBus gameMessageBus,
         IItemDataProvider itemDataProvider)
         : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
@@ -21,12 +22,11 @@
         {
             try
             {
-                var modifiers =
-                    request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
-                var item = creator.CreateEquipItem(request.RecipeId, modifiers);
+                var modifiers = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
+                var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, modifiers);
                 item.SaveUsedResources(request.UsedResources.ToDictionary());
                 gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.UsedResources));
-                gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Create, item.Rarity));
+                gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(CraftingMode.Create, item.Rarity));
                 return Task.FromResult<IEquipItem?>(item);
             }
             catch (InvalidOperationException ex)

@@ -37,7 +37,7 @@
         public async Task RunBattleAsync()
         {
             var battleHud = await _uiElementProvider.CreateAndShowMainElement<BattleHud>();
-            battleHud.SetupEventBus(_localBus);
+            await battleHud.SetupEventBus(_localBus);
             battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
             foreach (IEntity entity in _entities)
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);

@@ -33,7 +33,7 @@
         private async Task PerformAttacks(List<IEntity> targets)
         {
             if (Owner == null) return;
-            var rnd = new RndGodot();
+            var rnd = new RandomNumberGenerator();
             rnd.Randomize();
             foreach (IEntity target in targets)
             {
@@ -45,7 +45,7 @@
                     float damage = Owner.GetDamage();
                     damage += Owner.Parameters.SpellDamage;
                     damage *= increase;
-                    float chance = rnd.RandFloat();
+                    float chance = rnd.Randf();
                     bool isCrit = chance <= Owner.Parameters.CriticalChance;
                     if (isCrit)
                         damage *= Owner.Parameters.CriticalDamage;

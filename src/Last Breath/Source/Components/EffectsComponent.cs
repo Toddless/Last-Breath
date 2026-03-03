@@ -1,16 +1,16 @@
-﻿namespace Battle.Source.Components
+﻿namespace LastBreath.Source.Components
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Interfaces.Entity;
-    using Godot;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
 
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {

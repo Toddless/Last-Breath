@@ -1,9 +1,9 @@
-﻿namespace Battle.Source.Components
+﻿namespace LastBreath.Source.Components
 {
+    using Godot;
     using System;
     using System.Threading.Tasks;
     using Core.Interfaces.Components;
-    using Godot;
 
     [GlobalClass]
     public partial class AnimationsComponent : Node, IAnimationsComponent

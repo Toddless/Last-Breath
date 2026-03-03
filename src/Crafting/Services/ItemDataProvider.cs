@@ -30,6 +30,7 @@
         }
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
+        public List<IModifier> GetEquipItemBaseModifierPool(string id) => throw new NotImplementedException();
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
@@ -103,7 +104,8 @@
                         case var _ when dataPath.EndsWith("Recipes"):
                             var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
                                 (type, s, arg3) => new ResourceRequirement(type, s, arg3),
-                                (id, resultItem, tags, rarity, requirements, isOpened) => new CraftingRecipe(id, resultItem, tags, rarity, requirements, isOpened));
+                                (id, resultItem, tags, rarity, requirements, itemType, isOpened) =>
+                                    new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
                             data = recipes.Cast<IItem>().ToList();
                             break;
                         case var _ when dataPath.EndsWith("Resources"):

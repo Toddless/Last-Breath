@@ -55,12 +55,12 @@
 
         public Texture2D? Icon
         {
-            get
-            {
-                if (field != null) return field;
-                field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/{Id}.png");
-                return field;
-            }
+            get;
+            // {
+            //     if (field != null) return field;
+            //     field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/{Id}.png");
+            //     return field;
+            // }
         }
 
         public int CooldownLeft { get; private set; }

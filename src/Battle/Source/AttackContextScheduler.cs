@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
-    using Godot;
+    using System.Collections.Generic;
 
     public class AttackContextScheduler : IAttackContextScheduler
     {
@@ -32,7 +32,7 @@
             }
             catch (Exception ex)
             {
-                GD.Print("Exception: " + ex.Message);
+                GD.Print($"Exception: {ex.Message}\n {ex.StackTrace}");
             }
             finally
             {

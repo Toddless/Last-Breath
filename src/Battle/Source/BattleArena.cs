@@ -157,7 +157,7 @@
         }
 
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
-            currentFighter.GetDamage(), new RndGodot(), _attackContextScheduler);
+            currentFighter.GetDamage(), new RandomNumberGenerator(), _attackContextScheduler);
 
         private void OnEntityDead(EntityDiedEvent obj)
         {

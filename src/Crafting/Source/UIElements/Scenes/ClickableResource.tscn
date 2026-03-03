@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://naq3akxs2d3o"]
 
-[ext_resource type="Script" uid="uid://50863pyf5jha" path="res://Addons/Crafting/Source/UIElements/ClickableResource.cs" id="1_iejr5"]
+[ext_resource type="Script" uid="uid://crssb40y6tjro" path="res://Source/UIElements/ClickableResource.cs" id="1_iejr5"]
 
 [node name="ResourceTemplate" type="Control" node_paths=PackedStringArray("_text", "_quantity", "_icon")]
 custom_minimum_size = Vector2(0, 50)

@@ -9,9 +9,9 @@
 				"Crafting",
 				"Equipment"
 			],
-			"icon": "CreatorsRing.png",
 			"rarity": "Rare",
 			"isOpened": true,
+			"itemType": "Equipment",
 			"mainResources": [
 				{
 					"type": "ResourceAmount",
@@ -40,9 +40,9 @@
 				"Equipment",
 				"Generic"
 			],
-			"icon": "GenericBoots.png",
 			"rarity": "Rare",
 			"isOpened": true,
+			"itemType": "Equipment",
 			"mainResources": [
 				{
 					"type": "ResourceAmount",
@@ -66,9 +66,9 @@
 				"Equipment",
 				"Generic"
 			],
-			"icon": "GenericGloves.png",
 			"rarity": "Rare",
 			"isOpened": true,
+			"itemType": "Equipment",
 			"mainResources": [
 				{
 					"type": "ResourceAmount",
@@ -92,9 +92,9 @@
 				"Equipment",
 				"Generic"
 			],
-			"icon": "GenericHelmet.png",
 			"rarity": "Rare",
 			"isOpened": true,
+			"itemType": "Equipment",
 			"mainResources": [
 				{
 					"type": "ResourceAmount",

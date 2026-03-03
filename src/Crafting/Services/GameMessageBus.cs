@@ -1,6 +1,5 @@
 ﻿namespace Crafting.Services
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
@@ -8,8 +7,6 @@
 
     internal class GameMessageBus : IGameMessageBus
     {
-        public event Action? UpdateUi;
-
         public async Task<TResponce> Send<TRequest, TResponce>(TRequest request)
             where TRequest : IRequest<TResponce>
         {
@@ -24,6 +21,5 @@
             var tasks = handlers.Select(x => x.HandleAsync(evt));
             await Task.WhenAll(tasks);
         }
-        public void RaiseUpdateUi() => UpdateUi?.Invoke();
     }
 }

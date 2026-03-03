@@ -2,7 +2,7 @@
 
 [ext_resource type="Shader" uid="uid://dmpa45qo2kco7" path="res://Source/Assets/ItemOnGround.tres" id="1_xwcmp"]
 [ext_resource type="Texture2D" uid="uid://c1e7tkjhxk88x" path="res://Source/Assets/LootDropEffect.png" id="2_65rwn"]
-[ext_resource type="Script" uid="uid://b4oekikujebkf" path="res://Source/ItemOnGround.cs" id="5_gwjaa"]
+[ext_resource type="Script" uid="uid://csxqoca8kkhub" path="res://Source/ItemOnGround.cs" id="5_gwjaa"]
 [ext_resource type="Texture2D" uid="uid://ctiqrv1nre10y" path="res://Source/Assets/DropIcon.png" id="5_h4cdb"]
 [ext_resource type="Texture2D" uid="uid://bqdyhp2n0j715" path="res://Source/Assets/Illustration.png" id="5_txkrn"]
 

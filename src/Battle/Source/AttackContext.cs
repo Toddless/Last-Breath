@@ -4,11 +4,12 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
+    using Godot;
 
-    public class AttackContext(IEntity attacker, IEntity target, float baseDamage, IRandomNumberGenerator rnd, IAttackContextScheduler attackContextScheduler)
+    public class AttackContext(IEntity attacker, IEntity target, float baseDamage, RandomNumberGenerator rnd, IAttackContextScheduler attackContextScheduler)
         : IAttackContext
     {
-        public IRandomNumberGenerator Rnd { get; } = rnd;
+        public RandomNumberGenerator Rnd { get; } = rnd;
         public IEntity Attacker { get; } = attacker;
         public IEntity Target { get; } = target;
         public float BaseDamage { get; } = baseDamage;

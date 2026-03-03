@@ -1,20 +1,17 @@
-﻿namespace Battle.TestData
+﻿namespace Battle.Internal
 {
-    using Godot;
     using System;
-    using Source;
-    using Core.Enums;
-    using Source;
-    using Core.Modifiers;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Skills;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
-    using Core.Interfaces.Abilities;
+    using System.Threading.Tasks;
+    using Source;
     using Source.PassiveSkills;
-    using Bat = Internal.NPC.Bat;
-    using Necromancer = Internal.NPC.Necromancer;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Skills;
+    using Core.Interfaces.UI;
+    using Core.Modifiers;
+    using Godot;
 
     [GlobalClass]
     public partial class DevPanel : Control, IInitializable
@@ -129,8 +126,6 @@
             AddTypes<EntityParameter>(_parameters);
             AddTypes<Fractions>(_npcFraction);
 
-            AddNpcCategory();
-
             foreach (var skill in PassiveFactory.Skills)
             {
                 string key = skill.Id;
@@ -214,12 +209,6 @@
         private void OnPlayerSkillAdded(ISkill obj)
         {
             _obtainedPassives?.AddItem(obj.Id);
-        }
-
-        private void AddNpcCategory()
-        {
-            _npcCategory?.AddItem($"{nameof(Necromancer)}");
-            _npcCategory?.AddItem($"{nameof(Bat)}");
         }
 
         private async void OnAddNpcPressed()

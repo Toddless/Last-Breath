@@ -3,9 +3,11 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
     using Core.Results;
+    using Core.Modifiers;
     using Core.Constants;
     using Core.Interfaces.UI;
     using Core.Interfaces.Items;
@@ -13,10 +15,8 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Data;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
-    using Core.Modifiers;
 
     public partial class CraftingWindow : DraggableWindow, IInitializable, IClosable, IRequireServices
     {
@@ -32,7 +32,7 @@
 
         private Recipes? _recipes;
         private IItemDataProvider? _dataProvider;
-        private IGameMessageBus? _mediator;
+        private IGameMessageBus? _messageBus;
         private IUiElementProvider? _uiElementProvider;
         private IUIResourcesProvider? _uiResourcesProvider;
 
@@ -83,7 +83,7 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IGameMessageBus>();
+            _messageBus = provider.GetService<IGameMessageBus>();
             _uiElementProvider = provider.GetService<IUiElementProvider>();
             _uiResourcesProvider = provider.GetService<IUIResourcesProvider>();
             //  _mediator.UpdateUi += UpdateRequiredResourcesAsync;
@@ -178,7 +178,7 @@
             }
             catch (Exception ex)
             {
-                Tracker.TrackException($"Perform action went wrong. Crafint mode: {_craftingMode}", ex, this);
+                Tracker.TrackException($"Perform action went wrong. Crafting mode: {_craftingMode}", ex, this);
             }
         }
 
@@ -188,15 +188,15 @@
 
         private async void CreateItemAsync(string id)
         {
-            ArgumentNullException.ThrowIfNull(_mediator);
-            var item = await _mediator.Send<CreateEquipItemRequest, IEquipItem?>(new(id, _usedResources));
-            if (item != null) _mediator?.PublishAsync(new ItemCreatedEvent(item));
+            ArgumentNullException.ThrowIfNull(_messageBus);
+            var item = await _messageBus.Send<CreateEquipItemRequest, IEquipItem?>(new(id, _usedResources));
+            if (item != null) _messageBus?.PublishAsync(new ItemCreatedEvent(item));
         }
 
         private async void UpgradeEquipItemAsync()
         {
-            ArgumentNullException.ThrowIfNull(_mediator);
-            var result = await _mediator.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_equpItem?.InstanceId ?? string.Empty, _usedResources));
+            ArgumentNullException.ThrowIfNull(_messageBus);
+            var result = await _messageBus.Send<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_equpItem?.InstanceId ?? string.Empty, _usedResources));
             switch (result)
             {
                 case ItemUpgradeResult.Success:
@@ -236,12 +236,12 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
                 if (!isToggled) return;
                 if (_craftingMode != CraftingMode.Upgrade)
                     _craftingMode = CraftingMode.Upgrade;
                 var upgradeCost =
-                    await _mediator.Send<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>(
+                    await _messageBus.Send<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>(
                         new(_equpItem?.InstanceId ?? string.Empty, mode));
                 SetMainResourceRequirementsAsync(upgradeCost);
             }
@@ -257,11 +257,11 @@
             {
                 if (isToggled)
                 {
-                    ArgumentNullException.ThrowIfNull(_mediator);
+                    ArgumentNullException.ThrowIfNull(_messageBus);
                     if (_craftingMode != CraftingMode.Recraft)
                         _craftingMode = CraftingMode.Recraft;
                     var recraftCost =
-                        await _mediator
+                        await _messageBus
                             .Send<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>(
                                 new(_equpItem?.InstanceId ?? string.Empty));
                     SetMainResourceRequirementsAsync(recraftCost);
@@ -281,7 +281,7 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
                 if (isToggled)
                 {
                     if (_craftingMode != CraftingMode.Ascend)
@@ -299,12 +299,12 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
                 _usedResources.Clear();
                 FreeChildren(_requirements?.GetChildren() ?? []);
                 // maybe i only need to update quantity when we changing upgrade mode
                 var result =
-                    await _mediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
+                    await _messageBus.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
                         new(requirements.Select(x => x.ResourceId)));
 
                 foreach (var req in requirements)
@@ -365,10 +365,10 @@
             try
             {
                 if (_craftingMode != CraftingMode.Recraft) return;
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
 
                 var result =
-                    await _mediator.Send<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(
+                    await _messageBus.Send<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(
                         new(_equpItem?.InstanceId ?? string.Empty, hash, _usedResources));
                 if (result.IsSuccess)
                     source.UpdateSelectedItem((Localization.Format(result.Param), result.Param!.GetHashCode()));
@@ -422,9 +422,9 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
                 var takenResources =
-                    await _mediator.Send<OpenCraftingItemsWindowRequest, IEnumerable<string>>(new(_usedResources.Keys));
+                    await _messageBus.Send<OpenCraftingItemsWindowRequest, IEnumerable<string>>(new(_usedResources.Keys));
                 AddOptionalResourcesAsync(takenResources);
             }
             catch (Exception ex)
@@ -435,9 +435,9 @@
 
         private async void AddOptionalResourcesAsync(IEnumerable<string> takenResources)
         {
-            ArgumentNullException.ThrowIfNull(_mediator);
+            ArgumentNullException.ThrowIfNull(_messageBus);
             var result =
-                await _mediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(takenResources));
+                await _messageBus.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(takenResources));
 
             foreach (var res in takenResources)
             {
@@ -461,10 +461,10 @@
             try
             {
                 ArgumentNullException.ThrowIfNull(_requirements);
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
                 var clickableResources = _requirements.GetChildren().Cast<ClickableResource>() ?? [];
                 var result =
-                    await _mediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
+                    await _messageBus.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
                         new(clickableResources.Select(x => x.GetResourceId())));
                 foreach (var resource in clickableResources)
                 {
@@ -485,9 +485,9 @@
             try
             {
                 ArgumentNullException.ThrowIfNull(_dataProvider);
-                var id = _recipeId ?? string.Empty;
-                var resultItemId = _dataProvider.GetRecipeResultItemId(id);
-                var itemId = _dataProvider.IsItemHasTag(id, "Generic") ? $"{resultItemId}_Generic" : resultItemId;
+                string id = _recipeId ?? string.Empty;
+                string resultItemId = _dataProvider.GetRecipeResultItemId(id);
+                string itemId = _dataProvider.IsItemHasTag(id, "Generic") ? $"{resultItemId}_Generic" : resultItemId;
                 var itemBaseStats = _equpItem?.BaseModifiers.ToHashSet() ?? [];
                 CreateHoverArea(itemBaseStats, _baseStats);
             }
@@ -528,10 +528,10 @@
 
         private void SetDisplayableData(string id)
         {
-            _itemName.Text = Localization.Localize(id);
-            _description.Text = Localization.LocalizeDescription(id);
-            _itemIcon.Texture = GetChachedIcon(id);
-            _itemUpgradeLevel.Text = GetUpdateLevel();
+            _itemName?.Text = Localization.Localize(id);
+            _description?.Text = Localization.LocalizeDescription(id);
+            _itemIcon?.Texture = GetChachedIcon(id);
+            _itemUpgradeLevel?.Text = GetUpdateLevel();
         }
 
         private string GetUpdateLevel()
@@ -583,9 +583,9 @@
 
         private async Task<bool> AllRequirementsMetAsync()
         {
-            ArgumentNullException.ThrowIfNull(_mediator);
+            ArgumentNullException.ThrowIfNull(_messageBus);
             var result =
-                await _mediator
+                await _messageBus
                     .Send<GetTotalItemAmountRequest, Dictionary<string, int>>(new(_usedResources.Keys));
             return _usedResources.Count > 0 && !_usedResources.Any(res => result[res.Key] < res.Value);
         }

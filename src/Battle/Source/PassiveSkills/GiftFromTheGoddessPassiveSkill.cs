@@ -32,9 +32,9 @@
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
             var rnd = evnt.Context.Rnd;
-            if (rnd.RandFloat() > Chance) return;
+            if (rnd.Randf() > Chance) return;
 
-            int number = rnd.RandIntRange(0, _effects.Count - 1);
+            int number = rnd.RandiRange(0, _effects.Count - 1);
             var effect = _effects[number].Clone();
             effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = evnt.Context.FinalDamage, Source = Id, Target = Owner! });
         }

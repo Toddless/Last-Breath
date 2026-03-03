@@ -3,12 +3,10 @@
 		{
 			"id": "Belt",
 			"equipmentPart": "Belt",
-			"maxStackSize": 1,
-			"icon": "Belt.png",
 			"rarity": "Uncommon",
 			"tags": [],
 			"attributeType": "None",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"baseModifiers": [
@@ -28,12 +26,10 @@
 		{
 			"id": "Test_Belt",
 			"equipmentPart": "Belt",
-			"maxStackSize": 1,
-			"icon": "TestBelt.png",
 			"rarity": "Uncommon",
 			"tags": [],
 			"attributeType": "None",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"baseModifiers": [

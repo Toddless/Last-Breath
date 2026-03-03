@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dqrub1rhhnkqp"]
 
-[ext_resource type="Script" uid="uid://b2g4prnwjhgay" path="res://Addons/Crafting/Source/UIElements/PopupWindow.cs" id="1_kkd6u"]
+[ext_resource type="Script" uid="uid://do3u0yl4oxek" path="res://Source/UIElements/PopupWindow.cs" id="1_kkd6u"]
 
 [node name="PopupWindow" type="PanelContainer" node_paths=PackedStringArray("_childContainer")]
 custom_minimum_size = Vector2(100, 50)

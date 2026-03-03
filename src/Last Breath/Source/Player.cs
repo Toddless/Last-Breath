@@ -1,26 +1,26 @@
 ﻿namespace LastBreath.Source
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Battle.Source;
-    using Battle.Source.Attribute;
-    using Battle.Source.Components;
-    using Core.Constants;
-    using Core.Data;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
     using Godot;
+    using System;
     using Services;
     using Stateless;
     using Utilities;
+    using Core.Data;
+    using Attribute;
+    using Components;
+    using Core.Enums;
+    using Battle.Source;
+    using Core.Interfaces;
+    using Core.Constants;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
     public partial class Player : CharacterBody2D, IPlayer
     {
@@ -220,7 +220,6 @@
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
-
         public bool TryApplyStatusEffect(StatusEffects statusEffect)
         {
             if ((StatusEffects & statusEffect) != 0) return false;
@@ -255,11 +254,11 @@
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        await Animations.PlayAnimationAsync("Fight_Blocked");
+                        // await Animations.PlayAnimationAsync("Fight_Blocked");
                         break;
                     case AttackResults.Evaded:
                         CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        await Animations.PlayAnimationAsync("Fight_Evaded");
+                        //     await Animations.PlayAnimationAsync("Fight_Evaded");
                         break;
                 }
 
@@ -272,12 +271,13 @@
             }
         }
 
-        public async Task Attack(IAttackContext context)
+        public Task Attack(IAttackContext context)
         {
-            context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
+            context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
             Effects.TriggerBeforeAttack(context);
-            await Animations.PlayAnimationAsync("Fight_Attack");
+            //  await Animations.PlayAnimationAsync("Fight_Attack");
+            return Task.CompletedTask;
         }
 
         public void OnTurnEnd()
@@ -296,12 +296,14 @@
             _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
-        public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             CurrentHealth -= damage;
-            await Animations.PlayAnimationAsync("Fight_Hurt");
+            //  await Animations.PlayAnimationAsync("Fight_Hurt");
+
+            return Task.CompletedTask;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -312,13 +314,13 @@
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                // .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
                 .Permit(Trigger.Battle, State.Battle);
 
             _stateMachine.Configure(State.Walk)
-                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                // .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Walk)
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Battle, State.Battle);
@@ -326,7 +328,7 @@
             _stateMachine.Configure(State.Battle)
                 .OnEntry(() =>
                 {
-                    Animations.PlayAnimation("Idle");
+                    //Animations.PlayAnimation("Idle");
                     CanMove = false;
                     _lastPosition = Position;
                 })
@@ -363,8 +365,6 @@
 
         private void OnBodyEnter(Node2D body)
         {
-            // if (body is IFightable fightable)
-            //     _mediator?.PublishAsync(new InitializeFightEvent<IFightable>([fightable, this]));
         }
 
         private void OnEffectRemoved(IEffect effect)
@@ -391,7 +391,7 @@
             _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
             _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
 
-            Animations.PlayAnimation("Dead");
+           // Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
         }
 
@@ -439,7 +439,7 @@
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 3600;
+                        value = 1000;
                         break;
                     case EntityParameter.Mana:
                         value = 500;
@@ -465,7 +465,7 @@
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
-                        value = 100;
+                        value = 300;
                         break;
                 }
 

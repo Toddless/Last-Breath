@@ -1,26 +1,27 @@
 ﻿namespace Crafting.Source
 {
-    using System.Collections.Generic;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Modifiers;
     using Core.Results;
     using EventHandlers;
-    using Microsoft.Extensions.DependencyInjection;
+    using Core.Modifiers;
     using RequestHandlers;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
+    using Core.Interfaces;
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.MessageBus.Requests;
+    using Microsoft.Extensions.DependencyInjection;
 
     public static class CraftingSystemModuleDependencies
     {
         public static IServiceCollection AddCraftingSystemModuleDependencies(this IServiceCollection services)
         {
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
-            services.AddSingleton<IItemCreator, ItemCreator>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
+
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
             services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
             services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();

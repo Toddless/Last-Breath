@@ -3,12 +3,10 @@
 		{
 			"id": "Creators_Cloak",
 			"equipmentPart": "Cloak",
-			"maxStackSize": 1,
-			"icon": "Cloak.png",
 			"rarity": "Uncommon",
 			"tags": [],
 			"attributeType": "None",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"baseModifiers": [

@@ -12,6 +12,7 @@
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using Core.Data;
+    using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
     using Core.Modifiers;
@@ -47,11 +48,10 @@
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<IItemUpgrader, ItemUpgrader>();
-            services.AddSingleton<IItemCreator, ItemCreator>();
             services.AddSingleton<IUiElementProvider, UIElementProvider>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
+            services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
             {
                 var instance = new ItemDataProvider("res://TestResources/RecipeAndResources/");
@@ -64,6 +64,7 @@
                 instance.Randomize();
                 return instance;
             });
+            services.AddCraftingSystemModuleDependencies();
             return services.BuildServiceProvider();
         }
     }

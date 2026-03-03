@@ -1,10 +1,11 @@
-﻿namespace Battle.Source.Attribute
+﻿namespace LastBreath.Source.Attribute
 {
-    using Godot;
-    using Core.Enums;
-    using Core.Modifiers;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Battle.Source.Attribute;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using Core.Modifiers;
+    using Godot;
 
     public class Dexterity(IModifiersComponent manager)
         : EntityAttribute(GetModifiers(), manager, new Modifier(ModifierType.Flat, EntityParameter.Dexterity, 0f))

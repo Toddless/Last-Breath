@@ -1,12 +1,12 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using Godot;
     using Core.Enums;
     using Core.Interfaces.UI;
-    using Godot;
 
     public partial class FlyNumbers : Node2D, IInitializable
     {
-        private const string UID = "uid://crckxdaqepep8";
+        private const string UID = "uid://b3me1ofsbyw38";
         [Export] private Label? _label;
         [Export] private float _rise = 25f;
         [Export] private float _duration = 0.5f;

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dot5loe7a27rt"]
 
-[ext_resource type="Script" uid="uid://soblgdvrnpmn" path="res://Addons/Crafting/Source/UIElements/CraftingItems.cs" id="1_b4ojs"]
+[ext_resource type="Script" uid="uid://dxf7ly53ey3h4" path="res://Source/UIElements/CraftingItems.cs" id="1_b4ojs"]
 
 [node name="CraftingItems" type="ColorRect" node_paths=PackedStringArray("_items", "_add", "_cancel")]
 anchors_preset = 15

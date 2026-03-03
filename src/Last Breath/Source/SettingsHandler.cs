@@ -1,13 +1,12 @@
-﻿namespace LastBreath.Script
+﻿namespace LastBreath.Source
 {
     using Godot;
     using System;
     using Utilities;
     using Core.Enums;
-    using Core.Interfaces;
-    using LastBreath.Script.Helpers;
+    using Script.Helpers;
     using Core.Constants;
-    using Core.Interfaces.MessageBus;
+    using Core.Interfaces;
 
     public class SettingsHandler : ISettingsHandler
     {
@@ -16,10 +15,9 @@
         private readonly string[] _languages = ["en", "ru"];
         private readonly Vector2I[] _resolution = [new(1366, 768), new(1920, 1080), new(2560, 1440)];
         private readonly string[] _windowMods = ["Full-Screen", "Window", "Borderless Window"];
-        private readonly string[] _resolutins = ["1366 x 768", "1920 x 1080", "2560 x 1440"];
-        private readonly IGameMessageBus _uiMediator;
+        private readonly string[] _resolutions = ["1366 x 768", "1920 x 1080", "2560 x 1440"];
 
-        public SettingsHandler(IGameMessageBus uiMediator)
+        public SettingsHandler()
         {
             if (!FileAccess.FileExists(ConfigFilePath))
             {
@@ -41,8 +39,6 @@
             }
             else
                 _config.Load(ConfigFilePath);
-
-            _uiMediator = uiMediator;
         }
 
         public void ApplySavedSettings()
@@ -53,9 +49,10 @@
         }
 
         public string[] GetWindowMods() => _windowMods;
-        public string[] GetWindowResolutions() => _resolutins;
+        public string[] GetWindowResolutions() => _resolutions;
         public string[] GetLanguages() => _languages;
-        public Variant GetSettingValue(string section, string setting)=> _config.GetValue(section, setting);
+        public Variant GetSettingValue(string section, string setting) => _config.GetValue(section, setting);
+
         public void SetResolution(long index)
         {
             // changing resolution in Full screen mode does nothing, for now.
@@ -117,19 +114,18 @@
         {
             foreach (var bus in Enum.GetValues<SoundBus>())
             {
-                var value = (float)_config.GetValue(SettingsSection.Sound, bus.ToString());
+                float value = (float)_config.GetValue(SettingsSection.Sound, bus.ToString());
                 AudioServer.SetBusVolumeDb((int)bus, Mathf.LinearToDb(value));
             }
         }
 
         private void LoadVideoSettings()
         {
-            var mode = (long)_config.GetValue(SettingsSection.Video, Settings.WindowMode);
-            var resolution = (int)_config.GetValue(SettingsSection.Video, Settings.Resolution);
-            var borderless = (bool)_config.GetValue(SettingsSection.Video, Settings.Borderless);
+            long mode = (long)_config.GetValue(SettingsSection.Video, Settings.WindowMode);
+            int resolution = (int)_config.GetValue(SettingsSection.Video, Settings.Resolution);
+            bool borderless = (bool)_config.GetValue(SettingsSection.Video, Settings.Borderless);
             DisplayServer.WindowSetSize(_resolution[resolution]);
             SetWindowMode(mode, borderless);
-
         }
 
         private void LoadUISettings() => SetLanguage((long)_config.GetValue(SettingsSection.UI, Settings.Language));

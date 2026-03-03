@@ -8,12 +8,12 @@
     using Battle.Source;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
+    using LootGeneration.Source;
 
     public partial class Main : Node2D
     {
-        private const string UID = "uid://drgs10sgp405d";
+        private const string UID = "uid://c2gxl7q5wfdxt";
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
-        private IUiElementProvider? _uiElementProvider;
         private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
         [Export] private Node? _uiLayerManager;
@@ -24,11 +24,10 @@
             {
                 ArgumentNullException.ThrowIfNull(_uiLayerManager);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
-                _uiElementProvider = _provider.GetService<IUiElementProvider>();
-                if (_uiLayerManager != null) _uiElementProvider.Subscribe(_uiLayerManager);
+                _provider.GetService<IUiElementProvider>().Subscribe(_uiLayerManager);
+                _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_mainWorld);
                 _gameEventBus = _provider.GetService<IGameEventBus>();
                 _gameEventBus.Subscribe<BattleStartEvent>(OnBattleInitialized);
-
             }
             catch (Exception ex)
             {
@@ -40,12 +39,12 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_uiElementProvider);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
                 var context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
                 await ToSignal(GetTree(), "process_frame");
                 await context.RunBattleAsync();
                 context.Dispose();
+                _gameEventBus?.Publish(new BattleEndEvent());
             }
             catch (Exception es)
             {

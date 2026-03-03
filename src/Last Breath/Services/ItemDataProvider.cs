@@ -1,18 +1,18 @@
 ﻿namespace LastBreath.Services
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Utilities;
     using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
+    using System.Linq;
+    using Source.Items;
     using Core.Modifiers;
     using Crafting.Source;
-    using Godot;
-    using Utilities;
-    using EquipItem = Source.Items.EquipItem;
+    using Core.Interfaces.Items;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Crafting;
+    using System.Collections.Generic;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider
@@ -26,16 +26,12 @@
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
-        public List<IModifier> GetEquipItemModifierPool(string id)
-        {
-            // Each item category has its own basic modifier pool. The first word in the ID represents the item category.
-            string category = id.Split('_').First();
-            if (!_equipItemModifierPools.TryGetValue(category, out List<IModifier>? modifiers))
-                modifiers = [];
-            if (!_equipItemModifierPools.TryGetValue(id, out var pool))
-                pool = [];
-            return modifiers.Concat(pool).ToList();
-        }
+
+        public List<IModifier> GetEquipItemBaseModifierPool(string id) =>
+            !_equipItemModifierPools.TryGetValue(id.Split('_').First(), out List<IModifier>? modifiers) ? [] : modifiers.ToList();
+
+        public List<IModifier> GetEquipItemModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool.ToList();
+
 
         public List<IResourceRequirement> GetRecipeRequirements(string id)
         {
@@ -45,6 +41,7 @@
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) =>
             _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
+
 
         public string GetRecipeResultItemId(string recipeId)
         {
@@ -90,9 +87,11 @@
             var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
             var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
             var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => await ParseEquipItemResources(s));
+            var items = LoadDataFromJson(Path.Combine(dataPath, "Items"), async s => await ParseItems(s));
 
-            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, modifiers);
+            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, modifiers, items);
         }
+
 
         private static async Task LoadDataFromJson(string path, Func<string, Task> loadDataFunc)
         {
@@ -119,6 +118,13 @@
             {
                 dir.ListDirEnd();
             }
+        }
+
+        private async Task ParseItems(string jsonContent)
+        {
+            var data = await DataParser.ParseItems(jsonContent, (id, rarity, maxStack, tags) => new Item(id, rarity, maxStack, tags));
+            lock (_itemData)
+                data.ForEach(item => _itemData.TryAdd(item.Id, item));
         }
 
         private async Task ParseEquipItems(string jsonContent)
@@ -154,7 +160,7 @@
         {
             var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
                 (type, s, arg3) => new ResourceRequirement(type, s, arg3),
-                (id, resultItem, tags, rarity, requirements, isOpened) => new CraftingRecipe(id, resultItem, tags, rarity, requirements, isOpened));
+                (id, resultItem, tags, rarity, requirements, itemType, isOpened) => new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
             List<IItem> data = recipes.Cast<IItem>().ToList();
             lock (_itemData)
                 data.ForEach(item => _itemData.TryAdd(item.Id, item));

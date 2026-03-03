@@ -1,12 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bd5wylwyowomd"]
+[gd_scene load_steps=3 format=3 uid="uid://bd5wylwyowomd"]
 
-[ext_resource type="Texture2D" uid="uid://d3s62mu2qu0f1" path="res://Assets/MainMenuBackground.png" id="1_kk64l"]
-[ext_resource type="Script" uid="uid://bd8dkamekmlop" path="res://Script/UI/View/MainMenu.cs" id="1_ogonq"]
-[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="3_4e8ab"]
-[ext_resource type="AudioStream" uid="uid://c41u82tba0tul" path="res://Assets/Sounds/mainTheme.mp3" id="5_gnfau"]
+[ext_resource type="Script" uid="uid://cue26ig8hk3wm" path="res://Source/UI/View/MainMenu.cs" id="1_ogonq"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gssjr"]
-texture = ExtResource("1_kk64l")
 
 [node name="MainMenu" type="Control" node_paths=PackedStringArray("_newGameButton", "_optionsButton", "_quitButton", "_loadGameButton")]
 layout_mode = 3
@@ -71,8 +67,6 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "New Game"
-script = ExtResource("3_4e8ab")
-_id = "NewGameBtn"
 
 [node name="LoadGameBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(120, 30)
@@ -80,8 +74,6 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Load Game"
-script = ExtResource("3_4e8ab")
-_id = "LoadGameBtn"
 
 [node name="OptionsBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
@@ -89,8 +81,6 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Options"
-script = ExtResource("3_4e8ab")
-_id = "OptionsBtn"
 
 [node name="QuitBtn" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 30)
@@ -98,11 +88,6 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 36
 text = "Quit"
-script = ExtResource("3_4e8ab")
-_id = "QuitBtn"
 
 [node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_gnfau")
 autoplay = true
-bus = &"Music"
-parameters/looping = true

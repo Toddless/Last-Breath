@@ -17,6 +17,6 @@ namespace LootGeneration.Source
 
         public int TryUpgradeTier(int currentTier, float chance) => chance <= TierUpgradeChance ? Math.Max(0, currentTier - TierUpgradeBy) : currentTier;
 
-        public Rarity TryUpgradeRarity(Rarity currentRarity) => currentRarity < AtLeast ? currentRarity : AtLeast;
+        public Rarity TryUpgradeRarity(Rarity currentRarity) => currentRarity <= AtLeast ? currentRarity : AtLeast;
     }
 }

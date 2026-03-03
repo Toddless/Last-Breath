@@ -1,29 +1,31 @@
 namespace LastBreath.Source.Npc
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Battle.Source;
-    using Battle.Source.Attribute;
-    using Battle.Source.Components;
-    using Battle.Source.PassiveSkills;
-    using Core.Data;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
     using Godot;
+    using System;
     using Stateless;
     using Utilities;
+    using Attribute;
+    using Core.Data;
+    using Components;
+    using Core.Enums;
+    using Battle.Source;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Battle.Source.PassiveSkills;
+    using Core.Interfaces.Events.GameEvents;
+    using LootGeneration.Source.NpcModifiers;
+    using Services;
 
     public partial class BaseNpc : CharacterBody2D, INpc
     {
-       [Export] private Area2D? _interactionArea;
+        [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
@@ -78,11 +80,11 @@ namespace LastBreath.Source.Npc
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
 
-        public int Level { get; }
-        public Rarity Rarity { get; }
-        public EntityType EntityType { get; }
-        public Fractions Fraction { get; }
-        public INpcModifiersComponent NpcModifiers { get; }
+        public int Level { get; } = 150;
+        public Rarity Rarity { get; } = Rarity.Legendary;
+        public EntityType EntityType { get; } = EntityType.Regular;
+        public Fractions Fraction { get; } = Fractions.Human;
+        public INpcModifiersComponent NpcModifiers { get; private set; }
 
         public float CurrentHealth
         {
@@ -130,9 +132,8 @@ namespace LastBreath.Source.Npc
 
         public override void _Ready()
         {
-            Animations.PlayAnimation("Idle");
-            if (_interactionArea != null)
-                _interactionArea.BodyEntered += OnBodyEnter;
+            //  Animations.PlayAnimation("Idle");
+            _interactionArea?.BodyEntered += OnBodyEnter;
 
             _rnd.Randomize();
             Parameters = new EntityParametersComponent();
@@ -143,6 +144,7 @@ namespace LastBreath.Source.Npc
             Dexterity = new Dexterity(Modifiers);
             Strength = new Strength(Modifiers);
             Intelligence = new Intelligence(Modifiers);
+            NpcModifiers = new NpcModifiersComponent(this);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
@@ -151,19 +153,10 @@ namespace LastBreath.Source.Npc
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-            var passive = new ChainAttackPassiveSkill();
-            passive.Attach(this);
-            var passiveTwo = new CounterAttackPassiveSkill();
-            passiveTwo.Attach(this);
-            var mana = new ManaBurnPassiveSkill(0.15f);
-            mana.Attach(this);
-            var burning = new BurningPassiveSkill(0.3f, 3, 3);
-            burning.Attach(this);
-            var regen = new RegenerationPassiveSkill(0.05f);
-            regen.Attach(this);
             ConfigureStateMachine();
             SetBaseValuesForParameters();
 
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
         }
@@ -176,7 +169,7 @@ namespace LastBreath.Source.Npc
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { Animations.PlayAnimation($"Idle"); })
+                // .OnEntry(() => { Animations.PlayAnimation($"Idle"); })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
                 .Permit(Trigger.Battle, State.Battle);
@@ -189,7 +182,7 @@ namespace LastBreath.Source.Npc
             _stateMachine.Configure(State.Battle)
                 .OnEntry(() =>
                 {
-                    Animations.PlayAnimation("Idle");
+                    //Animations.PlayAnimation("Idle");
                     CanMove = false;
                     _lastPosition = Position;
                 })
@@ -278,11 +271,11 @@ namespace LastBreath.Source.Npc
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        await Animations.PlayAnimationAsync("Blocked");
+                        //   await Animations.PlayAnimationAsync("Blocked");
                         break;
                     case AttackResults.Evaded:
                         CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        await Animations.PlayAnimationAsync("Evaded");
+                        //  await Animations.PlayAnimationAsync("Evaded");
                         break;
                 }
 
@@ -295,11 +288,13 @@ namespace LastBreath.Source.Npc
             }
         }
 
-        public async Task Attack(IAttackContext context)
+        public Task Attack(IAttackContext context)
         {
-            context.IsCritical = context.Rnd.RandFloat() <= Parameters.CriticalChance;
+            context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            await Animations.PlayAnimationAsync("Attack");
+            //    await Animations.PlayAnimationAsync("Attack");
+
+            return Task.CompletedTask;
         }
 
         public void OnTurnEnd()
@@ -318,13 +313,14 @@ namespace LastBreath.Source.Npc
             _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
-        public async Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             // TODO: Here i need to calculate final damage with armor/resistance etc
             CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
             CurrentHealth -= damage;
-            await Animations.PlayAnimationAsync("Hurt");
+            // await Animations.PlayAnimationAsync("Hurt");
+            return Task.CompletedTask;
         }
 
         private void OnBodyEnter(Node2D body)
@@ -345,7 +341,7 @@ namespace LastBreath.Source.Npc
                             else
                                 fighters.Add(this);
 
-                            _stateMachine.Fire(Trigger.Battle);
+                            // _stateMachine.Fire(Trigger.Battle);
                             _gameEventBus?.Publish(new BattleStartEvent(player, fighters));
                             break;
                         }
@@ -417,7 +413,7 @@ namespace LastBreath.Source.Npc
             _gameEventBus?.Publish<EntityDiedEvent>(new(this));
             _battleEventBus?.Publish<EntityDiedEvent>(new(this));
 
-            Animations.PlayAnimation("Dead");
+            // Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
         }
 
@@ -433,7 +429,7 @@ namespace LastBreath.Source.Npc
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 10000;
+                        value = 500;
                         break;
                     case EntityParameter.Mana:
                         value = 50;
@@ -455,11 +451,9 @@ namespace LastBreath.Source.Npc
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:
-                        value = rnd.RandfRange(50, 250);
-                        break;
                     case EntityParameter.Accuracy:
                     case EntityParameter.Evade:
-                        value = rnd.RandfRange(50, 500);
+                        value = rnd.RandfRange(50, 100);
                         break;
                 }
 
@@ -474,6 +468,5 @@ namespace LastBreath.Source.Npc
             _battleEventBus = null;
             _gameEventBus = null;
         }
-
     }
 }

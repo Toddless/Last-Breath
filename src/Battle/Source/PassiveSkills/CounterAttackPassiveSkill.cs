@@ -21,8 +21,8 @@
             {
                 ArgumentNullException.ThrowIfNull(Owner);
                 if (evnt.Context.Target.InstanceId != Owner.InstanceId) return;
-                if (evnt.Context.Rnd.RandFloat() <= Chance) return;
-                var context = new AttackContext(Owner, evnt.Context.Attacker, Owner.GetDamage(), new RndGodot(), evnt.Context.AttackContextScheduler);
+                if (evnt.Context.Rnd.Randf() <= Chance) return;
+                var context = new AttackContext(Owner, evnt.Context.Attacker, Owner.GetDamage(), evnt.Context.Rnd, evnt.Context.AttackContextScheduler);
                 context.Schedule();
             }
             catch (Exception e)

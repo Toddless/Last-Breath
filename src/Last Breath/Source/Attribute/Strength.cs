@@ -1,6 +1,7 @@
-﻿namespace Battle.Source.Attribute
+﻿namespace LastBreath.Source.Attribute
 {
     using System.Collections.Generic;
+    using Battle.Source.Attribute;
     using Core.Enums;
     using Core.Interfaces.Components;
     using Core.Modifiers;

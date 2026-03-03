@@ -8,12 +8,13 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Godot;
 
     public class Fireball : Ability
     {
         private readonly float _baseDamage;
         private readonly float _baseCriticalChance;
-        private readonly RndGodot _rnd;
+        private readonly RandomNumberGenerator _rnd;
 
         public Fireball(string[] tags,
             int cooldown,
@@ -29,11 +30,11 @@
         {
             _baseDamage = baseDamage;
             _baseCriticalChance = baseCriticalChance;
-            _rnd = new RndGodot();
+            _rnd = new RandomNumberGenerator();
             _rnd.Randomize();
             ModuleManager.AddBaseModule(AbilityParameter.Damage, new Module<AbilityParameter>(() => baseDamage, AbilityParameter.Damage));
             ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceDetermination,
-                new Module<AbilityParameter>(() => _rnd.RandFloat(), AbilityParameter.CriticalChanceDetermination));
+                new Module<AbilityParameter>(() => _rnd.Randf(), AbilityParameter.CriticalChanceDetermination));
             ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceValue, new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChanceValue));
         }
 

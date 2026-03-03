@@ -9,6 +9,7 @@ namespace LootGeneration.Internal
     using Core.Interfaces;
     using Core.Interfaces.Items;
     using System.Collections.Generic;
+    using Core.Modifiers;
 
     public class ItemCreationService(IItemEffectProvider effectProvider, IItemDataProvider dataProvider, RandomNumberGenerator rnd) : IItemCreationService
     {
@@ -25,6 +26,8 @@ namespace LootGeneration.Internal
             return item;
         }
 
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> resources) => throw new System.NotImplementedException();
+
         private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance)
         {
             if (equip.Rarity is Rarity.Mythic or Rarity.Unique) return;
@@ -36,10 +39,11 @@ namespace LootGeneration.Internal
                 : string.Empty;
             equip.SetItemEffect(equipItemEffect);
             equip.Rarity = rarity;
-            var modifiersPool = dataProvider.GetEquipItemModifierPool(equip.Id);
 
+            var modifiersPool = dataProvider.GetEquipItemModifierPool(equip.Id);
+            var basePool = dataProvider.GetEquipItemBaseModifierPool(equip.Id);
             // Don't forget to concat item modifiers with modifier from context
-            var weighted = WeightedRandomPicker.CalculateWeights(modifiersPool);
+            var weighted = WeightedRandomPicker.CalculateWeights(modifiersPool.Concat(basePool));
             var chosenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(
                 weighted.WeightedObjects,
                 weighted.TotalWeight,

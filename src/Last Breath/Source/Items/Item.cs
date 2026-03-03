@@ -19,7 +19,6 @@
         [Export] public string[] Tags { get; protected set; } = [];
 
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public bool IsSame(string otherId) => throw new NotImplementedException();
 
         public string DisplayName => Localization.Localize(Id);
 
@@ -31,25 +30,19 @@
 
         public Item(string id,
             Rarity rarity,
-            Texture2D icon,
-            Texture2D fullImage,
             int maxStackSize,
             string[] tags)
         {
             Id = id;
             Rarity = rarity;
-            Icon = icon;
-            FullImage = fullImage;
             MaxStackSize = maxStackSize;
             Tags = tags;
         }
 
+        public bool IsSame(string otherId) => Id == otherId;
         public bool Equals(IItem other)
         {
-            if (other == null || string.IsNullOrEmpty(DisplayName))
-            {
-                return false;
-            }
+            if (string.IsNullOrEmpty(Id)) return false;
 
             return Id.Equals(other.Id) && MaxStackSize == other.MaxStackSize;
         }

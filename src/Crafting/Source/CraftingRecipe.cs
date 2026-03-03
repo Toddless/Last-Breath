@@ -18,6 +18,7 @@
         [Export] public Rarity Rarity { get; set; }
         [Export] public bool IsOpened { get; private set; } = true;
         [Export] public int MaxStackSize { get; private set; } = 1;
+        [Export] public ItemType ItemType { get; private set; }
         public string DisplayName => Localization.Localize(Id);
         public string Description => Localization.LocalizeDescription(Id);
         public List<IResourceRequirement> MainResource { get; set; } = [];
@@ -28,7 +29,7 @@
 
         }
 
-        public CraftingRecipe(string id, string resultItemId, string[] tags,  Rarity rarity, List<IResourceRequirement> requirements, bool isOpened = false)
+        public CraftingRecipe(string id, string resultItemId, string[] tags,  Rarity rarity, List<IResourceRequirement> requirements, ItemType type,bool isOpened = false)
         {
             Id = id;
             ResultItemId = resultItemId;
@@ -36,6 +37,7 @@
             Rarity = rarity;
             IsOpened = isOpened;
             MainResource= requirements;
+            ItemType = type;
         }
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);

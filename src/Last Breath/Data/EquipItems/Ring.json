@@ -4,7 +4,6 @@
 			"id": "Ring_Strength",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingStrength.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -32,7 +31,6 @@
 			"id": "Ring_Dexterity",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingDexterity.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -60,7 +58,6 @@
 			"id": "Ring_Intelligence",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingIntelligence.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -88,7 +85,6 @@
 			"id": "Ring_Intelligence_Multicast",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingIntelligenceMulticast.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -116,7 +112,6 @@
 			"id": "Ring_Dexterity_Critical_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingDexterityCriticalChance.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -144,7 +139,6 @@
 			"id": "Ring_Dexterity_Additional_Hit_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingDexterityAdditionalHitChance.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -172,7 +166,6 @@
 			"id": "Ring_Dexterity_Accuracy",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingDexterityAccuracy.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -200,7 +193,6 @@
 			"id": "Ring_Strength_Block_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "RingStrengthBlockChance.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -228,7 +220,6 @@
 			"id": "Ring_of_Creators",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "TestRing.png",
 			"rarity": "Uncommon",
 			"tags": [
 				"Ring",
@@ -266,7 +257,6 @@
 			"id": "Ring_Hell_Servant",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"icon": "HellServant.png",
 			"rarity": "Unuqie",
 			"tags": [
 				"Ring",
@@ -274,6 +264,54 @@
 			],
 			"attributeType": "None",
 			"skill": "Passive_Skill_Servant_Hell",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"additionalModifiers": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "inc",
+					"value": 0.15
+				},
+				{
+					"parameter": "Intelligence",
+					"modifierType": "inc",
+					"value": 0.15
+				},
+				{
+					"parameter": "Strength",
+					"modifierType": "inc",
+					"value": 0.15
+				}
+			]
+		},
+		{
+			"id": "Ring_Of_Fire_Demon",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Mythic",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"attributeType": "None",
+			"skill": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"baseModifiers": [

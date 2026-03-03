@@ -1,12 +1,11 @@
 ﻿namespace LastBreath.Source.UI.View
 {
+    using Godot;
     using System;
+    using Services;
     using Core.Data;
     using Core.Interfaces;
-    using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Godot;
-    using Services;
 
     public partial class MainMenu : Control, IInitializable
     {
@@ -15,20 +14,17 @@
         [Export] private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
 
         private IUiElementProvider? _uIElementProvider;
-        private IGameMessageBus? _gameMessageBus;
 
         public override void _Ready()
         {
             var provider = GameServiceProvider.Instance;
             _uIElementProvider = provider.GetService<IUiElementProvider>();
-            _gameMessageBus = provider.GetService<IGameMessageBus>();
             provider.GetService<ISettingsHandler>().ApplySavedSettings();
-            provider.GetService<IItemDataProvider>().LoadData();
 
-            _loadGameButton.Pressed += LoadGamePressed;
-            _optionsButton.Pressed += OptionsButtonPressed;
-            _quitButton.Pressed += () => GetTree().Quit();
-            _newGameButton.Pressed += () => GetTree().ChangeSceneToPacked(Main.Initialize());
+            _loadGameButton?.Pressed += LoadGamePressed;
+            _optionsButton?.Pressed += OptionsButtonPressed;
+            _quitButton?.Pressed += () => GetTree().Quit();
+            _newGameButton?.Pressed += () => GetTree().ChangeSceneToPacked(Main.Initialize());
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

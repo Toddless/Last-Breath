@@ -20,5 +20,6 @@
         void LoadData();
         List<IModifier> GetEquipItemModifierPool(string id);
         Dictionary<string, int> GetEquipItemResources(string itemId);
+        List<IModifier> GetEquipItemBaseModifierPool(string id);
     }
 }

@@ -30,7 +30,7 @@
         {
             if (Owner == null) return;
             var scheduler = new AttackContextScheduler();
-            var rnd = new RndGodot();
+            var rnd = new RandomNumberGenerator();
             rnd.Randomize();
             while (true)
             {
@@ -45,7 +45,7 @@
 
                 // with lower hp we have lower chance for next cycle
                 float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.80f);
-                if (rnd.RandFloat() > chance)
+                if (rnd.Randf() > chance)
                     break;
             }
         }

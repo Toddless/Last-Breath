@@ -16,7 +16,7 @@ namespace LootGeneration.Source.NpcModifiers
 
         public override void ApplyModifier(IModifierApplyingContext context)
         {
-            if (context.AtLeast < MinRarity) context.AtLeast = MinRarity;
+            if (context.AtLeast > MinRarity) context.AtLeast = MinRarity;
         }
 
         public override INpcModifier Copy() => new MinRarityModifier(Id, Weight, BaseDifficultyMultiplier, IsUnique, NpcBuffId, MinRarity);

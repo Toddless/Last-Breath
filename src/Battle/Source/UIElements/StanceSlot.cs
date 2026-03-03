@@ -6,10 +6,9 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
 
-    [GlobalClass]
     public partial class StanceSlot : TextureButton, IInitializable
     {
-        private const string UID = "uid://0hxs4hjfeym6";
+        private const string UID = "uid://bke05jg0bjgy1";
 
         private IBattleEventBus? _battleEventBus;
         private Stance _stance;

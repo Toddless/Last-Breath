@@ -14,7 +14,7 @@
         [Export] private Button? _craftingButton, _allStatsButton, _sortButton, _destroyButton;
         [Export] private GridContainer? _inventoryGrid;
 
-        private IGameMessageBus? _mediator;
+        private IGameMessageBus? _messageBus;
         private IInventory? _inventory;
         private IItemDataProvider? _itemDataProvider;
 
@@ -33,7 +33,7 @@
         {
             _inventory = provider.GetService<IInventory>();
             _itemDataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IGameMessageBus>();
+            _messageBus = provider.GetService<IGameMessageBus>();
         }
 
         private void OnInventoryFull(InventoryFullEvent obj)
@@ -43,6 +43,6 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnCraftingButtonPressed() => _mediator?.PublishAsync(new OpenCraftingWindowEvent(string.Empty));
+        private void OnCraftingButtonPressed() => _messageBus?.PublishAsync(new OpenCraftingWindowEvent(string.Empty));
     }
 }
