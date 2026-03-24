@@ -2,7 +2,6 @@
 {
     using Godot;
     using System;
-    using System.Linq;
     using Utilities;
     using Core.Enums;
     using Core.Interfaces.Items;

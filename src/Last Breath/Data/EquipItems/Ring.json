@@ -4,7 +4,7 @@
 			"id": "Ring_Strength",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -31,7 +31,7 @@
 			"id": "Ring_Dexterity",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -58,7 +58,7 @@
 			"id": "Ring_Intelligence",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -85,7 +85,7 @@
 			"id": "Ring_Intelligence_Multicast",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -112,7 +112,7 @@
 			"id": "Ring_Dexterity_Critical_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -139,7 +139,7 @@
 			"id": "Ring_Dexterity_Additional_Hit_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -166,7 +166,7 @@
 			"id": "Ring_Dexterity_Accuracy",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -193,7 +193,7 @@
 			"id": "Ring_Strength_Block_Chance",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Ring",
 				"Equipment"
@@ -220,7 +220,7 @@
 			"id": "Ring_of_Creators",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Uncommon",
+			"rarity": "Legendary",
 			"tags": [
 				"Ring",
 				"Equipment"

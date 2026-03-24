@@ -3,21 +3,21 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
+    using Core.Interfaces;
     using Core.Interfaces.UI;
+    using System.Threading.Tasks;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Core.Data;
-    using Core.Interfaces;
     using Core.Interfaces.Events.GameEvents;
 
-    public partial class BattleHud : Control, IInitializable, IRequireServices
+    public partial class BattleHud : Control, IHud
     {
         private const string UID = "uid://6d0sr4hy4gg2";
         private IBattleEventBus? _battleEventBus;
-        private IUiElementProvider? _uiElementProvider;
+        private IUiElementsManager? _uiElementProvider;
         private Dictionary<string, CharacterBar> _characterBars = [];
         private Dictionary<string, QueueSlot> _queueSlots = [];
         private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[9];
@@ -26,7 +26,6 @@
         [Export] private CharacterBar? _playerBars;
         [Export] private HBoxContainer? _stanceButtons;
         [Export] private GridContainer? _entityBars;
-        [Export] private HBoxContainer? _queue;
         [Export] private HBoxContainer? _abilitySlots;
 
         public override void _Ready()
@@ -65,8 +64,6 @@
             _playerBars?.ClearEffects();
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.RemoveBattleEventBus();
-            // foreach (Node child in _queue?.GetChildren() ?? [])
-            //     child.QueueFree();
             foreach (var node in _entityBars?.GetChildren() ?? [])
                 node.QueueFree();
         }
@@ -88,9 +85,7 @@
             _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
-         //   _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
-            _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);
 
             foreach (AbilitySlot slot in _abilitySlotsInstances)
@@ -111,7 +106,7 @@
         public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana)
         {
             if (_uiElementProvider == null) return;
-            var bar = _uiElementProvider.Create<CharacterBar>();
+            var bar = CharacterBar.Initialize().Instantiate<CharacterBar>();
             bar.SetInitialValues(maxMana, currentMana, maxHealth, currentHealth);
             bar.FlipH = true;
             _characterBars.Add(id, bar);
@@ -127,13 +122,15 @@
         {
             try
             {
-                _uiElementProvider = provider.GetService<IUiElementProvider>();
+                _uiElementProvider = provider.GetService<IUiElementsManager>();
             }
             catch (Exception ex)
             {
                 Tracker.TrackError("Failed to inject services.", ex);
             }
         }
+
+        public void Remove() => GetParent().RemoveChild(this);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -197,34 +194,10 @@
             else GetCharacterBar(target.InstanceId)?.AddEffect(effect);
         }
 
-        private void OnTurnEnd(TurnEndEvent obj)
-        {
-            var entity = obj.CompletedTurn;
-            _queueSlots.TryGetValue(entity.InstanceId, out QueueSlot? slot);
-            if (slot != null) _queue?.CallDeferred(Node.MethodName.RemoveChild, slot);
-        }
-
         private void OnTurnStart(TurnStartEvent obj)
         {
             if (obj.StartedTurn is IPlayer) _buttonsContainer?.Show();
             else _buttonsContainer?.Hide();
-        }
-
-        private void OnQueueDefined(BattleQueueDefinedEvent obj)
-        {
-            if (_uiElementProvider == null) return;
-            var queue = obj.Entities;
-            foreach (var entity in queue)
-            {
-                if (!_queueSlots.TryGetValue(entity.InstanceId, out QueueSlot? slot))
-                {
-                    slot = _uiElementProvider.Create<QueueSlot>();
-                    if (entity.Icon != null) slot.SetIcon(entity.Icon);
-                    _queueSlots.Add(entity.InstanceId, slot);
-                }
-
-                _queue?.CallDeferred(Node.MethodName.AddChild, slot);
-            }
         }
     }
 }

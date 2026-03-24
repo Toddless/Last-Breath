@@ -8,10 +8,12 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces;
+    using Core.Data;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
     using Microsoft.Extensions.DependencyInjection;
+    using UIElements;
 
     public static class CraftingSystemModuleDependencies
     {
@@ -29,16 +31,18 @@
             services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
 
-            services.AddTransient<IEventHandler<DestroyItemEvent>, DestroyItemEventHandler>();
-            services.AddTransient<IEventHandler<GainCraftingExpirienceEvent>, GainCraftingExperienceEventHandler>();
-            services.AddTransient<IEventHandler<SendNotificationMessageEvent>, SendNotificationMessageEventHandler>();
-            services.AddTransient<IEventHandler<ShowInventorySlotButtonsTooltipEvent>, ShowTooltipEventHandler>();
-            services.AddTransient<IEventHandler<ShowInventoryItemEvent>, ShowInventoryItemEventHandler>();
-            services.AddTransient<IEventHandler<ConsumeResourcesInInventoryEvent>, ConsumeResourcesWithinInventoryEventHandler>();
-            services.AddTransient<IEventHandler<ClearUiElementsEvent>, ClearUiElementsEventHandler>();
-            services.AddTransient<IEventHandler<ItemCreatedEvent>, ItemCreatedEventHandler>();
-            services.AddTransient<IEventHandler<OpenCraftingWindowEvent>, OpenCraftingWindowEventHandler>();
+            services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();
+            services.AddTransient<IMessageHandler<GainCraftingExpirienceMessage>, GainCraftingExperienceMessageHandler>();
+            services.AddTransient<IMessageHandler<ConsumeResourcesInInventoryMessage>, ConsumeResourcesWithinInventoryMessageHandler>();
+            services.AddTransient<IMessageHandler<ItemCreatedMessage>, ItemCreatedMessageHandler>();
             return services;
+        }
+
+        public static void AddCraftingWindowFactories(this IGameServiceProvider provider)
+        {
+            var uiElementManager = provider.GetService<IUiElementsManager>();
+            uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(Recipes), () => Recipes.Initialize().Instantiate<Recipes>());
         }
     }
 }

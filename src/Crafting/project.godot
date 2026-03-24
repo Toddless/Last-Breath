@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Crafting"
-run/main_scene="uid://dcpqui52lodel"
+run/main_scene="uid://b157jy1w03jwo"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 
 [display]
@@ -38,7 +38,7 @@ ui_crafting={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://TestResources/Lokalization/en.po", "res://TestResources/Lokalization/ru.po")
+locale/translations=PackedStringArray("res://temp/en.po")
 
 [xr]
 

@@ -1,7 +1,6 @@
 namespace LootGeneration.Source
 {
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Core.Data.LootTable;
 
     public interface ILootTableProvider

@@ -4,15 +4,15 @@
     using System;
     using Source;
     using Utilities;
+    using Core.Data;
     using System.IO;
     using System.Linq;
     using TestResources;
+    using Core.Modifiers;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Data;
-    using Core.Modifiers;
 
     internal class ItemDataProvider(string itemDataPath) : IItemDataProvider
     {

@@ -16,9 +16,9 @@
         {
             var item = inventory.GetItem<IEquipItem>(request.InstanceId);
             if (item == null) return Task.FromResult(ItemUpgradeResult.Failure);
-            gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
+            gameMessageBus.PublishMessageAsync(new ConsumeResourcesInInventoryMessage(request.Resources));
             // Later, I need to pass the used resources to the TryUpgradeItem method (some of these resources influence the result).
-            gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Upgrade, item.Rarity));
+            gameMessageBus.PublishMessageAsync(new GainCraftingExpirienceMessage(Core.Enums.CraftingMode.Upgrade, item.Rarity));
             return Task.FromResult(itemUpgrader.TryUpgradeItem(item));
         }
     }

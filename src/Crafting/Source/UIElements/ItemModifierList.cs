@@ -1,70 +1,56 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using System;
     using System.Linq;
+    using Godot.Collections;
     using Core.Interfaces.UI;
     using System.Collections.Generic;
 
+    [Tool]
     [GlobalClass]
-    public partial class ItemModifierList : Control, IInitializable
+    public partial class ItemModifierList : VBoxContainer, IInitializable
     {
         private const string UID = "uid://b6glmp15vrdpg";
-        private int _lastSelectedChild = -1;
-        [Export] private VBoxContainer? _container;
-        private readonly Dictionary<int, InteractiveLabel> _labels = [];
+        private int _lastSelectedLabelIdentifier = -1;
+        [Export] private Array<InteractiveLabel> _labels = [];
 
-        [Signal] public delegate void ItemSelectedEventHandler(int hash, ItemModifierList source);
+        [Signal]
+        public delegate void ItemSelectedEventHandler(int identifier, ItemModifierList source);
 
-        public void AddModifiersToList(List<(string Mod, int Hash)> modifiers, LabelSettings? labelSettings)
+
+        public void AddModifiersToList(List<(string ModifierText, int Identifier)> modifiers)
         {
             for (int i = 0; i < modifiers.Count; i++)
             {
-                var item = new InteractiveLabel();
-                item.SetIndex(i);
-                item.SetText(modifiers[i].Mod);
-                item.SetMetadata(modifiers[i].Hash);
-                item.SetSelectable(false);
-                item.SetLabelSetting(labelSettings);
-                item.Selected += OnItemSelected;
-                _container?.AddChild(item);
-                _labels[modifiers[i].Hash] = item;
+                var label = _labels[i];
+                label.Identifier = modifiers[i].Identifier;
+                label.SetText(modifiers[i].ModifierText);
+                label.Selected += OnItemSelected;
             }
         }
 
         public void SetItemsSelectable(bool selectable = true)
         {
-            foreach (var item in _container?.GetChildren().Cast<InteractiveLabel>() ?? [])
-                item.SetSelectable(selectable);
+            foreach (var item in GetChildren().Cast<InteractiveLabel>())
+                item.Selectable = selectable;
         }
 
-        public void UpdateModifierText(int hash, string newText)
-        {
-            if (_labels.TryGetValue(hash, out var label))
-                label.UpdateText(newText);
-        }
+        public void UpdateModifierText(int identifier, string newText) => _labels.FirstOrDefault(x => x.Identifier == identifier)?.SetText(newText);
 
-        public void UpdateSelectedItem((string Mod, int Hash) newModifier)
+        public void UpdateSelectedItem((string ModifierText, int Identifier) newModifier)
         {
-            ArgumentNullException.ThrowIfNull(_container);
-            var selectableItem = _container.GetChild<InteractiveLabel>(_lastSelectedChild);
-            var oldHash = selectableItem.GetMetadata().AsInt32();
-            selectableItem.SetText(newModifier.Mod);
-            selectableItem.SetMetadata(newModifier.Hash);
-            if( _labels.TryGetValue(oldHash, out var label))
-            {
-                _labels.Remove(_lastSelectedChild);
-                _labels[newModifier.Hash] = label;
-            }
+            var selectableItem = _labels.FirstOrDefault(x => x.Identifier == _lastSelectedLabelIdentifier);
+            selectableItem?.SetText(newModifier.ModifierText);
+            selectableItem?.Identifier = newModifier.Identifier;
+            _lastSelectedLabelIdentifier = -1;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnItemSelected(int index)
+        private void OnItemSelected(int identifier)
         {
-            _lastSelectedChild = index;
-            var hash = _container?.GetChild<InteractiveLabel>(index).GetMetadata().AsInt32() ?? 0;
-            if (hash != 0) EmitSignal(SignalName.ItemSelected, hash, this);
+            _lastSelectedLabelIdentifier = identifier;
+            EmitSignal(SignalName.ItemSelected, _lastSelectedLabelIdentifier, this);
         }
     }
 }

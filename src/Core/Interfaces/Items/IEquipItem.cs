@@ -7,11 +7,11 @@
 
     public interface IEquipItem : IItem
     {
-        public IReadOnlyList<IModifier> BaseModifiers { get; }
-        public IReadOnlyList<IModifier> AdditionalModifiers { get; }
-        public EquipmentType EquipmentPart { get; }
+        IReadOnlyList<IModifier> BaseModifiers { get; }
+        IReadOnlyList<IModifier> AdditionalModifiers { get; }
+        EquipmentPiece EquipmentPiece { get; }
         AttributeType AttributeType { get; set; }
-        public string ItemEffect { get; }
+        string ItemEffect { get; }
         int UpdateLevel { get; set; }
         int MaxUpdateLevel { get; set; }
         IReadOnlyDictionary<string, int> UsedResources { get; }

@@ -3,6 +3,7 @@
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
     using Core.Interfaces.UI;
@@ -11,85 +12,83 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Data;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
 
-    [GlobalClass]
-    public partial class Recipes : PanelContainer, IInitializable, IRequireServices
+    public partial class Recipes : FoldableContainer, IWindow
     {
         private const string UID = "uid://1qq3je71i5vi";
         private Dictionary<RecipeCategories, TreeItem> _categories = [];
         [Export] private RecipeTree? _recipeTree;
 
         private IItemDataProvider? _dataProvider;
-        private IGameMessageBus? _mediator;
+        private IGameMessageBus? _messageBus;
+
+        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         [Signal]
         public delegate void RecipeSelectedEventHandler(string id);
 
         public override void _Ready()
         {
-            if (_recipeTree != null)
-            {
-                _recipeTree.LeftClick += OnLeftClick;
-                _recipeTree.RightClick += OnRightClick;
-            }
+            Title = Localization.Localize("Window_Crafting_Recipes");
+            _recipeTree?.LeftClick += OnLeftClick;
+            _recipeTree?.RightClick += OnRightClick;
 
             CreateRecipeTree(_dataProvider?.GetCraftingRecipes() ?? []);
         }
 
+        public void Close() => GetParent().RemoveChild(this);
+
         public void InjectServices(IGameServiceProvider provider)
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
-            _mediator = provider.GetService<IGameMessageBus>();
-        }
-
-        public override void _EnterTree()
-        {
-            //if (_mediator != null) _mediator.UpdateUi += UpdateRecipeTree;
-        }
-
-        public override void _ExitTree()
-        {
-           // if (_mediator != null) _mediator.UpdateUi -= UpdateRecipeTree;
+            _messageBus = provider.GetService<IGameMessageBus>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private async void CreateRecipeTree(IEnumerable<ICraftingRecipe> recipes)
         {
-            if (_recipeTree == null)
+            try
             {
-                Tracker.TrackNull(nameof(_recipeTree), this);
-                return;
+                if (_recipeTree == null)
+                {
+                    Tracker.TrackNull(nameof(_recipeTree), this);
+                    return;
+                }
+
+                _recipeTree.Clear();
+                _categories.Clear();
+
+                var treeRoot = _recipeTree.CreateItem();
+                foreach (var cat in Enum.GetValues<RecipeCategories>())
+                {
+                    var category = _recipeTree.CreateItem(treeRoot);
+                    category.SetText(0, Localization.Localize(cat.ToString()));
+                    category.SetSelectable(0, false);
+                    category.SetMetadata(0, "category");
+                    _categories[cat] = category;
+                }
+
+                foreach (var recipe in recipes)
+                {
+                    var category = _categories.Keys.FirstOrDefault(category =>
+                        recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
+                    var treeItem = _recipeTree.CreateItem(_categories[category]);
+                    int amount = await CalculateAmountToCraft(recipe.MainResource);
+                    string recipeName = Localization.Localize(recipe.Id);
+                    if (amount > 0)
+                        recipeName += $" ({amount})";
+                    treeItem.SetText(0, recipeName);
+                    treeItem.SetMetadata(0, recipe.Id);
+                    treeItem.SetSelectable(0, recipe.IsOpened);
+                }
             }
-
-            _recipeTree.Clear();
-            _categories.Clear();
-
-            var treeRoot = _recipeTree.CreateItem();
-            foreach (var cat in Enum.GetValues<RecipeCategories>())
+            catch (Exception e)
             {
-                var category = _recipeTree.CreateItem(treeRoot);
-                category.SetText(0, Localization.Localize(cat.ToString()));
-                category.SetSelectable(0, false);
-                category.SetMetadata(0, "category");
-                _categories[cat] = category;
-            }
-
-            foreach (var recipe in recipes)
-            {
-                var category = _categories.Keys.FirstOrDefault(category =>
-                    recipe.Tags.Contains(category.ToString(), StringComparer.OrdinalIgnoreCase));
-                var treeItem = _recipeTree.CreateItem(_categories[category]);
-                var amount = await CalculateAmountToCraft(recipe.MainResource);
-                var recipeName = $"{Localization.Localize(recipe.Id)}";
-                if (amount > 0)
-                    recipeName += $" ({amount})";
-                treeItem.SetText(0, recipeName);
-                treeItem.SetMetadata(0, recipe.Id);
-                treeItem.SetSelectable(0, recipe.IsOpened);
+                Tracker.TrackError($"Failed to create recipe tree: {e.Message}", this);
+                GD.Print($"Failed to create recipe tree: {e.Message},\n stack trace: {e.StackTrace}", this);
             }
         }
 
@@ -97,17 +96,17 @@
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(_mediator);
+                ArgumentNullException.ThrowIfNull(_messageBus);
 
                 var requirements = _dataProvider?.GetRecipeRequirements(id) ?? [];
-                var amount = await CalculateAmountToCraft(requirements);
+                int amount = await CalculateAmountToCraft(requirements);
                 if (amount > 1)
                 {
-                    var item = await _mediator.Send<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id,
+                    var item = await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id,
                         requirements.ToDictionary(key => key.ResourceId, value => value.Amount)));
                     if (item != null)
                     {
-                        _mediator?.PublishAsync(new ItemCreatedEvent(item));
+                        _messageBus?.PublishMessageAsync(new ItemCreatedMessage(item));
                     }
                 }
             }
@@ -121,10 +120,10 @@
 
         private async Task<int> CalculateAmountToCraft(IEnumerable<IResourceRequirement> requirements)
         {
-            ArgumentNullException.ThrowIfNull(_mediator);
+            ArgumentNullException.ThrowIfNull(_messageBus);
             int canCraft = int.MaxValue;
             var itemsInInventory =
-                await _mediator.Send<GetTotalItemAmountRequest, Dictionary<string, int>>(
+                await _messageBus.SendRequest<GetTotalItemAmountRequest, Dictionary<string, int>>(
                     new(requirements.Select(x => x.ResourceId)));
             foreach (var requirement in requirements)
             {

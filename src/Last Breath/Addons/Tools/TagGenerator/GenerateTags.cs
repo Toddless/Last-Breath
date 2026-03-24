@@ -1,7 +1,6 @@
 namespace LastBreath.Addons.Tools.TagGenerator
 {
-    using Core;
-	using Godot;
+    using Godot;
 
 	[Tool]
 	public partial class GenerateTags /*: EditorScript*/

@@ -16,10 +16,19 @@
         // ________________________________________________________
         private const float BaseSkillChance = 0.15f;
         private const float TargetSkillChance = 0.7f;
+
         private const float BaseResourceReturn = 0.3f;
         private const float TargetResourceReturn = 1f;
-        private const float BaseValueMultiplier = 0.8f;
+
+        private const float BaseValueMultiplier = 0.2f;
         private const float TargetValueMultiplier = 1.25f;
+
+        private const float BaseMinRange = 0.4f;
+        private const float BaseMaxRange = 1.15f;
+
+        private const float TargetMinRange = 0.9f;
+        private const float TargetMaxRange = 1.25f;
+
         private const float ExpFactor = 1.8f;
         private const float MaxLevel = 25;
         private const int BaseExp = 50;
@@ -30,7 +39,7 @@
         // TODO: Same
         // ________________________________________________________
         // Level one probabilities
-        private readonly float[] _rarityBase = [65f, 24f, 10f, 1f];
+        private readonly float[] _rarityBase = [1f, 10f, 24f, 65f];
 
         // Level 25 probabilities
         private readonly float[] _rarityTarget = [10f, 30f, 35f, 25f];
@@ -83,27 +92,31 @@
             return _currentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExperience);
         }
 
-        public float GetSkillChance(float skillBonus = default)
+        public float GetCurrentSkillChance(float skillBonus = 0)
         {
             float baseChance = CalculateBase(BaseSkillChance, TargetSkillChance, GetProgressFactor());
             float finalChance = baseChance * (1f + skillBonus);
             return Mathf.Clamp(finalChance, 0f, 1f);
         }
 
-        public float GetValueMultiplier(float multiplierBonus = default)
+        public float GetCurrentValueMultiplier(float multiplierBonus = 0)
         {
             float baseChance = CalculateBase(BaseValueMultiplier, TargetValueMultiplier, GetProgressFactor());
             float chanceWithBonus = baseChance * (1f + multiplierBonus);
-            float finalChance = rnd.RandfRange(chanceWithBonus * 0.9f, chanceWithBonus * 1.1f);
-            return Mathf.Min(finalChance, 1.9f);
+            return Mathf.Min(chanceWithBonus, 1.9f);
         }
 
-        public float GetResourceMultiplier(float resourceBonus = default)
+        public float GetCurrentResourceMultiplier(float resourceBonus = 0)
         {
             float baseMultiplier = CalculateBase(BaseResourceReturn, TargetResourceReturn, GetProgressFactor());
             float finalMultiplier = baseMultiplier * (1f + resourceBonus);
             return Math.Min(finalMultiplier, 1.5f);
         }
+
+        public float GetCurrentMinRange() => CalculateBase(BaseMinRange, TargetMinRange, GetProgressFactor());
+        public float GetCurrentMaxRange() => CalculateBase(BaseMaxRange, TargetMaxRange, GetProgressFactor());
+
+        public float GetRandomValueRange() => rnd.RandfRange(GetCurrentMinRange(), GetCurrentMaxRange());
 
         public Rarity RollRarity(float rarityBonus = 0)
         {
@@ -160,7 +173,7 @@
                 {
                     CurrentExperience -= need;
                     _currentLevel++;
-                    gameMessageBus.PublishAsync(new SendNotificationMessageEvent($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    gameMessageBus.PublishMessageAsync(new SendNotificationMessageMessage($"Crafting Mastery reached lvl: {_currentLevel}"));
                 }
                 else
                     break;

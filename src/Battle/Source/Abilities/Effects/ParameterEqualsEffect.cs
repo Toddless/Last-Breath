@@ -3,7 +3,6 @@
     using Battle.Source.Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components.Decorator;
 
     public class ParameterEqualsEffect(
         string id,

@@ -172,7 +172,7 @@
             return await Task.FromResult(items);
         }
 
-        public static async Task<List<IItem>> ParseEquipItems(string json, Func<EquipmentType, string, string[], IEquipItem> itemFactory)
+        public static async Task<List<IItem>> ParseEquipItems(string json, Func<EquipmentPiece, string, string[], IEquipItem> itemFactory)
         {
             var data = JsonConvert.DeserializeObject<EquipItemDataList>(json, s_settings);
 
@@ -183,7 +183,7 @@
                 var baseModifiers = await LoadModifiers(item.BaseModifiers);
                 var additionalModifiers = await LoadModifiers(item.AdditionalModifiers);
                 ParseEnum<Rarity>(item.Rarity, out var rarity);
-                ParseEnum<EquipmentType>(item.EquipmentPart, out var equipmentType);
+                ParseEnum<EquipmentPiece>(item.EquipmentPart, out var equipmentType);
                 ParseEnum<AttributeType>(item.AttributeType, out var attributeType);
 
                 var newItem = itemFactory.Invoke(equipmentType, item.Id, item.Tags);

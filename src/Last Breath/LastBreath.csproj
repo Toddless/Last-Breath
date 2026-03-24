@@ -31,4 +31,7 @@
   <ItemGroup>
     <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="temp\" />
+  </ItemGroup>
 </Project>

@@ -1,7 +1,6 @@
 namespace LastBreath.Addons.Tools.TagGenerator
 {
     using System.Text;
-	using Core;
 
     public partial class GenerateTagConst /*: EditorScript*/
 	{

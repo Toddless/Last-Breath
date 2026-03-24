@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Services
 {
     using Godot;
+    using Items;
     using System;
     using Utilities;
     using System.IO;
     using Core.Data;
     using System.Linq;
-    using Source.Items;
     using Core.Modifiers;
     using Crafting.Source;
     using Core.Interfaces.Items;

@@ -30,8 +30,8 @@
                 modifiers.AddRange(itemDataProvider.GetResourceModifiers(resource.Key));
 
             var mode = itemUpgrader.TryRecraftModifier(item, request.ModifierHash, modifiers);
-            gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.Resources));
-            gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(Core.Enums.CraftingMode.Recraft, item.Rarity));
+            gameMessageBus.PublishMessageAsync(new ConsumeResourcesInInventoryMessage(request.Resources));
+            gameMessageBus.PublishMessageAsync(new GainCraftingExpirienceMessage(Core.Enums.CraftingMode.Recraft, item.Rarity));
             return Task.FromResult(new RequestResult<IModifierInstance>(true, string.Empty, mode));
         }
     }

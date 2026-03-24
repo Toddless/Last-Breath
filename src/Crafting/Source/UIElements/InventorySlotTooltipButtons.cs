@@ -45,13 +45,13 @@
 
         private void OnDestroyPressed()
         {
-            _mediator?.PublishAsync(new DestroyItemEvent(_itemInstance));
+            _mediator?.PublishMessageAsync(new DestroyItemMessage(_itemInstance));
             Close?.Invoke();
         }
 
         private void OnUpdatePressed()
         {
-            _mediator?.PublishAsync(new OpenCraftingWindowEvent(_itemInstance, true));
+            _mediator?.PublishMessageAsync(new OpenCraftingWindowMessage(_itemInstance, true));
             Close?.Invoke();
         }
 

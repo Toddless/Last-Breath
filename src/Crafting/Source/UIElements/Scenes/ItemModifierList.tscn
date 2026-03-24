@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b6glmp15vrdpg"]
 
-[ext_resource type="Script" uid="uid://dsx6f7hjd36m3" path="res://Addons/Crafting/Source/UIElements/ItemModifierList.cs" id="1_hc03u"]
+[ext_resource type="Script" uid="uid://yj5qmru4xgya" path="res://Source/UIElements/ItemModifierList.cs" id="1_hc03u"]
 
 [node name="ItemModifierList" type="Control" node_paths=PackedStringArray("_container")]
 layout_mode = 3

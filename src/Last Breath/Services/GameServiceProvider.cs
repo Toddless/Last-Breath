@@ -1,20 +1,20 @@
 ﻿namespace LastBreath.Services
 {
+    using Godot;
+    using Source;
     using System;
-    using System.Collections.Generic;
-    using Battle.Source;
+    using Inventory;
     using Core.Data;
+    using Battle.Source;
     using Core.Interfaces;
+    using Crafting.Source;
+    using Core.Interfaces.UI;
+    using LootGeneration.Source;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.MessageBus;
-    using Crafting.Source;
-    using Godot;
-    using LootGeneration.Source;
+    using System.Collections.Generic;
     using Microsoft.Extensions.DependencyInjection;
-    using Script;
-    using Source;
-    using Source.Inventory;
 
     public class GameServiceProvider : IGameServiceProvider
     {
@@ -46,14 +46,19 @@
                 instance.Randomize();
                 return instance;
             });
+            services.AddSingleton<IUiElementsManager, UiElementsManager>(_ =>
+            {
+                var instance = new UiElementsManager(this);
+                return instance;
+            });
+            services.AddTransient<IMessageHandler<OpenWindowMessage>, OpenWindowMessageHandler>();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IUiElementProvider, UIElementProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
-            services.AddCraftingSystemModuleDependencies();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
+            services.AddCraftingSystemModuleDependencies();
             services.AddBattleSystemModuleDependencies();
             services.AddLootGenerationServices();
             return services.BuildServiceProvider();

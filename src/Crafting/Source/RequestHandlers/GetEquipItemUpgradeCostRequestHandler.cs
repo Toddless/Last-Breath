@@ -25,7 +25,7 @@
             var item = _inventory.GetItem<IEquipItem>(request.ItemInstanceId);
             if (item == null) return Task.FromResult<IEnumerable<IResourceRequirement>>([]);
 
-            var upgradeCosts = _itemUpgrader?.GetUpgradeResourceCost(item.Rarity, item.EquipmentPart.ConvertEquipmentPartToCategory(), request.Mode) ?? [];
+            var upgradeCosts = _itemUpgrader?.GetUpgradeResourceCost(item.Rarity, item.EquipmentPiece.ConvertEquipmentPartToCategory(), request.Mode) ?? [];
 
             return Task.FromResult<IEnumerable<IResourceRequirement>>(upgradeCosts);
         }

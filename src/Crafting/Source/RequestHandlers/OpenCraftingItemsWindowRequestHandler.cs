@@ -2,23 +2,23 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Core.Data;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
     using UIElements;
 
     public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {
-        private readonly IUiElementProvider _uIElementProvider;
+        private readonly IUiElementsManager _uIElementManager;
 
-        public OpenCraftingItemsWindowRequestHandler(IUiElementProvider uIElementProvider)
+        public OpenCraftingItemsWindowRequestHandler(IUiElementsManager uIElementManager)
         {
-            _uIElementProvider = uIElementProvider;
+            _uIElementManager = uIElementManager;
         }
 
         public async Task<IEnumerable<string>> HandleRequest(OpenCraftingItemsWindowRequest request)
         {
-            var craftingItems = _uIElementProvider.CreateSingleClosable<CraftingItems>();
+            var craftingItems = (CraftingItems)_uIElementManager.OpenWindow(typeof(CraftingItems));
             craftingItems.Setup(request.TakenResources);
             var selected = await craftingItems.WaitForSelectionAsync();
             return selected;

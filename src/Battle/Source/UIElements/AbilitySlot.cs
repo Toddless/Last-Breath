@@ -11,7 +11,6 @@
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
 
-    [GlobalClass]
     public partial class AbilitySlot : Control, IInitializable
     {
         private const string UID = "uid://bcq7vkx5c2o4";
@@ -70,7 +69,6 @@
         {
             MouseEntered += OnMouseEnter;
             MouseExited += OnMouseExit;
-
             ConfigureStateMachine();
         }
 
@@ -102,10 +100,10 @@
             CheckAbilityAvailable();
         }
 
-        public void SetNumber(int numbr)
+        public void SetNumber(int number)
         {
-            _slotNumber = numbr.GetKeyAssociatedWithNumber();
-            _number?.Text = numbr.ToString();
+            _slotNumber = number.GetKeyAssociatedWithNumber();
+            _number?.Text = number.ToString();
         }
 
         private void TryActivateAbility()

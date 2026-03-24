@@ -25,8 +25,8 @@
                 var modifiers = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
                 var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, modifiers);
                 item.SaveUsedResources(request.UsedResources.ToDictionary());
-                gameMessageBus.PublishAsync(new ConsumeResourcesInInventoryEvent(request.UsedResources));
-                gameMessageBus.PublishAsync(new GainCraftingExpirienceEvent(CraftingMode.Create, item.Rarity));
+                gameMessageBus.PublishMessageAsync(new ConsumeResourcesInInventoryMessage(request.UsedResources));
+                gameMessageBus.PublishMessageAsync(new GainCraftingExpirienceMessage(CraftingMode.Create, item.Rarity));
                 return Task.FromResult<IEquipItem?>(item);
             }
             catch (InvalidOperationException ex)

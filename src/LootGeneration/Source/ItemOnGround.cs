@@ -21,7 +21,7 @@ namespace LootGeneration.Source
         [Export] private Area2D? _interactionArea;
         [Export] private Dictionary<Rarity, Color> _colors = [];
         [Export] private Dictionary<Rarity, AudioStream> _dropSounds = [];
-        [Export] private Dictionary<EquipmentType, Texture2D> _equipGroundIcons = [];
+        [Export] private Dictionary<EquipmentPiece, Texture2D> _equipGroundIcons = [];
         [Export] private Texture2D? _resourceIcon;
         [Export] private Texture2D? _craftingRecipeIcon;
         [Export] private Sprite2D? _lootIcon;
@@ -88,7 +88,7 @@ namespace LootGeneration.Source
             switch (true)
             {
                 case var _ when item is IEquipItem equipItem:
-                    _equipGroundIcons.TryGetValue(equipItem.EquipmentPart, out icon);
+                    _equipGroundIcons.TryGetValue(equipItem.EquipmentPiece, out icon);
                     break;
                 case var _ when item is ICraftingResource:
                     icon = _resourceIcon;

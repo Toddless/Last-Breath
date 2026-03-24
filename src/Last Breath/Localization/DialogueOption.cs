@@ -2,6 +2,7 @@
 {
     using Godot;
     using Source;
+    using Player = LastBreath.Player;
 
     [GlobalClass]
     public partial class DialogueOption : Resource

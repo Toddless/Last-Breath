@@ -102,7 +102,7 @@
 
         private float ApplyPlayerMultiplier(float baseValue, ModifierType type)
         {
-            float multiplier = craftingMastery.GetValueMultiplier();
+            float multiplier = craftingMastery.GetCurrentValueMultiplier();
             if (type == ModifierType.Multiplicative)
                 return 1f + (baseValue - 1f) * multiplier;
 

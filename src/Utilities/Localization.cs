@@ -2,10 +2,10 @@
 {
     using Godot;
     using System;
+    using Core.Modifiers;
     using System.Globalization;
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
-    using Core.Modifiers;
 
     public static class Localization
     {
@@ -27,14 +27,25 @@
             return string.Empty;
         }
 
+        public static string Format<T>(T obj, float minValueMultiplier, float maxValueMultiplier)
+        {
+            switch (true)
+            {
+                case var _ when obj is IModifier modifier:
+                    return s_modifierFormatter.FormatModifier(modifier, minValueMultiplier, maxValueMultiplier);
+            }
+
+            return string.Empty;
+        }
+
         public static string Localize(string id) => TranslationServer.Translate(id);
         public static string LocalizeDescription(string id) => TranslationServer.Translate(id + "_Description");
+
         public static string LocalizeDescriptionFormated(string id, params object[] args)
         {
             string template = LocalizeDescription(id);
 
             return ContainsNamedPlaceholder(template) ? FormatNamed(template, BuildNamedDictFromArgs(args)) : FormatNumbered(template, args);
-
         }
 
         private static string FormatNumbered(string template, object[] args)
@@ -96,6 +107,7 @@
                 if (args[i] is string key)
                     dict[key] = args[i + 1];
             }
+
             return dict;
         }
     }

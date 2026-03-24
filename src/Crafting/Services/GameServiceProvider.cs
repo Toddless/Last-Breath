@@ -15,6 +15,7 @@
     using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
     using Core.Modifiers;
     using Microsoft.Extensions.DependencyInjection;
     using Source.RequestHandlers;
@@ -48,13 +49,13 @@
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<IUiElementProvider, UIElementProvider>();
+            services.AddSingleton<IUiElementsManager, UiElementManager>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
             {
-                var instance = new ItemDataProvider("res://TestResources/RecipeAndResources/");
+                var instance = new ItemDataProvider("res://temp/Data/");
                 instance.LoadData();
                 return instance;
             });

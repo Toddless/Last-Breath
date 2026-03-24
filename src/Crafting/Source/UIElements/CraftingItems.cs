@@ -11,7 +11,7 @@
     using Core.Data;
 
     [GlobalClass]
-    public partial class CraftingItems : Control, IInitializable, IClosable, IRequireServices
+    public partial class CraftingItems : Control, IWindow
     {
         private const string UID = "uid://dot5loe7a27rt";
         private TaskCompletionSource<IEnumerable<string>>? _selectedItems;
@@ -21,15 +21,15 @@
         private IItemDataProvider? _itemDataProvider;
         private IInventory? _inventory;
 
-
-        public event Action? Close;
-
+        public bool IsAlreadyVisible => IsInsideTree() && Visible;
+        
         public override void _Ready()
         {
             _add?.Pressed += OnAddPressed;
             _cancel?.Pressed += OnCancelPressed;
         }
 
+        public void Close() => GetParent().RemoveChild(this);
 
         public void InjectServices(IGameServiceProvider provider)
         {
@@ -60,13 +60,11 @@
         private void OnCancelPressed()
         {
             _selectedItems?.TrySetResult([]);
-            Close?.Invoke();
         }
 
         private void OnAddPressed()
         {
             _selectedItems?.TrySetResult(GetSelectedIds());
-            Close?.Invoke();
         }
 
         private void AddItem(string resourceId, bool selectable = true)
@@ -91,5 +89,6 @@
             foreach (var res in _resources.Where(res => disabled.Contains(res.Value)))
                 _items?.SetItemDisabled(res.Key, true);
         }
+
     }
 }

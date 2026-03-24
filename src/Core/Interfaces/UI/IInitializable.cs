@@ -4,6 +4,6 @@
 
     public interface IInitializable
     {
-        static abstract PackedScene Initialize();
+        // PackedScene Initialize();
     }
 }

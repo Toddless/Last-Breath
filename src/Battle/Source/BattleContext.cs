@@ -4,6 +4,7 @@
     using System;
     using Core.Data;
     using UIElements;
+    using Core.Interfaces.UI;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
@@ -14,7 +15,7 @@
     internal class BattleContext : IBattleContext
     {
         private readonly IBattleEventBus _localBus;
-        private readonly IUiElementProvider _uiElementProvider;
+        private readonly IUiElementsManager _uiElementManager;
         private readonly BattleArena _battleArena;
         private readonly List<IEntity> _entities;
         private readonly Node2D _mainWorld;
@@ -22,7 +23,7 @@
 
         public BattleContext(IEntity player, List<IEntity> entities, Node2D mainWorld, IGameServiceProvider provider, Node2D parent)
         {
-            _uiElementProvider = provider.GetService<IUiElementProvider>();
+            _uiElementManager = provider.GetService<IUiElementsManager>();
             _player = player;
             _entities = entities;
             _mainWorld = mainWorld;
@@ -36,7 +37,7 @@
 
         public async Task RunBattleAsync()
         {
-            var battleHud = await _uiElementProvider.CreateAndShowMainElement<BattleHud>();
+            var battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
             await battleHud.SetupEventBus(_localBus);
             battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
             foreach (IEntity entity in _entities)
@@ -51,7 +52,6 @@
             ReturnParticipantsToWorld();
             _battleArena.QueueFree();
             _localBus.Dispose();
-            _uiElementProvider.HideMainElement<BattleHud>();
         }
 
         private void ReturnParticipantsToWorld()
@@ -66,7 +66,7 @@
                     _mainWorld.AddChild(asNode);
                 }
 
-                _localBus.Publish<BattleEndEvent>(new());
+                _localBus.Publish(new BattleEndEvent());
             }
             catch (Exception ex)
             {

@@ -2,7 +2,6 @@
 {
     using Core.Enums;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
     using Godot;
 

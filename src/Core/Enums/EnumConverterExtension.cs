@@ -5,15 +5,15 @@
 
     public static class EnumConverterExtension
     {
-        public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentType equipment) => equipment switch
+        public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentPiece equipment) => equipment switch
         {
-            EquipmentType.Body => EquipmentCategory.Armor,
-            EquipmentType.Cloak => EquipmentCategory.Armor,
-            EquipmentType.Gloves => EquipmentCategory.Armor,
-            EquipmentType.Boots => EquipmentCategory.Armor,
-            EquipmentType.Helmet => EquipmentCategory.Armor,
-            EquipmentType.Amulet or EquipmentType.Belt or EquipmentType.Ring => EquipmentCategory.Jewellery,
-            EquipmentType.Weapon => EquipmentCategory.Weapon,
+            EquipmentPiece.Body => EquipmentCategory.Armor,
+            EquipmentPiece.Cloak => EquipmentCategory.Armor,
+            EquipmentPiece.Gloves => EquipmentCategory.Armor,
+            EquipmentPiece.Boots => EquipmentCategory.Armor,
+            EquipmentPiece.Helmet => EquipmentCategory.Armor,
+            EquipmentPiece.Amulet or EquipmentPiece.Belt or EquipmentPiece.Ring => EquipmentCategory.Jewellery,
+            EquipmentPiece.Weapon => EquipmentCategory.Weapon,
             _ => throw new ArgumentOutOfRangeException(nameof(equipment))
         };
 

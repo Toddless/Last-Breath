@@ -7,6 +7,7 @@
         Legendary = 0,
         Epic,
         Rare,
-        Uncommon
+        Uncommon,
+        Common
     }
 }

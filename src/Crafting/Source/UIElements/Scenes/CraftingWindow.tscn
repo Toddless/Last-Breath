@@ -14,9 +14,9 @@ font_size = 22
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1mud6"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[node name="CraftingWindow" type="PanelContainer" node_paths=PackedStringArray("_close", "_add", "_description", "_skill", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_recipeContainer", "_buttons", "_itemIcon", "DragArea")]
-offset_right = 85.0
-offset_bottom = 31.0
+[node name="CraftingWindow" type="PanelContainer" node_paths=PackedStringArray("_close", "_add", "_description", "_skill", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_recipeContainer", "_buttons", "_itemIcon")]
+offset_right = 804.0
+offset_bottom = 500.0
 size_flags_vertical = 8
 theme_override_styles/panel = SubResource("StyleBoxFlat_vb7l8")
 script = ExtResource("1_1mud6")
@@ -32,7 +32,6 @@ _baseStats = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/Ic
 _recipeContainer = NodePath("HBoxContainer/RecipeContainer")
 _buttons = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Buttons")
 _itemIcon = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats/Icon")
-DragArea = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer/DragArea")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
@@ -148,11 +147,6 @@ theme_override_constants/separation = 1
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
-
-[node name="DragArea" type="Control" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.9
 
 [node name="CloseButtonContainer" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer"]
 custom_minimum_size = Vector2(35, 35)

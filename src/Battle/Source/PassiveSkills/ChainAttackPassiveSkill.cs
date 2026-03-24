@@ -3,7 +3,6 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
     using Core.Interfaces.Events.GameEvents;
-    using Godot;
 
     public class ChainAttackPassiveSkill()
         : Skill(id: "Passive_Skill_Chain_Attack")

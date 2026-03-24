@@ -39,7 +39,6 @@
 
         public void SetItemBaseStats(InteractiveLabel item)
         {
-            item.SetLabelSetting(_uiResourcesProvider?.GetResource("BaseItemStatsSetting") as LabelSettings);
             _baseStatsContainer?.AddChild(item);
             var childSize = item.GetCombinedMinimumSize();
             _currentMaxSize = childSize > _currentMaxSize ? childSize : _currentMaxSize;
@@ -47,7 +46,6 @@
 
         public void SetItemAdditionalStats(InteractiveLabel item)
         {
-            item.SetLabelSetting(_uiResourcesProvider?.GetResource("AdditionalStatsSettings") as LabelSettings);
             _additionalStatsContainer?.AddChild(item);
         }
 

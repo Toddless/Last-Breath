@@ -50,7 +50,7 @@ namespace LootGeneration.Source
             // same npc can die multiple times per battle
             if (!_tableCache.TryGetValue(npc.InstanceId, out Dictionary<int, List<TableRecord>>? baseTable))
             {
-                baseTable = await _gameMessageBus.Send<GetLootTableRequest, Dictionary<int, List<TableRecord>>>(new(npc.Fraction, npc.EntityType, npc.Id));
+                baseTable = await _gameMessageBus.SendRequest<GetLootTableRequest, Dictionary<int, List<TableRecord>>>(new(npc.Fraction, npc.EntityType, npc.Id));
                 _tableCache[npc.InstanceId] = baseTable;
             }
 

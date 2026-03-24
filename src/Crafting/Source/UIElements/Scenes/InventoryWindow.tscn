@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://byx7g1b2wlwfl"]
+[gd_scene load_steps=2 format=3 uid="uid://crr1u8pdpamoq"]
 
-[ext_resource type="Script" uid="uid://b4juple8vn5ku" path="res://Source/UIElements/InventoryWindow.cs" id="1_vmfmr"]
+[ext_resource type="Script" uid="uid://drrims7f874sy" path="res://Source/UIElements/InventoryWindow.cs" id="1_vmfmr"]
 
 [node name="InventoryWindow" type="Panel" node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_inventoryGrid")]
 custom_minimum_size = Vector2(800, 1080)

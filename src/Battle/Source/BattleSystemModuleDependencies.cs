@@ -1,13 +1,21 @@
 ﻿namespace Battle.Source
 {
+    using Core.Data;
+    using Core.Interfaces.UI;
     using Microsoft.Extensions.DependencyInjection;
+    using UIElements;
 
     public static class BattleSystemModuleDependencies
     {
         public static IServiceCollection AddBattleSystemModuleDependencies(this IServiceCollection services)
         {
-
             return services;
+        }
+
+        public static void AddBattleHudFactory(this IGameServiceProvider provider)
+        {
+            var uiElementManager = provider.GetService<IUiElementsManager>();
+            uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
         }
     }
 }
