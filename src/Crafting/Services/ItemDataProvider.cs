@@ -13,6 +13,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces;
 
     internal class ItemDataProvider(string itemDataPath) : IItemDataProvider
     {
@@ -32,10 +33,10 @@
         public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
         public List<IModifier> GetEquipItemBaseModifierPool(string id) => throw new NotImplementedException();
 
-        public List<IResourceRequirement> GetRecipeRequirements(string id)
+        public List<IRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
-            return item is not ICraftingRecipe recipe ? [] : recipe.MainResource;
+            return item is not ICraftingRecipe recipe ? [] : recipe.Requirements;
         }
 
         public string GetRecipeResultItemId(string recipeId)
@@ -103,9 +104,9 @@
                             break;
                         case var _ when dataPath.EndsWith("Recipes"):
                             var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
-                                (type, s, arg3) => new ResourceRequirement(type, s, arg3),
-                                (id, resultItem, tags, rarity, requirements, itemType, isOpened) =>
-                                    new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
+                                (type, s, arg3) => new Requirement(type, s, arg3),
+                                (id, resultItem, tags, rarity, requirements, itemType, isOpened, categories) =>
+                                    new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, categories, isOpened));
                             data = recipes.Cast<IItem>().ToList();
                             break;
                         case var _ when dataPath.EndsWith("Resources"):

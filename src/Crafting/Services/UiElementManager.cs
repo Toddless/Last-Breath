@@ -1,24 +1,27 @@
 ﻿namespace Crafting.Services
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Items;
+    using temp.Layers;
     using Core.Interfaces.UI;
     using Source.UIElements;
-    using TestResources.Layers;
-    using Godot;
-    using Utilities;
+    using System.Collections.Generic;
 
     internal class UiElementManager(IGameServiceProvider provider) : IUiElementsManager
     {
         private readonly Dictionary<Type, IHud> _hudCache = [];
         private readonly Dictionary<Type, IWindow> _windowCache = [];
+        private readonly Dictionary<Type, Func<IHud>> _hudFactories = new();
+
+        private readonly Dictionary<Type, Func<IWindow>> _windowFactories = new()
+        {
+            [typeof(CraftingWindow)] = () => CraftingWindow.Initialize().Instantiate<CraftingWindow>(),
+            [typeof(CraftingItems)] = () => CraftingItems.Initialize().Instantiate<CraftingItems>()
+        };
+
         private UILayerManager? _layers;
         private IHud? _currentHud;
-
 
         public void Subscribe(Node layer)
         {
@@ -52,34 +55,29 @@
             return window;
         }
 
-        public void ClearCache() => throw new NotImplementedException();
+        public void ClearCache()
+        {
+            _hudCache.Clear();
+            _windowCache.Clear();
+        }
 
         public bool RegisterHudFactory(Type hudType, Func<IHud> factory) => throw new NotImplementedException();
-
         public bool RegisterWindowFactory(Type windowType, Func<IWindow> factory) => throw new NotImplementedException();
-
-
-        // TODO: Simplify it later?
 
         private IWindow CreateWindowInstance(Type type)
         {
-            IWindow window = type switch
-            {
-                _ when type == typeof(CraftingWindow) => CraftingWindow.Initialize().Instantiate<CraftingWindow>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
-
+            if (!_windowFactories.TryGetValue(type, out var factory))
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            var window = factory();
             window.InjectServices(provider);
             return window;
         }
 
         private IHud CreateHudInstance(Type type)
         {
-            IHud hud = type switch
-            {
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
-
+            if (!_hudFactories.TryGetValue(type, out var factory))
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            var hud = factory();
             hud.InjectServices(provider);
             return hud;
         }

@@ -3,13 +3,14 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
 
-    public class GetEquipItemRecraftModifierCostRequestHandler : IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IResourceRequirement>>
+    public class GetEquipItemRecraftModifierCostRequestHandler : IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IRequirement>>
     {
         private readonly IInventory _inventory;
         private readonly IItemUpgrader _itemUpgrader;
@@ -20,14 +21,14 @@
             _inventory = inventory;
         }
 
-        public Task<IEnumerable<IResourceRequirement>> HandleRequest(GetEquipItemRecraftModifierCostRequest request)
+        public Task<IEnumerable<IRequirement>> HandleRequest(GetEquipItemRecraftModifierCostRequest request)
         {
             var item = _inventory.GetItem<IEquipItem>(request.ItemInstanceId);
-            if (item == null) return Task.FromResult<IEnumerable<IResourceRequirement>>([]);
+            if (item == null) return Task.FromResult<IEnumerable<IRequirement>>([]);
 
             var recraftCost = _itemUpgrader?.GetRecraftResourceCost(item.Rarity, item.EquipmentPiece.ConvertEquipmentPartToCategory()) ?? [];
 
-            return Task.FromResult<IEnumerable<IResourceRequirement>>(recraftCost);
+            return Task.FromResult<IEnumerable<IRequirement>>(recraftCost);
         }
     }
 }

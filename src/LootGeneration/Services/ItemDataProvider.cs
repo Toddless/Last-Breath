@@ -11,13 +11,14 @@ namespace LootGeneration.Services
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces;
+    using temp;
     using ExampleCraftingRecipe = temp.ExampleCraftingRecipe;
     using ExampleCraftingResource = temp.ExampleCraftingResource;
     using ExampleEquipItem = temp.ExampleEquipItem;
     using ExampleMaterialCategory = temp.ExampleMaterialCategory;
     using ExampleMaterialModifier = temp.ExampleMaterialModifier;
     using ExampleMaterialType = temp.ExampleMaterialType;
-    using ExampleResourceRequirement = temp.ExampleResourceRequirement;
     using ExampleUpgradeResource = temp.ExampleUpgradeResource;
     using FileAccess = Godot.FileAccess;
 
@@ -36,10 +37,10 @@ namespace LootGeneration.Services
 
         public List<IModifier> GetEquipItemModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool;
 
-        public List<IResourceRequirement> GetRecipeRequirements(string id)
+        public List<IRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
-            return item is not ICraftingRecipe recipe ? [] : recipe.MainResource;
+            return item is not ICraftingRecipe recipe ? [] : recipe.Requirements;
         }
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) =>
@@ -152,8 +153,9 @@ namespace LootGeneration.Services
         private async Task ParseRecipes(string jsonContent)
         {
             var recipes = await DataParser.ParseRecipes<ExampleCraftingRecipe>(jsonContent,
-                (type, s, arg3) => new ExampleResourceRequirement(type, s, arg3),
-                (id, resultItem, tags, rarity, requirements, itemType, isOpened) => new ExampleCraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
+                (type, s, arg3) => new ExampleRequirement(type, s, arg3),
+                (id, resultItem, tags, rarity, requirements, itemType, isOpened, categories) =>
+                    new ExampleCraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, categories, isOpened));
             List<IItem> data = recipes.Cast<IItem>().ToList();
             lock (_itemData)
                 data.ForEach(item => _itemData.TryAdd(item.Id, item));

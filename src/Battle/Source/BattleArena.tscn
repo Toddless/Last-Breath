@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcj35twqggu1d"]
+
+[ext_resource type="Script" uid="uid://cbmhijfsw13a3" path="res://Addons/Battle/BattleArena.cs" id="1_ggikp"]
+[ext_resource type="PackedScene" uid="uid://chwl8e6atuhnk" path="res://Addons/Battle/EntitySpot.tscn" id="2_vrr7q"]
+
+[node name="BattleArena" type="Node2D" node_paths=PackedStringArray("_spots", "_playerSpot")]
+script = ExtResource("1_ggikp")
+_spots = [NodePath("FirstSpot"), NodePath("SecondSpot"), NodePath("ThirdSpot"), NodePath("FourthSpot"), NodePath("FifthSpot")]
+_playerSpot = NodePath("PlayerSpot")
+
+[node name="PlayerSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(400, 550)
+
+[node name="FirstSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(1300, 550)
+
+[node name="SecondSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(1460, 400)
+
+[node name="ThirdSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(1460, 700)
+
+[node name="FourthSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(1670, 400)
+
+[node name="FifthSpot" parent="." instance=ExtResource("2_vrr7q")]
+position = Vector2(1670, 700)

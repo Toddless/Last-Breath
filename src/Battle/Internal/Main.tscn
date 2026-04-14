@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://bq1xb76glxis1"]
+
+[ext_resource type="Script" uid="uid://bwxykc0e4k3ce" path="res://Internal/Main.cs" id="1_lv1mp"]
+[ext_resource type="PackedScene" uid="uid://cruh58rlrfg2e" path="res://Internal/MainWorld.tscn" id="2_hwo8b"]
+[ext_resource type="Script" uid="uid://c35halbfiq3ku" path="res://Internal/UiLayerManager.cs" id="3_4pd56"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("_mainWorld", "_layerManager")]
+script = ExtResource("1_lv1mp")
+_mainWorld = NodePath("MainWorld")
+_layerManager = NodePath("CanvasLayer")
+
+[node name="MainWorld" parent="." instance=ExtResource("2_hwo8b")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+script = ExtResource("3_4pd56")

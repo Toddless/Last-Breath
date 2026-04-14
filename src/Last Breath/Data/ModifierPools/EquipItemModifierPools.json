@@ -1,0 +1,1098 @@
+{
+    "pools": [
+        {
+            "id": "Amulet",
+            "modifiersPool": [
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": 0.3,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": 0.3,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.3,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.3,
+                    "weight": 15
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": 200,
+                    "weight": 50
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "inc",
+                    "value": 0.4,
+                    "weight": 100
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "multi",
+                    "value": 0.35,
+                    "weight": 15
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": 200,
+                    "weight": 50
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "multi",
+                    "value": 0.3,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 50,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 50
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 50
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Amulet_Of_Defence",
+            "modifiersPool": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 650,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.25,
+                    "weight": 100
+                }
+            ]
+        },
+        {
+            "id": "Belt",
+            "modifiersPool": [
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 480,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": 0.18,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": 600,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 600,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 450,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": 450,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": 0.30,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Test_Belt",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body",
+            "modifiersPool": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 1300,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.65,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.4,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": 1300,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": 0.65,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": 0.4,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": 0.3,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 900,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.7,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.4,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Body_Strength_Stoneheart",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Strength_Iron_Bastion",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Strength_Vital_Core",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Dexterity_Shadowstep",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Dexterity_Hunters_Dream",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Dexterity_Feral_Instinct",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Intelligence_Eternal_Reserve",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Intelligence_Arcane_Bulwark",
+            "modifiersPool": []
+        },
+        {
+            "id": "Body_Intelligence_Aegis",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots",
+            "modifiersPool": [
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "flat",
+                    "value": 300,
+                    "weight": 50
+                },
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "inc",
+                    "value": 0.30,
+                    "weight": 100
+                },
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 500,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.45,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": 500,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": 0.45,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 350,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": 0.4,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 500,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Boots_Strength_Stoneheart",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Strength_Iron_Bastion",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Strength_Vital_Core",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Dexterity_Shadowstep",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Dexterity_Hunters_Dream",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Dexterity_Feral_Instinct",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Intelligence_Eternal_Reserve",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Intelligence_Arcane_Bulwark",
+            "modifiersPool": []
+        },
+        {
+            "id": "Boots_Intelligence_Aegis",
+            "modifiersPool": []
+        },
+        {
+            "id": "Cloak",
+            "modifiersPool": [
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": 250,
+                    "weight": 50
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": 250,
+                    "weight": 50
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 800,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 550,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": 0.3,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Creators_Cloak",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves",
+            "modifiersPool": [
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "CriticalDamage",
+                    "modifierType": "flat",
+                    "value": 90,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "flat",
+                    "value": 300,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "flat",
+                    "value": 450,
+                    "weight": 50
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "inc",
+                    "value": 0.4,
+                    "weight": 100
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "multi",
+                    "value": 0.25,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 600,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 600,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Gloves_Strength_Stoneheart",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Strength_Iron_Bastion",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Strength_Vital_Core",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Dexterity_Shadowstep",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Dexterity_Hunters_Dream",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Dexterity_Feral_Instinct",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Intelligence_Eternal_Reserve",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Intelligence_Arcane_Bulwark",
+            "modifiersPool": []
+        },
+        {
+            "id": "Gloves_Intelligence_Aegis",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet",
+            "modifiersPool": [
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 650,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": 650,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 450,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 450,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": 0.45,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Helmet_Strength_Stoneheart",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Strength_Iron_Bastion",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Strength_Vital_Core",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Dexterity_Shadowstep",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Dexterity_Hunters_Dream",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Dexterity_Feral_Instinct",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Intelligence_Eternal_Reserve",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Intelligence_Arcane_Bulwark",
+            "modifiersPool": []
+        },
+        {
+            "id": "Helmet_Intelligence_Aegis",
+            "modifiersPool": []
+        },
+        {
+            "id": "Ring",
+            "modifiersPool": [
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "flat",
+                    "value": 0.2,
+                    "weight": 50
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "flat",
+                    "value": 900,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "inc",
+                    "value": 0.35,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "multi",
+                    "value": 0.15,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 50,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": 0.25,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "multi",
+                    "value": 0.11,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 50,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": 0.25,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "multi",
+                    "value": 0.11,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 50,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": 0.25,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "multi",
+                    "value": 0.11,
+                    "weight": 15
+                }
+            ]
+        },
+        {
+            "id": "Ring_Strength_Generic",
+            "modifiersPool": []
+        },
+        {
+            "id": "Ring_Dexterity_Generic",
+            "modifiersPool": []
+        },
+        {
+            "id": "Ring_Intelligence_Generic",
+            "modifiersPool": []
+        },
+        {
+            "id": "Weapons",
+            "modifiersPool": [
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": 0.1,
+                    "weight": 100
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": 0.1,
+                    "weight": 15
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "flat",
+                    "value": 250,
+                    "weight": 50
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 100
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "multi",
+                    "value": 0.2,
+                    "weight": 15
+                }
+            ]
+        }
+    ]
+}

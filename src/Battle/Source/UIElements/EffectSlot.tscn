@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://5n5bfrh72v8s"]
+
+[ext_resource type="Script" uid="uid://dqpnf2yargpck" path="res://Source/UIElements/EffectSlot.cs" id="1_qp1m6"]
+
+[node name="EffectSlot" type="Control" node_paths=PackedStringArray("_effectIcon", "_effectStacks")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_qp1m6")
+_effectIcon = NodePath("TextureRect")
+_effectStacks = NodePath("TextureRect/Label")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+expand_mode = 1
+
+[node name="Label" type="Label" parent="TextureRect"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+horizontal_alignment = 2
+vertical_alignment = 1

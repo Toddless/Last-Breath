@@ -11,7 +11,7 @@
         event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
         event Action<string, int>? ItemAmountChanges;
         event Action<string, string, int, int>? InventoryFull;
-        event Action<string>? NotEnougthItems;
+        event Action<string>? NotEnoughItems;
         event Action<IItem, MouseInteractions>? ItemInteraction;
 
         void Initialize(int amount, GridContainer? container);

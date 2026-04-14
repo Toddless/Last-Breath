@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Godot;
 
-    public interface IEquipItemUi
+    public interface IItemUi
     {
         void SetItemName(string name);
         void SetItemDescription(string description);
@@ -14,5 +14,6 @@
         void SetItemEffectName(string name);
         void SetItemEffectDescription(string description);
         void SetItemAdditionalStats(List<(string ModifierText, int Identifier)> additionalStats);
+        void SetItemUpgradeLevel(string level);
     }
 }

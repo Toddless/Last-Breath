@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3 uid="uid://b61p1gu5nrmfd"]
+
+[ext_resource type="Script" uid="uid://crssb40y6tjro" path="res://Source/UIElements/ClickableRequirement.cs" id="1_xx3jw"]
+
+[sub_resource type="Gradient" id="Gradient_rc17n"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rs8fk"]
+gradient = SubResource("Gradient_rc17n")
+
+[sub_resource type="LabelSettings" id="LabelSettings_xx3jw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fpbnb"]
+font_size = 12
+
+[node name="ClickableRequirement" type="VBoxContainer" node_paths=PackedStringArray("_text", "_quantity", "_icon")]
+offset_right = 102.0
+offset_bottom = 77.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_xx3jw")
+_enoughQuantityTextColor = Color(0, 0.398416, 0, 1)
+_notEnoughQuantityTextColor = Color(0.6756453, 0.15419228, 0.11345376, 1)
+_resourceNameTextSize = 16
+_resourceQuantityTextSize = 12
+_text = NodePath("HBoxContainer/ResourceName")
+_quantity = NodePath("HBoxContainer/Quantity")
+_icon = NodePath("MarginContainer/TextureRect")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = SubResource("GradientTexture1D_rs8fk")
+expand_mode = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="ResourceName" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Resource"
+label_settings = SubResource("LabelSettings_xx3jw")
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Quantity" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "(1/4)"
+label_settings = SubResource("LabelSettings_fpbnb")

@@ -1,14 +1,13 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using System;
+    using Core.Data;
     using Utilities;
     using System.Linq;
     using Core.Interfaces.UI;
     using System.Threading.Tasks;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
-    using Core.Data;
 
     [GlobalClass]
     public partial class CraftingItems : Control, IWindow
@@ -22,14 +21,19 @@
         private IInventory? _inventory;
 
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
-        
+
         public override void _Ready()
         {
             _add?.Pressed += OnAddPressed;
             _cancel?.Pressed += OnCancelPressed;
         }
 
-        public void Close() => GetParent().RemoveChild(this);
+        public void Close()
+        {
+            _items?.Clear();
+            _resources.Clear();
+            GetParent().RemoveChild(this);
+        }
 
         public void InjectServices(IGameServiceProvider provider)
         {
@@ -39,13 +43,15 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public void Setup(IEnumerable<string> disabledResources)
+        public void Setup(IEnumerable<string> disabledResources, string[] tags, bool isSingle = false)
         {
-            // TODO: I need not only Essences.
-            var inventoryItems = _inventory?.GetAllItemIdsWithTag("Essence");
-            foreach (string res in inventoryItems ?? [])
-                AddItem(res);
+            List<string> inventoryItems = [];
+            foreach (string tag in tags)
+                inventoryItems.AddRange(_inventory?.GetAllItemIdsWithTag(tag) ?? []);
 
+            foreach (string res in inventoryItems)
+                AddItem(res);
+            _items?.SelectMode = isSingle ? ItemList.SelectModeEnum.Single : ItemList.SelectModeEnum.Multi;
             UpdateDisabled(disabledResources);
         }
 
@@ -89,6 +95,5 @@
             foreach (var res in _resources.Where(res => disabled.Contains(res.Value)))
                 _items?.SetItemDisabled(res.Key, true);
         }
-
     }
 }

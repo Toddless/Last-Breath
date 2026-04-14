@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bke05jg0bjgy1"]
+
+[ext_resource type="Script" uid="uid://dfatet4jyu8mn" path="res://Source/UIElements/StanceSlot.cs" id="1_r0o61"]
+
+[node name="StanceSlot" type="TextureButton"]
+script = ExtResource("1_r0o61")

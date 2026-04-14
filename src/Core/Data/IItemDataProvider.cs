@@ -4,6 +4,7 @@
     using Interfaces.Items;
     using Interfaces.Crafting;
     using System.Collections.Generic;
+    using Interfaces;
     using Modifiers;
 
     public interface IItemDataProvider
@@ -13,7 +14,7 @@
         IEnumerable<ICraftingRecipe> GetCraftingRecipes();
         Texture2D? GetItemIcon(string id);
         ICraftingRecipe GetRecipe(string recipeId);
-        List<IResourceRequirement> GetRecipeRequirements(string id);
+        List<IRequirement> GetRecipeRequirements(string id);
         string GetRecipeResultItemId(string recipeId);
         IReadOnlyList<IModifier> GetResourceModifiers(string id);
         bool IsItemHasTag(string id, string tag);

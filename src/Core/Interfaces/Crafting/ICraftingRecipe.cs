@@ -5,9 +5,10 @@
 
     public interface ICraftingRecipe : IIdentifiable, IDisplayable, ITaggable
     {
-        string ResultItemId {  get; }
+        string ResultItemId { get; }
         bool IsOpened { get; }
-        List<IResourceRequirement> MainResource { get; set; }
+        List<IRequirement> Requirements { get; set; }
         ItemType ItemType { get; }
+        string[] OptionalResourceCategories { get; }
     }
 }

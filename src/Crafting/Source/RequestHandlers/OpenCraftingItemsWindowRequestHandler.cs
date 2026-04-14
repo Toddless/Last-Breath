@@ -7,20 +7,14 @@
     using Core.Interfaces.UI;
     using UIElements;
 
-    public class OpenCraftingItemsWindowRequestHandler : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
+    public class OpenCraftingItemsWindowRequestHandler(IUiElementsManager uIElementManager) : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>
     {
-        private readonly IUiElementsManager _uIElementManager;
-
-        public OpenCraftingItemsWindowRequestHandler(IUiElementsManager uIElementManager)
-        {
-            _uIElementManager = uIElementManager;
-        }
-
         public async Task<IEnumerable<string>> HandleRequest(OpenCraftingItemsWindowRequest request)
         {
-            var craftingItems = (CraftingItems)_uIElementManager.OpenWindow(typeof(CraftingItems));
-            craftingItems.Setup(request.TakenResources);
+            var craftingItems = (CraftingItems)uIElementManager.OpenWindow(typeof(CraftingItems));
+            craftingItems.Setup(request.TakenResources, request.Tags, request.IsSingleChose);
             var selected = await craftingItems.WaitForSelectionAsync();
+            craftingItems.Close();
             return selected;
         }
     }

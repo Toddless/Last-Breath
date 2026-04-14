@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://dgagtrp0u08jt"]
+
+[ext_resource type="Script" uid="uid://4j5gtp3snq6j" path="res://Player.cs" id="1_kpjcp"]
+[ext_resource type="Texture2D" uid="uid://djde1vw5juilc" path="res://temp/Front - Idle_000.png" id="2_kne1u"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l1asl"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6if7a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l1asl"]
+atlas = ExtResource("2_kne1u")
+region = Rect2(154, 90.5, 177, 294)
+
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_interactionArea")]
+z_index = 1
+script = ExtResource("1_kpjcp")
+_interactionArea = NodePath("InteractionArea")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(3.645, 3.645)
+shape = SubResource("CapsuleShape2D_l1asl")
+
+[node name="InteractionArea" type="Area2D" parent="."]
+scale = Vector2(3.86, 3.86)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("CapsuleShape2D_6if7a")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
+texture = SubResource("AtlasTexture_l1asl")

@@ -3,13 +3,14 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
 
-    public class GetEquipItemUpgradeCostRequestHandler : IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IResourceRequirement>>
+    public class GetEquipItemUpgradeCostRequestHandler : IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>
     {
         private readonly IInventory _inventory;
         private readonly IItemUpgrader _itemUpgrader;
@@ -20,14 +21,14 @@
             _inventory = inventory;
         }
 
-        public Task<IEnumerable<IResourceRequirement>> HandleRequest(GetEquipItemUpgradeCostRequest request)
+        public Task<IEnumerable<IRequirement>> HandleRequest(GetEquipItemUpgradeCostRequest request)
         {
             var item = _inventory.GetItem<IEquipItem>(request.ItemInstanceId);
-            if (item == null) return Task.FromResult<IEnumerable<IResourceRequirement>>([]);
+            if (item == null) return Task.FromResult<IEnumerable<IRequirement>>([]);
 
             var upgradeCosts = _itemUpgrader?.GetUpgradeResourceCost(item.Rarity, item.EquipmentPiece.ConvertEquipmentPartToCategory(), request.Mode) ?? [];
 
-            return Task.FromResult<IEnumerable<IResourceRequirement>>(upgradeCosts);
+            return Task.FromResult<IEnumerable<IRequirement>>(upgradeCosts);
         }
     }
 }

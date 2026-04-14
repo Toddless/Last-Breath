@@ -1,38 +1,32 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source.UIElements
 {
     using Godot;
-    using Source.UIElements;
     using Godot.Collections;
     using Core.Interfaces.UI;
     using System.Collections.Generic;
-    using Core.Data;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Services;
-    using Source;
 
-    public partial class EquipItemUi : Control, IInitializable, IEquipItemUi
+    public partial class ItemUi : Control, IInitializable, IItemUi
     {
         private const string UID = "uid://b157jy1w03jwo";
-        [Export] private Label? _itemName, _effectName, _rarity, _piece;
+        [Export] private Label? _itemName, _effectName, _rarity, _piece, _itemUpgradeLevel;
         [Export] private Array<Label> _itemBaseStats = [];
         [Export] private TextureRect? _itemIcon;
         [Export] private RichTextLabel? _itemDescription, _effectDescription;
         [Export] private ItemModifierList? _additionalStats;
-        private IEquipItemUiConfiguration? _configuration;
+        private IItemUiConfiguration? _configuration;
 
+        [Signal]
+        public delegate void ModifierSelectedEventHandler(int identifier, ItemModifierList source);
 
         public override void _Ready()
         {
-            // var provider = GameServiceProvider.Instance.GetService<IItemDataProvider>();
-            // var messageBus = GameServiceProvider.Instance.GetService<IGameMessageBus>();
-            // var mastery = new CraftingMastery(messageBus, new RandomNumberGenerator());
-            // mastery.AddExperience(5000000);
-            // var item = (IEquipItem)provider.CopyItem("Ring_Of_Fire_Demon");
-            // SetConfiguration(new EquipItemCreationConfiguration(item, mastery));
+            if (_additionalStats != null)
+                _additionalStats.ItemSelected += OnModifierItemSelected;
         }
 
-        public void SetConfiguration(IEquipItemUiConfiguration? configuration)
+        public void SetModifiersSelectable(bool selectable) => _additionalStats?.SetItemsSelectable(selectable);
+
+        public void SetConfiguration(IItemUiConfiguration? configuration)
         {
             _configuration = configuration;
             _configuration?.Configure(this);
@@ -47,6 +41,8 @@
         public void SetItemRarity(string rarity) => _rarity?.Text = rarity;
 
         public void SetItemPiece(string piece) => _piece?.Text = piece;
+
+        public void SetItemUpgradeLevel(string level) => _itemUpgradeLevel?.Text = level;
 
         public void SetItemBaseStats(List<string> baseStats)
         {
@@ -63,5 +59,8 @@
         public void SetItemEffectDescription(string description) => _effectDescription?.Text = description;
 
         public void SetItemAdditionalStats(List<(string ModifierText, int Identifier)> additionalStats) => _additionalStats?.AddModifiersToList(additionalStats);
+
+        private void OnModifierItemSelected(int identifier, ItemModifierList source) =>
+            EmitSignal(SignalName.ModifierSelected, identifier, source);
     }
 }

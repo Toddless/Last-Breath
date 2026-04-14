@@ -18,7 +18,7 @@
 
         public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
         public event Action<string, string, int, int>? InventoryFull;
-        public event Action<string>? NotEnougthItems;
+        public event Action<string>? NotEnoughItems;
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
@@ -125,7 +125,7 @@
                 else
                     Tracker.TrackError("");
             }
-            if (remainToDelete > 0) NotEnougthItems?.Invoke(itemId);
+            if (remainToDelete > 0) NotEnoughItems?.Invoke(itemId);
 
             ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
         }

@@ -13,6 +13,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using Core.Interfaces;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider
@@ -33,10 +34,10 @@
         public List<IModifier> GetEquipItemModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool.ToList();
 
 
-        public List<IResourceRequirement> GetRecipeRequirements(string id)
+        public List<IRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
-            return item is not ICraftingRecipe recipe ? [] : recipe.MainResource;
+            return item is not ICraftingRecipe recipe ? [] : recipe.Requirements;
         }
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) =>
@@ -159,8 +160,9 @@
         private async Task ParseRecipes(string jsonContent)
         {
             var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
-                (type, s, arg3) => new ResourceRequirement(type, s, arg3),
-                (id, resultItem, tags, rarity, requirements, itemType, isOpened) => new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, isOpened));
+                (type, s, arg3) => new Requirement(type, s, arg3),
+                (id, resultItem, tags, rarity, requirements, itemType, isOpened, categories) =>
+                    new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, categories, isOpened));
             List<IItem> data = recipes.Cast<IItem>().ToList();
             lock (_itemData)
                 data.ForEach(item => _itemData.TryAdd(item.Id, item));

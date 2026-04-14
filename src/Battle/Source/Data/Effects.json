@@ -1,0 +1,290 @@
+{
+    "effect": [
+        {
+            "id": "Effect_Unlucky_Critical_Chance",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                }
+            ]
+        },
+        {
+            "id": "Effect_Regeneration",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "Amount",
+                    "value": 200
+                }
+            ]
+        },
+        {
+            "id": "Effect_Parameter_Equals",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "Parameter",
+                    "value": "Strength"
+                },
+                {
+                    "parameter": "Value",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "Effect_On_Edge",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                }
+            ]
+        },
+        {
+            "id": "Effect_Lucky_Crit_Chance",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                }
+            ]
+        },
+        {
+            "id": "Effect_Life_Giving_Shade",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "Regeneration"
+                },
+                {
+                    "parameter": "LifeToRecover",
+                    "value": 100
+                },
+                {
+                    "parameter": "Activations",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "id": "Effect_Healing_Fury",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "Fury"
+                },
+                {
+                    "parameter": "HealthPercent",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "Effect_Fury",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "Fury"
+                },
+                {
+                    "parameter": "HealthPercent",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "Effect_Burning_Fury",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                }
+            ]
+        },
+        {
+            "id": "Effect_Primal_Fury",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "HealthPercent",
+                    "value": 0.05
+                },
+                {
+                    "parameter": "DamageMultiplier",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "Effect_Execution",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "Threshold",
+                    "value": 0.15
+                }
+            ]
+        },
+        {
+            "id": "Effect_Evade_First_Death",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "PercentHealthToRecover",
+                    "value": 0.7
+                }
+            ]
+        },
+        {
+            "id": "Effect_Damage_Over_Turn",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                },
+                {
+                    "parameter": "PercentFromDamage",
+                    "value": 0.7
+                }
+            ]
+        },
+        {
+            "id": "Effect_Curse",
+            "parameter": [
+                {
+                    "parameter": "Duration",
+                    "value": 3
+                },
+                {
+                    "parameter": "Stacks",
+                    "value": 1
+                },
+                {
+                    "parameter": "StatusEffect",
+                    "value": "None"
+                }
+            ]
+        }
+    ]
+}

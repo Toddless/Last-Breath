@@ -4,7 +4,7 @@
     using Enums;
     using Crafting;
 
-    public record GetEquipItemUpgradeCostRequest(string ItemInstanceId, ItemUpgradeMode Mode) : IRequest<IEnumerable<IResourceRequirement>>
+    public record GetEquipItemUpgradeCostRequest(string ItemInstanceId, ItemUpgradeMode Mode) : IRequest<IEnumerable<IRequirement>>
     {
     }
 }

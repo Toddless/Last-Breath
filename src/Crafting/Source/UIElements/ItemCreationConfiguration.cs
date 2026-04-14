@@ -1,4 +1,4 @@
-﻿namespace Crafting.TestResources
+﻿namespace Crafting.Source.UIElements
 {
     using Utilities;
     using Core.Enums;
@@ -8,11 +8,12 @@
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
 
-    public class EquipItemCreationConfiguration(IEquipItem item, ICraftingMastery mastery) : IEquipItemUiConfiguration
+    public class ItemCreationConfiguration(IEquipItem item, ICraftingMastery mastery) : IItemUiConfiguration
     {
-        public void Configure(IEquipItemUi ui)
+        public void Configure(IItemUi ui)
         {
             ui.SetItemName(item.DisplayName);
+            ui.SetItemUpgradeLevel(item.UpdateLevel > 0 ? $"+{item.UpdateLevel}" : string.Empty);
             ui.SetItemDescription(item.Description);
             ui.SetItemRarity(FormatRarity(item.Rarity));
             ui.SetItemPiece(Localization.Localize(item.EquipmentPiece.ToString()));
@@ -23,9 +24,10 @@
             ui.SetItemAdditionalStats(FormatAdditionalModifiers());
         }
 
+
         private string FormatRarity(Rarity itemRarity) => itemRarity switch
         {
-            Rarity.Common => "???",
+            Rarity.Common => $"{Localization.Localize("Rarity")}: ???",
             _ => Localization.Localize(itemRarity.ToString())
         };
 

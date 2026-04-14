@@ -11,6 +11,7 @@ namespace Core.Data.CraftingData
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
         [JsonProperty("isOpened")] public bool IsOpened { get; init; }
         [JsonProperty("itemType")] public string ItemType { get; init; } = string.Empty;
-        [JsonProperty("mainResources")] public List<ResourceRequirementData> MainResources { get; init; } = [];
+        [JsonProperty("requirements")] public List<RecipeRequirementsData> Requirements { get; init; } = [];
+        [JsonProperty("optionalResourceCategories")] public string[] OptionalResourceCategories { get; init; } = [];
     }
 }

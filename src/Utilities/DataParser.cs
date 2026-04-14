@@ -16,6 +16,7 @@
     using Core.Data.NpcModifiersData;
     using System.Collections.Generic;
     using Core.Data.ItemData;
+    using Core.Interfaces;
     using Newtonsoft.Json.Serialization;
 
     public abstract class DataParser
@@ -121,8 +122,8 @@
 
         public static async Task<List<TRecipe>> ParseRecipes<TRecipe>(
             string json,
-            Func<RequirementType, string, int, IResourceRequirement> resourceRequirementFactory,
-            Func<string, string, string[], Rarity, List<IResourceRequirement>, ItemType, bool, TRecipe> recipeFactory)
+            Func<RequirementType, string, int, IRequirement> resourceRequirementFactory,
+            Func<string, string, string[], Rarity, List<IRequirement>, ItemType, bool, string[],TRecipe> recipeFactory)
             where TRecipe : class, ICraftingRecipe, IItem
         {
             var data = JsonConvert.DeserializeObject<RecipeData>(json, s_settings);
@@ -131,12 +132,12 @@
 
             foreach (var recipeData in data?.CraftingRecipes ?? [])
             {
-                var requirements = new List<IResourceRequirement>();
+                var requirements = new List<IRequirement>();
 
-                foreach (var reqData in recipeData.MainResources)
+                foreach (var reqData in recipeData.Requirements)
                 {
                     var type = Enum.Parse<RequirementType>(reqData.Type);
-                    var requirement = resourceRequirementFactory.Invoke(type, reqData.ResourceId, reqData.Amount);
+                    var requirement = resourceRequirementFactory.Invoke(type, reqData.Id, reqData.Amount);
                     requirements.Add(requirement);
                 }
 
@@ -149,7 +150,8 @@
                     rarity,
                     requirements,
                     itemType,
-                    recipeData.IsOpened);
+                    recipeData.IsOpened,
+                    recipeData.OptionalResourceCategories);
 
                 recipes.Add(recipe);
             }

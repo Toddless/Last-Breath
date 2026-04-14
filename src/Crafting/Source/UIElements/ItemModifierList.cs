@@ -17,7 +17,6 @@
         [Signal]
         public delegate void ItemSelectedEventHandler(int identifier, ItemModifierList source);
 
-
         public void AddModifiersToList(List<(string ModifierText, int Identifier)> modifiers)
         {
             for (int i = 0; i < modifiers.Count; i++)

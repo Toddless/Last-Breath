@@ -1,6 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://betq124kfglyy"]
+[gd_scene load_steps=7 format=3 uid="uid://betq124kfglyy"]
 
 [ext_resource type="Script" uid="uid://twqbt4a617y7" path="res://Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
+[ext_resource type="PackedScene" uid="uid://b157jy1w03jwo" path="res://temp/Item.tscn" id="2_2kwm1"]
+[ext_resource type="PackedScene" uid="uid://1qq3je71i5vi" path="res://Source/UIElements/Scenes/Recipies.tscn" id="2_ixukq"]
+[ext_resource type="PackedScene" uid="uid://vaetfuo41kq1" path="res://temp/Resources.tscn" id="3_ftsnn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb7l8"]
 bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0)
@@ -8,36 +11,27 @@ bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwm1"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[sub_resource type="LabelSettings" id="LabelSettings_vb7l8"]
-font_size = 22
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1mud6"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-
-[node name="CraftingWindow" type="PanelContainer" node_paths=PackedStringArray("_close", "_add", "_description", "_skill", "_itemName", "_itemUpgradeLevel", "_requirements", "_additionalStats", "_baseStats", "_recipeContainer", "_buttons", "_itemIcon")]
+[node name="CraftingWindow" type="PanelContainer" node_paths=PackedStringArray("_close", "_add", "_recipeContainer", "_buttons", "_itemUi", "_recipes", "_resourcesUi", "_canBeCrafted")]
 offset_right = 804.0
 offset_bottom = 500.0
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_vb7l8")
 script = ExtResource("1_1mud6")
 _close = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer/CloseButtonContainer/Close")
 _add = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Add")
-_description = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription/Description/ItemDescription")
-_skill = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription/Skill")
-_itemName = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemName")
-_itemUpgradeLevel = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/ItemName/ItemUpdateLevel")
-_requirements = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/RequirementsContainer/RequirementsScrollContainer/Requirements")
-_additionalStats = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription/AdditionalStats")
-_baseStats = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats/BaseStats")
 _recipeContainer = NodePath("HBoxContainer/RecipeContainer")
 _buttons = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Buttons")
-_itemIcon = NodePath("HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats/Icon")
+_itemUi = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/Item")
+_recipes = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/Recipies")
+_resourcesUi = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer/Resources")
+_canBeCrafted = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer/Button")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
 
 [node name="Panel" type="PanelContainer" parent="HBoxContainer"]
-custom_minimum_size = Vector2(800, 500)
+custom_minimum_size = Vector2(1200, 900)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_2kwm1")
 
@@ -45,97 +39,41 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_2kwm1")
 layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background"]
-layout_mode = 0
-offset_right = 800.0
-offset_bottom = 500.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ItemStats" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer"]
+layout_mode = 2
+
+[node name="Recipies" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer" instance=ExtResource("2_ixukq")]
+layout_mode = 2
+title = "Recipes"
+title_alignment = 1
+
+[node name="Item" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer" instance=ExtResource("2_2kwm1")]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Resources" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_ftsnn")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 size_flags_stretch_ratio = 0.5
-theme_override_constants/separation = 1
 
-[node name="IconNameAndStats" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats"]
+[node name="Button" type="Button" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.4
-
-[node name="ItemName" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats"]
-layout_mode = 2
-size_flags_stretch_ratio = 0.1
-theme_override_constants/separation = 1
-alignment = 1
-
-[node name="ItemName" type="Label" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/ItemName"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-size_flags_horizontal = 5
-size_flags_vertical = 5
-size_flags_stretch_ratio = 0.9
-label_settings = SubResource("LabelSettings_vb7l8")
-
-[node name="ItemUpdateLevel" type="Label" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/ItemName"]
-custom_minimum_size = Vector2(50, 0)
-layout_mode = 2
-size_flags_horizontal = 5
-size_flags_vertical = 5
-size_flags_stretch_ratio = 0.1
-
-[node name="IconAndBaseStats" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.9
-
-[node name="Icon" type="TextureRect" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats"]
-clip_contents = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.45
-expand_mode = 1
-
-[node name="BaseStats" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/IconNameAndStats/IconAndBaseStats"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.55
-theme_override_constants/separation = 1
-alignment = 1
-
-[node name="SkillAndDescription" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.6
-theme_override_constants/separation = 1
-
-[node name="AdditionalStats" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.45
-theme_override_constants/separation = 2
-alignment = 1
-
-[node name="Skill" type="PanelContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.4
-mouse_filter = 1
-theme_override_styles/panel = SubResource("StyleBoxFlat_1mud6")
-
-[node name="Description" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription"]
-custom_minimum_size = Vector2(0, 25)
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.15
-theme_override_constants/margin_left = 5
-
-[node name="ItemDescription" type="RichTextLabel" parent="HBoxContainer/Panel/Background/HBoxContainer/ItemStats/SkillAndDescription/Description"]
-layout_mode = 2
-mouse_filter = 1
-theme_override_font_sizes/normal_font_size = 14
-horizontal_alignment = 1
-vertical_alignment = 1
+size_flags_horizontal = 0
+focus_mode = 0
+text = "Can be crafted"
 
 [node name="RequirementsAndButtons" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer"]
 layout_mode = 2
@@ -163,24 +101,6 @@ size_flags_horizontal = 8
 size_flags_stretch_ratio = 0.2
 text = "X"
 flat = true
-
-[node name="RequirementsContainer" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.85
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
-
-[node name="RequirementsScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/RequirementsContainer"]
-layout_mode = 2
-
-[node name="Requirements" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/RequirementsContainer/RequirementsScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.1
 
 [node name="ButtonsContainer" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons"]
 custom_minimum_size = Vector2(0, 45)

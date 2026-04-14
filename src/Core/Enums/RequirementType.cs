@@ -2,12 +2,10 @@
 {
     public enum RequirementType
     {
-        InventoryContains,
-        ItemUpgradeLevel,
-        ResourceAmount,
-        ItemRarity,
+        Resource,
+        ResourceCategory,
+        Rarity,
         MasteryLevel,
-        QuestCompleted,
-        QuestFailed
+        UpgradeLevel
     }
 }
