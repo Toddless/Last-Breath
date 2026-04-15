@@ -1,0 +1,64 @@
+[gd_scene load_steps=4 format=3 uid="uid://cekpl68hghs2v"]
+
+[ext_resource type="Script" uid="uid://dbo08d2wj4dmr" path="res://TestResources/Inventory/InventorySlot.cs" id="1_q6odv"]
+
+[sub_resource type="Gradient" id="Gradient_q6odv"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0.214876, 0.214876, 0.214876, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_j33og"]
+gradient = SubResource("Gradient_q6odv")
+
+[node name="InventorySlot" type="Control" node_paths=PackedStringArray("QuantityLabel", "Background", "Icon", "Frame")]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 60.0
+offset_bottom = 60.0
+size_flags_horizontal = 0
+mouse_filter = 1
+script = ExtResource("1_q6odv")
+QuantityLabel = NodePath("Label")
+Background = NodePath("Background")
+Icon = NodePath("Icon")
+Frame = NodePath("Frame")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture1D_j33og")
+expand_mode = 1
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="Frame" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0

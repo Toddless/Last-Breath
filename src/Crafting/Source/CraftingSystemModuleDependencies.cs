@@ -33,7 +33,6 @@
 
             services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();
             services.AddTransient<IMessageHandler<GainCraftingExpirienceMessage>, GainCraftingExperienceMessageHandler>();
-            services.AddTransient<IMessageHandler<ConsumeResourcesInInventoryMessage>, ConsumeResourcesWithinInventoryMessageHandler>();
             services.AddTransient<IMessageHandler<ItemCreatedMessage>, ItemCreatedMessageHandler>();
             services.AddTransient<IMessageHandler<OpenCraftingWindowMessage>, OpenCraftingWindowMessageHandler>();
             return services;

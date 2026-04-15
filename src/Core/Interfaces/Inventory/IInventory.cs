@@ -1,29 +1,24 @@
 ﻿namespace Core.Interfaces.Inventory
 {
-    using Godot;
-    using System;
-    using Enums;
     using Items;
+    using System;
     using System.Collections.Generic;
 
     public interface IInventory
     {
-        event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
+        int InventoryCapacity { get; }
+
         event Action<string, int>? ItemAmountChanges;
         event Action<string, string, int, int>? InventoryFull;
         event Action<string>? NotEnoughItems;
-        event Action<IItem, MouseInteractions>? ItemInteraction;
 
-        void Initialize(int amount, GridContainer? container);
-        ItemInstance? GetItemInstance(string id);
         List<string> GetAllItemIdsWithTag(string tag);
-        T? GetItem<T>(string instanceId) where T : IItem;
+        T? GetItem<T>(string instanceId) where T : class, IItem;
         int GetTotalItemAmount(string id);
         bool TryAddItem(IItem item, int amount = 1);
+        int GetAvailableCapacity();
         void RemoveItemById(string itemId, int amount = 1);
         void RemoveItemByInstanceId(string instanceId);
-        bool TryReturnItemInstanceToInventory(ItemInstance instance, int amount = 1);
-        void Clear();
         bool TryAddItemStacks(string itemId, int amount = 1);
     }
 }

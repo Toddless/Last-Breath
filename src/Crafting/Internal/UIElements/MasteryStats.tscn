@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgkdi4yraut0h"]
+
+[ext_resource type="Script" uid="uid://bt2ojr35h1o5g" path="res://TestResources/UIElements/MasteryStats.cs" id="1_dmfv5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_36e6s"]
+font_size = 19
+
+[node name="Mastery" type="PanelContainer" node_paths=PackedStringArray("_masteryStatContainer", "_masteryName")]
+script = ExtResource("1_dmfv5")
+_masteryStatContainer = NodePath("MasteryContainer/MasteryStatsContainer")
+_masteryName = NodePath("MasteryContainer/MasteryName")
+
+[node name="MasteryContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="MasteryName" type="Label" parent="MasteryContainer"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_36e6s")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MasteryStatsContainer" type="VBoxContainer" parent="MasteryContainer"]
+layout_mode = 2
+alignment = 1

@@ -3,15 +3,14 @@
     using Godot;
     using Source;
     using System;
-    using TestResources.Inventory;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
+    using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
-    using temp.Inventory;
 
     internal class GameServiceProvider : IGameServiceProvider
     {
@@ -52,7 +51,7 @@
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
             {
-                var instance = new ItemDataProvider("res://temp/Data/");
+                var instance = new ItemDataProvider("res://Internal/Data/");
                 instance.LoadData();
                 return instance;
             });

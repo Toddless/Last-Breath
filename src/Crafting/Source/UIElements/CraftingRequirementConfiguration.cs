@@ -8,6 +8,7 @@
     using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.UI;
+    using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
@@ -88,8 +89,9 @@
 
         private void OnItemAmountChanges(string id, int amount)
         {
-            if (_ui?.Id != id) return;
-            SetProperties(Localization.Localize(id), amount, requirement.Amount, null, true);
+            var item = _inventory?.GetItem<IItem>(id);
+            if (item == null || _ui?.Id != item.Id) return;
+            SetProperties(Localization.Localize(item.Id), amount, requirement.Amount, null, true);
         }
 
         private async void OnLeftClick(IRequirementUi ui)

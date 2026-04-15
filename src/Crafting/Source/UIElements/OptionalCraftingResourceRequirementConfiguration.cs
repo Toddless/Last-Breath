@@ -8,6 +8,7 @@
     using Core.Interfaces.UI;
     using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
 
@@ -35,8 +36,9 @@
 
         private void OnItemAmountChanges(string id, int amountHave)
         {
-            if (_ui?.Id != id) return;
-            _ui?.SetDisplayText(Localization.Localize(id), amountHave, 1);
+            var item = _inventory?.GetItem<IItem>(id);
+            if (item == null || _ui?.Id != item.Id) return;
+            _ui?.SetDisplayText(Localization.Localize(item.Id), amountHave, 1);
         }
 
         private void OnRightClick(IRequirementUi req)

@@ -1,0 +1,176 @@
+[gd_scene load_steps=4 format=3 uid="uid://buca4c3cfieil"]
+
+[ext_resource type="Script" uid="uid://b7obvgwyvx0ou" path="res://Source/UIElements/ItemUi.cs" id="1_sukw1"]
+[ext_resource type="Script" uid="uid://yj5qmru4xgya" path="res://Source/UIElements/ItemModifierList.cs" id="2_u2jop"]
+[ext_resource type="Script" uid="uid://biviw86bpwv7q" path="res://Source/UIElements/InteractiveLabel.cs" id="3_a8vdw"]
+
+[node name="Item" type="MarginContainer" node_paths=PackedStringArray("_itemName", "_effectName", "_rarity", "_piece", "_itemUpgradeLevel", "_itemBaseStats", "_itemIcon", "_itemDescription", "_effectDescription", "_additionalStats")]
+custom_minimum_size = Vector2(250, 0)
+offset_right = 206.0
+offset_bottom = 372.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 10
+script = ExtResource("1_sukw1")
+_itemName = NodePath("VBoxContainer/ItemName/ItemName")
+_effectName = NodePath("VBoxContainer/AdditionalStats/Effect/VBoxContainer/EffectName")
+_rarity = NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Rarity")
+_piece = NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Piece")
+_itemUpgradeLevel = NodePath("VBoxContainer/ItemName/ItemUpgradeLevel")
+_itemBaseStats = [NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Stat One"), NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Stat Two"), NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Stat Three"), NodePath("VBoxContainer/HBoxContainer/BaseStats/BaseStats/Stat Four")]
+_itemIcon = NodePath("VBoxContainer/HBoxContainer/Icon")
+_itemDescription = NodePath("VBoxContainer/ItemDescription/ItemDescription")
+_effectDescription = NodePath("VBoxContainer/AdditionalStats/Effect/VBoxContainer/EffectDescription")
+_additionalStats = NodePath("VBoxContainer/AdditionalStats/ItemModifierList")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ItemName" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="ItemName" type="Label" parent="VBoxContainer/ItemName"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "Item Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemUpgradeLevel" type="Label" parent="VBoxContainer/ItemName"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 14
+text = "+3"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="BaseStats" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 15
+
+[node name="BaseStats" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/BaseStats"]
+layout_mode = 2
+
+[node name="Piece" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Gloves"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Rarity" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="Stat One" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="Stat Two" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="Stat Three" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="Stat Four" type="Label" parent="VBoxContainer/HBoxContainer/BaseStats/BaseStats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="AdditionalStats" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ItemModifierList" type="VBoxContainer" parent="VBoxContainer/AdditionalStats" node_paths=PackedStringArray("_labels")]
+layout_mode = 2
+script = ExtResource("2_u2jop")
+_labels = [NodePath("StatOne"), NodePath("StatTwo"), NodePath("StatThree"), NodePath("StatFour")]
+
+[node name="StatOne" type="Label" parent="VBoxContainer/AdditionalStats/ItemModifierList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_a8vdw")
+metadata/_custom_type_script = "uid://biviw86bpwv7q"
+
+[node name="StatTwo" type="Label" parent="VBoxContainer/AdditionalStats/ItemModifierList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_a8vdw")
+metadata/_custom_type_script = "uid://biviw86bpwv7q"
+
+[node name="StatThree" type="Label" parent="VBoxContainer/AdditionalStats/ItemModifierList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_a8vdw")
+metadata/_custom_type_script = "uid://biviw86bpwv7q"
+
+[node name="StatFour" type="Label" parent="VBoxContainer/AdditionalStats/ItemModifierList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_a8vdw")
+metadata/_custom_type_script = "uid://biviw86bpwv7q"
+
+[node name="Effect" type="MarginContainer" parent="VBoxContainer/AdditionalStats"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/AdditionalStats/Effect"]
+layout_mode = 2
+
+[node name="EffectName" type="Label" parent="VBoxContainer/AdditionalStats/Effect/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Effect name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectDescription" type="RichTextLabel" parent="VBoxContainer/AdditionalStats/Effect/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 12
+text = "Worn through to the point of having holes, peeling in places. Something is scratched on the back."
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemDescription" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="ItemDescription" type="RichTextLabel" parent="VBoxContainer/ItemDescription"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 10
+text = "Example item description asdad na sdonadnald nakds nlaknsd lkandlkan sdasd asdasd asd asd asd asdwew "
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1

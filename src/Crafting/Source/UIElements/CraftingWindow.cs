@@ -31,7 +31,6 @@
 
         private IItemDataProvider? _dataProvider;
         private IGameMessageBus? _messageBus;
-        private IUIResourcesProvider? _uiResourcesProvider;
         private IGameServiceProvider? _provider;
 
         private CraftingMode _craftingMode;
@@ -47,8 +46,7 @@
             _recipes?.RecipeSelected += SetRecipe;
             _resourcesUi?.ItemCanBeCrafted += OnItemCanBeCrafted;
             _canBeCrafted?.Pressed += OnCraftPressed;
-            if (_itemUi != null)
-                _itemUi.ModifierSelected += OnModifierSelectedAsync;
+            _itemUi?.ModifierSelected += OnModifierSelectedAsync;
         }
 
         private void OnCraftPressed()
@@ -95,10 +93,10 @@
             _recipeId = recipeId;
             var recipe = (ICraftingRecipe)_dataProvider.CopyItem(_recipeId);
             var item = (IEquipItem)_dataProvider.CopyItem(recipe.ResultItemId);
+
             // For test
             var craftingMastery = _provider.GetService<ICraftingMastery>();
             craftingMastery.AddExperience(50000);
-            //
             _itemUi?.SetConfiguration(new ItemCreationConfiguration(item, craftingMastery));
             foreach (IRequirement recipeRequirement in recipe.Requirements)
                 _resourcesUi?.SetRequirements(recipeRequirement, _provider);
@@ -139,7 +137,7 @@
             _itemUi?.SetConfiguration(new ItemUpgradeConfiguration(_equipItem));
         }
 
-        private void SetEquipItem(IEquipItem item, IItemUiConfiguration configuration,  CraftingMode craftingMode,bool isModifiersSelectable = false)
+        private void SetEquipItem(IEquipItem item, IItemUiConfiguration configuration, CraftingMode craftingMode, bool isModifiersSelectable = false)
         {
             _resourcesUi?.ClearSlots();
             _craftingMode = craftingMode;

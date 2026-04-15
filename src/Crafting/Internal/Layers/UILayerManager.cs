@@ -1,0 +1,46 @@
+﻿namespace Crafting.Internal.Layers
+{
+    using Core.Interfaces.MessageBus;
+    using Core.Interfaces.UI;
+    using Services;
+    using Godot;
+
+    [GlobalClass]
+    internal partial class UILayerManager : Node
+    {
+        [Export] private CanvasLayer? _mainLayer, _windowLayer, _notificationLayer;
+
+        private IGameMessageBus? _messageBus;
+
+        public override void _Ready()
+        {
+            var serviceProvider = GameServiceProvider.Instance;
+            _messageBus = serviceProvider.GetService<IGameMessageBus>();
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+        }
+
+        public void ShowHud(IHud hud)
+        {
+            if (hud is Control cHud)
+                _mainLayer?.CallDeferred(Node.MethodName.AddChild, cHud);
+        }
+
+        public void ShowWindow(IWindow window)
+        {
+            if (window is Control cWindow)
+                _windowLayer?.CallDeferred(Node.MethodName.AddChild, cWindow);
+        }
+        public void ShowNotification(Control notificaton) => _notificationLayer?.CallDeferred(Node.MethodName.AddChild, notificaton);
+        public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.AddChild, hud);
+        public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(Node.MethodName.AddChild, window);
+
+        public void CloseAllWindows()
+        {
+            foreach (var child in _windowLayer?.GetChildren() ?? [])
+                _windowLayer?.CallDeferred(Node.MethodName.AddChild, child);
+        }
+    }
+}

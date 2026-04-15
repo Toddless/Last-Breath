@@ -34,7 +34,7 @@
 					"amount": 5
 				}
 			],
-			"optionalResourceCategories":[
+			"optionalResourceCategories": [
 				"Essence"
 			]
 		},
@@ -58,7 +58,7 @@
 				},
 				{
 					"type": "ResourceCategory",
-					"id": "Steel",
+					"id": "Metal",
 					"amount": 4
 				},
 				{
@@ -72,7 +72,7 @@
 					"amount": 10
 				}
 			],
-			"optionalResourceCategories":[
+			"optionalResourceCategories": [
 				"Essence"
 			]
 		},
@@ -101,7 +101,7 @@
 					"amount": 2
 				}
 			],
-			"optionalResourceCategories":[
+			"optionalResourceCategories": [
 				"Essence"
 			]
 		},
@@ -125,7 +125,7 @@
 					"amount": 2
 				}
 			],
-			"optionalResourceCategories":[
+			"optionalResourceCategories": [
 				"Essence"
 			]
 		}

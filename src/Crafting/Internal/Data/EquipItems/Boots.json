@@ -1,0 +1,238 @@
+{
+	"items": [
+		{
+			"id": "Boots_Strength_Stoneheart",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Strength_Iron_Bastion",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Strength_Vital_Core",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.25
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Dexterity_Shadowstep",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 400
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Dexterity_Hunters_Dream",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Dexterity_Feral_Instinct",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "inc",
+					"value": 0.3
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Intelligence_Eternal_Reserve",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Intelligence_Arcane_Bulwark",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "inc",
+					"value": 0.3
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Boots_Intelligence_Aegis",
+			"equipmentPart": "Boots",
+			"rarity": "Uncommon",
+			"tags": [
+				"Boots",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 400
+				},
+				{
+					"parameter": "Movespeed",
+					"modifierType": "flat",
+					"value": 50
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

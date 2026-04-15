@@ -9,13 +9,15 @@
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Events;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
 
     public class CreateEquipItemRequestHandler(
         IItemCreationService creationService,
         IGameMessageBus gameMessageBus,
-        IItemDataProvider itemDataProvider)
+        IItemDataProvider itemDataProvider,
+        IInventory inventory)
         : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
     {
         public Task<IEquipItem?> HandleRequest(CreateEquipItemRequest request)
@@ -25,8 +27,12 @@
                 var modifiers = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
                 var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, modifiers);
                 item.SaveUsedResources(request.UsedResources.ToDictionary());
-                gameMessageBus.PublishMessageAsync(new ConsumeResourcesInInventoryMessage(request.UsedResources));
                 gameMessageBus.PublishMessageAsync(new GainCraftingExpirienceMessage(CraftingMode.Create, item.Rarity));
+
+                foreach ((string resourceId, int quantity) in request.UsedResources)
+                    inventory.RemoveItemById(resourceId, quantity);
+
+                inventory.TryAddItem(item);
                 return Task.FromResult<IEquipItem?>(item);
             }
             catch (InvalidOperationException ex)

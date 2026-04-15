@@ -1,0 +1,131 @@
+﻿namespace Crafting.Internal.Modifiers
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using Core.Modifiers;
+    using Utilities;
+
+    internal class ModifiersComponent : IModifiersComponent
+    {
+        // all modifiers from equipment, passive abilities etc.
+        private readonly Dictionary<EntityParameter, List<IModifierInstance>> _permanentModifiers = [];
+        // temporary modifiers from abilities, weapon effect etc.
+        private readonly Dictionary<EntityParameter, List<IModifierInstance>> _temporaryModifiers = [];
+        // mo
+        private readonly Dictionary<EntityParameter, List<IModifierInstance>> _battleModifiers = [];
+
+        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> PermanentModifiers => _permanentModifiers;
+        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> TemporaryModifiers => _temporaryModifiers;
+        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> BattleModifiers => _battleModifiers;
+
+        public event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
+
+        public IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter) => [];
+        public void AddPermanentModifier(IModifierInstance modifier) => AddToCategory(_permanentModifiers, modifier);
+        public void AddTemporaryModifier(IModifierInstance modifier) => AddToCategory(_temporaryModifiers, modifier);
+
+        public void AddBattleModifier(IModifierInstance modifier) => AddToCategory(_battleModifiers, modifier);
+
+        public void UpdatePermanentModifier(IModifierInstance modifier) => UpdateModifier(_permanentModifiers, modifier);
+        public void UpdatePermanentModifiers(IEnumerable<IModifierInstance> modifiers) => throw new NotImplementedException();
+
+        public void UpdateTemporaryModifier(IModifierInstance modifier) => UpdateModifier(_temporaryModifiers, modifier);
+        public void UpdateBattleModifier(IModifierInstance modifier) => UpdateModifier(_battleModifiers, modifier);
+
+        public void RemovePermanentModifier(IModifierInstance modifier) => RemoveFromCategory(_permanentModifiers, modifier);
+        public void RemoveTemporaryModifier(IModifierInstance modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
+        public void RemoveBattleModifier(IModifierInstance modifier) => RemoveFromCategory(_battleModifiers, modifier);
+
+        public void RemovePermanentModifierBySource(object source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
+        public void RemoveTemporaryModifierBySource(object source) => RemoveAllFromCategoryBySource(_temporaryModifiers, source);
+        public void RemoveBattleModifierBySource(object source) => RemoveAllFromCategoryBySource(_battleModifiers, source);
+
+        public void RemoveAllTemporaryModifiers() => _temporaryModifiers.Clear();
+        public void RemoveAllBattleModifiers() => _battleModifiers.Clear();
+
+
+        private List<IModifierInstance> GetCombinedModifiers(EntityParameter entityParameter)
+        {
+            var modifiers = new List<IModifierInstance>();
+            if (_permanentModifiers.TryGetValue(entityParameter, out var permanent))
+                modifiers.AddRange(permanent);
+            if (_temporaryModifiers.TryGetValue(entityParameter, out var temp))
+                modifiers.AddRange(temp);
+            if (_battleModifiers.TryGetValue(entityParameter, out var battle))
+                modifiers.AddRange(battle);
+
+            return modifiers;
+        }
+
+        private void RaiseEvent(EntityParameter entityParameter) => ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(GetCombinedModifiers(entityParameter), entityParameter));
+
+
+        // adding multiple modifiers via foreach generate to many unnecessary calls
+        private void UpdateModifier(Dictionary<EntityParameter, List<IModifierInstance>> category, IModifierInstance newModifier)
+        {
+            if (!category.TryGetValue(newModifier.EntityParameter, out var list))
+            {
+                Tracker.TrackNotFound($"List for {newModifier.EntityParameter}", this);
+                list = [];
+                category[newModifier.EntityParameter] = list;
+            }
+            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierType == newModifier.ModifierType);
+            if (existingModifier == null)
+            {
+                Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierType}", this);
+                list.Add(newModifier);
+            }
+            else
+            {
+                // TODO: should i change all properties?
+                existingModifier.Value = newModifier.Value;
+            }
+            RaiseEvent(newModifier.EntityParameter);
+        }
+
+        private void AddToCategory(Dictionary<EntityParameter, List<IModifierInstance>> category, IModifierInstance modifier)
+        {
+            if (!category.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list))
+            {
+                Tracker.TrackNotFound($"List for: {modifier.EntityParameter}", this);
+                list = [];
+                category[modifier.EntityParameter] = list;
+            }
+
+            if (list.Contains(modifier))
+            {
+                Tracker.TrackError("Trying to add a modifier that already exists in the list", this);
+            }
+
+            list.Add(modifier);
+
+            RaiseEvent(modifier.EntityParameter);
+        }
+
+        private void RemoveFromCategory(Dictionary<EntityParameter, List<IModifierInstance>> category, IModifierInstance modifier)
+        {
+            if (!category.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list))
+            {
+                Tracker.TrackError("Trying to remove a modifier from non-existent list", this);
+                return;
+            }
+            list.Remove(modifier);
+            if (list.Count == 0)
+            {
+                category.Remove(modifier.EntityParameter);
+            }
+            RaiseEvent(modifier.EntityParameter);
+        }
+
+        private void RemoveAllFromCategoryBySource(Dictionary<EntityParameter, List<IModifierInstance>> category, object source)
+        {
+            foreach (var list in category)
+            {
+                if (list.Value.RemoveAll(x => x.Source == source) > 0) RaiseEvent(list.Key);
+            }
+        }
+    }
+}

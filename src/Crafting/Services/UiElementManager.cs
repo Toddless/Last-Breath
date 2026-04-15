@@ -3,10 +3,11 @@
     using Godot;
     using System;
     using Core.Data;
-    using temp.Layers;
     using Core.Interfaces.UI;
     using Source.UIElements;
+    using Internal.Inventory;
     using System.Collections.Generic;
+    using Internal.Layers;
 
     internal class UiElementManager(IGameServiceProvider provider) : IUiElementsManager
     {
@@ -17,7 +18,8 @@
         private readonly Dictionary<Type, Func<IWindow>> _windowFactories = new()
         {
             [typeof(CraftingWindow)] = () => CraftingWindow.Initialize().Instantiate<CraftingWindow>(),
-            [typeof(CraftingItems)] = () => CraftingItems.Initialize().Instantiate<CraftingItems>()
+            [typeof(CraftingItems)] = () => CraftingItems.Initialize().Instantiate<CraftingItems>(),
+            [typeof(InventoryWindow)] = () => InventoryWindow.Initialize().Instantiate<InventoryWindow>()
         };
 
         private UILayerManager? _layers;

@@ -1,0 +1,27 @@
+{
+	"items": [
+		{
+			"id": "Creators_Cloak",
+			"equipmentPart": "Cloak",
+			"rarity": "Uncommon",
+			"tags": [],
+			"attributeType": "None",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "multi",
+					"value": 0.1
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "multi",
+					"value": 0.1
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

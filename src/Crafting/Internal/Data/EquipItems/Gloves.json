@@ -1,0 +1,238 @@
+{
+	"items": [
+		{
+			"id": "Gloves_Strength_Stoneheart",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 200
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Strength_Iron_Bastion",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 250
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "inc",
+					"value": 0.25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Strength_Vital_Core",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Strength",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 350
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.25
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Dexterity_Shadowstep",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Evade",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Dexterity_Hunters_Dream",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "flat",
+					"value": 600
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 550
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Dexterity_Feral_Instinct",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Dexterity",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Evade",
+					"modifierType": "inc",
+					"value": 0.4
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 550
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Intelligence_Eternal_Reserve",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 450
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Intelligence_Arcane_Bulwark",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 450
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "inc",
+					"value": 0.3
+				}
+			],
+			"additionalModifiers": []
+		},
+		{
+			"id": "Gloves_Intelligence_Aegis",
+			"equipmentPart": "Gloves",
+			"rarity": "Uncommon",
+			"tags": [
+				"Gloves",
+				"Equipment"
+			],
+			"attributeType": "Intelligence",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"baseModifiers": [
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 450
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 350
+				}
+			],
+			"additionalModifiers": []
+		}
+	]
+}

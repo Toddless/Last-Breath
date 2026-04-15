@@ -22,7 +22,6 @@
 
         public override void _Ready()
         {
-            _inventory?.Initialize(216, _inventoryGrid);
             if (_craftingButton != null)
                 _craftingButton.Pressed += OnCraftingButtonPressed;
 

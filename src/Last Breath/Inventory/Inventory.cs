@@ -19,6 +19,7 @@
         public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
         public event Action<string, string, int, int>? InventoryFull;
         public event Action<string>? NotEnoughItems;
+        public int InventoryCapacity { get; }
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
@@ -52,6 +53,8 @@
 
         public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
         public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
+        T? IInventory.GetItem<T>(string instanceId) where T : class => throw new NotImplementedException();
+
         public T? GetItem<T>(string instanceId)
             where T : IItem => (T?)_itemInstances.GetValueOrDefault(instanceId);
         public int GetTotalItemAmount(string itemId) => Slots.Where(x => x.CurrentItem != null && x.CurrentItem.ItemId == itemId).Sum(x => x.Quantity);
@@ -82,6 +85,8 @@
 
             return true;
         }
+
+        public int GetAvailableCapacity() => throw new NotImplementedException();
 
         /// <summary>
         /// Use to return item instance in inventory.
