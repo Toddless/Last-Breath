@@ -61,14 +61,14 @@
             itemDetails.SetItemIcon(equip.Icon!);
             itemDetails.SetItemName(equip.DisplayName);
             itemDetails.SetItemUpdateLevel(equip.UpdateLevel);
-            foreach (var item in equip.BaseModifiers)
+            foreach (var item in equip.Implicits)
             {
                 var selectable = new InteractiveLabel();
                 selectable.SetText(Localization.Format(item));
                 itemDetails.SetItemBaseStats(selectable);
             }
 
-            foreach (var modifier in equip.AdditionalModifiers)
+            foreach (var modifier in equip.Modifiers)
             {
                 var stat = new InteractiveLabel();
                 stat.SetText(Localization.Format(modifier));

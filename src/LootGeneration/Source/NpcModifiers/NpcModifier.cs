@@ -14,7 +14,7 @@ namespace LootGeneration.Source.NpcModifiers
         public float Weight { get; set; } = weight;
         public float BaseDifficultyMultiplier { get; } = difficultyMultiplier;
         public float DifficultyMultiplier => BaseDifficultyMultiplier * TotalScale;
-        public bool IsUnique { get; } =  isUnique;
+        public bool IsUnique { get; } = isUnique;
         public string NpcBuffId { get; } = npcBuffId;
         public string DisplayName => Localization.Localize(Id);
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -33,15 +33,9 @@ namespace LootGeneration.Source.NpcModifiers
         {
         }
 
-        public virtual void ScaleUp(IScaleModifier modifier)
-        {
-            TotalScale += modifier.ScaleFactor;
-        }
+        public virtual void ScaleUp(IScaleModifier modifier) => TotalScale += modifier.ScaleFactor;
 
-        public virtual void ScaleDown(IScaleModifier modifier)
-        {
-            TotalScale -= modifier.ScaleFactor;
-        }
+        public virtual void ScaleDown(IScaleModifier modifier) => TotalScale -= modifier.ScaleFactor;
 
         public abstract INpcModifier Copy();
         public bool IsSame(string otherId) => otherId == Id;

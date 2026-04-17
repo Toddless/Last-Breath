@@ -10,15 +10,23 @@ namespace LootGeneration.Services
     using Godot;
     using Utilities;
 
-    public class NpcModifierProvider(INpcModifiersFactory factory) : INpcModifierProvider
+    public class NpcModifierProvider : INpcModifierProvider
     {
         private const string NpcModifierData = "res://Data/NpcModifiers/";
         private readonly Dictionary<string, INpcModifier> _npcModifiers = [];
+        private readonly IDataParser _dataParser;
+        private readonly INpcModifiersFactory _modifiersFactory;
+
+        public NpcModifierProvider(INpcModifiersFactory modifiersFactory, IItemGameDataFactory factory)
+        {
+            _modifiersFactory = modifiersFactory;
+            _dataParser = new DataParser(factory);
+            LoadDataAsync();
+        }
 
         public INpcModifier GetModifier(string id) => !_npcModifiers.TryGetValue(id, out var modifier)
             ? throw new KeyNotFoundException()
             : modifier.Copy();
-
 
         public List<string> GetAllModifierIds() => _npcModifiers.Keys.ToList();
 
@@ -39,8 +47,8 @@ namespace LootGeneration.Services
 
         private async Task ParseNpcModifiers(string json)
         {
-            var data = await DataParser.ParseNpcModifiers(json);
-            var modifiers = factory.CreateNpcModifiers(data);
+            var data = await _dataParser.ParseNpcModifiers(json);
+            var modifiers = _modifiersFactory.CreateNpcModifiers(data);
             modifiers.ForEach(mod => _npcModifiers.TryAdd(mod.Id, mod));
         }
     }

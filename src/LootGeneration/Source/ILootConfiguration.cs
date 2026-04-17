@@ -10,6 +10,7 @@ namespace LootGeneration.Source
         float[] BaseRarityChances { get; }
         float LvlCoefficient { get; }
         float EquipItemEffectChance { get; }
+        float ItemModifierMultiplier { get; }
         Dictionary<EntityType, float> BaseBudget { get; }
         Dictionary<Rarity, float> RarityMultipliers { get; }
     }

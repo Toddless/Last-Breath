@@ -9,7 +9,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "multi",
@@ -21,7 +21,7 @@
 					"value": 0.1
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		}
 	]
 }

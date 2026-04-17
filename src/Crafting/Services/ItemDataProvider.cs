@@ -1,24 +1,29 @@
-﻿namespace Crafting.Services
+namespace Crafting.Services
 {
     using Godot;
     using System;
-    using Source;
     using Utilities;
     using Core.Data;
-    using System.IO;
     using System.Linq;
     using Core.Modifiers;
+    using Core.Interfaces;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces;
-    using Internal;
 
-    internal class ItemDataProvider(string itemDataPath) : IItemDataProvider
+    internal class ItemDataProvider : IItemDataProvider
     {
+        private const string itemDataPath = "res://Internal/Data/";
         private readonly Dictionary<string, IItem> _itemData = [];
         private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private readonly IDataParser _dataParser;
+
+        public ItemDataProvider(IItemGameDataFactory factory)
+        {
+            _dataParser = new DataParser(factory);
+            LoadData();
+        }
 
         public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
@@ -54,7 +59,7 @@
         public ICraftingRecipe GetRecipe(string recipeId)
         {
             var item = TryGetItem(recipeId);
-            if (item is not ICraftingRecipe recipe || recipe == null) throw new ArgumentNullException($"Recipe not found: {recipeId}");
+            if (item is not ICraftingRecipe recipe) throw new ArgumentNullException($"Recipe not found: {recipeId}");
             return recipe;
         }
 
@@ -72,6 +77,7 @@
             }
             catch (Exception ex)
             {
+                GD.Print($"Failed to load item data: {ex.Message}\n{ex.StackTrace}");
                 Tracker.TrackException("Data loading failed.", ex, this);
             }
         }
@@ -82,41 +88,30 @@
             if (dir == null) return;
 
             dir.ListDirBegin();
-
             string fileName = dir.GetNext();
             while (fileName != string.Empty)
             {
-                string filePath = Path.Combine(dataPath, fileName);
+                string filePath = System.IO.Path.Combine(dataPath, fileName);
                 if (dir.CurrentIsDir())
                     await LoadDataFromDirectory(filePath);
                 else
                 {
                     if (!filePath.EndsWith(".json")) continue;
-                    using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
-                    string jsonContent = file.GetAsText() ?? throw new FileNotFoundException();
+                    using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new System.IO.FileLoadException();
+                    string jsonContent = file.GetAsText() ?? throw new System.IO.FileNotFoundException();
+
                     List<IItem> data = [];
+
                     switch (true)
                     {
                         case var _ when dataPath.EndsWith("EquipItems"):
-                            data = await DataParser.ParseEquipItems(jsonContent,
-                                (equipType, id, tags) =>
-                                    new TestEquipItem(equipType, id, tags));
+                            data = await _dataParser.ParseEquipItems(jsonContent);
                             break;
                         case var _ when dataPath.EndsWith("Recipes"):
-                            var recipes = await DataParser.ParseRecipes<CraftingRecipe>(jsonContent,
-                                (type, s, arg3) => new Requirement(type, s, arg3),
-                                (id, resultItem, tags, rarity, requirements, itemType, isOpened, categories) =>
-                                    new CraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, categories, isOpened));
-                            data = recipes.Cast<IItem>().ToList();
+                            data = await _dataParser.ParseRecipes(jsonContent);
                             break;
-                        case var _ when dataPath.EndsWith("Resources"):
-                            data = await DataParser.ParseResources(
-                                jsonContent,
-                                (list, id) => new MaterialCategory(list, id),
-                                (id, tags, rarity, equipmentCategory, stackSize) => new UpgradeResource(id, tags, rarity, equipmentCategory, stackSize),
-                                (parameter, modifierType, baseValue, weight) => new MaterialModifier(parameter, modifierType, baseValue, weight),
-                                (materialModifiers, materialCategory) => new MaterialType(materialModifiers, materialCategory),
-                                (id, maxStackSize, tags, materialCategory, rarity) => new CraftingResource(id, maxStackSize, tags, materialCategory, rarity));
+                        case var _ when dataPath.EndsWith("CraftingResources"):
+                            data = await _dataParser.ParseResources(jsonContent);
                             break;
                     }
 

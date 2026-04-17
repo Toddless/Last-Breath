@@ -4,14 +4,13 @@ namespace LootGeneration.Services
     using System;
     using Source;
     using Internal;
+    using Utilities;
     using Core.Data;
+    using Core.Interfaces;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Microsoft.Extensions.DependencyInjection;
-    using Source.NpcModifiers;
-    using temp;
 
     internal class GameServiceProvider : IGameServiceProvider
     {
@@ -36,24 +35,16 @@ namespace LootGeneration.Services
                 return instance;
             });
             services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
-            {
-                var instance = new ItemDataProvider();
-                instance.LoadData();
-                return instance;
-            });
+            services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
+            services.AddSingleton<IDataParser, DataParser>();
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>();
             services.AddSingleton<RandomNumberGenerator>(_ =>
             {
                 var rnd = new RandomNumberGenerator();
                 rnd.Randomize();
                 return rnd;
             });
-            services.AddSingleton<INpcModifierProvider, NpcModifierProvider>(_ =>
-            {
-                var instance = new NpcModifierProvider(new NpcModifiersFactory());
-                instance.LoadDataAsync();
-                return instance;
-            });
+            services.AddSingleton<INpcModifierProvider, NpcModifierProvider>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();

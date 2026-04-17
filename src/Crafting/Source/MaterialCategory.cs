@@ -2,9 +2,9 @@
 {
     using Godot;
     using System.Linq;
+    using Core.Modifiers;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Modifiers;
 
     public partial class MaterialCategory : Resource, IMaterialCategory
     {
@@ -17,6 +17,7 @@
         {
 
         }
+
         /// <summary>
         /// Constructor to create a resource within code
         /// </summary>

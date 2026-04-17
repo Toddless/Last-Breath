@@ -17,7 +17,7 @@
             ui.SetItemDescription(item.Description);
             ui.SetItemRarity(FormatRarity(item.Rarity));
             ui.SetItemPiece(Localization.Localize(item.EquipmentPiece.ToString()));
-            ui.SetItemBaseStats(FormatItemModifiers(item.BaseModifiers).ConvertAll(valueTuple => valueTuple.ModifierText));
+            ui.SetItemBaseStats(FormatItemModifiers(item.Implicits).ConvertAll(valueTuple => valueTuple.ModifierText));
             ui.SetItemIcon(item.Icon);
             ui.SetItemEffectName(Localization.Localize(item.ItemEffect));
             ui.SetItemEffectDescription(Localization.LocalizeDescription(item.ItemEffect));
@@ -49,8 +49,8 @@
         }
 
 
-        private List<(string ModifierText, int Identifier)> FormatAdditionalModifiers() => item.AdditionalModifiers.Count == 0
+        private List<(string ModifierText, int Identifier)> FormatAdditionalModifiers() => item.Modifiers.Count == 0
             ? [("???", 1), ("???", 2), ("???", 3), ("???", 4)]
-            : FormatItemModifiers(item.AdditionalModifiers);
+            : FormatItemModifiers(item.Modifiers);
     }
 }

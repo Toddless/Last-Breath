@@ -7,8 +7,8 @@
 
     public interface IEquipItem : IItem
     {
-        IReadOnlyList<IModifier> BaseModifiers { get; }
-        IReadOnlyList<IModifier> AdditionalModifiers { get; }
+        IReadOnlyList<IModifier> Implicits { get; }
+        IReadOnlyList<IModifier> Modifiers { get; }
         EquipmentPiece EquipmentPiece { get; }
         AttributeType AttributeType { get; set; }
         string ItemEffect { get; }

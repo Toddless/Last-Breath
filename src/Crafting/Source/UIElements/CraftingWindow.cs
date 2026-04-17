@@ -37,7 +37,6 @@
         private ActionButton? _actionButton;
         private string? _recipeId;
         private IEquipItem? _equipItem;
-        private ItemUpgradeMode _upgradeMode = ItemUpgradeMode.Normal;
 
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
@@ -109,9 +108,8 @@
             ArgumentNullException.ThrowIfNull(_messageBus);
             ArgumentNullException.ThrowIfNull(_provider);
             SetEquipItem(item, new ItemUpgradeConfiguration(item), CraftingMode.Upgrade);
-            _upgradeMode = ItemUpgradeMode.Normal;
             var requirements = await _messageBus.SendRequest<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>(
-                new(item.InstanceId, _upgradeMode));
+                new(item.InstanceId));
             foreach (var req in requirements)
                 _resourcesUi?.SetRequirements(req, _provider);
         }
@@ -131,10 +129,18 @@
 
         private async void UpgradeItemAsync()
         {
-            ArgumentNullException.ThrowIfNull(_messageBus);
-            var result = await _messageBus.SendRequest<UpgradeEquipItemRequest, ItemUpgradeResult>(
-                new(_equipItem!.InstanceId, _resourcesUi?.GetRequirements() ?? []));
-            _itemUi?.SetConfiguration(new ItemUpgradeConfiguration(_equipItem));
+            try
+            {
+                ArgumentNullException.ThrowIfNull(_messageBus);
+                var result = await _messageBus.SendRequest<UpgradeEquipItemRequest, ItemUpgradeResult>(
+                    new(_equipItem!.InstanceId, _resourcesUi?.GetRequirements() ?? []));
+                _itemUi?.SetConfiguration(new ItemUpgradeConfiguration(_equipItem));
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"Failed to update item: {ex.Message}\n {ex.StackTrace}");
+                Tracker.TrackException("Failed to upgrade item", ex, this);
+            }
         }
 
         private void SetEquipItem(IEquipItem item, IItemUiConfiguration configuration, CraftingMode craftingMode, bool isModifiersSelectable = false)
@@ -148,8 +154,16 @@
 
         private async void CreateItemAsync(string id)
         {
-            ArgumentNullException.ThrowIfNull(_messageBus);
-            var item = await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new(id, _resourcesUi?.GetRequirements() ?? []));
+            try
+            {
+                ArgumentNullException.ThrowIfNull(_messageBus);
+                var item = await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new(id, _resourcesUi?.GetRequirements() ?? []));
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"Failed to create item: {ex.Message}\n {ex.StackTrace}");
+                Tracker.TrackException("Failed to create item", ex, this);
+            }
         }
 
         private async void OnModifierSelectedAsync(int identifier, ItemModifierList source)

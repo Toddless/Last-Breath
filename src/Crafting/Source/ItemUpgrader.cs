@@ -1,6 +1,8 @@
 ﻿namespace Crafting.Source
 {
     using Godot;
+    using System;
+    using Core.Data;
     using Utilities;
     using Core.Enums;
     using System.Linq;
@@ -10,20 +12,19 @@
     using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
-    using Core.Interfaces.Entity;
 
-    public class ItemUpgrader : IItemUpgrader
+    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery) : IItemUpgrader
     {
-        private const float BaseDoubleRoll = 0.05f;
-        private const float BaseLuckyRollUpgrade = 0.01f;
-        private const float BaseLuckyRollDowngrade = 0.01f;
-        private const int BaseDoubleUpgradeAmount = 2;
+        private const float P0 = 0.95f;
+        private const float P5 = 0.70f;
+        private const float P6 = 0.35f;
+        private const float P9 = 0.15f;
+        private const float P12 = 0.01f;
 
-        private float _criticalDobubleRoll = BaseDoubleRoll;
-        private float _criticalLuckyRollUpgrade = BaseLuckyRollUpgrade;
-        private float _criticalLuckyRollDowngrade = BaseLuckyRollDowngrade;
-        private int _doubleUpgradeAmount = BaseDoubleUpgradeAmount;
-        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _upgradeRequiremens = new()
+        private static readonly float s_r = Mathf.Pow(P12 / P9, 1.0f / 3.0f);
+
+
+        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _upgradeRequirements = new()
         {
             [EquipmentCategory.Weapon] =
             [
@@ -55,50 +56,50 @@
             ]
         };
 
-        private readonly RandomNumberGenerator _rnd;
 
-        private ItemUpgradeMode _currentUpgradeMode = ItemUpgradeMode.None;
-
-        public ItemUpgrader(RandomNumberGenerator rnd)
+        public List<IRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory)
         {
-            _rnd = rnd;
+            var requirements = _upgradeRequirements[itemCategory].ToList();
+            var newReq = new List<IRequirement>();
+            int amount = GetAmount(itemRarity);
+            requirements.ForEach(req => newReq.Add(new Requirement(req.Type, req.Id, req.Amount + amount)));
+            return newReq;
         }
 
-        public List<IRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory, ItemUpgradeMode mode)
+        private int GetAmount(Rarity itemRarity) => itemRarity switch
         {
-            _currentUpgradeMode = mode;
-            var requirements = _upgradeRequiremens[itemCategory].Cast<IRequirement>().ToList();
-            var newRequ = new List<IRequirement>();
-            int amount = GetAmount(itemRarity, mode);
-            requirements.ForEach(req => newRequ.Add(new Requirement(req.Type, req.Id, req.Amount + amount)));
-            return newRequ;
-        }
+            Rarity.Common or Rarity.Uncommon => 1,
+            Rarity.Rare => 2,
+            Rarity.Epic => 3,
+            Rarity.Legendary or Rarity.Unique => 5,
+            _ => throw new ArgumentOutOfRangeException(nameof(itemRarity), itemRarity, null)
+        };
 
         public List<IRequirement> GetRecraftResourceCost(Rarity itemRarity, EquipmentCategory itemCategory)
         {
-            var requirements = _recraftRequirements[itemCategory].Cast<IRequirement>().ToList();
-            var newRequrements = new List<IRequirement>();
-            requirements.ForEach(req => newRequrements.Add(new Requirement(req.Type, req.Id, req.Amount + (int)itemRarity)));
+            var requirements = _recraftRequirements[itemCategory].ToList();
+            var newRequirements = new List<IRequirement>();
+            requirements.ForEach(req => newRequirements.Add(new Requirement(req.Type, req.Id, req.Amount + GetAmount(itemRarity))));
 
-            return newRequrements;
+            return newRequirements;
         }
 
-        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers, IEntity? player = default)
+        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers)
         {
-            var (WeightedObjects, TotalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
+            (List<WeightedObject<IModifier>> weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
 
             item.RemoveAdditionalModifier(modifierToReroll);
             IModifierInstance? modifier = null;
             while (modifier == null)
             {
-                var newMod = WeightedRandomPicker.PickRandom(WeightedObjects, TotalWeight, _rnd);
+                var newMod = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
 
-                if (newMod != null && !item.AdditionalModifiers.Any(x => x.GetHashCode() == newMod.GetHashCode()))
-                {
-                    modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierType, ApplyPlayerMultiplier(newMod.BaseValue, player), item);
-                    item.AddAdditionalModifier(modifier);
-                }
+                if (item.Modifiers.Any(x => x.GetHashCode() == newMod.GetHashCode())) continue;
+
+                modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierType, newMod.BaseValue, item);
+                item.AddAdditionalModifier(modifier);
             }
+
             return modifier;
         }
 
@@ -106,44 +107,22 @@
         {
             if (item.UpdateLevel == item.MaxUpdateLevel) return ItemUpgradeResult.ReachedMaxLevel;
 
-            if (_currentUpgradeMode == ItemUpgradeMode.None) return ItemUpgradeResult.Failure;
+            float chances = GetChance(item.UpdateLevel);
+            bool upgradeSucceed = rnd.Randf() <= chances;
 
-            var chances = UpgradeChances.GetChance(item.UpdateLevel);
-            bool upgradeSucced = _rnd.Randf() <= chances;
+            if (upgradeSucceed) item.Upgrade();
 
-            if (upgradeSucced)
-            {
-                switch (true)
-                {
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollUpgrade):
-                        item.Upgrade(item.MaxUpdateLevel);
-                        return ItemUpgradeResult.CriticalSuccess;
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Double:
-                        item.Upgrade(_doubleUpgradeAmount);
-                        return ItemUpgradeResult.Success;
-                    default:
-                        item.Upgrade();
-                        return ItemUpgradeResult.Success;
-                }
-            }
-            else
-            {
-                switch (true)
-                {
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Double && CheckRollIsCritical(_criticalDobubleRoll):
-                        item.Downgrade();
-                        return ItemUpgradeResult.Failure;
-                    case var _ when _currentUpgradeMode == ItemUpgradeMode.Lucky && CheckRollIsCritical(_criticalLuckyRollDowngrade):
-                        item.Downgrade(item.MaxUpdateLevel);
-                        return ItemUpgradeResult.CriticalFailure;
-                    default:
-                        return ItemUpgradeResult.Failure;
-                }
-            }
+            return upgradeSucceed ? ItemUpgradeResult.Success : ItemUpgradeResult.Failure;
         }
 
-        private bool CheckRollIsCritical(float criticalChance) => _rnd.Randf() <= criticalChance;
-        private int GetAmount(Rarity itemRarity, ItemUpgradeMode mode) => (int)itemRarity + (mode == ItemUpgradeMode.None ? 0 : (int)mode + 1);
-        private float ApplyPlayerMultiplier(float baseValue, IEntity? player = default) => baseValue * _rnd.RandfRange(0.95f, 1.2f);
+        private float GetChance(int level)
+        {
+            return true switch
+            {
+                _ when level <= 5 => Mathf.Lerp(P0, P5, level / 3.0f),
+                _ when level <= 9 => Mathf.Lerp(P6, P9, (level - 5) / 3.0f),
+                _ => P9 * Mathf.Pow(s_r, level - 9),
+            };
+        }
     }
 }

@@ -27,14 +27,16 @@
             return item;
         }
 
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> resources)
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) => throw new NotImplementedException();
+
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers)
         {
             var recipe = dataProvider.GetRecipe(recipeId);
             string resultItemId = recipe.ResultItemId;
             switch (recipe.ItemType)
             {
                 case ItemType.Equipment:
-                    (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(resources);
+                    (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
                     return CreateEquip(resultItemId, mods, totalWeight);
                 case ItemType.Consumable or ItemType.Quest or ItemType.Crafting:
                     return dataProvider.CopyItem(resultItemId);

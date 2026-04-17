@@ -26,7 +26,9 @@ namespace LootGeneration.Internal
             return item;
         }
 
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> resources) => throw new System.NotImplementedException();
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) => throw new System.NotImplementedException();
+
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
 
         private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance)
         {

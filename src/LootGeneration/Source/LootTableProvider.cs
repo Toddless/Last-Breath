@@ -3,19 +3,21 @@ namespace LootGeneration.Source
     using Godot;
     using System;
     using Utilities;
+    using Core.Data;
     using Core.Enums;
     using System.Linq;
     using Core.Data.LootTable;
     using System.Threading.Tasks;
     using System.Collections.Generic;
 
-    public class LootTableProvider : ILootTableProvider
+    public class LootTableProvider(IItemGameDataFactory factory) : ILootTableProvider
     {
         private const string DataPath = "res://Data/LootTables/";
         private Dictionary<Fractions, List<LootTableTierData>> _fractionTables = [];
         private Dictionary<EntityType, List<LootTableTierData>> _entityTypeTables = [];
         private Dictionary<string, List<LootTableTierData>> _individualTables = [];
         private List<LootTableTierData> _basicTable = [];
+        private readonly IDataParser _dataParser = new DataParser(factory);
 
         public List<LootTableTierData> BasicTable => _basicTable.ToList();
 
@@ -46,6 +48,6 @@ namespace LootGeneration.Source
         }
 
         private async Task ParseTables(string jsonContent) =>
-            await DataParser.ParseLootTables(jsonContent, ref _fractionTables, ref _entityTypeTables, ref _individualTables, ref _basicTable);
+            await _dataParser.ParseLootTables(jsonContent, ref _fractionTables, ref _entityTypeTables, ref _individualTables, ref _basicTable);
     }
 }

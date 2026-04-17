@@ -4,8 +4,6 @@
     {
         Success = 0,
         Failure,
-        CriticalSuccess,
-        CriticalFailure,
-        ReachedMaxLevel,
+        ReachedMaxLevel
     }
 }

@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.MessageBus.Requests
 {
-    using System.Collections.Generic;
     using Modifiers;
+    using System.Collections.Generic;
 
-    public record RecraftEquipItemModifierRequest(string ItemInstanceID, int ModifierHash, Dictionary<string, int> Resources) : IRequest<RequestResult<IModifierInstance>>
+    public record RecraftEquipItemModifierRequest(string ItemInstanceId, int ModifierHash, Dictionary<string, int> Resources) : IRequest<RequestResult<IModifierInstance>>
     {
     }
 }

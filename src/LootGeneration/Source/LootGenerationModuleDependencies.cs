@@ -1,11 +1,13 @@
 namespace LootGeneration.Source
 {
+    using System;
     using Godot;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Data.LootTable;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
     using Core.Interfaces.MessageBus;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -13,9 +15,9 @@ namespace LootGeneration.Source
     {
         public static IServiceCollection AddLootGenerationServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILootTableProvider, LootTableProvider>(_ =>
+            services.AddSingleton<ILootTableProvider, LootTableProvider>(provider =>
             {
-                var instance = new LootTableProvider();
+                var instance = new LootTableProvider(provider.GetService<IItemGameDataFactory>() ?? throw new ArgumentNullException(nameof(IItemGameDataFactory), "Not register"));
                 instance.LoadData();
                 return instance;
             });
@@ -32,6 +34,7 @@ namespace LootGeneration.Source
                             [0.003f, 0.15f, 0.27f, 0.55f],
                             0.35f,
                             0.15f,
+                            0.10f,
                             new Dictionary<EntityType, float>
                             {
                                 [EntityType.Regular] = 5f,

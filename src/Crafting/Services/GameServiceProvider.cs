@@ -9,6 +9,7 @@
     using Core.Interfaces;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
+    using Internal;
     using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -41,6 +42,7 @@
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
+            services.AddSingleton<IItemGameDataFactory, ItemItemGameDataFactory>();
             services.AddSingleton<IUiElementsManager, UiElementManager>(_ =>
             {
                 var instance = new UiElementManager(this);
@@ -49,12 +51,7 @@
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
-            {
-                var instance = new ItemDataProvider("res://Internal/Data/");
-                instance.LoadData();
-                return instance;
-            });
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>();
             services.AddSingleton(_ =>
             {
                 var instance = new RandomNumberGenerator();

@@ -1,0 +1,27 @@
+namespace Core.Data
+{
+    using Enums;
+    using Modifiers;
+    using LootTable;
+    using NpcModifiersData;
+    using Interfaces.Items;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
+
+    public interface IDataParser
+    {
+        Task ParseLootTables(string json,
+            ref Dictionary<Fractions, List<LootTableTierData>> fractionsTables,
+            ref Dictionary<EntityType, List<LootTableTierData>> entityTypeTables,
+            ref Dictionary<string, List<LootTableTierData>> individualTables,
+            ref List<LootTableTierData> basicTable);
+
+        Task<Dictionary<string, Dictionary<string, int>>> ParseEquipItemResources(string json);
+        Task<Dictionary<string, List<NpcModifierData>>> ParseNpcModifiers(string json);
+        Task ParseEquipItemModifierPools(string json, ref Dictionary<string, List<IModifier>> equipItemModifierPools);
+        Task<List<IItem>> ParseItems(string json);
+        Task<List<IItem>> ParseEquipItems(string json);
+        Task<List<IItem>> ParseRecipes(string json);
+        Task<List<IItem>> ParseResources(string json);
+    }
+}

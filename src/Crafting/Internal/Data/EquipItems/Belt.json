@@ -9,7 +9,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "flat",
@@ -21,7 +21,7 @@
 					"value": 500
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Test_Belt",
@@ -32,7 +32,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "flat",
@@ -44,7 +44,7 @@
 					"value": 800
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		}
 	]
 }

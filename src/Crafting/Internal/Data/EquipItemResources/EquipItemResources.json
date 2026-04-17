@@ -1,13 +1,569 @@
-{
-    "usedResources": [
-        {
-            "itemId": "",
-            "resources": [
-                {
-                    "resourceId": "",
-                    "amount": 1
-                }
-            ]
-        }
-    ]
-}
+[
+    {
+        "itemId": "Amulet_Of_Recovery",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Of_Defence",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Eternal_Ravage",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Dexterity_Strength",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Dexterity_Intelligence",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Of_Power",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Of_Wisdom",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Of_Dexterity",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Mana_Health",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Amulet_Goliath_Sign",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Belt",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Test_Belt",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Strength_Stoneheart",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Strength_Iron_Bastion",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Strength_Vital_Core",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Dexterity_Shadowstep",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Dexterity_Hunters_Dream",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Dexterity_Feral_Instinct",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Intelligence_Eternal_Reserve",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Intelligence_Arcane_Bulwark",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Intelligence_Aegis",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_Porcupine",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_No_Way_Back",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Body_All_Evade_To_Armor",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Strength_Stoneheart",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Strength_Iron_Bastion",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Strength_Vital_Core",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Dexterity_Shadowstep",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Dexterity_Hunters_Dream",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Dexterity_Feral_Instinct",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Intelligence_Eternal_Reserve",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Intelligence_Arcane_Bulwark",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Boots_Intelligence_Aegis",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Creators_Cloak",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Strength_Stoneheart",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Strength_Iron_Bastion",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Strength_Vital_Core",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Dexterity_Shadowstep",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Dexterity_Hunters_Dream",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Dexterity_Feral_Instinct",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Intelligence_Eternal_Reserve",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Intelligence_Arcane_Bulwark",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Helmet_Intelligence_Aegis",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Strength_Stoneheart",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Strength_Iron_Bastion",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Strength_Vital_Core",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Dexterity_Shadowstep",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Dexterity_Hunters_Dream",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Dexterity_Feral_Instinct",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Intelligence_Eternal_Reserve",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Intelligence_Arcane_Bulwark",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Gloves_Intelligence_Aegis",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Strength",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Dexterity",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Intelligence",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Intelligence_Multicast",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Dexterity_Critical_Chance",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Dexterity_Additional_Hit_Chance",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Dexterity_Accuracy",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Strength_Block_Chance",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_of_Creators",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Hell_Servant",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "itemId": "Ring_Of_Fire_Demon",
+        "resources": [
+            {
+                "resourceId": "",
+                "amount": 1
+            }
+        ]
+    }
+]

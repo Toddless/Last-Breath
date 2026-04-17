@@ -133,7 +133,8 @@ namespace LootGeneration.Source
                     }
 
                     Rarity rarity = context.TryUpgradeRarity((Rarity)MakeRoll(actualRarityChances));
-                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance);
+                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance,
+                        _configuration.ItemModifierMultiplier * context.TotalDifficultyMultiplier);
                     rarityAmount[item.Rarity]++;
                     items.Add(new ItemStack(item) { Stack = 1 });
                 }
@@ -189,6 +190,7 @@ namespace LootGeneration.Source
             var modifierApplyingContext = new ModifierApplyingContext();
             foreach (INpcModifier npcNpcModifier in npc.NpcModifiers.AllModifiers)
                 npcNpcModifier.ApplyModifier(modifierApplyingContext);
+            modifierApplyingContext.TotalDifficultyMultiplier = npc.NpcModifiers.AllModifiers.Sum(mod => mod.DifficultyMultiplier);
             return modifierApplyingContext;
         }
 

@@ -45,15 +45,14 @@
         private readonly float[] _rarityTarget = [10f, 30f, 35f, 25f];
         // --------------------------------------------------------
 
-        public string Id { get; } = "Mastery_Crafting";
+        public string Id => "Mastery_Crafting";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
-        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
         public Texture2D? Icon { get; }
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
 
-        public int CurrentExperience { get; private set; } = 0;
+        public int CurrentExperience { get; private set; }
 
         public int CurrentLevel
         {
@@ -63,7 +62,7 @@
 
         public int BonusLevel
         {
-            get => field;
+            get;
             private set
             {
                 if (value == field) return;
@@ -87,10 +86,7 @@
         // Позднее возможно так же добавить шансы на получение более редких способностей
         // Сюда же шансы на апгрейд предметов
 
-        public int ExpToNextLevelRemain()
-        {
-            return _currentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExperience);
-        }
+        public int ExpToNextLevelRemain() => _currentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExperience);
 
         public float GetCurrentSkillChance(float skillBonus = 0)
         {
@@ -115,7 +111,6 @@
 
         public float GetCurrentMinRange() => CalculateBase(BaseMinRange, TargetMinRange, GetProgressFactor());
         public float GetCurrentMaxRange() => CalculateBase(BaseMaxRange, TargetMaxRange, GetProgressFactor());
-
         public float GetRandomValueRange() => rnd.RandfRange(GetCurrentMinRange(), GetCurrentMaxRange());
 
         public Rarity RollRarity(float rarityBonus = 0)
@@ -160,6 +155,8 @@
 
             return result;
         }
+
+        public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         private float CalculateBase(float baseValue, float targetValue, float progression) => Mathf.Lerp(baseValue, targetValue, progression);

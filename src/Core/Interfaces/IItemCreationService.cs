@@ -7,7 +7,7 @@ namespace Core.Interfaces
 
     public interface IItemCreationService
     {
-        IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance);
-        IItem CreateItemByRecipe(string recipeId,  IEnumerable<IModifier> resources);
+        IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier);
+        IItem CreateItemByRecipe(string recipeId,  IEnumerable<IModifier> modifiers);
     }
 }

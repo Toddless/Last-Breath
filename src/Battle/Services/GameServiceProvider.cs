@@ -2,12 +2,11 @@ namespace Battle.Services
 {
     using Godot;
     using System;
-    using Core.Interfaces;
+    using Core.Data;
+    using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using Core.Data;
     using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider
@@ -28,7 +27,7 @@ namespace Battle.Services
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<RandomNumberGenerator>((_) =>
+            services.AddSingleton<RandomNumberGenerator>(_ =>
             {
                 var instance = new RandomNumberGenerator();
                 instance.Randomize();

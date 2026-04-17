@@ -35,8 +35,8 @@
         public int UpdateLevel { get; set; }
         public int MaxUpdateLevel { get; set; } = 12;
 
-        public IReadOnlyList<IModifier> AdditionalModifiers => [.. _additionalModifiers];
-        public IReadOnlyList<IModifier> BaseModifiers => [.. _baseModifiers];
+        public IReadOnlyList<IModifier> Modifiers => [.. _additionalModifiers];
+        public IReadOnlyList<IModifier> Implicits => [.. _baseModifiers];
         public IReadOnlyList<IModifier> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= 12;

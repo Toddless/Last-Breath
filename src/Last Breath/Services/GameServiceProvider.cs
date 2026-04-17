@@ -5,6 +5,7 @@
     using System;
     using Inventory;
     using Core.Data;
+    using Utilities;
     using Battle.Source;
     using Core.Interfaces;
     using Crafting.Source;
@@ -34,12 +35,9 @@
         private ServiceProvider RegisterServices()
         {
             var services = new ServiceCollection();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>(_ =>
-            {
-                var instance = new ItemDataProvider();
-                instance.LoadData();
-                return instance;
-            });
+            services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
+            services.AddSingleton<IDataParser, DataParser>();
+            services.AddSingleton<IItemDataProvider, ItemDataProvider>();
             services.AddSingleton(_ =>
             {
                 var instance = new RandomNumberGenerator();

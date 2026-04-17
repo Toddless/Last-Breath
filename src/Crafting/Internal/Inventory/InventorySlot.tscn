@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cekpl68hghs2v"]
 
-[ext_resource type="Script" uid="uid://dbo08d2wj4dmr" path="res://TestResources/Inventory/InventorySlot.cs" id="1_q6odv"]
+[ext_resource type="Script" uid="uid://dbo08d2wj4dmr" path="res://Internal/Inventory/InventorySlot.cs" id="1_q6odv"]
 
 [sub_resource type="Gradient" id="Gradient_q6odv"]
 offsets = PackedFloat32Array(0)

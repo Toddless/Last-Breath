@@ -47,8 +47,8 @@
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
 
-        public IReadOnlyList<IModifier> AdditionalModifiers => [.. _additionalModifiers];
-        public IReadOnlyList<IModifier> BaseModifiers => [.. _baseModifiers];
+        public IReadOnlyList<IModifier> Modifiers => [.. _additionalModifiers];
+        public IReadOnlyList<IModifier> Implicits => [.. _baseModifiers];
         public IReadOnlyList<IModifier> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= 12;

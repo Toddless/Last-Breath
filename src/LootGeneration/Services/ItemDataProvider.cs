@@ -5,21 +5,13 @@ namespace LootGeneration.Services
     using Utilities;
     using System.IO;
     using Core.Data;
-    using System.Linq;
     using Core.Modifiers;
     using Core.Interfaces.Items;
     using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces;
-    using temp;
-    using ExampleCraftingRecipe = temp.ExampleCraftingRecipe;
-    using ExampleCraftingResource = temp.ExampleCraftingResource;
-    using ExampleEquipItem = temp.ExampleEquipItem;
-    using ExampleMaterialCategory = temp.ExampleMaterialCategory;
-    using ExampleMaterialModifier = temp.ExampleMaterialModifier;
-    using ExampleMaterialType = temp.ExampleMaterialType;
-    using ExampleUpgradeResource = temp.ExampleUpgradeResource;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider
@@ -28,14 +20,23 @@ namespace LootGeneration.Services
         private readonly Dictionary<string, IItem> _itemData = [];
         private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
         private Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
+        private readonly IDataParser _dataParser;
+
+        public ItemDataProvider(IDataParser dataParser)
+        {
+            _dataParser = dataParser;
+            LoadData();
+        }
 
         public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
         public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
 
-        public List<IModifier> GetEquipItemBaseModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id.Split('_').First(), out var modifiersPool) ? [] : modifiersPool;
+        public List<IModifier> GetEquipItemBaseModifierPool(string id) =>
+            !_equipItemModifierPools.TryGetValue(id.Split('_')[0], out var modifiersPool) ? [] : modifiersPool;
 
-        public List<IModifier> GetEquipItemModifierPool(string id) => !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool;
+        public List<IModifier> GetEquipItemModifierPool(string id) =>
+            !_equipItemModifierPools.TryGetValue(id, out var pool) ? [] : pool;
 
         public List<IRequirement> GetRecipeRequirements(string id)
         {
@@ -61,7 +62,7 @@ namespace LootGeneration.Services
         public ICraftingRecipe GetRecipe(string recipeId)
         {
             var item = TryGetItem(recipeId);
-            if (item is not ICraftingRecipe recipe || recipe == null) throw new ArgumentNullException($"Recipe not found: {recipeId}");
+            if (item is not ICraftingRecipe recipe) throw new ArgumentNullException($"Recipe not found: {recipeId}");
             return recipe;
         }
 
@@ -85,13 +86,20 @@ namespace LootGeneration.Services
 
         private async Task LoadDataFromDirectory(string dataPath)
         {
-            var equip = LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => await ParseEquipItems(s));
-            var recipes = LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => await ParseRecipes(s));
-            var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => await ParseResources(s));
-            var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await ParseModifiersPool(s));
-            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => await ParseEquipItemResources(s));
+            var equip = LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => AddItems(await _dataParser.ParseEquipItems(s)));
+            var recipes = LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => AddItems(await _dataParser.ParseRecipes(s)));
+            var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => AddItems(await _dataParser.ParseResources(s)));
+            var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await _dataParser.ParseEquipItemModifierPools(s, ref _equipItemModifierPools));
+            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"),
+                async s => { _equipItemsResources = await _dataParser.ParseEquipItemResources(s); });
 
-            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, modifiers);
+            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources);
+        }
+
+        private void AddItems(List<IItem> data)
+        {
+            lock (_itemData)
+                data.ForEach(item => _itemData.TryAdd(item.Id, item));
         }
 
         private static async Task LoadDataFromJson(string path, Func<string, Task> loadDataFunc)
@@ -113,54 +121,13 @@ namespace LootGeneration.Services
             }
             catch (Exception e)
             {
-                Tracker.TrackException("Failed to load equip items", e);
+                Tracker.TrackException("Failed to load item data", e);
             }
             finally
             {
                 dir.ListDirEnd();
             }
         }
-
-        private async Task ParseEquipItems(string jsonContent)
-        {
-            List<IItem> data = await DataParser.ParseEquipItems(jsonContent,
-                (equipType, id, tags) =>
-                    new ExampleEquipItem(equipType, id, tags));
-            lock (_itemData)
-                data.ForEach(item => _itemData.TryAdd(item.Id, item));
-        }
-
-        private async Task ParseEquipItemResources(string jsonContent) => _equipItemsResources = await DataParser.ParseEquipItemResources(jsonContent);
-
-
-        private async Task ParseModifiersPool(string jsonContent) =>
-            await DataParser.ParseEquipItemModifierPools(jsonContent, ref _equipItemModifierPools,
-                (parameter, type, value, weight) => new Modifier(type, parameter, value, weight));
-
-        private async Task ParseResources(string jsonContent)
-        {
-            List<IItem> data = await DataParser.ParseResources<ExampleMaterialCategory>(
-                jsonContent,
-                (list, id) => new ExampleMaterialCategory(list, id),
-                (id, tags, rarity, equipmentCategory, stackSize) => new ExampleUpgradeResource(id, tags, rarity, equipmentCategory, stackSize),
-                (parameter, modifierType, baseValue, weight) => new ExampleMaterialModifier(parameter, modifierType, baseValue, weight),
-                (materialModifiers, materialCategory) => new ExampleMaterialType(materialModifiers, materialCategory),
-                (id, maxStackSize, tags, materialCategory, rarity) => new ExampleCraftingResource(id, maxStackSize, tags, materialCategory, rarity));
-            lock (_itemData)
-                data.ForEach(item => _itemData.TryAdd(item.Id, item));
-        }
-
-        private async Task ParseRecipes(string jsonContent)
-        {
-            var recipes = await DataParser.ParseRecipes<ExampleCraftingRecipe>(jsonContent,
-                (type, s, arg3) => new ExampleRequirement(type, s, arg3),
-                (id, resultItem, tags, rarity, requirements, itemType, isOpened, categories) =>
-                    new ExampleCraftingRecipe(id, resultItem, tags, rarity, requirements, itemType, categories, isOpened));
-            List<IItem> data = recipes.Cast<IItem>().ToList();
-            lock (_itemData)
-                data.ForEach(item => _itemData.TryAdd(item.Id, item));
-        }
-
 
         private IItem? TryGetItem(string id)
         {

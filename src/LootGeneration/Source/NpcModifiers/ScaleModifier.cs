@@ -14,7 +14,7 @@ namespace LootGeneration.Source.NpcModifiers
 
         public override void Attach(IEntity to)
         {
-            if(to is not INpc npc) return;
+            if (to is not INpc npc) return;
             foreach (INpcModifier modifier in npc.NpcModifiers.AllModifiers)
                 modifier.ScaleUp(this);
             npc.NpcModifiers.ModifierAdded += OnModifierAdded;
@@ -22,7 +22,7 @@ namespace LootGeneration.Source.NpcModifiers
 
         public override void Detach(IEntity from)
         {
-            if(from is not INpc npc) return;
+            if (from is not INpc npc) return;
             foreach (INpcModifier modifier in npc.NpcModifiers.AllModifiers)
                 modifier.ScaleDown(this);
             npc.NpcModifiers.ModifierAdded -= OnModifierAdded;
@@ -30,17 +30,15 @@ namespace LootGeneration.Source.NpcModifiers
 
         public override void ScaleUp(IScaleModifier modifier)
         {
-
         }
 
         public override void ScaleDown(IScaleModifier modifier)
         {
-
         }
 
         private void OnModifierAdded(INpcModifier modifier)
         {
-            if(modifier is IScaleModifier scaleModifier) return;
+            if (modifier is IScaleModifier) return;
             modifier.ScaleUp(this);
         }
 

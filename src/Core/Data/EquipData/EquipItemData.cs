@@ -13,7 +13,7 @@ namespace Core.Data.EquipData
         [JsonProperty("effectId")] public string EffectId { get; init; } = string.Empty;
         [JsonProperty("updateLevel")] public int UpdateLevel { get; init; }
         [JsonProperty("maxUpdateLevel")] public int MaxUpdateLevel { get; init; }
-        [JsonProperty("baseModifiers")] public List<ItemModifier> BaseModifiers { get; init; } = [];
-        [JsonProperty("additionalModifiers")] public List<ItemModifier> AdditionalModifiers { get; init; } = [];
+        [JsonProperty("implicits")] public List<ItemModifier> Implicits { get; init; } = [];
+        [JsonProperty("modifiers")] public List<ItemModifier> Modifiers { get; init; } = [];
     }
 }

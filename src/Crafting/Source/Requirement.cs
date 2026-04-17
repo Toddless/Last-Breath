@@ -17,10 +17,10 @@
 
         }
 
-        public Requirement(RequirementType type, string entityId, int amount = 1)
+        public Requirement(RequirementType type, string requirementId, int amount = 1)
         {
             Type = type;
-            Id = entityId;
+            Id = requirementId;
             Amount = amount;
         }
     }

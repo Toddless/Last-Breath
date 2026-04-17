@@ -12,7 +12,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "flat",
@@ -24,7 +24,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Strength_Iron_Bastion",
@@ -38,7 +38,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Armor",
 					"modifierType": "flat",
@@ -50,7 +50,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Strength_Vital_Core",
@@ -64,7 +64,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "inc",
@@ -76,7 +76,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Dexterity_Shadowstep",
@@ -90,7 +90,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Evade",
 					"modifierType": "flat",
@@ -102,7 +102,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Dexterity_Hunters_Dream",
@@ -116,7 +116,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "flat",
@@ -128,7 +128,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Dexterity_Feral_Instinct",
@@ -142,7 +142,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Evade",
 					"modifierType": "inc",
@@ -154,7 +154,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Intelligence_Eternal_Reserve",
@@ -168,7 +168,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Barrier",
 					"modifierType": "flat",
@@ -180,7 +180,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Intelligence_Arcane_Bulwark",
@@ -194,7 +194,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Barrier",
 					"modifierType": "inc",
@@ -206,7 +206,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		},
 		{
 			"id": "Boots_Intelligence_Aegis",
@@ -220,7 +220,7 @@
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
-			"baseModifiers": [
+			"implicits": [
 				{
 					"parameter": "Health",
 					"modifierType": "inc",
@@ -232,7 +232,7 @@
 					"value": 50
 				}
 			],
-			"additionalModifiers": []
+			"modifiers": []
 		}
 	]
 }

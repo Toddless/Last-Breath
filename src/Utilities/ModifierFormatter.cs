@@ -90,7 +90,7 @@
         {
             string sign = value >= 0 ? "+" : "-";
             float abs = MathF.Abs(value);
-            return $"{sign}{(abs % 1 < 0.00001f ? Mathf.RoundToInt(abs) : abs.ToString("0.#"))}";
+            return $"{sign}{(abs % 1 < 0.0001f ? Mathf.RoundToInt(abs) : abs.ToString("0.#"))}";
         }
 
         private string FormatSignedPercent(float percent)
@@ -106,7 +106,7 @@
             float absMin = Mathf.Abs(minValue);
             float absMax = Mathf.Abs(maxValue);
             return
-                $"{sign}{(absMin % 1 < 0.00001f ? Mathf.RoundToInt(absMin) : absMin.ToString("0.#"))} - {(absMax % 1 < 0.00001f ? Mathf.RoundToInt(absMax) : absMax.ToString("0.#"))}";
+                $"{sign}{(absMin % 1 < 0.0001f ? Mathf.RoundToInt(absMin) : absMin.ToString("0.#"))} - {(absMax % 1 < 0.0001f ? Mathf.RoundToInt(absMax) : absMax.ToString("0.#"))}";
         }
 
         private string FormatSignedPercentRanged(float minValue, float maxValue)
