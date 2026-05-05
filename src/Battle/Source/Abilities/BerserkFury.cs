@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.Abilities
 {
+    using System;
     using Godot;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
 
@@ -12,17 +12,14 @@
         string[] tags,
         int cooldown,
         int costValue,
-        float maxTargets,
         List<IEffect> effects,
         List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery? mastery = null,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, maxTargets, effects, casterEffects, upgrades, mastery,
-        costType)
+        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, effects, casterEffects, upgrades, costType)
     {
-        public override async Task Activate(List<IEntity> targets)
+        public override async Task Execute(List<IEntity> targets)
         {
-            await base.Activate(targets);
+            await base.Execute(targets);
             await PerformMultipleAttacks(targets);
         }
 
@@ -39,11 +36,15 @@
                 {
                     var context = new AttackContext(Owner, target, Owner.GetDamage(), rnd, scheduler);
                     scheduler.Schedule(context);
-                    await scheduler.RunQueue();
+                    await foreach (var processed in scheduler.RunQueue())
+                    {
+                        
+                    }
+
                     if (Owner.CurrentHealth <= 1) break;
                 }
 
-                // with lower hp we have lower chance for next cycle
+                // with lower hp we have a lower chance for the next cycle
                 float chance = Mathf.Clamp(Owner.CurrentHealth / Owner.Parameters.MaxHealth, 0.05f, 0.80f);
                 if (rnd.Randf() > chance)
                     break;

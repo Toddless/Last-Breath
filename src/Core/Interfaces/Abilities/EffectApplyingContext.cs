@@ -4,10 +4,10 @@
 
     public struct EffectApplyingContext
     {
-        public IEntity Caster { get; set; }
+        public IEntity Caster { get; init; }
         public IEntity Target { get; set; }
         public float Damage { get; set; }
         public bool IsCritical { get; set; }
-        public string Source { get; set; }
+        public string Source { get; init; }
     }
 }

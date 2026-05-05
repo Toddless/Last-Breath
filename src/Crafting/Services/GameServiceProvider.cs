@@ -3,14 +3,14 @@
     using Godot;
     using Source;
     using System;
-    using Core.Interfaces.Inventory;
-    using System.Collections.Generic;
+    using Internal;
     using Core.Data;
     using Core.Interfaces;
-    using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Internal;
     using Internal.Inventory;
+    using Core.Interfaces.Inventory;
+    using Core.Interfaces.MessageBus;
+    using System.Collections.Generic;
     using Microsoft.Extensions.DependencyInjection;
 
     internal class GameServiceProvider : IGameServiceProvider
@@ -42,7 +42,7 @@
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<IItemGameDataFactory, ItemItemGameDataFactory>();
+            services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IUiElementsManager, UiElementManager>(_ =>
             {
                 var instance = new UiElementManager(this);

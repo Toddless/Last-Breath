@@ -11,8 +11,8 @@ namespace Core.Data
     {
         IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags);
         IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags);
-        IModifier CreateModifier(EntityParameter parameter, ModifierType type, float value, float weight);
-        IModifier CreateMaterialModifier(EntityParameter parameter, ModifierType type, float baseValue, float weight);
+        IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight);
+        IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight);
         IRequirement CreateRequirement(RequirementType type, string id, int amount);
         ICraftingRecipe CreateRecipe(string id, string resultItemId, string[] tags, Rarity rarity, List<IRequirement> requirements, ItemType itemType, bool isOpened, string[] optionalResourceCategories);
         IMaterialCategory CreateMaterialCategory(List<IModifier> modifiers, string id);

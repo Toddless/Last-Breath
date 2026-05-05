@@ -15,20 +15,20 @@
         {
             _passives = passives;
             foreach (IModifier modifier in modifiers)
-                _modifiers.Add(new ModifierInstance(modifier.EntityParameter, modifier.ModifierType, modifier.Value, this));
+                _modifiers.Add(new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, this));
         }
 
         public void OnActivate(IEntity owner)
         {
             foreach (var modifier in _modifiers)
-                owner.Modifiers.AddPermanentModifier(modifier);
+                owner.Modifiers.AddModifier(modifier);
             foreach (ISkill passive in _passives)
                 passive.Attach(owner);
         }
 
         public void OnDeactivate(IEntity owner)
         {
-            owner.Modifiers.RemovePermanentModifierBySource(this);
+            owner.Modifiers.RemoveModifierBySource(this);
             _passives.ForEach(x => x.Detach(owner));
         }
     }

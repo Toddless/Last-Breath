@@ -15,24 +15,24 @@
         public override void Apply(EffectApplyingContext context)
         {
             base.Apply(context);
-            Owner = context.Target;
-            Owner.CurrentHealthChanged += OnCurrentHealthChanges;
+            AppliedTo = context.Target;
+            AppliedTo.CurrentHealthChanged += OnCurrentHealthChanges;
         }
 
         private void OnCurrentHealthChanges(float value)
         {
             if (value > 0) return;
-            if (Owner == null) return;
-            float toRecover = Owner.Parameters.MaxHealth * PercentHealthToRecover;
-            Owner.Heal(toRecover);
+            if (AppliedTo == null) return;
+            float toRecover = AppliedTo.Parameters.MaxHealth * PercentHealthToRecover;
+            AppliedTo.Heal(toRecover);
             Remove();
         }
 
         public override void Remove()
         {
             base.Remove();
-            Owner?.CurrentHealthChanged -= OnCurrentHealthChanges;
-            Owner = null;
+            AppliedTo?.CurrentHealthChanged -= OnCurrentHealthChanges;
+            AppliedTo = null;
         }
 
         public override IEffect Clone() => new EvadeFirstDeath(Duration, MaxMaxStacks, PercentHealthToRecover);

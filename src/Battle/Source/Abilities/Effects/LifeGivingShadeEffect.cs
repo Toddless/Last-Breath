@@ -17,7 +17,7 @@
         {
             LifeToRecover = lifeToRecover;
             Activations = activationAmount;
-            _modifier = new ModifierInstance(EntityParameter.Evade, ModifierType.Increase, 0.15f, Id);
+            _modifier = new SimpleModifier(EntityParameter.Evade, ModifierValueType.Increase, 0.15f, Id);
         }
 
         public float LifeToRecover { get; }
@@ -25,23 +25,25 @@
 
         public override void Apply(EffectApplyingContext context)
         {
+            if (AppliedTo == null) return;
             base.Apply(context);
-            Owner?.Modifiers.AddPermanentModifier(_modifier.Copy());
-            Owner?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
+            var copy = _modifier.Copy();
+            copy.Apply(AppliedTo);
+            AppliedTo?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 
         private void OnAttackEvaded(AttackEvadedEvent obj)
         {
             // TODO: Update activation on same effect applying??
-            Owner?.Heal(LifeToRecover);
+            AppliedTo?.Heal(LifeToRecover);
             Activations--;
             if (Activations == 0) Remove();
         }
 
         public override void Remove()
         {
-            Owner?.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
-            Owner?.Modifiers.RemovePermanentModifierBySource(Id);
+            AppliedTo?.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
+            AppliedTo?.Modifiers.RemoveModifierBySource(Id);
             base.Remove();
         }
 

@@ -17,8 +17,8 @@
         IReadOnlyDictionary<string, int> UsedResources { get; }
         IReadOnlyList<IModifier> ModifiersPool { get; }
 
-        void SetBaseModifiers(IEnumerable<IModifier> modifiers);
-        void SetAdditionalModifiers(IEnumerable<IModifier> modifiers);
+        void SetImplicits(IEnumerable<IModifier> modifiers);
+        void SetModifiers(IEnumerable<IModifier> modifiers);
         void SetItemEffect(string effectId);
         void OnEquip(IEntity owner);
         void OnUnequip();

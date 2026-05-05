@@ -60,11 +60,11 @@
                 mods.AddRange(takenMods.Select(mod =>
                     ModifiersCreator.CreateModifierInstance(
                         mod.EntityParameter,
-                        mod.ModifierType,
-                        ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierType),
+                        mod.ModifierValueType,
+                        ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierValueType),
                         item)));
 
-                item.SetAdditionalModifiers(mods);
+                item.SetModifiers(mods);
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
 
                 // TODO : Change to get random effect/ability
@@ -99,13 +99,13 @@
                 rarity.ConvertRarityToItemModifierAmount(),
                 rnd);
 
-            equip.SetAdditionalModifiers(chosenMods);
+            equip.SetModifiers(chosenMods);
         }
 
-        private float ApplyPlayerMultiplier(float baseValue, ModifierType type)
+        private float ApplyPlayerMultiplier(float baseValue, ModifierValueType valueType)
         {
             float multiplier = craftingMastery.GetCurrentValueMultiplier();
-            if (type == ModifierType.Multiplicative)
+            if (valueType == ModifierValueType.Multiplicative)
                 return 1f + (baseValue - 1f) * multiplier;
 
             return baseValue * multiplier;

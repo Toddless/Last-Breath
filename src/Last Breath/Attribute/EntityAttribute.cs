@@ -33,11 +33,11 @@
         protected EntityAttribute(IEnumerable<IModifier> modifiers, IModifiersComponent manager, IModifier mod)
         {
             _manager = manager;
-            _investedAmountModifier = new ModifierInstance(mod.EntityParameter, mod.ModifierType, mod.Value, this);
-            _manager.AddPermanentModifier(_investedAmountModifier);
+            _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, this);
+            _manager.AddModifier(_investedAmountModifier);
             foreach (var modifier in modifiers)
             {
-                var instance = new ModifierInstance(modifier.EntityParameter, modifier.ModifierType, modifier.Value, this);
+                var instance = new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, this);
                 _instances.Add(instance);
             }
         }
@@ -65,7 +65,7 @@
             foreach (IModifierInstance modifier in _instances)
                 modifier.Value = modifier.BaseValue * Total;
 
-            _manager.UpdatePermanentModifiers(_instances);
+            _manager.UpdateModifiers(_instances);
         }
 
         private void UpdateInvestedAmount()
@@ -73,7 +73,7 @@
             float newValue = _investedAmountModifier.BaseValue + InvestedPoints;
             if (Math.Abs(_investedAmountModifier.Value - newValue) < 0.0001f) return;
             _investedAmountModifier.Value = newValue;
-            _manager.UpdatePermanentModifier(_investedAmountModifier);
+            _manager.UpdateModifier(_investedAmountModifier);
         }
     }
 }

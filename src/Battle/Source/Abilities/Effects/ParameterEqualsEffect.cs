@@ -28,7 +28,7 @@
         {
             base.Remove();
             if (_decorator != null)
-                Owner?.Parameters.RemoveModuleDecorator(_decorator.Id, Parameter);
+                AppliedTo?.Parameters.RemoveModuleDecorator(_decorator.Id, Parameter);
         }
 
         public override IEffect Clone() => new ParameterEqualsEffect(Id, Duration, MaxMaxStacks, Parameter, Value, Status);

@@ -1,0 +1,13 @@
+{
+    "quest": [
+        {}
+    ],
+    "common": [
+        {
+            "id": "Coal",
+            "maxStackSize": 9999,
+            "rarity": "Uncommon",
+            "tags": []
+        }
+    ]
+}

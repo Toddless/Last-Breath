@@ -3,7 +3,7 @@
 		{
 			"id": "Body_Strength_Stoneheart",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -16,12 +16,12 @@
 				{
 					"parameter": "Health",
 					"modifierType": "flat",
-					"value": 800
+					"value": 300
 				},
 				{
 					"parameter": "Armor",
 					"modifierType": "flat",
-					"value": 500
+					"value": 700
 				}
 			],
 			"modifiers": []
@@ -29,7 +29,7 @@
 		{
 			"id": "Body_Strength_Iron_Bastion",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -55,7 +55,7 @@
 		{
 			"id": "Body_Strength_Vital_Core",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -81,7 +81,7 @@
 		{
 			"id": "Body_Dexterity_Shadowstep",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -107,7 +107,7 @@
 		{
 			"id": "Body_Dexterity_Hunters_Dream",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -133,7 +133,7 @@
 		{
 			"id": "Body_Dexterity_Feral_Instinct",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -144,9 +144,9 @@
 			"maxUpdateLevel": 12,
 			"implicits": [
 				{
-					"parameter": "Evade",
-					"modifierType": "inc",
-					"value": 0.4
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 400
 				},
 				{
 					"parameter": "Health",
@@ -159,7 +159,7 @@
 		{
 			"id": "Body_Intelligence_Eternal_Reserve",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -172,7 +172,7 @@
 				{
 					"parameter": "Barrier",
 					"modifierType": "flat",
-					"value": 350
+					"value": 900
 				},
 				{
 					"parameter": "Barrier",
@@ -185,7 +185,7 @@
 		{
 			"id": "Body_Intelligence_Arcane_Bulwark",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -196,14 +196,14 @@
 			"maxUpdateLevel": 12,
 			"implicits": [
 				{
-					"parameter": "Health",
+					"parameter": "Armor",
 					"modifierType": "flat",
 					"value": 500
 				},
 				{
 					"parameter": "Barrier",
-					"modifierType": "increase",
-					"value": 0.3
+					"modifierType": "flat",
+					"value": 500
 				}
 			],
 			"modifiers": []
@@ -211,7 +211,7 @@
 		{
 			"id": "Body_Intelligence_Aegis",
 			"equipmentPart": "Body",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Body",
 				"Equipment"
@@ -224,10 +224,10 @@
 				{
 					"parameter": "Barrier",
 					"modifierType": "flat",
-					"value": 350
+					"value": 500
 				},
 				{
-					"parameter": "Health",
+					"parameter": "Evade",
 					"modifierType": "flat",
 					"value": 500
 				}

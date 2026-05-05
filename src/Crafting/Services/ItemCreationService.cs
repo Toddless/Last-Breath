@@ -64,11 +64,11 @@
                 mods.AddRange(takenMods.Select(mod =>
                     ModifiersCreator.CreateModifierInstance(
                         mod.EntityParameter,
-                        mod.ModifierType,
+                        mod.ModifierValueType,
                         mod.BaseValue * modifierMultiplier,
                         item)));
 
-                item.SetAdditionalModifiers(mods);
+                item.SetModifiers(mods);
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));
 
                 // TODO : Change to get random effect/ability

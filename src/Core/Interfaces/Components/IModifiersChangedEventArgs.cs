@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using System.Collections.Generic;
     using Enums;
     using Modifiers;
+    using System.Collections.Generic;
 
     public interface IModifiersChangedEventArgs
     {

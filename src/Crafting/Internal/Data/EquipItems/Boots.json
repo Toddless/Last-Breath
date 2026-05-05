@@ -3,7 +3,7 @@
 		{
 			"id": "Boots_Strength_Stoneheart",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -29,7 +29,7 @@
 		{
 			"id": "Boots_Strength_Iron_Bastion",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -55,7 +55,7 @@
 		{
 			"id": "Boots_Strength_Vital_Core",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -81,7 +81,7 @@
 		{
 			"id": "Boots_Dexterity_Shadowstep",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -107,7 +107,7 @@
 		{
 			"id": "Boots_Dexterity_Hunters_Dream",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -133,7 +133,7 @@
 		{
 			"id": "Boots_Dexterity_Feral_Instinct",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -159,7 +159,7 @@
 		{
 			"id": "Boots_Intelligence_Eternal_Reserve",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -185,7 +185,7 @@
 		{
 			"id": "Boots_Intelligence_Arcane_Bulwark",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"
@@ -211,7 +211,7 @@
 		{
 			"id": "Boots_Intelligence_Aegis",
 			"equipmentPart": "Boots",
-			"rarity": "Uncommon",
+			"rarity": "Common",
 			"tags": [
 				"Boots",
 				"Equipment"

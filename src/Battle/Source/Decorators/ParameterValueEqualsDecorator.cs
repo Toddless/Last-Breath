@@ -17,9 +17,9 @@
             return Value;
         }
 
-        public override float ApplyDecoratorsForValue(float value)
+        public override float ApplyDecoratorsForValue(float applyToValue)
         {
-            base.ApplyDecoratorsForValue(value);
+            base.ApplyDecoratorsForValue(applyToValue);
             return Value;
         }
     }

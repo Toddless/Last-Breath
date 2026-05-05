@@ -7,7 +7,7 @@
 
     public interface IEffect : IIdentifiable, IDisplayable
     {
-        IEntity? Owner { get; }
+        IEntity? AppliedTo { get; }
         StatusEffects Status { get; set; }
         int Duration { get; set; }
         int MaxMaxStacks { get; set; }

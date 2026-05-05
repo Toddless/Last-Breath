@@ -2,9 +2,9 @@
 {
     using Enums;
 
-    public class Modifier(ModifierType type, EntityParameter entityParameter, float baseValue, float weight = 0) : IModifier
+    public class Modifier(ModifierValueType valueType, EntityParameter entityParameter, float baseValue, float weight = 0) : IModifier
     {
-        public ModifierType ModifierType { get; } = type;
+        public ModifierValueType ModifierValueType { get; } = valueType;
         public EntityParameter EntityParameter { get; } = entityParameter;
         public float BaseValue { get; } = baseValue;
         public float Value { get; set; } = baseValue;

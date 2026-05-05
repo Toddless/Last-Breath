@@ -33,9 +33,7 @@
         event Action<IEntity>? Dead;
 
         void AddItemToInventory(IItem item);
-
         float GetDamage();
-
         void Heal(float amount);
         void ConsumeResource(Costs type, float amount);
         bool TryApplyStatusEffect(StatusEffects statusEffect);

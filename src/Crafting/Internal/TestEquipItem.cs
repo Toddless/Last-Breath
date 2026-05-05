@@ -55,16 +55,16 @@
         public T Copy<T>()
         {
             var copy = (IEquipItem)DuplicateDeep();
-            copy.SetBaseModifiers(_baseModifiers.ToHashSet());
-            copy.SetAdditionalModifiers(_additionalModifiers.ToHashSet());
+            copy.SetImplicits(_baseModifiers.ToHashSet());
+            copy.SetModifiers(_additionalModifiers.ToHashSet());
             copy.SaveUsedResources(_usedResources.ToDictionary());
             copy.SaveModifiersPool(_modifiersPool.ToList());
             return (T)copy;
         }
 
-        public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
+        public void SetImplicits(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
 
-        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) =>
+        public void SetModifiers(IEnumerable<IModifier> modifiers) =>
             SetModifiers(_additionalModifiers, modifiers);
 
         public void SetItemEffect(string effectId) => ItemEffect = effectId;

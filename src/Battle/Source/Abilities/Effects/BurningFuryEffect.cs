@@ -18,17 +18,17 @@
 
         public override void AfterAttack(IAttackContext context)
         {
-            if (Owner == null) return;
+            if (AppliedTo == null) return;
             var burnEffect = new DamageOverTurnEffect(
                 BurningDuration,
                 BurningMaxStacks,
-                HealthAsDamageMultiplier,
-                StatusEffects.Burning);
+                StatusEffects.Burning,
+                HealthAsDamageMultiplier);
 
             burnEffect.Apply(new EffectApplyingContext
             {
                 Target = context.Target,
-                Caster = Owner,
+                Caster = AppliedTo,
                 Damage = HealthBurned,
                 Source = Id,
                 IsCritical = false

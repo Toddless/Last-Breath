@@ -7,7 +7,7 @@
     using Godot;
 
     public class Dexterity(IModifiersComponent manager)
-        : EntityAttribute(GetModifiers(), manager, new Modifier(ModifierType.Flat, EntityParameter.Dexterity, 0f))
+        : EntityAttribute(GetModifiers(), manager, new Modifier(ModifierValueType.Flat, EntityParameter.Dexterity, 0f))
     {
         public override int Total
         {
@@ -29,13 +29,13 @@
 
         private static IEnumerable<IModifier> GetModifiers()
         {
-            yield return new Modifier(ModifierType.Increase, EntityParameter.CriticalChance, 0.05f);
+            yield return new Modifier(ModifierValueType.Increase, EntityParameter.CriticalChance, 0.01f);
 
-            yield return new Modifier(ModifierType.Increase, EntityParameter.CriticalDamage, 0.1f);
+            yield return new Modifier(ModifierValueType.Increase, EntityParameter.CriticalDamage, 0.01f);
 
-            yield return new Modifier(ModifierType.Increase, EntityParameter.AdditionalHitChance, 0.01f);
+            yield return new Modifier(ModifierValueType.Increase, EntityParameter.AdditionalHitChance, 0.01f);
 
-            yield return new Modifier(ModifierType.Increase, EntityParameter.Evade, 0.01f);
+            yield return new Modifier(ModifierValueType.Increase, EntityParameter.Evade, 0.01f);
         }
     }
 }

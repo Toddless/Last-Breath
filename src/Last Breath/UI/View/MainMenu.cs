@@ -7,9 +7,9 @@
     using Core.Interfaces.UI;
     using Crafting.Source;
     using Godot;
-    using LastBreath.Services;
+    using Services;
     using Source;
-    using Main = LastBreath.Main;
+    using Main = Main;
 
     public partial class MainMenu : Control, IInitializable
     {

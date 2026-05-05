@@ -21,10 +21,10 @@
             return _module.GetValue();
         }
 
-        public virtual float ApplyDecoratorsForValue(float value)
+        public virtual float ApplyDecoratorsForValue(float applyToValue)
         {
             ArgumentNullException.ThrowIfNull(_module);
-            return _module.ApplyDecoratorsForValue(value);
+            return _module.ApplyDecoratorsForValue(applyToValue);
         }
     }
 }

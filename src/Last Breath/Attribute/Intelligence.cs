@@ -7,7 +7,7 @@
     using Godot;
 
     public class Intelligence(IModifiersComponent manager) :
-        EntityAttribute(GetEffects(), manager,  new Modifier(ModifierType.Flat, EntityParameter.Intelligence, 0f))
+        EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Intelligence, 0f))
     {
         public override int Total
         {
@@ -28,13 +28,13 @@
 
         private static IEnumerable<IModifier> GetEffects()
         {
-            yield return new Modifier(ModifierType.Flat, EntityParameter.Barrier, 10);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Barrier, 10);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.SpellDamage, 10f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.SpellDamage, 10f);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.ManaRecovery, 0.1f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.ManaRecovery, 0.1f);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.Mana, 0.1f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Mana, 0.1f);
         }
     }
 }

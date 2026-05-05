@@ -4,12 +4,12 @@
     using System;
     using Core.Enums;
     using System.Linq;
+    using Core.Modifiers;
     using Core.Interfaces;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
-    using Core.Modifiers;
 
     public static class Calculations
     {
@@ -30,16 +30,16 @@
             context.FinalDamage *= 1 - (effectiveArmor / (effectiveArmor + ArmorScalingFactor));
         }
 
-        public static void CalculateHitSucceeded(IAttackContext context)
+        public static void CalculateSucceeded(IAttackContext context)
         {
-            if (ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.Attacker.Parameters.Accuracy), context.Rnd.Randf()))
+            if (!context.IsUnevadable && ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.Attacker.Parameters.Accuracy), context.Rnd.Randf()))
             {
                 context.Result = AttackResults.Evaded;
                 context.Attacker.CombatEvents.Publish<TargetEvadedAttackEvent>(new(context));
                 if (context.Result is AttackResults.Evaded) return;
             }
 
-            if (ChanceSuccessful(context.Target.Parameters.BlockChance, context.Rnd.Randf()))
+            if (!context.IsUnblockable && ChanceSuccessful(context.Target.Parameters.BlockChance, context.Rnd.Randf()))
             {
                 context.Result = AttackResults.Blocked;
                 context.Attacker.CombatEvents.Publish<TargetBlockedAttackEvent>(new(context));
@@ -114,17 +114,17 @@
             float sumAdditions = 0 + value;
             float sumIncreases = 1;
             float sumMultiplicative = 1;
-            foreach (var group in modifiers.GroupBy(m => m.ModifierType).OrderBy(g => g.Key))
+            foreach (var group in modifiers.GroupBy(m => m.ModifierValueType).OrderBy(g => g.Key))
             {
                 switch (group.Key)
                 {
-                    case ModifierType.Flat:
+                    case ModifierValueType.Flat:
                         sumAdditions += group.Sum(x => x.Value);
                         break;
-                    case ModifierType.Increase:
+                    case ModifierValueType.Increase:
                         sumIncreases += group.Sum(x => x.Value);
                         break;
-                    case ModifierType.Multiplicative:
+                    case ModifierValueType.Multiplicative:
                         sumMultiplicative += group.Sum(x => x.Value);
                         break;
                 }

@@ -18,11 +18,11 @@
             public IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags) =>
                 new ExampleEquipItem(piece, id, tags);
 
-            public IModifier CreateModifier(EntityParameter parameter, ModifierType type, float value, float weight) =>
-                new Modifier(type, parameter, value, weight);
+            public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
+                new Modifier(valueType, parameter, value, weight);
 
-            public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierType type, float baseValue, float weight) =>
-                new ExampleMaterialModifier(parameter, type, baseValue, weight);
+            public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight) =>
+                new ExampleMaterialModifier(parameter, valueType, baseValue, weight);
 
             public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
                 new ExampleRequirement(type, id, amount);

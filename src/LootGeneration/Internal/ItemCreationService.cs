@@ -52,7 +52,7 @@ namespace LootGeneration.Internal
                 rarity.ConvertRarityToItemModifierAmount(),
                 rnd);
 
-            equip.SetAdditionalModifiers(chosenMods);
+            equip.SetModifiers(chosenMods);
         }
     }
 }

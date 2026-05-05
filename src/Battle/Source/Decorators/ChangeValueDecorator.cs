@@ -11,6 +11,6 @@
         : EntityParameterModuleDecorator(parameter, priority, id)
     {
         public override float GetValue() => base.GetValue() * value;
-        public override float ApplyDecoratorsForValue(float baseValue) => base.ApplyDecoratorsForValue(baseValue) * value;
+        public override float ApplyDecoratorsForValue(float applyToValue) => base.ApplyDecoratorsForValue(applyToValue) * value;
     }
 }

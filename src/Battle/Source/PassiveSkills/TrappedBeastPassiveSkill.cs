@@ -13,7 +13,7 @@
         {
             HealthPercent = healthPercent;
             DamageBonus = damageBonus;
-            _increaseDamageModifier = new ModifierInstance(EntityParameter.Damage, ModifierType.Increase, 0f, this);
+            _increaseDamageModifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Increase, 0f, this);
         }
 
         public float HealthPercent { get; }
@@ -32,12 +32,12 @@
             int steps = (int)(percentLost / DamageBonus);
             float bonus = 1f + steps * DamageBonus;
             _increaseDamageModifier.Value = bonus;
-            Owner.Modifiers.UpdatePermanentModifier(_increaseDamageModifier);
+            Owner.Modifiers.UpdateModifier(_increaseDamageModifier);
         }
 
         public override void Detach(IEntity owner)
         {
-            Owner?.Modifiers.RemovePermanentModifier(_increaseDamageModifier);
+            Owner?.Modifiers.RemoveModifier(_increaseDamageModifier);
             Owner?.CurrentHealthChanged -= OnCurrentHealthChanged;
             Owner = null;
         }

@@ -13,21 +13,19 @@
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
-        private void OnAfterAttack(AfterAttackEvent evnt)
+        private void OnAfterAttack(AfterAttackEvent @event)
         {
-            // TODO: How a make sure that other passives already did they part????
-
             if (Owner == null) return;
-            if (evnt.Context.Rnd.Randf() > Owner.Parameters.AdditionalHit) return;
-            var context = new AttackContext(Owner, evnt.Context.Target, Owner.Parameters.Damage * evnt.Context.Rnd.RandfRange(0.9f, 1.1f), evnt.Context.Rnd,
-                evnt.Context.AttackContextScheduler);
+            if (@event.Context.Rnd.Randf() > Owner.Parameters.AdditionalHit) return;
+            var context = new AttackContext(Owner, @event.Context.Target,
+                Owner.Parameters.Damage * @event.Context.Rnd.RandfRange(0.9f, 1.1f), @event.Context.Rnd, @event.Context.AttackContextScheduler)
+            {
+                RawCriticalChance = Owner.Parameters.CriticalChance
+            };
             context.Schedule();
         }
 
-        public override void Detach(IEntity owner)
-        {
-            owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
-        }
+        public override void Detach(IEntity owner) => owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
 
         public override ISkill Copy() => new ChainAttackPassiveSkill();
 

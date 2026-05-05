@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Abilities;
 
     public class PrimalFuryEffect(
         int duration,

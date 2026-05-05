@@ -21,7 +21,7 @@
 
         public override void Remove()
         {
-            Owner?.Parameters.RemoveModuleDecorator(_luckyCritChanceDecorator.Id, _luckyCritChanceDecorator.Parameter);
+            AppliedTo?.Parameters.RemoveModuleDecorator(_luckyCritChanceDecorator.Id, _luckyCritChanceDecorator.Parameter);
             base.Remove();
         }
 

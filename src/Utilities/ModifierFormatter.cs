@@ -18,21 +18,21 @@
             EntityParameter.MulticastChance
         ];
 
-        public string FormatModifier(IModifier modifier, float rangeMinValue, float rangeMaxValue) => modifier.ModifierType switch
+        public string FormatModifier(IModifier modifier, float rangeMinValue, float rangeMaxValue) => modifier.ModifierValueType switch
         {
-            ModifierType.Flat => FormatFlatRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
-            ModifierType.Increase => FormatIncreaseRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
-            ModifierType.Multiplicative => FormatMultiplicativeRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
+            ModifierValueType.Flat => FormatFlatRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
+            ModifierValueType.Increase => FormatIncreaseRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
+            ModifierValueType.Multiplicative => FormatMultiplicativeRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
             _ => string.Empty
         };
 
         public string FormatModifier(IModifier modifier)
         {
-            return modifier.ModifierType switch
+            return modifier.ModifierValueType switch
             {
-                ModifierType.Flat => FormatFlat(modifier.Value, modifier.EntityParameter),
-                ModifierType.Increase => FormatIncrease(modifier.Value, modifier.EntityParameter),
-                ModifierType.Multiplicative => FormatMultiplicative(modifier.Value, modifier.EntityParameter),
+                ModifierValueType.Flat => FormatFlat(modifier.Value, modifier.EntityParameter),
+                ModifierValueType.Increase => FormatIncrease(modifier.Value, modifier.EntityParameter),
+                ModifierValueType.Multiplicative => FormatMultiplicative(modifier.Value, modifier.EntityParameter),
                 _ => FormatFallback(modifier.Value, modifier.EntityParameter)
             };
         }

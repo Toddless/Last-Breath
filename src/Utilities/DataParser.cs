@@ -17,22 +17,23 @@ namespace Utilities
     using Core.Interfaces.Crafting;
     using Core.Data.NpcModifiersData;
     using System.Collections.Generic;
+    using Godot;
     using Newtonsoft.Json.Serialization;
 
     public class DataParser(IItemGameDataFactory factory) : IDataParser
     {
         private static readonly JsonSerializerSettings s_settings = new() { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } };
 
-        private static readonly Dictionary<string, ModifierType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, ModifierValueType> s_typeMap = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["flat"] = ModifierType.Flat,
-            ["add"] = ModifierType.Flat,
-            ["additional"] = ModifierType.Flat,
-            ["increase"] = ModifierType.Increase,
-            ["inc"] = ModifierType.Increase,
-            ["mult"] = ModifierType.Multiplicative,
-            ["multiplicative"] = ModifierType.Multiplicative,
-            ["multi"] = ModifierType.Multiplicative
+            ["flat"] = ModifierValueType.Flat,
+            ["add"] = ModifierValueType.Flat,
+            ["additional"] = ModifierValueType.Flat,
+            ["increase"] = ModifierValueType.Increase,
+            ["inc"] = ModifierValueType.Increase,
+            ["mult"] = ModifierValueType.Multiplicative,
+            ["multiplicative"] = ModifierValueType.Multiplicative,
+            ["multi"] = ModifierValueType.Multiplicative
         };
 
         public Task ParseLootTables(string json,
@@ -104,7 +105,7 @@ namespace Utilities
                 var itemModifiers = modifierPool.ModifiersPool.Select(modifier =>
                 {
                     ParseEnum(modifier.Parameter, out EntityParameter param);
-                    ParseEnum(modifier.ModifierType, out ModifierType type);
+                    ParseEnum(modifier.ModifierType, out ModifierValueType type);
                     return factory.CreateModifier(param, type, modifier.Value, modifier.Weight);
                 }).ToList();
 
@@ -145,8 +146,8 @@ namespace Utilities
                 newItem.UpdateLevel = item.UpdateLevel;
                 newItem.MaxUpdateLevel = item.MaxUpdateLevel;
                 newItem.SetItemEffect(item.EffectId);
-                newItem.SetBaseModifiers(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem));
-                newItem.SetAdditionalModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem));
+                newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem));
+                newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem));
                 items.Add(newItem);
             }
 
@@ -159,7 +160,7 @@ namespace Utilities
             var recipes = (data?.CraftingRecipes ?? []).Select(recipeData =>
             {
                 var requirements = recipeData.Requirements
-                    .Select(r => factory.CreateRequirement(Enum.Parse<RequirementType>(r.Type), r.Id, r.Amount))
+                    .Select(requirement => factory.CreateRequirement(Enum.Parse<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
                     .ToList();
 
                 var recipe = factory.CreateRecipe(
@@ -200,19 +201,19 @@ namespace Utilities
         }
 
         private List<IModifier> LoadModifiers(List<ItemModifier> modifiers) =>
-            modifiers.Select(m =>
+            modifiers.Select(IModifier (m) =>
             {
                 var type = s_typeMap.GetValueOrDefault(m.ModifierType);
                 ParseEnum<EntityParameter>(m.Parameter, out var parameter);
-                return (IModifier)new Modifier(type, parameter, m.Value);
+                return new Modifier(type, parameter, m.Value);
             }).ToList();
 
         private List<IUpgradingResource> LoadUpgradeResources(List<UpgradeResourceData> upgradeResourceData) =>
-            upgradeResourceData.Select(u =>
+            upgradeResourceData.Select(upgradeResource =>
             {
-                ParseEnum<Rarity>(u.Rarity, out var rarity);
-                ParseEnum<EquipmentCategory>(u.Category, out var category);
-                return factory.CreateUpgradeResource(u.Id, u.Tags, rarity, category, u.MaxStackSize);
+                ParseEnum<Rarity>(upgradeResource.Rarity, out var rarity);
+                ParseEnum<EquipmentCategory>(upgradeResource.Category, out var category);
+                return factory.CreateUpgradeResource(upgradeResource.Id, upgradeResource.Tags, rarity, category, upgradeResource.MaxStackSize);
             }).ToList();
 
         private List<ICraftingResource> LoadCraftingResources(
@@ -225,6 +226,7 @@ namespace Utilities
                 if (!categories.TryGetValue(craftingData.Material.CategoryId, out var category))
                 {
                     Tracker.TrackError("Category not found");
+                    GD.Print($"Category not found: {craftingData.Material.CategoryId}");
                     continue;
                 }
 

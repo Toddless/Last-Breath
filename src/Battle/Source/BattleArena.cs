@@ -85,9 +85,10 @@
 
             foreach (var spot in _spots)
             {
-                if(!spot.HasEntityInit()) continue;
+                if (!spot.HasEntityInit()) continue;
                 spot.SetBattleEventBus(_battleEventBus);
             }
+
             _playerSpot?.SetBattleEventBus(_battleEventBus);
 
             var fightersQueue = _queueScheduler.AddFighters(fighters);
@@ -122,6 +123,7 @@
 
                     if (target is not { IsAlive: true }) continue;
                     var context = CreateAttackContext(_currentFighter, target);
+                    context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
                     _attackContextScheduler.Schedule(context);
                 }
                 else
@@ -129,6 +131,7 @@
                     var target = GetEntityTarget();
                     if (target is not { IsAlive: true }) continue;
                     var context = CreateAttackContext(_currentFighter, target);
+                    context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
                     _attackContextScheduler.Schedule(context);
                 }
 
@@ -157,7 +160,7 @@
         }
 
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
-            currentFighter.GetDamage(), new RandomNumberGenerator(), _attackContextScheduler);
+            currentFighter.GetDamage(),  new RandomNumberGenerator(), _attackContextScheduler);
 
         private void OnEntityDead(EntityDiedEvent obj)
         {

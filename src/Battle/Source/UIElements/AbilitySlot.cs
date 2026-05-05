@@ -154,7 +154,7 @@
                     var targets = new List<IEntity>();
                     _battleEventBus?.Publish<AbilityActivatedEvent>(new(_ability, targets));
                     _selectionId = string.Empty;
-                    _ability.Activate(targets);
+                    _ability.Execute(targets);
                 })
                 .Permit(Trigger.NotAvailable, State.NotAvailable);
 

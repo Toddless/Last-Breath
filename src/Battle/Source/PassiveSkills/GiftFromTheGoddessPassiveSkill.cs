@@ -14,11 +14,11 @@
         private readonly List<IEffect> _effects =
         [
             new RegenerationEffect(150, 3, 5),
-            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Bleed),
-            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Poison),
-            new DamageOverTurnEffect(3, 3, 0.07f, StatusEffects.Burning),
+            new DamageOverTurnEffect(3, 3, StatusEffects.Bleed, 0.07f),
+            new DamageOverTurnEffect(3, 3, StatusEffects.Poison, 0.07f),
+            new DamageOverTurnEffect(3, 3, StatusEffects.Burning, 0.07f),
             new ExecutionEffect(3, 1, 0.15f),
-            new LuckyCritChanceEffect(3,1)
+            new LuckyCritChanceEffect(3, 1)
         ];
 
         public float Chance { get; } = chance;

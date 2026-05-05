@@ -19,13 +19,13 @@
 
         public override void BeforeAttack(IAttackContext context)
         {
-            if (Owner == null) return;
-            float healthToBurn = Owner.Parameters.MaxHealth * HealthPercent;
-            float currentHealth = Owner.CurrentHealth;
+            if (AppliedTo == null) return;
+            float healthToBurn = AppliedTo.Parameters.MaxHealth * HealthPercent;
+            float currentHealth = AppliedTo.CurrentHealth;
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
-            Owner.TakeDamage(Owner, toBurn, Status.GetDamageType(), DamageSource.Effect);
-            if ((currentHealth - toBurn) <= 1) Owner.Effects.RemoveEffect(this);
+            AppliedTo.TakeDamage(AppliedTo, toBurn, Status.GetDamageType(), DamageSource.Effect);
+            if ((currentHealth - toBurn) <= 1) AppliedTo.Effects.RemoveEffect(this);
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);

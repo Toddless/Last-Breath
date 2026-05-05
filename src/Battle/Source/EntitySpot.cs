@@ -135,7 +135,7 @@
         private void OnAbilityActivated(AbilityActivatedEvent obj)
         {
             if (_entity == null || _stateMachine.State is not State.CandidateForAbility) return;
-            if (obj.Targets.Contains(_entity) || obj.Targets.Count == (int)obj.Ability.MaxTargets) return;
+            if (obj.Targets.Contains(_entity)) return;
             obj.Targets.Add(_entity);
             _stateMachine.Fire(Trigger.SetCanBeSelected);
         }

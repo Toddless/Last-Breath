@@ -18,25 +18,24 @@
         float increaseBonusPerManaConsumed,
         List<IEffect> effects,
         List<IEffect> casterEffects,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery? mastery = null,
+        Dictionary<int, List<IAbilityUpgradeWrap<>>> upgrades,
         Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, cooldown, costValue, maxTargets: 1, effects, casterEffects, upgrades,
-        mastery, costType, abilityType)
+        AbilityType abilityType = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, cooldown, costValue,  effects, casterEffects, upgrades,
+        costType, abilityType)
     {
         public float PercentToConsume { get; } = percentManaToConsume;
         public float IncreaseBonusPerManaConsumed { get; } = increaseBonusPerManaConsumed;
 
-        public override async Task Activate(List<IEntity> targets)
+        public override async Task Execute(List<IEntity> targets)
         {
             if (Owner == null) return;
 
             float manaConsumed = Owner.CurrentMana * PercentToConsume;
             float increase = manaConsumed / 100 / IncreaseBonusPerManaConsumed;
-            var modifier = new ModifierInstance(EntityParameter.SpellDamage, ModifierType.Increase, increase, Id);
-            Owner.Modifiers.AddPermanentModifier(modifier);
+            var modifier = new SimpleModifier(EntityParameter.SpellDamage, ModifierValueType.Increase, increase, Id);
+            Owner.Modifiers.AddModifier(modifier);
             Owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
-            await base.Activate(targets);
+            await base.Execute(targets);
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
@@ -44,7 +43,7 @@
         private void OnAbilityActivated(AbilityActivatedEvent obj)
         {
             Owner?.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivated);
-            Owner?.Modifiers.RemovePermanentModifierBySource(Id);
+            Owner?.Modifiers.RemoveModifierBySource(Id);
         }
     }
 }

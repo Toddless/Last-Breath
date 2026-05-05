@@ -2,8 +2,8 @@
 {
     using System;
     using Godot;
-    using LastBreath.Localization;
-    using LastBreath.Script.Helpers;
+    using Localization;
+    using Script.Helpers;
 
     public partial class DialogueUIOption : HBoxContainer
     {

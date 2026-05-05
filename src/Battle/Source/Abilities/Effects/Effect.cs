@@ -16,7 +16,7 @@
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         protected EffectApplyingContext? Context { get; private set; }
-        public IEntity? Owner { get; protected set; }
+        public IEntity? AppliedTo { get; protected set; }
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
@@ -45,9 +45,9 @@
             Context = context;
             var target = context.Target;
             var caster = context.Caster;
-            Owner = target;
+            AppliedTo = target;
             Source = context.Source;
-            target.Effects.AddEffect(this);
+            AppliedTo.Effects.AddEffect(this);
             // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status)) caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
         }
@@ -80,9 +80,9 @@
         public virtual void Remove()
         {
             // effect will be removed form "us" here, so we are publishing event within TryRemoveStatusEffect
-            Owner?.TryRemoveStatusEffect(Status);
-            Owner?.Effects.RemoveEffect(this);
-            Owner = null;
+            AppliedTo?.TryRemoveStatusEffect(Status);
+            AppliedTo?.Effects.RemoveEffect(this);
+            AppliedTo = null;
             Context = null;
         }
 

@@ -96,7 +96,7 @@
 
                 if (item.Modifiers.Any(x => x.GetHashCode() == newMod.GetHashCode())) continue;
 
-                modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierType, newMod.BaseValue, item);
+                modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierValueType, newMod.BaseValue, item);
                 item.AddAdditionalModifier(modifier);
             }
 

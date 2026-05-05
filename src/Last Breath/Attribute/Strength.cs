@@ -6,7 +6,7 @@
     using Core.Modifiers;
     using Godot;
 
-    public class Strength(IModifiersComponent manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierType.Flat, EntityParameter.Strength, 0f))
+    public class Strength(IModifiersComponent manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 0f))
     {
         public override int Total
         {
@@ -27,13 +27,13 @@
 
         private static IEnumerable<IModifier> GetEffects()
         {
-            yield return new Modifier(ModifierType.Flat, EntityParameter.Damage, 15f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 15f);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.Armor, 100f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Armor, 100f);
 
-            yield return new Modifier(ModifierType.Increase, EntityParameter.HealthRecovery, 0.01f);
+            yield return new Modifier(ModifierValueType.Increase, EntityParameter.HealthRecovery, 0.01f);
 
-            yield return new Modifier(ModifierType.Flat, EntityParameter.Health, 10f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Health, 10f);
         }
     }
 }

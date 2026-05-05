@@ -17,29 +17,29 @@
         // mo
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _battleModifiers = [];
 
-        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> PermanentModifiers => _permanentModifiers;
+        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> EntityModifiers => _permanentModifiers;
         public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> TemporaryModifiers => _temporaryModifiers;
         public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> BattleModifiers => _battleModifiers;
 
         public event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
 
         public IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter) => [];
-        public void AddPermanentModifier(IModifierInstance modifier) => AddToCategory(_permanentModifiers, modifier);
+        public void AddModifier(IModifierInstance modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifierInstance modifier) => AddToCategory(_temporaryModifiers, modifier);
 
         public void AddBattleModifier(IModifierInstance modifier) => AddToCategory(_battleModifiers, modifier);
 
-        public void UpdatePermanentModifier(IModifierInstance modifier) => UpdateModifier(_permanentModifiers, modifier);
-        public void UpdatePermanentModifiers(IEnumerable<IModifierInstance> modifiers) => throw new NotImplementedException();
+        public void UpdateModifier(IModifierInstance newModifier) => UpdateModifier(_permanentModifiers, newModifier);
+        public void UpdateModifiers(IEnumerable<IModifierInstance> modifiers) => throw new NotImplementedException();
 
         public void UpdateTemporaryModifier(IModifierInstance modifier) => UpdateModifier(_temporaryModifiers, modifier);
         public void UpdateBattleModifier(IModifierInstance modifier) => UpdateModifier(_battleModifiers, modifier);
 
-        public void RemovePermanentModifier(IModifierInstance modifier) => RemoveFromCategory(_permanentModifiers, modifier);
+        public void RemoveModifier(IModifierInstance modifier) => RemoveFromCategory(_permanentModifiers, modifier);
         public void RemoveTemporaryModifier(IModifierInstance modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
         public void RemoveBattleModifier(IModifierInstance modifier) => RemoveFromCategory(_battleModifiers, modifier);
 
-        public void RemovePermanentModifierBySource(object source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
+        public void RemoveModifierBySource(object source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
         public void RemoveTemporaryModifierBySource(object source) => RemoveAllFromCategoryBySource(_temporaryModifiers, source);
         public void RemoveBattleModifierBySource(object source) => RemoveAllFromCategoryBySource(_battleModifiers, source);
 
@@ -72,10 +72,10 @@
                 list = [];
                 category[newModifier.EntityParameter] = list;
             }
-            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierType == newModifier.ModifierType);
+            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierValueType == newModifier.ModifierValueType);
             if (existingModifier == null)
             {
-                Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierType}", this);
+                Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierValueType}", this);
                 list.Add(newModifier);
             }
             else

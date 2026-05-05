@@ -6,7 +6,7 @@
     using Core.Enums;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Crafting.Source;
+    using Source;
     using Crafting.Source.UIElements;
     using Godot;
     using Utilities;

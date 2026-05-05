@@ -245,7 +245,7 @@
         {
             try
             {
-                Calculations.CalculateHitSucceeded(context);
+                Calculations.CalculateSucceeded(context);
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
@@ -274,9 +274,9 @@
 
         public Task Attack(IAttackContext context)
         {
-            context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
             Effects.TriggerBeforeAttack(context);
+            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
             //  await Animations.PlayAnimationAsync("Fight_Attack");
             return Task.CompletedTask;
         }

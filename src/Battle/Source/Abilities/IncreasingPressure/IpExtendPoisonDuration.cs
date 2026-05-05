@@ -1,0 +1,32 @@
+﻿namespace Battle.Source.Abilities.IncreasingPressure
+{
+    using Core.Enums;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Entity;
+    using System.Collections.Generic;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Events.GameEvents;
+
+    public class IpExtendPoisonDuration(int duration, List<IAttackModifier> modifiers) : IpDefaultExecutionStrategy(modifiers)
+    {
+        public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets)
+        {
+            Subscribe(owner);
+            await base.Execute(ability, owner, targets);
+            Unsubscribe(owner);
+        }
+
+        private void Subscribe(IEntity owner) => owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+
+        private void OnAfterAttack(AfterAttackEvent obj)
+        {
+            var context = obj.Context;
+            if (context.Result != AttackResults.Succeed) return;
+            foreach (IEffect effect in context.Target.Effects.GetBy(x => x.Status == StatusEffects.Poison))
+                effect.Duration += duration;
+        }
+
+        private void Unsubscribe(IEntity owner) => owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+    }
+}

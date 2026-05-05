@@ -10,6 +10,6 @@
         DecoratorPriority Priority { get; }
 
         float GetValue();
-        float ApplyDecoratorsForValue(float value);
+        float ApplyDecoratorsForValue(float applyToValue);
     }
 }

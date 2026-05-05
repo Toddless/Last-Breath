@@ -5,9 +5,8 @@
         Cooldown,
         CostType,
         CostValue,
-        Target,
         Damage,
-        CriticalChanceValue,
-        CriticalChanceDetermination
+        SpellDamageScale,
+        WeaponDamageScale
     }
 }

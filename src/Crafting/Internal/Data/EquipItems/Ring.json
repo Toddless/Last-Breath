@@ -9,8 +9,7 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "Strength",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
@@ -18,11 +17,6 @@
 					"parameter": "Strength",
 					"modifierType": "flat",
 					"value": 25
-				},
-				{
-					"parameter": "Strength",
-					"modifierType": "inc",
-					"value": 0.25
 				}
 			],
 			"modifiers": []
@@ -36,8 +30,7 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "Dexterity",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
@@ -45,11 +38,6 @@
 					"parameter": "Dexterity",
 					"modifierType": "flat",
 					"value": 25
-				},
-				{
-					"parameter": "Dexterity",
-					"modifierType": "inc",
-					"value": 0.25
 				}
 			],
 			"modifiers": []
@@ -63,8 +51,28 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "Intelligence",
-			"skill": "",
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Intelligence",
+					"modifierType": "flat",
+					"value": 25
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_Intelligence_Mana",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
@@ -74,9 +82,165 @@
 					"value": 25
 				},
 				{
+					"parameter": "Mana",
+					"modifierType": "flat",
+					"value": 300
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_Intelligence_Barrier",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
 					"parameter": "Intelligence",
-					"modifierType": "inc",
-					"value": 0.25
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "Barrier",
+					"modifierType": "flat",
+					"value": 120
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_of_Hunter",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 20
+				},
+				{
+					"parameter": "Accuracy",
+					"modifierType": "flat",
+					"value": 500
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_of_Assasin",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 25
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "flat",
+					"value": 0.03
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_of_Trickster",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Dexterity",
+					"modifierType": "flat",
+					"value": 20
+				},
+				{
+					"parameter": "AdditionalHitChance",
+					"modifierType": "flat",
+					"value": 0.05
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_of_Knight",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 20
+				},
+				{
+					"parameter": "Armor",
+					"modifierType": "flat",
+					"value": 300
+				}
+			],
+			"modifiers": []
+		},
+		{
+			"id": "Ring_of_Giant",
+			"equipmentPart": "Ring",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [
+				"Ring",
+				"Equipment"
+			],
+			"effectId": "",
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{
+					"parameter": "Strength",
+					"modifierType": "flat",
+					"value": 20
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "flat",
+					"value": 150
 				}
 			],
 			"modifiers": []
@@ -90,8 +254,7 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "Intelligence",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
@@ -109,7 +272,7 @@
 			"modifiers": []
 		},
 		{
-			"id": "Ring_Dexterity_Critical_Chance",
+			"id": "Ring_Intelligence_Multicast",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
 			"rarity": "Common",
@@ -117,101 +280,19 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "Dexterity",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
 				{
-					"parameter": "Dexterity",
+					"parameter": "Intelligence",
 					"modifierType": "flat",
 					"value": 25
 				},
 				{
-					"parameter": "CriticalChance",
+					"parameter": "Multicast",
 					"modifierType": "flat",
-					"value": 0.5
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Ring_Dexterity_Additional_Hit_Chance",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [
-				"Ring",
-				"Equipment"
-			],
-			"attributeType": "Dexterity",
-			"skill": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Dexterity",
-					"modifierType": "flat",
-					"value": 25
-				},
-				{
-					"parameter": "AdditionalHitChance",
-					"modifierType": "flat",
-					"value": 0.5
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Ring_Dexterity_Accuracy",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [
-				"Ring",
-				"Equipment"
-			],
-			"attributeType": "Dexterity",
-			"skill": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Dexterity",
-					"modifierType": "flat",
-					"value": 25
-				},
-				{
-					"parameter": "Accuracy",
-					"modifierType": "flat",
-					"value": 500
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Ring_Strength_Block_Chance",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [
-				"Ring",
-				"Equipment"
-			],
-			"attributeType": "Strength",
-			"skill": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Strength",
-					"modifierType": "flat",
-					"value": 25
-				},
-				{
-					"parameter": "BlockChance",
-					"modifierType": "flat",
-					"value": 0.1
+					"value": 0.15
 				}
 			],
 			"modifiers": []
@@ -220,38 +301,53 @@
 			"id": "Ring_of_Creators",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Legendary",
+			"rarity": "Mythic",
 			"tags": [
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "None",
-			"skill": "",
+			"effectId": "",
 			"updateLevel": 0,
-			"maxUpdateLevel": 12,
+			"maxUpdateLevel": 0,
 			"implicits": [
 				{
-					"parameter": "Dexterity",
+					"parameter": "CriticalDamge",
 					"modifierType": "flat",
-					"value": 25
+					"value": 150
 				},
 				{
-					"parameter": "Intelligence",
+					"parameter": "CriticalChance",
 					"modifierType": "flat",
-					"value": 25
-				},
-				{
-					"parameter": "Strength",
-					"modifierType": "flat",
-					"value": 25
+					"value": 0.1
 				},
 				{
 					"parameter": "Damage",
 					"modifierType": "flat",
-					"value": 100
+					"value": 500
 				}
 			],
-			"modifiers": []
+			"modifiers": [
+				{
+					"parameter": "Damage",
+					"modifierType": "multi",
+					"value": 0.4
+				},
+				{
+					"parameter": "CriticalChance",
+					"modifierType": "multi",
+					"value": 0.4
+				},
+				{
+					"parameter": "Health",
+					"modifierType": "inc",
+					"value": 0.07
+				},
+				{
+					"parameter": "Mana",
+					"modifierType": "inc",
+					"value": 0.07
+				}
+			]
 		},
 		{
 			"id": "Ring_Hell_Servant",
@@ -262,8 +358,7 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "None",
-			"skill": "Passive_Skill_Servant_Hell",
+			"effectId": "Passive_Skill_Servant_Hell",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
@@ -310,42 +405,36 @@
 				"Ring",
 				"Equipment"
 			],
-			"attributeType": "None",
-			"skill": "",
+			"effectId": "Ability_Upgrade_Burning_Fury_Random",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
 				{
-					"parameter": "Dexterity",
+					"parameter": "Health",
 					"modifierType": "flat",
-					"value": 25
-				},
-				{
-					"parameter": "Intelligence",
-					"modifierType": "flat",
-					"value": 25
+					"value": 600
 				},
 				{
 					"parameter": "Strength",
 					"modifierType": "flat",
-					"value": 25
+					"value": 30
 				}
 			],
 			"modifiers": [
 				{
-					"parameter": "Dexterity",
+					"parameter": "Health",
 					"modifierType": "inc",
-					"value": 0.15
+					"value": 0.30
 				},
 				{
-					"parameter": "Intelligence",
-					"modifierType": "inc",
-					"value": 0.15
+					"parameter": "HealthRecovery",
+					"modifierType": "flat",
+					"value": 50
 				},
 				{
 					"parameter": "Strength",
 					"modifierType": "inc",
-					"value": 0.15
+					"value": 0.30
 				}
 			]
 		}

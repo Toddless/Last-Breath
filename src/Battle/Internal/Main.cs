@@ -1,8 +1,8 @@
 ﻿namespace Battle.Internal
 {
     using System;
-    using Battle.Services;
-    using Battle.Source;
+    using Services;
+    using Source;
     using Core.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;

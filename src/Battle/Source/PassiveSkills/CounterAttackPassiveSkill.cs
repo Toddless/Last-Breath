@@ -22,7 +22,10 @@
                 ArgumentNullException.ThrowIfNull(Owner);
                 if (evnt.Context.Target.InstanceId != Owner.InstanceId) return;
                 if (evnt.Context.Rnd.Randf() <= Chance) return;
-                var context = new AttackContext(Owner, evnt.Context.Attacker, Owner.GetDamage(), evnt.Context.Rnd, evnt.Context.AttackContextScheduler);
+                var context = new AttackContext(
+                    Owner, evnt.Context.Attacker, Owner.GetDamage(),
+                    evnt.Context.Rnd, evnt.Context.AttackContextScheduler);
+                context.RawCriticalChance = Owner.Parameters.CriticalChance;
                 context.Schedule();
             }
             catch (Exception e)

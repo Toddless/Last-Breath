@@ -3,7 +3,7 @@
     using System;
     using Core.Enums;
     using Godot;
-    using LastBreath.Localization;
+    using Localization;
 
     [GlobalClass]
     public partial class Quest : Resource

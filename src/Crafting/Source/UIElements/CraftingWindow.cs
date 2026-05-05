@@ -157,7 +157,7 @@
             try
             {
                 ArgumentNullException.ThrowIfNull(_messageBus);
-                var item = await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new(id, _resourcesUi?.GetRequirements() ?? []));
+                var item = await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new CreateEquipItemRequest(id, _resourcesUi?.GetRequirements() ?? []));
             }
             catch (Exception ex)
             {

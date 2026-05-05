@@ -1,17 +1,17 @@
 ﻿namespace LastBreath.Components
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
+    using Utilities;
+    using Core.Enums;
     using System.Linq;
     using Battle.Source;
-    using Battle.Source.Module;
-    using Core.Enums;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Components.Module;
     using Core.Modifiers;
-    using Godot;
-    using Utilities;
+    using Battle.Source.Module;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Components.Decorator;
 
     public class EntityParametersComponent : IEntityParametersComponent
     {
@@ -26,15 +26,15 @@
         public float BlockChance => Mathf.Clamp(this[EntityParameter.BlockChance], 0f, 0.9f);
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
         public float CriticalChance => Mathf.Clamp(this[EntityParameter.CriticalChance], 0f, 1f);
-        public float AdditionalHit => Mathf.Clamp(this[EntityParameter.AdditionalHitChance], 0f, 1f);
-        public float MulticastChance => Mathf.Clamp(this[EntityParameter.MulticastChance], 0f, 1f);
+        public float AdditionalHit => Mathf.Clamp(this[EntityParameter.AdditionalHitChance], 0f, 0.75f);
+        public float MulticastChance => Mathf.Clamp(this[EntityParameter.MulticastChance], 0f, 0.75f);
         public float SpellDamage => this[EntityParameter.SpellDamage];
         public float Accuracy => this[EntityParameter.Accuracy];
         public float Armor => this[EntityParameter.Armor];
         public float ArmorPenetration => Mathf.Clamp(this[EntityParameter.ArmorPenetration], 0f, 1f);
         public float Evade => this[EntityParameter.Evade];
         public float MaxBarrier => this[EntityParameter.Barrier];
-        public float Suppress => Mathf.Clamp(this[EntityParameter.Suppress], 0f, 1f);
+        public float Suppress => Mathf.Clamp(this[EntityParameter.Suppress], 0f, 0.75f);
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];

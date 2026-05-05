@@ -18,7 +18,7 @@
     {
         private const string UID = "uid://dg7d3dghfdevy";
         private IEntity? _player;
-        private ModifierType _modifierType = ModifierType.Flat;
+        private ModifierValueType _modifierValueType = ModifierValueType.Flat;
         private EntityParameter _entityParameter = EntityParameter.Damage;
         private DamageType _selectedDamageType = DamageType.Normal;
         private DamageSource _selectedDamageSource = DamageSource.Hit;
@@ -64,9 +64,9 @@
                 label?.Text = $"{t}";
             };
             _add?.Pressed += OnAddPressed;
-            _flat?.Pressed += () => _modifierType = ModifierType.Flat;
-            _percent?.Pressed += () => _modifierType = ModifierType.Increase;
-            _multiplier?.Pressed += () => _modifierType = ModifierType.Multiplicative;
+            _flat?.Pressed += () => _modifierValueType = ModifierValueType.Flat;
+            _percent?.Pressed += () => _modifierValueType = ModifierValueType.Increase;
+            _multiplier?.Pressed += () => _modifierValueType = ModifierValueType.Multiplicative;
             _parameters?.ItemSelected += (t) =>
             {
                 string text = _parameters?.GetItemText((int)t) ?? string.Empty;
@@ -140,7 +140,7 @@
             {
                 foreach (IModifierInstance modifierInstance in _player?.Modifiers.GetModifiers(param) ?? [])
                 {
-                    _modifiers?.AddItem($"{modifierInstance.EntityParameter}, {modifierInstance.ModifierType}, {modifierInstance.Value}");
+                    _modifiers?.AddItem($"{modifierInstance.EntityParameter}, {modifierInstance.ModifierValueType}, {modifierInstance.Value}");
                 }
             }
 
@@ -293,7 +293,7 @@
             foreach (KeyValuePair<int, IModifierInstance> modifierInstance in _addedModifiers)
             {
                 _modifiers?.RemoveItem(modifierInstance.Key);
-                _player?.Modifiers.RemovePermanentModifier(modifierInstance.Value);
+                _player?.Modifiers.RemoveModifier(modifierInstance.Value);
             }
 
             _addedModifiers.Clear();
@@ -304,7 +304,7 @@
             if (!_addedModifiers.TryGetValue((int)_selectedModifier, out var modifier)) return;
 
             _modifiers?.RemoveItem((int)_selectedModifier);
-            _player?.Modifiers.RemovePermanentModifier(modifier);
+            _player?.Modifiers.RemoveModifier(modifier);
             _addedModifiers.Remove((int)_selectedModifier);
         }
 
@@ -315,12 +315,12 @@
                 if (_modifiers == null || _modifierValue == null) return;
 
                 float amount = (float)_modifierValue.Value;
-                if (_modifierType is ModifierType.Increase or ModifierType.Multiplicative)
+                if (_modifierValueType is ModifierValueType.Increase or ModifierValueType.Multiplicative)
                     amount /= 100;
 
-                var modifier = new ModifierInstance(_entityParameter, _modifierType, amount, this);
-                _player?.Modifiers.AddPermanentModifier(modifier);
-                int idx = _modifiers.AddItem($"{modifier.EntityParameter}, {modifier.ModifierType}, {modifier.Value}");
+                var modifier = new SimpleModifier(_entityParameter, _modifierValueType, amount, this);
+                _player?.Modifiers.AddModifier(modifier);
+                int idx = _modifiers.AddItem($"{modifier.EntityParameter}, {modifier.ModifierValueType}, {modifier.Value}");
                 _addedModifiers.Add(idx, modifier);
             }
             catch (Exception ex)

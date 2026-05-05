@@ -1,11 +1,11 @@
 ﻿namespace Core.Interfaces.Battle
 {
-    using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Threading;
 
     public interface IAttackContextScheduler
     {
         void Schedule(IAttackContext context);
-        Task RunQueue();
-        void CancelQueue();
+        IAsyncEnumerable<IAttackContext> RunQueue(CancellationToken ct = default);
     }
 }

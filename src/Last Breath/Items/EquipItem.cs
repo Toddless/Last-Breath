@@ -1,14 +1,14 @@
 ﻿namespace LastBreath.Items
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Items;
-    using Core.Modifiers;
     using Godot;
+    using System;
     using Utilities;
+    using Core.Enums;
+    using System.Linq;
+    using Core.Modifiers;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.Entity;
+    using System.Collections.Generic;
 
     [Tool]
     [GlobalClass]
@@ -68,8 +68,8 @@
         public T Copy<T>()
         {
             var copy = (IEquipItem)DuplicateDeep();
-            copy.SetBaseModifiers(_baseModifiers.ToHashSet());
-            copy.SetAdditionalModifiers(_additionalModifiers.ToHashSet());
+            copy.SetImplicits(_baseModifiers.ToHashSet());
+            copy.SetModifiers(_additionalModifiers.ToHashSet());
             copy.SaveUsedResources(_usedResources.ToDictionary());
             copy.SaveModifiersPool(_modifiersPool.ToList());
             return (T)copy;
@@ -83,9 +83,9 @@
             return Id == other.Id;
         }
 
-        public void SetBaseModifiers(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
+        public void SetImplicits(IEnumerable<IModifier> modifiers) => SetModifiers(_baseModifiers, modifiers);
 
-        public void SetAdditionalModifiers(IEnumerable<IModifier> modifiers) =>
+        public void SetModifiers(IEnumerable<IModifier> modifiers) =>
             SetModifiers(_additionalModifiers, modifiers);
 
         public void SetItemEffect(string effectId) => ItemEffect = effectId;

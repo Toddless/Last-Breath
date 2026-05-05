@@ -260,7 +260,7 @@ namespace LastBreath.Npc
         {
             try
             {
-                Calculations.CalculateHitSucceeded(context);
+                Calculations.CalculateSucceeded(context);
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:

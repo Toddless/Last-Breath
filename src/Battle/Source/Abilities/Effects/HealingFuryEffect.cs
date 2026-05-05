@@ -24,7 +24,7 @@
         public override void Remove()
         {
             float toHeal = _damageDealt * HealAmount;
-            Owner?.Heal(toHeal);
+            AppliedTo?.Heal(toHeal);
             base.Remove();
         }
 

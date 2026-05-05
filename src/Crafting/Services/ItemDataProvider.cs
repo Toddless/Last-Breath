@@ -100,20 +100,13 @@ namespace Crafting.Services
                     using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new System.IO.FileLoadException();
                     string jsonContent = file.GetAsText() ?? throw new System.IO.FileNotFoundException();
 
-                    List<IItem> data = [];
-
-                    switch (true)
+                    List<IItem> data = dataPath switch
                     {
-                        case var _ when dataPath.EndsWith("EquipItems"):
-                            data = await _dataParser.ParseEquipItems(jsonContent);
-                            break;
-                        case var _ when dataPath.EndsWith("Recipes"):
-                            data = await _dataParser.ParseRecipes(jsonContent);
-                            break;
-                        case var _ when dataPath.EndsWith("CraftingResources"):
-                            data = await _dataParser.ParseResources(jsonContent);
-                            break;
-                    }
+                        _ when dataPath.EndsWith("EquipItems") => await _dataParser.ParseEquipItems(jsonContent),
+                        _ when dataPath.EndsWith("Recipes") => await _dataParser.ParseRecipes(jsonContent),
+                        _ when dataPath.EndsWith("CraftingResources") => await _dataParser.ParseResources(jsonContent),
+                        _ => []
+                    };
 
                     data.ForEach(item => _itemData.TryAdd(item.Id, item));
                 }

@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using Godot;
-    using LastBreath.Source;
-    using Player = LastBreath.Player;
+    using Source;
+    using Player = Player;
 
     public partial class QuestManager : Node
     {

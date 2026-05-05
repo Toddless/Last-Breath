@@ -1,12 +1,13 @@
 namespace Core.Data.EquipData
 {
-    using System.Collections.Generic;
     using Newtonsoft.Json;
+    using System.Collections.Generic;
 
     public record EquipItemData
     {
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty("equipmentPart")] public string EquipmentPart { get; init; } = string.Empty;
+        [JsonProperty("maxStackSize")] public int MaxStackSize { get; init; } = 1;
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];
         [JsonProperty("attributeType")] public string AttributeType { get; init; } = string.Empty;

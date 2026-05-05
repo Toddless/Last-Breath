@@ -10,8 +10,8 @@
     public class DamageOverTurnEffect(
         int duration,
         int maxStacks,
-        float percentFromDamage = 0.7f,
-        StatusEffects statusEffect = StatusEffects.None)
+        StatusEffects statusEffect = StatusEffects.None,
+        float percentFromDamage = 0.7f)
         : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect)
     {
         public float PercentFromBase { get; } = percentFromDamage;
@@ -25,7 +25,7 @@
 
         public override void TurnEnd()
         {
-            if (Context.HasValue) Owner?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Id, Context.Value.Caster));
+            if (Context.HasValue) AppliedTo?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Id, Context.Value.Caster));
             base.TurnEnd();
         }
 
@@ -38,10 +38,10 @@
 
         protected override string FormatDescription()
         {
-            float damage = Owner?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
+            float damage = AppliedTo?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
         }
 
-        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxMaxStacks, PercentFromBase, Status);
+        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxMaxStacks, Status, PercentFromBase);
     }
 }

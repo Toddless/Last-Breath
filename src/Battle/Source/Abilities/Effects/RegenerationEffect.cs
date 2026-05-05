@@ -17,13 +17,13 @@
 
         public override void TurnEnd()
         {
-            Owner?.Heal(Amount);
+            AppliedTo?.Heal(Amount);
             base.TurnEnd();
         }
 
         protected override string FormatDescription()
         {
-            float totalRegeneration = Owner?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
+            float totalRegeneration = AppliedTo?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
 
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(totalRegeneration));
         }

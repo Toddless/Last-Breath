@@ -79,6 +79,7 @@ namespace LastBreath.Services
             }
             catch (Exception ex)
             {
+                GD.Print($"Failed to load data: {ex.Message} \n {ex.StackTrace}");
                 Tracker.TrackException("Data loading failed.", ex, this);
             }
         }
@@ -89,7 +90,8 @@ namespace LastBreath.Services
             var recipes = LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => AddItems(await _dataParser.ParseRecipes(s)));
             var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => AddItems(await _dataParser.ParseResources(s)));
             var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await _dataParser.ParseEquipItemModifierPools(s, ref _equipItemModifierPools));
-            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"), async s => { _equipItemsResources = await _dataParser.ParseEquipItemResources(s); });
+            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"),
+                async s => { _equipItemsResources = await _dataParser.ParseEquipItemResources(s); });
             var items = LoadDataFromJson(Path.Combine(dataPath, "Items"), async s => AddItems(await _dataParser.ParseItems(s)));
 
             await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, items);

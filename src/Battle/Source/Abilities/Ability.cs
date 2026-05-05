@@ -7,7 +7,6 @@
     using Decorators;
     using Core.Enums;
     using System.Linq;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
@@ -22,18 +21,17 @@
         string[] tags,
         int cooldown,
         int costValue,
-        float maxTargets,
+        float damage,
+        float weaponDamageScale,
+        float spellDamageScale,
         List<IEffect> effects,
-        List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery? mastery = null,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.Target) : IAbility
     {
         protected IEntity? Owner;
-        protected readonly IStanceMastery? Mastery = mastery;
 
-        protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> ModuleManager
+        protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>> ModuleManager
         {
             get
             {
@@ -46,12 +44,23 @@
         }
 
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
-
+        public float Damage => this[AbilityParameter.Damage];
+        public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
+        public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
+        public Costs CostType => (Costs)this[AbilityParameter.CostType];
+        public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-
         public string[] Tags { get; } = tags;
-        public float SpendAbilityPoints { get; set; }
+        public int CooldownLeft { get; set; }
+        public bool IsEvadable { get; set; }
+        public AbilityType AbilityType { get; } = abilityType;
+        public List<IEffect> Effects { get; set; } = effects;
+        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
+        public Dictionary<int, IAbilityUpgradeWrap<IAbility>> CurrentUpgrades { get; set; } = [];
+        public float Cooldown => this[AbilityParameter.Cooldown];
+        public string Description => FormatDescription();
+        public string DisplayName => Localization.Localize(Id);
 
         public Texture2D? Icon
         {
@@ -63,66 +72,36 @@
             // }
         }
 
-        public int CooldownLeft { get; private set; }
-
-        public int CostValue => (int)this[AbilityParameter.CostValue];
-
-        public Costs CostType => (Costs)this[AbilityParameter.CostType];
-        public AbilityType AbilityType { get; } = abilityType;
-
-        public List<IConditionalModifier> ConditionalModifiers { get; } = [];
-        public List<IEffect> Effects { get; set; } = effects;
-        public List<IEffect> CasterEffects { get; } = casterEffects;
-        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
-
-        public float MaxTargets => this[AbilityParameter.Target];
-        public float Cooldown => this[AbilityParameter.Cooldown];
-        public string Description => FormatDescription();
-        public string DisplayName => Localization.Localize(Id);
-
-        public event Action<AbilityParameter>? OnParameterChanged;
+        public event Action<Enum>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
-        public virtual async Task Activate(List<IEntity> targets)
+        public virtual async Task Execute(List<IEntity> targets)
         {
             if (Owner == null) return;
-
-            var context = new EffectApplyingContext { Caster = Owner, Source = Id };
-            foreach (IEntity target in targets)
-            {
-                context.Target = target;
-                ApplyTargetEffects(context);
-            }
-
-            ApplyCasterEffects(context);
             StartCooldown();
             ConsumeResource();
             await Owner.Animations.PlayAnimationAsync(Id);
+            await ExecuteInternal(targets, Owner);
         }
 
-        public void AddParameterUpgrade<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        public virtual void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
             where T : struct, Enum
         {
-            if (decorator is not AbilityParameterDecorator moduleDecorator) return;
+            if (decorator is not AbilityParameterDecorator<AbilityParameter> moduleDecorator) return;
             ModuleManager.AddDecorator(moduleDecorator);
         }
 
-        public void RemoveParameterUpgrade<T>(string id, T key)
+        public virtual void RemoveParameterDecorator<T>(string id, T key)
             where T : struct, Enum
         {
             if (key is not AbilityParameter abilityParameter) return;
             ModuleManager.RemoveDecorator(id, abilityParameter);
         }
 
-        public void AddCondition(IConditionalModifier modifier) => ConditionalModifiers.Add(modifier);
-        public void RemoveCondition(string id) => ConditionalModifiers.RemoveAll(c => c.Id == id);
-        public void ClearConditions() => ConditionalModifiers.Clear();
-
         public void AddEffect(IEffect effect, bool targetEffect = true)
         {
             if (targetEffect) Effects.Add(effect);
-            else CasterEffects.Add(effect);
         }
 
         public void RemoveEffect(string id, bool targetEffect = true)
@@ -131,11 +110,6 @@
             {
                 var exist = Effects.FirstOrDefault(c => c.Id == id);
                 if (exist != null) RemoveFromList(Effects, exist);
-            }
-            else
-            {
-                var exist = CasterEffects.FirstOrDefault(c => c.Id == id);
-                if (exist != null) RemoveFromList(CasterEffects, exist);
             }
         }
 
@@ -177,12 +151,13 @@
 
         protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
 
+        protected virtual Task ExecuteInternal(List<IEntity> targets, IEntity owner) => Task.CompletedTask;
+
         protected void StartCooldown()
         {
             CooldownLeft = (int)Cooldown;
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
-
 
         protected void ApplyTargetEffects(EffectApplyingContext context)
         {
@@ -194,8 +169,6 @@
         {
             if (Owner == null) return;
             context.Target = Owner;
-            foreach (var clone in CasterEffects.Select(effect => effect.Clone()))
-                clone.Apply(context);
         }
 
         protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
@@ -204,28 +177,30 @@
             float increasedBonus = 1f;
             float multiplyBonus = 1f;
 
-            foreach (IConditionalModifier conditionalModifier in ConditionalModifiers)
-            {
-                if (conditionalModifier.Parameter != parameter) continue;
-                (float Value, ModifierType Type)? result = conditionalModifier.GetValue(context);
-                if (result == null) continue;
-
-                switch (result.Value.Type)
-                {
-                    case ModifierType.Flat:
-                        additiveBonus += result.Value.Value;
-                        break;
-                    case ModifierType.Increase:
-                        increasedBonus += result.Value.Value;
-                        break;
-                    case ModifierType.Multiplicative:
-                        multiplyBonus += result.Value.Value;
-                        break;
-                }
-            }
+            // foreach (IConditionalModifier conditionalModifier in ConditionalModifiers)
+            // {
+            //     if (conditionalModifier.Parameter != parameter) continue;
+            //     (float Value, ModifierType Type)? result = conditionalModifier.GetValue(context);
+            //     if (result == null) continue;
+            //
+            //     switch (result.Value.Type)
+            //     {
+            //         case ModifierType.Flat:
+            //             additiveBonus += result.Value.Value;
+            //             break;
+            //         case ModifierType.Increase:
+            //             increasedBonus += result.Value.Value;
+            //             break;
+            //         case ModifierType.Multiplicative:
+            //             multiplyBonus += result.Value.Value;
+            //             break;
+            //     }
+            // }
 
             return ((baseValue + additiveBonus) * increasedBonus) * multiplyBonus;
         }
+
+        protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);
 
         protected virtual string FormatDescription() => Localization.LocalizeDescriptionFormated(Id);
 
@@ -236,17 +211,20 @@
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
-        private IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator>(new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-            {
-                [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
-                [AbilityParameter.Target] = new Module<AbilityParameter>(() => maxTargets, AbilityParameter.Target)
-            });
+        private IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>> CreateModuleManager() =>
+            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>>(
+                new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
+                {
+                    [AbilityParameter.Damage] = new Module<AbilityParameter>(() => damage, AbilityParameter.Damage),
+                    [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
+                    [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
+                    [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
+                    [AbilityParameter.WeaponDamageScale] = new Module<AbilityParameter>(() => weaponDamageScale, AbilityParameter.WeaponDamageScale),
+                    [AbilityParameter.SpellDamageScale] = new Module<AbilityParameter>(() => spellDamageScale, AbilityParameter.SpellDamageScale)
+                });
 
         private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
-        private void OnModuleChanges(AbilityParameter key) => OnParameterChanged?.Invoke(key);
+
         private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
     }
 }

@@ -1,0 +1,749 @@
+{
+    "general": [
+        {
+            "key": "basic",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {
+                            "id": "Ring_Hell_Servant",
+                            "price": 330
+                        },
+                        {
+                            "id": "Helmet_Dexterity_Hunters_Dream",
+                            "price": 452
+                        },
+                        {
+                            "id": "Body_Dexterity_Hunters_Dream",
+                            "price": 454
+                        },
+                        {
+                            "id": "Gloves_Dexterity_Hunters_Dream",
+                            "price": 415
+                        },
+                        {
+                            "id": "Boots_Dexterity_Hunters_Dream",
+                            "price": 405
+                        },
+                        {
+                            "id": "Amulet_Mana_Health",
+                            "price": 352
+                        },
+                        {
+                            "id": "Ring_of_Creators",
+                            "price": 354
+                        },
+                        {
+                            "id": "Helmet_Intelligence_Aegis",
+                            "price": 484
+                        },
+                        {
+                            "id": "Body_Intelligence_Aegis",
+                            "price": 636
+                        },
+                        {
+                            "id": "Gloves_Intelligence_Aegis",
+                            "price": 435
+                        },
+                        {
+                            "id": "Boots_Intelligence_Aegis",
+                            "price": 565
+                        },
+                        {
+                            "id": "Amulet_Eternal_Ravage",
+                            "price": 335
+                        },
+                        {
+                            "id": "Helmet_Strength_Vital_Core",
+                            "price": 350
+                        },
+                        {
+                            "id": "Body_Strength_Vital_Core",
+                            "price": 420
+                        },
+                        {
+                            "id": "Gloves_Strength_Vital_Core",
+                            "price": 410
+                        },
+                        {
+                            "id": "Boots_Strength_Vital_Core",
+                            "price": 450
+                        },
+                        {
+                            "id": "Amulet_Of_Dexterity",
+                            "price": 253
+                        },
+                        {
+                            "id": "Amulet_Goliath_Sign",
+                            "price": 555
+                        },
+                        {
+                            "id": "Helmet_Intelligence_Eternal_Reserve",
+                            "price": 355
+                        },
+                        {
+                            "id": "Body_Intelligence_Eternal_Reserve",
+                            "price": 451
+                        },
+                        {
+                            "id": "Gloves_Intelligence_Eternal_Reserve",
+                            "price": 451
+                        },
+                        {
+                            "id": "Boots_Intelligence_Eternal_Reserve",
+                            "price": 451
+                        },
+                        {
+                            "id": "Ring_Dexterity_Additional_Hit_Chance",
+                            "price": 451
+                        }
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {
+                            "id": "Gloves_Dexterity_Feral_Instinct",
+                            "price": 150
+                        },
+                        {
+                            "id": "Body_Dexterity_Feral_Instinct",
+                            "price": 115
+                        },
+                        {
+                            "id": "Boots_Dexterity_Feral_Instinct",
+                            "price": 215
+                        },
+                        {
+                            "id": "Helmet_Dexterity_Feral_Instinct",
+                            "price": 115
+                        },
+                        {
+                            "id": "Amulet_Dexterity_Strength",
+                            "price": 175
+                        },
+                        {
+                            "id": "Body_Porcupine",
+                            "price": 180
+                        },
+                        {
+                            "id": "Ring_Of_Fire_Demon",
+                            "price": 165
+                        },
+                        {
+                            "id": "Boots_Strength_Iron_Bastion",
+                            "price": 150
+                        },
+                        {
+                            "id": "Body_Strength_Iron_Bastion",
+                            "price": 145
+                        },
+                        {
+                            "id": "Gloves_Strength_Iron_Bastion",
+                            "price": 155
+                        },
+                        {
+                            "id": "Helmet_Strength_Iron_Bastion",
+                            "price": 175
+                        },
+                        {
+                            "id": "Ring_Dexterity_Critical_Chance",
+                            "price": 195
+                        },
+                        {
+                            "id": "Boots_Strength_Stoneheart",
+                            "price": 165
+                        },
+                        {
+                            "id": "Helmet_Strength_Stoneheart",
+                            "price": 195
+                        },
+                        {
+                            "id": "Gloves_Strength_Stoneheart",
+                            "price": 175
+                        },
+                        {
+                            "id": "Body_Strength_Stoneheart",
+                            "price": 145
+                        },
+                        {
+                            "id": "Amulet_Dexterity_Intelligence",
+                            "price": 165
+                        },
+                        {
+                            "id": "Helmet_Dexterity_Shadowstep",
+                            "price": 195
+                        },
+                        {
+                            "id": "Body_Dexterity_Shadowstep",
+                            "price": 155
+                        },
+                        {
+                            "id": "Boots_Dexterity_Shadowstep",
+                            "price": 154
+                        },
+                        {
+                            "id": "Gloves_Dexterity_Shadowstep",
+                            "price": 151
+                        },
+                        {
+                            "id": "Ring_Intelligence_Multicast",
+                            "price": 105
+                        }
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {
+                            "id": "Upgrade_Resource_Armor_Dust",
+                            "price": 45
+                        },
+                        {
+                            "id": "Upgrade_Resource_Jewellery_Dust",
+                            "price": 45
+                        },
+                        {
+                            "id": "Upgrade_Resource_Weapon_Dust",
+                            "price": 45
+                        },
+                        {
+                            "id": "Recipe_Creators_Ring",
+                            "price": 33
+                        },
+                        {
+                            "id": "Recipe_Generic_Boots",
+                            "price": 33
+                        },
+                        {
+                            "id": "Recipe_Generic_Gloves",
+                            "price": 25
+                        },
+                        {
+                            "id": "Recipe_Generic_Helmet",
+                            "price": 25
+                        },
+                        {
+                            "id": "Amulet_Of_Wisdom",
+                            "price": 65
+                        },
+                        {
+                            "id": "Ring_Strength_Block_Chance",
+                            "price": 32
+                        },
+                        {
+                            "id": "Body_All_Evade_To_Armor",
+                            "price": 50
+                        },
+                        {
+                            "id": "Helmet_Dexterity_Feral_Instinct",
+                            "price": 35
+                        },
+                        {
+                            "id": "Body_Dexterity_Feral_Instinct",
+                            "price": 35
+                        },
+                        {
+                            "id": "Gloves_Dexterity_Feral_Instinct",
+                            "price": 35
+                        },
+                        {
+                            "id": "Body_Dexterity_Feral_Instinct",
+                            "price": 35
+                        },
+                        {
+                            "id": "Amulet_Of_Power",
+                            "price": 80
+                        },
+                        {
+                            "id": "Ring_Strength",
+                            "price": 45
+                        },
+                        {
+                            "id": "Ring_Dexterity",
+                            "price": 40
+                        },
+                        {
+                            "id": "Ring_Intelligence",
+                            "price": 40
+                        }
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Cooper_Ore",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Gold_Ore",
+                            "price":3
+                        },
+                        {
+                            "id": "Crafting_Resource_Iron_Ore",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Deer_Leather",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Wild_Boar_Leather",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Diamond_Gem",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Emerald_Gem",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Ruby_Gem",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Linen_Fabric",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Silk_Fabric",
+                            "price": 3
+                        },
+                        {
+                            "id": "Amulet_Of_Recovery",
+                            "price": 10
+                        },
+                        {
+                            "id": "Ring_Dexterity_Accuracy",
+                            "price":10
+                        },
+                        {
+                            "id": "Body_No_Way_Back",
+                            "price": 10
+                        },
+                        {
+                            "id": "Helmet_Intelligence_Arcane_Bulwark",
+                            "price": 15
+                        },
+                        {
+                            "id": "Body_Intelligence_Arcane_Bulwark",
+                            "price": 10
+                        },
+                        {
+                            "id": "Gloves_Intelligence_Arcane_Bulwark",
+                            "price": 10
+                        },
+                        {
+                            "id": "Boots_Intelligence_Arcane_Bulwark",
+                            "price": 10
+                        },
+                        {
+                            "id": "Amulet_Of_Defence",
+                            "price": 10
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "fractions": [
+        {
+            "key": "human",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": []
+                },
+                {
+                    "tier": 1,
+                    "items": []
+                },
+                {
+                    "tier": 2,
+                    "items": []
+                },
+                {
+                    "tier": 3,
+                    "items": []
+                }
+            ]
+        },
+        {
+            "key": "undead",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": []
+                },
+                {
+                    "tier": 1,
+                    "items": []
+                },
+                {
+                    "tier": 2,
+                    "items": []
+                },
+                {
+                    "tier": 3,
+                    "items": []
+                }
+            ]
+        },
+        {
+            "key": "elf",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "dwarf",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "demon",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "animal",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "mysticalCreature",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        }
+    ],
+    "types": [
+        {
+            "key": "regular",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "special",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "elit",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "unique",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "boss",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "archon",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        }
+    ],
+    "individual": [
+        {
+            "key": "npc_id",
+            "tiers": [
+                {
+                    "tier": 0,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 1,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 2,
+                    "items": [
+                        {}
+                    ]
+                },
+                {
+                    "tier": 3,
+                    "items": [
+                        {}
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -16,25 +16,23 @@
         int cooldown,
         float percentHealthToSacrifice,
         List<IEffect> effects,
-        List<IEffect> casterEffects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        IStanceMastery? mastery = null,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.SelfCast)
-        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, maxTargets: 1, effects, casterEffects, upgrades, mastery, costType, abilityType)
+        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, effects, upgrades, costType, abilityType)
     {
         public float PercentHealthToSacrifice { get; } = percentHealthToSacrifice;
 
-        public override async Task Activate(List<IEntity> targets)
+        public override async Task Execute(List<IEntity> targets)
         {
             if (Owner == null) return;
 
             float sacrificedLife = Owner.CurrentHealth * PercentHealthToSacrifice;
-            var modifier = new ModifierInstance(EntityParameter.Damage, ModifierType.Flat, sacrificedLife, Id);
+            var modifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, sacrificedLife, Id);
             Owner.CurrentHealth -= (int)sacrificedLife;
-            Owner.Modifiers.AddPermanentModifier(modifier);
+            Owner.Modifiers.AddModifier(modifier);
             Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
-            await base.Activate(targets);
+            await base.Execute(targets);
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentHealthToSacrifice * 100);
@@ -42,7 +40,7 @@
         private void OnAfterAttack(AfterAttackEvent obj)
         {
             Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
-            Owner?.Modifiers.RemovePermanentModifierBySource(Id);
+            Owner?.Modifiers.RemoveModifierBySource(Id);
         }
     }
 }

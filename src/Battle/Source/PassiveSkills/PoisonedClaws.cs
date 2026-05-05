@@ -17,7 +17,7 @@
             PercentToDealAsPoison = percentFormDamageToDealAsPoison;
             PoisonDuration = poisonDuration;
             PoisonStacks = stacks;
-            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, PoisonStacks, PercentToDealAsPoison, StatusEffects.Poison);
+            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, PoisonStacks, StatusEffects.Poison, PercentToDealAsPoison);
         }
 
         public int PoisonDuration { get; }

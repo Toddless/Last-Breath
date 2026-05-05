@@ -1,52 +1,28 @@
 ﻿namespace Battle.Source
 {
-    using Godot;
-    using System;
-    using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
 
     public class AttackContextScheduler : IAttackContextScheduler
     {
         private readonly Queue<IAttackContext> _attackQueue = [];
-        private bool _isCancelled, _isProcessing;
+        private bool _isCancelled;
 
-        public void Schedule(IAttackContext context)
+        public void Schedule(IAttackContext context) => _attackQueue.Enqueue(context);
+
+        public async IAsyncEnumerable<IAttackContext> RunQueue([EnumeratorCancellation] CancellationToken ct = default)
         {
-            _attackQueue.Enqueue(context);
-        }
-
-        public async Task RunQueue()
-        {
-            try
+            while (_attackQueue.Count > 0 && !_isCancelled && !ct.IsCancellationRequested)
             {
-                if (_isProcessing) return;
-                _isProcessing = true;
-                while (_attackQueue.Count > 0 && !_isCancelled)
-                {
-                    var context = _attackQueue.Dequeue();
-                    if (!context.IsValid) continue;
-                    await context.Attacker.Attack(context);
-                    await context.Target.ReceiveAttack(context);
-                }
+                var context = _attackQueue.Dequeue();
+                if (!context.IsValid) continue;
+                await context.Attacker.Attack(context);
+                await context.Target.ReceiveAttack(context);
+                yield return context;
             }
-            catch (Exception ex)
-            {
-                GD.Print($"Exception: {ex.Message}\n {ex.StackTrace}");
-            }
-            finally
-            {
-                _attackQueue.Clear();
-                _isProcessing = false;
-                _isCancelled = false;
-            }
-        }
-
-
-        public void CancelQueue()
-        {
-            _isCancelled = true;
-            _attackQueue.Clear();
+            _isCancelled = false;
         }
     }
 }

@@ -23,28 +23,18 @@
             int costValue,
             List<IEffect> effects,
             List<IEffect> casterEffects,
-            Dictionary<int, List<IAbilityUpgrade>> upgrades,
-            IStanceMastery? mastery = null,
-            int maxTargets = 1,
-            Costs costType = Costs.Mana) : base(id: "Ability_Fireball", tags, cooldown, costValue, maxTargets, effects, casterEffects, upgrades, mastery, costType)
+            Dictionary<int, List<IAbilityUpgradeWrap<>>> upgrades,
+            Costs costType = Costs.Mana) : base(id: "Ability_Fireball", tags, cooldown, costValue, effects, casterEffects, upgrades, costType)
         {
             _baseDamage = baseDamage;
             _baseCriticalChance = baseCriticalChance;
             _rnd = new RandomNumberGenerator();
             _rnd.Randomize();
-            ModuleManager.AddBaseModule(AbilityParameter.Damage, new Module<AbilityParameter>(() => baseDamage, AbilityParameter.Damage));
-            ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceDetermination,
-                new Module<AbilityParameter>(() => _rnd.Randf(), AbilityParameter.CriticalChanceDetermination));
-            ModuleManager.AddBaseModule(AbilityParameter.CriticalChanceValue, new Module<AbilityParameter>(GetCurrentCriticalChance, AbilityParameter.CriticalChanceValue));
         }
-
-        public float CriticalChanceDetermination => this[AbilityParameter.CriticalChanceDetermination];
 
         public float Damage => this[AbilityParameter.Damage];
 
-        public float CriticalChanceValue => this[AbilityParameter.CriticalChanceValue];
-
-        public override async Task Activate(List<IEntity> targets)
+        public override async Task Execute(List<IEntity> targets)
         {
             if (Owner == null) return;
 
@@ -54,14 +44,11 @@
             {
                 context.Target = target;
                 float damage = ApplyConditionalModifiers(context, AbilityParameter.Damage, Damage + Owner.Parameters.SpellDamage);
-                float criticalChance = ApplyConditionalModifiers(context, AbilityParameter.CriticalChanceValue, CriticalChanceValue);
-                bool isCritical = ApplyConditionalModifiers(context, AbilityParameter.CriticalChanceDetermination, CriticalChanceDetermination) <= criticalChance;
-                context.IsCritical = isCritical;
                 context.Damage = damage;
 
                 ApplyTargetEffects(context);
 
-                target.TakeDamage(Owner, damage, DamageType.Normal, DamageSource.Ability, isCritical);
+                target.TakeDamage(Owner, damage, DamageType.Normal, DamageSource.Ability, false);
             }
 
             ApplyCasterEffects(context);

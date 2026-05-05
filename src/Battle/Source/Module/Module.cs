@@ -12,6 +12,6 @@
 
         public float GetValue() => value();
 
-        public float ApplyDecoratorsForValue(float baseBalue) => baseBalue;
+        public float ApplyDecoratorsForValue(float applyToValue) => applyToValue;
     }
 }
