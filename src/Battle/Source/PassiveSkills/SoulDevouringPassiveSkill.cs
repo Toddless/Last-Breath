@@ -12,17 +12,17 @@
         public override void Attach(IEntity owner)
         {
             Owner = owner;
-            Owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            Owner.CombatEvents.Subscribe<AbilityActivationEvent>(OnAbilityActivatedEvent);
         }
 
-        private void OnAbilityActivatedEvent(AbilityActivatedEvent evnt)
+        private void OnAbilityActivatedEvent(AbilityActivationEvent evnt)
         {
             Owner?.CurrentBarrier += BarrierRecoveryAmount;
         }
 
         public override void Detach(IEntity owner)
         {
-            Owner?.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedEvent);
+            Owner?.CombatEvents.Unsubscribe<AbilityActivationEvent>(OnAbilityActivatedEvent);
             Owner = null;
         }
 

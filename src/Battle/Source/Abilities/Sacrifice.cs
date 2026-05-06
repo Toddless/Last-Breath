@@ -15,25 +15,12 @@
         int costValue,
         int cooldown,
         float percentHealthToSacrifice,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.SelfCast)
-        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, effects, upgrades, costType, abilityType)
+        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, upgrades, costType, abilityType)
     {
         public float PercentHealthToSacrifice { get; } = percentHealthToSacrifice;
-
-        public override async Task Execute(List<IEntity> targets)
-        {
-            if (Owner == null) return;
-
-            float sacrificedLife = Owner.CurrentHealth * PercentHealthToSacrifice;
-            var modifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, sacrificedLife, Id);
-            Owner.CurrentHealth -= (int)sacrificedLife;
-            Owner.Modifiers.AddModifier(modifier);
-            Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
-            await base.Execute(targets);
-        }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentHealthToSacrifice * 100);
 

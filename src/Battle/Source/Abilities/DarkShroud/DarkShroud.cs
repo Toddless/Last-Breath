@@ -5,6 +5,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using System.Threading.Tasks;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
 
     /// <summary>
     /// Self-cast defensive ability. Applies LightStep evasion stacks and percentage health regeneration.
@@ -14,7 +15,6 @@ namespace Battle.Source.Abilities.DarkShroud
         string[] tags,
         int cooldown,
         int costValue,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.SelfCast)
@@ -26,21 +26,13 @@ namespace Battle.Source.Abilities.DarkShroud
             damage: 0,
             weaponDamageScale: 0,
             spellDamageScale: 0,
-            effects,
             upgrades,
             costType,
             abilityType)
     {
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner)
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {
-            var context = new EffectApplyingContext
-            {
-                Caster = owner,
-                Target = owner,
-                Source = InstanceId,
-                Damage = 0
-            };
-            ApplyTargetEffects(context);
+            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Damage = 0 };
             return Task.CompletedTask;
         }
     }

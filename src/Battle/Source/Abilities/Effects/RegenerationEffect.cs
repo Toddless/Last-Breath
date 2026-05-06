@@ -28,6 +28,6 @@
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(totalRegeneration));
         }
 
-        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxMaxStacks, Status);
+        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
     }
 }

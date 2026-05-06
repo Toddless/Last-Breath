@@ -43,7 +43,7 @@
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent, HealthAsDamageMultiplier);
 
-        public override IEffect Clone() => new BurningFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status)
+        public override IEffect Clone() => new BurningFuryEffect(Duration, MaxStacks, HealthPercent, Status)
         {
             HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };

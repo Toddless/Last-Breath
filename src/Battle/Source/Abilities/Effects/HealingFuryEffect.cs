@@ -35,6 +35,6 @@
             return HealAmount > healing.HealAmount;
         }
 
-        public override IEffect Clone() => new HealingFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status) { HealAmount = HealAmount };
+        public override IEffect Clone() => new HealingFuryEffect(Duration, MaxStacks, HealthPercent, Status) { HealAmount = HealAmount };
     }
 }

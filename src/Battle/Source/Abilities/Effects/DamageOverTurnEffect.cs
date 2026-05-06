@@ -5,11 +5,12 @@
     using Core.Data;
     using Core.Enums;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
     public class DamageOverTurnEffect(
         int duration,
-        int maxStacks,
+        int maxStacks = 999,
         StatusEffects statusEffect = StatusEffects.None,
         float percentFromDamage = 0.7f)
         : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect)
@@ -17,10 +18,10 @@
         public float PercentFromBase { get; } = percentFromDamage;
         public float DamagePerTick { get; set; }
 
-        public override void Apply(EffectApplyingContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
             DamagePerTick = context.Damage * PercentFromBase;
-            base.Apply(context);
+            await base.Apply(context);
         }
 
         public override void TurnEnd()
@@ -42,6 +43,6 @@
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
         }
 
-        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxMaxStacks, Status, PercentFromBase);
+        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxStacks, Status, PercentFromBase);
     }
 }

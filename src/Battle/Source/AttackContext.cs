@@ -19,6 +19,9 @@
         public float AdditionalDamage { get; set; }
         public float FinalDamage { get; set; }
         public bool IsCritical { get; set; }
+        public bool ForceCriticalAttack { get; set; }
+        public bool IsUnevadable { get; set; }
+        public bool IsUnblockable { get; set; }
 
         public bool IsValid => Target.IsAlive && Attacker.IsAlive;
 

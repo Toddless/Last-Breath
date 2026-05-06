@@ -3,10 +3,11 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Module;
     using Core.Enums;
     using Decorators;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
+    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
@@ -20,12 +21,13 @@ namespace Battle.Source.Abilities.JarOfPoison
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.Target)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, effects, upgrades, costType, abilityType)
+        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType, abilityType)
     {
+        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
+
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
             get
@@ -39,7 +41,7 @@ namespace Battle.Source.Abilities.JarOfPoison
             }
         }
 
-        public int PoisonDuration => (int)AbilityParameterDecorator.GetModule(Parameters.PoisonDuration).GetValue();
+        public int PoisonDuration => (int)this[Parameters.PoisonDuration];
         public IJoPExecutionStrategy ExecutionStrategy { get; set; } = new JoPDefaultExecutionStrategy();
 
         public enum Parameters
@@ -69,7 +71,7 @@ namespace Battle.Source.Abilities.JarOfPoison
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner) =>
-            ExecutionStrategy.Execute(this, owner, targets);
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
+            ExecutionStrategy.Execute(this, owner, targets, field);
     }
 }

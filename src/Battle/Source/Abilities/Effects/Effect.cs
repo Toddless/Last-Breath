@@ -4,6 +4,7 @@
     using System;
     using Utilities;
     using Core.Enums;
+    using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
@@ -32,7 +33,7 @@
 
         public StatusEffects Status { get; set; } = statusEffect;
         public int Duration { get; set; } = duration;
-        public int MaxMaxStacks { get; set; } = maxStacks;
+        public int MaxStacks { get; set; } = maxStacks;
         public string Source { get; private set; } = string.Empty;
         public bool Expired => Duration == 0;
         public string Description => FormatDescription();
@@ -40,7 +41,7 @@
 
         public event Action<int>? DurationChanged;
 
-        public virtual void Apply(EffectApplyingContext context)
+        public virtual Task Apply(EffectApplyingContext context)
         {
             Context = context;
             var target = context.Target;
@@ -50,6 +51,7 @@
             AppliedTo.Effects.AddEffect(this);
             // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status)) caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
+            return Task.CompletedTask;
         }
 
         public virtual void TurnEnd()

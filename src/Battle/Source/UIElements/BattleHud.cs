@@ -86,7 +86,7 @@
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
-            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChanceStance);
+            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChangeStance);
 
             foreach (AbilitySlot slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
@@ -94,7 +94,7 @@
                 stanceSlot.SetBattleEventBus(_battleEventBus);
         }
 
-        private void OnPlayerChanceStance(PlayerChangesStanceEvent obj)
+        private void OnPlayerChangeStance(PlayerChangesStanceEvent obj)
         {
             // var player = IPlayer.;
             // if (player == null) return;

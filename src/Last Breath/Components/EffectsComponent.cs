@@ -126,7 +126,7 @@
 
         private void ProcessEffectStacking(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
         {
-            bool isSingleStack = newEffect.MaxMaxStacks <= 1;
+            bool isSingleStack = newEffect.MaxStacks <= 1;
 
             if (isSingleStack) HandleSingleStack(effects, sameEffects, newEffect);
             else HandleMultipleStacks(effects, sameEffects, newEffect);
@@ -134,7 +134,7 @@
 
         private void HandleMultipleStacks(List<IEffect> effects, List<IEffect> sameEffects, IEffect newEffect)
         {
-            bool hasReachedMaxStacks = sameEffects.Count >= newEffect.MaxMaxStacks;
+            bool hasReachedMaxStacks = sameEffects.Count >= newEffect.MaxStacks;
 
             if (!hasReachedMaxStacks)
             {

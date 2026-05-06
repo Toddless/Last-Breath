@@ -16,33 +16,21 @@
         int cooldown,
         float percentManaToConsume,
         float increaseBonusPerManaConsumed,
-        List<IEffect> effects,
-        List<IEffect> casterEffects,
-        Dictionary<int, List<IAbilityUpgradeWrap<>>> upgrades,
+        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, cooldown, costValue,  effects, casterEffects, upgrades,
+        AbilityType abilityType = AbilityType.SelfCast) : Ability(id: "Ability_Mana_Devour", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0,
+        upgrades,
         costType, abilityType)
     {
         public float PercentToConsume { get; } = percentManaToConsume;
         public float IncreaseBonusPerManaConsumed { get; } = increaseBonusPerManaConsumed;
 
-        public override async Task Execute(List<IEntity> targets)
-        {
-            if (Owner == null) return;
-
-            float manaConsumed = Owner.CurrentMana * PercentToConsume;
-            float increase = manaConsumed / 100 / IncreaseBonusPerManaConsumed;
-            var modifier = new SimpleModifier(EntityParameter.SpellDamage, ModifierValueType.Increase, increase, Id);
-            Owner.Modifiers.AddModifier(modifier);
-            Owner.CombatEvents.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
-            await base.Execute(targets);
-        }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
 
-        private void OnAbilityActivated(AbilityActivatedEvent obj)
+        private void OnAbilityActivated(AbilityActivationEvent obj)
         {
-            Owner?.CombatEvents.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivated);
+            Owner?.CombatEvents.Unsubscribe<AbilityActivationEvent>(OnAbilityActivated);
             Owner?.Modifiers.RemoveModifierBySource(Id);
         }
     }

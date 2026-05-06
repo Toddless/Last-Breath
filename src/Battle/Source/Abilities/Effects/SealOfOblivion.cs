@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
@@ -10,10 +11,12 @@
         StatusEffects statusEffect = StatusEffects.Cursed)
         : Effect(id, duration, maxStacks, statusEffect)
     {
-        public override void Apply(EffectApplyingContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
-            base.Apply(context);
+            await base.Apply(context);
             var target = context.Target;
         }
+
+        public override IEffect Clone() => new SealOfOblivion(Id, Duration, MaxStacks, Status);
     }
 }

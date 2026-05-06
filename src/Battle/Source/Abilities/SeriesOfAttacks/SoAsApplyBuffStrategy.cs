@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
 
     public class SoAsApplyBuffStrategy(int attacksNeedForBuff, IEffect toApply) : SoAsDefaultExecutionStrategy
@@ -13,11 +14,11 @@
         private IEntity? _owner;
         private int _successfulAttacks;
 
-        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets)
+        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             _successfulAttacks = 0;
             Subscribe(ability, owner);
-            await base.Execute(ability, owner, targets);
+            await base.Execute(ability, owner, targets, field);
             Unsubscribe(owner);
         }
 

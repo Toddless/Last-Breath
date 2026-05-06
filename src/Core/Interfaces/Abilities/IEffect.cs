@@ -3,6 +3,7 @@
     using Enums;
     using Battle;
     using System;
+    using System.Threading.Tasks;
     using Entity;
 
     public interface IEffect : IIdentifiable, IDisplayable
@@ -10,12 +11,12 @@
         IEntity? AppliedTo { get; }
         StatusEffects Status { get; set; }
         int Duration { get; set; }
-        int MaxMaxStacks { get; set; }
+        int MaxStacks { get; set; }
         string Source { get; }
 
         event Action<int>? DurationChanged;
 
-        void Apply(EffectApplyingContext context);
+        Task Apply(EffectApplyingContext context);
         void Remove();
         void TurnStart();
         void TurnEnd();

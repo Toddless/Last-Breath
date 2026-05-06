@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
 
     public class SoAsPoisonOnAttackExecutionStrategy(int duration, int stacks) : SoAsDefaultExecutionStrategy
@@ -13,10 +14,10 @@
         private SeriesOfAttacks? _ability;
         private IEntity? _owner;
 
-        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets)
+        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             Subscribe(ability, owner);
-            await base.Execute(ability, owner, targets);
+            await base.Execute(ability, owner, targets, field);
             Unsubscribe(owner);
         }
 

@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
+    using System.Threading;
     using Core.Interfaces.Battle;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    using System.Threading;
 
     public class AttackContextScheduler : IAttackContextScheduler
     {
@@ -22,6 +22,7 @@
                 await context.Target.ReceiveAttack(context);
                 yield return context;
             }
+
             _isCancelled = false;
         }
     }

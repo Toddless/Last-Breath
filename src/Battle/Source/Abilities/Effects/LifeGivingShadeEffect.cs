@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Modifiers;
     using Core.Interfaces.Abilities;
@@ -23,10 +24,10 @@
         public float LifeToRecover { get; }
         public int Activations { get; private set; }
 
-        public override void Apply(EffectApplyingContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
             if (AppliedTo == null) return;
-            base.Apply(context);
+            await base.Apply(context);
             var copy = _modifier.Copy();
             copy.Apply(AppliedTo);
             AppliedTo?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);

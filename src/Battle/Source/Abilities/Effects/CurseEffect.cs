@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
@@ -9,13 +10,14 @@
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Curse", duration, maxStacks, statusEffect)
     {
-        public override void Apply(EffectApplyingContext context)
+        public override Task Apply(EffectApplyingContext context)
         {
+            return Task.CompletedTask;
         }
 
         public override IEffect Clone() => new CurseEffect
         (
-            Duration, MaxMaxStacks, Status
+            Duration, MaxStacks, Status
         );
     }
 }

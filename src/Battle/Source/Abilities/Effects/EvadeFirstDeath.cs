@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
@@ -12,9 +13,9 @@
     {
         public float PercentHealthToRecover { get; } = percentHealthToRecover;
 
-        public override void Apply(EffectApplyingContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
-            base.Apply(context);
+            await base.Apply(context);
             AppliedTo = context.Target;
             AppliedTo.CurrentHealthChanged += OnCurrentHealthChanges;
         }
@@ -35,6 +36,6 @@
             AppliedTo = null;
         }
 
-        public override IEffect Clone() => new EvadeFirstDeath(Duration, MaxMaxStacks, PercentHealthToRecover);
+        public override IEffect Clone() => new EvadeFirstDeath(Duration, MaxStacks, PercentHealthToRecover);
     }
 }

@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
 
     public interface IIpExecutionStrategy
@@ -10,6 +11,6 @@
         public void AddAttackModifier(IAttackModifier modifier);
         public void RemoveAttackModifier(IAttackModifier modifier);
 
-        Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets);
+        Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field);
     }
 }

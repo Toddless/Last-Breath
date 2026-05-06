@@ -6,10 +6,11 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
 
     public class SoAsDefaultExecutionStrategy : ISoAExecutionStrategy
     {
-        public virtual async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets)
+        public virtual async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             // условно
             var rnd = new RandomNumberGenerator();

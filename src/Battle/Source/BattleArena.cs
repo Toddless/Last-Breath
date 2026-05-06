@@ -3,6 +3,8 @@
     using Godot;
     using System;
     using Core.Data;
+    using Utilities;
+    using System.Linq;
     using Core.Interfaces;
     using Godot.Collections;
     using Core.Interfaces.UI;
@@ -13,7 +15,7 @@
     using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
 
-    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus
+    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField
     {
         private const string UID = "uid://bcj35twqggu1d";
         private readonly RandomNumberGenerator _rnd = new();
@@ -54,6 +56,26 @@
             _battleEventBus.Subscribe<PlayerDiedEvent>(OnPlayerDead);
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDead);
             _battleEventBus.Subscribe<AttackTargetSelectedEvent>(OnAttackTargetSelected);
+            _battleEventBus.Subscribe<AbilityActivationEvent>(OnAbilityActivation);
+        }
+
+        private async void OnAbilityActivation(AbilityActivationEvent obj)
+        {
+            try
+            {
+                var targets = _spots
+                    .Where(s => s.SelectionId == obj.SelectionId)
+                    .Select(s => s.Entity)
+                    .OfType<IEntity>()
+                    .ToList();
+
+                await obj.Ability.Execute(targets, this);
+            }
+            catch (Exception e)
+            {
+                GD.Print($"Failed to activate ability {obj.Ability.Id}", e.Message, e.StackTrace);
+                Tracker.TrackException("Failed to activate ability", e, this);
+            }
         }
 
 
@@ -103,8 +125,19 @@
         }
 
         public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
+        public Vector2 GetCameraPosition() => GlobalPosition;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        public IReadOnlyList<IEntity> GetEnemies(IEntity entity) => throw new NotImplementedException();
+
+        public IReadOnlyList<IEntity> GetAllies(IEntity entity) => throw new NotImplementedException();
+
+        public IReadOnlyList<IEntity> GetAll() => throw new NotImplementedException();
+
+        public IEntity GetRandomEntity(IEntity entity) => throw new NotImplementedException();
+
+        public IEntity GetRandomAlly(IEntity entity) => throw new NotImplementedException();
 
         private async Task ProcessTurnsAsync()
         {
@@ -135,7 +168,7 @@
                     _attackContextScheduler.Schedule(context);
                 }
 
-                await _attackContextScheduler.RunQueue();
+                await _attackContextScheduler.DrainQueue();
 
                 _currentFighter.OnTurnEnd();
 
@@ -160,7 +193,7 @@
         }
 
         private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
-            currentFighter.GetDamage(),  new RandomNumberGenerator(), _attackContextScheduler);
+            currentFighter.GetDamage(), new RandomNumberGenerator(), _attackContextScheduler);
 
         private void OnEntityDead(EntityDiedEvent obj)
         {
@@ -177,7 +210,5 @@
         {
             _fightEnds = true;
         }
-
-        public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }

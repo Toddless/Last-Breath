@@ -1,17 +1,17 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Battle.Source.Abilities.Decorators;
-    using Battle.Source.Module;
+    using Module;
+    using Utilities;
     using Core.Enums;
+    using Decorators;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Decorator;
+    using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Godot;
-    using Utilities;
+    using Core.Interfaces.Components.Decorator;
 
     public class IncreasingPressure(
         string[] tags,
@@ -22,10 +22,9 @@
         float spellDamageScale,
         int maxAttacks,
         float increaseAttackDamageStep,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, effects, upgrades, costType)
+        : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
 
@@ -78,8 +77,8 @@
             AbilityParametersModuleManager.RemoveDecorator(id, pKey);
         }
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner) =>
-            await ExecutionStrategy.Execute(this, owner, targets);
+        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
+            await ExecutionStrategy.Execute(this, owner, targets, field);
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, maxAttacks, increaseAttackDamageStep * 100);
     }

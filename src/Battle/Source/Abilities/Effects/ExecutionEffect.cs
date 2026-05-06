@@ -20,7 +20,7 @@
             if (healthAsPercentLeft <= Percentage) context.Target.Kill();
         }
 
-        public override IEffect Clone() => new ExecutionEffect(Duration, MaxMaxStacks, Percentage, Status);
+        public override IEffect Clone() => new ExecutionEffect(Duration, MaxStacks, Percentage, Status);
 
         public override bool IsStronger(IEffect otherEffect)
         {

@@ -1,6 +1,5 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using System;
     using Godot;
     using Core.Enums;
     using Core.Interfaces.Entity;
@@ -12,16 +11,12 @@
         string[] tags,
         int cooldown,
         int costValue,
-        List<IEffect> effects,
-        List<IEffect> casterEffects,
+        float damage,
+        float weaponDamageScale,
+        float spellDamageScale,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, effects, casterEffects, upgrades, costType)
+        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
-        public override async Task Execute(List<IEntity> targets)
-        {
-            await base.Execute(targets);
-            await PerformMultipleAttacks(targets);
-        }
 
         private async Task PerformMultipleAttacks(List<IEntity> targets)
         {
@@ -38,7 +33,6 @@
                     scheduler.Schedule(context);
                     await foreach (var processed in scheduler.RunQueue())
                     {
-                        
                     }
 
                     if (Owner.CurrentHealth <= 1) break;

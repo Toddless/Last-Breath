@@ -7,6 +7,7 @@
     using Components.Decorator;
     using System.Threading.Tasks;
     using System.Collections.Generic;
+    using Battle;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {
@@ -25,12 +26,10 @@
         event Action<IAbility, bool>? AbilityResourceChanges;
         event Action<IAbility, int>? CooldownLeftChanges;
 
-        Task Execute(List<IEntity> targets);
+        Task Execute(List<IEntity> targets, IBattleField field);
 
         void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator) where T : struct, Enum;
         void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;
-        void AddEffect(IEffect effect, bool targetEffect = true);
-        void RemoveEffect(string id, bool targetEffect = true);
         void SetOwner(IEntity owner);
         bool IsEnoughResource();
         void RemoveOwner();

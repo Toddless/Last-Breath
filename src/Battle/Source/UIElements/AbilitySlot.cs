@@ -151,10 +151,8 @@
                 .OnEntry(() =>
                 {
                     if (_ability == null) return;
-                    var targets = new List<IEntity>();
-                    _battleEventBus?.Publish<AbilityActivatedEvent>(new(_ability, targets));
+                    _battleEventBus?.Publish<AbilityActivationEvent>(new(_ability, _selectionId));
                     _selectionId = string.Empty;
-                    _ability.Execute(targets);
                 })
                 .Permit(Trigger.NotAvailable, State.NotAvailable);
 

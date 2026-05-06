@@ -12,6 +12,7 @@
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
@@ -24,7 +25,6 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.Target) : IAbility
@@ -55,7 +55,6 @@
         public int CooldownLeft { get; set; }
         public bool IsEvadable { get; set; }
         public AbilityType AbilityType { get; } = abilityType;
-        public List<IEffect> Effects { get; set; } = effects;
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
         public Dictionary<int, IAbilityUpgradeWrap<IAbility>> CurrentUpgrades { get; set; } = [];
         public float Cooldown => this[AbilityParameter.Cooldown];
@@ -76,13 +75,13 @@
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
-        public virtual async Task Execute(List<IEntity> targets)
+        public virtual async Task Execute(List<IEntity> targets, IBattleField field)
         {
             if (Owner == null) return;
             StartCooldown();
             ConsumeResource();
             await Owner.Animations.PlayAnimationAsync(Id);
-            await ExecuteInternal(targets, Owner);
+            await ExecuteInternal(targets, Owner, field);
         }
 
         public virtual void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
@@ -99,19 +98,6 @@
             ModuleManager.RemoveDecorator(id, abilityParameter);
         }
 
-        public void AddEffect(IEffect effect, bool targetEffect = true)
-        {
-            if (targetEffect) Effects.Add(effect);
-        }
-
-        public void RemoveEffect(string id, bool targetEffect = true)
-        {
-            if (targetEffect)
-            {
-                var exist = Effects.FirstOrDefault(c => c.Id == id);
-                if (exist != null) RemoveFromList(Effects, exist);
-            }
-        }
 
         public virtual void SetOwner(IEntity owner)
         {
@@ -151,24 +137,12 @@
 
         protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
 
-        protected virtual Task ExecuteInternal(List<IEntity> targets, IEntity owner) => Task.CompletedTask;
+        protected virtual Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => Task.CompletedTask;
 
         protected void StartCooldown()
         {
             CooldownLeft = (int)Cooldown;
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
-        }
-
-        protected void ApplyTargetEffects(EffectApplyingContext context)
-        {
-            foreach (var clone in Effects.Select(effect => effect.Clone()))
-                clone.Apply(context);
-        }
-
-        protected void ApplyCasterEffects(EffectApplyingContext context)
-        {
-            if (Owner == null) return;
-            context.Target = Owner;
         }
 
         protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
@@ -204,7 +178,7 @@
 
         protected virtual string FormatDescription() => Localization.LocalizeDescriptionFormated(Id);
 
-        protected virtual void OnTurnEnd(TurnEndEvent obj)
+        protected void OnTurnEnd(TurnEndEvent obj)
         {
             if (CooldownLeft == 0) return;
             CooldownLeft--;
@@ -222,8 +196,6 @@
                     [AbilityParameter.WeaponDamageScale] = new Module<AbilityParameter>(() => weaponDamageScale, AbilityParameter.WeaponDamageScale),
                     [AbilityParameter.SpellDamageScale] = new Module<AbilityParameter>(() => spellDamageScale, AbilityParameter.SpellDamageScale)
                 });
-
-        private void RemoveFromList(List<IEffect> listEffects, IEffect effect) => listEffects.Remove(effect);
 
         private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
     }

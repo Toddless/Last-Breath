@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
@@ -22,12 +23,11 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        List<IEffect> effects,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         float damageMultiplier = 1,
         Costs costType = Costs.Mana,
         AbilityType abilityType = AbilityType.Target)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, effects, upgrades, costType, abilityType)
+        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType, abilityType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
@@ -80,6 +80,6 @@
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner) => await ExecutionStrategy.Execute(this, owner, targets);
+        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
     }
 }

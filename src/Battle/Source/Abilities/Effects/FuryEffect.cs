@@ -30,6 +30,6 @@
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);
 
-        public override IEffect Clone() => new FuryEffect(Duration, MaxMaxStacks, HealthPercent, Status);
+        public override IEffect Clone() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);
     }
 }

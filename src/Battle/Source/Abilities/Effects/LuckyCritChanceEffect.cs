@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using System.Threading.Tasks;
     using Battle.Source.Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
@@ -13,10 +14,10 @@
     {
         private readonly EntityParameterModuleDecorator _luckyCritChanceDecorator = new LuckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
 
-        public override void Apply(EffectApplyingContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
             context.Target.Parameters.AddModuleDecorator(_luckyCritChanceDecorator);
-            base.Apply(context);
+            await base.Apply(context);
         }
 
         public override void Remove()
@@ -25,6 +26,6 @@
             base.Remove();
         }
 
-        public override IEffect Clone() => new LuckyCritChanceEffect(Duration, MaxMaxStacks, Status);
+        public override IEffect Clone() => new LuckyCritChanceEffect(Duration, MaxStacks, Status);
     }
 }

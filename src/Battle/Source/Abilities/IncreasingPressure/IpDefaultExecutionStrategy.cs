@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Interfaces.Battle;
 
     public class IpDefaultExecutionStrategy(List<IAttackModifier> modifiers) : IIpExecutionStrategy
     {
@@ -20,7 +21,7 @@
 
         public void RemoveAttackModifier(IAttackModifier modifier) => Modifiers.Remove(modifier);
 
-        public virtual async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets)
+        public virtual async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             var rnd = new RandomNumberGenerator();
             var cts = new CancellationTokenSource();

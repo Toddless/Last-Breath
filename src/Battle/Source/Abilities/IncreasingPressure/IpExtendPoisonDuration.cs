@@ -6,14 +6,15 @@
     using Core.Interfaces.Entity;
     using System.Collections.Generic;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
 
     public class IpExtendPoisonDuration(int duration, List<IAttackModifier> modifiers) : IpDefaultExecutionStrategy(modifiers)
     {
-        public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets)
+        public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             Subscribe(owner);
-            await base.Execute(ability, owner, targets);
+            await base.Execute(ability, owner, targets, field);
             Unsubscribe(owner);
         }
 

@@ -20,6 +20,6 @@
             base.BeforeAttack(context);
         }
 
-        public override IEffect Clone() => new PrimalFuryEffect(Duration, MaxMaxStacks, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };
+        public override IEffect Clone() => new PrimalFuryEffect(Duration, MaxStacks, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };
     }
 }
