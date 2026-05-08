@@ -18,7 +18,7 @@
 
         public override void AfterAttack(IAttackContext context)
         {
-            if (AppliedTo == null) return;
+            if (Target == null) return;
             var burnEffect = new DamageOverTurnEffect(
                 BurningDuration,
                 BurningMaxStacks,
@@ -28,7 +28,7 @@
             burnEffect.Apply(new EffectApplyingContext
             {
                 Target = context.Target,
-                Caster = AppliedTo,
+                Caster = Target,
                 Damage = HealthBurned,
                 Source = Id,
                 IsCritical = false
@@ -43,7 +43,7 @@
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent, HealthAsDamageMultiplier);
 
-        public override IEffect Clone() => new BurningFuryEffect(Duration, MaxStacks, HealthPercent, Status)
+        public override IEffect Copy() => new BurningFuryEffect(Duration, MaxStacks, HealthPercent, Status)
         {
             HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };

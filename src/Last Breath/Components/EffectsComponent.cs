@@ -1,16 +1,16 @@
 ﻿namespace LastBreath.Components
 {
+    using Godot;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
+    using System.Linq;
     using Core.Interfaces.Entity;
-    using Godot;
+    using Core.Interfaces.Battle;
+    using System.Threading.Tasks;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
 
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {
@@ -118,7 +118,7 @@
                 if (!from.IsAlive) continue;
                 var status = grouping.Key;
                 float totalDamage = grouping.Sum(dot => dot.Damage);
-                await owner.TakeDamage(from, totalDamage, status.GetDamageType(), DamageSource.Effect);
+                await owner.TakeDamage(new DamageContext { Source = from, Damage = totalDamage, Type = status.GetDamageType(), Cause = DamageCause.Effect });
             }
 
             _dotTicks.Clear();

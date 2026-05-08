@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
+    using Core.Enums;
     using System.Threading.Tasks;
     using Battle.Source.Decorators;
-    using Core.Enums;
     using Core.Interfaces.Abilities;
 
     public class ParameterEqualsEffect(
@@ -29,10 +29,10 @@
         {
             base.Remove();
             if (_decorator != null)
-                AppliedTo?.Parameters.RemoveModuleDecorator(_decorator.Id, Parameter);
+                Target?.Parameters.RemoveModuleDecorator(_decorator.Id, Parameter);
         }
 
-        public override IEffect Clone() => new ParameterEqualsEffect(Id, Duration, MaxStacks, Parameter, Value, Status);
+        public override IEffect Copy() => new ParameterEqualsEffect(Id, Duration, MaxStacks, Parameter, Value, Status);
 
         public override bool IsStronger(IEffect otherEffect)
         {

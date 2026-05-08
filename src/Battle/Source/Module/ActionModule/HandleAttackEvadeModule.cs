@@ -9,7 +9,7 @@
         private readonly IEntity _owner = owner;
         public ActionModule Parameter => ActionModule.EvadeAction;
 
-        public DecoratorPriority Priority => DecoratorPriority.Base;
+        public Priority Priority => Priority.Base;
 
         public void PerformModuleAction(IEntity target)
         {

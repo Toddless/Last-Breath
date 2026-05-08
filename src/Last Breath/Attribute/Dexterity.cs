@@ -6,7 +6,7 @@
     using Core.Modifiers;
     using Godot;
 
-    public class Dexterity(IModifiersComponent manager)
+    public class Dexterity(IParameterModifiersComponent manager)
         : EntityAttribute(GetModifiers(), manager, new Modifier(ModifierValueType.Flat, EntityParameter.Dexterity, 0f))
     {
         public override int Total

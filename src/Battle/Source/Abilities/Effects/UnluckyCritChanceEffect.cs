@@ -12,7 +12,7 @@
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Unlucky_Critical_Chance", duration, maxStacks, statusEffect)
     {
-        private readonly EntityParameterModuleDecorator _unluckyCritChanceDecorator = new UnluckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
+        private readonly EntityParameterModuleDecorator _unluckyCritChanceDecorator = new UnluckyChanceDecorator(Priority.Strong, EntityParameter.CriticalChance);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -22,10 +22,10 @@
 
         public override void Remove()
         {
-            AppliedTo?.Parameters.RemoveModuleDecorator(_unluckyCritChanceDecorator.Id, _unluckyCritChanceDecorator.Parameter);
+            Target?.Parameters.RemoveModuleDecorator(_unluckyCritChanceDecorator.Id, _unluckyCritChanceDecorator.Parameter);
             base.Remove();
         }
 
-        public override IEffect Clone() => new UnluckyCritChanceEffect(Duration, MaxStacks, Status);
+        public override IEffect Copy() => new UnluckyCritChanceEffect(Duration, MaxStacks, Status);
     }
 }

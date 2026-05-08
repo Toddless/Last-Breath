@@ -1,11 +1,11 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using System;
     using Enums;
-    using System.Collections.Generic;
+    using System;
     using Modifiers;
+    using System.Collections.Generic;
 
-    public interface IModifiersComponent
+    public interface IParameterModifiersComponent
     {
         IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> EntityModifiers { get; }
 

@@ -3,8 +3,8 @@
     using System;
     using Core.Enums;
 
-    public class SimpleAbilityParameterDecorator<TParameter>(TParameter abilityParameter, DecoratorPriority priority, OperationType type, float value)
-        : AbilityParameterDecorator<TParameter>(abilityParameter, priority, string.Empty)
+    public class SimpleAbilityParameterDecorator<TParameter>(TParameter abilityParameter, Priority priority, OperationType type, float value, string id,string source)
+        : AbilityParameterDecorator<TParameter>(abilityParameter, priority, id, source)
         where TParameter : struct, Enum
     {
         public override float GetValue() => PerformCalculation(base.GetValue());

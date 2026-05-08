@@ -6,12 +6,12 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
 
-    public abstract class BaseSkillModule(IEntity owner, SkillType type, DecoratorPriority priority) : ISkillModule
+    public abstract class BaseSkillModule(IEntity owner, SkillType type, Priority priority) : ISkillModule
     {
         protected readonly IEntity Owner = owner;
 
         public SkillType Parameter { get; } = type;
-        public DecoratorPriority Priority { get; } = priority;
+        public Priority Priority { get; } = priority;
 
         public virtual List<ISkill> GetSkills()
         {

@@ -44,7 +44,7 @@
         }
 
         public bool HasEffect(IEffect effect) => effect.Id.Equals(_effect?.Id);
-        public bool HasOwner() => _effect?.AppliedTo != null;
+        public bool HasOwner() => _effect?.Target != null;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

@@ -8,7 +8,7 @@
         where TKey : struct, Enum
     {
         public TKey Parameter { get; } = parameter;
-        public DecoratorPriority Priority => DecoratorPriority.Base;
+        public Priority Priority => Priority.Base;
 
         public float GetValue() => value();
 

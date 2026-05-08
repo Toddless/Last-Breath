@@ -18,6 +18,7 @@
         int CooldownLeft { get; set; }
         int CostValue { get; }
         bool IsEvadable { get; set; }
+        IEffect? Effect { get; set; }
         Costs CostType { get; }
         AbilityType AbilityType { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }

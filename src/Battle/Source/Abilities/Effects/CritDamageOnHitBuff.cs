@@ -23,7 +23,7 @@ namespace Battle.Source.Abilities.Effects
     {
         private readonly ChangeValueDecorator _critDamageDecorator = new(
             EntityParameter.CriticalDamage,
-            DecoratorPriority.Weak,
+            Priority.Weak,
             "Effect_Crit_Dmg_Buff_Decorator",
             1f + critDamageBonus);
 
@@ -35,23 +35,23 @@ namespace Battle.Source.Abilities.Effects
 
         public override void AfterAttack(IAttackContext context)
         {
-            if (AppliedTo == null) return;
+            if (Target == null) return;
             if (context.Result != AttackResults.Succeed) return;
 
             // Flat increase to crit chance on each successful attack
             var modifier = new SimpleModifier(EntityParameter.CriticalChance, ModifierValueType.Flat, critChancePerHit, $"CC_CritChance_OnHit_{InstanceId}");
-            modifier.Apply(AppliedTo);
+            modifier.ApplyTo(Target);
             // Note: this modifier persists for the remainder of the fight (intentional for stacking).
             // Add Remove tracking if needed.
         }
 
         public override void Remove()
         {
-            AppliedTo?.Parameters.RemoveModuleDecorator(_critDamageDecorator.Id, EntityParameter.CriticalDamage);
+            Target?.Parameters.RemoveModuleDecorator(_critDamageDecorator.Id, EntityParameter.CriticalDamage);
             base.Remove();
         }
 
-        public override IEffect Clone() =>
+        public override IEffect Copy() =>
             new CritDamageOnHitBuff(critDamageBonus, Duration, critChancePerHit, MaxStacks, Status);
     }
 }

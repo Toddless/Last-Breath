@@ -14,14 +14,15 @@ namespace Battle.Source.Abilities.Effects
 
         public override void TurnEnd()
         {
-            if (AppliedTo != null)
+            if (Target != null)
             {
-                float healAmount = AppliedTo.Parameters.MaxHealth * PercentOfMaxHealth;
-                AppliedTo.Heal(healAmount);
+                float healAmount = Target.Parameters.MaxHealth * PercentOfMaxHealth;
+                Target.Heal(new HealContext(Target, Target) { Amount = healAmount });
             }
+
             base.TurnEnd();
         }
 
-        public override IEffect Clone() => new PercentHealthRegenerationEffect(PercentOfMaxHealth, Duration, MaxStacks, Status);
+        public override IEffect Copy() => new PercentHealthRegenerationEffect(PercentOfMaxHealth, Duration, MaxStacks, Status);
     }
 }

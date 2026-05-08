@@ -31,7 +31,7 @@
         private void OnAbilityActivated(AbilityActivationEvent obj)
         {
             Owner?.CombatEvents.Unsubscribe<AbilityActivationEvent>(OnAbilityActivated);
-            Owner?.Modifiers.RemoveModifierBySource(Id);
+            Owner?.ParameterModifiers.RemoveModifierBySource(Id);
         }
     }
 }

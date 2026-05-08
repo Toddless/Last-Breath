@@ -9,10 +9,11 @@
     public interface IEntity : IIdentifiable, IDisplayable, IFightable
     {
         IEffectsComponent Effects { get; }
-        IModifiersComponent Modifiers { get; }
+        IParameterModifiersComponent ParameterModifiers { get; }
         IEntityParametersComponent Parameters { get; }
         IPassiveSkillsComponent PassiveSkills { get; }
         IAnimationsComponent Animations { get; }
+        IModifierHandlerComponent ModifierHandler { get; }
         IEntityAttribute Dexterity { get; }
         IEntityAttribute Strength { get; }
         IEntityAttribute Intelligence { get; }
@@ -34,7 +35,7 @@
 
         void AddItemToInventory(IItem item);
         float GetDamage();
-        void Heal(float amount);
+        void Heal(IHealContext context);
         void ConsumeResource(Costs type, float amount);
         bool TryApplyStatusEffect(StatusEffects statusEffect);
         bool TryRemoveStatusEffect(StatusEffects statusEffect);

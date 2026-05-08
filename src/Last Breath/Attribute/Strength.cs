@@ -6,7 +6,7 @@
     using Core.Modifiers;
     using Godot;
 
-    public class Strength(IModifiersComponent manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 0f))
+    public class Strength(IParameterModifiersComponent manager) : EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Strength, 0f))
     {
         public override int Total
         {

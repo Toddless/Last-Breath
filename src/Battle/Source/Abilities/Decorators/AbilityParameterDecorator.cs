@@ -5,14 +5,15 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
 
-    public abstract class AbilityParameterDecorator<TParameter>(TParameter abilityParameter, DecoratorPriority priority, string id)
+    public abstract class AbilityParameterDecorator<TParameter>(TParameter abilityParameter, Priority priority, string id, string source)
         : IParameterModule<TParameter>, IModuleDecorator<TParameter, IParameterModule<TParameter>>
         where TParameter : struct, Enum
     {
         private IParameterModule<TParameter>? _decorated;
         public string Id { get; } = id;
+        public string Source { get; } = source;
         public TParameter Parameter { get; } = abilityParameter;
-        public DecoratorPriority Priority { get; } = priority;
+        public Priority Priority { get; } = priority;
 
         public void ChainModule(IParameterModule<TParameter> inner) => _decorated = inner;
 
@@ -27,5 +28,7 @@
             ArgumentNullException.ThrowIfNull(_decorated);
             return _decorated.ApplyDecoratorsForValue(applyToValue);
         }
+
+        public virtual bool IsStronger(IModuleDecorator<TParameter, IParameterModule<TParameter>> decorator)=>decorator.Id == Id;
     }
 }

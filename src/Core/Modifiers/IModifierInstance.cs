@@ -10,7 +10,7 @@
 
         IModifierInstance Copy();
 
-        void Apply(IEntity entity);
-        void Remove(IEntity entity);
+        void ApplyTo(IEntity target);
+        void RemoveFrom(IEntity target);
     }
 }

@@ -54,7 +54,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             int idx = _splashRnd.RandiRange(0, enemies.Count - 1);
             var randomTarget = enemies[idx];
 
-            randomTarget.TakeDamage(_owner, splashDamage, DamageType.Normal, DamageSource.Ability);
+            randomTarget.TakeDamage(new DamageContext { Source = _owner, Damage = splashDamage, Cause = DamageCause.Ability, Type = DamageType.Normal });
         }
 
         private void Unsubscribe(IEntity owner) =>

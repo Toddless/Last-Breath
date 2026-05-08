@@ -17,6 +17,6 @@
             var target = context.Target;
         }
 
-        public override IEffect Clone() => new SealOfOblivion(Id, Duration, MaxStacks, Status);
+        public override IEffect Copy() => new SealOfOblivion(Id, Duration, MaxStacks, Status);
     }
 }

@@ -15,13 +15,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
-            _addedEffect = new ParameterBuffEffect(
-                id: "Effect_CC_Extra_Crit_Chance",
-                duration: ability.BuffDuration,
-                maxStacks: 999,
-                amount: critChanceBonus,
-                parameter: EntityParameter.CriticalChance,
-                type: ModifierValueType.Flat);
         }
 
         public override void RemoveUpgrade(CriticalCalculation ability)

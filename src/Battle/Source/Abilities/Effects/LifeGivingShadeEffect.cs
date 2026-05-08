@@ -26,30 +26,30 @@
 
         public override async Task Apply(EffectApplyingContext context)
         {
-            if (AppliedTo == null) return;
+            if (Target == null) return;
             await base.Apply(context);
             var copy = _modifier.Copy();
-            copy.Apply(AppliedTo);
-            AppliedTo?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
+            copy.ApplyTo(Target);
+            Target?.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
         }
 
         private void OnAttackEvaded(AttackEvadedEvent obj)
         {
             // TODO: Update activation on same effect applying??
-            AppliedTo?.Heal(LifeToRecover);
+            Target?.Heal(new HealContext(Target, Target) { Amount = LifeToRecover });
             Activations--;
             if (Activations == 0) Remove();
         }
 
         public override void Remove()
         {
-            AppliedTo?.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
-            AppliedTo?.Modifiers.RemoveModifierBySource(Id);
+            Target?.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
+            Target?.ParameterModifiers.RemoveModifierBySource(Id);
             base.Remove();
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, _modifier.Value, Activations, LifeToRecover);
 
-        public override IEffect Clone() => new LifeGivingShadeEffect(LifeToRecover, Duration, Activations, Status);
+        public override IEffect Copy() => new LifeGivingShadeEffect(LifeToRecover, Duration, Activations, Status);
     }
 }

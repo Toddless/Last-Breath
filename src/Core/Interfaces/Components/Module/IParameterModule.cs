@@ -7,7 +7,7 @@
         where TKey : struct, Enum
     {
         TKey Parameter { get; }
-        DecoratorPriority Priority { get; }
+        Priority Priority { get; }
 
         float GetValue();
         float ApplyDecoratorsForValue(float applyToValue);

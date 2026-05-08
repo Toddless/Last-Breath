@@ -15,7 +15,7 @@
             return Task.CompletedTask;
         }
 
-        public override IEffect Clone() => new CurseEffect
+        public override IEffect Copy() => new CurseEffect
         (
             Duration, MaxStacks, Status
         );

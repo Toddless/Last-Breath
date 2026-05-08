@@ -22,9 +22,12 @@ namespace Battle.Source.Abilities.JarOfPoison
                            + (owner.Parameters.Damage * ability.WeaponDamageScale)
                            + (owner.Parameters.SpellDamage * ability.SpellDamageScale);
 
+            var effect = ability.Effect?.Copy();
             var context = new EffectApplyingContext { Caster = owner, Target = target, Source = ability.InstanceId, Damage = damage };
             var poison = new DamageOverTurnEffect(ability.PoisonDuration, 999, StatusEffects.Poison);
             await poison.Apply(context);
+            if (effect == null) return;
+            await effect.Apply(context);
         }
     }
 }

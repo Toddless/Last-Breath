@@ -8,7 +8,7 @@
     using Core.Modifiers;
     using Utilities;
 
-    internal class ModifiersComponent : IModifiersComponent
+    internal class ParameterModifiersComponent : IParameterModifiersComponent
     {
         // all modifiers from equipment, passive abilities etc.
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _permanentModifiers = [];

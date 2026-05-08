@@ -1,35 +1,42 @@
 ﻿namespace Battle.Source.Abilities.Effects
 {
-    using System.Threading.Tasks;
     using Core.Enums;
-    using Core.Modifiers;
+    using System.Linq;
+    using Source.Decorators;
+    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
-    public class ParameterBuffEffect : Effect
+    public class ParameterBuffEffect(
+        string id,
+        int duration,
+        int maxStacks,
+        float value,
+        EntityParameter parameter,
+        OperationType type,
+        Priority priority,
+        StatusEffects statusEffect = StatusEffects.None) : Effect(id, duration, maxStacks, statusEffect)
     {
-        private IModifierInstance _modifier;
-        private readonly ModifierValueType _type;
-
-        public ParameterBuffEffect(string id, int duration, int maxStacks, float amount, EntityParameter parameter, ModifierValueType type,
-            StatusEffects statusEffect = StatusEffects.None) : base(id, duration, maxStacks, statusEffect)
-        {
-            Parameter = parameter;
-            BuffAmount = amount;
-            _type = type;
-            _modifier = new SimpleModifier(parameter, type, amount, InstanceId);
-        }
-
-        public EntityParameter Parameter { get; }
-
-        public float BuffAmount { get; }
+        private string _decoratorId = string.Empty;
+        public EntityParameter Parameter { get; } = parameter;
+        public float BuffValue { get; } = value;
 
         public override async Task Apply(EffectApplyingContext context)
         {
-            if(AppliedTo == null) return;
             await base.Apply(context);
-            _modifier.Apply(AppliedTo);
+            int stacks = Target?.Effects.GetBy(x => x.Id == Id).Count() ?? 1;
+            var decorator = new EntityParameterDecorator($"{Id}_{type}", BuffValue * stacks, type, Parameter, priority);
+            Target?.Parameters.AddModuleDecorator(decorator);
+            _decoratorId = decorator.Id;
         }
 
-        public override IEffect Clone() => new ParameterBuffEffect(Id, Duration, MaxStacks, BuffAmount, Parameter, _type, Status);
+        public override void Remove()
+        {
+            Target?.Parameters.RemoveModuleDecorator(_decoratorId, Parameter);
+            int stacks = Target?.Effects.GetBy(x => x.Id == Id && x != this).Count() ?? 0;
+            if (stacks > 0) Target?.Parameters.AddModuleDecorator(new EntityParameterDecorator(_decoratorId, BuffValue * stacks, type, Parameter, priority));
+            base.Remove();
+        }
+
+        public override IEffect Copy() => new ParameterBuffEffect(Id, Duration, MaxStacks, BuffValue, Parameter, type, priority, Status);
     }
 }

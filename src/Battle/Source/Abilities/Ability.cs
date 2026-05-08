@@ -9,10 +9,10 @@
     using System.Linq;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
@@ -54,9 +54,10 @@
         public string[] Tags { get; } = tags;
         public int CooldownLeft { get; set; }
         public bool IsEvadable { get; set; }
+        public IEffect? Effect { get; set; }
         public AbilityType AbilityType { get; } = abilityType;
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
-        public Dictionary<int, IAbilityUpgradeWrap<IAbility>> CurrentUpgrades { get; set; } = [];
+        public Dictionary<int, IAbilityUpgrade> CurrentUpgrades { get; set; } = [];
         public float Cooldown => this[AbilityParameter.Cooldown];
         public string Description => FormatDescription();
         public string DisplayName => Localization.Localize(Id);
@@ -80,6 +81,7 @@
             if (Owner == null) return;
             StartCooldown();
             ConsumeResource();
+            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this));
             await Owner.Animations.PlayAnimationAsync(Id);
             await ExecuteInternal(targets, Owner, field);
         }
@@ -143,35 +145,6 @@
         {
             CooldownLeft = (int)Cooldown;
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
-        }
-
-        protected float ApplyConditionalModifiers(EffectApplyingContext context, AbilityParameter parameter, float baseValue)
-        {
-            float additiveBonus = 0f;
-            float increasedBonus = 1f;
-            float multiplyBonus = 1f;
-
-            // foreach (IConditionalModifier conditionalModifier in ConditionalModifiers)
-            // {
-            //     if (conditionalModifier.Parameter != parameter) continue;
-            //     (float Value, ModifierType Type)? result = conditionalModifier.GetValue(context);
-            //     if (result == null) continue;
-            //
-            //     switch (result.Value.Type)
-            //     {
-            //         case ModifierType.Flat:
-            //             additiveBonus += result.Value.Value;
-            //             break;
-            //         case ModifierType.Increase:
-            //             increasedBonus += result.Value.Value;
-            //             break;
-            //         case ModifierType.Multiplicative:
-            //             multiplyBonus += result.Value.Value;
-            //             break;
-            //     }
-            // }
-
-            return ((baseValue + additiveBonus) * increasedBonus) * multiplyBonus;
         }
 
         protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);

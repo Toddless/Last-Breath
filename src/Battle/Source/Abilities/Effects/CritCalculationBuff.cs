@@ -18,7 +18,7 @@ namespace Battle.Source.Abilities.Effects
         : Effect(id: "Effect_Crit_Calculation_Buff", duration, maxStacks, statusEffect)
     {
         private readonly EntityParameterModuleDecorator _decorator =
-            new LuckyChanceDecorator(DecoratorPriority.Strong, EntityParameter.CriticalChance);
+            new LuckyChanceDecorator(Priority.Strong, EntityParameter.CriticalChance);
 
         public override async Task Apply(EffectApplyingContext context)
         {
@@ -34,10 +34,10 @@ namespace Battle.Source.Abilities.Effects
 
         public override void Remove()
         {
-            AppliedTo?.Parameters.RemoveModuleDecorator(_decorator.Id, _decorator.Parameter);
+            Target?.Parameters.RemoveModuleDecorator(_decorator.Id, _decorator.Parameter);
             base.Remove();
         }
 
-        public override IEffect Clone() => new CritCalculationBuff(Duration, MaxStacks, Status);
+        public override IEffect Copy() => new CritCalculationBuff(Duration, MaxStacks, Status);
     }
 }

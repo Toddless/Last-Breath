@@ -20,13 +20,13 @@ namespace Battle.Source.Abilities.Effects
 
         public override void AfterAttack(IAttackContext context)
         {
-            if (AppliedTo == null) return;
+            if (Target == null) return;
             if (context.Result != AttackResults.Succeed) return;
 
             var poison = new DamageOverTurnEffect(PoisonDuration, 999, StatusEffects.Poison, PoisonDamagePercent);
             var applyContext = new EffectApplyingContext
             {
-                Caster = AppliedTo,
+                Caster = Target,
                 Target = context.Target,
                 Source = Id,
                 Damage = context.FinalDamage,
@@ -35,7 +35,7 @@ namespace Battle.Source.Abilities.Effects
             poison.Apply(applyContext);
         }
 
-        public override IEffect Clone() =>
+        public override IEffect Copy() =>
             new PoisonCoatingEffect(Duration, MaxStacks, PoisonDuration, PoisonDamagePercent, Status);
     }
 }

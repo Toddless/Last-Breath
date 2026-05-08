@@ -65,6 +65,7 @@ namespace LastBreath.Npc
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations { get; private set; }
+        public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -74,7 +75,7 @@ namespace LastBreath.Npc
         public bool IsFighting { get; set; }
         public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
-        public IModifiersComponent Modifiers { get; private set; }
+        public IParameterModifiersComponent ParameterModifiers { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
@@ -136,17 +137,17 @@ namespace LastBreath.Npc
 
             _rnd.Randomize();
             Parameters = new EntityParametersComponent();
-            Modifiers = new ModifiersComponent();
-            Parameters.Initialize(Modifiers.GetModifiers);
+            ParameterModifiers = new ParameterModifiersComponent();
+            Parameters.Initialize(ParameterModifiers.GetModifiers);
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
-            Dexterity = new Dexterity(Modifiers);
-            Strength = new Strength(Modifiers);
-            Intelligence = new Intelligence(Modifiers);
+            Dexterity = new Dexterity(ParameterModifiers);
+            Strength = new Strength(ParameterModifiers);
+            Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
-            Modifiers.ModifiersChanged += Parameters.OnModifiersChange;
+            ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
@@ -206,8 +207,17 @@ namespace LastBreath.Npc
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
-        public void Heal(float amount)
+        public void Heal(IHealContext context)
         {
+            ModifierHandler.Apply(context);
+            if (context.Amount <= 0) return;
+            if (context.ConvertToDamage)
+            {
+                TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                return;
+            }
+
+            float amount = context.Amount;
             CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
             _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
             CurrentHealth += amount;
@@ -266,7 +276,14 @@ namespace LastBreath.Npc
                     case AttackResults.Succeed:
                         Calculations.CalculateFinalDamage(context);
                         CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
-                        await TakeDamage(context.Attacker, context.FinalDamage, DamageType.Normal, DamageSource.Hit);
+                        await TakeDamage(new DamageContext
+                        {
+                            Source = context.Attacker,
+                            Damage = context.FinalDamage,
+                            Type = DamageType.Normal,
+                            Cause = DamageCause.Attack,
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical
+                        });
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
@@ -299,9 +316,9 @@ namespace LastBreath.Npc
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent(this));
-            _battleEventBus?.Publish(new TurnEndEvent(this));
-            _gameEventBus?.Publish(new TurnEndEvent(this));
+            CombatEvents.Publish(new TurnEndEvent());
+            _battleEventBus?.Publish(new TurnEndEvent());
+            _gameEventBus?.Publish(new TurnEndEvent());
         }
 
         public void OnTurnStart()
@@ -312,12 +329,12 @@ namespace LastBreath.Npc
             _gameEventBus?.Publish(new TurnStartEvent(this));
         }
 
-        public Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public Task TakeDamage(IDamageContext context)
         {
             // TODO: Here i need to calculate final damage with armor/resistance etc
-            CombatEvents.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
-            _battleEventBus?.Publish(new DamageTakenEvent(from, this, damage, type, source, isCrit));
-            CurrentHealth -= damage;
+            CombatEvents.Publish(new DamageTakenEvent(context, this));
+            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
+            CurrentHealth -= context.Damage;
             // await Animations.PlayAnimationAsync("Hurt");
             return Task.CompletedTask;
         }

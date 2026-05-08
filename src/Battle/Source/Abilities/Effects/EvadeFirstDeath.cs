@@ -16,26 +16,26 @@
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
-            AppliedTo = context.Target;
-            AppliedTo.CurrentHealthChanged += OnCurrentHealthChanges;
+            Target = context.Target;
+            Target.CurrentHealthChanged += OnCurrentHealthChanges;
         }
 
         private void OnCurrentHealthChanges(float value)
         {
             if (value > 0) return;
-            if (AppliedTo == null) return;
-            float toRecover = AppliedTo.Parameters.MaxHealth * PercentHealthToRecover;
-            AppliedTo.Heal(toRecover);
+            if (Target == null) return;
+            float toRecover = Target.Parameters.MaxHealth * PercentHealthToRecover;
+            Target.Heal(new HealContext(Target, Target) { Amount = toRecover });
             Remove();
         }
 
         public override void Remove()
         {
             base.Remove();
-            AppliedTo?.CurrentHealthChanged -= OnCurrentHealthChanges;
-            AppliedTo = null;
+            Target?.CurrentHealthChanged -= OnCurrentHealthChanges;
+            Target = null;
         }
 
-        public override IEffect Clone() => new EvadeFirstDeath(Duration, MaxStacks, PercentHealthToRecover);
+        public override IEffect Copy() => new EvadeFirstDeath(Duration, MaxStacks, PercentHealthToRecover);
     }
 }

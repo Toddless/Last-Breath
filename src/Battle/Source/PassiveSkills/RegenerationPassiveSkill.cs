@@ -17,8 +17,8 @@
 
         private void OnTurnEnd(TurnEndEvent evnt)
         {
-            float healAmount = Owner.Parameters.MaxHealth * PercentFromMaxHealth;
-            Owner?.Heal(healAmount);
+            float healAmount = Owner?.Parameters.MaxHealth * PercentFromMaxHealth ?? 0f;
+            Owner?.Heal(new HealContext(Owner, Owner) { Amount = healAmount });
         }
 
         public override void Detach(IEntity owner)

@@ -2,7 +2,7 @@
 {
     using Battle;
 
-    public record BeforeAttackEvent( IAttackContext Context) : ICombatEvent
+    public record BeforeAttackEvent(IAttackContext Context) : ICombatEvent
     {
     }
 }

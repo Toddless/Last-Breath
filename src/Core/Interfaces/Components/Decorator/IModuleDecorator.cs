@@ -3,13 +3,14 @@
     using System;
     using Enums;
 
-    public interface IModuleDecorator<out TKey, in TModule>
+    public interface IModuleDecorator<TKey, TModule>
         where TKey : struct, Enum
     {
         string Id { get; }
         TKey Parameter { get; }
-        DecoratorPriority Priority { get; }
+        Priority Priority { get; }
 
         void ChainModule(TModule inner);
+        bool IsStronger(IModuleDecorator<TKey, TModule> decorator);
     }
 }

@@ -77,11 +77,12 @@ namespace Battle.Source.Abilities.PoisonExplosion
                     stack.Remove();
             }
 
-            target.TakeDamage(owner, totalDamage, DamageType.Normal, DamageSource.Ability);
+            var context = new DamageContext { Source = owner, Damage = totalDamage, Type = DamageType.Normal, Cause = DamageCause.Ability};
+            target.TakeDamage(context);
 
             // Execute target if stack count exceeds threshold
             if (stackCount > ExecutionThreshold)
-                target.TakeDamage(owner, target.CurrentHealth * 2f, DamageType.Normal, DamageSource.Ability);
+                target.Kill();
         }
 
         private void SpreadPoisonToAllEnemies(
@@ -94,7 +95,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
             {
                 foreach (var stack in originalStacks)
                 {
-                    var clone = (DamageOverTurnEffect)stack.Clone();
+                    var clone = (DamageOverTurnEffect)stack.Copy();
                     clone.Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = InstanceId, Damage = stack.DamagePerTick });
                 }
             }

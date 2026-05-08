@@ -27,7 +27,7 @@
         private void OnAfterAttack(AfterAttackEvent obj)
         {
             Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
-            Owner?.Modifiers.RemoveModifierBySource(Id);
+            Owner?.ParameterModifiers.RemoveModifierBySource(Id);
         }
     }
 }

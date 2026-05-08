@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
+    using System.Collections.Generic;
+    using Core.Interfaces.Events.GameEvents;
 
     public class EchoPassiveSkill(
         float delayedDamagePercent,
@@ -48,8 +48,8 @@
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
+            if (evnt.Context.Result is not AttackResults.Succeed) return;
             var context = evnt.Context;
-            if (context.Result is not AttackResults.Succeed) return;
             float actualDamage = context.FinalDamage * DelayedDamagePercent;
             float toDealLater = context.FinalDamage - actualDamage;
             context.FinalDamage = actualDamage;
@@ -93,7 +93,15 @@
                     _toRemove.Add(source);
             }
 
-            Owner.TakeDamage(Owner, totalDamage, DamageType.Pure, DamageSource.Passive);
+            var context = new DamageContext
+            {
+                Source = Owner,
+                Cause = DamageCause.Passive,
+                Damage = totalDamage,
+                IsCrit = false,
+                Type = DamageType.Pure
+            };
+            Owner.TakeDamage(context);
 
             foreach (IEntity entity in _toRemove)
                 _damageSources.Remove(entity);

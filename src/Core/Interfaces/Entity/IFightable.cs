@@ -20,7 +20,7 @@
         void OnTurnEnd();
         void OnTurnStart();
         Task ReceiveAttack(IAttackContext context);
-        Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false);
+        Task TakeDamage(IDamageContext context);
         IEntity ChoseTarget(List<IEntity> targets);
         void Kill();
     }

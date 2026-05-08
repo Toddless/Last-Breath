@@ -15,6 +15,6 @@
            await  base.Apply(context);
         }
 
-        public override IEffect Clone() => new OnEdgeEffect(Duration, MaxStacks, Status);
+        public override IEffect Copy() => new OnEdgeEffect(Duration, MaxStacks, Status);
     }
 }

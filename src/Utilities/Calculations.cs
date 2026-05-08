@@ -24,8 +24,8 @@
             float baseDamage = context.BaseDamage;
             float additionalDamage = context.AdditionalDamage;
             context.FinalDamage = baseDamage + additionalDamage;
-            if (context.IsCritical)
-                context.FinalDamage *= context.Attacker.Parameters.CriticalDamage;
+            if (context.IsCritical || context.ForceCriticalAttack)
+                context.FinalDamage *= context.RawCriticalDamage;
             float effectiveArmor = context.Target.Parameters.Armor * (1 - context.Attacker.Parameters.ArmorPenetration);
             context.FinalDamage *= 1 - (effectiveArmor / (effectiveArmor + ArmorScalingFactor));
         }

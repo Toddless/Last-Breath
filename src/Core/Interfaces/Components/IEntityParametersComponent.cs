@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using System;
-    using System.Collections.Generic;
-    using Decorator;
     using Enums;
+    using System;
+    using Decorator;
     using Modifiers;
+    using System.Collections.Generic;
 
     public interface IEntityParametersComponent
     {
@@ -35,6 +35,6 @@
         void RemoveModuleDecorator(string id, EntityParameter param);
         float CalculateForBase(EntityParameter parameter, float baseValue);
         void SetBaseValueForParameter(EntityParameter parameter, float baseValue);
-        void OnModifiersChange(object? sender, IModifiersChangedEventArgs args);
+        void OnParameterModifiersChange(object? sender, IModifiersChangedEventArgs args);
     }
 }

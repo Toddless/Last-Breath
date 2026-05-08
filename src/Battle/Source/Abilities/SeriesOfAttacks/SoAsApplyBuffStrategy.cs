@@ -17,12 +17,12 @@
         public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             _successfulAttacks = 0;
-            Subscribe(ability, owner);
+            Subscribe(owner);
             await base.Execute(ability, owner, targets, field);
-            Unsubscribe(owner);
+            Unsubscribe();
         }
 
-        private void Subscribe(SeriesOfAttacks ability, IEntity owner)
+        private void Subscribe(IEntity owner)
         {
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
@@ -38,12 +38,12 @@
         private void ApplyBuff()
         {
             if (_owner == null || _ability == null) return;
-            var copy = toApply.Clone();
+            var copy = toApply.Copy();
             var applyContext = new EffectApplyingContext { Caster = _owner, Target = _owner, Source = _ability.InstanceId };
             copy.Apply(applyContext);
         }
 
-        private void Unsubscribe(IEntity owner)
+        private void Unsubscribe()
         {
             if (_owner == null || _ability == null) return;
             _owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);

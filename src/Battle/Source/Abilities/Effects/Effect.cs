@@ -17,7 +17,7 @@
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         protected EffectApplyingContext? Context { get; private set; }
-        public IEntity? AppliedTo { get; protected set; }
+        public IEntity? Target { get; protected set; }
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
@@ -46,12 +46,26 @@
             Context = context;
             var target = context.Target;
             var caster = context.Caster;
-            AppliedTo = target;
+            Target = target;
             Source = context.Source;
-            AppliedTo.Effects.AddEffect(this);
-            // here we need to notify caster, that he applied some effect. Target will get notified within TryApplyStatusEffect
+            Target.Effects.AddEffect(this);
+            // here we need to notify caster that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (target.TryApplyStatusEffect(Status)) caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
             return Task.CompletedTask;
+        }
+
+        public virtual void Remove()
+        {
+            // effect will be removed form "us" here, so we are publishing event within TryRemoveStatusEffect
+            Target?.TryRemoveStatusEffect(Status);
+            Target?.Effects.RemoveEffect(this);
+            Target = null;
+            Context = null;
+        }
+
+        public virtual void OnStackChanged(int currentStack)
+        {
+
         }
 
         public virtual void TurnEnd()
@@ -77,16 +91,9 @@
 
         public virtual bool IsStronger(IEffect otherEffect) => false;
 
-        public abstract IEffect Clone();
+        public abstract IEffect Copy();
 
-        public virtual void Remove()
-        {
-            // effect will be removed form "us" here, so we are publishing event within TryRemoveStatusEffect
-            AppliedTo?.TryRemoveStatusEffect(Status);
-            AppliedTo?.Effects.RemoveEffect(this);
-            AppliedTo = null;
-            Context = null;
-        }
+
 
         protected virtual string FormatDescription() => Localization.LocalizeDescription(Id);
     }

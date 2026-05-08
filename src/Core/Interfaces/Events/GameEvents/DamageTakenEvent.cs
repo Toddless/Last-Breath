@@ -4,5 +4,5 @@
     using Entity;
     using Enums;
 
-    public record DamageTakenEvent(IEntity From, IEntity DamageTaken, float Damage, DamageType Type, DamageSource Source, bool IsCritical = false) : ICombatEvent, IBattleEvent;
+    public record DamageTakenEvent(IDamageContext Context, IEntity Target) : ICombatEvent, IBattleEvent;
 }

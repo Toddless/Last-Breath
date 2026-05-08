@@ -13,7 +13,6 @@ namespace Battle.Source.Abilities.JarOfPoison
     {
         public override async Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
-            // Apply to all living enemies from the owner's group
             foreach (IEntity target in field.GetEnemies(owner))
             {
                 if (!target.IsAlive) continue;

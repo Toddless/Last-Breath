@@ -5,7 +5,7 @@
 
     public class ChangeValueDecorator(
         EntityParameter parameter,
-        DecoratorPriority priority,
+        Priority priority,
         string id,
         float value)
         : EntityParameterModuleDecorator(parameter, priority, id)

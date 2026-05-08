@@ -21,14 +21,14 @@
         public void OnActivate(IEntity owner)
         {
             foreach (var modifier in _modifiers)
-                owner.Modifiers.AddModifier(modifier);
+                owner.ParameterModifiers.AddModifier(modifier);
             foreach (ISkill passive in _passives)
                 passive.Attach(owner);
         }
 
         public void OnDeactivate(IEntity owner)
         {
-            owner.Modifiers.RemoveModifierBySource(this);
+            owner.ParameterModifiers.RemoveModifierBySource(this);
             _passives.ForEach(x => x.Detach(owner));
         }
     }

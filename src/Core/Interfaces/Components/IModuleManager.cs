@@ -3,7 +3,7 @@
     using System;
     using Decorator;
 
-    public interface IModuleManager<TKey, TModule, in TDecorator>
+    public interface IModuleManager<TKey, TModule, TDecorator>
         where TKey : struct, Enum
         where TModule : class
         where TDecorator : IModuleDecorator<TKey, TModule>

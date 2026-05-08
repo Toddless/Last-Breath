@@ -19,17 +19,17 @@
 
         public override void BeforeAttack(IAttackContext context)
         {
-            if (AppliedTo == null) return;
-            float healthToBurn = AppliedTo.Parameters.MaxHealth * HealthPercent;
-            float currentHealth = AppliedTo.CurrentHealth;
+            if (Target == null) return;
+            float healthToBurn = Target.Parameters.MaxHealth * HealthPercent;
+            float currentHealth = Target.CurrentHealth;
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
-            AppliedTo.TakeDamage(AppliedTo, toBurn, Status.GetDamageType(), DamageSource.Effect);
-            if ((currentHealth - toBurn) <= 1) AppliedTo.Effects.RemoveEffect(this);
+            Target.TakeDamage(new DamageContext { Source = Target, Damage = toBurn, Cause = DamageCause.Effect, Type = Status.GetDamageType() });
+            if ((currentHealth - toBurn) <= 1) Target.Effects.RemoveEffect(this);
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);
 
-        public override IEffect Clone() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);
+        public override IEffect Copy() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);
     }
 }

@@ -17,17 +17,17 @@
 
         public override void TurnEnd()
         {
-            AppliedTo?.Heal(Amount);
+            Target?.Heal(new HealContext(Target, Target) { Amount = Amount });
             base.TurnEnd();
         }
 
         protected override string FormatDescription()
         {
-            float totalRegeneration = AppliedTo?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
+            float totalRegeneration = Target?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
 
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(totalRegeneration));
         }
 
-        public override IEffect Clone() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
+        public override IEffect Copy() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
     }
 }

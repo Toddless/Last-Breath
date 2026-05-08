@@ -22,10 +22,12 @@
         private void OnAfterAttack(DamageTakenEvent evnt)
         {
             if (Owner == null) return;
-            var attacker = evnt.From;
+
+            var attacker = evnt.Context.Source;
             float armorAsDamage = Owner.Parameters.Armor * AdditionalDamageFromArmor;
-            float fromDamageTaken = evnt.Damage * DamagePercentToReturn;
-            attacker.TakeDamage(attacker, armorAsDamage + fromDamageTaken, DamageType.Normal, DamageSource.Passive);
+            float fromDamageTaken = evnt.Context.Damage * DamagePercentToReturn;
+            var context = new DamageContext { Source = attacker, Cause = DamageCause.Passive, Type = DamageType.Normal, Damage = armorAsDamage + fromDamageTaken };
+            attacker.TakeDamage(context);
         }
 
         public override void Detach(IEntity owner)

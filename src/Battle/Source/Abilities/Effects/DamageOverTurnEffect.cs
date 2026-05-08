@@ -26,7 +26,7 @@
 
         public override void TurnEnd()
         {
-            if (Context.HasValue) AppliedTo?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Id, Context.Value.Caster));
+            if (Context.HasValue) Target?.Effects.RegisterDotTick(new DotTick(DamagePerTick, Status, Id, Context.Value.Caster));
             base.TurnEnd();
         }
 
@@ -34,15 +34,15 @@
         {
             if (otherEffect is not DamageOverTurnEffect other) return false;
 
-            return DamagePerTick > other.DamagePerTick;
+            return other.DamagePerTick > DamagePerTick;
         }
 
         protected override string FormatDescription()
         {
-            float damage = AppliedTo?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
+            float damage = Target?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
         }
 
-        public override IEffect Clone() => new DamageOverTurnEffect(Duration, MaxStacks, Status, PercentFromBase);
+        public override IEffect Copy() => new DamageOverTurnEffect(Duration, MaxStacks, Status, PercentFromBase);
     }
 }

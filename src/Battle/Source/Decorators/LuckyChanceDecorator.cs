@@ -4,7 +4,7 @@
     using Core.Enums;
     using Core.Interfaces.Components.Decorator;
 
-    public class LuckyChanceDecorator(DecoratorPriority priority, EntityParameter parameter) : EntityParameterModuleDecorator(parameter, priority, "Lucky_Chance_Decorator")
+    public class LuckyChanceDecorator(Priority priority, EntityParameter parameter) : EntityParameterModuleDecorator(parameter, priority, "Lucky_Chance_Decorator")
     {
         public override float GetValue()
         {

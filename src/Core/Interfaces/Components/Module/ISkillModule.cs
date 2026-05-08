@@ -8,7 +8,7 @@
     {
         SkillType Parameter { get; }
 
-        DecoratorPriority Priority { get; }
+        Priority Priority { get; }
 
         List<ISkill> GetSkills();
     }

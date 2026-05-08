@@ -32,12 +32,12 @@
             int steps = (int)(percentLost / DamageBonus);
             float bonus = 1f + steps * DamageBonus;
             _increaseDamageModifier.Value = bonus;
-            Owner.Modifiers.UpdateModifier(_increaseDamageModifier);
+            Owner.ParameterModifiers.UpdateModifier(_increaseDamageModifier);
         }
 
         public override void Detach(IEntity owner)
         {
-            Owner?.Modifiers.RemoveModifier(_increaseDamageModifier);
+            Owner?.ParameterModifiers.RemoveModifier(_increaseDamageModifier);
             Owner?.CurrentHealthChanged -= OnCurrentHealthChanged;
             Owner = null;
         }

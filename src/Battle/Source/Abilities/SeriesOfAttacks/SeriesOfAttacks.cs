@@ -1,14 +1,13 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using System;
     using Module;
     using Decorators;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;

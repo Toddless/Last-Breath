@@ -1,8 +1,8 @@
 ﻿namespace Core.Enums
 {
-    public enum DamageSource
+    public enum DamageCause
     {
-        Hit,
+        Attack,
         Ability,
         Effect,
         Passive,

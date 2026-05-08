@@ -141,10 +141,10 @@
 
         private void OnDamageTaken(DamageTakenEvent evnt)
         {
-            if (Entity?.InstanceId != evnt.DamageTaken.InstanceId) return;
-            float damage = evnt.Damage;
-            var type = evnt.Type;
-            bool isCrit = evnt.IsCritical;
+            if (Entity?.InstanceId != evnt.Target.InstanceId) return;
+            float damage = evnt.Context.Damage;
+            var type = evnt.Context.Type;
+            bool isCrit = evnt.Context.IsCrit;
 
             var flyNumbers = FlyNumbers.Initialize().Instantiate<FlyNumbers>();
             flyNumbers.PlayDamageNumbers(Mathf.RoundToInt(damage), type, isCrit);

@@ -4,6 +4,6 @@
 
     public interface IModule : IIdentifiable, IDisplayable
     {
-        DecoratorPriority Priority { get; }
+        Priority Priority { get; }
     }
 }

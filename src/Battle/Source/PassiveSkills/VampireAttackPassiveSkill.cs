@@ -17,8 +17,9 @@
 
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
+            if (Owner == null) return;
             float toHeal = evnt.Context.FinalDamage * LeachPercent;
-            Owner?.Heal(toHeal);
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = toHeal });
         }
 
         public override void Detach(IEntity owner)

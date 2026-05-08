@@ -8,7 +8,7 @@
     using Core.Interfaces.Components;
     using System.Collections.Generic;
 
-    public class ModifiersComponent : IModifiersComponent
+    public class ParameterModifiersComponent : IParameterModifiersComponent
     {
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _modifiers = [];
 

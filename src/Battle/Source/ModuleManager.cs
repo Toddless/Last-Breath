@@ -51,18 +51,12 @@
                 _decorators[newDecorator.Parameter] = list;
             }
 
-            // 1. Одинаковые декораторы не добавляются
-            // 2. Если декораторы равны по айди, проверяем их приоритет. Если старый weak новый strong => заменяем старый на новый
-            // 3. Абсолютный декоратор только один для параметра
-            // Check if this type of decorator already in list
             var existing = list.FirstOrDefault(x => x.Id == newDecorator.Id);
             if (existing != null)
             {
-                if (existing.Priority >= newDecorator.Priority)
-                    return;
+                if (existing.IsStronger(newDecorator)) return;
                 list.Remove(existing);
             }
-
 
             list.Add(newDecorator);
             list.Sort((a, b) => a.Priority.CompareTo(b.Priority));

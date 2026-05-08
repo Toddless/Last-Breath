@@ -75,7 +75,7 @@
             RaiseParameterChanges(parameter);
         }
 
-        public void OnModifiersChange(object? sender, IModifiersChangedEventArgs args)
+        public void OnParameterModifiersChange(object? sender, IModifiersChangedEventArgs args)
         {
             var parameter = args.EntityParameter;
             if (!_parameterValues.TryGetValue(parameter, out (float Base, float Current) value)) return;

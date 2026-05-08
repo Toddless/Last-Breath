@@ -7,7 +7,7 @@
         float value,
         EntityParameter parameter,
         string id)
-        : EntityParameterModuleDecorator(parameter, priority: DecoratorPriority.Absolute, id)
+        : EntityParameterModuleDecorator(parameter, priority: Priority.Absolute, id)
     {
         public float Value { get; } = value;
 

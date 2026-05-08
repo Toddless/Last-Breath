@@ -6,7 +6,7 @@
     using Core.Modifiers;
     using Godot;
 
-    public class Intelligence(IModifiersComponent manager) :
+    public class Intelligence(IParameterModifiersComponent manager) :
         EntityAttribute(GetEffects(), manager,  new Modifier(ModifierValueType.Flat, EntityParameter.Intelligence, 0f))
     {
         public override int Total

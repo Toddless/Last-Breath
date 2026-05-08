@@ -11,7 +11,7 @@
     {
         // TODO: Add new effect to attributes (e.g int will give the player increase spell damage) as
         private readonly List<IModifierInstance> _instances = [];
-        private readonly IModifiersComponent _manager;
+        private readonly IParameterModifiersComponent _manager;
         private readonly IModifierInstance _investedAmountModifier;
 
         public abstract int Total { get; set; }
@@ -30,7 +30,7 @@
 
         public IReadOnlyCollection<IModifierInstance> Modifiers => _instances;
 
-        protected EntityAttribute(IEnumerable<IModifier> modifiers, IModifiersComponent manager, IModifier mod)
+        protected EntityAttribute(IEnumerable<IModifier> modifiers, IParameterModifiersComponent manager, IModifier mod)
         {
             _manager = manager;
             _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, this);
