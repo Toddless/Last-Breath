@@ -1,4 +1,4 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.5.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.7.0">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -12,20 +12,12 @@
   <ItemGroup>
     <PackageReference Update="Serilog" Version="4.3.1" />
     <PackageReference Update="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Update="GodotSharp" Version="4.7.0" />
+    <PackageReference Update="Godot.SourceGenerators" Version="4.7.0" />
+    <PackageReference Update="GodotSharpEditor" />
+    <PackageReference Update="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="Godot.SourceGenerators" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharp" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="GodotSharpEditor" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="Newtonsoft.Json" />
   </ItemGroup>
 </Project>

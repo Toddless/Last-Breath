@@ -8,8 +8,6 @@
     using Crafting.Source;
     using Godot;
     using Services;
-    using Source;
-    using Main = Main;
 
     public partial class MainMenu : Control, IInitializable
     {
