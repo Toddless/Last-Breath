@@ -22,9 +22,8 @@ namespace Battle.Source.Abilities.JarOfPoison
         float weaponDamageScale,
         float spellDamageScale,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.Target)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType, abilityType)
+        Costs costType = Costs.Mana)
+        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
 
@@ -70,6 +69,8 @@ namespace Battle.Source.Abilities.JarOfPoison
 
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
+
+        public override IAbility Copy() => new JarOfPoison(Id, Tags, (int)Cooldown, CostValue, PoisonDuration, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             ExecutionStrategy.Execute(this, owner, targets, field);

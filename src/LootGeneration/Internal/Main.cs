@@ -5,12 +5,12 @@ namespace LootGeneration.Internal
     using System;
     using Services;
     using Core.Data;
-    using Spawner = temp.Spawner;
+    using Spawner = Internal.Spawner;
     using Core.Interfaces.Events;
 
     internal partial class Main : Node2D
     {
-        private readonly Spawner _spawner = new();
+        private readonly Internal.Spawner _spawner = new();
         private readonly IGameServiceProvider _gameServiceProvider = GameServiceProvider.Instance;
         [Export] private MainWorld? _mainWorld;
         [Export] LootGenerationHud? _lootGenerationHud;

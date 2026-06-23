@@ -1,13 +1,14 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
     using Godot;
+    using Utilities;
     using Core.Enums;
+    using System.Linq;
     using System.Threading;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
-    using System.Linq;
     using Core.Interfaces.Battle;
+    using System.Collections.Generic;
 
     public class IpDefaultExecutionStrategy(List<IAttackModifier> modifiers) : IIpExecutionStrategy
     {
@@ -47,9 +48,7 @@
                         modifier.Apply(context, meta);
 
                     if (!context.Schedule()) break;
-                    await foreach (var _ in scheduler.RunQueue(cts.Token))
-                    {
-                    }
+                    await scheduler.DrainQueue(cts.Token);
 
                     if (context.Result is AttackResults.Succeed) increase += ability.IncreaseAttackDamage;
                 }

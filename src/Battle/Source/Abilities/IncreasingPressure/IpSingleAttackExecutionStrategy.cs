@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Core.Interfaces.Battle;
+    using Utilities;
 
     public class IpSingleAttackExecutionStrategy(List<IAttackModifier> modifiers) : IIpExecutionStrategy
     {
@@ -40,9 +41,7 @@
                     attackModifier.Apply(context, meta);
 
                 if (!context.Schedule()) break;
-                await foreach (var _ in scheduler.RunQueue(cts.Token))
-                {
-                }
+                await scheduler.DrainQueue(cts.Token);
             }
         }
 

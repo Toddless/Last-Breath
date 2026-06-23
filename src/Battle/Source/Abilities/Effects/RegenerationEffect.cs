@@ -10,14 +10,16 @@
         float amount,
         int duration,
         int maxStacks,
+        bool isPercent = false,
         StatusEffects statusEffect = StatusEffects.Regeneration)
         : Effect(id: "Effect_Regeneration", duration, maxStacks, statusEffect)
     {
+        public bool IsPercent => isPercent;
         public float Amount { get; } = amount;
 
         public override void TurnEnd()
         {
-            Target?.Heal(new HealContext(Target, Target) { Amount = Amount });
+            Target?.Heal(!isPercent ? new HealContext(Target, Target) { Amount = Amount } : new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * Amount });
             base.TurnEnd();
         }
 
@@ -28,6 +30,6 @@
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(totalRegeneration));
         }
 
-        public override IEffect Copy() => new RegenerationEffect(Amount, Duration, MaxStacks, Status);
+        public override IEffect Copy() => new RegenerationEffect(Amount, Duration, MaxStacks, IsPercent, Status);
     }
 }

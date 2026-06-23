@@ -10,7 +10,7 @@
         public override void ApplyUpgrade(SeriesOfAttacks ability)
         {
             _previousStrategy = ability.ExecutionStrategy;
-            ability.ExecutionStrategy = new SoAsPoisonOnAttackExecutionStrategy(poisonDuration, 999);
+            ability.ExecutionStrategy = new SoAsPoisonOnAttackExecutionStrategy(poisonDuration);
         }
 
         public override void RemoveUpgrade(SeriesOfAttacks ability)

@@ -24,9 +24,8 @@
         float spellDamageScale,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         float damageMultiplier = 1,
-        Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.Target)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType, abilityType)
+        Costs costType = Costs.Mana)
+        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
@@ -78,6 +77,9 @@
 
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
+
+        public override IAbility Copy() =>
+            new SeriesOfAttacks(Id, Tags, (int)Cooldown, CostValue, MinAttacks, MaxAttacks, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, DamageMultiplier, CostType);
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
     }

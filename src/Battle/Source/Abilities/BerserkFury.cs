@@ -17,7 +17,6 @@
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
-
         private async Task PerformMultipleAttacks(List<IEntity> targets)
         {
             if (Owner == null) return;
@@ -44,5 +43,7 @@
                     break;
             }
         }
+
+        public override IAbility Copy() => new BerserkFury(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, CostType);
     }
 }

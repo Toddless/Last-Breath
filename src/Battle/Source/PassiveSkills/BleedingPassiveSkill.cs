@@ -18,7 +18,7 @@
             PercentFromDamage = percentFromDamage;
             MaxStack = maxStack;
             BleedDuration = bleedDuration;
-            _damageOverTurnEffect = new DamageOverTurnEffect(BleedDuration, MaxStack, StatusEffects.Bleed, PercentFromDamage);
+            _damageOverTurnEffect = new DamageOverTurnEffect(BleedDuration, StatusEffects.Bleed, MaxStack, PercentFromDamage);
         }
 
         public float PercentFromDamage { get; }

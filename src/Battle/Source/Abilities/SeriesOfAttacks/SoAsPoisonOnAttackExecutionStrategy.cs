@@ -1,15 +1,18 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
+    using Godot;
+    using System;
     using Effects;
+    using Utilities;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Events.GameEvents;
 
-    public class SoAsPoisonOnAttackExecutionStrategy(int duration, int stacks) : SoAsDefaultExecutionStrategy
+    public class SoAsPoisonOnAttackExecutionStrategy(int duration) : SoAsDefaultExecutionStrategy
     {
         private SeriesOfAttacks? _ability;
         private IEntity? _owner;
@@ -21,20 +24,28 @@
             Unsubscribe(owner);
         }
 
-        private void OnAfterAttack(AfterAttackEvent obj)
+        private async void OnAfterAttack(AfterAttackEvent obj)
         {
-            if (_ability == null || _owner == null) return;
-            var context = obj.Context;
-            var poison = new DamageOverTurnEffect(duration, stacks, StatusEffects.Poison);
-            var applyContext = new EffectApplyingContext
+            try
             {
-                Caster = _owner,
-                Target = context.Target,
-                Source = _ability.InstanceId,
-                Damage = context.FinalDamage,
-                IsCritical = context.IsCritical
-            };
-            poison.Apply(applyContext);
+                if (_ability == null || _owner == null) return;
+                var context = obj.Context;
+                var poison = new DamageOverTurnEffect(duration, StatusEffects.Poison);
+                var applyContext = new EffectApplyingContext
+                {
+                    Caster = _owner,
+                    Target = context.Target,
+                    Source = _ability.InstanceId,
+                    Damage = context.FinalDamage,
+                    IsCritical = context.IsCritical
+                };
+                await poison.Apply(applyContext);
+            }
+            catch (Exception ex)
+            {
+                GD.Print($"Failed to apply poison: {ex.Message}, {ex.StackTrace}");
+                Tracker.TrackException("Failed to apply poison", ex, this);
+            }
         }
 
         private void Subscribe(SeriesOfAttacks ability, IEntity owner)

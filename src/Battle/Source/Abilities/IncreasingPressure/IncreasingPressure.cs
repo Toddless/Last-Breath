@@ -77,6 +77,9 @@
             AbilityParametersModuleManager.RemoveDecorator(id, pKey);
         }
 
+        public override IAbility Copy() => new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale, maxAttacks, IncreaseAttackDamage,
+            Upgrades, CostType);
+
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);
 

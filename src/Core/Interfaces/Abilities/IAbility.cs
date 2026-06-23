@@ -20,7 +20,8 @@
         bool IsEvadable { get; set; }
         IEffect? Effect { get; set; }
         Costs CostType { get; }
-        AbilityType AbilityType { get; }
+        Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
+        Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }
 
         event Action<Enum>? OnParameterChanged;
@@ -28,11 +29,11 @@
         event Action<IAbility, int>? CooldownLeftChanges;
 
         Task Execute(List<IEntity> targets, IBattleField field);
-
         void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator) where T : struct, Enum;
         void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;
         void SetOwner(IEntity owner);
         bool IsEnoughResource();
         void RemoveOwner();
+        IAbility Copy();
     }
 }

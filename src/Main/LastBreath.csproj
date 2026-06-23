@@ -6,6 +6,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <UserSecretsId>0132e77a-2c43-41e0-acc0-5791c77b2d87</UserSecretsId>
     <Configurations>Debug;ExportDebug;ExportRelease;Release</Configurations>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <LangVersion>14</LangVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -30,8 +31,5 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="GodotSharpEditor" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="temp\" />
   </ItemGroup>
 </Project>

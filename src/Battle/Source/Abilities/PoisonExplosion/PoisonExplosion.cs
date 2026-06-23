@@ -31,8 +31,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
             weaponDamageScale: 0,
             spellDamageScale: 0,
             upgrades,
-            costType,
-            AbilityType.Target)
+            costType)
     {
         public int ExecutionThreshold { get; set; } = executionThreshold;
         public float DamageMultiplier { get; set; } = damageMultiplier;
@@ -42,6 +41,8 @@ namespace Battle.Source.Abilities.PoisonExplosion
 
         /// <summary>When true (L3 upgrade), spreads poison to all enemies instead of exploding on one.</summary>
         public bool SpreadMode { get; set; } = false;
+
+        public override IAbility Copy() => new PoisonExplosion(Tags, (int)Cooldown, CostValue, ExecutionThreshold, DamageMultiplier, Upgrades, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {
@@ -77,7 +78,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                     stack.Remove();
             }
 
-            var context = new DamageContext { Source = owner, Damage = totalDamage, Type = DamageType.Normal, Cause = DamageCause.Ability};
+            var context = new DamageContext { Source = owner, Damage = totalDamage, Type = DamageType.Normal, Cause = DamageCause.Ability };
             target.TakeDamage(context);
 
             // Execute target if stack count exceeds threshold

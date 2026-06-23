@@ -1,11 +1,15 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
+    using Module;
     using Core.Enums;
+    using Decorators;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Abilities;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Components;
+    using System.Collections.Generic;
+    using Core.Interfaces.Components.Module;
 
     /// <summary>
     /// Self-cast defensive ability. Applies LightStep evasion stacks and percentage health regeneration.
@@ -15,9 +19,10 @@ namespace Battle.Source.Abilities.DarkShroud
         string[] tags,
         int cooldown,
         int costValue,
+        float buffDuration,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        Costs costType = Costs.Mana,
-        AbilityType abilityType = AbilityType.SelfCast)
+        float buffEffectiveness = 1f,
+        Costs costType = Costs.Mana)
         : Ability(
             id: "Ability_Dark_Shroud",
             tags,
@@ -27,13 +32,37 @@ namespace Battle.Source.Abilities.DarkShroud
             weaponDamageScale: 0,
             spellDamageScale: 0,
             upgrades,
-            costType,
-            abilityType)
+            costType)
     {
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
+
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
-            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Damage = 0 };
-            return Task.CompletedTask;
+            get
+            {
+                if (field != null) return field;
+                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
+                {
+                    [Parameters.Duration] = new Module<Parameters>(() => buffDuration, Parameters.Duration),
+                    [Parameters.Effectiveness] = new Module<Parameters>(() => buffEffectiveness, Parameters.Effectiveness),
+                });
+                return field;
+            }
         }
+
+        public IDarkShroudExecutionStrategy ExecutionStrategy { get; set; } = new DefaultExecutionStrategy();
+        public float BuffDuration => this[Parameters.Duration];
+        public float BuffEffectiveness => this[Parameters.Effectiveness];
+
+
+        public enum Parameters
+        {
+            Effectiveness,
+            Duration,
+        }
+
+        public override IAbility Copy() => new DarkShroud(Tags, (int)Cooldown, CostValue, BuffEffectiveness, Upgrades, BuffDuration, CostType);
+
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => ExecutionStrategy.Execute(targets, owner, field);
     }
 }

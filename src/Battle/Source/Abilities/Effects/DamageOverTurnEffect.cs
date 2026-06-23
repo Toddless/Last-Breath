@@ -10,8 +10,8 @@
 
     public class DamageOverTurnEffect(
         int duration,
-        int maxStacks = 999,
         StatusEffects statusEffect = StatusEffects.None,
+        int maxStacks = 999,
         float percentFromDamage = 0.7f)
         : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect)
     {
@@ -43,6 +43,6 @@
             return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
         }
 
-        public override IEffect Copy() => new DamageOverTurnEffect(Duration, MaxStacks, Status, PercentFromBase);
+        public override IEffect Copy() => new DamageOverTurnEffect(Duration, Status, MaxStacks, PercentFromBase) { DamagePerTick = DamagePerTick };
     }
 }

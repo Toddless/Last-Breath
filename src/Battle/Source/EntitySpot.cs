@@ -135,7 +135,6 @@
         private void OnPlayerSelectingAbilityTarget(PlayerSelectingTargetForAbilityEvent evnt)
         {
             if (Entity == null || _stateMachine.State is State.CannotBeSelected) return;
-            if (evnt.Ability.AbilityType is AbilityType.SelfCast) return;
             _stateMachine.Fire(_candidateForAbility, evnt.SelectionId);
         }
 

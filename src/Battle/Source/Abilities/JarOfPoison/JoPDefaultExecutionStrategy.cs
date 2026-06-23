@@ -24,7 +24,7 @@ namespace Battle.Source.Abilities.JarOfPoison
 
             var effect = ability.Effect?.Copy();
             var context = new EffectApplyingContext { Caster = owner, Target = target, Source = ability.InstanceId, Damage = damage };
-            var poison = new DamageOverTurnEffect(ability.PoisonDuration, 999, StatusEffects.Poison);
+            var poison = new DamageOverTurnEffect(ability.PoisonDuration, StatusEffects.Poison);
             await poison.Apply(context);
             if (effect == null) return;
             await effect.Apply(context);

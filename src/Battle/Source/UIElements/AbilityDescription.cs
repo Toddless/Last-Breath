@@ -19,7 +19,6 @@
             SetAbilityName(ability.DisplayName);
             SetDescription(ability.Description);
 
-            SetAbilityParameter(Localization.Localize("Type"), Localization.Localize(ability.AbilityType.ToString()));
             SetAbilityParameter(Localization.Localize("Cost"), ability.CostValue.ToString());
             SetAbilityParameter(Localization.Localize("Resource"), Localization.Localize(ability.CostType.ToString()));
         }

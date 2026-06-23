@@ -1,14 +1,10 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Module;
+    using Godot;
     using Utilities;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Battle;
-    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Godot;
 
     public class Fireball : Ability
     {
@@ -34,6 +30,8 @@
 
         public float Damage => this[AbilityParameter.Damage];
 
+
+        public override IAbility Copy() => new Fireball(Tags, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale, _baseCriticalChance, CostValue, Upgrades, CostType);
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, Damage);
 

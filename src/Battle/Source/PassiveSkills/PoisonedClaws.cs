@@ -11,17 +11,15 @@
     {
         private readonly DamageOverTurnEffect _damageOverTurnEffect;
 
-        public PoisonedClaws(float percentFormDamageToDealAsPoison, int poisonDuration, int stacks)
+        public PoisonedClaws(float percentFormDamageToDealAsPoison, int poisonDuration)
             : base(id: "Passive_Skill_Poisoned_Claws")
         {
             PercentToDealAsPoison = percentFormDamageToDealAsPoison;
             PoisonDuration = poisonDuration;
-            PoisonStacks = stacks;
-            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, PoisonStacks, StatusEffects.Poison, PercentToDealAsPoison);
+            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison, 999,PercentToDealAsPoison);
         }
 
         public int PoisonDuration { get; }
-        public int PoisonStacks { get; }
         public float PercentToDealAsPoison { get; }
 
         public override void Attach(IEntity owner)
@@ -46,7 +44,7 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new PoisonedClaws(PercentToDealAsPoison, PoisonDuration, PoisonStacks);
+        public override ISkill Copy() => new PoisonedClaws(PercentToDealAsPoison, PoisonDuration);
 
         public override bool IsStronger(ISkill skill)
         {

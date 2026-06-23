@@ -1,9 +1,7 @@
 namespace LootGeneration.Internal
 {
-    using temp;
     using Godot;
     using System;
-    using Source;
     using Core.Enums;
     using System.Linq;
     using System.Globalization;

@@ -41,7 +41,7 @@ namespace Battle.Source.Abilities.PoisonCoating
             for (int i = 0; i < extraStacks; i++)
             {
                 var poison = new Battle.Source.Abilities.Effects.DamageOverTurnEffect(
-                    _ability.PoisonDuration, 999, StatusEffects.Poison, _ability.PoisonDamagePercent);
+                    _ability.PoisonDuration, StatusEffects.Poison, 999, _ability.PoisonDamagePercent);
                 poison.Apply(new EffectApplyingContext
                 {
                     Caster = _owner,

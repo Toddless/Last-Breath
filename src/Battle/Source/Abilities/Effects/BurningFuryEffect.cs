@@ -21,8 +21,8 @@
             if (Target == null) return;
             var burnEffect = new DamageOverTurnEffect(
                 BurningDuration,
-                BurningMaxStacks,
                 StatusEffects.Burning,
+                BurningMaxStacks,
                 HealthAsDamageMultiplier);
 
             burnEffect.Apply(new EffectApplyingContext

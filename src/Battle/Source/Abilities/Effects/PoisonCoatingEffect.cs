@@ -23,7 +23,7 @@ namespace Battle.Source.Abilities.Effects
             if (Target == null) return;
             if (context.Result != AttackResults.Succeed) return;
 
-            var poison = new DamageOverTurnEffect(PoisonDuration, 999, StatusEffects.Poison, PoisonDamagePercent);
+            var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison, 999, PoisonDamagePercent);
             var applyContext = new EffectApplyingContext
             {
                 Caster = Target,

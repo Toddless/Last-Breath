@@ -8,6 +8,6 @@
         void RemoveUpgrade(T ability);
         void ApplyUpgrade(T ability);
 
-        IAbilityUpgradeWrap<T> Clone();
+        IAbilityUpgrade Clone();
     }
 }

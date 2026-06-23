@@ -34,8 +34,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
             weaponDamageScale: 0,
             spellDamageScale: 0,
             upgrades,
-            costType,
-            AbilityType.SelfCast)
+            costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
@@ -81,6 +80,8 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
+
+        public override IAbility Copy() => new CriticalCalculation(Tags, (int)Cooldown, CostValue, BuffStacks, BuffDuration, Upgrades, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {

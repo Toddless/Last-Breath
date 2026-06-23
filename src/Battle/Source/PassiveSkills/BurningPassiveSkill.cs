@@ -16,7 +16,7 @@
             PercentFromDamage = percentFromDamage;
             BurningDuration = burningDuration;
             BurningStacks = burningStacks;
-            _damageOverTurnEffect = new DamageOverTurnEffect(BurningDuration, BurningStacks, StatusEffects.Burning, PercentFromDamage);
+            _damageOverTurnEffect = new DamageOverTurnEffect(BurningDuration, StatusEffects.Burning,BurningStacks, PercentFromDamage);
         }
 
         public float PercentFromDamage { get; }

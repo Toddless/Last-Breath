@@ -1,6 +1,5 @@
 ﻿namespace LootGeneration.Internal
 {
-    using temp;
     using System;
     using Core.Data;
     using Core.Enums;

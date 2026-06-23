@@ -6,9 +6,7 @@
     using Core.Enums;
     using Core.Interfaces.UI;
     using Core.Interfaces.Events;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
-    using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
 
     public partial class AbilitySlot : Control, IInitializable
@@ -111,7 +109,7 @@
             switch (_stateMachine.State)
             {
                 case State.Ready:
-                    _stateMachine.Fire(_ability!.AbilityType is AbilityType.SelfCast ? Trigger.Activate : Trigger.SelectingTargets);
+                    _stateMachine.Fire(Trigger.SelectingTargets);
                     break;
                 case State.SelectingTargets:
                     _stateMachine.Fire(Trigger.Activate);
