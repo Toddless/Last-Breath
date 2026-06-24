@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://chwl8e6atuhnk"]
+[gd_scene format=3 uid="uid://chwl8e6atuhnk"]
 
-[ext_resource type="Script" uid="uid://bxan30mssbocw" path="res://Addons/Battle/EntitySpot.cs" id="1_ejhmn"]
+[ext_resource type="Script" uid="uid://borfi3kktmwih" path="res://Source/EntitySpot.cs" id="1_ejhmn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ejhmn"]
 radius = 125.0

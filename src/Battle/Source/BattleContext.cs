@@ -10,12 +10,13 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using System.Collections.Generic;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Enums;
 
     internal class BattleContext : IBattleContext
     {
-        private readonly IBattleEventBus _localBus;
+        private readonly BattleExperienceProcessor _battleExperienceProcessor;
         private readonly IUiElementsManager _uiElementManager;
+        private readonly IBattleEventBus _localBus;
         private readonly BattleArena _battleArena;
         private readonly List<IEntity> _entities;
         private readonly Node2D _mainWorld;
@@ -30,12 +31,13 @@
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
             _localBus = new BattleEventBus();
             _battleArena.SetupEventBus(_localBus);
+            _battleExperienceProcessor = new BattleExperienceProcessor(_localBus, provider);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);
             RemoveParticipantFromWorld();
         }
 
-        public async Task RunBattleAsync()
+        public async Task<BattleResults> RunBattleAsync()
         {
             var battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
             await battleHud.SetupEventBus(_localBus);
@@ -44,12 +46,14 @@
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);
 
             _battleArena.SetPlayer(_player);
-            await _battleArena.StartFight(_entities);
+            if (!_battleArena.PrepareBattleArena(_entities)) return await Task.FromResult(BattleResults.BattleAbandoned);
+            return await _battleArena.RunBattleAsync();
         }
 
         public void Dispose()
         {
             ReturnParticipantsToWorld();
+            _battleExperienceProcessor.Dispose();
             _battleArena.QueueFree();
             _localBus.Dispose();
         }
@@ -65,8 +69,6 @@
                     if (!entity.IsAlive || entity is not Node2D asNode) continue;
                     _mainWorld.AddChild(asNode);
                 }
-
-                _localBus.Publish(new BattleEndEvent());
             }
             catch (Exception ex)
             {

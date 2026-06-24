@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://6d0sr4hy4gg2"]
+[gd_scene format=3 uid="uid://6d0sr4hy4gg2"]
 
-[ext_resource type="Script" uid="uid://mk4qyq8sfr02" path="res://Addons/Battle/UIElements/BattleHud.cs" id="1_qll2p"]
-[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Addons/Battle/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
+[ext_resource type="Script" uid="uid://cdpdw7f753nlg" path="res://Source/UIElements/BattleHud.cs" id="1_qll2p"]
+[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Source/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
 
 [node name="BattleHud" type="Control" node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_entityBars", "_abilitySlots")]
 layout_mode = 3

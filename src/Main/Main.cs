@@ -32,7 +32,7 @@
                 manager.ChangeHud(typeof(PlayerHud));
                 _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_mainWorld);
                 _gameEventBus = _provider.GetService<IGameEventBus>();
-                _gameEventBus.Subscribe<BattleStartEvent>(OnBattleInitialized);
+                _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
             }
             catch (Exception ex)
             {
@@ -40,16 +40,16 @@
             }
         }
 
-        private async void OnBattleInitialized(BattleStartEvent evnt)
+        private async void OnBattleInitialized(BattleInitializedEvent evnt)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(_mainWorld);
                 var context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
                 await ToSignal(GetTree(), "process_frame");
-                await context.RunBattleAsync();
+                var result = await context.RunBattleAsync();
                 context.Dispose();
-                _gameEventBus?.Publish(new BattleEndEvent());
+                _gameEventBus?.Publish(new BattleEndEvent(result));
             }
             catch (Exception es)
             {

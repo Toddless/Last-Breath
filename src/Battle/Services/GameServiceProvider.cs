@@ -8,6 +8,7 @@ namespace Battle.Services
     using System.Collections.Generic;
     using Core.Interfaces.MessageBus;
     using Microsoft.Extensions.DependencyInjection;
+    using Source;
 
     internal class GameServiceProvider : IGameServiceProvider
     {
@@ -34,7 +35,12 @@ namespace Battle.Services
                 return instance;
             });
             services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IUiElementsManager, UiElementManager>();
+            services.AddSingleton<IUiElementsManager, UiElementManager>(_ =>
+            {
+                var instance = new UiElementManager(this);
+                return instance;
+            });
+            services.AddBattleSystemModuleDependencies();
             return services.BuildServiceProvider();
         }
     }

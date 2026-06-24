@@ -34,8 +34,6 @@
         private const int BaseExp = 50;
         // ---------------------------------------------------------
 
-        private int _currentLevel = 1;
-
         // TODO: Same
         // ________________________________________________________
         // Level one probabilities
@@ -52,12 +50,26 @@
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
 
-        public int CurrentExperience { get; private set; }
+        public int CurrentExperience
+        {
+            get;
+            private set
+            {
+                if (value == field) return;
+                field = value;
+                ExperienceChange?.Invoke(field);
+            }
+        }
 
         public int CurrentLevel
         {
-            get => _currentLevel + BonusLevel;
-            private set => _currentLevel = value;
+            get => field + BonusLevel;
+            private set
+            {
+                if (value == field) return;
+                field = value;
+                CurrentLevelChange?.Invoke(field);
+            }
         }
 
         public int BonusLevel
@@ -79,14 +91,18 @@
             if (amount <= 0) return;
             CurrentExperience += amount;
             ExperienceChange?.Invoke(CurrentExperience);
-            if (_currentLevel >= MaxLevel) return;
+            if (CurrentLevel >= MaxLevel) return;
             CheckForLevelUp();
         }
+
+        public void AddBonusLevel() => BonusLevel++;
+
+        public void RemoveBonusLevel() => BonusLevel--;
         // TODO: Мастери должно влиять так же на шансы получить более редкий модификатор при рекрафте
         // Позднее возможно так же добавить шансы на получение более редких способностей
         // Сюда же шансы на апгрейд предметов
 
-        public int ExpToNextLevelRemain() => _currentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(_currentLevel) - CurrentExperience);
+        public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
 
         public float GetCurrentSkillChance(float skillBonus = 0)
         {
@@ -163,14 +179,14 @@
 
         private void CheckForLevelUp()
         {
-            while (_currentLevel < MaxLevel)
+            while (CurrentLevel < MaxLevel)
             {
-                int need = ExpToNextLevel(_currentLevel);
+                int need = ExpToNextLevel(CurrentLevel);
                 if (CurrentExperience >= need)
                 {
                     CurrentExperience -= need;
-                    _currentLevel++;
-                    gameMessageBus.PublishMessageAsync(new SendNotificationMessageMessage($"Crafting Mastery reached lvl: {_currentLevel}"));
+                    CurrentLevel++;
+                    gameMessageBus.PublishMessageAsync(new SendNotificationMessageMessage($"Crafting Mastery reached lvl: {CurrentLevel}"));
                 }
                 else
                     break;
@@ -206,6 +222,6 @@
         }
 
         private float GetProgressFactor() =>
-            Mathf.Clamp((_currentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
+            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
     }
 }

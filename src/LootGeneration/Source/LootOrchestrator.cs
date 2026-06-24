@@ -3,6 +3,7 @@ namespace LootGeneration.Source
     using Godot;
     using System;
     using Utilities;
+    using Core.Enums;
     using System.Linq;
     using Core.Interfaces.Items;
     using Core.Interfaces.Events;
@@ -23,7 +24,7 @@ namespace LootGeneration.Source
             _rnd = rnd;
             _lootGenerationService = lootGenerationService;
             gameEventBus.Subscribe<EntityDiedEvent>(OnEntityDied);
-            gameEventBus.Subscribe<BattleStartEvent>(OnBattleStart);
+            gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleStart);
             gameEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
@@ -33,6 +34,7 @@ namespace LootGeneration.Source
         {
             try
             {
+                if (obj.Results is not BattleResults.PlayerWon) return;
                 foreach (var item in _itemOnGroundsCache)
                 {
                     _floor?.AddChild(item);
@@ -49,7 +51,7 @@ namespace LootGeneration.Source
             }
         }
 
-        private void OnBattleStart(BattleStartEvent obj)
+        private void OnBattleStart(BattleInitializedEvent obj)
         {
             if (obj.Player is CharacterBody2D player)
                 _startPosition = player.Position;

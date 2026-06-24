@@ -1,4 +1,6 @@
 ﻿namespace Core.Interfaces.Events.GameEvents
 {
-    public record BattleEndEvent : IGameEvent, IBattleEvent;
+    using Enums;
+
+    public record BattleEndEvent(BattleResults Results) : IGameEvent, IBattleEvent;
 }

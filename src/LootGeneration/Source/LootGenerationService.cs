@@ -22,6 +22,7 @@ namespace LootGeneration.Source
         private readonly IGameMessageBus _gameMessageBus;
         private readonly IGameEventBus _gameEventBus;
         private readonly IItemCreationService _itemCreationService;
+        private readonly List<string> _diedEntities = [];
         private ILootConfiguration _configuration;
 
         public LootGenerationService(
@@ -43,7 +44,7 @@ namespace LootGeneration.Source
 
         public async Task<List<ItemStack>> GenerateItemsAsync(IEntity diedEntity)
         {
-            if (diedEntity is not INpc npc) return [];
+            if (diedEntity is not INpc npc || _diedEntities.Contains(diedEntity.InstanceId)) return [];
 
             float budget = CalculateBudget(npc);
 
@@ -63,7 +64,7 @@ namespace LootGeneration.Source
 
             var chosenItemsIds = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable);
             chosenItemsIds.AddRange(context.GuaranteedItems);
-
+            _diedEntities.Add(diedEntity.InstanceId);
             return GenerateChosenItems(actualRarityChances, context, chosenItemsIds);
         }
 
@@ -176,7 +177,11 @@ namespace LootGeneration.Source
 
         private TableRecord? FindFirstSuitableItem(List<TableRecord> tableRecords, float budget) => tableRecords.FirstOrDefault(x => x.Price >= budget);
 
-        private void OnBattleEnds(BattleEndEvent obj) => _tableCache.Clear();
+        private void OnBattleEnds(BattleEndEvent obj)
+        {
+            _tableCache.Clear();
+            _diedEntities.Clear();
+        }
 
         private float[] CopyBaseChances(float[] baseChancesToCopy)
         {

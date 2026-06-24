@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bcj35twqggu1d"]
+[gd_scene format=3 uid="uid://bcj35twqggu1d"]
 
-[ext_resource type="Script" uid="uid://cbmhijfsw13a3" path="res://Addons/Battle/BattleArena.cs" id="1_ggikp"]
-[ext_resource type="PackedScene" uid="uid://chwl8e6atuhnk" path="res://Addons/Battle/EntitySpot.tscn" id="2_vrr7q"]
+[ext_resource type="Script" uid="uid://cbv0p52cgcqon" path="res://Source/BattleArena.cs" id="1_ggikp"]
+[ext_resource type="PackedScene" uid="uid://chwl8e6atuhnk" path="res://Source/EntitySpot.tscn" id="2_vrr7q"]
 
 [node name="BattleArena" type="Node2D" node_paths=PackedStringArray("_spots", "_playerSpot")]
 script = ExtResource("1_ggikp")

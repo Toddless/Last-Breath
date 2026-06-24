@@ -79,7 +79,6 @@ namespace LastBreath.Npc
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
-
         public int Level { get; } = 150;
         public Rarity Rarity { get; } = Rarity.Legendary;
         public EntityType EntityType { get; } = EntityType.Regular;
@@ -358,7 +357,7 @@ namespace LastBreath.Npc
                                 fighters.Add(this);
 
                             // _stateMachine.Fire(Trigger.Battle);
-                            _gameEventBus?.Publish(new BattleStartEvent(player, fighters));
+                            _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
                             break;
                         }
                     case IFightable fighter:

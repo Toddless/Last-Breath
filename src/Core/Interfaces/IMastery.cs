@@ -11,6 +11,8 @@
         event Action<int>? BonusLevelChange, ExperienceChange, CurrentLevelChange;
 
         void AddExperience(int experience);
+        void AddBonusLevel();
+        void RemoveBonusLevel();
         int ExpToNextLevelRemain();
     }
 }

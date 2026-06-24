@@ -1,11 +1,9 @@
 ﻿namespace Battle.Source
 {
-    using Abilities;
-    using Abilities.Effects;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Modifiers;
     using PassiveSkills;
+    using Core.Modifiers;
+    using Core.Interfaces.Entity;
 
     public class StrengthStance(IEntity owner)
         : StanceBase(owner, effect: new StanceActivationEffect([new TrappedBeastPassiveSkill(0.05f, 0.05f)],

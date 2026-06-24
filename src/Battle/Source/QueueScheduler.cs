@@ -8,7 +8,7 @@
 
     public class QueueScheduler
     {
-        private readonly StatusEffects _skipTurnEffect = StatusEffects.Stun | StatusEffects.Freeze;
+        private const StatusEffects SkipTurnEffect = StatusEffects.Stun | StatusEffects.Freeze;
         private Queue<IEntity> FighterQueue { get; } = new();
 
         public event Action? QueueContainLessThenTwoFighters;
@@ -18,7 +18,7 @@
             var orderedFighters = fighters.OrderBy(entity => entity.Dexterity.Total).ToList();
             foreach (var fighter in orderedFighters)
             {
-                if ((fighter.StatusEffects & _skipTurnEffect) != 0 || !fighter.IsAlive) continue;
+                if ((fighter.StatusEffects & SkipTurnEffect) != 0 || !fighter.IsAlive) continue;
                 FighterQueue.Enqueue(fighter);
             }
 

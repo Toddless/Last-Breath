@@ -4,6 +4,7 @@
     using System;
     using Core.Data;
     using Utilities;
+    using Core.Enums;
     using System.Linq;
     using Core.Interfaces;
     using Godot.Collections;
@@ -23,7 +24,8 @@
         private readonly QueueScheduler _queueScheduler = new();
         private IBattleEventBus? _battleEventBus;
         private List<IEntity> _fighters = [];
-        private int _playerEnemiesCount;
+        private int _playersEnemiesCount;
+        private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
         private IPlayer? _player;
@@ -87,9 +89,36 @@
             _player = p;
         }
 
-        public async Task StartFight(List<IEntity> fighters)
+        public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
+        public Vector2 GetCameraPosition() => GlobalPosition;
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        public IReadOnlyList<IEntity> GetEnemies(IEntity entity) => throw new NotImplementedException();
+
+        // how I can define with entity is an enemy/ally to player or each other?
+        public IReadOnlyList<IEntity> GetAllies(IEntity entity) => throw new NotImplementedException();
+
+        public IReadOnlyList<IEntity> GetAll() => _fighters.Where(x => x.IsAlive).ToList();
+
+        public IEntity GetRandomEntity(IEntity entity)
         {
-            ArgumentNullException.ThrowIfNull(_battleEventBus);
+            var alive = _fighters.Where(x => x.IsAlive).ToList();
+
+            return alive[_rnd.RandiRange(0, alive.Count - 1)];
+        }
+
+        public void RemoveAliveEntitiesFromArena()
+        {
+            foreach (var spot in _spots)
+                spot.RemoveEntityFromSpot();
+        }
+
+        public IEntity GetRandomAlly(IEntity entity) => throw new NotImplementedException();
+
+        public bool PrepareBattleArena(List<IEntity> fighters)
+        {
+            if (_battleEventBus == null) return false;
             int enemiesCount = fighters.Count;
 
             for (int i = 0; i < enemiesCount; i++)
@@ -99,11 +128,11 @@
                 _spots[i].SetEntity(npc);
             }
 
-            _playerEnemiesCount = enemiesCount;
+            _playersEnemiesCount = enemiesCount;
 
-            if (_player != null)
-                fighters.Add(_player);
             _fighters = fighters;
+            if (_player != null)
+                _fighters.Add(_player);
 
             foreach (var spot in _spots)
             {
@@ -113,71 +142,98 @@
 
             _playerSpot?.SetBattleEventBus(_battleEventBus);
 
-            var fightersQueue = _queueScheduler.AddFighters(fighters);
+            var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
-            await ProcessTurnsAsync();
+            return true;
         }
 
-        public void RemoveAliveEntitiesFromArena()
+        public async Task<BattleResults> RunBattleAsync()
         {
-            foreach (var spot in _spots)
-                spot.RemoveEntityFromSpot();
-        }
-
-        public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
-        public Vector2 GetCameraPosition() => GlobalPosition;
-
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        public IReadOnlyList<IEntity> GetEnemies(IEntity entity) => throw new NotImplementedException();
-
-        public IReadOnlyList<IEntity> GetAllies(IEntity entity) => throw new NotImplementedException();
-
-        public IReadOnlyList<IEntity> GetAll() => throw new NotImplementedException();
-
-        public IEntity GetRandomEntity(IEntity entity) => throw new NotImplementedException();
-
-        public IEntity GetRandomAlly(IEntity entity) => throw new NotImplementedException();
-
-        private async Task ProcessTurnsAsync()
-        {
-            while (!_fightEnds && _playerEnemiesCount > 0)
+            while (_battleOutcome == null)
             {
-                if (!_queueScheduler.TryGetNextFighter(out _currentFighter)) break;
+                if (!_queueScheduler.TryGetNextFighter(out _currentFighter))
+                {
+                    EndBattle(new BattleOutcome(BattleResults.BattleAbandoned));
+                    break;
+                }
 
                 if (_currentFighter is not { IsAlive: true }) continue;
-
                 _currentFighter.OnTurnStart();
-                if (_currentFighter is IPlayer)
+
+                var target = await ResolveTargetAsync(_currentFighter);
+                if (target is { IsAlive: true })
                 {
-                    _playerTargetTcs = new TaskCompletionSource<IEntity?>();
-
-                    var target = await _playerTargetTcs.Task;
-
-                    if (target is not { IsAlive: true }) continue;
                     var context = CreateAttackContext(_currentFighter, target);
                     context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
                     _attackContextScheduler.Schedule(context);
+                    await _attackContextScheduler.DrainQueue();
                 }
-                else
-                {
-                    var target = GetEntityTarget();
-                    if (target is not { IsAlive: true }) continue;
-                    var context = CreateAttackContext(_currentFighter, target);
-                    context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
-                    _attackContextScheduler.Schedule(context);
-                }
-
-                await _attackContextScheduler.DrainQueue();
 
                 _currentFighter.OnTurnEnd();
 
                 var queue = _queueScheduler.RefillIfEmpty(_fighters);
-                if (queue.Count > 1) _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(queue));
+                if (queue.Count > 1)
+                    _battleEventBus?.Publish(new BattleQueueDefinedEvent(queue));
+
+                #region OldLogic
+
+                // if (!_queueScheduler.TryGetNextFighter(out _currentFighter)) break;
+                //
+                // if (_currentFighter is not { IsAlive: true }) continue;
+                //
+                // _currentFighter.OnTurnStart();
+                // if (_currentFighter is IPlayer)
+                // {
+                //     _playerTargetTcs = new TaskCompletionSource<IEntity?>();
+                //
+                //     var target = await _playerTargetTcs.Task;
+                //
+                //     if (target is not { IsAlive: true }) continue;
+                //     var context = CreateAttackContext(_currentFighter, target);
+                //     context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
+                //     _attackContextScheduler.Schedule(context);
+                // }
+                // else
+                // {
+                //     var target = GetEntityTarget();
+                //     if (target is not { IsAlive: true }) continue;
+                //     var context = CreateAttackContext(_currentFighter, target);
+                //     context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
+                //     _attackContextScheduler.Schedule(context);
+                // }
+                //
+                // await _attackContextScheduler.DrainQueue();
+                //
+                // _currentFighter.OnTurnEnd();
+                //
+                // var queue = _queueScheduler.RefillIfEmpty(_fighters);
+                // if (queue.Count > 1) _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(queue));
+
+                #endregion
             }
+
+            return _battleOutcome?.Results ?? BattleResults.BattleAbandoned;
         }
 
-        private IEntity? GetEntityTarget() => _currentFighter?.ChoseTarget(_fighters);
+        private void EndBattle(BattleOutcome outcome)
+        {
+            if (_battleOutcome != null) return;
+            _battleOutcome = outcome;
+
+            if (_playerTargetTcs is { Task.IsCompleted: false })
+                _playerTargetTcs.SetResult(null);
+        }
+
+        private async Task<IEntity?> ResolveTargetAsync(IEntity fighter)
+        {
+            if (fighter is not IPlayer)
+            {
+                return fighter.ChoseTarget(_fighters);
+            }
+
+            _playerTargetTcs = new TaskCompletionSource<IEntity?>();
+            return await _playerTargetTcs.Task;
+        }
 
         private void OnQueueContainLessThenTwoFighters()
         {
@@ -197,9 +253,9 @@
 
         private void OnEntityDead(EntityDiedEvent obj)
         {
-            _playerEnemiesCount--;
+            _playersEnemiesCount--;
             _fighters.Remove(obj.Entity);
-            if (_playerEnemiesCount <= 0 && _currentFighter is IPlayer && _playerTargetTcs is { Task.IsCompleted: false })
+            if (_playersEnemiesCount <= 0 && _currentFighter is IPlayer && _playerTargetTcs is { Task.IsCompleted: false })
             {
                 _playerTargetTcs?.SetResult(null);
                 _fightEnds = true;
@@ -209,6 +265,11 @@
         private void OnPlayerDead(PlayerDiedEvent evnt)
         {
             _fightEnds = true;
+        }
+
+        private class BattleOutcome(BattleResults results)
+        {
+            public BattleResults Results = results;
         }
     }
 }

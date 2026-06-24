@@ -38,7 +38,7 @@ namespace LootGeneration.Internal
             ConvertEnumToList<EntityType>(_entityTypeList);
             ConvertEnumToList<Rarity>(_rarityList);
             _startBattle?.Pressed += () => _eventBus?.Publish(new ExampleBattleStart(850f, 450f));
-            _endBattle?.Pressed += () => _eventBus?.Publish(new BattleEndEvent());
+            _endBattle?.Pressed += () => _eventBus?.Publish(new BattleEndEvent(BattleResults.PlayerWon));
             _createSingle?.Pressed += OnCreateSinglePressed;
             _setAsDefault?.Pressed += OnSetAsDefault;
             _random?.Pressed += () => SetRandomNpcCreation?.Invoke();

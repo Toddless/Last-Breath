@@ -23,10 +23,10 @@
             _uiElementProvider = _provider.GetService<IUiElementsManager>();
             if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
             _gameEventBus = _provider.GetService<IGameEventBus>();
-            _gameEventBus.Subscribe<BattleStartEvent>(OnBattleInitialized);
+            _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
         }
 
-        private async void OnBattleInitialized(BattleStartEvent evnt)
+        private async void OnBattleInitialized(BattleInitializedEvent evnt)
         {
             try
             {
@@ -34,7 +34,8 @@
                 ArgumentNullException.ThrowIfNull(_mainWorld);
                 var context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
                 await ToSignal(GetTree(), "process_frame");
-                await context.RunBattleAsync();
+                var result = await context.RunBattleAsync();
+                _gameEventBus?.Publish(new BattleEndEvent(result));
                 context.Dispose();
             }
             catch (Exception es)
