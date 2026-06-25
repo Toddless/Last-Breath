@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using Battle.Source.Abilities.Effects;
-    using Battle.Source.Module;
-    using Battle.Source.Abilities.Decorators;
+    using Effects;
+    using Module;
+    using Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cdpdw7f753nlg" path="res://Source/UIElements/BattleHud.cs" id="1_qll2p"]
 [ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Source/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
 
-[node name="BattleHud" type="Control" node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_entityBars", "_abilitySlots")]
+[node name="BattleHud" type="Control" unique_id=745766495 node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_entityBars", "_abilitySlots")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ _stanceButtons = NodePath("VBoxContainer/StanceSlots")
 _entityBars = NodePath("HBoxContainer/GridContainer")
 _abilitySlots = NodePath("VBoxContainer/AbilitySlots")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=284745788]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -31,16 +31,16 @@ offset_right = 20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="StanceSlots" type="HBoxContainer" parent="VBoxContainer"]
+[node name="StanceSlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1680529311]
 layout_mode = 2
 
-[node name="AbilitySlots" type="HBoxContainer" parent="VBoxContainer"]
+[node name="AbilitySlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1938591861]
 layout_mode = 2
 
-[node name="CharacterHealthBar" parent="." instance=ExtResource("2_5gjf2")]
+[node name="CharacterHealthBar" parent="." unique_id=2145971479 instance=ExtResource("2_5gjf2")]
 layout_mode = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1675317335]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -49,6 +49,6 @@ offset_left = -40.0
 offset_bottom = 40.0
 grow_horizontal = 0
 
-[node name="GridContainer" type="GridContainer" parent="HBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer" unique_id=2050438703]
 layout_mode = 2
 size_flags_horizontal = 0

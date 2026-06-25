@@ -1,9 +1,9 @@
-﻿namespace Battle
+﻿namespace Battle.Internal
 {
-    using Godot;
-    using Services;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
+    using Godot;
+    using Services;
 
     internal partial class UiLayerManager : Node
     {

@@ -1,13 +1,13 @@
 ﻿namespace Battle.Internal
 {
     using System;
-    using Services;
-    using Source;
     using Core.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
     using Godot;
+    using Services;
+    using Source;
     using Utilities;
 
     public partial class Main : Node2D

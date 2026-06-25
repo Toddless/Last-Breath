@@ -5,6 +5,7 @@
     using Core.Data;
     using Core.Interfaces.UI;
     using Godot;
+    using Internal;
     using Source.UIElements;
 
     internal class UiElementManager(IGameServiceProvider provider) : IUiElementsManager

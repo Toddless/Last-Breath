@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
-    using Battle.Source.Abilities.Decorators;
-    using Battle.Source.Module;
+    using Decorators;
+    using Module;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;

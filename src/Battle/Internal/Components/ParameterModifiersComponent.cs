@@ -1,0 +1,113 @@
+﻿namespace Battle.Internal.Components
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Components;
+    using Core.Modifiers;
+    using Source;
+
+    public class ParameterModifiersComponent : IParameterModifiersComponent
+    {
+        private readonly Dictionary<EntityParameter, List<IModifierInstance>> _modifiers = [];
+
+        public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> EntityModifiers => _modifiers;
+
+        public event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
+
+        public IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter) => GetCombinedModifiers(parameter);
+
+        public void AddModifier(IModifierInstance modifier)
+        {
+            if (!_modifiers.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list))
+            {
+                list = [];
+                _modifiers[modifier.EntityParameter] = list;
+            }
+
+            if (list.Contains(modifier))
+            {
+                // Tracker.TrackError("Trying to add a modifier that already exists in the list", this);
+            }
+
+            list.Add(modifier);
+            RaiseEvent(modifier.EntityParameter);
+        }
+
+        public void UpdateModifier(IModifierInstance newModifier)
+        {
+            if (!_modifiers.TryGetValue(newModifier.EntityParameter, out var list))
+            {
+                // Tracker.TrackNotFound($"List for {newModifier.EntityParameter}", this);
+                list = [];
+                _modifiers[newModifier.EntityParameter] = list;
+            }
+
+            var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierValueType == newModifier.ModifierValueType);
+            if (existingModifier == null)
+            {
+                //  Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierType}", this);
+                list.Add(newModifier);
+            }
+            else existingModifier.Value = newModifier.Value;
+
+            RaiseEvent(newModifier.EntityParameter);
+        }
+
+        public void UpdateModifiers(IEnumerable<IModifierInstance> modifiers)
+        {
+            IEnumerable<IModifierInstance> modifierInstances = modifiers.ToList();
+            foreach (var modifier in modifierInstances)
+            {
+                if (_modifiers.TryGetValue(modifier.EntityParameter, out var existing))
+                {
+                    var existingModifier = existing.FirstOrDefault(x => ReferenceEquals(x.Source, modifier.Source) && x.ModifierValueType == modifier.ModifierValueType);
+                    if (existingModifier == null) existing.Add(modifier);
+                    else existingModifier.Value = modifier.Value;
+                }
+                else
+                {
+                    existing = [];
+                    _modifiers[modifier.EntityParameter] = existing;
+                    existing.Add(modifier);
+                }
+            }
+
+            modifierInstances.GroupBy(x => x.EntityParameter).ToList().ForEach(x => RaiseEvent(x.Key));
+        }
+
+        public void RemoveModifier(IModifierInstance modifier)
+        {
+            if (!_modifiers.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list))
+            {
+                //Tracker.TrackError("Trying to remove a modifier from non-existent list", this);
+                return;
+            }
+
+            list.RemoveAll(x => x.InstanceId == modifier.InstanceId);
+            if (list.Count == 0)
+            {
+                _modifiers.Remove(modifier.EntityParameter);
+            }
+
+            RaiseEvent(modifier.EntityParameter);
+        }
+
+        public void RemoveModifierBySource(object source)
+        {
+            foreach (var list in _modifiers.Where(list => list.Value.RemoveAll(x => x.Source == source) > 0))
+                RaiseEvent(list.Key);
+        }
+
+        private List<IModifierInstance> GetCombinedModifiers(EntityParameter parameter)
+        {
+            var modifiers = new List<IModifierInstance>();
+            if (_modifiers.TryGetValue(parameter, out var permanent))
+                modifiers.AddRange(permanent);
+            return modifiers;
+        }
+
+        private void RaiseEvent(EntityParameter parameter) => ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(parameter, GetCombinedModifiers(parameter)));
+    }
+}
