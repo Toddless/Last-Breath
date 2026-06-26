@@ -7,6 +7,7 @@
         int BonusLevel { get; }
         int CurrentExperience { get; }
         int CurrentLevel { get; }
+        int MaximumLevel { get; }
 
         event Action<int>? BonusLevelChange, ExperienceChange, CurrentLevelChange;
 

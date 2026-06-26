@@ -93,13 +93,15 @@
             var recipe = (ICraftingRecipe)_dataProvider.CopyItem(_recipeId);
             var item = (IEquipItem)_dataProvider.CopyItem(recipe.ResultItemId);
 
-            // For test
+            #region Tests
             var craftingMastery = _provider.GetService<ICraftingMastery>();
             craftingMastery.AddExperience(50000);
             _itemUi?.SetConfiguration(new ItemCreationConfiguration(item, craftingMastery));
             foreach (IRequirement recipeRequirement in recipe.Requirements)
                 _resourcesUi?.SetRequirements(recipeRequirement, _provider);
             _resourcesUi?.SetOptional(recipe.OptionalResourceCategories, _provider);
+
+            #endregion
         }
 
 

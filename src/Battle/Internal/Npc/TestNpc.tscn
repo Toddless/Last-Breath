@@ -460,8 +460,8 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c5gx5")
 }],
-"loop": 1,
-"name": &"Figth_Attack",
+"loop": 0,
+"name": &"Fight_Attack",
 "speed": 24.0
 }, {
 "frames": [{
@@ -495,8 +495,8 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_lwrhg")
 }],
-"loop": 1,
-"name": &"Figth_Hurt",
+"loop": 0,
+"name": &"Fight_Hurt",
 "speed": 24.0
 }, {
 "frames": [{
@@ -721,8 +721,9 @@ Id = "Test_Npc"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=177793197]
 shape = SubResource("CircleShape2D_fx85w")
 
-[node name="AnimationsComponent" type="Node" parent="." unique_id=236084216]
+[node name="AnimationsComponent" type="Node" parent="." unique_id=236084216 node_paths=PackedStringArray("_animatedSprite2D")]
 script = ExtResource("2_om8jy")
+_animatedSprite2D = NodePath("../AnimatedSprite2D")
 metadata/_custom_type_script = "uid://dbnh2fchmlp3e"
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1573985267]
@@ -733,4 +734,4 @@ shape = SubResource("CapsuleShape2D_8osjy")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=331296717]
 scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_fx85w")
-animation = &"Idle_Right"
+animation = &"Idle_Down"

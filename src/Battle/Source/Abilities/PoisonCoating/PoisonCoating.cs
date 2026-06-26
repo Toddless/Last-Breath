@@ -22,10 +22,10 @@ namespace Battle.Source.Abilities.PoisonCoating
         string[] tags,
         int cooldown,
         int costValue,
+        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int coatingDuration,
         int poisonDuration,
         float poisonDamagePercent,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana)
         : Ability(
             id: "Ability_Poison_Coating",

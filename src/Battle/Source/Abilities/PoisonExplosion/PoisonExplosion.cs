@@ -12,15 +12,14 @@ namespace Battle.Source.Abilities.PoisonExplosion
     /// <summary>
     /// Removes all poison stacks from the target and instantly deals their accumulated damage.
     /// Executes the target if it had more than <see cref="ExecutionThreshold"/> stacks.
-    /// Cost: 100 mana. Cooldown: 7 turns.
     /// </summary>
     public class PoisonExplosion(
         string[] tags,
         int cooldown,
         int costValue,
+        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int executionThreshold,
         float damageMultiplier,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana)
         : Ability(
             id: "Ability_Poison_Explosion",
@@ -42,7 +41,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         /// <summary>When true (L3 upgrade), spreads poison to all enemies instead of exploding on one.</summary>
         public bool SpreadMode { get; set; } = false;
 
-        public override IAbility Copy() => new PoisonExplosion(Tags, (int)Cooldown, CostValue, ExecutionThreshold, DamageMultiplier, Upgrades, CostType);
+        public override IAbility Copy() => new PoisonExplosion(Tags, (int)Cooldown, CostValue, Upgrades, ExecutionThreshold, DamageMultiplier, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {

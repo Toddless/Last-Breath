@@ -120,14 +120,7 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            try
-            {
-                _uiElementProvider = provider.GetService<IUiElementsManager>();
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackError("Failed to inject services.", ex);
-            }
+            _uiElementProvider = provider.GetService<IUiElementsManager>();
         }
 
         public void Remove() => GetParent().RemoveChild(this);

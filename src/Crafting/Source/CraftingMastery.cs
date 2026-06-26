@@ -30,7 +30,7 @@
         private const float TargetMaxRange = 1.25f;
 
         private const float ExpFactor = 1.8f;
-        private const float MaxLevel = 25;
+        private const int MaxLevel = 25;
         private const int BaseExp = 50;
         // ---------------------------------------------------------
 
@@ -71,6 +71,8 @@
                 CurrentLevelChange?.Invoke(field);
             }
         }
+
+        public int MaximumLevel => MaxLevel;
 
         public int BonusLevel
         {

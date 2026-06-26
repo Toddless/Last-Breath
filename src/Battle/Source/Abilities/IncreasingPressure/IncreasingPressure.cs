@@ -20,9 +20,9 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
+        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int maxAttacks,
         float increaseAttackDamageStep,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana)
         : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
@@ -77,8 +77,8 @@
             AbilityParametersModuleManager.RemoveDecorator(id, pKey);
         }
 
-        public override IAbility Copy() => new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale, maxAttacks, IncreaseAttackDamage,
-            Upgrades, CostType);
+        public override IAbility Copy() => new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale,
+            Upgrades, maxAttacks, IncreaseAttackDamage, CostType);
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);

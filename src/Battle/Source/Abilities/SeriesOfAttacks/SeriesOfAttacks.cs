@@ -13,19 +13,18 @@
     using Core.Interfaces.Components.Decorator;
 
     public class SeriesOfAttacks(
-        string id,
         string[] tags,
         int cooldown,
         int costValue,
-        int minAttacks,
-        int maxAttacks,
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
+        int minAttacks,
+        int maxAttacks,
         float damageMultiplier = 1,
         Costs costType = Costs.Mana)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        : Ability(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
@@ -79,7 +78,7 @@
         }
 
         public override IAbility Copy() =>
-            new SeriesOfAttacks(Id, Tags, (int)Cooldown, CostValue, MinAttacks, MaxAttacks, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, DamageMultiplier, CostType);
+            new SeriesOfAttacks(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, MinAttacks, MaxAttacks, DamageMultiplier, CostType);
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
     }

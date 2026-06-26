@@ -315,7 +315,7 @@ namespace Battle.Internal.Npc
         {
             context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            await Animations.PlayAnimationAsync("Attack");
+            await Animations.PlayAnimationAsync("Fight_Attack");
         }
 
         public void OnTurnEnd()
@@ -340,7 +340,7 @@ namespace Battle.Internal.Npc
             CombatEvents.Publish(new DamageTakenEvent(context, this));
             _battleEventBus?.Publish(new DamageTakenEvent(context, this));
             CurrentHealth -= context.Damage;
-            await Animations.PlayAnimationAsync("Hurt");
+            await Animations.PlayAnimationAsync("Fight_Hurt");
         }
 
         private void OnBodyEnter(Node2D body)
@@ -441,7 +441,7 @@ namespace Battle.Internal.Npc
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 500;
+                        value = 1000;
                         break;
                     case EntityParameter.Mana:
                         value = 50;
@@ -465,7 +465,7 @@ namespace Battle.Internal.Npc
                     case EntityParameter.SpellDamage:
                     case EntityParameter.Accuracy:
                     case EntityParameter.Evade:
-                        value = rnd.RandfRange(50, 100);
+                        value = rnd.RandfRange(50, 1000);
                         break;
                 }
 

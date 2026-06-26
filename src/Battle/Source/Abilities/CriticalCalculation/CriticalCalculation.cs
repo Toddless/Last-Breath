@@ -21,9 +21,9 @@ namespace Battle.Source.Abilities.CriticalCalculation
         string[] tags,
         int cooldown,
         int costValue,
+        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int buffStacks,
         int buffDuration,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana)
         : Ability(
             id: "Ability_Critical_Calculation",
@@ -81,7 +81,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() => new CriticalCalculation(Tags, (int)Cooldown, CostValue, BuffStacks, BuffDuration, Upgrades, CostType);
+        public override IAbility Copy() => new CriticalCalculation(Tags, (int)Cooldown, CostValue, Upgrades, BuffStacks, BuffDuration, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {

@@ -22,7 +22,7 @@
             _uIElementProvider = _provider.GetService<IUiElementsManager>();
             _provider.GetService<ISettingsHandler>().ApplySavedSettings();
             _provider.AddCraftingWindowFactories();
-            _provider.AddBattleHudFactory();
+            _provider.AddBattleUiElementsFactory();
             _loadGameButton?.Pressed += LoadGamePressed;
             _optionsButton?.Pressed += OptionsButtonPressed;
             _quitButton?.Pressed += () => GetTree().Quit();

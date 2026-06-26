@@ -11,9 +11,9 @@
     {
         private const float ExpFactor = 1.8f;
         private const int BaseExp = 50;
-        private const float MaxLevel = 50;
+        private const int MaxLevel = 50;
 
-        public string Id { get; } = "Mastery_Martial_Art";
+        public string Id => "Mastery_Martial_Art";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = [];
         public Texture2D? Icon { get; }
@@ -51,6 +51,8 @@
             }
         } = 1;
 
+        public int MaximumLevel => MaxLevel;
+
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
 
@@ -72,11 +74,10 @@
 
         public void RemoveBonusLevel() => BonusLevel--;
 
-
         public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
 
         private float GetProgressFactor() =>
-            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f) + 1;
+            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / ((float)MaxLevel + BonusLevel - 1), 0f, 1f) + 1;
 
         // Same piece of code like within Crafting mastery class.
         // I don't want to couple two projects via a Core library to reduce code duplication
@@ -89,7 +90,7 @@
                 {
                     CurrentExperience -= need;
                     CurrentLevel++;
-                    bus.PublishMessageAsync(new SendNotificationMessageMessage($"Martial art mastery level up"));
+                    bus.PublishMessageAsync(new SendNotificationMessageMessage("Martial art mastery level up!"));
                 }
                 else break;
             }

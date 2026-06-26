@@ -13,17 +13,16 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Components.Decorator;
 
     public class JarOfPoison(
-        string id,
         string[] tags,
         int cooldown,
         int costValue,
-        int poisonDuration,
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
+        int poisonDuration,
         Costs costType = Costs.Mana)
-        : Ability(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        : Ability(id:"Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
 
@@ -70,7 +69,7 @@ namespace Battle.Source.Abilities.JarOfPoison
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() => new JarOfPoison(Id, Tags, (int)Cooldown, CostValue, PoisonDuration, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, CostType);
+        public override IAbility Copy() => new JarOfPoison( Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, PoisonDuration,CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             ExecutionStrategy.Execute(this, owner, targets, field);

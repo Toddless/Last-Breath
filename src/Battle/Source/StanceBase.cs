@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source
 {
-    using System.Collections.Generic;
     using Core.Enums;
+    using System.Collections.Generic;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
@@ -24,15 +24,15 @@
         public virtual void OnActivate()
         {
             _obtainedPassiveSkills.ForEach(skill => skill.Attach(Owner));
-            _obtainedAbilities.ForEach(ability => ability.SetOwner(Owner));
             ActivationEffect.OnActivate(Owner);
         }
 
         public virtual void OnDeactivate()
         {
             _obtainedPassiveSkills.ForEach(skill => skill.Detach(Owner));
-            _obtainedAbilities.ForEach(ability => ability.RemoveOwner());
             ActivationEffect.OnDeactivate(Owner);
         }
+
+        public void AttachOwner() => _obtainedAbilities.ForEach(ability => ability.SetOwner(Owner));
     }
 }

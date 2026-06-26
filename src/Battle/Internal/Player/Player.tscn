@@ -1296,6 +1296,14 @@ animations = [{
 "speed": 24.0
 }]
 
+[sub_resource type="Animation" id="Animation_q84kv"]
+step = 0.041666668
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_poay5"]
+_data = {
+&"Idle_Down": SubResource("Animation_q84kv")
+}
+
 [node name="Player" type="CharacterBody2D" unique_id=698931184 node_paths=PackedStringArray("_animationsComponent", "_interactionArea")]
 script = ExtResource("1_rk3mg")
 _animationsComponent = NodePath("AnimationsComponent")
@@ -1318,3 +1326,6 @@ shape = SubResource("CapsuleShape2D_q84kv")
 scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_fx85w")
 animation = &"Fight_Attack"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=945689744]
+libraries/Idle = SubResource("AnimationLibrary_poay5")

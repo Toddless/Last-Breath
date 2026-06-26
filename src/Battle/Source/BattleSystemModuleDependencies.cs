@@ -14,10 +14,11 @@
             return services;
         }
 
-        public static void AddBattleHudFactory(this IGameServiceProvider provider)
+        public static void AddBattleUiElementsFactory(this IGameServiceProvider provider)
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
+            uiElementManager.RegisterWindowFactory(typeof(MartialArtMastery), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
         }
     }
 }

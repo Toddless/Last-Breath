@@ -15,5 +15,6 @@
 
         void OnActivate();
         void OnDeactivate();
+        void AttachOwner();
     }
 }

@@ -9,10 +9,12 @@
     public partial class AnimationsComponent : Node, IAnimationsComponent
     {
         [Export] private AnimatedSprite2D? _animatedSprite2D;
+        private string _previousAnimation = "Idle_Down";
 
         public async Task PlayAnimationAsync(string animation)
         {
             if (_animatedSprite2D == null) return;
+           _previousAnimation = _animatedSprite2D.GetAnimation();
             try
             {
                 if (animation.StartsWith("Ability"))
@@ -24,7 +26,7 @@
                 {
                     _animatedSprite2D.Play(animation);
                     await ToSignal(_animatedSprite2D, "animation_finished");
-                    _animatedSprite2D.Play("Idle_Right");
+                    _animatedSprite2D.Play(_previousAnimation);
                 }
             }
             catch (Exception e)

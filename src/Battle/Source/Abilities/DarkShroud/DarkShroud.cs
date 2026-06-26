@@ -19,8 +19,8 @@ namespace Battle.Source.Abilities.DarkShroud
         string[] tags,
         int cooldown,
         int costValue,
-        float buffDuration,
         Dictionary<int, List<IAbilityUpgrade>> upgrades,
+        float buffDuration,
         float buffEffectiveness = 1f,
         Costs costType = Costs.Mana)
         : Ability(
@@ -61,7 +61,7 @@ namespace Battle.Source.Abilities.DarkShroud
             Duration,
         }
 
-        public override IAbility Copy() => new DarkShroud(Tags, (int)Cooldown, CostValue, BuffEffectiveness, Upgrades, BuffDuration, CostType);
+        public override IAbility Copy() => new DarkShroud(Tags, (int)Cooldown, CostValue, Upgrades, BuffDuration, BuffEffectiveness, CostType);
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => ExecutionStrategy.Execute(targets, owner, field);
     }
