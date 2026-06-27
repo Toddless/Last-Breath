@@ -9,6 +9,7 @@
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
@@ -20,11 +21,10 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int maxAttacks,
         float increaseAttackDamageStep,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
 
@@ -77,8 +77,13 @@
             AbilityParametersModuleManager.RemoveDecorator(id, pKey);
         }
 
-        public override IAbility Copy() => new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale,
-            Upgrades, maxAttacks, IncreaseAttackDamage, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale,
+                maxAttacks, IncreaseAttackDamage, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);

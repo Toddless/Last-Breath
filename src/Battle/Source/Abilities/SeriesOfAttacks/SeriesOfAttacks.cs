@@ -3,9 +3,10 @@
     using Module;
     using Decorators;
     using Core.Enums;
+    using System.Linq;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using Core.Interfaces.Components;
@@ -19,12 +20,11 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int minAttacks,
         int maxAttacks,
         float damageMultiplier = 1,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        : Ability(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
@@ -77,8 +77,12 @@
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() =>
-            new SeriesOfAttacks(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, MinAttacks, MaxAttacks, DamageMultiplier, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new SeriesOfAttacks(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, MinAttacks, MaxAttacks, DamageMultiplier, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
     }

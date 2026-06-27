@@ -12,7 +12,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public override void RemoveUpgrade(PoisonExplosion ability) =>
             ability.ExecutionThreshold += reduction;
 
-        public override IAbilityUpgradeWrap<PoisonExplosion> Clone() =>
+        public override IAbilityUpgradeWrap<PoisonExplosion> Copy() =>
             new PeUpgradeLowerExecutionThreshold(Id, Tags, Tier, reduction);
     }
 }

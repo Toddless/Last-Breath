@@ -1,57 +1,56 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
     using Effects;
+    using Conditions;
     using Core.Enums;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
 
     /// <summary>
     /// Removes all poison stacks from the target and instantly deals their accumulated damage.
     /// Executes the target if it had more than <see cref="ExecutionThreshold"/> stacks.
     /// </summary>
-    public class PoisonExplosion(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        int executionThreshold,
-        float damageMultiplier,
-        Costs costType = Costs.Mana)
-        : Ability(
-            id: "Ability_Poison_Explosion",
-            tags,
-            cooldown,
-            costValue,
-            damage: 0,
-            weaponDamageScale: 0,
-            spellDamageScale: 0,
-            upgrades,
-            costType)
+    public class PoisonExplosion : Ability
     {
-        public int ExecutionThreshold { get; set; } = executionThreshold;
-        public float DamageMultiplier { get; set; } = damageMultiplier;
-
-        /// <summary>When true (L3 upgrade), stacks are NOT removed — damage is dealt while keeping them.</summary>
-        public bool PreserveStacks { get; set; } = false;
-
-        /// <summary>When true (L3 upgrade), spreads poison to all enemies instead of exploding on one.</summary>
-        public bool SpreadMode { get; set; } = false;
-
-        public override IAbility Copy() => new PoisonExplosion(Tags, (int)Cooldown, CostValue, Upgrades, ExecutionThreshold, DamageMultiplier, CostType);
-
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        public PoisonExplosion(string[] tags,
+            int cooldown,
+            int costValue,
+            int executionThreshold,
+            float damageMultiplier,
+            Costs costType = Costs.Mana) : base(id: "Ability_Poison_Explosion", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, costType)
         {
-            foreach (IEntity target in targets)
-                ExplodePoison(target, owner, field);
-
-            return Task.CompletedTask;
+            ExecutionThreshold = executionThreshold;
+            DamageMultiplier = damageMultiplier;
+            ExecuteCondition = new PoisonStackExecuteCondition(() => ExecutionThreshold);
         }
 
-        private void ExplodePoison(IEntity target, IEntity owner, IBattleField field)
+        public int ExecutionThreshold { get; set; }
+        public float DamageMultiplier { get; set; }
+
+        /// <summary>When true (L3 upgrade), stacks are NOT removed — damage is dealt while keeping them.</summary>
+        public bool PreserveStacks { get; set; }
+
+        public IPoisonSpreadMode? SpreadMode { get; set; }
+        public IExecuteCondition? ExecuteCondition { get; set; }
+
+        public override IAbility Copy()
+        {
+            var copy = new PoisonExplosion(Tags, (int)Cooldown, CostValue, ExecutionThreshold, DamageMultiplier, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
+
+        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        {
+            foreach (IEntity target in targets)
+                await ExplodePoison(target, owner, field);
+        }
+
+        private async Task ExplodePoison(IEntity target, IEntity owner, IBattleField field)
         {
             var poisonStacks = target.Effects
                 .GetBy(e => e.Status == StatusEffects.Poison)
@@ -60,13 +59,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
 
             if (poisonStacks.Count == 0) return;
 
-            int stackCount = poisonStacks.Count;
-
-            if (SpreadMode)
-            {
-                SpreadPoisonToAllEnemies(poisonStacks, target, owner, field);
-                return;
-            }
+            SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId);
 
             // Sum all remaining damage (DamagePerTick × remaining Duration) for each stack
             float totalDamage = poisonStacks.Sum(s => s.DamagePerTick * s.Duration) * DamageMultiplier;
@@ -81,24 +74,8 @@ namespace Battle.Source.Abilities.PoisonExplosion
             target.TakeDamage(context);
 
             // Execute target if stack count exceeds threshold
-            if (stackCount > ExecutionThreshold)
+            if (ExecuteCondition?.ShouldExecute(target) == true)
                 target.Kill();
-        }
-
-        private void SpreadPoisonToAllEnemies(
-            List<DamageOverTurnEffect> originalStacks, IEntity originalTarget, IEntity owner, IBattleField field)
-        {
-            var enemies = field.GetEnemies(owner).Where(e => e.IsAlive && e != originalTarget).ToList();
-            if (enemies.Count == 0) return;
-
-            foreach (IEntity enemy in enemies)
-            {
-                foreach (var stack in originalStacks)
-                {
-                    var clone = (DamageOverTurnEffect)stack.Copy();
-                    clone.Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = InstanceId, Damage = stack.DamagePerTick });
-                }
-            }
         }
     }
 }

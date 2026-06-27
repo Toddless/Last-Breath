@@ -53,7 +53,7 @@ namespace Battle.Source.Abilities.PoisonCoating
             }
         }
 
-        public override IAbilityUpgradeWrap<PoisonCoating> Clone() =>
+        public override IAbilityUpgradeWrap<PoisonCoating> Copy() =>
             new PcUpgradeMultiStackOnHit(Id, Tags, Tier);
     }
 }

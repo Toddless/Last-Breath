@@ -41,7 +41,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 stack.Duration += extension;
         }
 
-        public override IAbilityUpgradeWrap<PoisonCoating> Clone() =>
+        public override IAbilityUpgradeWrap<PoisonCoating> Copy() =>
             new PcUpgradeExtendExistingPoison(Id, Tags, Tier, extension);
     }
 }

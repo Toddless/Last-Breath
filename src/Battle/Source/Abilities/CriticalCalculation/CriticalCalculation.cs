@@ -9,6 +9,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
 
@@ -21,7 +22,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
         string[] tags,
         int cooldown,
         int costValue,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int buffStacks,
         int buffDuration,
         Costs costType = Costs.Mana)
@@ -33,7 +33,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
             damage: 0,
             weaponDamageScale: 0,
             spellDamageScale: 0,
-            upgrades,
             costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
@@ -81,7 +80,12 @@ namespace Battle.Source.Abilities.CriticalCalculation
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() => new CriticalCalculation(Tags, (int)Cooldown, CostValue, Upgrades, BuffStacks, BuffDuration, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new CriticalCalculation(Tags, (int)Cooldown, CostValue, BuffStacks, BuffDuration, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {

@@ -4,6 +4,7 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Events.GameEvents;
 
     public class ManaDevour(
@@ -12,7 +13,6 @@
         int cooldown,
         float percentManaToConsume,
         float increaseBonusPerManaConsumed,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana) :
         Ability(id: "Ability_Mana_Devour",
             tags,
@@ -21,13 +21,17 @@
             damage: 0,
             weaponDamageScale: 0,
             spellDamageScale: 0,
-            upgrades,
             costType)
     {
         public float PercentToConsume { get; } = percentManaToConsume;
         public float IncreaseBonusPerManaConsumed { get; } = increaseBonusPerManaConsumed;
 
-        public override IAbility Copy() => new ManaDevour(Tags, CostValue, (int)Cooldown, PercentToConsume, IncreaseBonusPerManaConsumed, Upgrades, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new ManaDevour(Tags, CostValue, (int)Cooldown, PercentToConsume, IncreaseBonusPerManaConsumed, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
 

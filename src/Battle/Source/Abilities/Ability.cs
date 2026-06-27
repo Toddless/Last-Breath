@@ -25,7 +25,6 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         Costs costType = Costs.Mana) : IAbility
     {
         protected IEntity? Owner;
@@ -56,7 +55,7 @@
         public IEffect? Effect { get; set; }
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; } = [];
-        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; } = upgrades;
+        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
         public Dictionary<int, IAbilityUpgrade> CurrentUpgrades { get; set; } = [];
         public float Cooldown => this[AbilityParameter.Cooldown];
         public string Description => FormatDescription();
@@ -75,6 +74,8 @@
         public event Action<Enum>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
+
+        public void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades) => Upgrades = upgrades;
 
         public virtual async Task Execute(List<IEntity> targets, IBattleField field)
         {

@@ -13,6 +13,6 @@
 
         public override void RemoveUpgrade(TAbility ability) => ability.RemoveParameterDecorator(decorator.Id, decorator.Parameter);
 
-        public override IAbilityUpgradeWrap<TAbility> Clone() => new SimpleUpgrade<TAbility, TParameter>(Id, Tags, Tier, decorator);
+        public override IAbilityUpgradeWrap<TAbility> Copy() => new SimpleUpgrade<TAbility, TParameter>(Id, Tags, Tier, decorator);
     }
 }

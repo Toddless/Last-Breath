@@ -24,6 +24,6 @@
 
         public abstract void RemoveUpgrade(T ability);
 
-        public abstract IAbilityUpgrade Clone();
+        public abstract IAbilityUpgrade Copy();
     }
 }

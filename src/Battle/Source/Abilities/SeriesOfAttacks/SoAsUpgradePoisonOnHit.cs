@@ -20,6 +20,6 @@
             _previousStrategy = null;
         }
 
-        public override IAbilityUpgradeWrap<SeriesOfAttacks> Clone() => new SoAsUpgradePoisonOnHit(Id, Tags, Tier, poisonDuration);
+        public override IAbilityUpgradeWrap<SeriesOfAttacks> Copy() => new SoAsUpgradePoisonOnHit(Id, Tags, Tier, poisonDuration);
     }
 }

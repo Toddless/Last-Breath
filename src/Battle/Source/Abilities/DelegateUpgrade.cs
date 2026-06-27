@@ -8,6 +8,6 @@
     {
         public override void ApplyUpgrade(T ability) => add(ability);
         public override void RemoveUpgrade(T ability) => remove(ability);
-        public override IAbilityUpgradeWrap<T> Clone() => new DelegateUpgrade<T>(Id, Tags, Tier, add, remove);
+        public override IAbilityUpgradeWrap<T> Copy() => new DelegateUpgrade<T>(Id, Tags, Tier, add, remove);
     }
 }

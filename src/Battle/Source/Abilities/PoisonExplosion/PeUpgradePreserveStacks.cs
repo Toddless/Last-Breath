@@ -12,7 +12,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
 
         public override void RemoveUpgrade(PoisonExplosion ability) => ability.PreserveStacks = false;
 
-        public override IAbilityUpgradeWrap<PoisonExplosion> Clone() =>
+        public override IAbilityUpgradeWrap<PoisonExplosion> Copy() =>
             new PeUpgradePreserveStacks(Id, Tags, Tier);
     }
 }

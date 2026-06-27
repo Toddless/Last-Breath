@@ -7,6 +7,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Module;
@@ -19,10 +20,9 @@ namespace Battle.Source.Abilities.JarOfPoison
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int poisonDuration,
         Costs costType = Costs.Mana)
-        : Ability(id:"Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        : Ability(id:"Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
 
@@ -69,7 +69,12 @@ namespace Battle.Source.Abilities.JarOfPoison
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() => new JarOfPoison( Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, PoisonDuration,CostType);
+        public override IAbility Copy()
+        {
+            var copy =  new JarOfPoison( Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, PoisonDuration,CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             ExecutionStrategy.Execute(this, owner, targets, field);

@@ -1,3 +1,258 @@
 ﻿{
-
+    "abilities": [
+        {
+            "id": "Ability_Series_Of_Attacks",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 100,
+            "costType": 0,
+            "damage": 30,
+            "weaponDamageScale": 0.50,
+            "spellDamageScale": 0.25,
+            "abilityProperties": {
+                "minAttacks": 2,
+                "maxAttacks": 5,
+                "damageMultiplier": 1
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Poison_On_Hit",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "poisonDuration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Apply_Buff_Critical_Chance",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amountAttacks": 6,
+                        "criticalChance": 0.15,
+                        "duration": 5,
+                        "maxStacks": 3
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Apply_Buff_Critical_Damage",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amountAttacks": 9,
+                        "criticalDamage": 0.25,
+                        "duration": 5,
+                        "maxStacks": 3
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Additional_Max_Attacks",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "maxAdditionalAttacks": 3
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_More_Attack_Damage",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "damageMultiplier": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Attacks_Cannot_Be_Evaded",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Additional_Attacks",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amountAttacks": 1
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Reduce_Ability_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 50
+                    }
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_Reduce_Ability_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "abilityProperties": {
+                "minAttacks": 2,
+                "maxAttacks": 5,
+                "damageMultiplier": 1
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {}
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "abilityProperties": {
+                "minAttacks": 2,
+                "maxAttacks": 5,
+                "damageMultiplier": 1
+            },
+            "upgrades": [
+                {
+                    "id": "",
+                    "tier": 1,
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "upgrades": [
+                {
+                    "id": "",
+                    "tier": 1,
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "upgrades": [
+                {
+                    "id": "",
+                    "tier": 1,
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "upgrades": [
+                {
+                    "id": "",
+                    "tier": 1,
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "",
+            "tags": [],
+            "cooldown": 1,
+            "costValue": 1,
+            "costType": 1,
+            "damage": 0,
+            "weaponDamageScale": 1,
+            "spellDamageScale": 1,
+            "upgrades": [
+                {
+                    "id": "",
+                    "tier": 1,
+                    "tags": []
+                }
+            ]
+        }
+    ]
 }

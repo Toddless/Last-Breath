@@ -18,7 +18,7 @@ namespace Battle.Source.Abilities.PoisonCoating
         {
         }
 
-        public override IAbilityUpgradeWrap<PoisonCoating> Clone() =>
+        public override IAbilityUpgradeWrap<PoisonCoating> Copy() =>
             new PcUpgradeRegenOnHit(Id, Tags, Tier, regenAmount, regenDuration);
     }
 }

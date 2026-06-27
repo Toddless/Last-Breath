@@ -21,7 +21,7 @@ namespace Battle.Source.Abilities.JarOfPoison
             _previousStrategy = null;
         }
 
-        public override IAbilityUpgradeWrap<JarOfPoison> Clone() =>
+        public override IAbilityUpgradeWrap<JarOfPoison> Copy() =>
             new JoPUpgradeBouncing(Id, Tags, Tier, bounces);
     }
 }

@@ -25,7 +25,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             _previousStrategy = null;
         }
 
-        public override IAbilityUpgradeWrap<IncreasingPressure> Clone() =>
+        public override IAbilityUpgradeWrap<IncreasingPressure> Copy() =>
             new IpUpgradeSingleEmpoweredStrike(Id, Tags, Tier);
     }
 }

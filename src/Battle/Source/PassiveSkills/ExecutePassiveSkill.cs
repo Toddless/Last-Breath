@@ -4,7 +4,7 @@
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Skills;
 
-    public class ExecutePassiveSkill( float threshold)
+    public class ExecutePassiveSkill(float threshold)
         : Skill(id: "Passive_Skill_Execute")
     {
         public float Threshold { get; } = threshold;
@@ -27,7 +27,7 @@
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
-        public override ISkill Copy() => new ExecutePassiveSkill( Threshold);
+        public override ISkill Copy() => new ExecutePassiveSkill(Threshold);
 
         public override bool IsStronger(ISkill skill)
         {

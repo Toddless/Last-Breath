@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class BerserkFury(
         string[] tags,
@@ -14,8 +15,7 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private async Task PerformMultipleAttacks(List<IEntity> targets)
         {
@@ -44,6 +44,11 @@
             }
         }
 
-        public override IAbility Copy() => new BerserkFury(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, Upgrades, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new BerserkFury(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,  CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
     }
 }

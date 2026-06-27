@@ -18,7 +18,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
         {
         }
 
-        public override IAbilityUpgradeWrap<CriticalCalculation> Clone() =>
+        public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
             new CcUpgradeReplaceWithHitChanceBuff(Id, Tags, Tier);
     }
 }

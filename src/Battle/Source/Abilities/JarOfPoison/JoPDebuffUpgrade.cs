@@ -9,6 +9,6 @@
 
         public override void RemoveUpgrade(JarOfPoison ability) => ability.PostActivationEffect.Remove(modifier.Id);
 
-        public override IAbilityUpgrade Clone() => new JoPDebuffUpgrade(Id, Tags, Tier, modifier);
+        public override IAbilityUpgrade Copy() => new JoPDebuffUpgrade(Id, Tags, Tier, modifier);
     }
 }

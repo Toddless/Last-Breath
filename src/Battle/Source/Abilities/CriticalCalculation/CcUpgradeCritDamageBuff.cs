@@ -24,7 +24,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
             _critDmgEffect = null;
         }
 
-        public override IAbilityUpgradeWrap<CriticalCalculation> Clone() =>
+        public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
             new CcUpgradeCritDamageBuff(Id, Tags, Tier, critDamageBonus, critChancePerHit, critDamageDuration);
     }
 }

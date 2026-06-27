@@ -5,6 +5,7 @@
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class Fireball : Ability
     {
@@ -19,8 +20,7 @@
             float spellDamageScale,
             float baseCriticalChance,
             int costValue,
-            Dictionary<int, List<IAbilityUpgrade>> upgrades,
-            Costs costType = Costs.Mana) : base(id: "Ability_Fireball", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, upgrades, costType)
+            Costs costType = Costs.Mana) : base(id: "Ability_Fireball", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
         {
             _damage = damage;
             _baseCriticalChance = baseCriticalChance;
@@ -31,7 +31,12 @@
         public float Damage => this[AbilityParameter.Damage];
 
 
-        public override IAbility Copy() => new Fireball(Tags, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale, _baseCriticalChance, CostValue, Upgrades, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new Fireball(Tags, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale, _baseCriticalChance, CostValue, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, Damage);
 

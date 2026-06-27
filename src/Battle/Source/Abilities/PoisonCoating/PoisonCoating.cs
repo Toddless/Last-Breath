@@ -10,6 +10,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
 
@@ -22,7 +23,6 @@ namespace Battle.Source.Abilities.PoisonCoating
         string[] tags,
         int cooldown,
         int costValue,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         int coatingDuration,
         int poisonDuration,
         float poisonDamagePercent,
@@ -35,7 +35,6 @@ namespace Battle.Source.Abilities.PoisonCoating
             damage: 0,
             weaponDamageScale: 0,
             spellDamageScale: 0,
-            upgrades,
             costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
@@ -70,6 +69,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 base.AddParameterDecorator(decorator);
                 return;
             }
+
             AbilityParameterDecorator.AddDecorator(parameterDecorator);
         }
 
@@ -80,10 +80,16 @@ namespace Battle.Source.Abilities.PoisonCoating
                 base.RemoveParameterDecorator(id, key);
                 return;
             }
+
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public override IAbility Copy() => throw new System.NotImplementedException();
+        public override IAbility Copy()
+        {
+            var copy = new PoisonCoating(tags, cooldown, costValue, coatingDuration, poisonDuration, poisonDamagePercent, costType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
         {
@@ -94,13 +100,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 poisonDuration: PoisonDuration,
                 poisonDamagePercent: PoisonDamagePercent);
 
-            coatingBuff.Apply(new EffectApplyingContext
-            {
-                Caster = owner,
-                Target = owner,
-                Source = InstanceId,
-                Damage = 0
-            });
+            coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Damage = 0 });
 
             return Task.CompletedTask;
         }

@@ -34,6 +34,17 @@
             _ => 0
         };
 
+        public static float ConvertEntityTypeToThresholdPenalty(this EntityType type) => type switch
+        {
+            EntityType.Regular => 0f,
+            EntityType.Special => 0.05f,
+            EntityType.Elit => 0.1f,
+            EntityType.Unique => 0.15f,
+            EntityType.Boss => 0.20f,
+            EntityType.Archon => 0.25f,
+            _ => 0f
+        };
+
         public static Key GetKeyAssociatedWithNumber(this int number) => number switch
         {
             1 => Key.Key1,

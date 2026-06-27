@@ -10,7 +10,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
 
         public override void RemoveUpgrade(IncreasingPressure ability) => ability.ExecutionStrategy.RemoveAttackModifier(modifier);
 
-        public override IAbilityUpgradeWrap<IncreasingPressure> Clone() =>
+        public override IAbilityUpgradeWrap<IncreasingPressure> Copy() =>
             new IpUpgradeFirstAttackCritDamage(Id, Tags, Tier, modifier);
     }
 }

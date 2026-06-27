@@ -22,12 +22,13 @@
         Costs CostType { get; }
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
         Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; }
-        Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; set; }
+        Dictionary<int, List<IAbilityUpgrade>> Upgrades { get;  }
 
         event Action<Enum>? OnParameterChanged;
         event Action<IAbility, bool>? AbilityResourceChanges;
         event Action<IAbility, int>? CooldownLeftChanges;
 
+        void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades);
         Task Execute(List<IEntity> targets, IBattleField field);
         void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator) where T : struct, Enum;
         void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;

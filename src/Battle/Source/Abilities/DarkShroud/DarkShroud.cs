@@ -9,6 +9,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Components.Module;
 
     /// <summary>
@@ -19,7 +20,6 @@ namespace Battle.Source.Abilities.DarkShroud
         string[] tags,
         int cooldown,
         int costValue,
-        Dictionary<int, List<IAbilityUpgrade>> upgrades,
         float buffDuration,
         float buffEffectiveness = 1f,
         Costs costType = Costs.Mana)
@@ -31,7 +31,6 @@ namespace Battle.Source.Abilities.DarkShroud
             damage: 0,
             weaponDamageScale: 0,
             spellDamageScale: 0,
-            upgrades,
             costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
@@ -61,7 +60,12 @@ namespace Battle.Source.Abilities.DarkShroud
             Duration,
         }
 
-        public override IAbility Copy() => new DarkShroud(Tags, (int)Cooldown, CostValue, Upgrades, BuffDuration, BuffEffectiveness, CostType);
+        public override IAbility Copy()
+        {
+            var copy = new DarkShroud(Tags, (int)Cooldown, CostValue, BuffDuration, BuffEffectiveness, CostType);
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
 
         protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => ExecutionStrategy.Execute(targets, owner, field);
     }
