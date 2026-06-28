@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.UI.View
 {
-    using Godot;
-    using Inventory;
     using Core.Data;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Core.Interfaces.UI;
     using Crafting.Source.UIElements;
+    using Godot;
+    using Inventory;
 
     public partial class PlayerHud : Control, IHud
     {

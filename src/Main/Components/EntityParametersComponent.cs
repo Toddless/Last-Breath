@@ -1,17 +1,17 @@
 ﻿namespace LastBreath.Components
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Linq;
     using Battle.Source;
-    using Core.Modifiers;
     using Battle.Source.Module;
+    using Core.Enums;
     using Core.Interfaces.Components;
-    using System.Collections.Generic;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
+    using Core.Modifiers;
+    using Godot;
+    using Utilities;
 
     public class EntityParametersComponent : IEntityParametersComponent
     {

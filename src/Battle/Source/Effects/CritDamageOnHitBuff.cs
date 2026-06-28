@@ -1,11 +1,10 @@
-namespace Battle.Source.Abilities.Effects
+namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Battle.Source.Decorators;
     using Core.Enums;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Battle;
     using Core.Modifiers;
 
     /// <summary>

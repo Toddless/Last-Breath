@@ -1,15 +1,15 @@
 ﻿namespace Battle.Source
 {
-    using Godot;
     using System;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
-    using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
+    using Godot;
 
     public class BattleExperienceProcessor : IDisposable
     {

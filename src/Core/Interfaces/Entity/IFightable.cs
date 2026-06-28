@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Entity
 {
-    using Enums;
     using System.Collections.Generic;
-    using Battle;
     using System.Threading.Tasks;
+    using Battle;
+    using Enums;
     using Events;
 
     public interface IFightable

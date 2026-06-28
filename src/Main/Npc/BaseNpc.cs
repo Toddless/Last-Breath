@@ -3,7 +3,9 @@ namespace LastBreath.Npc
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Attribute;
     using Battle.Source;
+    using Components;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
@@ -15,10 +17,8 @@ namespace LastBreath.Npc
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Items;
     using Godot;
-    using Attribute;
-    using Components;
-    using Services;
     using LootGeneration.Source.NpcModifiers;
+    using Services;
     using Stateless;
     using Utilities;
 

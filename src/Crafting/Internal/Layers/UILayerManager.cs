@@ -2,8 +2,8 @@
 {
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Services;
     using Godot;
+    using Services;
 
     [GlobalClass]
     internal partial class UILayerManager : Node

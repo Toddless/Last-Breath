@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
-    using Effects;
     using Core.Interfaces.Abilities;
+    using Effects;
 
     /// <summary>
     /// L3 upgrade option: while the crit buff is active, also grants critical damage boost for 3 turns,

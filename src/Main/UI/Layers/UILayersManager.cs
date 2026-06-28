@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Source.UI.Layers
 {
     using System;
-    using Godot;
-    using Services;
     using Core.Constants;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
+    using Godot;
+    using Services;
 
     public partial class UILayersManager : Node
     {

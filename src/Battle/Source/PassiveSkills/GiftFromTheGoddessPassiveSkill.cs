@@ -1,12 +1,12 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Enums;
-    using Abilities.Effects;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Skills;
+    using Effects;
 
     public class GiftFromTheGoddessPassiveSkill(float chance)
         : Skill(id: "Passive_Skill_Gift_From_The_Goddess")

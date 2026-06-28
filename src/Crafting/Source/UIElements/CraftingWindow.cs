@@ -1,21 +1,21 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
-    using Utilities;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Core.Constants;
     using Core.Data;
     using Core.Enums;
-    using Core.Results;
-    using Core.Modifiers;
-    using Core.Constants;
     using Core.Interfaces;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Items;
-    using System.Threading.Tasks;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
-    using System.Collections.Generic;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
+    using Core.Modifiers;
+    using Core.Results;
+    using Godot;
+    using Utilities;
 
     public partial class CraftingWindow : Control, IWindow
     {

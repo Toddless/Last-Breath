@@ -1,14 +1,14 @@
 namespace LootGeneration.Source
 {
     using System;
-    using Godot;
-    using Core.Enums;
-    using Core.Interfaces;
-    using Core.Data.LootTable;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
     using Core.Data;
+    using Core.Data.LootTable;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Godot;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class LootGenerationModuleDependencies

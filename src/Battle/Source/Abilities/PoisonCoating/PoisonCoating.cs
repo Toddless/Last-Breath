@@ -1,18 +1,18 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using Effects;
-    using Module;
-    using Decorators;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
+    using Decorators;
+    using Effects;
+    using Module;
 
     /// <summary>
     /// Self-cast buff. For <see cref="CoatingDuration"/> turns, each of the caster's attacks

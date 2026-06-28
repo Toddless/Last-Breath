@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Abilities
 {
-    using Enums;
-    using Battle;
     using System;
-    using Entity;
     using System.Threading.Tasks;
+    using Battle;
+    using Entity;
+    using Enums;
 
     public interface IEffect : IIdentifiable, IDisplayable
     {

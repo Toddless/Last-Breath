@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
-    using Utilities;
-    using Core.Enums;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Godot;
+    using Utilities;
 
     public class Fireball : Ability
     {

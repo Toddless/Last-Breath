@@ -1,17 +1,17 @@
 ﻿namespace LastBreath.Services
 {
-    using Godot;
     using System;
-    using Utilities;
+    using System.Collections.Generic;
+    using System.Linq;
     using Core.Data;
     using Core.Enums;
-    using System.Linq;
-    using Core.Modifiers;
     using Core.Interfaces;
-    using Core.Interfaces.Items;
-    using LootGeneration.Source;
     using Core.Interfaces.Crafting;
-    using System.Collections.Generic;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
+    using Godot;
+    using LootGeneration.Source;
+    using Utilities;
 
     public class ItemCreationService(
         IItemEffectProvider effectProvider,

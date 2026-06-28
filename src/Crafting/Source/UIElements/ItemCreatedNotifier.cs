@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
     using Core.Interfaces.UI;
+    using Godot;
 
     [GlobalClass]
     public partial class ItemCreatedNotifier : Control, IInitializable

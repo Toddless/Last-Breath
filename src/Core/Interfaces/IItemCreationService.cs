@@ -1,9 +1,9 @@
 namespace Core.Interfaces
 {
+    using System.Collections.Generic;
     using Enums;
     using Items;
     using Modifiers;
-    using System.Collections.Generic;
 
     public interface IItemCreationService
     {

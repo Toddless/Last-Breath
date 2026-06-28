@@ -7,8 +7,8 @@
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
     using Godot;
-    using Services;
     using LootGeneration.Source;
+    using Services;
     using UI.View;
     using Utilities;
 

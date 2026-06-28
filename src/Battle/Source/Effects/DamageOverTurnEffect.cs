@@ -1,12 +1,12 @@
-﻿namespace Battle.Source.Abilities.Effects
+﻿namespace Battle.Source.Effects
 {
-    using Godot;
-    using Utilities;
-    using Core.Data;
-    using Core.Enums;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Godot;
+    using Utilities;
 
     public class DamageOverTurnEffect(
         int duration,

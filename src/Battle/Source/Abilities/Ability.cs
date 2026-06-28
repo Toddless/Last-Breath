@@ -1,21 +1,21 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
+    using Decorators;
+    using Godot;
     using Module;
     using Utilities;
-    using Decorators;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
-    using System.Collections.Generic;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Components.Decorator;
 
     public abstract class Ability(
         string id,

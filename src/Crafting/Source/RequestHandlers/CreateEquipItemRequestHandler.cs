@@ -1,17 +1,17 @@
 ﻿namespace Crafting.Source.RequestHandlers
 {
     using System;
-    using Core.Data;
-    using Utilities;
-    using Core.Enums;
     using System.Linq;
-    using Core.Interfaces;
-    using Core.Interfaces.Items;
     using System.Threading.Tasks;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
+    using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Utilities;
 
     public class CreateEquipItemRequestHandler(
         IItemCreationService creationService,

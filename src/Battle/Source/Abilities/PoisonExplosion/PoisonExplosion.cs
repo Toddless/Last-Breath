@@ -1,14 +1,14 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
-    using Effects;
-    using Conditions;
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Battle;
+    using Conditions;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
-    using System.Collections.Generic;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Effects;
 
     /// <summary>
     /// Removes all poison stacks from the target and instantly deals their accumulated damage.

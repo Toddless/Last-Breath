@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Core.Enums;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
 
     public class SoAsApplyBuffStrategy(int attacksNeedForBuff, IEffect toApply) : SoAsDefaultExecutionStrategy

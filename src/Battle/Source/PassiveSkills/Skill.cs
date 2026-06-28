@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Godot;
     using System;
-    using Utilities;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
+    using Godot;
+    using Utilities;
 
     public abstract class Skill(string id) : ISkill
     {

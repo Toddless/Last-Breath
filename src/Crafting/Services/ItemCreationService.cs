@@ -1,16 +1,16 @@
 ﻿namespace Crafting.Services
 {
-    using Godot;
     using System;
-    using Core.Data;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Modifiers;
-    using Core.Interfaces;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
+    using Godot;
+    using Utilities;
 
     public class ItemCreationService(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         : IItemCreationService

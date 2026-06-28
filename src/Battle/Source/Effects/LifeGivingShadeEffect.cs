@@ -1,10 +1,10 @@
-﻿namespace Battle.Source.Abilities.Effects
+﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Core.Enums;
-    using Core.Modifiers;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Modifiers;
     using Utilities;
 
     public class LifeGivingShadeEffect : Effect

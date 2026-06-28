@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities
 {
     using System;
-    using Core.Data.AbilityData;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Data.AbilityData;
     using Core.Interfaces.Abilities;
     using SeriesOfAttacks;
 

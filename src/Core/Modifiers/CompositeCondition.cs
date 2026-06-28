@@ -1,9 +1,9 @@
 ﻿namespace Core.Modifiers
 {
     using System;
-    using Interfaces;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
+    using Interfaces;
 
     public class CompositeCondition : ICondition
     {

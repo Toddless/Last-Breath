@@ -1,7 +1,7 @@
 ﻿namespace Core.Modifiers
 {
-    using Enums;
     using System.Collections.Generic;
+    using Enums;
 
     public abstract class ModifiersCreator
     {

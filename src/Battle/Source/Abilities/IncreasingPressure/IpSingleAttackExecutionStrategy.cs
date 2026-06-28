@@ -1,26 +1,16 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Godot;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-    using Core.Interfaces.Entity;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Godot;
     using Utilities;
 
-    public class IpSingleAttackExecutionStrategy(List<IAttackModifier> modifiers) : IIpExecutionStrategy
+    public class IpSingleAttackExecutionStrategy : IIpExecutionStrategy
     {
-        public List<IAttackModifier> Modifiers { get; } = modifiers;
-
-        public void AddAttackModifier(IAttackModifier modifier)
-        {
-            if (Modifiers.FirstOrDefault(mod => mod.Id == modifier.Id) == null)
-                Modifiers.Add(modifier);
-        }
-
-        public void RemoveAttackModifier(IAttackModifier modifier) => Modifiers.Remove(modifier);
-
         public async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {
             var rnd = new RandomNumberGenerator();
@@ -37,7 +27,7 @@
                     RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
                 };
 
-                foreach (IAttackModifier attackModifier in Modifiers)
+                foreach (IAttackModifier attackModifier in ability.AttackModifiers)
                     attackModifier.Apply(context, meta);
 
                 if (!context.Schedule()) break;
@@ -54,7 +44,7 @@
                 float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
                 float damage = (owner.Parameters.Damage + additionalDamage) * increase;
                 totalDamage += damage;
-                increase += ability.IncreaseAttackDamage;
+                increase += ability.AttackDamageMultiplier;
             }
 
             return totalDamage;

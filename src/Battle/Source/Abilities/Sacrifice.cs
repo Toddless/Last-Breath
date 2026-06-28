@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Utilities;
-    using Core.Enums;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using Utilities;
 
     public class Sacrifice(
         string[] tags,

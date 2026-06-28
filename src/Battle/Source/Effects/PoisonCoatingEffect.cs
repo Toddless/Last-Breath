@@ -1,8 +1,8 @@
-namespace Battle.Source.Abilities.Effects
+namespace Battle.Source.Effects
 {
     using Core.Enums;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
 
     /// <summary>
     /// Buff applied to the caster. Each attack made while this effect is active applies a poison stack to the target.

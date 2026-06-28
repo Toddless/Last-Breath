@@ -1,11 +1,11 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using Enums;
     using System;
-    using Battle;
-    using Abilities;
-    using Data;
     using System.Collections.Generic;
+    using Abilities;
+    using Battle;
+    using Data;
+    using Enums;
 
     public interface IEffectsComponent
     {

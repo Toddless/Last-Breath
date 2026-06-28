@@ -2,8 +2,8 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
 
     public abstract class AbilityParameterDecorator<TParameter>(TParameter abilityParameter, Priority priority, string id, string source)
         : IParameterModule<TParameter>, IModuleDecorator<TParameter, IParameterModule<TParameter>>

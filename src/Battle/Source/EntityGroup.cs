@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
-    using System.Linq;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Enums;
+    using Core.Interfaces.Entity;
 
     public class EntityGroup(int maxMembers = 2) : IEntityGroup
     {

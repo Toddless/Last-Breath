@@ -1,11 +1,11 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
     using Core.Data;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Core.Interfaces.UI;
+    using Godot;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable
     {

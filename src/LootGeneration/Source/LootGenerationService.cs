@@ -1,19 +1,19 @@
 namespace LootGeneration.Source
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces;
-    using Core.Data.LootTable;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Events;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
-    using Core.Interfaces.MessageBus;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Data.LootTable;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.MessageBus;
+    using Godot;
+    using Utilities;
 
     public class LootGenerationService : ILootGenerationService
     {

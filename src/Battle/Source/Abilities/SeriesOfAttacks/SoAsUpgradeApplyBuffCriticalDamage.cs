@@ -1,14 +1,12 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Effects;
-    using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Effects;
 
     public class SoAsUpgradeApplyBuffCriticalDamage(string id, string[] tags, int tier, int amountAttack, float criticalDamage, int duration, int maxStacks)
         : AbilityUpgrade<SeriesOfAttacks>(id, tags, tier)
     {
-        private readonly SoAsApplyBuffStrategy _buffStrategy = new(amountAttack,
-            new ParameterBuffEffect("Effect_Critical_Damage_Buff", duration, maxStacks, criticalDamage, EntityParameter.CriticalDamage, OperationType.Add, Priority.Weak));
+        private readonly SoAsApplyBuffStrategy _buffStrategy = new(amountAttack, new CriticalDamageBuffEffect(duration, maxStacks, criticalDamage));
 
         private ISoAExecutionStrategy? _previousStrategy;
 

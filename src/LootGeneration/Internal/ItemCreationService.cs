@@ -1,15 +1,15 @@
 namespace LootGeneration.Internal
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
     using Godot;
     using Source;
     using Utilities;
-    using Core.Data;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces;
-    using Core.Interfaces.Items;
-    using System.Collections.Generic;
-    using Core.Modifiers;
 
     public class ItemCreationService(IItemEffectProvider effectProvider, IItemDataProvider dataProvider, RandomNumberGenerator rnd) : IItemCreationService
     {

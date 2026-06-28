@@ -143,7 +143,7 @@
                 return;
             }
 
-            int oldestIndex = effects.FindIndex(x => x.Id == newEffect.Id);
+            int oldestIndex = effects.FindIndex(effect => effect.Id == newEffect.Id);
             if (oldestIndex < 0) return;
 
             var oldEffect = effects[oldestIndex];
@@ -173,7 +173,7 @@
             EffectAdded?.Invoke(newEffect);
         }
 
-        private static List<IEffect> FindSameEffects(string newEffectId, List<IEffect> effects) => effects.Where(x => x.Id == newEffectId).ToList();
+        private List<IEffect> FindSameEffects(string newEffectId, List<IEffect> effects) => effects.Where(x => x.Id == newEffectId).ToList();
 
         private List<IEffect> GetEffectsForSource(string source)
         {

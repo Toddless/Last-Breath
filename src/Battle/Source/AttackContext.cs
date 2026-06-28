@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
-    using Godot;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using Godot;
 
     public class AttackContext(IEntity attacker, IEntity target, float baseDamage, RandomNumberGenerator rnd, IAttackContextScheduler attackContextScheduler)
         : IAttackContext

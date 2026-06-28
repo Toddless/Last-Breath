@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
-    using System.Linq;
-    using Godot.Collections;
-    using Core.Interfaces.UI;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Godot.Collections;
 
     [Tool]
     [GlobalClass]

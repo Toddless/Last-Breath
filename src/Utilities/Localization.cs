@@ -1,11 +1,11 @@
 ﻿namespace Utilities
 {
-    using Godot;
     using System;
-    using Core.Modifiers;
-    using System.Globalization;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Text.RegularExpressions;
+    using Core.Modifiers;
+    using Godot;
 
     public static class Localization
     {

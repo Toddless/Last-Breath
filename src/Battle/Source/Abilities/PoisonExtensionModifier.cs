@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Core.Enums;
     using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
 
     public class PoisonExtensionModifier(int additionalDuration) : IPostAttackModifier
     {

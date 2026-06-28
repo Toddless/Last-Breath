@@ -1,18 +1,18 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Module;
-    using Utilities;
-    using Core.Enums;
-    using Decorators;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Entity;
+    using Decorators;
+    using Module;
+    using Utilities;
 
     public class IncreasingPressure(
         string[] tags,
@@ -27,6 +27,7 @@
         : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
+        private Dictionary<string, IAttackModifier> _attackModifiers = [];
 
         public IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
@@ -38,21 +39,21 @@
                     new Dictionary<Parameters, IParameterModule<Parameters>>
                     {
                         [Parameters.Attacks] = new Module<Parameters>(() => maxAttacks, Parameters.Attacks),
-                        [Parameters.IncreaseAttackDamageStep] = new Module<Parameters>(() => increaseAttackDamageStep, Parameters.IncreaseAttackDamageStep),
+                        [Parameters.AttackDamageStepMultiplier] = new Module<Parameters>(() => increaseAttackDamageStep, Parameters.AttackDamageStepMultiplier),
                     });
                 return field;
             }
         }
 
-
+        public IReadOnlyList<IAttackModifier> AttackModifiers => _attackModifiers.Values.ToList();
         public float Attacks => this[Parameters.Attacks];
-        public float IncreaseAttackDamage => this[Parameters.IncreaseAttackDamageStep];
-        public IIpExecutionStrategy ExecutionStrategy = new IpDefaultExecutionStrategy([]);
+        public float AttackDamageMultiplier => this[Parameters.AttackDamageStepMultiplier];
+        public IIpExecutionStrategy ExecutionStrategy = new IpDefaultExecutionStrategy();
 
         public enum Parameters : byte
         {
             Attacks,
-            IncreaseAttackDamageStep
+            AttackDamageStepMultiplier
         }
 
         public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
@@ -80,10 +81,13 @@
         public override IAbility Copy()
         {
             var copy = new IncreasingPressure(Tags, CostValue, (int)Cooldown, Damage, WeaponDamageScale, SpellDamageScale,
-                maxAttacks, IncreaseAttackDamage, CostType);
+                maxAttacks, AttackDamageMultiplier, CostType);
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
+        public void AddAttackModifier(IAttackModifier modifier) => _attackModifiers.TryAdd(modifier.Id, modifier);
+        public void RemoveAttackModifier(string id) => _attackModifiers.Remove(id);
 
         protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);

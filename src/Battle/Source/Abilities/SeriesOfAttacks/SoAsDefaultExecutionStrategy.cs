@@ -1,12 +1,12 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Godot;
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
-    using System.Collections.Generic;
+    using Core.Enums;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Godot;
 
     public class SoAsDefaultExecutionStrategy : ISoAExecutionStrategy
     {
@@ -44,6 +44,9 @@
                             return;
                         }
                     }
+
+                    foreach (IAttackModifier modifier in ability.AttackModifiers)
+                        modifier.Apply(context, new AttackMetadata(i, ability.MaxAttacks));
                 }
             }
         }

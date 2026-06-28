@@ -1,13 +1,13 @@
 ﻿namespace LastBreath.Services
 {
-    using Godot;
     using System;
-    using UI.View;
-    using Inventory;
-    using Core.Data;
-    using Source.UI.Layers;
-    using Core.Interfaces.UI;
     using System.Collections.Generic;
+    using Core.Data;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Inventory;
+    using Source.UI.Layers;
+    using UI.View;
 
     public class UiElementsManager(IGameServiceProvider provider) : IUiElementsManager
     {

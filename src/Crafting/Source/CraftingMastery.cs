@@ -1,14 +1,14 @@
 ﻿namespace Crafting.Source
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Godot;
+    using Utilities;
 
     public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery
     {

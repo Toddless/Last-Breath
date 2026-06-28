@@ -2,8 +2,8 @@
 {
     using System;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Skills;
 
     public class CounterAttackPassiveSkill(float chance = 0.5f) : Skill(id: "Passive_Skill_Counter_Attack")
     {

@@ -1,13 +1,13 @@
 ﻿namespace Crafting.Services
 {
-    using Godot;
     using System;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces.UI;
-    using Source.UIElements;
+    using Godot;
     using Internal.Inventory;
-    using System.Collections.Generic;
     using Internal.Layers;
+    using Source.UIElements;
 
     internal class UiElementManager(IGameServiceProvider provider) : IUiElementsManager
     {

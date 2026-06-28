@@ -1,8 +1,8 @@
 namespace LootGeneration.Source.NpcModifiers
 {
+    using System.Collections.Generic;
     using Core.Interfaces;
     using Core.Interfaces.Entity;
-    using System.Collections.Generic;
 
     public class GuaranteedItemsModifier(
         string id,

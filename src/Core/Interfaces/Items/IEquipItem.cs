@@ -1,9 +1,9 @@
 ﻿namespace Core.Interfaces.Items
 {
-    using Enums;
-    using Entity;
-    using Modifiers;
     using System.Collections.Generic;
+    using Entity;
+    using Enums;
+    using Modifiers;
 
     public interface IEquipItem : IItem
     {

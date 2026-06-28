@@ -1,13 +1,13 @@
 ﻿namespace LastBreath.UI.View
 {
-    using Godot;
     using System;
+    using Core.Constants;
     using Core.Data;
     using Core.Enums;
-    using Script.Helpers;
-    using Core.Constants;
     using Core.Interfaces;
     using Core.Interfaces.UI;
+    using Godot;
+    using Script.Helpers;
 
     public partial class OptionsWindow : Control, IWindow
     {

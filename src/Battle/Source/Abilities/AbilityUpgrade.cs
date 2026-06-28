@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
     using System;
-    using Utilities;
     using Core.Interfaces.Abilities;
+    using Godot;
+    using Utilities;
 
     public abstract class AbilityUpgrade<T>(string id, string[] tags, int tier) : IAbilityUpgradeWrap<T>
         where T : IAbility

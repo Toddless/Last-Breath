@@ -1,12 +1,12 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Godot;
-    using Core.Enums;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
+    using Godot;
 
     public class BerserkFury(
         string[] tags,

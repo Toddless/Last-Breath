@@ -1,15 +1,15 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Entity;
-    using System.Collections.Generic;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
 
-    public class IpExtendPoisonDuration(int duration, List<IAttackModifier> modifiers) : IpDefaultExecutionStrategy(modifiers)
+    public class IpExtendPoisonDuration(int duration) : IpDefaultExecutionStrategy
     {
         public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
         {

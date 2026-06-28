@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Crafting
 {
-    using Enums;
     using System.Collections.Generic;
+    using Enums;
 
     public interface ICraftingMastery : IMastery
     {

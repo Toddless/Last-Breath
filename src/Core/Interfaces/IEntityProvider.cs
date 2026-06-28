@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces
 {
     using Data;
-    using UI;
     using Godot;
+    using UI;
 
     public interface IEntityProvider
     {

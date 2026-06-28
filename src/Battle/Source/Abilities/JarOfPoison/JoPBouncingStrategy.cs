@@ -1,11 +1,11 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Godot;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using Godot;
 
     /// <summary>
     /// L3 upgrade strategy: the jar bounces 5 times between random enemies,

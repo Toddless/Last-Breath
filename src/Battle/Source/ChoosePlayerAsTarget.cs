@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source
 {
-    using System.Linq;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
 
     public class ChoosePlayerAsTarget : ITargetChooser
     {

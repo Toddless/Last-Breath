@@ -1,8 +1,8 @@
 namespace LootGeneration.Source
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Interfaces.Entity;
-    using System.Collections.Generic;
 
     public interface ILootGenerationService
     {

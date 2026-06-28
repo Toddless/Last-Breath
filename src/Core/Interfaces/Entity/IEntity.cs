@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Entity
 {
-    using Enums;
-    using Items;
     using System;
     using Components;
+    using Enums;
     using Interfaces;
+    using Items;
 
     public interface IEntity : IIdentifiable, IDisplayable, IFightable
     {

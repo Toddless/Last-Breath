@@ -1,20 +1,20 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Godot;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Godot;
 
     /// <summary>
     /// L3 upgrade strategy: each successful attack also deals a percentage of the damage
     /// to a random enemy on the battlefield.
     /// </summary>
-    public class IpDamageRandomTargetStrategy(float splashDamagePercent, List<IAttackModifier> modifiers) : IpDefaultExecutionStrategy(modifiers)
+    public class IpDamageRandomTargetStrategy(float splashDamagePercent) : IpDefaultExecutionStrategy
     {
         private IEntity? _owner;
         private readonly RandomNumberGenerator _splashRnd = new();

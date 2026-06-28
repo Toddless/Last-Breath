@@ -1,17 +1,17 @@
 namespace LootGeneration.Services
 {
-    using Godot;
     using System;
-    using Utilities;
-    using System.IO;
-    using Core.Data;
-    using Core.Modifiers;
-    using Core.Interfaces.Items;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Crafting;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
+    using Godot;
+    using Utilities;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider

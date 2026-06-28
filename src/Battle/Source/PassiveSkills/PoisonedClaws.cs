@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using Core.Enums;
-    using Abilities.Effects;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Skills;
+    using Effects;
 
     public class PoisonedClaws : Skill
     {

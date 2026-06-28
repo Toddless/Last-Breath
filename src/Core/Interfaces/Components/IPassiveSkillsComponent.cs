@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Components
 {
     using System;
-    using Skills;
     using System.Collections.Generic;
+    using Skills;
 
     public interface IPassiveSkillsComponent
     {

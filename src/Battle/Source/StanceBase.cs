@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source
 {
-    using Core.Enums;
     using System.Collections.Generic;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;

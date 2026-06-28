@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
     using Core.Enums;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.UI;
+    using Godot;
 
     public partial class StanceSlot : TextureButton, IInitializable
     {

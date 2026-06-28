@@ -1,14 +1,14 @@
 ﻿namespace LastBreath.Services
 {
-    using Items;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Enums;
-    using Core.Modifiers;
     using Core.Interfaces;
-    using Crafting.Source;
-    using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
-    using System.Collections.Generic;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
+    using Crafting.Source;
+    using Items;
 
     public sealed class ItemGameDataFactory: IItemGameDataFactory
     {

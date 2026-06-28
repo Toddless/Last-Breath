@@ -1,14 +1,14 @@
 namespace LootGeneration.Source
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Items;
+    using Godot;
+    using Utilities;
 
     public class LootOrchestrator : ILootOrchestrator
     {

@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
-    using System.Threading;
-    using Core.Interfaces.Battle;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using System.Threading;
+    using Core.Interfaces.Battle;
 
     public class AttackContextScheduler : IAttackContextScheduler
     {

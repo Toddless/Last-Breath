@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source
 {
-    using Godot;
     using Core.Enums;
     using Core.Modifiers;
+    using Godot;
 
     [GlobalClass]
     public partial class MaterialModifier : Resource, IModifier

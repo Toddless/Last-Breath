@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Decorators
 {
-    using Godot;
     using Core.Enums;
     using Core.Interfaces.Components.Decorator;
+    using Godot;
 
     public class LuckyChanceDecorator(Priority priority, EntityParameter parameter) : EntityParameterModuleDecorator(parameter, priority, "Lucky_Chance_Decorator")
     {

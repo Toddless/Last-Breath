@@ -1,21 +1,21 @@
 ﻿namespace LastBreath.Services
 {
-    using Godot;
-    using Source;
     using System;
-    using Inventory;
-    using Core.Data;
-    using Utilities;
+    using System.Collections.Generic;
     using Battle.Source;
+    using Core.Data;
     using Core.Interfaces;
-    using Crafting.Source;
-    using Core.Interfaces.UI;
-    using LootGeneration.Source;
     using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.MessageBus;
-    using System.Collections.Generic;
+    using Core.Interfaces.UI;
+    using Crafting.Source;
+    using Godot;
+    using Inventory;
+    using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
+    using Source;
+    using Utilities;
 
     public class GameServiceProvider : IGameServiceProvider
     {

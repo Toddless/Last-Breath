@@ -1,13 +1,13 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Effects;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Battle;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
+    using Effects;
 
     /// <summary>
     /// L3 upgrade strategy: after applying poison, when the target dies, remaining

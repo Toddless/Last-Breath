@@ -1,17 +1,17 @@
 ﻿namespace Crafting.Services
 {
-    using Godot;
-    using Source;
     using System;
-    using Internal;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces;
-    using Core.Interfaces.UI;
-    using Internal.Inventory;
     using Core.Interfaces.Inventory;
     using Core.Interfaces.MessageBus;
-    using System.Collections.Generic;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Internal;
+    using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
+    using Source;
 
     internal class GameServiceProvider : IGameServiceProvider
     {

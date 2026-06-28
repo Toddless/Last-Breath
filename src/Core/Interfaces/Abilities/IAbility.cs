@@ -1,13 +1,13 @@
 ﻿namespace Core.Interfaces.Abilities
 {
-    using Enums;
-    using Entity;
     using System;
-    using Components.Module;
-    using Components.Decorator;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Battle;
+    using Components.Decorator;
+    using Components.Module;
+    using Entity;
+    using Enums;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {

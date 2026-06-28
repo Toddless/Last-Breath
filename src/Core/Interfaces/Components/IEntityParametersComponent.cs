@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using Enums;
     using System;
-    using Decorator;
-    using Modifiers;
     using System.Collections.Generic;
+    using Decorator;
+    using Enums;
+    using Modifiers;
 
     public interface IEntityParametersComponent
     {

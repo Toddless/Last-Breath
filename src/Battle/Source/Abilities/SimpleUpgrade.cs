@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities
 {
     using System;
-    using Decorators;
     using Core.Interfaces.Abilities;
+    using Decorators;
 
     public class SimpleUpgrade<TAbility, TParameter>(string id, string[] tags, int tier, AbilityParameterDecorator<TParameter> decorator)
         : AbilityUpgrade<TAbility>(id, tags, tier)

@@ -3,8 +3,8 @@ namespace Battle.Source.Abilities.PoisonCoating
     using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
 
     /// <summary>
     /// L3 upgrade: when the coating is applied, extends the duration of all existing poison stacks

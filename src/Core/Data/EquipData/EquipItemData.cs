@@ -1,7 +1,7 @@
 namespace Core.Data.EquipData
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
+    using Newtonsoft.Json;
 
     public record EquipItemData
     {

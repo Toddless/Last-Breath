@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Conditions
 {
     using System;
-    using Core.Enums;
     using System.Linq;
+    using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
 

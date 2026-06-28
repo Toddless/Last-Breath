@@ -1,6 +1,5 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
-    using Effects;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 

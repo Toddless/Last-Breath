@@ -1,8 +1,8 @@
 ﻿namespace LootGeneration.Internal
 {
-    using Core.Data;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
 

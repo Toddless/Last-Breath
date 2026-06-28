@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using Core.Interfaces.UI;
+    using Godot;
 
     public partial class SkillDescription : Control, IInitializable
     {

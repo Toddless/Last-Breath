@@ -1,11 +1,11 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
-    using Utilities;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Modifiers;
+    using Godot;
+    using Utilities;
 
     public partial class HoverableItem : Panel
     {

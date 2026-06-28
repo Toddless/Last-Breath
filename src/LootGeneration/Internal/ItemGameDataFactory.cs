@@ -1,13 +1,13 @@
 ﻿namespace LootGeneration.Internal
 {
     using System;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Enums;
-    using Core.Modifiers;
     using Core.Interfaces;
-    using Core.Interfaces.Items;
     using Core.Interfaces.Crafting;
-    using System.Collections.Generic;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
 
     public class ItemGameDataFactory: IItemGameDataFactory
     {

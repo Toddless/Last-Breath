@@ -1,14 +1,14 @@
 ﻿namespace Crafting.Source.RequestHandlers
 {
     using System.Linq;
-    using Core.Modifiers;
-    using Core.Interfaces.Items;
     using System.Threading.Tasks;
-    using Core.Interfaces.Events;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
+    using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Modifiers;
 
     public class
         RecraftEquipItemModifierRequestHandler(

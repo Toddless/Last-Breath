@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities.Effects
+﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Battle.Source.Decorators;

@@ -1,15 +1,15 @@
 ﻿namespace Utilities
 {
-    using Godot;
     using System;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Modifiers;
-    using Core.Interfaces;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Battle;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Modifiers;
+    using Godot;
 
     public static class Calculations
     {

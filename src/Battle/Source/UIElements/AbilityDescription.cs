@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.UIElements
 {
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.UI;
     using Godot;
     using Utilities;
-    using Core.Enums;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Abilities;
 
     public partial class AbilityDescription : Control, IInitializable
     {

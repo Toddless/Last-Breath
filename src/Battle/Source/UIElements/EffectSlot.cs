@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.UI;
+    using Godot;
 
     public partial class EffectSlot : Control, IInitializable
     {

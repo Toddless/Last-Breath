@@ -3,9 +3,9 @@
     using System;
     using Core.Interfaces.Battle;
 
-    public class UnevadableAttackModifier(string id) : IAttackModifier
+    public class UnevadableAttackModifier : IAttackModifier
     {
-        public string Id { get; } = id;
+        public string Id => "Modifier_Unevadable_Attack";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 

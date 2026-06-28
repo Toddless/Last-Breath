@@ -1,17 +1,17 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
     using System;
-    using Utilities;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Data;
     using Core.Enums;
-    using System.Linq;
     using Core.Interfaces;
-    using Core.Interfaces.UI;
-    using System.Threading.Tasks;
     using Core.Interfaces.Events;
-    using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Utilities;
 
     public partial class BattleHud : Control, IHud
     {

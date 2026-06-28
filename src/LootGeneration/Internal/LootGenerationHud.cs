@@ -1,13 +1,13 @@
 namespace LootGeneration.Internal
 {
-    using Godot;
     using System;
-    using Core.Enums;
-    using System.Linq;
-    using System.Globalization;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
+    using Godot;
 
     internal partial class LootGenerationHud : Control
     {

@@ -1,7 +1,7 @@
 namespace LootGeneration.Source
 {
-    using Core.Enums;
     using System.Collections.Generic;
+    using Core.Enums;
 
     public class LootConfiguration(
         int[] tierPrices,

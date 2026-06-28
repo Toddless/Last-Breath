@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces.Crafting
 {
-    using Items;
-    using Enums;
-    using Results;
-    using Modifiers;
     using System.Collections.Generic;
+    using Enums;
+    using Items;
+    using Modifiers;
+    using Results;
 
     public interface IItemUpgrader
     {

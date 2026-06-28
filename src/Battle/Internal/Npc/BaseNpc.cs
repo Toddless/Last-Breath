@@ -5,8 +5,6 @@ namespace Battle.Internal.Npc
     using System.Threading.Tasks;
     using Attribute;
     using Components;
-    using Services;
-    using Source;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
@@ -19,6 +17,8 @@ namespace Battle.Internal.Npc
     using Core.Interfaces.Items;
     using Godot;
     using LastBreath.Components;
+    using Services;
+    using Source;
     using Stateless;
     using Utilities;
 

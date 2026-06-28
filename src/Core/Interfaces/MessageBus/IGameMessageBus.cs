@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.MessageBus
 {
-    using Events;
     using System.Threading.Tasks;
+    using Events;
 
     public interface IGameMessageBus
     {

@@ -1,11 +1,11 @@
 ﻿namespace Utilities
 {
-    using Godot;
     using System;
-    using Serilog;
-    using System.Linq;
     using System.Diagnostics;
+    using System.Linq;
     using System.Runtime.CompilerServices;
+    using Godot;
+    using Serilog;
 
     public static class Tracker
     {

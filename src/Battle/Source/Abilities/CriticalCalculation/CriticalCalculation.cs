@@ -1,17 +1,17 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
-    using Decorators;
-    using Module;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
+    using Decorators;
+    using Module;
 
     /// <summary>
     /// Self-cast ability. Applies N stacks of CritCalculationBuff.

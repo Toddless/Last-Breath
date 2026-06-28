@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
-    using Godot;
-    using Core.Enums;
-    using Core.Interfaces.Events;
     using System.Threading.Tasks;
+    using Core.Enums;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Events;
+    using Godot;
 
     public class GainCraftingExperienceMessageHandler(ICraftingMastery craftingMastery)
         : IMessageHandler<GainCraftingExpirienceMessage>

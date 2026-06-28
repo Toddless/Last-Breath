@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Components
 {
-    using Core.Interfaces;
     using System.Collections.Generic;
+    using Core.Interfaces;
     using Core.Interfaces.Components;
 
     public class ModifierHandlerComponent : IModifierHandlerComponent

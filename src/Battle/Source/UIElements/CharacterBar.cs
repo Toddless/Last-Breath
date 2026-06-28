@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
-    using System.Linq;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.UI;
+    using Godot;
 
     [GlobalClass]
     [Tool]

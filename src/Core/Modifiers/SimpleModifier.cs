@@ -1,7 +1,7 @@
 ﻿namespace Core.Modifiers
 {
-    using Enums;
     using System;
+    using Enums;
     using Interfaces.Entity;
 
     public class SimpleModifier(EntityParameter entityParameter, ModifierValueType valueType, float value, object source, float weight = 1) : IModifierInstance

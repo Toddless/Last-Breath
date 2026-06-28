@@ -5,8 +5,6 @@
     using System.Threading.Tasks;
     using Attribute;
     using Components;
-    using Services;
-    using Source;
     using Core.Constants;
     using Core.Data;
     using Core.Enums;
@@ -19,6 +17,8 @@
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Items;
     using Godot;
+    using Services;
+    using Source;
     using Stateless;
     using Utilities;
     using AnimationsComponent = Components.AnimationsComponent;

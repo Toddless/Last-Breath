@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Components.Decorator
 {
-    using Enums;
     using System;
+    using Enums;
     using Module;
 
     public abstract class EntityParameterModuleDecorator(EntityParameter parameter, Priority priority, string id)

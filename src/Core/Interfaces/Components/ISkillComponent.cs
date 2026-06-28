@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Components
 {
+    using System.Collections.Generic;
     using Enums;
     using Skills;
-    using System.Collections.Generic;
 
     public interface ISkillComponent<T> where T : ISkill
     {

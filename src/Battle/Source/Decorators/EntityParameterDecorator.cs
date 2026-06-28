@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Decorators
 {
     using Core.Enums;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
 
     public class EntityParameterDecorator(
         string id,

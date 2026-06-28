@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using System.Collections.Generic;
+    using Core.Interfaces.UI;
     using Godot;
     using Godot.Collections;
-    using Core.Interfaces.UI;
-    using System.Collections.Generic;
 
     public partial class ItemUi : Control, IInitializable, IItemUi
     {

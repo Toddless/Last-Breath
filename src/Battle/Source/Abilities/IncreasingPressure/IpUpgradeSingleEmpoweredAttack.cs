@@ -1,10 +1,12 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using System.Linq;
     using Core.Interfaces.Abilities;
 
-    /// <summary>L3 upgrade: each attack also deals 45% of the damage to a random enemy on the battlefield.</summary>
-    public class IpUpgradeDamageRandomTarget(string id, string[] tags, int tier, float splashPercent = 0.45f)
+    /// <summary>
+    /// L3 upgrade: replaces the series with one empowered strike that deals
+    /// the total damage to the full series (with incremental scaling applied).
+    /// </summary>
+    public class IpUpgradeSingleEmpoweredAttack(string id, string[] tags, int tier)
         : AbilityUpgrade<IncreasingPressure>(id, tags, tier)
     {
         private IIpExecutionStrategy? _previousStrategy;
@@ -12,17 +14,17 @@ namespace Battle.Source.Abilities.IncreasingPressure
         public override void ApplyUpgrade(IncreasingPressure ability)
         {
             _previousStrategy = ability.ExecutionStrategy;
-            ability.ExecutionStrategy = new IpDamageRandomTargetStrategy(splashPercent, _previousStrategy.Modifiers.ToList());
+            ability.ExecutionStrategy = new IpSingleAttackExecutionStrategy();
         }
 
         public override void RemoveUpgrade(IncreasingPressure ability)
         {
-            if (_previousStrategy == null) return;
-            ability.ExecutionStrategy = _previousStrategy;
+            if (_previousStrategy != null)
+                ability.ExecutionStrategy = _previousStrategy;
             _previousStrategy = null;
         }
 
         public override IAbilityUpgradeWrap<IncreasingPressure> Copy() =>
-            new IpUpgradeDamageRandomTarget(Id, Tags, Tier, splashPercent);
+            new IpUpgradeSingleEmpoweredAttack(Id, Tags, Tier);
     }
 }

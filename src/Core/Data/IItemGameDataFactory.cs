@@ -1,11 +1,11 @@
 namespace Core.Data
 {
-    using Enums;
-    using Modifiers;
-    using Interfaces;
-    using Interfaces.Items;
-    using Interfaces.Crafting;
     using System.Collections.Generic;
+    using Enums;
+    using Interfaces;
+    using Interfaces.Crafting;
+    using Interfaces.Items;
+    using Modifiers;
 
     public interface IItemGameDataFactory
     {

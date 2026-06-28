@@ -1,8 +1,8 @@
 namespace Core.Interfaces
 {
-    using Enums;
-    using Data.LootTable;
     using System.Collections.Generic;
+    using Data.LootTable;
+    using Enums;
     using Modifiers;
 
     public interface IModifierApplyingContext

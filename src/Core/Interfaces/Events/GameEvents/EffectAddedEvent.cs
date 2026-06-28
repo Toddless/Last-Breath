@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Events.GameEvents
 {
-    using Entity;
     using Abilities;
+    using Entity;
 
     public record EffectAddedEvent(IEffect Effect, IEntity Target) : IBattleEvent, IGameEvent;
 }

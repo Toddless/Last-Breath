@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Components
 {
     using System;
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Linq;
     using Battle.Source;
-    using Core.Modifiers;
+    using Core.Enums;
     using Core.Interfaces.Components;
-    using System.Collections.Generic;
+    using Core.Modifiers;
 
     public class ParameterModifiersComponent : IParameterModifiersComponent
     {

@@ -1,16 +1,16 @@
 namespace LootGeneration.Services
 {
-    using Godot;
     using System;
-    using Source;
-    using Internal;
-    using Utilities;
+    using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Events;
-    using System.Collections.Generic;
     using Core.Interfaces.MessageBus;
+    using Godot;
+    using Internal;
     using Microsoft.Extensions.DependencyInjection;
+    using Source;
+    using Utilities;
 
     internal class GameServiceProvider : IGameServiceProvider
     {

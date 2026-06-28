@@ -1,14 +1,14 @@
 ﻿namespace LastBreath.Items
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Modifiers;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Enums;
+    using Core.Interfaces.Entity;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
+    using Godot;
+    using Utilities;
 
     [Tool]
     [GlobalClass]

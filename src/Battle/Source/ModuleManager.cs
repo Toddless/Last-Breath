@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source
 {
     using System;
-    using Utilities;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Interfaces.Components;
     using Core.Interfaces.Components.Decorator;
+    using Utilities;
 
     public class ModuleManager<TKey, TModule, TDecorator> : IModuleManager<TKey, TModule, TDecorator>
         where TKey : struct, Enum
@@ -51,7 +51,7 @@
                 _decorators[newDecorator.Parameter] = list;
             }
 
-            var existing = list.FirstOrDefault(x => x.Id == newDecorator.Id);
+            var existing = list.FirstOrDefault(decorator => decorator.Id == newDecorator.Id);
             if (existing != null)
             {
                 if (existing.IsStronger(newDecorator)) return;
@@ -72,7 +72,7 @@
                 return;
             }
 
-            var exist = decorators.FirstOrDefault(x => x.Id == decoratorId);
+            var exist = decorators.FirstOrDefault(decorator => decorator.Id == decoratorId);
 
             if (exist == null) return;
             decorators.Remove(exist);

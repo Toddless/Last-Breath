@@ -1,10 +1,10 @@
 namespace LootGeneration.Source.NpcModifiers
 {
     using System;
-    using System.Linq;
-    using Core.Interfaces.Entity;
-    using Core.Data.NpcModifiersData;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data.NpcModifiersData;
+    using Core.Interfaces.Entity;
 
     public class NpcModifiersFactory : INpcModifiersFactory
     {

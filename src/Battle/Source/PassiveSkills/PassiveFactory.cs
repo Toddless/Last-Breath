@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces.Skills;
-    using System.Collections.Generic;
 
     public abstract class PassiveFactory
     {

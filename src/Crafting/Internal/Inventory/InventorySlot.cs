@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Internal.Inventory
 {
-    using Godot;
     using System;
     using Core.Enums;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Inventory;
+    using Core.Interfaces.UI;
+    using Godot;
 
     internal partial class InventorySlot : Slot, IInventorySlot, IInitializable
     {

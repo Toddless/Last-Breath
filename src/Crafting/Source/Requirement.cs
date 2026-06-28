@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source
 {
-    using Godot;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
+    using Godot;
 
     [GlobalClass]
     public partial class Requirement : Resource, IRequirement

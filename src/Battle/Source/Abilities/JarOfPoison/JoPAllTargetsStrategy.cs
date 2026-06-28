@@ -1,9 +1,9 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
-    using System.Collections.Generic;
 
     /// <summary>
     /// L3 upgrade strategy: applies poison to ALL enemies on the battlefield,

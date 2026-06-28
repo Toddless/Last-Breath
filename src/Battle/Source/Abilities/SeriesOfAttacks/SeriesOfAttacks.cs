@@ -1,17 +1,17 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Module;
-    using Decorators;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Entity;
+    using Decorators;
+    using Module;
 
     public class SeriesOfAttacks(
         string[] tags,
@@ -26,6 +26,8 @@
         Costs costType = Costs.Mana)
         : Ability(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
+        private Dictionary<string, IAttackModifier> _attackModifiers = [];
+
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
             get
@@ -47,6 +49,7 @@
         public int MaxAttacks => (int)this[Parameters.MaxAttacks];
         public float DamageMultiplier => this[Parameters.DamageMultiplier];
         public ISoAExecutionStrategy ExecutionStrategy { get; set; } = new SoAsDefaultExecutionStrategy();
+        public IReadOnlyList<IAttackModifier> AttackModifiers => _attackModifiers.Values.ToList();
 
         public enum Parameters : byte
         {
@@ -76,6 +79,9 @@
 
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
+
+        public void AddAttackModifier(IAttackModifier modifier) => _attackModifiers.TryAdd(modifier.Id, modifier);
+        public void RemoveAttackModifier(string id) => _attackModifiers.Remove(id);
 
         public override IAbility Copy()
         {

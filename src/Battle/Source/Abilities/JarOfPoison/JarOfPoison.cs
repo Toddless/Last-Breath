@@ -1,17 +1,17 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Module;
-    using Core.Enums;
-    using Decorators;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
+    using Core.Interfaces.Entity;
+    using Decorators;
+    using Module;
 
     public class JarOfPoison(
         string[] tags,
@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         float spellDamageScale,
         int poisonDuration,
         Costs costType = Costs.Mana)
-        : Ability(id:"Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : Ability(id: "Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
 
@@ -71,7 +71,7 @@ namespace Battle.Source.Abilities.JarOfPoison
 
         public override IAbility Copy()
         {
-            var copy =  new JarOfPoison( Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, PoisonDuration,CostType);
+            var copy = new JarOfPoison(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, PoisonDuration, CostType);
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }

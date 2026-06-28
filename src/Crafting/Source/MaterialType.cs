@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source
 {
-    using Godot;
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces.Crafting;
-    using System.Collections.Generic;
     using Core.Modifiers;
+    using Godot;
 
     public partial class MaterialType : Resource, IMaterial
     {

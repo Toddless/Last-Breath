@@ -1,12 +1,12 @@
 ﻿namespace Crafting.Source
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
     using System.Linq;
-    using Core.Interfaces.Items;
+    using Core.Enums;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Godot;
+    using Utilities;
 
     public partial class CraftingResource : Resource, ICraftingResource, IItem
     {

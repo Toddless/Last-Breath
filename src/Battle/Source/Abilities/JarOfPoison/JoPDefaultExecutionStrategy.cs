@@ -1,12 +1,12 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Effects;
-    using Core.Enums;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Abilities;
-    using System.Collections.Generic;
+    using Effects;
 
     public class JoPDefaultExecutionStrategy : IJoPExecutionStrategy
     {

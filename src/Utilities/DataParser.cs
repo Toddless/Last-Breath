@@ -1,23 +1,23 @@
 namespace Utilities
 {
     using System;
-    using Core.Data;
-    using System.IO;
-    using Core.Enums;
-    using System.Linq;
-    using Core.Modifiers;
-    using Newtonsoft.Json;
-    using Core.Data.ItemData;
-    using Core.Data.EquipData;
-    using Core.Data.LootTable;
-    using Newtonsoft.Json.Linq;
-    using Core.Interfaces.Items;
-    using System.Threading.Tasks;
-    using Core.Data.CraftingData;
-    using Core.Interfaces.Crafting;
-    using Core.Data.NpcModifiersData;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Data;
+    using Core.Data.CraftingData;
+    using Core.Data.EquipData;
+    using Core.Data.ItemData;
+    using Core.Data.LootTable;
+    using Core.Data.NpcModifiersData;
+    using Core.Enums;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Modifiers;
     using Godot;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Serialization;
 
     public class DataParser(IItemGameDataFactory factory) : IDataParser

@@ -16,7 +16,7 @@
             },
             "upgrades": [
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Poison_On_Hit",
+                    "id": "Ability_SoA_Upgrade_Poison_On_Hit",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
@@ -24,7 +24,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Apply_Buff_Critical_Chance",
+                    "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Chance",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
@@ -35,7 +35,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Apply_Buff_Critical_Damage",
+                    "id": "Ability_SoA_Upgrade_Apply_Buff_Critical_Damage",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
@@ -46,7 +46,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Additional_Max_Attacks",
+                    "id": "Ability_SoA_Upgrade_Additional_Max_Attacks",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {
@@ -54,7 +54,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_More_Attack_Damage",
+                    "id": "Ability_SoA_Upgrade_More_Attack_Damage",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {
@@ -62,13 +62,13 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Attacks_Cannot_Be_Evaded",
+                    "id": "Ability_SoA_Upgrade_Attacks_Cannot_Be_Evaded",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {}
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Additional_Attacks",
+                    "id": "Ability_SoA_Upgrade_Additional_Attacks",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
@@ -76,7 +76,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Reduce_Ability_Cost",
+                    "id": "Ability_SoA_Upgrade_Reduce_Cost",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
@@ -84,7 +84,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_Reduce_Ability_Cooldown",
+                    "id": "Ability_SoA_Upgrade_Reduce_Cooldown",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
@@ -94,95 +94,172 @@
             ]
         },
         {
-            "id": "",
+            "id": "Ability_Increasing_Pressure",
             "tags": [],
-            "cooldown": 1,
-            "costValue": 1,
-            "costType": 1,
-            "damage": 0,
-            "weaponDamageScale": 1,
-            "spellDamageScale": 1,
+            "cooldown": 7,
+            "costValue": 100,
+            "costType": 0,
+            "damage": 35,
+            "weaponDamageScale": 0.15,
+            "spellDamageScale": 0.35,
             "abilityProperties": {
-                "minAttacks": 2,
-                "maxAttacks": 5,
-                "damageMultiplier": 1
+                "attacks": 5,
+                "damageMultiplier": 0.15
             },
             "upgrades": [
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Single_Empowered_Attack",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {}
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Attack_Random_Target",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "splashDamage": 0.45
+                    }
+                },
+                {
+                    "id": "Ability_Ip_Upgrade_Last_Attack_Always_Crit",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {}
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
-                    "tier": 3,
+                    "id": "Ability_Ip_Upgrade_First_Attack_Crit_Damage",
+                    "tier": 2,
                     "tags": [],
-                    "upgradeProperties": {}
+                    "upgradeProperties": {
+                        "critDamageBonus": 1.3
+                    }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Attack_Extend_Poison",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "poisonDuration": 1
+                    }
+                },
+                {
+                    "id": "Ability_Ip_Upgrade_Unevadable",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {}
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Additional_Amount_Attacks",
                     "tier": 1,
                     "tags": [],
-                    "upgradeProperties": {}
+                    "upgradeProperties": {
+                        "amountAttacks": 2
+                    }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Additional_Damage_Multiplier",
                     "tier": 1,
                     "tags": [],
-                    "upgradeProperties": {}
+                    "upgradeProperties": {
+                        "damageMultiplier": 0.05
+                    }
                 },
                 {
-                    "id": "Ability_Series_Of_Attacks_Upgrade_",
+                    "id": "Ability_Ip_Upgrade_Reduce_Cooldown",
                     "tier": 1,
                     "tags": [],
-                    "upgradeProperties": {}
+                    "upgradeProperties": {
+                        "cooldown": 2
+                    }
                 }
             ]
         },
         {
-            "id": "",
+            "id": "Ability_Jar_Of_Poison",
             "tags": [],
-            "cooldown": 1,
-            "costValue": 1,
-            "costType": 1,
-            "damage": 0,
-            "weaponDamageScale": 1,
-            "spellDamageScale": 1,
-            "abilityProperties": {
-                "minAttacks": 2,
-                "maxAttacks": 5,
-                "damageMultiplier": 1
-            },
+            "cooldown": 3,
+            "costValue": 100,
+            "costType": 0,
+            "damage": 50,
+            "weaponDamageScale": 0.35,
+            "spellDamageScale": 0.5,
+            "abilityProperties": {},
             "upgrades": [
                 {
-                    "id": "",
+                    "id": "Ability_JoP_Upgrade_Bouncing",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "bounces": 5
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Transfer_Poison_On_Death",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_All_Targets",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Clumsiness",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "evadeReduce": 0.15,
+                        "maxStacks": 5,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Apply_Blind",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "accuracyReduce": 0.15,
+                        "maxStacks": 5,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Apply_Weakness",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "damageReduce": 0.15,
+                        "maxStacks": 5,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Increasing_Scales",
                     "tier": 1,
-                    "tags": []
+                    "tags": [],
+                    "upgradeProperties": {
+                        "weaponDamageScale": 0.6,
+                        "spellDamageScale": 0.85
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Poison_Duration",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "poisonDuration": 1
+                    }
+                },
+                {
+                    "id": "Ability_JoP_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 1
+                    }
                 }
             ]
         },

@@ -1,9 +1,9 @@
 namespace LootGeneration.Source
 {
-    using System.Linq;
-    using Core.Data.LootTable;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Core.Data.LootTable;
     using Core.Interfaces.MessageBus;
 
     public class GetLootTableRequestHandler(ILootTableProvider lootTableProvider) : IRequestHandler<GetLootTableRequest, Dictionary<int, List<TableRecord>>>

@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
 
     /// <summary>

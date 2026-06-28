@@ -1,10 +1,10 @@
 namespace LootGeneration.Source.NpcModifiers
 {
-    using System.Linq;
-    using Core.Interfaces;
-    using Core.Data.LootTable;
-    using Core.Interfaces.Entity;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data.LootTable;
+    using Core.Interfaces;
+    using Core.Interfaces.Entity;
 
     public class AdditionalItemsModifier(
         string id,

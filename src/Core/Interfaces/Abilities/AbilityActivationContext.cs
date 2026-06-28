@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Abilities
 {
+    using System.Collections.Generic;
     using Battle;
     using Entity;
-    using System.Collections.Generic;
 
     public record AbilityActivationContext
     {

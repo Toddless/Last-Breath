@@ -1,14 +1,14 @@
-﻿namespace Battle.Source.Abilities.Effects
+﻿namespace Battle.Source.Effects
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
     using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;
+    using Godot;
+    using Utilities;
 
     public abstract class Effect(
         string id,
@@ -57,6 +57,7 @@
         public virtual void Remove()
         {
             // effect will be removed form "us" here, so we are publishing event within TryRemoveStatusEffect
+            // TODO: Статус эффект должен быть удален только с последним стаком. Сейчас мы удаляем его полностью при попытке убрать самый старый стак
             Target?.TryRemoveStatusEffect(Status);
             Target?.Effects.RemoveEffect(this);
             Target = null;

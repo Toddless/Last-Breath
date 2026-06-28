@@ -1,7 +1,7 @@
 ﻿namespace Core.Modifiers
 {
-    using Enums;
     using System;
+    using Enums;
     using Interfaces;
     using Interfaces.Entity;
 

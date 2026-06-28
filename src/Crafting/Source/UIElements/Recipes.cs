@@ -1,20 +1,20 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
-    using Utilities;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Data;
     using Core.Enums;
-    using System.Linq;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Items;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Crafting;
-    using System.Collections.Generic;
     using Core.Interfaces;
+    using Core.Interfaces.Crafting;
+    using Core.Interfaces.Events;
+    using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Utilities;
 
     public partial class Recipes : FoldableContainer, IWindow
     {

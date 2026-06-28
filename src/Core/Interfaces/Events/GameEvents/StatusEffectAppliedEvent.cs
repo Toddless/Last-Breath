@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Events.GameEvents
 {
-    using Enums;
     using Battle;
+    using Enums;
 
     public record StatusEffectAppliedEvent(StatusEffects StatusEffect) : ICombatEvent
     {

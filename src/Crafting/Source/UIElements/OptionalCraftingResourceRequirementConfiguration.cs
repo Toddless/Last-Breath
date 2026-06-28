@@ -1,16 +1,16 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
-    using Core.Data;
-    using Utilities;
-    using System.Linq;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Inventory;
     using System.Collections.Generic;
+    using System.Linq;
+    using Core.Data;
+    using Core.Interfaces.Inventory;
     using Core.Interfaces.Items;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Utilities;
 
     public class OptionalCraftingResourceRequirementConfiguration(string[] categories, IGameServiceProvider provider, Func<List<string>> resourcesAlreadyInSlots)
         : IRequirementUiConfiguration

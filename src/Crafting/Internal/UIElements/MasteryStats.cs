@@ -6,9 +6,9 @@
     using Core.Enums;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Source;
     using Crafting.Source.UIElements;
     using Godot;
+    using Source;
     using Utilities;
 
     [GlobalClass]

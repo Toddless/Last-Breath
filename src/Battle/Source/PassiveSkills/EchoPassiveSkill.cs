@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Enums;
     using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
-    using System.Collections.Generic;
     using Core.Interfaces.Events.GameEvents;
+    using Core.Interfaces.Skills;
 
     public class EchoPassiveSkill(
         float delayedDamagePercent,

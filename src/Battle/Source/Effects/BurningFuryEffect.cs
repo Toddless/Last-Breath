@@ -1,9 +1,9 @@
-﻿namespace Battle.Source.Abilities.Effects
+﻿namespace Battle.Source.Effects
 {
-    using Utilities;
     using Core.Enums;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Utilities;
 
     public class BurningFuryEffect(
         int duration,

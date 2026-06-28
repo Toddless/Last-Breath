@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source
 {
-    using Godot;
     using System;
-    using Utilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Godot;
+    using Utilities;
 
     public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery
     {

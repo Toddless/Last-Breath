@@ -1,8 +1,8 @@
 ﻿namespace Core.Data.AbilityData
 {
+    using System.Collections.Generic;
     using Enums;
     using Newtonsoft.Json;
-    using System.Collections.Generic;
 
     public record AbilityBaseData
     {

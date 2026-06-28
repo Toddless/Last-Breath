@@ -1,12 +1,12 @@
 namespace Battle.Services
 {
-    using Godot;
     using System;
-    using Core.Data;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Events;
     using System.Collections.Generic;
+    using Core.Data;
+    using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
+    using Core.Interfaces.UI;
+    using Godot;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
 

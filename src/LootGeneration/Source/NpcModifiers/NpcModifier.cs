@@ -1,10 +1,10 @@
 namespace LootGeneration.Source.NpcModifiers
 {
-    using Godot;
     using System;
-    using Utilities;
     using Core.Interfaces;
     using Core.Interfaces.Entity;
+    using Godot;
+    using Utilities;
 
     public abstract class NpcModifier(string id, float weight, float difficultyMultiplier, bool isUnique, string npcBuffId) : INpcModifier
     {

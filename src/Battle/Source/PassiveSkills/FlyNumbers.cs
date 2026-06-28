@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Godot;
     using Core.Enums;
     using Core.Interfaces.UI;
+    using Godot;
 
     public partial class FlyNumbers : Node2D, IInitializable
     {

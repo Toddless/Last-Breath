@@ -1,12 +1,12 @@
 namespace Core.Data
 {
-    using Enums;
-    using Modifiers;
-    using LootTable;
-    using NpcModifiersData;
-    using Interfaces.Items;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Enums;
+    using Interfaces.Items;
+    using LootTable;
+    using Modifiers;
+    using NpcModifiersData;
 
     public interface IDataParser
     {

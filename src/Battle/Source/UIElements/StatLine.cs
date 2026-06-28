@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Godot;
     using Core.Interfaces.UI;
+    using Godot;
 
     [GlobalClass]
     public partial class StatLine : Control, IInitializable

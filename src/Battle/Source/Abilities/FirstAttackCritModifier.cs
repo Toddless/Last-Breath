@@ -3,9 +3,9 @@
     using System;
     using Core.Interfaces.Battle;
 
-    public class FirstAttackCritModifier(string id, float criticalDamageBonus) : IAttackModifier
+    public class FirstAttackCritModifier( float criticalDamageBonus) : IAttackModifier
     {
-        public string Id { get; } = id;
+        public string Id => "Modifier_First_Attack_Crit";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 

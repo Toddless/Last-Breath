@@ -1,16 +1,16 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Godot;
     using System;
-    using Effects;
-    using Utilities;
-    using Core.Enums;
-    using Core.Interfaces.Entity;
-    using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Abilities;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Effects;
+    using Godot;
+    using Utilities;
 
     public class SoAsPoisonOnAttackExecutionStrategy(int duration) : SoAsDefaultExecutionStrategy
     {
@@ -29,6 +29,7 @@
             try
             {
                 if (_ability == null || _owner == null) return;
+                if (obj.Context.Result is not AttackResults.Succeed) return;
                 var context = obj.Context;
                 var poison = new DamageOverTurnEffect(duration, StatusEffects.Poison);
                 var applyContext = new EffectApplyingContext

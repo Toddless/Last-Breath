@@ -1,7 +1,7 @@
 ﻿namespace Core.Interfaces.Components
 {
-    using Enums;
     using System.Collections.Generic;
+    using Enums;
     using Modifiers;
 
     public interface IEntityAttribute

@@ -1,12 +1,12 @@
 namespace LootGeneration.Source
 {
-    using Godot;
-    using Core.Enums;
-    using Godot.Collections;
-    using Core.Interfaces.UI;
-    using Core.Interfaces.Items;
     using System.Threading.Tasks;
+    using Core.Enums;
     using Core.Interfaces.Crafting;
+    using Core.Interfaces.Items;
+    using Core.Interfaces.UI;
+    using Godot;
+    using Godot.Collections;
 
     public partial class ItemOnGround : Node2D, IInitializable
     {

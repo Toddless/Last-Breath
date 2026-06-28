@@ -3,7 +3,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Abilities;
 
     /// <summary>L3 upgrade: the jar bounces 5 times between random enemies, applying poison each time.</summary>
-    public class JoPUpgradeBouncing(string id, string[] tags, int tier, int bounces = 5)
+    public class JoPUpgradeBouncing(string id, string[] tags, int tier, int bounces)
         : AbilityUpgrade<JarOfPoison>(id, tags, tier)
     {
         private IJoPExecutionStrategy? _previousStrategy;

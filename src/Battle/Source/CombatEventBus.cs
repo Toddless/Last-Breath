@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces.Battle;
-    using System.Collections.Generic;
 
     public class CombatEventBus : ICombatEventBus
     {

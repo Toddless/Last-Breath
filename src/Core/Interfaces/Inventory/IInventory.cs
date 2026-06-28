@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Inventory
 {
-    using Items;
     using System;
     using System.Collections.Generic;
+    using Items;
 
     public interface IInventory
     {

@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Internal.Layers
 {
     using Core.Interfaces.UI;
-    using Services;
-    using Source.UIElements;
     using Godot;
     using Inventory;
+    using Services;
+    using Source.UIElements;
 
     public partial class Main : Node2D
     {

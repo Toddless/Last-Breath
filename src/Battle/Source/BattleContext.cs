@@ -1,16 +1,16 @@
 ﻿namespace Battle.Source
 {
-    using Godot;
     using System;
-    using Core.Data;
-    using UIElements;
-    using Core.Interfaces.UI;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Data;
+    using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
-    using System.Collections.Generic;
-    using Core.Enums;
+    using Core.Interfaces.UI;
+    using Godot;
+    using UIElements;
 
     internal class BattleContext : IBattleContext
     {

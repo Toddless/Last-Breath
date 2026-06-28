@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Utilities;
     using System.Linq;
-    using Core.Interfaces.UI;
     using Core.Interfaces.Items;
+    using Core.Interfaces.UI;
+    using Utilities;
 
     public class ItemDemoConfiguration(IEquipItem item) : IItemUiConfiguration
     {

@@ -1,13 +1,13 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
-    using UIElements;
-    using Utilities;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.Events;
     using System.Threading.Tasks;
     using Core.Data;
+    using Core.Interfaces.Events;
     using Core.Interfaces.Inventory;
+    using Core.Interfaces.Items;
     using Core.Interfaces.UI;
+    using UIElements;
+    using Utilities;
 
     public class ItemCreatedMessageHandler(IUiElementsManager manager, IInventory inventory)
         : IMessageHandler<ItemCreatedMessage>

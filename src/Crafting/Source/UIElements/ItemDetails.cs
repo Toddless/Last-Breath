@@ -1,10 +1,10 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Godot;
     using System;
     using Core.Data;
-    using Godot.Collections;
     using Core.Interfaces.UI;
+    using Godot;
+    using Godot.Collections;
 
     public partial class ItemDetails : Control, IInitializable, IClosable, IRequireServices, IRequireReposition
     {

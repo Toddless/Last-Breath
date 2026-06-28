@@ -1,12 +1,12 @@
 ﻿namespace LastBreath.Source
 {
-    using Godot;
     using System;
-    using Utilities;
-    using Core.Enums;
-    using Script.Helpers;
     using Core.Constants;
+    using Core.Enums;
     using Core.Interfaces;
+    using Godot;
+    using Script.Helpers;
+    using Utilities;
 
     public class SettingsHandler : ISettingsHandler
     {
