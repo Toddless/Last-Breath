@@ -33,7 +33,7 @@
 
             int number = rnd.RandiRange(0, _effects.Count - 1);
             var effect = _effects[number].Copy();
-            effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = evnt.Context.FinalDamage, Source = Id, Target = Owner! });
+            effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = evnt.Context.FinalDamage, Source = InstanceId, Target = Owner! });
         }
 
         public override void Detach(IEntity owner)

@@ -2,8 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
     using Utilities;
 
@@ -18,9 +21,6 @@
             tags,
             cooldown,
             costValue,
-            damage: 0,
-            weaponDamageScale: 0,
-            spellDamageScale: 0,
             costType)
     {
         public float PercentToConsume { get; } = percentManaToConsume;
@@ -32,6 +32,8 @@
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
 

@@ -12,17 +12,12 @@
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
     {
         float Cooldown { get; }
-        float Damage { get; }
-        float WeaponDamageScale { get; }
-        float SpellDamageScale { get; }
         int CooldownLeft { get; set; }
         int CostValue { get; }
-        bool IsEvadable { get; set; }
-        IEffect? Effect { get; set; }
         Costs CostType { get; }
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
         Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; }
-        Dictionary<int, List<IAbilityUpgrade>> Upgrades { get;  }
+        Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; }
 
         event Action<Enum>? OnParameterChanged;
         event Action<IAbility, bool>? AbilityResourceChanges;

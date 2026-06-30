@@ -28,7 +28,7 @@ namespace Battle.Source.Effects
             {
                 Caster = Target,
                 Target = context.Target,
-                Source = Id,
+                Source = InstanceId,
                 Damage = context.FinalDamage,
                 IsCritical = context.IsCritical
             };

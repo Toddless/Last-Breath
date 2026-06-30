@@ -15,6 +15,7 @@
         event Action<IEffect>? EffectRemoved;
 
         public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate);
+        public IEnumerable<IEffect> GetBySource(string source);
         void RegisterDotTick(DotTick tick);
         void RemoveEffect(IEffect effect);
         void TriggerTurnEnd();

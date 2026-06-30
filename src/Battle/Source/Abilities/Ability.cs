@@ -22,9 +22,6 @@
         string[] tags,
         int cooldown,
         int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
         Costs costType = Costs.Mana) : IAbility
     {
         protected IEntity? Owner;
@@ -34,25 +31,19 @@
             get
             {
                 if (field != null) return field;
-
-                field = CreateModuleManager();
+                field = new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>>(CreateBaseModules());
                 field.ModuleChanges += OnModuleChanges;
                 return field;
             }
         }
 
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
-        public float Damage => this[AbilityParameter.Damage];
-        public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
-        public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
         public int CooldownLeft { get; set; }
-        public bool IsEvadable { get; set; }
-        public IEffect? Effect { get; set; }
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; } = [];
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
@@ -142,7 +133,7 @@
 
         protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
 
-        protected virtual Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => Task.CompletedTask;
+        protected abstract Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field);
 
         protected void StartCooldown()
         {
@@ -161,17 +152,12 @@
             CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
-        private IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>> CreateModuleManager() =>
-            new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>>(
-                new Dictionary<AbilityParameter, IParameterModule<AbilityParameter>>
-                {
-                    [AbilityParameter.Damage] = new Module<AbilityParameter>(() => damage, AbilityParameter.Damage),
-                    [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-                    [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-                    [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
-                    [AbilityParameter.WeaponDamageScale] = new Module<AbilityParameter>(() => weaponDamageScale, AbilityParameter.WeaponDamageScale),
-                    [AbilityParameter.SpellDamageScale] = new Module<AbilityParameter>(() => spellDamageScale, AbilityParameter.SpellDamageScale)
-                });
+        protected virtual Dictionary<AbilityParameter, IParameterModule<AbilityParameter>> CreateBaseModules() => new()
+        {
+            [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
+            [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
+            [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
+        };
 
         private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
     }

@@ -39,7 +39,6 @@
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
 
-
         public event Action<EntityParameter, float>? ParameterChanged;
 
         public EntityParametersComponent()

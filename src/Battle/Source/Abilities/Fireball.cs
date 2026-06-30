@@ -2,12 +2,15 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Godot;
     using Utilities;
 
-    public class Fireball : Ability
+    public class Fireball : AttackAbility
     {
         private readonly float _damage;
         private readonly float _baseCriticalChance;
@@ -37,6 +40,8 @@
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, Damage);
 

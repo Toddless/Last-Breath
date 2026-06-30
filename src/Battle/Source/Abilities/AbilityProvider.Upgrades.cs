@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using Core.Data.AbilityData;
     using Core.Interfaces.Abilities;
+    using CriticalCalculation;
+    using DarkShroud;
     using Effects;
     using IncreasingPressure;
     using JarOfPoison;
@@ -146,7 +148,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ApplyDebuffPostActivationModifier(
+                    new AbilityDebuffPostActivationModifier(
                         new Clumsiness(
                             (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                             (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
@@ -156,7 +158,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ApplyDebuffPostActivationModifier(new BlindEffect(
+                    new AbilityDebuffPostActivationModifier(new BlindEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
                         data.UpgradeProperties.GetValueOrDefault("evadeReduce", 5)))),
@@ -165,7 +167,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new ApplyDebuffPostActivationModifier(new Weakness(
+                    new AbilityDebuffPostActivationModifier(new Weakness(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
                         data.UpgradeProperties.GetValueOrDefault("evadeReduce", 5)))),
@@ -188,6 +190,68 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Cc_Upgrade_Additional_Attack_Chance"] = data =>
+                new CcUpgradeAdditionalAttackChance(
+                    data.Id,
+                    data.Tags,
+                    data.Tier),
+            ["Ability_Ds_Upgrade_Additional_Attack_Chance"] = data =>
+                new DsUpgradeAdditionalAttackChance(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Ds_Upgrade_Additional_Accuracy"] = data =>
+                new DsUpgradeAdditionalAccuracy(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.2f)),
+            ["Ability_Ds_Upgrade_Immortality"] = data =>
+                new DsUpgradeImmortality(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("lifeToRecover", 0.35f),
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 1)),
+            ["Ability_Ds_Upgrade_Mana_Regen"] = data =>
+                new DsUpgradeManaRegen(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.05f)),
+            ["Ability_Ds_Upgrade_Additional_Health_Regen"] = data =>
+                new DsUpgradeAdditionalHealthRegen(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("additionalRegen", 0.025f)),
+            ["Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks"] = data =>
+                new DsUpgradeAddEffectivenessReduceStacks(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("additionalEffectiveness", 0.35f),
+                    (int)data.UpgradeProperties.GetValueOrDefault("amountStacks", 2)),
+            ["Ability_Ds_Upgrade_Increased_Buff_Duration"] = data =>
+                new DsUpgradeIncreasedBuffDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("duration", 1)),
+            ["Ability_Ds_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Ds_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 25)),
         };
     }
 }

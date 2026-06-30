@@ -7,19 +7,24 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Decorators;
+    using Effects;
+    using Godot;
     using Module;
 
     /// <summary>
     /// Self-cast defensive ability. Applies LightStep evasion stacks and percentage health regeneration.
-    /// Base: 4 LightStep stacks, 5% max health regen per turn for 5 turns.
     /// </summary>
     public class DarkShroud(
         string[] tags,
         int cooldown,
         int costValue,
+        int stacks,
+        float healthRegen,
+        float lightStepValue,
         float buffDuration,
         float buffEffectiveness = 1f,
         Costs costType = Costs.Mana)
@@ -28,9 +33,6 @@ namespace Battle.Source.Abilities.DarkShroud
             tags,
             cooldown,
             costValue,
-            damage: 0,
-            weaponDamageScale: 0,
-            spellDamageScale: 0,
             costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
@@ -44,29 +46,64 @@ namespace Battle.Source.Abilities.DarkShroud
                 {
                     [Parameters.Duration] = new Module<Parameters>(() => buffDuration, Parameters.Duration),
                     [Parameters.Effectiveness] = new Module<Parameters>(() => buffEffectiveness, Parameters.Effectiveness),
+                    [Parameters.Stacks] = new Module<Parameters>(() => stacks, Parameters.Stacks),
+                    [Parameters.HealthRegen] = new Module<Parameters>(() => healthRegen, Parameters.HealthRegen),
+                    [Parameters.LightStepValue] = new Module<Parameters>(() => lightStepValue, Parameters.LightStepValue),
                 });
                 return field;
             }
         }
 
-        public IDarkShroudExecutionStrategy ExecutionStrategy { get; set; } = new DefaultExecutionStrategy();
-        public float BuffDuration => this[Parameters.Duration];
-        public float BuffEffectiveness => this[Parameters.Effectiveness];
-
+        public float Duration => this[Parameters.Duration];
+        public float Effectiveness => this[Parameters.Effectiveness];
+        public float Stacks => this[Parameters.Stacks];
+        public float LightStepValue => this[Parameters.LightStepValue];
+        public float HealthRegen => this[Parameters.HealthRegen];
 
         public enum Parameters
         {
             Effectiveness,
             Duration,
+            Stacks,
+            HealthRegen,
+            LightStepValue
+        }
+
+        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        {
+            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
+            {
+                base.AddParameterDecorator(decorator);
+                return;
+            }
+
+            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+        }
+
+        public override void RemoveParameterDecorator<T>(string id, T key)
+        {
+            if (key is not Parameters parameter)
+            {
+                base.RemoveParameterDecorator(id, key);
+                return;
+            }
+
+            AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()
         {
-            var copy = new DarkShroud(Tags, (int)Cooldown, CostValue, BuffDuration, BuffEffectiveness, CostType);
+            var copy = new DarkShroud(Tags, (int)Cooldown, CostValue, stacks, healthRegen, lightStepValue, buffDuration, buffEffectiveness, CostType);
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => ExecutionStrategy.Execute(targets, owner, field);
+        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        {
+            var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId };
+            await new LightStep(Mathf.RoundToInt(Duration), Mathf.RoundToInt(Stacks), LightStepValue * Effectiveness)
+                .ApplyStacks(context, Mathf.RoundToInt(Stacks));
+            await new HealthRegenerationEffect(HealthRegen * Effectiveness, Mathf.RoundToInt(Duration), 1).Apply(context);
+        }
     }
 }

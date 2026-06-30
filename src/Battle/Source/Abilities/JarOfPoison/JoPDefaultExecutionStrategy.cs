@@ -18,16 +18,11 @@ namespace Battle.Source.Abilities.JarOfPoison
 
         protected async Task ApplyToTarget(JarOfPoison ability, IEntity owner, IEntity target)
         {
-            float damage = ability.Damage
-                           + (owner.Parameters.Damage * ability.WeaponDamageScale)
-                           + (owner.Parameters.SpellDamage * ability.SpellDamageScale);
+            float damage = ability.Damage + (owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale);
 
-            var effect = ability.Effect?.Copy();
             var context = new EffectApplyingContext { Caster = owner, Target = target, Source = ability.InstanceId, Damage = damage };
             var poison = new DamageOverTurnEffect(ability.PoisonDuration, StatusEffects.Poison);
             await poison.Apply(context);
-            if (effect == null) return;
-            await effect.Apply(context);
         }
     }
 }

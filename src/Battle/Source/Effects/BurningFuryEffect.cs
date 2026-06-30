@@ -30,7 +30,7 @@
                 Target = context.Target,
                 Caster = Target,
                 Damage = HealthBurned,
-                Source = Id,
+                Source = InstanceId,
                 IsCritical = false
             });
         }

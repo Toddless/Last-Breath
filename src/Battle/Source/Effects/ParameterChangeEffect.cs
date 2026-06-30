@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Effects
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using Decorators;
     using Core.Enums;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
     public abstract class ParameterChangeEffect(

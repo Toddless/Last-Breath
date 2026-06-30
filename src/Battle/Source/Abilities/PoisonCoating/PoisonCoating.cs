@@ -17,7 +17,6 @@ namespace Battle.Source.Abilities.PoisonCoating
     /// <summary>
     /// Self-cast buff. For <see cref="CoatingDuration"/> turns, each of the caster's attacks
     /// applies a poison stack to the target.
-    /// Cost: 100 mana. Cooldown: 7 turns.
     /// </summary>
     public class PoisonCoating(
         string[] tags,
@@ -32,9 +31,6 @@ namespace Battle.Source.Abilities.PoisonCoating
             tags,
             cooldown,
             costValue,
-            damage: 0,
-            weaponDamageScale: 0,
-            spellDamageScale: 0,
             costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
@@ -86,7 +82,7 @@ namespace Battle.Source.Abilities.PoisonCoating
 
         public override IAbility Copy()
         {
-            var copy = new PoisonCoating(tags, cooldown, costValue, coatingDuration, poisonDuration, poisonDamagePercent, costType);
+            var copy = new PoisonCoating(Tags, cooldown, CostValue, CoatingDuration, PoisonDuration, PoisonDamagePercent, CostType);
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }

@@ -2,8 +2,11 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
     using Utilities;
 
@@ -13,7 +16,7 @@
         int cooldown,
         float percentHealthToSacrifice,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, costType)
+        : Ability(id: "Ability_Sacrifice", tags, cooldown, costValue,  costType)
     {
         public float PercentHealthToSacrifice { get; } = percentHealthToSacrifice;
 
@@ -23,6 +26,8 @@
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentHealthToSacrifice * 100);
 

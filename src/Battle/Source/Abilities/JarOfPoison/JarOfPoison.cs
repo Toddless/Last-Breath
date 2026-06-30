@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         float spellDamageScale,
         int poisonDuration,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : AttackAbility(id: "Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
 

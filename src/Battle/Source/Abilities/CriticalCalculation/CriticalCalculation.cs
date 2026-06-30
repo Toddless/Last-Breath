@@ -30,9 +30,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
             tags,
             cooldown,
             costValue,
-            damage: 0,
-            weaponDamageScale: 0,
-            spellDamageScale: 0,
             costType)
     {
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator

@@ -38,7 +38,7 @@
             float damage = context.FinalDamage;
             var target = context.Target;
             var bleed = _damageOverTurnEffect.Copy();
-            var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = Id };
+            var applyContext = new EffectApplyingContext { Caster = Owner, Target = target, Damage = damage, Source = InstanceId };
             bleed.Apply(applyContext);
         }
 

@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Godot;
 
@@ -15,7 +16,7 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Costs costType = Costs.Mana) : Ability(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        Costs costType = Costs.Mana) : AttackAbility(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private async Task PerformMultipleAttacks(List<IEntity> targets)
         {
@@ -50,5 +51,7 @@
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
+        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
     }
 }

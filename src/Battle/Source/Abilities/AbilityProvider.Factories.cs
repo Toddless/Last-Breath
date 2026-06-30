@@ -7,7 +7,7 @@
 
     public partial class AbilityProvider
     {
-         private readonly Dictionary<string, Func<AbilityBaseData, IAbility>> _abilityFactories = new()
+        private readonly Dictionary<string, Func<AbilityBaseData, IAbility>> _abilityFactories = new()
         {
             ["Ability_Series_Of_Attacks"] = data => new SeriesOfAttacks.SeriesOfAttacks(
                 data.Tags,
@@ -57,8 +57,11 @@
                 data.Tags,
                 data.Cooldown,
                 data.CostValue,
-                buffDuration: 3,
-                buffEffectiveness: 1f,
+                (int)data.AbilityProperties.GetValueOrDefault("stacks", 3),
+                data.AbilityProperties.GetValueOrDefault("healthRegen", 0.05f),
+                    data.AbilityProperties.GetValueOrDefault("lightStepValue", 0.15f),
+                (int)data.AbilityProperties.GetValueOrDefault("duration", 3),
+                data.AbilityProperties.GetValueOrDefault("effectiveness", 1f),
                 data.CostsType),
             ["Ability_Critical_Calculation"] = data => new CriticalCalculation.CriticalCalculation(
                 data.Tags,
@@ -68,6 +71,5 @@
                 3,
                 data.CostsType)
         };
-
     }
 }

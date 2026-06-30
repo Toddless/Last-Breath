@@ -24,7 +24,7 @@
         int maxAttacks,
         float damageMultiplier = 1,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : AttackAbility(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private Dictionary<string, IAttackModifier> _attackModifiers = [];
 

@@ -17,13 +17,10 @@
         IEntityAttribute Dexterity { get; }
         IEntityAttribute Strength { get; }
         IEntityAttribute Intelligence { get; }
-
         IEntityGroup? Group { get; set; }
-
         StatusEffects StatusEffects { get; }
 
         bool CanMove { get; set; }
-
         float CurrentHealth { get; set; }
         float CurrentBarrier { get; set; }
         float CurrentMana { get; set; }

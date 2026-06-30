@@ -6,7 +6,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     /// L3 upgrade: replaces the crit chance buff with an additional hit chance buff
     /// (AdditionalHitChance), keeping the same stack/duration mechanics.
     /// </summary>
-    public class CcUpgradeReplaceWithHitChanceBuff(string id, string[] tags, int tier)
+    public class CcUpgradeAdditionalAttackChance(string id, string[] tags, int tier)
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
 
@@ -19,6 +19,6 @@ namespace Battle.Source.Abilities.CriticalCalculation
         }
 
         public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
-            new CcUpgradeReplaceWithHitChanceBuff(Id, Tags, Tier);
+            new CcUpgradeAdditionalAttackChance(Id, Tags, Tier);
     }
 }

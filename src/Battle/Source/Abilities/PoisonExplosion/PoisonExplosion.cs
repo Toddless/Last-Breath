@@ -14,7 +14,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     /// Removes all poison stacks from the target and instantly deals their accumulated damage.
     /// Executes the target if it had more than <see cref="ExecutionThreshold"/> stacks.
     /// </summary>
-    public class PoisonExplosion : Ability
+    public class PoisonExplosion : AttackAbility
     {
         public PoisonExplosion(string[] tags,
             int cooldown,

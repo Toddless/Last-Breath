@@ -24,7 +24,7 @@
         int maxAttacks,
         float increaseAttackDamageStep,
         Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : AttackAbility(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
         private Dictionary<string, IAttackModifier> _attackModifiers = [];

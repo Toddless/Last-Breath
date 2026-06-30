@@ -1,6 +1,8 @@
 ﻿namespace Battle.Internal.Components
 {
     using System;
+    using Godot;
+    using Source;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -10,18 +12,17 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
-    using Godot;
-    using Source;
 
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {
-        private readonly Dictionary<string, List<IEffect>> _effects = [];
+        private readonly Dictionary<string, List<IEffect>> _effectsBySource = [];
         private readonly List<DotTick> _dotTicks = [];
-        public IReadOnlyList<IEffect> Effects => _effects.Values.SelectMany(x => x).ToList();
+        public IReadOnlyList<IEffect> Effects => _effectsBySource.Values.SelectMany(x => x).ToList();
         public event Action<IEffect>? EffectAdded;
         public event Action<IEffect>? EffectRemoved;
 
-        public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effects.Values.ToList().SelectMany(list => list.Where(predicate));
+        public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effectsBySource.Values.ToList().SelectMany(list => list.Where(predicate));
+        public IEnumerable<IEffect> GetBySource(string source) => _effectsBySource.GetValueOrDefault(source, []);
 
         public void RegisterDotTick(DotTick tick) => _dotTicks.Add(tick);
 
@@ -41,32 +42,32 @@
         {
             string source = effect.Source;
             if (string.IsNullOrWhiteSpace(source)) return;
-            _effects.TryGetValue(source, out List<IEffect>? effects);
+            _effectsBySource.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
             _dotTicks.RemoveAll(dot => dot.Source == effect.Id);
-            if (effects?.Count == 0) _effects.Remove(source);
+            if (effects?.Count == 0) _effectsBySource.Remove(source);
             EffectRemoved?.Invoke(effect);
         }
 
         public void RemoveEffectByStatus(StatusEffects status)
         {
-            foreach (var effect in _effects.Values.SelectMany(x => x).Where(x => x.Status == status))
+            foreach (var effect in _effectsBySource.Values.SelectMany(x => x).Where(x => x.Status == status))
                 effect.Remove();
         }
 
         public void RemoveEffectBySource(string source)
         {
-            _effects.TryGetValue(source, out List<IEffect>? effects);
+            _effectsBySource.TryGetValue(source, out List<IEffect>? effects);
             foreach (var effect in effects ?? [])
                 effect.Remove();
         }
 
         public void RemoveAllEffects()
         {
-            foreach (var effect in _effects.Values.SelectMany(x => x).ToList())
+            foreach (var effect in _effectsBySource.Values.SelectMany(x => x).ToList())
                 effect.Remove();
 
-            _effects.Clear();
+            _effectsBySource.Clear();
             _dotTicks.Clear();
         }
 
@@ -105,7 +106,7 @@
         private List<IEffect> GetEffects()
         {
             var effects = new List<IEffect>();
-            foreach (var permanentEffect in _effects.Values)
+            foreach (var permanentEffect in _effectsBySource.Values)
                 effects.AddRange(permanentEffect);
 
             return effects;
@@ -177,10 +178,10 @@
 
         private List<IEffect> GetEffectsForSource(string source)
         {
-            if (_effects.TryGetValue(source, out List<IEffect>? effects)) return effects;
+            if (_effectsBySource.TryGetValue(source, out List<IEffect>? effects)) return effects;
 
             effects = [];
-            _effects[source] = effects;
+            _effectsBySource[source] = effects;
             return effects;
         }
     }
