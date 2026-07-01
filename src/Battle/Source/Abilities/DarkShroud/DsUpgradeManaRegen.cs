@@ -13,7 +13,9 @@ namespace Battle.Source.Abilities.DarkShroud
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new AbilityBuffPostActivationModifier(new ManaRegenerationEffect(regenAmount * ability.Effectiveness, (int)ability.Duration, (int)ability.Stacks));
+            var modifier = new DeferredEffectPostActivationModifier(
+                "Ability_Apply_Effect_Mana_Regeneration_Post_Activation_Modifier",
+                () => new ManaRegenerationEffect(regenAmount * ability.Effectiveness, (int)ability.Duration, 1));
             _modifierId = modifier.Id;
             ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
         }

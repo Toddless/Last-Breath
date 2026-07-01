@@ -1,13 +1,15 @@
-﻿namespace LastBreath.Components
+namespace LastBreath.Components
 {
     using System.Collections.Generic;
     using Core.Interfaces;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
 
     public class ModifierHandlerComponent : IModifierHandlerComponent
     {
         private readonly List<IHealModifier> _healModifiers = [];
         private readonly List<IDamageModifier> _damageModifiers = [];
+        private readonly List<IAttackModifier> _attackModifiers = [];
 
         public void Add<T>(T modifier)
         {
@@ -18,6 +20,9 @@
                     break;
                 case IDamageModifier damageModifier:
                     _damageModifiers.Add(damageModifier);
+                    break;
+                case IAttackModifier attackModifier:
+                    _attackModifiers.Add(attackModifier);
                     break;
             }
         }
@@ -31,6 +36,9 @@
                     break;
                 case IDamageModifier damageModifier:
                     _damageModifiers.Remove(damageModifier);
+                    break;
+                case IAttackModifier attackModifier:
+                    _attackModifiers.Remove(attackModifier);
                     break;
             }
         }
@@ -46,6 +54,10 @@
                 case IDamageContext damageCtx:
                     foreach (var modifier in _damageModifiers)
                         modifier.Apply(damageCtx);
+                    break;
+                case IAttackContext attackCtx:
+                    foreach (var modifier in _attackModifiers)
+                        modifier.Apply(attackCtx);
                     break;
             }
         }

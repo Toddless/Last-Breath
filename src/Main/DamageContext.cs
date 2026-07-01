@@ -11,5 +11,6 @@
         public DamageType Type { get; set; }
         public DamageCause Cause { get; set; }
         public bool IsCrit { get; set; } = false;
+        public float AbsorbedByBarrier { get; set; }
     }
 }

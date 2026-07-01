@@ -103,7 +103,7 @@ namespace LastBreath.Npc
             get => Mathf.Max(0, field);
             set
             {
-                float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
+                float clamped = Mathf.Clamp(value, 0, Parameters.MaxBarrier);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
                 NotifyBarrierChanges(field);
@@ -274,15 +274,16 @@ namespace LastBreath.Npc
                 {
                     case AttackResults.Succeed:
                         Calculations.CalculateFinalDamage(context);
-                        CombatEvents.Publish<BeforeDamageTakenEvent>(new(context));
-                        await TakeDamage(new DamageContext
+                        var damageContext = new DamageContext
                         {
                             Source = context.Attacker,
                             Damage = context.FinalDamage,
                             Type = DamageType.Normal,
                             Cause = DamageCause.Attack,
                             IsCrit = context.ForceCriticalAttack || context.IsCritical
-                        });
+                        };
+                        await TakeDamage(damageContext);
+                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
@@ -295,6 +296,7 @@ namespace LastBreath.Npc
                 }
 
                 context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+                context.Attacker.ModifierHandler.Apply(context);
                 context.Attacker.Effects.TriggerAfterAttack(context);
             }
             catch (Exception e)
@@ -331,9 +333,21 @@ namespace LastBreath.Npc
         public Task TakeDamage(IDamageContext context)
         {
             // TODO: Here i need to calculate final damage with armor/resistance etc
+            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+
+            float remaining = context.Damage;
+            if (CurrentBarrier > 0)
+            {
+                float absorbed = Mathf.Min(CurrentBarrier, remaining);
+                context.AbsorbedByBarrier = absorbed;
+                CurrentBarrier -= absorbed;
+                remaining -= absorbed;
+            }
+
+            if (remaining > 0) CurrentHealth -= remaining;
+
             CombatEvents.Publish(new DamageTakenEvent(context, this));
             _battleEventBus?.Publish(new DamageTakenEvent(context, this));
-            CurrentHealth -= context.Damage;
             // await Animations.PlayAnimationAsync("Hurt");
             return Task.CompletedTask;
         }

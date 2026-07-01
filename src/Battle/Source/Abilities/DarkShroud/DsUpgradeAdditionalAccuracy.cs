@@ -12,10 +12,11 @@ namespace Battle.Source.Abilities.DarkShroud
     {
         private string _modifierId = string.Empty;
 
-
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new AbilityBuffPostActivationModifier(new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, amount));
+            var modifier = new DeferredEffectPostActivationModifier(
+                "Ability_Apply_Effect_Accuracy_Buff_Post_Activation_Modifier",
+                () => new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, amount));
             _modifierId = modifier.Id;
             ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
         }

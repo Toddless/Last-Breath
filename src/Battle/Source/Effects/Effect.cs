@@ -32,7 +32,18 @@
         }
 
         public StatusEffects Status { get; set; } = statusEffect;
-        public int Duration { get; set; } = duration;
+
+        public int Duration
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                field = value;
+                DurationChanged?.Invoke(field);
+            }
+        } = duration;
+
         public int MaxStacks { get; set; } = maxStacks;
         public string Source { get; private set; } = string.Empty;
         public bool Expired => Duration == 0;
@@ -66,14 +77,12 @@
 
         public virtual void OnStackChanged(int currentStack)
         {
-
         }
 
         public virtual void TurnEnd()
         {
             if (Expired) Remove();
             Duration--;
-            DurationChanged?.Invoke(Duration);
         }
 
         public virtual void TurnStart()
@@ -93,8 +102,6 @@
         public virtual bool IsStronger(IEffect otherEffect) => false;
 
         public abstract IEffect Copy();
-
-
 
         protected virtual string FormatDescription() => Localization.LocalizeDescription(Id);
     }

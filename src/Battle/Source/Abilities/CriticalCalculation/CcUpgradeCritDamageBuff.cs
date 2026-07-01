@@ -4,27 +4,19 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Effects;
 
     /// <summary>
-    /// L3 upgrade option: while the crit buff is active, also grants critical damage boost for 3 turns,
-    /// and each successful attack increases the bearer's crit chance by 15%.
+    /// L2: on cast, buffs the caster with a critical-damage boost that also raises crit chance
+    /// after each successful attack, for the given duration.
     /// </summary>
-    public class CcUpgradeCritDamageBuff(string id, string[] tags, int tier,
-        float critDamageBonus = 1.0f, float critChancePerHit = 0.15f, int critDamageDuration = 3)
+    public class CcUpgradeCritDamageBuff(string id, string[] tags, int tier, float critDamageBonus, float critDamagePerCritAttack, int duration)
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
-        private IEffect? _critDmgEffect;
+        private readonly IAbilityPostActivationModifier _modifier =
+            new AbilityBuffPostActivationModifier(new CritDamageOnHitBuff(critDamageBonus, duration, critDamagePerCritAttack));
 
-        public override void ApplyUpgrade(CriticalCalculation ability)
-        {
-            _critDmgEffect = new CritDamageOnHitBuff(
-                critDamageBonus, critDamageDuration, critChancePerHit);
-        }
+        public override void ApplyUpgrade(CriticalCalculation ability) => ability.PostActivationEffect.TryAdd(_modifier.Id, _modifier);
 
-        public override void RemoveUpgrade(CriticalCalculation ability)
-        {
-            _critDmgEffect = null;
-        }
+        public override void RemoveUpgrade(CriticalCalculation ability) => ability.PostActivationEffect.Remove(_modifier.Id);
 
-        public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
-            new CcUpgradeCritDamageBuff(Id, Tags, Tier, critDamageBonus, critChancePerHit, critDamageDuration);
+        public override IAbilityUpgrade Copy() => new CcUpgradeCritDamageBuff(Id, Tags, Tier, critDamageBonus, critDamagePerCritAttack, duration);
     }
 }

@@ -48,15 +48,17 @@
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
         {
-            if (evnt.Context.Result is not AttackResults.Succeed) return;
+            // Only echo real attack damage — not our own deferred hit (Passive/Pure) or DoTs,
+            // otherwise the event now firing inside TakeDamage would re-process them endlessly.
+            if (evnt.Context.Cause is not DamageCause.Attack) return;
             var context = evnt.Context;
-            float actualDamage = context.FinalDamage * DelayedDamagePercent;
-            float toDealLater = context.FinalDamage - actualDamage;
-            context.FinalDamage = actualDamage;
-            if (!_damageSources.TryGetValue(context.Attacker, out List<DamageEntry>? sources))
+            float actualDamage = context.Damage * DelayedDamagePercent;
+            float toDealLater = context.Damage - actualDamage;
+            context.Damage = actualDamage;
+            if (!_damageSources.TryGetValue(context.Source, out List<DamageEntry>? sources))
             {
                 sources = [];
-                _damageSources[context.Attacker] = sources;
+                _damageSources[context.Source] = sources;
             }
 
             sources.Add(new DamageEntry { Turns = Turns, Damage = toDealLater });

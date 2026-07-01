@@ -12,9 +12,9 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
-    using Decorators;
     using Godot;
     using Module;
+    using Source.Decorators;
     using Utilities;
 
     public abstract class Ability(

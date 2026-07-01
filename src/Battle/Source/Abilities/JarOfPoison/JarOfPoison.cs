@@ -10,8 +10,8 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
-    using Decorators;
     using Module;
+    using Source.Decorators;
 
     public class JarOfPoison(
         string[] tags,

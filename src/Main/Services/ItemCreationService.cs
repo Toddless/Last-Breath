@@ -62,7 +62,7 @@
                         mod.EntityParameter,
                         mod.ModifierValueType,
                         ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierValueType),
-                        item)));
+                        item.InstanceId)));
 
                 item.SetModifiers(mods);
                 item.SaveModifiersPool(modifiers.Select(x => x.Obj));

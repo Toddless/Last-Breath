@@ -1,26 +1,27 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
-    using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Effects;
 
     /// <summary>
-    /// L2 upgrade: additionally increases the bearer's critical chance by a flat amount
-    /// by adding an extra ParameterBuffEffect to the ability's effects list.
+    /// L3: on cast, additionally raises the caster's critical chance for the ability's buff duration.
     /// </summary>
-    public class CcUpgradeIncreaseCritChance(string id, string[] tags, int tier, float critChanceBonus = 0.05f)
+    public class CcUpgradeIncreaseCritChance(string id, string[] tags, int tier, float criticalChance)
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
-        private IEffect? _addedEffect;
+        private string _modifierId = string.Empty;
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
+            var modifier = new DeferredEffectPostActivationModifier(
+                "Ability_Apply_Cc_Crit_Chance_Buff_Post_Activation_Modifier",
+                () => new CriticalChanceBuffEffect(ability.BuffDuration, 1, criticalChance));
+            _modifierId = modifier.Id;
+            ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
         }
 
-        public override void RemoveUpgrade(CriticalCalculation ability)
-        {
-        }
+        public override void RemoveUpgrade(CriticalCalculation ability) => ability.PostActivationEffect.Remove(_modifierId);
 
-        public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
-            new CcUpgradeIncreaseCritChance(Id, Tags, Tier, critChanceBonus);
+        public override IAbilityUpgrade Copy() => new CcUpgradeIncreaseCritChance(Id, Tags, Tier, criticalChance);
     }
 }

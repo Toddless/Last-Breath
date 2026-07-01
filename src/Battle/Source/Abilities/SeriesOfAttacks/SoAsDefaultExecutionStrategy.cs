@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Godot;
@@ -45,8 +46,10 @@
                         }
                     }
 
+                    context.Index = i;
+                    context.TotalCount = ability.MaxAttacks;
                     foreach (IAttackModifier modifier in ability.AttackModifiers)
-                        modifier.Apply(context, new AttackMetadata(i, ability.MaxAttacks));
+                        modifier.Apply(context);
                 }
             }
         }

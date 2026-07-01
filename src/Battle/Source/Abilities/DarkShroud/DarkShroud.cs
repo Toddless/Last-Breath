@@ -10,10 +10,10 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
-    using Decorators;
     using Effects;
     using Godot;
     using Module;
+    using Source.Decorators;
 
     /// <summary>
     /// Self-cast defensive ability. Applies LightStep evasion stacks and percentage health regeneration.

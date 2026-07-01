@@ -10,9 +10,9 @@ namespace Battle.Source.Abilities.PoisonCoating
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
-    using Decorators;
     using Effects;
     using Module;
+    using Source.Decorators;
 
     /// <summary>
     /// Self-cast buff. For <see cref="CoatingDuration"/> turns, each of the caster's attacks

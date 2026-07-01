@@ -24,22 +24,21 @@
                 for (int i = 0; i < ability.Attacks; i++)
                 {
                     if (!target.IsAlive) break;
-                    var meta = new AttackMetadata(i, (int)ability.Attacks);
                     float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
                     additionalDamage *= increase;
                     float damage = owner.Parameters.Damage * increase;
                     var context = new AttackContext(owner, target, damage, rnd, scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance,
-                        RawCriticalDamage = owner.Parameters.CriticalDamage,
-                        AdditionalDamage = additionalDamage
+                        RawCriticalChance = owner.Parameters.CriticalChance, RawCriticalDamage = owner.Parameters.CriticalDamage, AdditionalDamage = additionalDamage
                     };
+
+                    context.Index = i;
+                    context.TotalCount = (int)ability.Attacks;
+                    foreach (var modifier in ability.AttackModifiers)
+                        modifier.Apply(context);
 
                     if (!context.Schedule()) break;
                     await scheduler.DrainQueue(cts.Token);
-
-                    foreach (var modifier in ability.AttackModifiers)
-                        modifier.Apply(context, meta);
 
                     if (context.Result is AttackResults.Succeed) increase += ability.AttackDamageMultiplier;
                 }

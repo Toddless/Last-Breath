@@ -194,7 +194,62 @@
                 new CcUpgradeAdditionalAttackChance(
                     data.Id,
                     data.Tags,
-                    data.Tier),
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("value", 0.15f)),
+            ["Ability_Cc_Upgrade_Additional_Crit_Chance"] = data =>
+                new CcUpgradeIncreaseCritChance(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("criticalChance", 0.08f)),
+            ["Ability_Cc_Upgrade_Lucky_Crit"] = data =>
+                new CcUpgradeLuckyCrit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
+            ["Ability_Cc_Upgrade_Additional_Crit_Multiplier"] = data =>
+                new CcUpgradeCritDamageBuff(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("multiplier", 0.15f),
+                    data.UpgradeProperties.GetValueOrDefault("critChancePerHit", 0.15f),
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
+            ["Ability_Cc_Upgrade_Apply_Enhanced_Defence"] = data =>
+                new CcUpgradeApplyEnhancedDefence(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 3),
+                    data.UpgradeProperties.GetValueOrDefault("value", 0.15f)),
+            ["Ability_Cc_Upgrade_Leach_On_Crit"] = data =>
+                new CcUpgradeLeachOnCrit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f),
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
+            ["Ability_Cc_Upgrade_More_Stacks_More_Cost"] = data =>
+                new CcUpgradeMoreStacksMoreCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 1),
+                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
+            ["Ability_Cc_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Cc_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
             ["Ability_Ds_Upgrade_Additional_Attack_Chance"] = data =>
                 new DsUpgradeAdditionalAttackChance(
                     data.Id,

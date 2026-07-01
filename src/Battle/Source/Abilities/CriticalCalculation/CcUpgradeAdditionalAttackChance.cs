@@ -1,24 +1,29 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
+    using System;
     using Core.Interfaces.Abilities;
-    using Core.Modifiers;
+    using Effects;
+
     /// <summary>
-    /// L3 upgrade: replaces the crit chance buff with an additional hit chance buff
-    /// (AdditionalHitChance), keeping the same stack/duration mechanics.
+    /// L3: replaces the ability's primary crit-chance buff with a self-extending additional-attack-chance
+    /// buff (same stack/duration/extend-on-crit mechanic). Swaps the ability's primary buff factory.
     /// </summary>
-    public class CcUpgradeAdditionalAttackChance(string id, string[] tags, int tier)
+    public class CcUpgradeAdditionalAttackChance(string id, string[] tags, int tier, float value = 0.15f)
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
+        private Func<int, int, IEffect>? _previous;
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
+            _previous = ability.PrimaryBuffFactory;
+            ability.PrimaryBuffFactory = (duration, maxStacks) => new AttackChanceCalculationBuff(duration, maxStacks, value: value);
         }
 
         public override void RemoveUpgrade(CriticalCalculation ability)
         {
+            if (_previous != null) ability.PrimaryBuffFactory = _previous;
         }
 
-        public override IAbilityUpgradeWrap<CriticalCalculation> Copy() =>
-            new CcUpgradeAdditionalAttackChance(Id, Tags, Tier);
+        public override IAbilityUpgrade Copy() => new CcUpgradeAdditionalAttackChance(Id, Tags, Tier, value);
     }
 }

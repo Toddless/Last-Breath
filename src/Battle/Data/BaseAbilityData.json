@@ -270,9 +270,9 @@
             "costValue": 100,
             "costType": 0,
             "abilityProperties": {
-                "buffDuration": 3,
+                "duration": 3,
                 "effectiveness": 1,
-                "maxStacks": 4,
+                "stacks": 4,
                 "healthRegen": 0.05,
                 "lightStepValue": 0.15
             },
@@ -328,7 +328,7 @@
                     }
                 },
                 {
-                    "id": "Ability_Ds_Upgrade_Incrased_Buff_Duration",
+                    "id": "Ability_Ds_Upgrade_Increased_Buff_Duration",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
@@ -385,7 +385,9 @@
                     "id": "Ability_Cc_Upgrade_Lucky_Crit",
                     "tier": 3,
                     "tags": [],
-                    "upgradeProperties": {}
+                    "upgradeProperties": {
+                        "duration": 3
+                    }
                 },
                 {
                     "id": "Ability_Cc_Upgrade_Additional_Crit_Multiplier",
@@ -410,7 +412,8 @@
                     "tags": [],
                     "upgradeProperties": {
                         "duration": 3,
-                        "stacks": 3
+                        "stacks": 3,
+                        "value": 0.15
                     }
                 },
                 {

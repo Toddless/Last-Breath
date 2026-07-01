@@ -2,5 +2,5 @@
 {
     using Battle;
 
-    public record BeforeDamageTakenEvent(IAttackContext Context) : ICombatEvent, IBattleEvent;
+    public record BeforeDamageTakenEvent(IDamageContext Context) : ICombatEvent, IBattleEvent;
 }

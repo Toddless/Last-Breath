@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.PassiveSkills
+namespace Battle.Source.PassiveSkills
 {
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
@@ -18,8 +18,8 @@
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
             if (Owner == null) return;
-            float toHeal = evnt.Context.FinalDamage * LeachPercent;
-            Owner.Heal(new HealContext(Owner, Owner) { Amount = toHeal });
+            float leeched = evnt.Context.FinalDamage * LeachPercent;
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = leeched });
         }
 
         public override void Detach(IEntity owner)

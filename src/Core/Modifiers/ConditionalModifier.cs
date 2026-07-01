@@ -5,7 +5,7 @@
     using Interfaces;
     using Interfaces.Entity;
 
-    public class ConditionalModifier(float weight, ModifierValueType valueType, EntityParameter parameter, float value, ICondition condition, object source)
+    public class ConditionalModifier(float weight, ModifierValueType valueType, EntityParameter parameter, float value, ICondition condition, string source)
         : IConditionalModifier
     {
         public float Weight { get; set; } = weight;
@@ -14,7 +14,7 @@
         public float BaseValue { get; } = value;
         public float Value { get; set; } = value;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public object Source { get; } = source;
+        public string Source { get; } = source;
         public bool IsActive => condition.IsMet;
         public IModifierInstance Copy() => new ConditionalModifier(Weight, ModifierValueType, EntityParameter, BaseValue, condition, Source);
         public void ApplyTo(IEntity target) => throw new NotImplementedException();

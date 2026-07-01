@@ -146,8 +146,8 @@ namespace Utilities
                 newItem.UpdateLevel = item.UpdateLevel;
                 newItem.MaxUpdateLevel = item.MaxUpdateLevel;
                 newItem.SetItemEffect(item.EffectId);
-                newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem));
-                newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem));
+                newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem.InstanceId));
+                newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem.InstanceId));
                 items.Add(newItem);
             }
 

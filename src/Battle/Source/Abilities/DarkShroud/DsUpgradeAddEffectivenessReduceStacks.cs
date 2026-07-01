@@ -5,8 +5,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Decorators;
 
     /// <summary>
-    /// L2 upgrade: increases buff effectiveness while reducing the number of LightStep stacks applied.
-    /// Two decorators on the ability's own parameters.
+    /// L2 upgrade: increases buff effectiveness while reducing the number of LightStep stacks applied
     /// </summary>
     public class DsUpgradeAddEffectivenessReduceStacks(string id, string[] tags, int tier, float additionalEffectiveness, int amountStacks)
         : AbilityUpgrade<DarkShroud>(id, tags, tier)

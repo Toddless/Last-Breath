@@ -25,7 +25,11 @@
             float additionalDamage = context.AdditionalDamage;
             context.FinalDamage = baseDamage + additionalDamage;
             if (context.IsCritical || context.ForceCriticalAttack)
-                context.FinalDamage *= context.RawCriticalDamage;
+            {
+                // Mitigation is 0 for most targets -> factor is 1 (no-op). Clamped so over-stacking can't invert damage.
+                float critMitigation = Mathf.Clamp(context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation), 0f, 1f);
+                context.FinalDamage *= context.RawCriticalDamage * (1 - critMitigation);
+            }
             float effectiveArmor = context.Target.Parameters.Armor * (1 - context.Attacker.Parameters.ArmorPenetration);
             context.FinalDamage *= 1 - (effectiveArmor / (effectiveArmor + ArmorScalingFactor));
         }

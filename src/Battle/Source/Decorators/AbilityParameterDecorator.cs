@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities.Decorators
+﻿namespace Battle.Source.Decorators
 {
     using System;
     using Core.Enums;

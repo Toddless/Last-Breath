@@ -23,6 +23,11 @@
         public bool IsUnevadable { get; set; }
         public bool IsUnblockable { get; set; }
 
+        public int Index { get; set; }
+        public int TotalCount { get; set; } = 1;
+        public bool IsFirst => Index == 0;
+        public bool IsLast => Index == TotalCount - 1;
+
         public bool IsValid => Target.IsAlive && Attacker.IsAlive;
 
         public bool Schedule()

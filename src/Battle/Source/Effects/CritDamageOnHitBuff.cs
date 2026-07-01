@@ -15,42 +15,40 @@ namespace Battle.Source.Effects
     public class CritDamageOnHitBuff(
         float critDamageBonus,
         int duration,
-        float critChancePerHit,
+        float critDamagePerHit,
         int maxStacks = 1,
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Crit_Damage_On_Hit_Buff", duration, maxStacks, statusEffect)
     {
-        private readonly ChangeValueDecorator _critDamageDecorator = new(
+        private readonly EntityParameterDecorator _critDamageDecorator = new("Effect_Crit_Dmg_Buff_Decorator",
+            critDamageBonus,
+            OperationType.Add,
             EntityParameter.CriticalDamage,
-            Priority.Weak,
-            "Effect_Crit_Dmg_Buff_Decorator",
-            1f + critDamageBonus);
+            Priority.Weak);
 
         public override async Task Apply(EffectApplyingContext context)
         {
             context.Target.Parameters.AddModuleDecorator(_critDamageDecorator);
-           await base.Apply(context);
+            await base.Apply(context);
         }
 
         public override void AfterAttack(IAttackContext context)
         {
             if (Target == null) return;
-            if (context.Result != AttackResults.Succeed) return;
+            if (context.Result != AttackResults.Succeed && !context.IsCritical) return;
 
-            // Flat increase to crit chance on each successful attack
-            var modifier = new SimpleModifier(EntityParameter.CriticalChance, ModifierValueType.Flat, critChancePerHit, $"CC_CritChance_OnHit_{InstanceId}");
+            // Flat increase to crit damage on each successful critical attack
+            var modifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, critDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
             modifier.ApplyTo(Target);
-            // Note: this modifier persists for the remainder of the fight (intentional for stacking).
-            // Add Remove tracking if needed.
         }
 
         public override void Remove()
         {
             Target?.Parameters.RemoveModuleDecorator(_critDamageDecorator.Id, EntityParameter.CriticalDamage);
+            Target?.ParameterModifiers.RemoveModifierBySource($"CC_CritChance_OnHit_{InstanceId}");
             base.Remove();
         }
 
-        public override IEffect Copy() =>
-            new CritDamageOnHitBuff(critDamageBonus, Duration, critChancePerHit, MaxStacks, Status);
+        public override IEffect Copy() => new CritDamageOnHitBuff(critDamageBonus, Duration, critDamagePerHit, MaxStacks, Status);
     }
 }

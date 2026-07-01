@@ -32,12 +32,13 @@
 
         protected EntityAttribute(IEnumerable<IModifier> modifiers, IParameterModifiersComponent manager, IModifier mod)
         {
+            // TODO: Add id and instance id as source
             _manager = manager;
-            _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, this);
+            _investedAmountModifier = new SimpleModifier(mod.EntityParameter, mod.ModifierValueType, mod.Value, string.Empty);
             _manager.AddModifier(_investedAmountModifier);
             foreach (var modifier in modifiers)
             {
-                var instance = new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, this);
+                var instance = new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, string.Empty);
                 _instances.Add(instance);
             }
         }

@@ -17,6 +17,6 @@
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override IEffect Copy() => throw new System.NotImplementedException();
+        public override IEffect Copy() => new CriticalChanceBuffEffect(Duration, MaxStacks, Value);
     }
 }

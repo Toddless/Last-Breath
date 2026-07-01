@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Godot;
@@ -21,14 +22,13 @@
             {
                 float totalDamage = CalculateTotalDamage(ability, owner);
                 var scheduler = new AttackContextScheduler();
-                var meta = new AttackMetadata(0, 1);
                 var context = new AttackContext(owner, target, totalDamage, rnd, scheduler)
                 {
                     RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
                 };
 
                 foreach (IAttackModifier attackModifier in ability.AttackModifiers)
-                    attackModifier.Apply(context, meta);
+                    attackModifier.Apply(context);
 
                 if (!context.Schedule()) break;
                 await scheduler.DrainQueue(cts.Token);

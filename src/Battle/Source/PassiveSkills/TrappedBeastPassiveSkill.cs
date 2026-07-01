@@ -13,7 +13,7 @@
         {
             HealthPercent = healthPercent;
             DamageBonus = damageBonus;
-            _increaseDamageModifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Increase, 0f, this);
+            _increaseDamageModifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Increase, 0f, InstanceId);
         }
 
         public float HealthPercent { get; }

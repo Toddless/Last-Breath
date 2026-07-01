@@ -6,7 +6,7 @@
     {
         string InstanceId { get; }
 
-        object Source { get; }
+        string Source { get; }
 
         IModifierInstance Copy();
 

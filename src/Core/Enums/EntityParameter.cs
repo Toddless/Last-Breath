@@ -23,5 +23,6 @@
         Suppress,
         Health,
         HealthRecovery,
+        CriticalDamageMitigation,
     }
 }

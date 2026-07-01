@@ -4,13 +4,13 @@
     using Enums;
     using Interfaces.Entity;
 
-    public class SimpleModifier(EntityParameter entityParameter, ModifierValueType valueType, float value, object source, float weight = 1) : IModifierInstance
+    public class SimpleModifier(EntityParameter entityParameter, ModifierValueType valueType, float value, string source, float weight = 1) : IModifierInstance
     {
         public EntityParameter EntityParameter { get; } = entityParameter;
         public ModifierValueType ModifierValueType { get; } = valueType;
         public float Value { get; set; } = value;
         public float BaseValue { get; } = value;
-        public object Source { get; } = source;
+        public string Source { get; } = source;
         public float Weight { get; set; } = weight;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 

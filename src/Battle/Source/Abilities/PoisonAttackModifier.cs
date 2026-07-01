@@ -1,7 +1,8 @@
-﻿namespace Battle.Source.Abilities
+namespace Battle.Source.Abilities
 {
     using System;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Effects;
@@ -10,9 +11,10 @@
     {
         public string Id => "Modifier_Poison_Attack";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+        public Priority Priority { get; set; } = Priority.Weak;
         public bool IsSame(string otherId) => Id.Equals(otherId);
 
-        public void Apply(IAttackContext context, AttackMetadata metadata)
+        public void Apply(IAttackContext context)
         {
             if (context.Result is not AttackResults.Succeed) return;
 

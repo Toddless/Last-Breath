@@ -94,7 +94,7 @@
             RaiseEvent(modifier.EntityParameter);
         }
 
-        public void RemoveModifierBySource(object source)
+        public void RemoveModifierBySource(string source)
         {
             foreach (var list in _modifiers.Where(list => list.Value.RemoveAll(x => x.Source == source) > 0))
                 RaiseEvent(list.Key);

@@ -14,7 +14,9 @@
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new AbilityBuffPostActivationModifier(new AdditionalHitChanceEffect((int)ability.Duration, (int)ability.Stacks, amount));
+            var modifier = new DeferredEffectPostActivationModifier(
+                "Ability_Apply_Effect_Additional_Hit_Chance_Buff_Post_Activation_Modifier",
+                () => new AdditionalHitChanceEffect((int)ability.Duration, 1, amount));
             _modifierId = modifier.Id;
             ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
         }

@@ -21,6 +21,7 @@
         public event Action<IEffect>? EffectRemoved;
 
         public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effects.Values.ToList().SelectMany(list => list.Where(predicate));
+        public IEnumerable<IEffect> GetBySource(string source) => _effects.GetValueOrDefault(source, []);
 
         public void RegisterDotTick(DotTick tick) => _dotTicks.Add(tick);
 

@@ -15,7 +15,7 @@
 
         void AddModifier(IModifierInstance modifier);
         void RemoveModifier(IModifierInstance modifier);
-        void RemoveModifierBySource(object source);
+        void RemoveModifierBySource(string source);
         void UpdateModifier(IModifierInstance newModifier);
         void UpdateModifiers(IEnumerable<IModifierInstance> modifiers);
     }
