@@ -20,6 +20,7 @@ namespace Core.Interfaces.Entity
         IEntityParametersComponent Parameters { get; }
         IPassiveSkillsComponent PassiveSkills { get; }
         IModifierHandlerComponent ModifierHandler { get; }
+        IAbilityBookComponent AbilityBook { get; }
         IEntityAttribute Dexterity { get; }
         IEntityAttribute Strength { get; }
         IEntityAttribute Intelligence { get; }
@@ -43,20 +44,22 @@ namespace Core.Interfaces.Entity
         event Action<float>? CurrentHealthChanged;
         event Action<IFightable>? Dead;
 
+
+
         float GetDamage();
-        void Heal(IHealContext context);
         void ConsumeResource(Costs type, float amount);
         bool TryApplyStatusEffect(StatusEffects statusEffect);
         bool TryRemoveStatusEffect(StatusEffects statusEffect);
 
         // Combat loop
-        Task Attack(IAttackContext context);
-        Task ReceiveAttack(IAttackContext context);
-        Task TakeDamage(IDamageContext context);
         IFightable ChoseTarget(List<IFightable> targets);
         void Kill();
+        void SetupBattleEventBus(IBattleEventBus bus);
+        Task ReceiveAttack(IAttackContext context);
+        Task Attack(IAttackContext context);
+        Task TakeDamage(IDamageContext context);
+        void Heal(IHealContext context);
         void OnTurnStart();
         void OnTurnEnd();
-        void SetupBattleEventBus(IBattleEventBus bus);
     }
 }

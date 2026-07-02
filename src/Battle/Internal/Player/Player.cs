@@ -1,10 +1,11 @@
-﻿namespace Battle.Internal.Player
+namespace Battle.Internal.Player
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Attribute;
     using Components;
+    using Core.Components;
     using Core.Constants;
     using Core.Data;
     using Core.Enums;
@@ -20,6 +21,7 @@
     using Services;
     using Source;
     using Stateless;
+    using Utilities;
     using AnimationsComponent = Components.AnimationsComponent;
 
     public partial class Player : CharacterBody2D, IPlayer
@@ -59,7 +61,6 @@
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
-        private ICombatComponent? _combat;
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -72,6 +73,7 @@
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
+        public IAbilityBookComponent AbilityBook { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -146,7 +148,7 @@
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             ModifierHandler = new ModifierHandlerComponent();
-            _combat = new CombatComponent(this) { GameEventBus = _gameEventBus };
+            AbilityBook = new AbilityBookComponent(this);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -178,7 +180,6 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
-            if (_combat != null) _combat.GameEventBus = _gameEventBus;
         }
 
         public void AddItemToInventory(IItem item)
@@ -190,7 +191,6 @@
         public void SetupBattleEventBus(IBattleEventBus bus)
         {
             _battleEventBus = bus;
-            _combat!.BattleEventBus = bus;
             _stateMachine.Fire(Trigger.Fight);
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnStanceChanges);
@@ -201,6 +201,7 @@
             CurrentStance?.OnDeactivate();
             CurrentStance = _stances.GetValueOrDefault(obj.Stance);
             CurrentStance?.OnActivate();
+            AbilityBook.SetStance(obj.Stance);
         }
 
         public void ConsumeResource(Costs type, float amount)
@@ -241,19 +242,103 @@
 
         public void Kill() => NotifyShouldDie();
 
-        public void Heal(IHealContext context) => _combat!.Heal(context);
+        public async Task ReceiveAttack(IAttackContext context)
+        {
+            try
+            {
+                Calculations.CalculateSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateFinalDamage(context);
+                        var damageContext = new DamageContext
+                        {
+                            Source = context.Attacker,
+                            Damage = context.FinalDamage,
+                            Type = DamageType.Normal,
+                            Cause = DamageCause.Attack,
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical
+                        };
+                        await TakeDamage(damageContext);
+                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        break;
+                }
 
-        public Task ReceiveAttack(IAttackContext context) => _combat!.ReceiveAttack(context);
+                // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
+        }
 
-        public Task Attack(IAttackContext context) => _combat!.Attack(context);
+        public async Task Attack(IAttackContext context)
+        {
+            // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
+            await Animations.PlayAnimationAsync("Fight_Attack");
+        }
 
-        public Task TakeDamage(IDamageContext context) => _combat!.TakeDamage(context);
+        public async Task TakeDamage(IDamageContext context)
+        {
+            ModifierHandler.Apply(context);
+            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
 
-        public void OnTurnEnd() => _combat!.OnTurnEnd();
+            float remaining = context.Damage;
+            if (CurrentBarrier > 0)
+            {
+                float absorbed = Mathf.Min(CurrentBarrier, remaining);
+                context.AbsorbedByBarrier = absorbed;
+                CurrentBarrier -= absorbed;
+                remaining -= absorbed;
+            }
 
-        public void OnTurnStart() => _combat!.OnTurnStart();
+            if (remaining > 0) CurrentHealth -= remaining;
 
+            CombatEvents.Publish(new DamageTakenEvent(context, this));
+            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
+            await Animations.PlayAnimationAsync("Fight_Hurt");
+        }
 
+        public void Heal(IHealContext context)
+        {
+            ModifierHandler.Apply(context);
+            if (context.Amount <= 0) return;
+            if (context.ConvertToDamage)
+            {
+                _ = TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                return;
+            }
+
+            float amount = context.Amount;
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
+
+        public void OnTurnStart()
+        {
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
+        }
+
+        public void OnTurnEnd()
+        {
+            Effects.TriggerTurnEnd();
+            CombatEvents.Publish(new TurnEndEvent());
+            _battleEventBus?.Publish(new TurnEndEvent());
+            _gameEventBus?.Publish(new TurnEndEvent());
+        }
 
         private void ConfigureStateMachine()
         {
@@ -328,7 +413,6 @@
             Effects.RemoveAllEffects();
             _stateMachine.Fire(Trigger.Idle);
             _battleEventBus = null;
-            _combat!.BattleEventBus = null;
         }
 
         private void NotifyShouldDie()
@@ -421,4 +505,3 @@
         public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

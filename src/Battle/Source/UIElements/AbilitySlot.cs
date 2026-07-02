@@ -89,13 +89,27 @@
 
         public void SetAbility(IAbility ability)
         {
-            _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
-            _ability?.CooldownLeftChanges -= OnCooldownChanges;
+            DetachCurrentAbility();
             _ability = ability;
             _ability.CooldownLeftChanges += OnCooldownChanges;
             _ability.AbilityResourceChanges += OnAbilityResourceChanges;
             _icon?.Texture = _ability.Icon;
             CheckAbilityAvailable();
+        }
+
+        public void ClearAbility()
+        {
+            DetachCurrentAbility();
+            _icon?.Texture = null;
+            if (_stateMachine.State is not State.NotAvailable && _stateMachine.CanFire(Trigger.NotAvailable))
+                _stateMachine.Fire(Trigger.NotAvailable);
+        }
+
+        private void DetachCurrentAbility()
+        {
+            _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
+            _ability?.CooldownLeftChanges -= OnCooldownChanges;
+            _ability = null;
         }
 
         public void SetNumber(int number)

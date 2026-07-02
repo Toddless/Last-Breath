@@ -9,11 +9,7 @@
     {
         IBattleEventBus? BattleEventBus { get; set; }
         IGameEventBus? GameEventBus { get; set; }
-        Task ReceiveAttack(IAttackContext context);
-        Task Attack(IAttackContext context);
-        Task TakeDamage(IDamageContext context);
-        void Heal(IHealContext context);
-        void OnTurnStart();
-        void OnTurnEnd();
+
+
     }
 }

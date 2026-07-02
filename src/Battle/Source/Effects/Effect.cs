@@ -77,13 +77,15 @@
 
         public virtual void Remove()
         {
-            foreach (Action unsubscribe in _unsubscribes) unsubscribe();
-            _unsubscribes.Clear();
+            ClearSubscriptions();
 
-            Target?.TryRemoveStatusEffect(Status);
-            Target?.Effects.RemoveEffect(this);
+            var target = Target;
             Target = null;
             Context = null;
+            if (target == null) return;
+
+            target.Effects.RemoveEffect(this);
+            RemoveStatusIfLastCarrier(target);
         }
 
         public virtual void OnStackChanged(int currentStack)
@@ -117,5 +119,22 @@
         }
 
         protected virtual string FormatDescription() => Localization.LocalizeDescription(Id);
+
+        private void ClearSubscriptions()
+        {
+            foreach (Action unsubscribe in _unsubscribes) unsubscribe();
+            _unsubscribes.Clear();
+        }
+
+        /// <summary>
+        /// The status flag is shared between effects: it must go away only with the last effect carrying it.
+        /// Called after this effect is removed from the target's list, so remaining carriers are counted correctly.
+        /// </summary>
+        private void RemoveStatusIfLastCarrier(IFightable target)
+        {
+            if (Status == StatusEffects.None) return;
+            bool anotherCarrierExists = target.Effects.GetBy(e => e.Status == Status).Any();
+            if (!anotherCarrierExists) target.TryRemoveStatusEffect(Status);
+        }
     }
 }

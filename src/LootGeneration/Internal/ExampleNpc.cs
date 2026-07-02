@@ -62,6 +62,8 @@ namespace LootGeneration.Internal
         public IPassiveSkillsComponent PassiveSkills { get; }
         public IAnimationsComponent Animations { get; }
         public IModifierHandlerComponent ModifierHandler { get; }
+        public ICombatComponent CombatComponent { get; }
+        public IAbilityBookComponent AbilityBook { get; }
         public INpcModifiersComponent NpcModifiers { get; set; }
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }

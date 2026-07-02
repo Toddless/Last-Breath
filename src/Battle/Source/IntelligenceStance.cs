@@ -7,9 +7,7 @@
 
     public class IntelligenceStance(IFightable owner)
         : StanceBase(owner, effect: new StanceActivationEffect([],
-                [new Modifier(ModifierValueType.Flat, EntityParameter.Intelligence, 15)]), Stance.Intelligence,
-            [
-            ])
+                [new Modifier(ModifierValueType.Flat, EntityParameter.Intelligence, 15)]), Stance.Intelligence)
     {
     }
 }

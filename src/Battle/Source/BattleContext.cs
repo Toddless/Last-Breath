@@ -42,6 +42,7 @@
             var battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
             await battleHud.SetupEventBus(_localBus);
             battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
+            battleHud.SetAbilityBook(_player.AbilityBook);
             foreach (IFightable entity in _entities)
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);
 

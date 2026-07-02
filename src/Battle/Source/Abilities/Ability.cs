@@ -43,7 +43,18 @@
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
-        public int CooldownLeft { get; set; }
+
+        public int CooldownLeft
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                field = value;
+                CooldownLeftChanges?.Invoke(this, CooldownLeft);
+            }
+        }
+
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; } = [];
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
@@ -135,11 +146,7 @@
 
         protected abstract Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field);
 
-        protected void StartCooldown()
-        {
-            CooldownLeft = (int)Cooldown;
-            CooldownLeftChanges?.Invoke(this, CooldownLeft);
-        }
+        protected void StartCooldown() => CooldownLeft = (int)Cooldown;
 
         protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);
 
@@ -149,7 +156,6 @@
         {
             if (CooldownLeft == 0) return;
             CooldownLeft--;
-            CooldownLeftChanges?.Invoke(this, CooldownLeft);
         }
 
         protected virtual Dictionary<AbilityParameter, IParameterModule<AbilityParameter>> CreateBaseModules() => new()

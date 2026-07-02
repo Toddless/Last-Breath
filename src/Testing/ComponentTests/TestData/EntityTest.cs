@@ -34,6 +34,7 @@
         public bool IsFighting { get; set; }
         public bool IsAlive { get; set; }
         public IEffectsComponent Effects { get; }
+        public IAbilityBookComponent AbilityBook { get; }
         public IModifiersComponent Modifiers { get; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;

@@ -6,6 +6,7 @@ namespace LastBreath.Npc
     using Attribute;
     using Battle.Source;
     using Components;
+    using Core.Components;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
@@ -66,6 +67,9 @@ namespace LastBreath.Npc
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations { get; private set; }
         public IModifierHandlerComponent ModifierHandler { get; private set; }
+        public ICombatComponent CombatComponent { get; }
+        public IAbilityBookComponent AbilityBook { get; private set; }
+
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -144,6 +148,7 @@ namespace LastBreath.Npc
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
+            AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -163,6 +168,12 @@ namespace LastBreath.Npc
         public void InjectServices(IGameServiceProvider provider)
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
+        }
+
+        private Stance GetRandomStance()
+        {
+            var stances = Enum.GetValues<Stance>();
+            return stances[_rnd.RandiRange(0, stances.Length - 1)];
         }
 
         private void ConfigureStateMachine()
@@ -498,4 +509,3 @@ namespace LastBreath.Npc
         }
     }
 }
-                                                                      

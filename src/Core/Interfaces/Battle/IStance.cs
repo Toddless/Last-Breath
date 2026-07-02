@@ -11,10 +11,8 @@
         Stance StanceType { get; }
 
         IReadOnlyList<ISkill> ObtainedPassiveSkills { get; }
-        IReadOnlyList<IAbility> ObtainedAbilities { get; }
 
         void OnActivate();
         void OnDeactivate();
-        void AttachOwner();
     }
 }

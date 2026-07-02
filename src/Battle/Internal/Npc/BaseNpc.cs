@@ -5,6 +5,7 @@ namespace Battle.Internal.Npc
     using System.Threading.Tasks;
     using Attribute;
     using Components;
+    using Core.Components;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
@@ -27,7 +28,6 @@ namespace Battle.Internal.Npc
         private Vector2 _lastPosition = Vector2.Zero;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
-        private ICombatComponent? _combat;
 
         private enum State
         {
@@ -67,6 +67,7 @@ namespace Battle.Internal.Npc
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
+        public IAbilityBookComponent AbilityBook { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -145,6 +146,8 @@ namespace Battle.Internal.Npc
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
+            ModifierHandler = new ModifierHandlerComponent();
+            AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -157,7 +160,6 @@ namespace Battle.Internal.Npc
             SetBaseValuesForParameters();
 
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            _combat = new CombatComponent(this) { GameEventBus = _gameEventBus };
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
         }
@@ -165,7 +167,12 @@ namespace Battle.Internal.Npc
         public void InjectServices(IGameServiceProvider provider)
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
-            _combat?.GameEventBus = _gameEventBus;
+        }
+
+        private Stance GetRandomStance()
+        {
+            var stances = Enum.GetValues<Stance>();
+            return stances[_rnd.RandiRange(0, stances.Length - 1)];
         }
 
         private void ConfigureStateMachine()
@@ -200,17 +207,112 @@ namespace Battle.Internal.Npc
         {
         }
 
+        public async Task ReceiveAttack(IAttackContext context)
+        {
+            try
+            {
+                Calculations.CalculateSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateFinalDamage(context);
+                        var damageContext = new DamageContext
+                        {
+                            Source = context.Attacker,
+                            Damage = context.FinalDamage,
+                            Type = DamageType.Normal,
+                            Cause = DamageCause.Attack,
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical
+                        };
+                        await TakeDamage(damageContext);
+                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        break;
+                }
+
+                // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
+        }
+
+        public async Task Attack(IAttackContext context)
+        {
+            // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
+            await Animations.PlayAnimationAsync("Fight_Attack");
+        }
+
+        public async Task TakeDamage(IDamageContext context)
+        {
+            ModifierHandler.Apply(context);
+            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+
+            float remaining = context.Damage;
+            if (CurrentBarrier > 0)
+            {
+                float absorbed = Mathf.Min(CurrentBarrier, remaining);
+                context.AbsorbedByBarrier = absorbed;
+                CurrentBarrier -= absorbed;
+                remaining -= absorbed;
+            }
+
+            if (remaining > 0) CurrentHealth -= remaining;
+
+            CombatEvents.Publish(new DamageTakenEvent(context, this));
+            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
+            await Animations.PlayAnimationAsync("Fight_Hurt");
+        }
+
+        public void Heal(IHealContext context)
+        {
+            ModifierHandler.Apply(context);
+            if (context.Amount <= 0) return;
+            if (context.ConvertToDamage)
+            {
+                _ = TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                return;
+            }
+
+            float amount = context.Amount;
+            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
+            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
+            CurrentHealth += amount;
+        }
+
+        public void OnTurnStart()
+        {
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
+        }
+
+        public void OnTurnEnd()
+        {
+            Effects.TriggerTurnEnd();
+            CombatEvents.Publish(new TurnEndEvent());
+            _battleEventBus?.Publish(new TurnEndEvent());
+            _gameEventBus?.Publish(new TurnEndEvent());
+        }
+
         public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
 
         public void SetupBattleEventBus(IBattleEventBus bus)
         {
             // TODO:
             _battleEventBus = bus;
-            _combat!.BattleEventBus = bus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
-
-        public void Heal(IHealContext context) => _combat!.Heal(context);
 
         public void ConsumeResource(Costs type, float amount)
         {
@@ -254,16 +356,6 @@ namespace Battle.Internal.Npc
 
             return TargetChooser.Choose(targets);
         }
-
-        public Task ReceiveAttack(IAttackContext context) => _combat!.ReceiveAttack(context);
-
-        public Task Attack(IAttackContext context) => _combat!.Attack(context);
-
-        public void OnTurnEnd() => _combat!.OnTurnEnd();
-
-        public void OnTurnStart() => _combat!.OnTurnStart();
-
-        public Task TakeDamage(IDamageContext context) => _combat!.TakeDamage(context);
 
         private void OnBodyEnter(Node2D body)
         {
@@ -309,7 +401,6 @@ namespace Battle.Internal.Npc
             Effects.RemoveAllEffects();
             if (IsAlive) _stateMachine.Fire(Trigger.Idle);
             _battleEventBus = null;
-            _combat!.BattleEventBus = null;
         }
 
         private void OnEffectRemoved(IEffect effect)
@@ -402,11 +493,6 @@ namespace Battle.Internal.Npc
 
             _battleEventBus = null;
             _gameEventBus = null;
-            if (_combat == null) return;
-
-            _combat.BattleEventBus = null;
-            _combat.GameEventBus = null;
         }
     }
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

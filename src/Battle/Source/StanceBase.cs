@@ -2,15 +2,13 @@
 {
     using System.Collections.Generic;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public abstract class StanceBase(IFightable owner, IStanceActivationEffect effect, Stance stanceType, List<IAbility> abilities) : IStance
+    public abstract class StanceBase(IFightable owner, IStanceActivationEffect effect, Stance stanceType) : IStance
     {
         protected List<ISkill> _obtainedPassiveSkills = [];
-        protected List<IAbility> _obtainedAbilities = abilities;
 
         protected IStanceActivationEffect ActivationEffect { get; } = effect;
         protected IFightable Owner { get; } = owner;
@@ -19,7 +17,6 @@
         public Stance StanceType { get; } = stanceType;
 
         public IReadOnlyList<ISkill> ObtainedPassiveSkills => _obtainedPassiveSkills;
-        public IReadOnlyList<IAbility> ObtainedAbilities => _obtainedAbilities;
 
         public virtual void OnActivate()
         {
@@ -32,7 +29,5 @@
             _obtainedPassiveSkills.ForEach(skill => skill.Detach(Owner));
             ActivationEffect.OnDeactivate(Owner);
         }
-
-        public void AttachOwner() => _obtainedAbilities.ForEach(ability => ability.SetOwner(Owner));
     }
 }

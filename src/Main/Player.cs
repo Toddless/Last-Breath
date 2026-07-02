@@ -6,6 +6,7 @@
     using Attribute;
     using Battle.Source;
     using Components;
+    using Core.Components;
     using Core.Constants;
     using Core.Data;
     using Core.Enums;
@@ -73,6 +74,8 @@
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
+        public ICombatComponent CombatComponent { get; }
+        public IAbilityBookComponent AbilityBook { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -148,6 +151,7 @@
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             ModifierHandler = new ModifierHandlerComponent();
+            AbilityBook = new AbilityBookComponent(this);
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -508,4 +512,3 @@
         public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }
-                                                                                                                        

@@ -4,9 +4,11 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Constants;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
+    using Core.Interfaces.Components;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
@@ -20,7 +22,8 @@
         private IUiElementsManager? _uiElementProvider;
         private Dictionary<string, CharacterBar> _characterBars = [];
         private Dictionary<string, QueueSlot> _queueSlots = [];
-        private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[9];
+        private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[BattleConstants.AbilitySlotsPerStance];
+        private IAbilityBookComponent? _abilityBook;
         [Export] private Button? _returnButton;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
@@ -32,7 +35,7 @@
         {
             try
             {
-                for (int i = 0; i < 9; i++)
+                for (int i = 0; i < BattleConstants.AbilitySlotsPerStance; i++)
                 {
                     var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
                     slot.SetNumber(i + 1);
@@ -58,6 +61,8 @@
 
         public override void _ExitTree()
         {
+            if (_abilityBook != null) _abilityBook.ActiveAbilitiesChanged -= RefreshAbilitySlots;
+            _abilityBook = null;
             _battleEventBus = null;
             _characterBars.Clear();
             _queueSlots.Clear();
@@ -86,7 +91,6 @@
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
-            _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnPlayerChangeStance);
 
             foreach (AbilitySlot slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
@@ -94,13 +98,23 @@
                 stanceSlot.SetBattleEventBus(_battleEventBus);
         }
 
-        private void OnPlayerChangeStance(PlayerChangesStanceEvent obj)
+        public void SetAbilityBook(IAbilityBookComponent abilityBook)
         {
-            // var player = IPlayer.;
-            // if (player == null) return;
-            // var skills = player.CurrentStance?.ObtainedAbilities ?? [];
-            // for (int i = 0; i < skills.Count; i++)
-            //     _abilitySlotsInstances[i].SetAbility(skills[i]);
+            _abilityBook = abilityBook;
+            _abilityBook.ActiveAbilitiesChanged += RefreshAbilitySlots;
+            RefreshAbilitySlots();
+        }
+
+        /// <summary>Maps the book's slot layout of the current stance 1:1 onto the HUD buttons.</summary>
+        private void RefreshAbilitySlots()
+        {
+            var slots = _abilityBook?.ActiveSlots;
+            for (int i = 0; i < _abilitySlotsInstances.Length; i++)
+            {
+                var ability = slots != null && i < slots.Count ? slots[i] : null;
+                if (ability != null) _abilitySlotsInstances[i].SetAbility(ability);
+                else _abilitySlotsInstances[i].ClearAbility();
+            }
         }
 
         public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana)
