@@ -11,7 +11,7 @@
 
     public class SoAsDefaultExecutionStrategy : ISoAExecutionStrategy
     {
-        public virtual async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public virtual async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             // условно
             var rnd = new RandomNumberGenerator();
@@ -19,11 +19,11 @@
             var cts = new CancellationTokenSource();
             int attacks = rnd.RandiRange(ability.MinAttacks, ability.MaxAttacks);
 
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
                 await ExecuteOnTarget(target);
             return;
 
-            async Task ExecuteOnTarget(IEntity target)
+            async Task ExecuteOnTarget(IFightable target)
             {
                 var scheduler = new AttackContextScheduler();
                 int processedCount = 0;

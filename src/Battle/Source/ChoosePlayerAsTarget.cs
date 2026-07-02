@@ -8,6 +8,6 @@
 
     public class ChoosePlayerAsTarget : ITargetChooser
     {
-        public IEntity Choose(List<IEntity> targets) => targets.First(x => x is IPlayer);
+        public IFightable Choose(List<IFightable> targets) => targets.First(x => x is IPlayer);
     }
 }

@@ -9,12 +9,12 @@
 
     public class SpreadPoisonToAll : IPoisonSpreadMode
     {
-        public void SpreadPoison(List<DamageOverTurnEffect> originalStacks, IEntity originalTarget, IEntity owner, IBattleField field, string source)
+        public void SpreadPoison(List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source)
         {
             var enemies = field.GetEnemies(owner).Where(e => e.IsAlive && e != originalTarget).ToList();
             if (enemies.Count == 0) return;
 
-            foreach (IEntity enemy in enemies)
+            foreach (IFightable enemy in enemies)
             {
                 foreach (var stack in originalStacks)
                 {

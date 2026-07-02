@@ -18,7 +18,7 @@
         float spellDamageScale,
         Costs costType = Costs.Mana) : AttackAbility(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
-        private async Task PerformMultipleAttacks(List<IEntity> targets)
+        private async Task PerformMultipleAttacks(List<IFightable> targets)
         {
             if (Owner == null) return;
             var scheduler = new AttackContextScheduler();
@@ -27,7 +27,7 @@
             while (true)
             {
                 if (Owner.CurrentHealth <= 1) break;
-                foreach (IEntity target in targets)
+                foreach (IFightable target in targets)
                 {
                     var context = new AttackContext(Owner, target, Owner.GetDamage(), rnd, scheduler);
                     scheduler.Schedule(context);
@@ -52,6 +52,6 @@
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
+        protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => throw new System.NotImplementedException();
     }
 }

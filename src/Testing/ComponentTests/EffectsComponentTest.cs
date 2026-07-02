@@ -14,7 +14,7 @@
         [TestMethod]
         public void FireballAppyBurning_Test()
         {
-            IEntity entity = Entity(out Fireball fireball);
+            IFightable entity = Entity(out Fireball fireball);
             fireball.Activate([entity]);
 
             Assert.IsTrue(entity.StatusEffects == StatusEffects.Burning);
@@ -23,7 +23,7 @@
         [TestMethod]
         public void FireballDealDamage_Test()
         {
-            IEntity entity = Entity(out Fireball fireball);
+            IFightable entity = Entity(out Fireball fireball);
             fireball.Activate([entity]);
 
             Assert.IsTrue(Math.Abs(entity.CurrentHealth - 540) < 0.0001f, $"Actual value: {entity.CurrentHealth}");
@@ -32,7 +32,7 @@
         [TestMethod]
         public void BurningEffectDealDamage_Test()
         {
-            IEntity entity = Entity(out Fireball fireball);
+            IFightable entity = Entity(out Fireball fireball);
 
             fireball.Activate([entity]);
 
@@ -45,7 +45,7 @@
         [TestMethod]
         public void BurningEffectRemoved_Test()
         {
-            IEntity entity = Entity(out Fireball fireball);
+            IFightable entity = Entity(out Fireball fireball);
 
             fireball.Activate([entity]);
 
@@ -58,7 +58,7 @@
         [TestMethod]
         public void BurningEffectStacks_Test()
         {
-            IEntity entity = Entity(out Fireball fireball);
+            IFightable entity = Entity(out Fireball fireball);
 
             for (int i = 0; i < 2; i++)
             {
@@ -75,7 +75,7 @@
             [new DamageOverTurnEffect(3, 4, 0.7f, StatusEffects.Burning)], [],
             new Mock<IStanceMastery>().Object);
 
-        private static IEntity Entity(out Fireball fireball)
+        private static IFightable Entity(out Fireball fireball)
         {
             var entity = new EntityTest();
             var secondEntity = new EntityTest();

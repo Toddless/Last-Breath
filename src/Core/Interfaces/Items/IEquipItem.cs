@@ -20,7 +20,7 @@
         void SetImplicits(IEnumerable<IModifier> modifiers);
         void SetModifiers(IEnumerable<IModifier> modifiers);
         void SetItemEffect(string effectId);
-        void OnEquip(IEntity owner);
+        void OnEquip(IFightable owner);
         void OnUnequip();
         bool Upgrade(int upgradeLevel = 1);
         bool Downgrade(int downgradeLevel = 1);

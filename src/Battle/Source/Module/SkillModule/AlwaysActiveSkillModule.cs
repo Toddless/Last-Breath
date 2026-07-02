@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Entity;
 
-    public class AlwaysActiveSkillModule(IEntity owner) : BaseSkillModule(owner, SkillType.AlwaysActive,  Priority.Base)
+    public class AlwaysActiveSkillModule(IFightable owner) : BaseSkillModule(owner, SkillType.AlwaysActive,  Priority.Base)
     {
     }
 }

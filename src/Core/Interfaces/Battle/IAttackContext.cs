@@ -7,8 +7,8 @@
     public interface IAttackContext
     {
         RandomNumberGenerator Rnd { get; }
-        IEntity Attacker { get; }
-        IEntity Target { get; }
+        IFightable Attacker { get; }
+        IFightable Target { get; }
         IAttackContextScheduler AttackContextScheduler { get; }
         AttackResults Result { get; set; }
         float BaseDamage { get; }

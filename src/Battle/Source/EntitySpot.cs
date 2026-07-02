@@ -31,7 +31,7 @@
         [Export] private Area2D? _spotArea;
 
         public string SelectionId { get; private set; } = string.Empty;
-        public IEntity? Entity { get; private set; }
+        public IFightable? Entity { get; private set; }
 
         public override void _Ready()
         {
@@ -84,7 +84,7 @@
             RemoveChild(node);
         }
 
-        public void SetEntity(IEntity entity)
+        public void SetEntity(IFightable entity)
         {
             entity.Dead += OnEntityDead;
             entity.Effects.EffectAdded += OnEffectAdded;

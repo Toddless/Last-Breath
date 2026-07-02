@@ -7,6 +7,6 @@
 
     public interface IPoisonSpreadMode
     {
-        public void SpreadPoison(List<DamageOverTurnEffect> originalStacks, IEntity originalTarget, IEntity owner, IBattleField field, string source);
+        public void SpreadPoison(List<DamageOverTurnEffect> originalStacks, IFightable originalTarget, IFightable owner, IBattleField field, string source);
     }
 }

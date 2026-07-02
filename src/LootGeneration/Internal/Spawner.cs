@@ -116,7 +116,7 @@ namespace LootGeneration.Internal
             if (CurrentNpcAmount < AmountNpc) SpawnNewNpc();
         }
 
-        private void OnNpcDead(IEntity obj)
+        private void OnNpcDead(IFightable obj)
         {
             if (obj is not ExampleNpc npc) return;
             npc.Dead -= OnNpcDead;
@@ -196,7 +196,7 @@ namespace LootGeneration.Internal
             EntityType type,
             List<INpcModifier> modifiers) : INpcCreationStrategy
         {
-            public IEntity CreateNpc()
+            public IFightable CreateNpc()
             {
                 var npc = ExampleNpc.Initialize().Instantiate<ExampleNpc>();
                 npc.Rarity = rarity;
@@ -217,7 +217,7 @@ namespace LootGeneration.Internal
             Func<EntityType, Rarity, int> getModifiersAmount,
             Func<int, List<INpcModifier>> getRandomAmountModifiers) : INpcCreationStrategy
         {
-            public IEntity CreateNpc()
+            public IFightable CreateNpc()
             {
                 var npc = ExampleNpc.Initialize().Instantiate<ExampleNpc>();
                 npc.Rarity = getRandomRarity();
@@ -232,7 +232,7 @@ namespace LootGeneration.Internal
 
         private interface INpcCreationStrategy
         {
-            IEntity CreateNpc();
+            IFightable CreateNpc();
         }
     }
 }

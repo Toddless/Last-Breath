@@ -5,6 +5,6 @@
 
     public interface IExecuteCondition
     {
-        public bool ShouldExecute(IEntity target, IAttackContext? context = null);
+        public bool ShouldExecute(IFightable target, IAttackContext? context = null);
     }
 }

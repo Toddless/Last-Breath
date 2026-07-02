@@ -19,7 +19,7 @@
         private readonly List<IModifier> _modifiersPool = [];
         private readonly Dictionary<string, int> _usedResources = [];
         private float _currentUpdateMultiplier = 1f;
-        private IEntity? _owner;
+        private IFightable? _owner;
 
         [Export] public EquipmentPiece EquipmentPiece { get; set; }
         [Export] public string Id { get; private set; } = string.Empty;
@@ -140,7 +140,7 @@
             //_owner = null;
         }
 
-        public void OnEquip(IEntity owner)
+        public void OnEquip(IFightable owner)
         {
             //_owner = owner;
             //var modifiers = _baseModifiers.Concat(_additionalModifiers);

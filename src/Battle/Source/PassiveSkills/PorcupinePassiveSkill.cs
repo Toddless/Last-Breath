@@ -13,7 +13,7 @@
         public float DamagePercentToReturn { get; } = damagePercentFromTakenDamageToBeReturned;
         public float AdditionalDamageFromArmor { get; } = additionalDamageFromArmor;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CombatEvents.Subscribe<DamageTakenEvent>(OnAfterAttack);
@@ -30,7 +30,7 @@
             attacker.TakeDamage(context);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner?.CombatEvents.Unsubscribe<DamageTakenEvent>(OnAfterAttack);
             Owner = null;

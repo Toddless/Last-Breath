@@ -72,6 +72,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                 base.AddParameterDecorator(decorator);
                 return;
             }
+
             AbilityParameterDecorator.AddDecorator(parameterDecorator);
         }
 
@@ -82,6 +83,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                 base.RemoveParameterDecorator(id, key);
                 return;
             }
+
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
@@ -92,13 +94,13 @@ namespace Battle.Source.Abilities.PoisonExplosion
             return copy;
         }
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
                 await ExplodePoison(target, owner, field);
         }
 
-        private async Task ExplodePoison(IEntity target, IEntity owner, IBattleField field)
+        private async Task ExplodePoison(IFightable target, IFightable owner, IBattleField field)
         {
             var poisonStacks = target.Effects
                 .GetBy(e => e.Status == StatusEffects.Poison)

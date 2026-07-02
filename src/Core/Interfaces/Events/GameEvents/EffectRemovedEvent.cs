@@ -3,5 +3,5 @@
     using Abilities;
     using Entity;
 
-    public record EffectRemovedEvent(IEffect Effect, IEntity Target) : IBattleEvent, IGameEvent;
+    public record EffectRemovedEvent(IEffect Effect, IFightable Target) : IBattleEvent, IGameEvent;
 }

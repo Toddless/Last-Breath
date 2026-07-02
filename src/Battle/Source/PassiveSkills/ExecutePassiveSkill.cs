@@ -9,7 +9,7 @@
     {
         public float Threshold { get; } = threshold;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
@@ -22,7 +22,7 @@
             if (healthLeftInPercent <= Threshold) context.Target.Kill();
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
         }

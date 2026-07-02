@@ -6,9 +6,9 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public abstract class BaseSkillModule(IEntity owner, SkillType type, Priority priority) : ISkillModule
+    public abstract class BaseSkillModule(IFightable owner, SkillType type, Priority priority) : ISkillModule
     {
-        protected readonly IEntity Owner = owner;
+        protected readonly IFightable Owner = owner;
 
         public SkillType Parameter { get; } = type;
         public Priority Priority { get; } = priority;

@@ -3,5 +3,5 @@
     using Abilities;
     using Entity;
 
-    public record EffectAddedEvent(IEffect Effect, IEntity Target) : IBattleEvent, IGameEvent;
+    public record EffectAddedEvent(IEffect Effect, IFightable Target) : IBattleEvent, IGameEvent;
 }

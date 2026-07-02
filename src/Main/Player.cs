@@ -130,7 +130,7 @@
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IEntity>? Dead;
+        public event Action<IFightable>? Dead;
 
 
         public override void _Ready()
@@ -253,7 +253,7 @@
             return true;
         }
 
-        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
+        public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
         public void Kill() => NotifyShouldDie();
 
@@ -508,3 +508,4 @@
         public Vector2 GetCameraPosition() => GlobalPosition;
     }
 }
+                                                                                                                        

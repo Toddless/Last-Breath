@@ -21,11 +21,11 @@ namespace LootGeneration.Source.NpcModifiers
         public string Description => Localization.LocalizeDescription(Id);
 
 
-        public virtual void Attach(IEntity to)
+        public virtual void Attach(IFightable to)
         {
         }
 
-        public virtual void Detach(IEntity from)
+        public virtual void Detach(IFightable from)
         {
         }
 

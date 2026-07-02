@@ -15,9 +15,9 @@
     public class SoAsPoisonOnAttackExecutionStrategy(int duration) : SoAsDefaultExecutionStrategy
     {
         private SeriesOfAttacks? _ability;
-        private IEntity? _owner;
+        private IFightable? _owner;
 
-        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             Subscribe(ability, owner);
             await base.Execute(ability, owner, targets, field);
@@ -49,14 +49,14 @@
             }
         }
 
-        private void Subscribe(SeriesOfAttacks ability, IEntity owner)
+        private void Subscribe(SeriesOfAttacks ability, IFightable owner)
         {
             _ability = ability;
             _owner = owner;
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
-        private void Unsubscribe(IEntity owner)
+        private void Unsubscribe(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             _ability = null;

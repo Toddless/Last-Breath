@@ -7,6 +7,6 @@
 
     public interface IIpExecutionStrategy
     {
-        Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field);
+        Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field);
     }
 }

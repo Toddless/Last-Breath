@@ -51,13 +51,13 @@
         private void OnEntityDiedEvent(EntityDiedEvent obj)
         {
             if (!CanGetExperience(obj.Entity)) return;
-            var npc = obj.Entity as INpc;
+            var npc = obj.Entity as IFightableNpc;
             int experienceAmount = Mathf.RoundToInt((BaseExp + npc!.Level) * CalculateTotalMultiplier(npc.EntityType, npc.Rarity));
             _totalExp += experienceAmount;
             _diedEntities.Add(obj.Entity.InstanceId);
         }
 
-        private bool CanGetExperience(IEntity entity) => entity is not IPlayer && entity is INpc && !_diedEntities.Contains(entity.InstanceId);
+        private bool CanGetExperience(IFightable entity) => entity is not IPlayer && entity is IFightableNpc && !_diedEntities.Contains(entity.InstanceId);
 
         private float CalculateTotalMultiplier(EntityType type, Rarity rarity) => 1f + (NpcTypeToMultiplier(type) + RarityToMultiplier(rarity));
 

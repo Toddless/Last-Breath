@@ -11,7 +11,7 @@
 
         [Signal] public delegate void CompletedEventHandler();
 
-        public async void ShowMessage(IEntity character)
+        public async void ShowMessage(IFightable character)
         {
             if (_textLabel == null)
             {

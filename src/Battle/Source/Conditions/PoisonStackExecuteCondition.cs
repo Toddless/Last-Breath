@@ -8,9 +8,9 @@
 
     public class PoisonStackExecuteCondition(Func<int> stackThreshold) : IExecuteCondition
     {
-        public bool ShouldExecute(IEntity target, IAttackContext? context = null)
+        public bool ShouldExecute(IFightable target, IAttackContext? context = null)
         {
-            if (target is not INpc npc) return false;
+            if (target is not IFightableNpc npc) return false;
             int stacks = npc.Effects.GetBy(e => e.Status == StatusEffects.Poison).Count();
             bool isBossOrArchon = npc.EntityType is EntityType.Boss or EntityType.Archon;
 

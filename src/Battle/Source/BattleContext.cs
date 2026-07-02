@@ -18,11 +18,11 @@
         private readonly IUiElementsManager _uiElementManager;
         private readonly IBattleEventBus _localBus;
         private readonly BattleArena _battleArena;
-        private readonly List<IEntity> _entities;
+        private readonly List<IFightable> _entities;
         private readonly Node2D _mainWorld;
-        private readonly IEntity _player;
+        private readonly IFightable _player;
 
-        public BattleContext(IEntity player, List<IEntity> entities, Node2D mainWorld, IGameServiceProvider provider, Node2D parent)
+        public BattleContext(IFightable player, List<IFightable> entities, Node2D mainWorld, IGameServiceProvider provider, Node2D parent)
         {
             _uiElementManager = provider.GetService<IUiElementsManager>();
             _player = player;
@@ -42,7 +42,7 @@
             var battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
             await battleHud.SetupEventBus(_localBus);
             battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
-            foreach (IEntity entity in _entities)
+            foreach (IFightable entity in _entities)
                 battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);
 
             _battleArena.SetPlayer(_player);

@@ -11,14 +11,14 @@
 
     public class IpExtendPoisonDuration(int duration) : IpDefaultExecutionStrategy
     {
-        public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             Subscribe(owner);
             await base.Execute(ability, owner, targets, field);
             Unsubscribe(owner);
         }
 
-        private void Subscribe(IEntity owner) => owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+        private void Subscribe(IFightable owner) => owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
 
         private void OnAfterAttack(AfterAttackEvent obj)
         {
@@ -28,6 +28,6 @@
                 effect.Duration += duration;
         }
 
-        private void Unsubscribe(IEntity owner) => owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
+        private void Unsubscribe(IFightable owner) => owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
     }
 }

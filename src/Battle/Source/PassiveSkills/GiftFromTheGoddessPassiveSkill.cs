@@ -20,7 +20,7 @@
 
         public float Chance { get; } = chance;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
@@ -36,7 +36,7 @@
             effect.Apply(new EffectApplyingContext { Caster = Owner!, Damage = evnt.Context.FinalDamage, Source = InstanceId, Target = Owner! });
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner = null;

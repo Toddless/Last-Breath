@@ -5,7 +5,7 @@
 
     public interface IOnGettingAttackEventArgs
     {
-        IEntity Character { get; }
+        IFightable Character { get; }
         float Damage { get; }
         bool IsCrit { get; }
         AttackResults Result { get; }

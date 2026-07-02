@@ -5,6 +5,6 @@
 
     public interface ITargetChooser
     {
-        IEntity Choose(List<IEntity> targets);
+        IFightable Choose(List<IFightable> targets);
     }
 }

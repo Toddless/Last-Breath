@@ -7,6 +7,6 @@
 
     public interface ISoAExecutionStrategy
     {
-        Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field);
+        Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field);
     }
 }

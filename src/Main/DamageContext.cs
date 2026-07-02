@@ -6,7 +6,7 @@
 
     public record DamageContext : IDamageContext
     {
-        public required IEntity Source { get; init; }
+        public required IFightable Source { get; init; }
         public float Damage { get; set; }
         public DamageType Type { get; set; }
         public DamageCause Cause { get; set; }

@@ -7,7 +7,7 @@
 
     public class MulticastPassiveSkill(float[] Chances) : Skill(id: "Passive_Skill_Multicast")
     {
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             owner.CombatEvents.Subscribe<AbilityActivationEvent>(OnAbilityActivated);
@@ -39,7 +39,7 @@
             }
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner = null;
             owner.CombatEvents.Unsubscribe<AbilityActivationEvent>(OnAbilityActivated);

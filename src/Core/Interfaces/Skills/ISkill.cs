@@ -4,8 +4,8 @@
 
     public interface ISkill : IIdentifiable, IDisplayable
     {
-        void Attach(IEntity owner);
-        void Detach(IEntity owner);
+        void Attach(IFightable owner);
+        void Detach(IFightable owner);
 
         ISkill Copy();
         bool IsStronger(ISkill skill);

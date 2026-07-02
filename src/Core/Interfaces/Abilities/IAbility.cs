@@ -24,10 +24,10 @@
         event Action<IAbility, int>? CooldownLeftChanges;
 
         void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades);
-        Task Execute(List<IEntity> targets, IBattleField field);
+        Task Execute(List<IFightable> targets, IBattleField field);
         void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator) where T : struct, Enum;
         void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;
-        void SetOwner(IEntity owner);
+        void SetOwner(IFightable owner);
         bool IsEnoughResource();
         void RemoveOwner();
         IAbility Copy();

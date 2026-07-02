@@ -19,7 +19,7 @@
                 _modifiers.Add(new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.Value, string.Empty));
         }
 
-        public void OnActivate(IEntity owner)
+        public void OnActivate(IFightable owner)
         {
             foreach (var modifier in _modifiers)
                 owner.ParameterModifiers.AddModifier(modifier);
@@ -27,7 +27,7 @@
                 passive.Attach(owner);
         }
 
-        public void OnDeactivate(IEntity owner)
+        public void OnDeactivate(IFightable owner)
         {
             // TODO: Add id and instanceId later
             owner.ParameterModifiers.RemoveModifierBySource(string.Empty);

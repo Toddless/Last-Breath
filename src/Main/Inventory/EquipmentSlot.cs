@@ -20,7 +20,7 @@
             }
         }
 
-        public void EquipItem(IEquipItem item, IEntity owner)
+        public void EquipItem(IEquipItem item, IFightable owner)
         {
             //CurrentItem = item;
             //if (CurrentItem is WeaponItem w && owner is Player p) p.OnEquipWeapon(w);

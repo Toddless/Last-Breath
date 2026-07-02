@@ -33,7 +33,7 @@
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
+        protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => throw new System.NotImplementedException();
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
 

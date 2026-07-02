@@ -11,10 +11,10 @@
     public class SoAsApplyBuffStrategy(int attacksNeedForBuff, IEffect toApply) : SoAsDefaultExecutionStrategy
     {
         private SeriesOfAttacks? _ability;
-        private IEntity? _owner;
+        private IFightable? _owner;
         private int _successfulAttacks;
 
-        public override async Task Execute(SeriesOfAttacks ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             _successfulAttacks = 0;
             Subscribe(owner);
@@ -22,7 +22,7 @@
             Unsubscribe();
         }
 
-        private void Subscribe(IEntity owner)
+        private void Subscribe(IFightable owner)
         {
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }

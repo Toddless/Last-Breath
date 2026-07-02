@@ -88,7 +88,7 @@ namespace Battle.Source.Abilities.PoisonCoating
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
             // Apply the coating buff to the caster; PoisonCoatingEffect handles attack interception
             var coatingBuff = new PoisonCoatingEffect(

@@ -5,9 +5,9 @@
 
     public interface IEntityGroup
     {
-        bool TryAddToGroup(IEntity entity);
+        bool TryAddToGroup(IFightable entity);
         void NotifyAllInGroup(GroupNotification notification);
-        void RemoveFromGroup(IEntity entity);
+        void RemoveFromGroup(IFightable entity);
         List<T> GetEntitiesInGroup<T>();
     }
 }

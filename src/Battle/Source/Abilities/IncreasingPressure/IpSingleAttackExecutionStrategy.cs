@@ -12,13 +12,13 @@
 
     public class IpSingleAttackExecutionStrategy : IIpExecutionStrategy
     {
-        public async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             var rnd = new RandomNumberGenerator();
             var cts = new CancellationTokenSource();
             rnd.Randomize();
 
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
             {
                 float totalDamage = CalculateTotalDamage(ability, owner);
                 var scheduler = new AttackContextScheduler();
@@ -35,7 +35,7 @@
             }
         }
 
-        private float CalculateTotalDamage(IncreasingPressure ability, IEntity owner)
+        private float CalculateTotalDamage(IncreasingPressure ability, IFightable owner)
         {
             float increase = 1f;
             float totalDamage = 0f;

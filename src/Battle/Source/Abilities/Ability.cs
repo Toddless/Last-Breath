@@ -24,7 +24,7 @@
         int costValue,
         Costs costType = Costs.Mana) : IAbility
     {
-        protected IEntity? Owner;
+        protected IFightable? Owner;
 
         protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>> ModuleManager
         {
@@ -68,7 +68,7 @@
 
         public void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades) => Upgrades = upgrades;
 
-        public virtual async Task Execute(List<IEntity> targets, IBattleField field)
+        public virtual async Task Execute(List<IFightable> targets, IBattleField field)
         {
             if (Owner == null) return;
             var context = new AbilityActivationContext { Caster = Owner, Field = field, Targets = targets };
@@ -95,7 +95,7 @@
             ModuleManager.RemoveDecorator(id, abilityParameter);
         }
 
-        public virtual void SetOwner(IEntity owner)
+        public virtual void SetOwner(IFightable owner)
         {
             Owner = owner;
             Owner.CurrentHealthChanged += OnResourceChanges;
@@ -133,7 +133,7 @@
 
         protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
 
-        protected abstract Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field);
+        protected abstract Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field);
 
         protected void StartCooldown()
         {

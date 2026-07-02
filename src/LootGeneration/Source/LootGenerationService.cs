@@ -42,9 +42,9 @@ namespace LootGeneration.Source
 
         public void ChangeLootConfiguration(ILootConfiguration configuration) => _configuration = configuration;
 
-        public async Task<List<ItemStack>> GenerateItemsAsync(IEntity diedEntity)
+        public async Task<List<ItemStack>> GenerateItemsAsync(IFightable diedEntity)
         {
-            if (diedEntity is not INpc npc || _diedEntities.Contains(diedEntity.InstanceId)) return [];
+            if (diedEntity is not IFightableNpc npc || _diedEntities.Contains(diedEntity.InstanceId)) return [];
 
             float budget = CalculateBudget(npc);
 
@@ -190,7 +190,7 @@ namespace LootGeneration.Source
             return tierChances;
         }
 
-        private IModifierApplyingContext CreateModifierApplyingContext(INpc npc)
+        private IModifierApplyingContext CreateModifierApplyingContext(IFightableNpc npc)
         {
             var modifierApplyingContext = new ModifierApplyingContext();
             foreach (INpcModifier npcNpcModifier in npc.NpcModifiers.AllModifiers)
@@ -199,7 +199,7 @@ namespace LootGeneration.Source
             return modifierApplyingContext;
         }
 
-        private float CalculateBudget(INpc npc)
+        private float CalculateBudget(IFightableNpc npc)
         {
             float baseBudget = _configuration.BaseBudget.GetValueOrDefault(npc.EntityType, 1f);
             float rarityMultiplier = _configuration.RarityMultipliers.GetValueOrDefault(npc.Rarity, 1f);

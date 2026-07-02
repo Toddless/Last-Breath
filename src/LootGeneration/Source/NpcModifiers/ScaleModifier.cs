@@ -12,17 +12,17 @@ namespace LootGeneration.Source.NpcModifiers
     {
         public float ScaleFactor { get; } = scaleFactor;
 
-        public override void Attach(IEntity to)
+        public override void Attach(IFightable to)
         {
-            if (to is not INpc npc) return;
+            if (to is not IFightableNpc npc) return;
             foreach (INpcModifier modifier in npc.NpcModifiers.AllModifiers)
                 modifier.ScaleUp(this);
             npc.NpcModifiers.ModifierAdded += OnModifierAdded;
         }
 
-        public override void Detach(IEntity from)
+        public override void Detach(IFightable from)
         {
-            if (from is not INpc npc) return;
+            if (from is not IFightableNpc npc) return;
             foreach (INpcModifier modifier in npc.NpcModifiers.AllModifiers)
                 modifier.ScaleDown(this);
             npc.NpcModifiers.ModifierAdded -= OnModifierAdded;

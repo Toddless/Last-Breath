@@ -9,7 +9,7 @@
     {
         public float PercentToBurn { get; } = percentToBurn;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             owner.CombatEvents.Subscribe<BeforeAttackEvent>(OnBeforeAttack);
@@ -23,7 +23,7 @@
             obj.Context.AdditionalDamage += toBurn;
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<BeforeAttackEvent>(OnBeforeAttack);
             Owner = null;

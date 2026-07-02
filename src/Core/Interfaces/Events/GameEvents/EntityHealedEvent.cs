@@ -3,5 +3,5 @@
     using Battle;
     using Entity;
 
-    public record EntityHealedEvent(IEntity Healed, float Amount) : IBattleEvent, ICombatEvent;
+    public record EntityHealedEvent(IFightable Healed, float Amount) : IBattleEvent, ICombatEvent;
 }

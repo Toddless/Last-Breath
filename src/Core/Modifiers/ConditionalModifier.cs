@@ -17,8 +17,8 @@
         public string Source { get; } = source;
         public bool IsActive => condition.IsMet;
         public IModifierInstance Copy() => new ConditionalModifier(Weight, ModifierValueType, EntityParameter, BaseValue, condition, Source);
-        public void ApplyTo(IEntity target) => throw new NotImplementedException();
+        public void ApplyTo(IFightable target) => throw new NotImplementedException();
 
-        public void RemoveFrom(IEntity target) => throw new NotImplementedException();
+        public void RemoveFrom(IFightable target) => throw new NotImplementedException();
     }
 }

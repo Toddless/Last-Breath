@@ -4,7 +4,7 @@
     using Battle;
     using Entity;
 
-    public record ChoseTargetEvent( List<IEntity> Targets) : ICombatEvent
+    public record ChoseTargetEvent( List<IFightable> Targets) : ICombatEvent
     {
     }
 }

@@ -4,7 +4,7 @@
 
     public interface IStanceActivationEffect
     {
-        void OnActivate(IEntity owner);
-        void OnDeactivate(IEntity owner);
+        void OnActivate(IFightable owner);
+        void OnDeactivate(IFightable owner);
     }
 }

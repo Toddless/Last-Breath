@@ -16,11 +16,11 @@ namespace Battle.Source.Abilities.IncreasingPressure
     /// </summary>
     public class IpDamageRandomTargetStrategy(float splashDamagePercent) : IpDefaultExecutionStrategy
     {
-        private IEntity? _owner;
+        private IFightable? _owner;
         private readonly RandomNumberGenerator _splashRnd = new();
         private IBattleField? _field;
 
-        public override async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             _owner = owner;
             _splashRnd.Randomize();
@@ -31,7 +31,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             _owner = null;
         }
 
-        private void Subscribe(IEntity owner) =>
+        private void Subscribe(IFightable owner) =>
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
 
         private void OnAfterAttack(AfterAttackEvent obj)
@@ -57,7 +57,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
             randomTarget.TakeDamage(new DamageContext { Source = _owner, Damage = splashDamage, Cause = DamageCause.Ability, Type = DamageType.Normal });
         }
 
-        private void Unsubscribe(IEntity owner) =>
+        private void Unsubscribe(IFightable owner) =>
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
     }
 }

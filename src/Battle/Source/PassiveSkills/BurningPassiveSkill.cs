@@ -23,7 +23,7 @@
         public int BurningDuration { get; }
         public int BurningStacks { get; }
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
@@ -40,7 +40,7 @@
             burning.Apply(applyContext);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner = null;

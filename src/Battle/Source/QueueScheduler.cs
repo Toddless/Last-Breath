@@ -9,11 +9,11 @@
     public class QueueScheduler
     {
         private const StatusEffects SkipTurnEffect = StatusEffects.Stun | StatusEffects.Freeze;
-        private Queue<IEntity> FighterQueue { get; } = new();
+        private Queue<IFightable> FighterQueue { get; } = new();
 
         public event Action? QueueContainLessThenTwoFighters;
 
-        public List<IEntity> AddFighters(List<IEntity> fighters)
+        public List<IFightable> AddFighters(List<IFightable> fighters)
         {
             var orderedFighters = fighters.OrderBy(entity => entity.Dexterity.Total).ToList();
             foreach (var fighter in orderedFighters)
@@ -25,7 +25,7 @@
             return orderedFighters;
         }
 
-        public List<IEntity> RefillIfEmpty(List<IEntity> fighters)
+        public List<IFightable> RefillIfEmpty(List<IFightable> fighters)
         {
             if (FighterQueue.Count > 0) return [];
 
@@ -35,7 +35,7 @@
             return [];
         }
 
-        public bool TryGetNextFighter(out IEntity? fighter)
+        public bool TryGetNextFighter(out IFightable? fighter)
         {
             if (FighterQueue.Count == 0)
             {

@@ -9,7 +9,7 @@
     {
         private float PercentFromMaxHealth { get; } = percentFromMaxHealth;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
@@ -21,7 +21,7 @@
             Owner?.Heal(new HealContext(Owner, Owner) { Amount = healAmount });
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner?.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
             Owner = null;

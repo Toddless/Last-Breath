@@ -5,7 +5,7 @@
     using System.Linq;
     using Core.Interfaces.Entity;
 
-    public class NpcModifiersComponent(IEntity owner) : INpcModifiersComponent
+    public class NpcModifiersComponent(IFightable owner) : INpcModifiersComponent
     {
         private readonly List<INpcModifier> _modifiers = [];
 

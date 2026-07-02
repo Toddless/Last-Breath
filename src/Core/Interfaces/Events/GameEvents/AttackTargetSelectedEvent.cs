@@ -2,5 +2,5 @@
 {
     using Entity;
 
-    public record AttackTargetSelectedEvent(IEntity Target) : IBattleEvent;
+    public record AttackTargetSelectedEvent(IFightable Target) : IBattleEvent;
 }

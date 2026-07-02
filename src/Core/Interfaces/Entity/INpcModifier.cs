@@ -7,8 +7,8 @@ namespace Core.Interfaces.Entity
         bool IsUnique { get; }
         string NpcBuffId { get; }
 
-        void Attach(IEntity to);
-        void Detach(IEntity from);
+        void Attach(IFightable to);
+        void Detach(IFightable from);
         void ApplyModifier(IModifierApplyingContext context);
         void ScaleUp(IScaleModifier modifier);
         void ScaleDown(IScaleModifier modifier);

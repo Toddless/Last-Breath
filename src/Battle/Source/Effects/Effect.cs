@@ -21,9 +21,11 @@
         private readonly List<Action> _unsubscribes = [];
 
         protected EffectApplyingContext? Context { get; private set; }
+
         /// <summary>True when the stacking rules actually accepted this instance (see EffectsComponent).</summary>
         protected bool IsApplied { get; private set; }
-        public IEntity? Target { get; protected set; }
+
+        public IFightable? Target { get; protected set; }
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
@@ -105,9 +107,7 @@
         public abstract IEffect Copy();
 
         /// <summary>
-        /// Subscribes to a combat event bus; the subscription is removed automatically in <see cref="Remove"/>.
-        /// Use for effect reactions (e.g. "on my attack, apply a stack") instead of manual Subscribe/Unsubscribe pairs.
-        /// </summary>
+        /// Subscribes to a combat event bus;  protected void SubscribeUntilRemoved<T>(ICombatEventBus bus, Action<T> handler)
         protected void SubscribeUntilRemoved<T>(ICombatEventBus bus, Action<T> handler)
             where T : ICombatEvent
         {

@@ -93,7 +93,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
             return copy;
         }
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field)
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
             var context = new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId };
             int stacks = BuffStacks;

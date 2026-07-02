@@ -2,7 +2,7 @@
 {
     using Entity;
 
-    public interface IPlayer : IEntity
+    public interface IPlayer : IFightable
     {
         string Name { get; }
     }

@@ -18,7 +18,7 @@
         private HashSet<IModifier> _additionalModifiers = [];
         private List<IModifier> _modifiersPool = [];
         private Dictionary<string, int> _usedResources = [];
-        private IEntity? _owner;
+        private IFightable? _owner;
 
         [Export] public EquipmentPiece EquipmentPiece { get; set; }
         [Export] public string Id { get; set; } = string.Empty;
@@ -119,7 +119,7 @@
             //_owner = null;
         }
 
-        public void OnEquip(IEntity owner)
+        public void OnEquip(IFightable owner)
         {
             //_owner = owner;
             //var modifiers = _baseModifiers.Concat(_additionalModifiers);

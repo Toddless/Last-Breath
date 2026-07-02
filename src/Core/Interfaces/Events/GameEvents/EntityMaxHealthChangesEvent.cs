@@ -2,5 +2,5 @@
 {
     using Entity;
 
-    public record EntityMaxHealthChangesEvent(IEntity Entity, float Value) : IBattleEvent;
+    public record EntityMaxHealthChangesEvent(IFightable Entity, float Value) : IBattleEvent;
 }

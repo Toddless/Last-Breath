@@ -25,7 +25,7 @@
         public int MaxStack { get; }
         public int BleedDuration { get; }
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
@@ -42,7 +42,7 @@
             bleed.Apply(applyContext);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner = null;

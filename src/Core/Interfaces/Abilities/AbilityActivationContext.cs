@@ -6,11 +6,11 @@
 
     public record AbilityActivationContext
     {
-        public required IEntity Caster { get; init; }
+        public required IFightable Caster { get; init; }
         public required IBattleField Field { get; init; }
-        public List<IEntity> Targets { get; init; } = [];
-        public List<(IEntity entity, IEffect effect)> PendingEffects { get; } = [];
+        public List<IFightable> Targets { get; init; } = [];
+        public List<(IFightable entity, IEffect effect)> PendingEffects { get; } = [];
 
-        public void AddEffectOn(IEntity entity, IEffect effect) => PendingEffects.Add((entity, effect));
+        public void AddEffectOn(IFightable entity, IEffect effect) => PendingEffects.Add((entity, effect));
     }
 }

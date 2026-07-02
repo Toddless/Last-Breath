@@ -11,13 +11,13 @@
 
     public class IpDefaultExecutionStrategy : IIpExecutionStrategy
     {
-        public virtual async Task Execute(IncreasingPressure ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public virtual async Task Execute(IncreasingPressure ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             var rnd = new RandomNumberGenerator();
             var cts = new CancellationTokenSource();
             rnd.Randomize();
 
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
             {
                 var scheduler = new AttackContextScheduler();
                 float increase = 1f;

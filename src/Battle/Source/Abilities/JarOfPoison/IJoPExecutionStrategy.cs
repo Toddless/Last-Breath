@@ -7,6 +7,6 @@ namespace Battle.Source.Abilities.JarOfPoison
 
     public interface IJoPExecutionStrategy
     {
-        Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field);
+        Task Execute(JarOfPoison ability, IFightable owner, List<IFightable> targets, IBattleField field);
     }
 }

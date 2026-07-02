@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Entity;
 
-    public class PreAttackSkillModule(IEntity owner) : BaseSkillModule(owner, SkillType.BeforeAttack, Priority.Base)
+    public class PreAttackSkillModule(IFightable owner) : BaseSkillModule(owner, SkillType.BeforeAttack, Priority.Base)
     {
     }
 }

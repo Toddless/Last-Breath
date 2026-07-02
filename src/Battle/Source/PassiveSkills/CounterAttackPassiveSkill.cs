@@ -9,7 +9,7 @@
     {
         public float Chance { get; } = chance;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CombatEvents.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
@@ -34,7 +34,7 @@
             }
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
             Owner = null;

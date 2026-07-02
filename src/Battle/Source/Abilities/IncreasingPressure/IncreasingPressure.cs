@@ -90,7 +90,7 @@
         public void AddAttackModifier(IAttackModifier modifier) => _attackModifiers.TryAdd(modifier.Id, modifier);
         public void RemoveAttackModifier(string id) => _attackModifiers.Remove(id);
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, maxAttacks, increaseAttackDamageStep * 100);

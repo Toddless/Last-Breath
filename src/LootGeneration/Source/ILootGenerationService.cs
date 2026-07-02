@@ -7,6 +7,6 @@ namespace LootGeneration.Source
     public interface ILootGenerationService
     {
         void ChangeLootConfiguration(ILootConfiguration configuration);
-        Task<List<ItemStack>> GenerateItemsAsync(IEntity diedEntity);
+        Task<List<ItemStack>> GenerateItemsAsync(IFightable diedEntity);
     }
 }

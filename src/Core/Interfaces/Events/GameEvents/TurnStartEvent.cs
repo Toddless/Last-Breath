@@ -3,5 +3,5 @@
     using Battle;
     using Entity;
 
-    public record TurnStartEvent(IEntity StartedTurn) : IGameEvent, IBattleEvent, ICombatEvent;
+    public record TurnStartEvent(IFightable StartedTurn) : IGameEvent, IBattleEvent, ICombatEvent;
 }

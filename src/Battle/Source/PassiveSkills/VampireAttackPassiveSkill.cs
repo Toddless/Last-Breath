@@ -9,7 +9,7 @@ namespace Battle.Source.PassiveSkills
     {
         public float LeachPercent { get; } = leachPercent;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
@@ -22,7 +22,7 @@ namespace Battle.Source.PassiveSkills
             Owner.Heal(new HealContext(Owner, Owner) { Amount = leeched });
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner?.CombatEvents.Unsubscribe<AfterAttackEvent>(OnAfterAttack);
             Owner = null;

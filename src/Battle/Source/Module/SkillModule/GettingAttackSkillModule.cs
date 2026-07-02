@@ -3,7 +3,7 @@
     using Core.Enums;
     using Core.Interfaces.Entity;
 
-    public class GettingAttackSkillModule(IEntity owner) : BaseSkillModule(owner, type: SkillType.GettingAttack, priority:Priority.Base)
+    public class GettingAttackSkillModule(IFightable owner) : BaseSkillModule(owner, type: SkillType.GettingAttack, priority:Priority.Base)
     {
     }
 }

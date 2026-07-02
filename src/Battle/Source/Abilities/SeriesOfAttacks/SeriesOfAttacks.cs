@@ -91,6 +91,6 @@
             return copy;
         }
 
-        protected override async Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
     }
 }

@@ -4,14 +4,14 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
 
-    public class HandleAttackBlockedModule(IEntity owner) : IActionModule<IEntity>
+    public class HandleAttackBlockedModule(IFightable owner) : IActionModule<IFightable>
     {
-        private readonly IEntity _owner = owner;
+        private readonly IFightable _owner = owner;
         public ActionModule Parameter => ActionModule.BlockAction;
 
         public Priority Priority => Priority.Base;
 
-        public void PerformModuleAction(IEntity target)
+        public void PerformModuleAction(IFightable target)
         {
         }
     }

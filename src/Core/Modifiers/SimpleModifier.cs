@@ -16,9 +16,9 @@
 
         public IModifierInstance Copy() => new SimpleModifier(EntityParameter, ModifierValueType, Value, Source, Weight);
 
-        public void ApplyTo(IEntity target) => target.ParameterModifiers.AddModifier(this);
+        public void ApplyTo(IFightable target) => target.ParameterModifiers.AddModifier(this);
 
-        public void RemoveFrom(IEntity target) => target.ParameterModifiers.RemoveModifier(this);
+        public void RemoveFrom(IFightable target) => target.ParameterModifiers.RemoveModifier(this);
 
         public override bool Equals(object? obj)
         {

@@ -13,7 +13,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     /// </summary>
     public class JoPBouncingStrategy(int bounces = 5) : JoPDefaultExecutionStrategy
     {
-        public override async Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(JarOfPoison ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             var rnd = new RandomNumberGenerator();
             rnd.Randomize();
@@ -22,7 +22,7 @@ namespace Battle.Source.Abilities.JarOfPoison
 
             if (enemies.Count == 0) return;
 
-            IEntity? lastTarget = null;
+            IFightable? lastTarget = null;
             for (int i = 0; i < bounces; i++)
             {
                 // Prefer targets other than the last to avoid back-to-back hits on same target
@@ -32,7 +32,7 @@ namespace Battle.Source.Abilities.JarOfPoison
 
                 if (pool.Count == 0) break;
 
-                IEntity target = pool[rnd.RandiRange(0, pool.Count - 1)];
+                IFightable target = pool[rnd.RandiRange(0, pool.Count - 1)];
                 await ApplyToTarget(ability, owner, target);
                 lastTarget = target;
             }

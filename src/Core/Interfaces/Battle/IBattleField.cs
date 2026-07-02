@@ -5,10 +5,10 @@
 
     public interface IBattleField
     {
-        IReadOnlyList<IEntity> GetEnemies(IEntity entity);
-        IReadOnlyList<IEntity> GetAllies(IEntity entity);
-        IReadOnlyList<IEntity> GetAll();
-        IEntity GetRandomEntity(IEntity entity);
-        IEntity GetRandomAlly(IEntity entity);
+        IReadOnlyList<IFightable> GetEnemies(IFightable entity);
+        IReadOnlyList<IFightable> GetAllies(IFightable entity);
+        IReadOnlyList<IFightable> GetAll();
+        IFightable GetRandomEntity(IFightable entity);
+        IFightable GetRandomAlly(IFightable entity);
     }
 }

@@ -23,16 +23,16 @@
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
         private IBattleEventBus? _battleEventBus;
-        private List<IEntity> _fighters = [];
+        private List<IFightable> _fighters = [];
         private int _playersEnemiesCount;
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
         private IPlayer? _player;
-        private IEntity? _currentFighter;
+        private IFightable? _currentFighter;
         private bool _fightEnds;
 
-        private TaskCompletionSource<IEntity?>? _playerTargetTcs;
+        private TaskCompletionSource<IFightable?>? _playerTargetTcs;
 
         public override void _Ready()
         {
@@ -68,7 +68,7 @@
                 var targets = _spots
                     .Where(s => s.SelectionId == obj.SelectionId)
                     .Select(s => s.Entity)
-                    .OfType<IEntity>()
+                    .OfType<IFightable>()
                     .ToList();
 
                 await obj.Ability.Execute(targets, this);
@@ -81,7 +81,7 @@
         }
 
 
-        public void SetPlayer(IEntity player)
+        public void SetPlayer(IFightable player)
         {
             if (_playerSpot == null) return;
             if (player is not IPlayer p) return;
@@ -94,14 +94,14 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public IReadOnlyList<IEntity> GetEnemies(IEntity entity) => throw new NotImplementedException();
+        public IReadOnlyList<IFightable> GetEnemies(IFightable entity) => throw new NotImplementedException();
 
         // how I can define with entity is an enemy/ally to player or each other?
-        public IReadOnlyList<IEntity> GetAllies(IEntity entity) => throw new NotImplementedException();
+        public IReadOnlyList<IFightable> GetAllies(IFightable entity) => throw new NotImplementedException();
 
-        public IReadOnlyList<IEntity> GetAll() => _fighters.Where(x => x.IsAlive).ToList();
+        public IReadOnlyList<IFightable> GetAll() => _fighters.Where(x => x.IsAlive).ToList();
 
-        public IEntity GetRandomEntity(IEntity entity)
+        public IFightable GetRandomEntity(IFightable entity)
         {
             var alive = _fighters.Where(x => x.IsAlive).ToList();
 
@@ -114,9 +114,9 @@
                 spot.RemoveEntityFromSpot();
         }
 
-        public IEntity GetRandomAlly(IEntity entity) => throw new NotImplementedException();
+        public IFightable GetRandomAlly(IFightable entity) => throw new NotImplementedException();
 
-        public bool PrepareBattleArena(List<IEntity> fighters)
+        public bool PrepareBattleArena(List<IFightable> fighters)
         {
             if (_battleEventBus == null) return false;
             int enemiesCount = fighters.Count;
@@ -184,7 +184,7 @@
                 // _currentFighter.OnTurnStart();
                 // if (_currentFighter is IPlayer)
                 // {
-                //     _playerTargetTcs = new TaskCompletionSource<IEntity?>();
+                //     _playerTargetTcs = new TaskCompletionSource<IFightable?>();
                 //
                 //     var target = await _playerTargetTcs.Task;
                 //
@@ -224,14 +224,14 @@
                 _playerTargetTcs.SetResult(null);
         }
 
-        private async Task<IEntity?> ResolveTargetAsync(IEntity fighter)
+        private async Task<IFightable?> ResolveTargetAsync(IFightable fighter)
         {
             if (fighter is not IPlayer)
             {
                 return fighter.ChoseTarget(_fighters);
             }
 
-            _playerTargetTcs = new TaskCompletionSource<IEntity?>();
+            _playerTargetTcs = new TaskCompletionSource<IFightable?>();
             return await _playerTargetTcs.Task;
         }
 
@@ -248,7 +248,7 @@
             _playerTargetTcs.SetResult(obj.Target);
         }
 
-        private IAttackContext CreateAttackContext(IEntity currentFighter, IEntity target) => new AttackContext(currentFighter, target,
+        private IAttackContext CreateAttackContext(IFightable currentFighter, IFightable target) => new AttackContext(currentFighter, target,
             currentFighter.GetDamage(), new RandomNumberGenerator(), _attackContextScheduler);
 
         private void OnEntityDead(EntityDiedEvent obj)

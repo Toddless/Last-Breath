@@ -12,7 +12,7 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
 
-    public class EntityTest : IEntity
+    public class EntityTest : IFightable
     {
         private IRandomNumberGenerator _rnd;
         public string Id { get; } = string.Empty;
@@ -78,7 +78,7 @@
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IEntity>? Dead;
+        public event Action<IFightable>? Dead;
         public event Action<float, DamageType, bool>? DamageTaken;
 
         public EntityTest()
@@ -223,13 +223,13 @@
             return Task.CompletedTask;
         }
 
-        public Task TakeDamage(IEntity from, float damage, DamageType type, DamageSource source, bool isCrit = false)
+        public Task TakeDamage(IFightable from, float damage, DamageType type, DamageSource source, bool isCrit = false)
         {
             CurrentHealth -= damage;
             return Task.CompletedTask;
         }
 
-        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
+        public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
         public void AllAttacks() => throw new NotImplementedException();
         public void OnEvadeAttack() => throw new NotImplementedException();

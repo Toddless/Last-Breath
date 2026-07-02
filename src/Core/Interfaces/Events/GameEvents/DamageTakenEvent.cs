@@ -4,5 +4,5 @@
     using Entity;
     using Enums;
 
-    public record DamageTakenEvent(IDamageContext Context, IEntity Target) : ICombatEvent, IBattleEvent;
+    public record DamageTakenEvent(IDamageContext Context, IFightable Target) : ICombatEvent, IBattleEvent;
 }

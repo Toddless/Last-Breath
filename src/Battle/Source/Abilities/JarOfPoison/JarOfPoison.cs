@@ -76,7 +76,7 @@ namespace Battle.Source.Abilities.JarOfPoison
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IEntity> targets, IEntity owner, IBattleField field) =>
+        protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             ExecutionStrategy.Execute(this, owner, targets, field);
     }
 }

@@ -22,7 +22,7 @@ namespace LastBreath.Npc
     using Stateless;
     using Utilities;
 
-    public partial class BaseNpc : CharacterBody2D, INpc
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc
     {
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
@@ -125,7 +125,7 @@ namespace LastBreath.Npc
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IEntity>? Dead;
+        public event Action<IFightable>? Dead;
         public event Action<float, DamageType, bool>? DamageTaken;
 
 
@@ -258,7 +258,7 @@ namespace LastBreath.Npc
 
         public void Kill() => NotifyShouldDie();
 
-        public IEntity ChoseTarget(List<IEntity> targets)
+        public IFightable ChoseTarget(List<IFightable> targets)
         {
             TargetChooser ??= new ChoosePlayerAsTarget();
 
@@ -360,11 +360,11 @@ namespace LastBreath.Npc
                 {
                     case IPlayer player:
                         {
-                            List<IEntity> fighters = [];
+                            List<IFightable> fighters = [];
                             if (Group != null)
                             {
                                 Group.NotifyAllInGroup(GroupNotification.Attacked);
-                                fighters.AddRange(Group.GetEntitiesInGroup<IEntity>());
+                                fighters.AddRange(Group.GetEntitiesInGroup<IFightable>());
                             }
                             else
                                 fighters.Add(this);
@@ -498,3 +498,4 @@ namespace LastBreath.Npc
         }
     }
 }
+                                                                      

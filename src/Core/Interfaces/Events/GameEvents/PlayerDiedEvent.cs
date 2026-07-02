@@ -2,5 +2,5 @@
 {
     using Entity;
 
-    public record PlayerDiedEvent(IEntity Player) : IGameEvent, IBattleEvent;
+    public record PlayerDiedEvent(IFightable Player) : IGameEvent, IBattleEvent;
 }

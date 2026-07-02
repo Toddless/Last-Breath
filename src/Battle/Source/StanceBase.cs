@@ -7,13 +7,13 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public abstract class StanceBase(IEntity owner, IStanceActivationEffect effect, Stance stanceType, List<IAbility> abilities) : IStance
+    public abstract class StanceBase(IFightable owner, IStanceActivationEffect effect, Stance stanceType, List<IAbility> abilities) : IStance
     {
         protected List<ISkill> _obtainedPassiveSkills = [];
         protected List<IAbility> _obtainedAbilities = abilities;
 
         protected IStanceActivationEffect ActivationEffect { get; } = effect;
-        protected IEntity Owner { get; } = owner;
+        protected IFightable Owner { get; } = owner;
 
         public int CurrentLevel { get; }
         public Stance StanceType { get; } = stanceType;

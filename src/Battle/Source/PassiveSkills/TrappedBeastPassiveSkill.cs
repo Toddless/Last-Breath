@@ -19,7 +19,7 @@
         public float HealthPercent { get; }
         public float DamageBonus { get; }
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             Owner = owner;
             Owner.CurrentHealthChanged += OnCurrentHealthChanged;
@@ -35,7 +35,7 @@
             Owner.ParameterModifiers.UpdateModifier(_increaseDamageModifier);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             Owner?.ParameterModifiers.RemoveModifier(_increaseDamageModifier);
             Owner?.CurrentHealthChanged -= OnCurrentHealthChanged;

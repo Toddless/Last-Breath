@@ -2,7 +2,7 @@
 {
     using Enums;
 
-    public interface INpc : IEntity
+    public interface IFightableNpc : IFightable
     {
         int Level { get; }
         Rarity Rarity { get; }

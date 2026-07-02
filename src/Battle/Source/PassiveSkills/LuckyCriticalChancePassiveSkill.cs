@@ -10,12 +10,12 @@
     {
         private readonly EntityParameterModuleDecorator _luckyCriticalChanceDecorator = new LuckyChanceDecorator(Priority.Strong, EntityParameter.CriticalChance);
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             owner.Parameters.AddModuleDecorator(_luckyCriticalChanceDecorator);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.Parameters.RemoveModuleDecorator(_luckyCriticalChanceDecorator.Id, EntityParameter.CriticalChance);
         }

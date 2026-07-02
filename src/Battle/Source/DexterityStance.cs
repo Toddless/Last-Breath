@@ -5,7 +5,7 @@
     using Core.Modifiers;
     using PassiveSkills;
 
-    public class DexterityStance(IEntity owner)
+    public class DexterityStance(IFightable owner)
         : StanceBase(owner, effect: new StanceActivationEffect([new ChainAttackPassiveSkill()],
             [new Modifier(ModifierValueType.Flat, EntityParameter.Dexterity, 15)]), Stance.Dexterity, [
         ])

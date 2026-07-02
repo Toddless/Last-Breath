@@ -5,13 +5,13 @@
     using Core.Interfaces.Entity;
     using Godot;
 
-    public class AttackContext(IEntity attacker, IEntity target, float baseDamage, RandomNumberGenerator rnd, IAttackContextScheduler attackContextScheduler)
+    public class AttackContext(IFightable attacker, IFightable target, float baseDamage, RandomNumberGenerator rnd, IAttackContextScheduler attackContextScheduler)
         : IAttackContext
     {
         public IAttackContextScheduler AttackContextScheduler { get; } = attackContextScheduler;
         public RandomNumberGenerator Rnd { get; } = rnd;
-        public IEntity Attacker { get; } = attacker;
-        public IEntity Target { get; } = target;
+        public IFightable Attacker { get; } = attacker;
+        public IFightable Target { get; } = target;
         public float BaseDamage { get; } = baseDamage;
         public AttackResults Result { get; set; }
         public float RawCriticalChance { get; set; }

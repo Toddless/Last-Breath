@@ -10,13 +10,13 @@ namespace Battle.Source.Abilities.JarOfPoison
 
     public class JoPDefaultExecutionStrategy : IJoPExecutionStrategy
     {
-        public virtual async Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public virtual async Task Execute(JarOfPoison ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
                 await ApplyToTarget(ability, owner, target);
         }
 
-        protected async Task ApplyToTarget(JarOfPoison ability, IEntity owner, IEntity target)
+        protected async Task ApplyToTarget(JarOfPoison ability, IFightable owner, IFightable target)
         {
             float damage = ability.Damage + (owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale);
 

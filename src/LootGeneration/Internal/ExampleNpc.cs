@@ -14,7 +14,7 @@ namespace LootGeneration.Internal
     using Core.Interfaces.UI;
     using Godot;
 
-    public partial class ExampleNpc : CharacterBody2D, INpc, IInitializable
+    public partial class ExampleNpc : CharacterBody2D, IFightableNpc, IInitializable
     {
         private const string UID = "uid://b6kjn8vsd4jjv";
 
@@ -80,7 +80,7 @@ namespace LootGeneration.Internal
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IEntity>? Dead;
+        public event Action<IFightable>? Dead;
 
         public override void _Ready()
         {
@@ -156,7 +156,7 @@ namespace LootGeneration.Internal
 
         public Task TakeDamage(IDamageContext context) => throw new NotImplementedException();
 
-        public IEntity ChoseTarget(List<IEntity> targets) => throw new NotImplementedException();
+        public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
         public void Kill() => throw new NotImplementedException();
 

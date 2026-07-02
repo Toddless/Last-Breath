@@ -7,7 +7,7 @@
         // public void TargetSkillActivated_Test()
         // {
         //     bool activated = false;
-        //     var character = new Mock<IEntity>().Object;
+        //     var character = new Mock<IFightable>().Object;
         //     var skill = new Mock<ISkill>();
         //     skill.Setup(x => x.Type).Returns(SkillType.AlwaysActive);
         //     skill.Setup(x => x.Activate(character)).Callback(new InvocationAction(invocation =>
@@ -26,7 +26,7 @@
         // public void TargetSkillNotActivated_Test()
         // {
         //     bool activated = false;
-        //     var character = new Mock<IEntity>().Object;
+        //     var character = new Mock<IFightable>().Object;
         //
         //     var skill = new Mock<ISkill>();
         //     skill.Setup(x => x.Type).Returns(SkillType.PreAttack);
@@ -44,7 +44,7 @@
         // [TestMethod]
         // public void SameSkillWillNotBeAddedTwice_Test()
         // {
-        //     var character = new Mock<IEntity>().Object;
+        //     var character = new Mock<IFightable>().Object;
         //     var skill = new Mock<ISkill>();
         //     skill.Setup(x => x.Type).Returns(SkillType.PreAttack);
         //

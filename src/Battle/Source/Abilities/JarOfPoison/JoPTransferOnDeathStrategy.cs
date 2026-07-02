@@ -15,9 +15,9 @@ namespace Battle.Source.Abilities.JarOfPoison
     /// </summary>
     public class JoPTransferOnDeathStrategy : JoPDefaultExecutionStrategy
     {
-        public override async Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(JarOfPoison ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            foreach (IEntity target in targets)
+            foreach (IFightable target in targets)
             {
                 if (!target.IsAlive) continue;
                 await ApplyToTarget(ability, owner, target);
@@ -25,19 +25,19 @@ namespace Battle.Source.Abilities.JarOfPoison
             }
         }
 
-        private static void SubscribeTransfer(IEntity target, IEntity owner, IBattleField field)
+        private static void SubscribeTransfer(IFightable target, IFightable owner, IBattleField field)
         {
             target.Dead += OnDead;
             return;
 
-            void OnDead(IEntity dead)
+            void OnDead(IFightable dead)
             {
                 dead.Dead -= OnDead;
                 TransferPoison(dead, owner, field);
             }
         }
 
-        private static void TransferPoison(IEntity dead, IEntity owner, IBattleField field)
+        private static void TransferPoison(IFightable dead, IFightable owner, IBattleField field)
         {
             var poisonStacks = dead.Effects.GetBy(e => e.Status == StatusEffects.Poison).OfType<DamageOverTurnEffect>().ToList();
             if (poisonStacks.Count == 0) return;

@@ -5,7 +5,7 @@
 
     public interface IDamageContext
     {
-        IEntity Source { get; }
+        IFightable Source { get; }
         float Damage { get; set; }
         DamageType Type { get; set; }
         DamageCause Cause { get; set; }

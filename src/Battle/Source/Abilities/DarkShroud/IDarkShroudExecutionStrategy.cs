@@ -7,6 +7,6 @@
 
     public interface IDarkShroudExecutionStrategy
     {
-        Task Execute(List<IEntity> targets, IEntity owner, IBattleField field);
+        Task Execute(List<IFightable> targets, IFightable owner, IBattleField field);
     }
 }

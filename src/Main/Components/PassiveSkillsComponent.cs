@@ -7,7 +7,7 @@
     using Core.Interfaces.Entity;
     using Core.Interfaces.Skills;
 
-    public class PassiveSkillsComponent(IEntity owner) : IPassiveSkillsComponent
+    public class PassiveSkillsComponent(IFightable owner) : IPassiveSkillsComponent
     {
         private readonly Dictionary<string, ISkill> _skills = new();
 

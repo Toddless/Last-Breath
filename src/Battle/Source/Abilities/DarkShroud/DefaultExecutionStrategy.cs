@@ -7,6 +7,6 @@
 
     public class DefaultExecutionStrategy : IDarkShroudExecutionStrategy
     {
-        public Task Execute(List<IEntity> targets, IEntity owner, IBattleField field) => throw new System.NotImplementedException();
+        public Task Execute(List<IFightable> targets, IFightable owner, IBattleField field) => throw new System.NotImplementedException();
     }
 }

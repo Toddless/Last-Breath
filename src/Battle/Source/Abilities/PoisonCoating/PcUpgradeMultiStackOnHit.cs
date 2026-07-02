@@ -14,13 +14,14 @@ namespace Battle.Source.Abilities.PoisonCoating
         : AbilityUpgrade<PoisonCoating>(id, tags, tier)
     {
         private PoisonCoating? _ability;
-        private IEntity? _owner;
+        private IFightable? _owner;
 
         public override void ApplyUpgrade(PoisonCoating ability)
         {
             _ability = ability;
             _owner?.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
+
 
         public override void RemoveUpgrade(PoisonCoating ability)
         {
@@ -37,7 +38,7 @@ namespace Battle.Source.Abilities.PoisonCoating
             // Extra stacks = (enemy count - 1), since PoisonCoatingEffect already applied 1 stack.
             // The target's group is the enemy side from the owner's perspective.
             int enemyCount = evt.Context.Target.Group?
-                .GetEntitiesInGroup<IEntity>()
+                .GetEntitiesInGroup<IFightable>()
                 .Count(e => e.IsAlive) ?? 1;
             int extraStacks = System.Math.Max(0, enemyCount - 1);
 
@@ -56,7 +57,6 @@ namespace Battle.Source.Abilities.PoisonCoating
             }
         }
 
-        public override IAbilityUpgradeWrap<PoisonCoating> Copy() =>
-            new PcUpgradeMultiStackOnHit(Id, Tags, Tier);
+        public override IAbilityUpgrade Copy() => new PcUpgradeMultiStackOnHit(Id, Tags, Tier);
     }
 }

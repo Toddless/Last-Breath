@@ -11,9 +11,9 @@ namespace Battle.Source.Abilities.JarOfPoison
     /// </summary>
     public class JoPAllTargetsStrategy : JoPDefaultExecutionStrategy
     {
-        public override async Task Execute(JarOfPoison ability, IEntity owner, List<IEntity> targets, IBattleField field)
+        public override async Task Execute(JarOfPoison ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
-            foreach (IEntity target in field.GetEnemies(owner))
+            foreach (IFightable target in field.GetEnemies(owner))
             {
                 if (!target.IsAlive) continue;
                 await ApplyToTarget(ability, owner, target);

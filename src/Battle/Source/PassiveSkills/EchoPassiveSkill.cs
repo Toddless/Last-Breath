@@ -17,12 +17,12 @@
             public float Damage;
         }
 
-        private readonly List<IEntity> _toRemove = [];
-        private readonly Dictionary<IEntity, List<DamageEntry>> _damageSources = new();
+        private readonly List<IFightable> _toRemove = [];
+        private readonly Dictionary<IFightable, List<DamageEntry>> _damageSources = new();
         public float DelayedDamagePercent { get; } = delayedDamagePercent;
         public int Turns { get; } = turns;
 
-        public override void Attach(IEntity owner)
+        public override void Attach(IFightable owner)
         {
             // TODO: i need another event for this passive
             Owner = owner;
@@ -30,7 +30,7 @@
             Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnds);
         }
 
-        public override void Detach(IEntity owner)
+        public override void Detach(IFightable owner)
         {
             owner.CombatEvents.Unsubscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
             owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnds);
@@ -70,7 +70,7 @@
 
             _toRemove.Clear();
             float totalDamage = 0;
-            foreach ((IEntity source, List<DamageEntry> damages) in _damageSources)
+            foreach ((IFightable source, List<DamageEntry> damages) in _damageSources)
             {
                 if (!source.IsAlive)
                 {
@@ -105,7 +105,7 @@
             };
             Owner.TakeDamage(context);
 
-            foreach (IEntity entity in _toRemove)
+            foreach (IFightable entity in _toRemove)
                 _damageSources.Remove(entity);
         }
     }

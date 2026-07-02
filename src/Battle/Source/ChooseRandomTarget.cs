@@ -8,7 +8,7 @@
 
     public class ChooseRandomTarget(IGameServiceProvider provider) : ITargetChooser
     {
-        public IEntity Choose(List<IEntity> targets)
+        public IFightable Choose(List<IFightable> targets)
         {
             var rnd = provider.GetService<RandomNumberGenerator>();
 
