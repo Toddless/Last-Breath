@@ -2,7 +2,7 @@
 {
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
 
     public class PrimalFuryEffect(
         int duration,
@@ -14,10 +14,10 @@
     {
         public float DamageMultiplier { get; set; }
 
-        public override void BeforeAttack(IAttackContext context)
+        protected override void OnBeforeAttack(BeforeAttackEvent evt)
         {
-            context.AdditionalDamage *= DamageMultiplier;
-            base.BeforeAttack(context);
+            evt.Context.AdditionalDamage *= DamageMultiplier;
+            base.OnBeforeAttack(evt);
         }
 
         public override IEffect Copy() => new PrimalFuryEffect(Duration, MaxStacks, HealthPercent, Status, Id) { DamageMultiplier = DamageMultiplier };

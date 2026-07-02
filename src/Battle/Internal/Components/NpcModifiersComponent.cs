@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Components
+﻿namespace Battle.Internal.Components
 {
     using System;
     using System.Collections.Generic;

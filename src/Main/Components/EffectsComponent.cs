@@ -90,18 +90,6 @@
                 effect.TurnStart();
         }
 
-        public void TriggerBeforeAttack(IAttackContext context)
-        {
-            foreach (IEffect effect in GetEffects())
-                effect.BeforeAttack(context);
-        }
-
-        public void TriggerAfterAttack(IAttackContext context)
-        {
-            foreach (IEffect effect in GetEffects())
-                effect.AfterAttack(context);
-        }
-
         private List<IEffect> GetEffects()
         {
             var effects = new List<IEffect>();

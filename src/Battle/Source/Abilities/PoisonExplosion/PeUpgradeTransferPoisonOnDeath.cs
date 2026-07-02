@@ -3,9 +3,9 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Interfaces.Abilities;
 
     /// <summary>
-    /// L3 upgrade: instead of exploding, spreads all poison stacks from the target to all other enemies.
+    /// L2 upgrade: when the target dies, its remaining poison stacks transfer to a random enemy.
     /// </summary>
-    public class PeUpgradeSpreadPoison(string id, string[] tags, int tier)
+    public class PeUpgradeTransferPoisonOnDeath(string id, string[] tags, int tier)
         : AbilityUpgrade<PoisonExplosion>(id, tags, tier)
     {
         private IPoisonSpreadMode? _previousMode;
@@ -13,12 +13,12 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public override void ApplyUpgrade(PoisonExplosion ability)
         {
             _previousMode = ability.SpreadMode;
-            ability.SpreadMode = new SpreadPoisonToAll();
+            ability.SpreadMode = new SpreadPoisonToRandomTarget();
         }
 
         public override void RemoveUpgrade(PoisonExplosion ability) => ability.SpreadMode = _previousMode;
 
         public override IAbilityUpgradeWrap<PoisonExplosion> Copy() =>
-            new PeUpgradeSpreadPoison(Id, Tags, Tier);
+            new PeUpgradeTransferPoisonOnDeath(Id, Tags, Tier);
     }
 }

@@ -11,7 +11,7 @@
             id: "Effect_Blind",
             duration,
             maxStacks,
-            value,
+            value: 1 - value,
             parameter: EntityParameter.Accuracy,
             type: OperationType.Multiply,
             priority: Priority.Weak,

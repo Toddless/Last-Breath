@@ -1,5 +1,6 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
+    using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Entity;
@@ -18,7 +19,6 @@ namespace Battle.Source.Abilities.PoisonCoating
         public override void ApplyUpgrade(PoisonCoating ability)
         {
             _ability = ability;
-            _owner = ability.AbilityOwner;
             _owner?.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 
@@ -34,9 +34,12 @@ namespace Battle.Source.Abilities.PoisonCoating
             if (_owner == null || _ability == null) return;
             if (evt.Context.Result != AttackResults.Succeed) return;
 
-            // Extra stacks = (enemy count - 1), since PoisonCoatingEffect already applied 1 stack
-          //  int enemyCount = _owner.Group?.GetEnemies()?.Count ?? 1;
-            int extraStacks = System.Math.Max(0, 2 - 1);
+            // Extra stacks = (enemy count - 1), since PoisonCoatingEffect already applied 1 stack.
+            // The target's group is the enemy side from the owner's perspective.
+            int enemyCount = evt.Context.Target.Group?
+                .GetEntitiesInGroup<IEntity>()
+                .Count(e => e.IsAlive) ?? 1;
+            int extraStacks = System.Math.Max(0, enemyCount - 1);
 
             for (int i = 0; i < extraStacks; i++)
             {

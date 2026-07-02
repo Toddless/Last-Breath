@@ -11,7 +11,7 @@
             id: "Effect_Weakness",
             duration,
             maxStacks,
-            value,
+            value: 1 - value,
             parameter: EntityParameter.Damage,
             type: OperationType.Multiply,
             priority: Priority.Weak,

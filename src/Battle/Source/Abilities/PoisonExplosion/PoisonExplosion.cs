@@ -7,35 +7,83 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Components;
+    using Core.Interfaces.Components.Decorator;
+    using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
+    using Decorators;
     using Effects;
+    using Module;
 
     /// <summary>
     /// Removes all poison stacks from the target and instantly deals their accumulated damage.
     /// Executes the target if it had more than <see cref="ExecutionThreshold"/> stacks.
     /// </summary>
-    public class PoisonExplosion : AttackAbility
+    public class PoisonExplosion : Ability
     {
+        private readonly int _executionThreshold;
+        private readonly float _damageMultiplier;
+
         public PoisonExplosion(string[] tags,
             int cooldown,
             int costValue,
             int executionThreshold,
             float damageMultiplier,
-            Costs costType = Costs.Mana) : base(id: "Ability_Poison_Explosion", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, costType)
+            Costs costType = Costs.Mana) : base(id: "Ability_Poison_Explosion", tags, cooldown, costValue, costType)
         {
-            ExecutionThreshold = executionThreshold;
-            DamageMultiplier = damageMultiplier;
+            _executionThreshold = executionThreshold;
+            _damageMultiplier = damageMultiplier;
             ExecuteCondition = new PoisonStackExecuteCondition(() => ExecutionThreshold);
         }
 
-        public int ExecutionThreshold { get; set; }
-        public float DamageMultiplier { get; set; }
+        private float this[Parameters parameters] => AbilityParameterDecorator.GetModule(parameters).GetValue();
 
-        /// <summary>When true (L3 upgrade), stacks are NOT removed — damage is dealt while keeping them.</summary>
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
+                {
+                    [Parameters.DamageMultiplier] = new Module<Parameters>(() => _damageMultiplier, Parameters.DamageMultiplier),
+                    [Parameters.ExecutionThreshold] = new Module<Parameters>(() => _executionThreshold, Parameters.ExecutionThreshold),
+                });
+                return field;
+            }
+        }
+
+        public int ExecutionThreshold => (int)this[Parameters.ExecutionThreshold];
+        public float DamageMultiplier => this[Parameters.DamageMultiplier];
+
         public bool PreserveStacks { get; set; }
-
         public IPoisonSpreadMode? SpreadMode { get; set; }
         public IExecuteCondition? ExecuteCondition { get; set; }
+
+        public enum Parameters : byte
+        {
+            ExecutionThreshold,
+            DamageMultiplier
+        }
+
+        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        {
+            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
+            {
+                base.AddParameterDecorator(decorator);
+                return;
+            }
+            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+        }
+
+        public override void RemoveParameterDecorator<T>(string id, T key)
+        {
+            if (key is not Parameters parameter)
+            {
+                base.RemoveParameterDecorator(id, key);
+                return;
+            }
+            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+        }
 
         public override IAbility Copy()
         {
@@ -59,23 +107,23 @@ namespace Battle.Source.Abilities.PoisonExplosion
 
             if (poisonStacks.Count == 0) return;
 
-            SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId);
-
             // Sum all remaining damage (DamagePerTick × remaining Duration) for each stack
-            float totalDamage = poisonStacks.Sum(s => s.DamagePerTick * s.Duration) * DamageMultiplier;
+            float totalDamage = poisonStacks.Sum(dot => dot.DamagePerTick * dot.Duration) * (1 + DamageMultiplier);
+
+            var context = new DamageContext { Source = owner, Damage = totalDamage, Type = DamageType.Poison, Cause = DamageCause.Ability };
+            await target.TakeDamage(context);
+
+            // Execute target if stack count exceeds threshold
+            if (ExecuteCondition?.ShouldExecute(target) == true)
+                target.Kill();
+
+            SpreadMode?.SpreadPoison(poisonStacks, target, owner, field, InstanceId);
 
             if (!PreserveStacks)
             {
                 foreach (var stack in poisonStacks)
                     stack.Remove();
             }
-
-            var context = new DamageContext { Source = owner, Damage = totalDamage, Type = DamageType.Normal, Cause = DamageCause.Ability };
-            target.TakeDamage(context);
-
-            // Execute target if stack count exceeds threshold
-            if (ExecuteCondition?.ShouldExecute(target) == true)
-                target.Kill();
         }
     }
 }

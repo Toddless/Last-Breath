@@ -2,7 +2,7 @@
 {
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
 
     public class HealingFuryEffect(
         int duration,
@@ -14,11 +14,11 @@
         private float _damageDealt;
         public float HealAmount { get; set; }
 
-        public override void AfterAttack(IAttackContext context)
+        protected override void OnAfterAttack(AfterAttackEvent evt)
         {
-            if (context.Result is not AttackResults.Succeed) return;
+            if (evt.Context.Result is not AttackResults.Succeed) return;
 
-            _damageDealt += context.FinalDamage;
+            _damageDealt += evt.Context.FinalDamage;
         }
 
         public override void Remove()

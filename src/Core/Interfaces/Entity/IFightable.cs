@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Battle;
-    using Enums;
     using Events;
 
     public interface IFightable

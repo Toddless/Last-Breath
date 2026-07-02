@@ -12,7 +12,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     using Core.Interfaces.Entity;
     using Effects;
     using Module;
-    using Source.Decorators;
+    using Decorators;
 
     /// <summary>
     /// Self-cast buff. For <see cref="CoatingDuration"/> turns, each of the caster's attacks
@@ -24,7 +24,7 @@ namespace Battle.Source.Abilities.PoisonCoating
         int costValue,
         int coatingDuration,
         int poisonDuration,
-        float poisonDamagePercent,
+        float poisonMultiplier,
         Costs costType = Costs.Mana)
         : Ability(
             id: "Ability_Poison_Coating",
@@ -41,7 +41,8 @@ namespace Battle.Source.Abilities.PoisonCoating
                 field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
                 {
                     [Parameters.CoatingDuration] = new Module<Parameters>(() => coatingDuration, Parameters.CoatingDuration),
-                    [Parameters.PoisonDuration] = new Module<Parameters>(() => poisonDuration, Parameters.PoisonDuration)
+                    [Parameters.PoisonDuration] = new Module<Parameters>(() => poisonDuration, Parameters.PoisonDuration),
+                    [Parameters.PoisonMultiplier] = new Module<Parameters>(() => poisonMultiplier, Parameters.PoisonMultiplier)
                 });
                 return field;
             }
@@ -49,13 +50,13 @@ namespace Battle.Source.Abilities.PoisonCoating
 
         public int CoatingDuration => (int)AbilityParameterDecorator.GetModule(Parameters.CoatingDuration).GetValue();
         public int PoisonDuration => (int)AbilityParameterDecorator.GetModule(Parameters.PoisonDuration).GetValue();
-        public float PoisonDamagePercent { get; } = poisonDamagePercent;
-        public IEntity? AbilityOwner => Owner;
+        public float PoisonDamagePercent => AbilityParameterDecorator.GetModule(Parameters.PoisonMultiplier).GetValue();
 
         public enum Parameters : byte
         {
             CoatingDuration,
-            PoisonDuration
+            PoisonDuration,
+            PoisonMultiplier
         }
 
         public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
@@ -96,7 +97,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 poisonDuration: PoisonDuration,
                 poisonDamagePercent: PoisonDamagePercent);
 
-            coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId, Damage = 0 });
+            coatingBuff.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
 
             return Task.CompletedTask;
         }

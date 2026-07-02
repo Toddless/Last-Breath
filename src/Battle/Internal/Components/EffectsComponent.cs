@@ -9,15 +9,16 @@
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
 
     public class EffectsComponent(IEntity owner) : IEffectsComponent
     {
         private readonly Dictionary<string, List<IEffect>> _effectsBySource = [];
+        // Global application order across all sources: stacking limits and "oldest stack" eviction use this list.
+        private readonly List<IEffect> _orderedEffects = [];
         private readonly List<DotTick> _dotTicks = [];
-        public IReadOnlyList<IEffect> Effects => _effectsBySource.Values.SelectMany(x => x).ToList();
+        public IReadOnlyList<IEffect> Effects => _orderedEffects;
         public event Action<IEffect>? EffectAdded;
         public event Action<IEffect>? EffectRemoved;
 
@@ -33,7 +34,8 @@
 
             var effects = GetEffectsForSource(source);
 
-            var sameEffects = FindSameEffects(newEffect.Id, effects);
+            // MaxStacks is a per-target limit: count same-id effects across ALL sources
+            var sameEffects = FindSameEffects(newEffect.Id, _orderedEffects);
 
             ProcessEffectStacking(effects, sameEffects, newEffect);
         }
@@ -44,14 +46,15 @@
             if (string.IsNullOrWhiteSpace(source)) return;
             _effectsBySource.TryGetValue(source, out List<IEffect>? effects);
             effects?.Remove(effect);
-            _dotTicks.RemoveAll(dot => dot.Source == effect.Id);
+            _orderedEffects.Remove(effect);
+            _dotTicks.RemoveAll(dot => dot.Source == effect.InstanceId);
             if (effects?.Count == 0) _effectsBySource.Remove(source);
             EffectRemoved?.Invoke(effect);
         }
 
         public void RemoveEffectByStatus(StatusEffects status)
         {
-            foreach (var effect in _effectsBySource.Values.SelectMany(x => x).Where(x => x.Status == status))
+            foreach (var effect in _orderedEffects.Where(x => x.Status == status).ToList())
                 effect.Remove();
         }
 
@@ -64,10 +67,11 @@
 
         public void RemoveAllEffects()
         {
-            foreach (var effect in _effectsBySource.Values.SelectMany(x => x).ToList())
+            foreach (var effect in _orderedEffects.ToList())
                 effect.Remove();
 
             _effectsBySource.Clear();
+            _orderedEffects.Clear();
             _dotTicks.Clear();
         }
 
@@ -91,36 +95,20 @@
                 effect.TurnStart();
         }
 
-        public void TriggerBeforeAttack(IAttackContext context)
-        {
-            foreach (IEffect effect in GetEffects())
-                effect.BeforeAttack(context);
-        }
-
-        public void TriggerAfterAttack(IAttackContext context)
-        {
-            foreach (IEffect effect in GetEffects())
-                effect.AfterAttack(context);
-        }
-
-        private List<IEffect> GetEffects()
-        {
-            var effects = new List<IEffect>();
-            foreach (var permanentEffect in _effectsBySource.Values)
-                effects.AddRange(permanentEffect);
-
-            return effects;
-        }
+        private List<IEffect> GetEffects() => [.. _orderedEffects];
 
         private async Task ApplyDotDamage()
         {
-            foreach (IGrouping<StatusEffects, DotTick> grouping in _dotTicks.GroupBy(dot => dot.Status))
+            foreach (IGrouping<StatusEffects, DotTick> byStatus in _dotTicks.GroupBy(dot => dot.Status))
             {
-                var from = grouping.Select(x => x.From).First();
-                if (!from.IsAlive) continue;
-                var status = grouping.Key;
-                float totalDamage = grouping.Sum(dot => dot.Damage);
-                await owner.TakeDamage(new DamageContext { Source = from, Damage = totalDamage, Type = status.GetDamageType(), Cause = DamageCause.Effect });
+                var status = byStatus.Key;
+                // Per caster: a dead caster only cancels their own ticks, not everyone else's
+                foreach (IGrouping<IEntity, DotTick> byCaster in byStatus.GroupBy(dot => dot.From))
+                {
+                    if (!byCaster.Key.IsAlive) continue;
+                    float totalDamage = byCaster.Sum(dot => dot.Damage);
+                    await owner.TakeDamage(new DamageContext { Source = byCaster.Key, Damage = totalDamage, Type = status.GetDamageType(), Cause = DamageCause.Effect });
+                }
             }
 
             _dotTicks.Clear();
@@ -144,10 +132,10 @@
                 return;
             }
 
-            int oldestIndex = effects.FindIndex(effect => effect.Id == newEffect.Id);
-            if (oldestIndex < 0) return;
+            // Evict the globally oldest stack, regardless of which source applied it
+            var oldEffect = _orderedEffects.FirstOrDefault(effect => effect.Id == newEffect.Id);
+            if (oldEffect == null) return;
 
-            var oldEffect = effects[oldestIndex];
             oldEffect.Remove();
             AddNewEffectAndNotify(effects, newEffect);
         }
@@ -171,6 +159,7 @@
         private void AddNewEffectAndNotify(List<IEffect> effects, IEffect newEffect)
         {
             effects.Add(newEffect);
+            _orderedEffects.Add(newEffect);
             EffectAdded?.Invoke(newEffect);
         }
 

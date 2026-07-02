@@ -1,6 +1,5 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Entity;
@@ -18,10 +17,7 @@ namespace Battle.Source.Abilities.PoisonCoating
 
         public override void ApplyUpgrade(PoisonCoating ability)
         {
-            // Hook into the owner's AfterAttack to extend poison on hit
-            if (ability.AbilityOwner is not { } owner) return;
-            _owner = owner;
-            owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
+
         }
 
         public override void RemoveUpgrade(PoisonCoating ability)
@@ -34,10 +30,8 @@ namespace Battle.Source.Abilities.PoisonCoating
         private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (evt.Context.Result != AttackResults.Succeed) return;
-            var poisonOnTarget = evt.Context.Target.Effects
-                .GetBy(e => e.Status == StatusEffects.Poison)
-                .ToList();
-            foreach (var stack in poisonOnTarget)
+
+            foreach (var stack in evt.Context.Target.Effects.GetBy(e => e.Status == StatusEffects.Poison))
                 stack.Duration += extension;
         }
 

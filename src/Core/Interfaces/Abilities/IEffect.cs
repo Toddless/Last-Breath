@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Battle;
     using Entity;
     using Enums;
 
@@ -21,8 +20,6 @@
         void Remove();
         void TurnStart();
         void TurnEnd();
-        void BeforeAttack(IAttackContext context);
-        void AfterAttack(IAttackContext context);
         bool IsStronger(IEffect otherEffect);
         IEffect Copy();
     }

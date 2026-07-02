@@ -2,6 +2,7 @@
 {
     using Decorators;
     using Core.Enums;
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
@@ -24,18 +25,33 @@
         {
             await base.Apply(context);
             if (Target == null) return;
+            _decoratorId = $"{Id}_{type}";
             int stacks = Target.Effects.GetBy(effect => effect.Id == Id).Count();
-            var decorator = new EntityParameterDecorator($"{Id}_{type}", Value * stacks, type, Parameter, priority);
-            Target.Parameters.AddModuleDecorator(decorator);
-            _decoratorId = decorator.Id;
+            RebuildDecorator(stacks);
         }
 
         public override void Remove()
         {
-            Target?.Parameters.RemoveModuleDecorator(_decoratorId, Parameter);
+            // Called before base.Remove(), so the current stack is still counted — hence the -1.
             int stacks = (Target?.Effects.GetBy(effect => effect.Id == Id).Count() ?? 0) - 1;
-            if (stacks > 0) Target?.Parameters.AddModuleDecorator(new EntityParameterDecorator(_decoratorId, Value * stacks, type, Parameter, priority));
+            RebuildDecorator(stacks);
             base.Remove();
+        }
+
+        /// <summary>
+        /// Keeps a single decorator per effect type, recalculated for the given stack count:
+        /// Add/Subtract scale linearly (Value * stacks), Multiply/Divide exponentially (Value ^ stacks).
+        /// </summary>
+        private void RebuildDecorator(int stacks)
+        {
+            if (Target == null) return;
+            Target.Parameters.RemoveModuleDecorator(_decoratorId, Parameter);
+            if (stacks <= 0) return;
+
+            float stackedValue = type is OperationType.Multiply or OperationType.Divide
+                ? MathF.Pow(Value, stacks)
+                : Value * stacks;
+            Target.Parameters.AddModuleDecorator(new EntityParameterDecorator(_decoratorId, stackedValue, type, Parameter, priority));
         }
     }
 }

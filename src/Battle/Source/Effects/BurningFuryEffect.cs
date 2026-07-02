@@ -2,7 +2,7 @@
 {
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
     using Utilities;
 
     public class BurningFuryEffect(
@@ -16,7 +16,7 @@
         public int BurningMaxStacks { get; set; }
         public int BurningDuration { get; set; }
 
-        public override void AfterAttack(IAttackContext context)
+        protected override void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Target == null) return;
             var burnEffect = new DamageOverTurnEffect(
@@ -27,7 +27,7 @@
 
             burnEffect.Apply(new EffectApplyingContext
             {
-                Target = context.Target,
+                Target = evt.Context.Target,
                 Caster = Target,
                 Damage = HealthBurned,
                 Source = InstanceId,

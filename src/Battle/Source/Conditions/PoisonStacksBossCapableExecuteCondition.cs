@@ -6,12 +6,16 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
 
-    public class PoisonStacksBossCapableExecuteCondition(Func<int> stackThreshold) : IExecuteCondition
+    public class PoisonStacksBossCapableExecuteCondition(Func<int> stackThreshold, float bossThresholdMultiplier = 1f) : IExecuteCondition
     {
         public bool ShouldExecute(IEntity target, IAttackContext? context = null)
         {
             int stacks = target.Effects.GetBy(e => e.Status == StatusEffects.Poison).Count();
-            return stacks > stackThreshold();
+            float threshold = stackThreshold();
+            if (target is INpc { EntityType: EntityType.Boss or EntityType.Archon })
+                threshold *= bossThresholdMultiplier;
+
+            return stacks > threshold;
         }
     }
 }

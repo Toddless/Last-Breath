@@ -20,7 +20,6 @@
     using Services;
     using Source;
     using Stateless;
-    using Utilities;
     using AnimationsComponent = Components.AnimationsComponent;
 
     public partial class Player : CharacterBody2D, IPlayer
@@ -60,6 +59,7 @@
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
+        private ICombatComponent? _combat;
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -146,6 +146,7 @@
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             ModifierHandler = new ModifierHandlerComponent();
+            _combat = new CombatComponent(this) { GameEventBus = _gameEventBus };
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -177,6 +178,7 @@
         public void InjectServices(IGameServiceProvider provider)
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
+            if (_combat != null) _combat.GameEventBus = _gameEventBus;
         }
 
         public void AddItemToInventory(IItem item)
@@ -188,6 +190,7 @@
         public void SetupBattleEventBus(IBattleEventBus bus)
         {
             _battleEventBus = bus;
+            _combat!.BattleEventBus = bus;
             _stateMachine.Fire(Trigger.Fight);
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus.Subscribe<PlayerChangesStanceEvent>(OnStanceChanges);
@@ -238,106 +241,17 @@
 
         public void Kill() => NotifyShouldDie();
 
-        public void Heal(IHealContext context)
-        {
-            ModifierHandler.Apply(context);
-            if (context.Amount <= 0) return;
-            if (context.ConvertToDamage)
-            {
-                TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
-                return;
-            }
+        public void Heal(IHealContext context) => _combat!.Heal(context);
 
-            float amount = context.Amount;
-            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
-            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
-            CurrentHealth += amount;
-        }
+        public Task ReceiveAttack(IAttackContext context) => _combat!.ReceiveAttack(context);
 
-        public async Task ReceiveAttack(IAttackContext context)
-        {
-            try
-            {
-                Calculations.CalculateSucceeded(context);
-                switch (context.Result)
-                {
-                    case AttackResults.Succeed:
-                        Calculations.CalculateFinalDamage(context);
-                        var damageContext = new DamageContext
-                        {
-                            Source = context.Attacker,
-                            Damage = context.FinalDamage,
-                            Type = DamageType.Normal,
-                            Cause = DamageCause.Attack,
-                            IsCrit = context.ForceCriticalAttack || context.IsCritical
-                        };
-                        await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
-                        break;
-                    case AttackResults.Blocked:
-                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        // await Animations.PlayAnimationAsync("Fight_Blocked");
-                        break;
-                    case AttackResults.Evaded:
-                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        //     await Animations.PlayAnimationAsync("Fight_Evaded");
-                        break;
-                }
+        public Task Attack(IAttackContext context) => _combat!.Attack(context);
 
-                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
-                context.Attacker.ModifierHandler.Apply(context);
-                context.Attacker.Effects.TriggerAfterAttack(context);
-            }
-            catch (Exception e)
-            {
-                GD.Print($"{e.Message}, {e.StackTrace}");
-            }
-        }
+        public Task TakeDamage(IDamageContext context) => _combat!.TakeDamage(context);
 
-        public async Task Attack(IAttackContext context)
-        {
-            CombatEvents.Publish(new BeforeAttackEvent(context));
-            Effects.TriggerBeforeAttack(context);
-            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
-            await Animations.PlayAnimationAsync("Fight_Attack");
-        }
+        public void OnTurnEnd() => _combat!.OnTurnEnd();
 
-        public async Task TakeDamage(IDamageContext context)
-        {
-            ModifierHandler.Apply(context);
-            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
-
-            float remaining = context.Damage;
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
-
-            if (remaining > 0) CurrentHealth -= remaining;
-
-            CombatEvents.Publish(new DamageTakenEvent(context, this));
-            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
-            await Animations.PlayAnimationAsync("Fight_Hurt");
-        }
-
-        public void OnTurnEnd()
-        {
-            Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent());
-            _battleEventBus?.Publish(new TurnEndEvent());
-            _gameEventBus?.Publish(new TurnEndEvent());
-        }
-
-        public void OnTurnStart()
-        {
-            Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
-            _battleEventBus?.Publish(new TurnStartEvent(this));
-            _gameEventBus?.Publish(new TurnStartEvent(this));
-        }
+        public void OnTurnStart() => _combat!.OnTurnStart();
 
 
 
@@ -414,6 +328,7 @@
             Effects.RemoveAllEffects();
             _stateMachine.Fire(Trigger.Idle);
             _battleEventBus = null;
+            _combat!.BattleEventBus = null;
         }
 
         private void NotifyShouldDie()

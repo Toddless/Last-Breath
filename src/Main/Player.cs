@@ -289,7 +289,6 @@
 
                 context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
                 context.Attacker.ModifierHandler.Apply(context);
-                context.Attacker.Effects.TriggerAfterAttack(context);
             }
             catch (Exception e)
             {
@@ -300,7 +299,6 @@
         public Task Attack(IAttackContext context)
         {
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            Effects.TriggerBeforeAttack(context);
             context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
             //  await Animations.PlayAnimationAsync("Fight_Attack");
             return Task.CompletedTask;

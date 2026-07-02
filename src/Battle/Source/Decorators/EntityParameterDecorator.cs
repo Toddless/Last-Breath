@@ -25,7 +25,7 @@
         public override bool IsStronger(IModuleDecorator<EntityParameter, IParameterModule<EntityParameter>> decorator)
         {
             if (decorator is not EntityParameterDecorator parameterDecorator) return false;
-            return parameterDecorator.Id == Id && parameterDecorator.Value > Value;
+            return parameterDecorator.Id == Id && Value > parameterDecorator.Value;
         }
     }
 }

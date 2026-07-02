@@ -42,7 +42,7 @@ namespace Battle.Source.Abilities.JarOfPoison
         public int PoisonDuration => (int)this[Parameters.PoisonDuration];
         public IJoPExecutionStrategy ExecutionStrategy { get; set; } = new JoPDefaultExecutionStrategy();
 
-        public enum Parameters
+        public enum Parameters : byte
         {
             PoisonDuration
         }

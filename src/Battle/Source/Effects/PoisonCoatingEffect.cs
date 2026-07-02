@@ -1,8 +1,9 @@
 namespace Battle.Source.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
 
     /// <summary>
     /// Buff applied to the caster. Each attack made while this effect is active applies a poison stack to the target.
@@ -13,24 +14,33 @@ namespace Battle.Source.Effects
         int poisonDuration,
         float poisonDamagePercent = 0.7f,
         StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Effect_Poison_Coating", duration, maxStacks, statusEffect)
+        : Effect(id: EffectId, duration, maxStacks, statusEffect)
     {
+        public const string EffectId = "Effect_Poison_Coating";
+
         public int PoisonDuration { get; } = poisonDuration;
         public float PoisonDamagePercent { get; } = poisonDamagePercent;
 
-        public override void AfterAttack(IAttackContext context)
+        public override async Task Apply(EffectApplyingContext context)
+        {
+            await base.Apply(context);
+            if (Target == null) return;
+            SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
+        }
+
+        private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Target == null) return;
-            if (context.Result != AttackResults.Succeed) return;
+            if (evt.Context.Result != AttackResults.Succeed) return;
 
             var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison, 999, PoisonDamagePercent);
             var applyContext = new EffectApplyingContext
             {
                 Caster = Target,
-                Target = context.Target,
+                Target = evt.Context.Target,
                 Source = InstanceId,
-                Damage = context.FinalDamage,
-                IsCritical = context.IsCritical
+                Damage = evt.Context.FinalDamage,
+                IsCritical = evt.Context.IsCritical
             };
             poison.Apply(applyContext);
         }

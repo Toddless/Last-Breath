@@ -1,8 +1,9 @@
 namespace Battle.Source.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
 
     /// <summary>
     /// Self-extending additional-attack-chance buff — the L3 "replace" variant of
@@ -20,9 +21,16 @@ namespace Battle.Source.Effects
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
-        public override void AfterAttack(IAttackContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
-            if (context.IsCritical) Duration++;
+            await base.Apply(context);
+            if (Target == null) return;
+            SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
+        }
+
+        private void OnAfterAttack(AfterAttackEvent evt)
+        {
+            if (evt.Context.IsCritical) Duration++;
         }
 
         public override IEffect Copy() => new AttackChanceCalculationBuff(Duration, MaxStacks, Value);

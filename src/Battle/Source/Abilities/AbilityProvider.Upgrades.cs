@@ -9,6 +9,8 @@
     using Effects;
     using IncreasingPressure;
     using JarOfPoison;
+    using PoisonCoating;
+    using PoisonExplosion;
     using SeriesOfAttacks;
 
     public partial class AbilityProvider
@@ -152,7 +154,7 @@
                         new Clumsiness(
                             (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                             (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                            data.UpgradeProperties.GetValueOrDefault("evadeReduce", 5)))),
+                            data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
             ["Ability_JoP_Upgrade_Apply_Blind"] = data =>
                 new JoPDebuffUpgrade(
                     data.Id,
@@ -161,7 +163,7 @@
                     new AbilityDebuffPostActivationModifier(new BlindEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 5)))),
+                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
             ["Ability_JoP_Upgrade_Apply_Weakness"] = data =>
                 new JoPDebuffUpgrade(
                     data.Id,
@@ -170,7 +172,7 @@
                     new AbilityDebuffPostActivationModifier(new Weakness(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 5)))),
+                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
             ["Ability_JoP_Upgrade_Increasing_Scales"] = data =>
                 new JoPUpgradeIncreasingScales(
                     data.Id,
@@ -307,6 +309,118 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cost", 25)),
+            ["Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion"] = data =>
+                new PeUpgradeApplySealOfOblivion(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                    (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1)),
+            ["Ability_Pe_Upgrade_Execute_Bosses"] = data =>
+                new PeUpgradeExecuteBosses(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("stacksMultiplier", 2)),
+            ["Ability_Pe_Upgrade_Spread_Poison"] = data =>
+                new PeUpgradeSpreadPoison(
+                    data.Id,
+                    data.Tags,
+                    data.Tier),
+            ["Ability_Pe_Upgrade_Poison_Not_Removed"] = data =>
+                new PeUpgradePreserveStacks(
+                    data.Id,
+                    data.Tags,
+                    data.Tier),
+            ["Ability_Pe_Upgrade_Reduce_Execution_Trahsold"] = data =>
+                new PeUpgradeLowerExecutionThreshold(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("amount", 5)),
+            ["Ability_Pe_Upgrade_Transfer_Poison_On_Death"] = data =>
+                new PeUpgradeTransferPoisonOnDeath(
+                    data.Id,
+                    data.Tags,
+                    data.Tier),
+            ["Ability_Pe_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
+            ["Ability_Pe_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldownAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 2),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
+            ["Ability_Pe_Upgrade_Total_Damage_Multiplier"] = data =>
+                new PeUpgradeTotalDamageMultiplier(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("multiplier", 0.15f)),
+            ["Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal"] = data =>
+                new PcUpgradeApplyDebuffOnHit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    () => new HealReductionEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 1),
+                        data.UpgradeProperties.GetValueOrDefault("reduceBy", 0.6f))),
+            ["Ability_Pc_Upgrade_Attacks_Reduce_Armor"] = data =>
+                new PcUpgradeApplyDebuffOnHit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    () => new ArmorReductionEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 4),
+                        data.UpgradeProperties.GetValueOrDefault("reduceArmorBy", 0.15f))),
+            ["Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy"] = data =>
+                new PcUpgradeMultiStackOnHit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier),
+            ["Ability_Pc_Upgrade_Increase_Poison_On_Target"] = data =>
+                new PcUpgradeExtendExistingPoison(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("poisonDuration", 1)),
+            ["Ability_Pc_Upgrade_Additional_Poison_Stack_Duration"] = data =>
+                new PcUpgradeAdditionalPoisonDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("additionalDuration", 1)),
+            ["Ability_Pc_Upgrade_Additional_Multiplier"] = data =>
+                new PcUpgradeAdditionalMultiplier(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("multiplier", 0.25f)),
+            ["Ability_Pc_Upgrade_Increase_Duration"] = data =>
+                new PcUpgradeIncreaseDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 1)),
+            ["Ability_Pc_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Pc_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 30)),
         };
     }
 }

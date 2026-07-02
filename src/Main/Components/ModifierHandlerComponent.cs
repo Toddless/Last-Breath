@@ -7,58 +7,39 @@ namespace LastBreath.Components
 
     public class ModifierHandlerComponent : IModifierHandlerComponent
     {
-        private readonly List<IHealModifier> _healModifiers = [];
-        private readonly List<IDamageModifier> _damageModifiers = [];
-        private readonly List<IAttackModifier> _attackModifiers = [];
+        private readonly ModifierList<IAttackContext> _attackModifiers = new();
+        private readonly ModifierList<IDamageContext> _damageModifiers = new();
+        private readonly ModifierList<IHealContext> _healModifiers = new();
 
-        public void Add<T>(T modifier)
+        public void Add(IAttackModifier modifier) => _attackModifiers.Add(modifier);
+        public void Add(IDamageModifier modifier) => _damageModifiers.Add(modifier);
+        public void Add(IHealModifier modifier) => _healModifiers.Add(modifier);
+
+        public void Remove(IAttackModifier modifier) => _attackModifiers.Remove(modifier);
+        public void Remove(IDamageModifier modifier) => _damageModifiers.Remove(modifier);
+        public void Remove(IHealModifier modifier) => _healModifiers.Remove(modifier);
+
+        public void Apply(IAttackContext context) => _attackModifiers.Apply(context);
+        public void Apply(IDamageContext context) => _damageModifiers.Apply(context);
+        public void Apply(IHealContext context) => _healModifiers.Apply(context);
+
+        /// <summary>Priority-ordered list of context mutators for a single pipeline.</summary>
+        private sealed class ModifierList<TContext>
         {
-            switch (modifier)
+            private readonly List<IContextModifier<TContext>> _modifiers = [];
+
+            public void Add(IContextModifier<TContext> modifier)
             {
-                case IHealModifier healModifier:
-                    _healModifiers.Add(healModifier);
-                    break;
-                case IDamageModifier damageModifier:
-                    _damageModifiers.Add(damageModifier);
-                    break;
-                case IAttackModifier attackModifier:
-                    _attackModifiers.Add(attackModifier);
-                    break;
+                _modifiers.Add(modifier);
+                _modifiers.Sort((a, b) => a.Priority.CompareTo(b.Priority));
             }
-        }
 
-        public void Remove<T>(T modifier)
-        {
-            switch (modifier)
-            {
-                case IHealModifier healModifier:
-                    _healModifiers.Remove(healModifier);
-                    break;
-                case IDamageModifier damageModifier:
-                    _damageModifiers.Remove(damageModifier);
-                    break;
-                case IAttackModifier attackModifier:
-                    _attackModifiers.Remove(attackModifier);
-                    break;
-            }
-        }
+            public void Remove(IContextModifier<TContext> modifier) => _modifiers.Remove(modifier);
 
-        public void Apply<T>(T context)
-        {
-            switch (context)
+            public void Apply(TContext context)
             {
-                case IHealContext healCtx:
-                    foreach (var modifier in _healModifiers)
-                        modifier.Apply(healCtx);
-                    break;
-                case IDamageContext damageCtx:
-                    foreach (var modifier in _damageModifiers)
-                        modifier.Apply(damageCtx);
-                    break;
-                case IAttackContext attackCtx:
-                    foreach (var modifier in _attackModifiers)
-                        modifier.Apply(attackCtx);
-                    break;
+                foreach (var modifier in _modifiers)
+                    modifier.Apply(context);
             }
         }
     }

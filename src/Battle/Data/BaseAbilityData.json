@@ -359,9 +359,6 @@
             "cooldown": 5,
             "costValue": 100,
             "costType": 0,
-            "damage": 0,
-            "weaponDamageScale": 1,
-            "spellDamageScale": 1,
             "abilityProperties": {
                 "buffDuration": 3,
                 "additionalDurationAmount": 1
@@ -444,36 +441,170 @@
             ]
         },
         {
-            "id": "",
+            "id": "Ability_Poison_Explosion",
             "tags": [],
-            "cooldown": 1,
-            "costValue": 1,
-            "costType": 1,
-            "damage": 0,
-            "weaponDamageScale": 1,
-            "spellDamageScale": 1,
+            "cooldown": 7,
+            "costValue": 100,
+            "costType": 0,
+            "abilityProperties": {
+                "multiplier": 0,
+                "executionThreshold": 1
+            },
             "upgrades": [
                 {
-                    "id": "",
+                    "id": "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Execute_Bosses",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "stacksMultiplier": 2
+                    }
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Spread_Poison",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Poison_Not_Removed",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Reduce_Execution_Trahsold",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 5
+                    }
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Transfer_Poison_On_Death",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Reduce_Cost",
                     "tier": 1,
-                    "tags": []
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 30
+                    }
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 2,
+                        "additionalCost": 50
+                    }
+                },
+                {
+                    "id": "Ability_Pe_Upgrade_Total_Damage_Multiplier",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "multiplier": 0.15
+                    }
                 }
             ]
         },
         {
-            "id": "",
+            "id": "Ability_Poison_Coating",
             "tags": [],
-            "cooldown": 1,
-            "costValue": 1,
-            "costType": 1,
-            "damage": 0,
-            "weaponDamageScale": 1,
-            "spellDamageScale": 1,
+            "cooldown": 7,
+            "costValue": 100,
+            "costType": 0,
+            "abilityProperties": {
+                "poisonMultiplier": 0.45,
+                "buffDuration": 3,
+                "poisonDuration": 5
+            },
             "upgrades": [
                 {
-                    "id": "",
+                    "id": "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "reduceBy": 0.6,
+                        "maxStacks": 1,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Attacks_Reduce_Armor",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "reduceArmorBy": 0.15,
+                        "maxStacks": 4,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Increase_Poison_On_Target",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "poisonDuration": 1
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Additional_Poison_Stack_Duration",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "additionalDuration": 1
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Additional_Multiplier",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "multiplier": 0.25
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Increase_Duration",
                     "tier": 1,
-                    "tags": []
+                    "tags": [],
+                    "upgradeProperties": {
+                        "duration": 1
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 1
+                    }
+                },
+                {
+                    "id": "Ability_Pc_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 30
+                    }
                 }
             ]
         }

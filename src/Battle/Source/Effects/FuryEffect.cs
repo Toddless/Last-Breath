@@ -1,8 +1,9 @@
-﻿namespace Battle.Source.Effects
+namespace Battle.Source.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
     using Godot;
     using Utilities;
 
@@ -17,7 +18,15 @@
         protected float HealthBurned;
         public float HealthPercent { get; } = healthPercent;
 
-        public override void BeforeAttack(IAttackContext context)
+        public override async Task Apply(EffectApplyingContext context)
+        {
+            await base.Apply(context);
+            if (Target == null) return;
+            SubscribeUntilRemoved<BeforeAttackEvent>(Target.CombatEvents, OnBeforeAttack);
+            SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
+        }
+
+        protected virtual void OnBeforeAttack(BeforeAttackEvent evt)
         {
             if (Target == null) return;
             float healthToBurn = Target.Parameters.MaxHealth * HealthPercent;
@@ -25,7 +34,11 @@
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
             Target.TakeDamage(new DamageContext { Source = Target, Damage = toBurn, Cause = DamageCause.Effect, Type = Status.GetDamageType() });
-            if ((currentHealth - toBurn) <= 1) Target.Effects.RemoveEffect(this);
+            if ((currentHealth - toBurn) <= 1) Remove();
+        }
+
+        protected virtual void OnAfterAttack(AfterAttackEvent evt)
+        {
         }
 
         protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);

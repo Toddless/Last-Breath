@@ -1,0 +1,22 @@
+namespace Battle.Source.Effects
+{
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+
+    /// <summary>
+    /// Debuff: reduces the target's armor by <c>reduceBy</c> (0..1) per stack.
+    /// Stacks multiplicatively: n stacks => armor * (1 - reduceBy)^n.
+    /// </summary>
+    public class ArmorReductionEffect(int duration, int maxStacks, float reduceBy)
+        : ParameterChangeEffect(id: "Effect_Armor_Reduction",
+            duration,
+            maxStacks,
+            value: 1 - reduceBy,
+            parameter: EntityParameter.Armor,
+            type: OperationType.Multiply,
+            priority: Priority.Weak,
+            statusEffect: StatusEffects.None)
+    {
+        public override IEffect Copy() => new ArmorReductionEffect(Duration, MaxStacks, reduceBy);
+    }
+}

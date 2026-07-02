@@ -11,7 +11,7 @@
         ParameterChangeEffect(id: "Effect_Clumsiness",
             duration,
             maxStacks,
-            value,
+            value: 1 - value,
             parameter: EntityParameter.Evade,
             type: OperationType.Multiply,
             priority: Priority.Weak,

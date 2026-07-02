@@ -1,8 +1,9 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
 
     public class ExecutionEffect(
         int duration,
@@ -13,11 +14,19 @@
     {
         public float Percentage { get; } = percentage;
 
-        public override void AfterAttack(IAttackContext context)
+        public override async Task Apply(EffectApplyingContext context)
         {
-            float healthAsPercentLeft = context.Target.CurrentHealth / context.Target.Parameters.MaxHealth;
+            await base.Apply(context);
+            if (Target == null) return;
+            SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
+        }
 
-            if (healthAsPercentLeft <= Percentage) context.Target.Kill();
+        private void OnAfterAttack(AfterAttackEvent evt)
+        {
+            var target = evt.Context.Target;
+            float healthAsPercentLeft = target.CurrentHealth / target.Parameters.MaxHealth;
+
+            if (healthAsPercentLeft <= Percentage) target.Kill();
         }
 
         public override IEffect Copy() => new ExecutionEffect(Duration, MaxStacks, Percentage, Status);
@@ -25,7 +34,7 @@
         public override bool IsStronger(IEffect otherEffect)
         {
             if (otherEffect is not ExecutionEffect execution) return false;
-            return execution.Percentage > Percentage;
+            return Percentage > execution.Percentage;
         }
     }
 }

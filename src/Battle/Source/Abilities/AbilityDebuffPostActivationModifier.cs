@@ -17,11 +17,15 @@
             if (applyOnSelf)
             {
                 await copy.Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster });
+                return;
             }
 
             foreach (var applyingContext in context.Targets.Select(contextTarget =>
                          new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = contextTarget }))
-                await copy.Apply(applyingContext);
+            {
+                var clone = debuff.Copy();
+                await clone.Apply(applyingContext);
+            }
         }
     }
 }

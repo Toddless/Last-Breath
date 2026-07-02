@@ -4,7 +4,7 @@ namespace Battle.Source.Effects
     using Battle.Source.Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Modifiers;
 
     /// <summary>
@@ -30,12 +30,14 @@ namespace Battle.Source.Effects
         {
             context.Target.Parameters.AddModuleDecorator(_critDamageDecorator);
             await base.Apply(context);
+            if (Target == null) return;
+            SubscribeUntilRemoved<AfterAttackEvent>(Target.CombatEvents, OnAfterAttack);
         }
 
-        public override void AfterAttack(IAttackContext context)
+        private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Target == null) return;
-            if (context.Result != AttackResults.Succeed && !context.IsCritical) return;
+            if (evt.Context.Result != AttackResults.Succeed && !evt.Context.IsCritical) return;
 
             // Flat increase to crit damage on each successful critical attack
             var modifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, critDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
