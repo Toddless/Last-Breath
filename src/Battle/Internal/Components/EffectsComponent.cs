@@ -107,7 +107,9 @@
                 {
                     if (!byCaster.Key.IsAlive) continue;
                     float totalDamage = byCaster.Sum(dot => dot.Damage);
-                    await owner.TakeDamage(new DamageContext { Source = byCaster.Key, Damage = totalDamage, Type = status.GetDamageType(), Cause = DamageCause.Effect });
+                    var damageContext = new DamageContext { Source = byCaster.Key, Cause = DamageCause.Effect };
+                    damageContext.Add(status.GetDamageType(), totalDamage);
+                    await owner.TakeDamage(damageContext);
                 }
             }
 

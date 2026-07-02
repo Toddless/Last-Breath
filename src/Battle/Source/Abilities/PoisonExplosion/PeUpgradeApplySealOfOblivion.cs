@@ -10,7 +10,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         : AbilityUpgrade<PoisonExplosion>(id, tags, tier)
     {
         private readonly IAbilityPostActivationModifier _modifier =
-            new AbilityDebuffPostActivationModifier(new SealOfOblivion("Effect_Seal_Of_Oblivion", duration, maxStacks));
+            new AbilityDebuffPostActivationModifier(new SealOfOblivion(duration, maxStacks));
 
         public override void ApplyUpgrade(PoisonExplosion ability) => ability.PostActivationEffect.TryAdd(_modifier.Id, _modifier);
 

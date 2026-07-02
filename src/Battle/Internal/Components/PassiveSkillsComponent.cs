@@ -1,4 +1,4 @@
-﻿namespace Battle.Internal.Components
+namespace Battle.Internal.Components
 {
     using System;
     using System.Collections.Generic;
@@ -12,9 +12,11 @@
         private readonly Dictionary<string, ISkill> _skills = new();
 
         public IReadOnlyList<ISkill> Skills => _skills.Values.ToList();
+        public bool IsSuppressed { get; private set; }
 
         public event Action<ISkill>? SkillAdded;
         public event Action<ISkill>? SkillDeleted;
+        public event Action<bool>? SuppressionChanged;
 
         public void AddSkill(ISkill skill)
         {
@@ -22,12 +24,12 @@
             {
                 if (existingSkill.IsStronger(skill)) return;
 
-                existingSkill.Detach(owner);
+                DetachIfActive(existingSkill);
                 _skills.Remove(existingSkill.Id);
             }
 
             _skills[skill.Id] = skill;
-            skill.Attach(owner);
+            AttachIfActive(skill);
             SkillAdded?.Invoke(skill);
         }
 
@@ -35,11 +37,39 @@
         {
             if (!_skills.TryGetValue(id, out var skill)) return;
 
-            skill.Detach(owner);
+            DetachIfActive(skill);
             _skills.Remove(id);
             SkillDeleted?.Invoke(skill);
         }
 
+        public void Suppress()
+        {
+            if (IsSuppressed) return;
+            IsSuppressed = true;
+            foreach (ISkill skill in _skills.Values)
+                skill.Detach(owner);
+            SuppressionChanged?.Invoke(true);
+        }
+
+        public void Resume()
+        {
+            if (!IsSuppressed) return;
+            IsSuppressed = false;
+            foreach (ISkill skill in _skills.Values)
+                skill.Attach(owner);
+            SuppressionChanged?.Invoke(false);
+        }
+
         public ISkill? GetSkill(string id) => _skills.GetValueOrDefault(id);
+
+        private void AttachIfActive(ISkill skill)
+        {
+            if (!IsSuppressed) skill.Attach(owner);
+        }
+
+        private void DetachIfActive(ISkill skill)
+        {
+            if (!IsSuppressed) skill.Detach(owner);
+        }
     }
 }

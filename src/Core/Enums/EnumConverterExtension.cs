@@ -22,7 +22,7 @@
             StatusEffects.Bleed => DamageType.Bleed,
             StatusEffects.Burning => DamageType.Burning,
             StatusEffects.Poison => DamageType.Poison,
-            _ => DamageType.Normal
+            _ => DamageType.Pure
         };
 
         public static int ConvertRarityToItemModifierAmount(this Rarity rarity) => rarity switch

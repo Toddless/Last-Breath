@@ -1,22 +1,40 @@
-﻿namespace Battle.Source.Effects
+namespace Battle.Source.Effects
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 
-    public class SealOfOblivion(
-        string id,
-        int duration,
-        int maxStacks,
-        StatusEffects statusEffect = StatusEffects.Cursed)
-        : Effect(id, duration, maxStacks, statusEffect)
+    /// <summary>
+    /// Disables the target's passive skills while present. Suppression lifts only when
+    /// the last seal on the target is removed; skills stay learned and reattach automatically.
+    /// </summary>
+    public class SealOfOblivion(int duration, int maxStacks = 1)
+        : Effect(id: "Effect_Seal_Of_Oblivion", duration, maxStacks, StatusEffects.Cursed)
     {
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
-            var target = context.Target;
+            if (!IsApplied) return; // a rejected stack must not suppress anything
+
+            Target?.PassiveSkills.Suppress();
         }
 
-        public override IEffect Copy() => new SealOfOblivion(Id, Duration, MaxStacks, Status);
+        public override void Remove()
+        {
+            var target = Target;
+            base.Remove();
+            if (target == null) return;
+
+            ResumeIfLastSeal(target);
+        }
+
+        public override IEffect Copy() => new SealOfOblivion(Duration, MaxStacks);
+
+        private void ResumeIfLastSeal(Core.Interfaces.Entity.IFightable target)
+        {
+            bool anotherSealExists = target.Effects.GetBy(effect => effect.Id == Id).Any();
+            if (!anotherSealExists) target.PassiveSkills.Resume();
+        }
     }
 }

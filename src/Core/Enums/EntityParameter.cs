@@ -24,5 +24,8 @@
         Health,
         HealthRecovery,
         CriticalDamageMitigation,
+        FireResistance,
+        ColdResistance,
+        LightningResistance,
     }
 }

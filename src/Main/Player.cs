@@ -213,7 +213,9 @@
             if (context.Amount <= 0) return;
             if (context.ConvertToDamage)
             {
-                TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                var convertedDamage = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
+                convertedDamage.Add(DamageType.Pure, context.Amount);
+                TakeDamage(convertedDamage);
                 return;
             }
 
@@ -269,17 +271,16 @@
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
-                        Calculations.CalculateFinalDamage(context);
+                        Calculations.CalculateInitialAttackDamage(context);
                         var damageContext = new DamageContext
                         {
                             Source = context.Attacker,
-                            Damage = context.FinalDamage,
-                            Type = DamageType.Normal,
                             Cause = DamageCause.Attack,
                             IsCrit = context.ForceCriticalAttack || context.IsCritical
                         };
+                        damageContext.Add(DamageType.Pure, context.FinalDamage);
                         await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
+                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
@@ -327,9 +328,11 @@
         public Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
+            context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+            Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.Damage;
+            float remaining = context.TotalDamage;
             if (CurrentBarrier > 0)
             {
                 float absorbed = Mathf.Min(CurrentBarrier, remaining);

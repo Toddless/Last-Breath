@@ -33,7 +33,9 @@ namespace Battle.Source.Effects
             float currentHealth = Target.CurrentHealth;
             float toBurn = Mathf.Min(healthToBurn, currentHealth - 1);
             HealthBurned = toBurn;
-            Target.TakeDamage(new DamageContext { Source = Target, Damage = toBurn, Cause = DamageCause.Effect, Type = Status.GetDamageType() });
+            var damageContext = new DamageContext { Source = Target, Cause = DamageCause.Effect };
+            damageContext.Add(Status.GetDamageType(), toBurn);
+            Target.TakeDamage(damageContext);
             if ((currentHealth - toBurn) <= 1) Remove();
         }
 

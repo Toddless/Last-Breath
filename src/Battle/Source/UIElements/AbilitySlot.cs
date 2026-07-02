@@ -177,7 +177,7 @@
         private bool CheckAbilityAvailable()
         {
             if (_ability == null) return false;
-            bool isAvailable = _ability.IsEnoughResource() && _ability.CooldownLeft == 0;
+            bool isAvailable = _ability.CanActivate();
             switch (isAvailable)
             {
                 case true when _stateMachine.State is not State.Ready:

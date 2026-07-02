@@ -25,8 +25,9 @@
 
             var attacker = evnt.Context.Source;
             float armorAsDamage = Owner.Parameters.Armor * AdditionalDamageFromArmor;
-            float fromDamageTaken = evnt.Context.Damage * DamagePercentToReturn;
-            var context = new DamageContext { Source = attacker, Cause = DamageCause.Passive, Type = DamageType.Normal, Damage = armorAsDamage + fromDamageTaken };
+            float fromDamageTaken = evnt.Context.TotalDamage * DamagePercentToReturn;
+            var context = new DamageContext { Source = attacker, Cause = DamageCause.Passive };
+            context.Add(DamageType.Pure, armorAsDamage + fromDamageTaken);
             attacker.TakeDamage(context);
         }
 

@@ -250,17 +250,16 @@ namespace Battle.Internal.Player
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
-                        Calculations.CalculateFinalDamage(context);
+                        Calculations.CalculateInitialAttackDamage(context);
                         var damageContext = new DamageContext
                         {
                             Source = context.Attacker,
-                            Damage = context.FinalDamage,
-                            Type = DamageType.Normal,
                             Cause = DamageCause.Attack,
                             IsCrit = context.ForceCriticalAttack || context.IsCritical
                         };
+                        damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
+                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
@@ -290,9 +289,11 @@ namespace Battle.Internal.Player
         public async Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
+            context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+            Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.Damage;
+            float remaining = context.TotalDamage;
             if (CurrentBarrier > 0)
             {
                 float absorbed = Mathf.Min(CurrentBarrier, remaining);
@@ -314,7 +315,9 @@ namespace Battle.Internal.Player
             if (context.Amount <= 0) return;
             if (context.ConvertToDamage)
             {
-                _ = TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                var damageContext = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
+                damageContext.Add(DamageType.Pure, context.Amount);
+                _ = TakeDamage(damageContext);
                 return;
             }
 

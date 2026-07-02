@@ -29,6 +29,9 @@
         void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;
         void SetOwner(IFightable owner);
         bool IsEnoughResource();
+
+        /// <summary>Full availability check: resource, cooldown and the owner's status (Paralysis blocks casting).</summary>
+        bool CanActivate();
         void RemoveOwner();
         IAbility Copy();
     }

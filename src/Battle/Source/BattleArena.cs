@@ -14,6 +14,7 @@
     using Core.Interfaces.UI;
     using Godot;
     using Godot.Collections;
+    using UIElements;
     using Utilities;
 
     public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField
@@ -28,6 +29,7 @@
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
+        private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
         private bool _fightEnds;
@@ -87,6 +89,7 @@
             if (player is not IPlayer p) return;
             _playerSpot.SetEntity(player);
             _player = p;
+            EnsureGroup(player); // ally/enemy semantics are group-based; companions will join this group later
         }
 
         public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
@@ -94,10 +97,12 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        public IReadOnlyList<IFightable> GetEnemies(IFightable entity) => throw new NotImplementedException();
+        public IReadOnlyList<IFightable> GetEnemies(IFightable entity) =>
+            _fighters.Where(fighter => fighter.IsAlive && !AreAllies(entity, fighter)).ToList();
 
-        // how I can define with entity is an enemy/ally to player or each other?
-        public IReadOnlyList<IFightable> GetAllies(IFightable entity) => throw new NotImplementedException();
+        /// <summary>Living groupmates, the entity itself excluded.</summary>
+        public IReadOnlyList<IFightable> GetAllies(IFightable entity) =>
+            _fighters.Where(fighter => fighter.IsAlive && !fighter.IsSame(entity.InstanceId) && AreAllies(entity, fighter)).ToList();
 
         public IReadOnlyList<IFightable> GetAll() => _fighters.Where(x => x.IsAlive).ToList();
 
@@ -114,7 +119,43 @@
                 spot.RemoveEntityFromSpot();
         }
 
-        public IFightable GetRandomAlly(IFightable entity) => throw new NotImplementedException();
+        private void SetupCombatTextPresenter(IBattleEventBus battleEventBus)
+        {
+            _combatTextPresenter = new CombatTextPresenter();
+            AddChild(_combatTextPresenter);
+            _combatTextPresenter.Setup(battleEventBus, FindSpotFor);
+        }
+
+        /// <summary>Anchor for floating combat text: the spot currently holding the entity.</summary>
+        private Node2D? FindSpotFor(string instanceId)
+        {
+            if (_playerSpot?.Entity?.IsSame(instanceId) == true) return _playerSpot;
+            return _spots.FirstOrDefault(spot => spot.Entity?.IsSame(instanceId) == true);
+        }
+
+        public IFightable GetRandomAlly(IFightable entity)
+        {
+            var allies = GetAllies(entity);
+            if (allies.Count == 0) return entity; // a lone fighter can only target itself
+
+            return allies[_rnd.RandiRange(0, allies.Count - 1)];
+        }
+
+        /// <summary>
+        /// Ally/enemy semantics: same group = allies, everyone outside = enemies.
+        /// A fighter without a group is hostile to everyone and allied only with itself.
+        /// </summary>
+        private static bool AreAllies(IFightable first, IFightable second)
+        {
+            if (first.IsSame(second.InstanceId)) return true;
+            return first.Group != null && ReferenceEquals(first.Group, second.Group);
+        }
+
+        private static void EnsureGroup(IFightable entity)
+        {
+            if (entity.Group != null) return;
+            new EntityGroup().TryAddToGroup(entity);
+        }
 
         public bool PrepareBattleArena(List<IFightable> fighters)
         {
@@ -141,6 +182,7 @@
             }
 
             _playerSpot?.SetBattleEventBus(_battleEventBus);
+            SetupCombatTextPresenter(_battleEventBus);
 
             var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));

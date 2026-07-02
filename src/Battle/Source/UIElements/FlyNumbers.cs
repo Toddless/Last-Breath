@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.PassiveSkills
+﻿namespace Battle.Source.UIElements
 {
     using Core.Enums;
     using Core.Interfaces.UI;
@@ -41,15 +41,19 @@
 
         private Color DefineColor(DamageType type, bool isCritical = false)
         {
-            return type switch
-            {
-                DamageType.Bleed => Colors.DarkRed,
-                DamageType.Burning => Colors.OrangeRed,
-                DamageType.Poison => Colors.LawnGreen,
-                DamageType.Normal => isCritical ? Colors.Red : Colors.White,
-                DamageType.Pure => Colors.Gold,
-                _ => Colors.White
-            };
+            return isCritical
+                ? Colors.Crimson
+                : type switch
+                {
+                    DamageType.Bleed => Colors.DarkRed,
+                    DamageType.Burning => Colors.OrangeRed,
+                    DamageType.Poison => Colors.LawnGreen,
+                    DamageType.Fire => Colors.Orange,
+                    DamageType.Cold => Colors.LightSkyBlue,
+                    DamageType.Lightning => Colors.Blue,
+                    DamageType.Pure => Colors.Gold,
+                    _ => Colors.White // Physical
+                };
         }
     }
 }

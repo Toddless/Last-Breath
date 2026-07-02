@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
@@ -11,20 +12,18 @@
         int turns)
         : Skill(id: "Passive_Skill_Echo")
     {
-        private struct DamageEntry
+        private record DamageEntry
         {
-            public int Turns;
-            public float Damage;
+            public int Turns { get; set; }
+            public float Damage { get; init; }
         }
 
-        private readonly List<IFightable> _toRemove = [];
-        private readonly Dictionary<IFightable, List<DamageEntry>> _damageSources = new();
+        private readonly List<DamageEntry> _delayedDamage = [];
         public float DelayedDamagePercent { get; } = delayedDamagePercent;
         public int Turns { get; } = turns;
 
         public override void Attach(IFightable owner)
         {
-            // TODO: i need another event for this passive
             Owner = owner;
             Owner.CombatEvents.Subscribe<BeforeDamageTakenEvent>(OnBeforeDamageTaken);
             Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnds);
@@ -52,61 +51,35 @@
             // otherwise the event now firing inside TakeDamage would re-process them endlessly.
             if (evnt.Context.Cause is not DamageCause.Attack) return;
             var context = evnt.Context;
-            float actualDamage = context.Damage * DelayedDamagePercent;
-            float toDealLater = context.Damage - actualDamage;
-            context.Damage = actualDamage;
-            if (!_damageSources.TryGetValue(context.Source, out List<DamageEntry>? sources))
+            // Defers DelayedDamagePercent of every component; the rest is taken now.
+            // E.g. 185 damage at 0.3 -> 129.5 now, 55.5 dealt after the delay. (Snapshot: Set mutates the collection.)
+            float toDealLater = 0;
+            foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
             {
-                sources = [];
-                _damageSources[context.Source] = sources;
+                float deferred = damage * DelayedDamagePercent;
+                toDealLater += deferred;
+                context.Set(type, damage - deferred);
             }
 
-            sources.Add(new DamageEntry { Turns = Turns, Damage = toDealLater });
+            _delayedDamage.Add(new DamageEntry { Turns = Turns, Damage = toDealLater });
         }
 
         private void OnTurnEnds(TurnEndEvent turnEndEvent)
         {
-            if (_damageSources.Count == 0 || Owner == null) return;
+            if (Owner == null) return;
 
-            _toRemove.Clear();
+            _delayedDamage.Clear();
             float totalDamage = 0;
-            foreach ((IFightable source, List<DamageEntry> damages) in _damageSources)
+            var delayed = _delayedDamage.ToList();
+            foreach (var damageEntry in delayed.Where(damageEntry => damageEntry.Turns-- <= 0))
             {
-                if (!source.IsAlive)
-                {
-                    _toRemove.Add(source);
-                    continue;
-                }
-
-                for (int i = damages.Count - 1; i >= 0; i--)
-                {
-                    var damage = damages[i];
-                    damage.Turns--;
-                    if (damage.Turns <= 0)
-                    {
-                        totalDamage += damage.Damage;
-                        damages.RemoveAt(i);
-                    }
-
-                    damages[i] = damage;
-                }
-
-                if (damages.Count == 0)
-                    _toRemove.Add(source);
+                totalDamage += damageEntry.Damage;
+                _delayedDamage.Remove(damageEntry);
             }
 
-            var context = new DamageContext
-            {
-                Source = Owner,
-                Cause = DamageCause.Passive,
-                Damage = totalDamage,
-                IsCrit = false,
-                Type = DamageType.Pure
-            };
+            var context = new DamageContext { Source = Owner, Cause = DamageCause.Passive, IsCrit = false };
+            context.Add(DamageType.Pure, totalDamage);
             Owner.TakeDamage(context);
-
-            foreach (IFightable entity in _toRemove)
-                _damageSources.Remove(entity);
         }
     }
 }

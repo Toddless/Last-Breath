@@ -82,6 +82,13 @@
         public virtual async Task Execute(List<IFightable> targets, IBattleField field)
         {
             if (Owner == null) return;
+            // Single gate for every activation path (UI, hotkey, future AI). Events cannot veto, so the check lives here.
+            if (IsOwnerParalyzed)
+            {
+                Owner.CombatEvents.Publish<AbilityActivationRejectedEvent>(new(this));
+                return;
+            }
+
             var context = new AbilityActivationContext { Caster = Owner, Field = field, Targets = targets };
             ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
             StartCooldown();
@@ -113,6 +120,8 @@
             Owner.CurrentBarrierChanged += OnResourceChanges;
             Owner.CurrentManaChanged += OnResourceChanges;
             Owner.CombatEvents.Subscribe<TurnEndEvent>(OnTurnEnd);
+            Owner.CombatEvents.Subscribe<StatusEffectAppliedEvent>(OnOwnerStatusApplied);
+            Owner.CombatEvents.Subscribe<StatusEffectRemovedEvent>(OnOwnerStatusRemoved);
         }
 
         public void RemoveOwner()
@@ -122,6 +131,8 @@
             Owner.CurrentHealthChanged -= OnResourceChanges;
             Owner.CurrentBarrierChanged -= OnResourceChanges;
             Owner.CombatEvents.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            Owner.CombatEvents.Unsubscribe<StatusEffectAppliedEvent>(OnOwnerStatusApplied);
+            Owner.CombatEvents.Unsubscribe<StatusEffectRemovedEvent>(OnOwnerStatusRemoved);
             Owner = null;
         }
 
@@ -136,6 +147,8 @@
                 _ => false
             };
         }
+
+        public virtual bool CanActivate() => IsEnoughResource() && CooldownLeft == 0 && !IsOwnerParalyzed;
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
@@ -165,6 +178,14 @@
             [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
         };
 
-        private void OnResourceChanges(float obj) => AbilityResourceChanges?.Invoke(this, IsEnoughResource());
+        private bool IsOwnerParalyzed => Owner != null && (Owner.StatusEffects & StatusEffects.Paralysis) != 0;
+
+        private void OnResourceChanges(float obj) => NotifyAvailabilityChanged();
+
+        private void OnOwnerStatusApplied(StatusEffectAppliedEvent evt) => NotifyAvailabilityChanged();
+
+        private void OnOwnerStatusRemoved(StatusEffectRemovedEvent evt) => NotifyAvailabilityChanged();
+
+        private void NotifyAvailabilityChanged() => AbilityResourceChanges?.Invoke(this, CanActivate());
     }
 }

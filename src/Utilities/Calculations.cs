@@ -16,23 +16,66 @@
         private const float EvasionScalingFactor = 10000f;
         private const float ArmorScalingFactor = 10000f;
 
+        /// <summary>Hard cap for elemental resistances: damage of a resisted type cannot be reduced by more than this fraction.</summary>
+        private const float MaxResistance = 0.8f;
+
+        private static readonly Dictionary<DamageType, EntityParameter> s_resistanceByType = new()
+        {
+            [DamageType.Fire] = EntityParameter.FireResistance,
+            [DamageType.Cold] = EntityParameter.ColdResistance,
+            [DamageType.Lightning] = EntityParameter.LightningResistance,
+        };
+
         public static float CalculateFloatValue(IReadOnlyList<IModifier> modifiers, float baseValue = 0)
             => Math.Max(0, CalculateModifiers(modifiers, baseValue));
 
-        public static void CalculateFinalDamage(IAttackContext context)
+        public static void CalculateInitialAttackDamage(IAttackContext context)
         {
             float baseDamage = context.BaseDamage;
             float additionalDamage = context.AdditionalDamage;
             context.FinalDamage = baseDamage + additionalDamage;
-            if (context.IsCritical || context.ForceCriticalAttack)
-            {
-                // Mitigation is 0 for most targets -> factor is 1 (no-op). Clamped so over-stacking can't invert damage.
-                float critMitigation = Mathf.Clamp(context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation), 0f, 1f);
-                context.FinalDamage *= context.RawCriticalDamage * (1 - critMitigation);
-            }
-            float effectiveArmor = context.Target.Parameters.Armor * (1 - context.Attacker.Parameters.ArmorPenetration);
-            context.FinalDamage *= 1 - (effectiveArmor / (effectiveArmor + ArmorScalingFactor));
+            if (context is { IsCritical: false, ForceCriticalAttack: false }) return;
+
+            // Mitigation is 0 for most targets -> factor is 1 (no-op). Clamped so over-stacking can't invert damage.
+            float critMitigation = Mathf.Clamp(context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation), 0f, 1f);
+            context.FinalDamage *= context.RawCriticalDamage * (1 - critMitigation);
         }
+
+        /// <summary>
+        /// Defender-side mitigation — the single place that knows how each damage type is reduced.
+        /// Pipeline order: outgoing modifiers (source) -> incoming modifiers (target) -> mitigation per component -> barrier -> health.
+        /// Rules: Physical/Normal — armor scaled by the source's armor penetration; Fire/Cold/Lightning — the matching
+        /// resistance (fraction 0..1); Pure and DoT types (Poison/Burning/Bleed) pass through untouched.
+        /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
+        /// so UI and statistics see the real post-mitigation damage split.
+        /// </summary>
+        public static void CalculateMitigation(IDamageContext context, IFightable target)
+        {
+            // Snapshot: Set() mutates the collection we are iterating
+            foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
+                context.Set(type, MitigateComponent(type, damage, context.Source, target));
+        }
+
+        private static float MitigateComponent(DamageType type, float damage, IFightable source, IFightable target)
+        {
+            if (s_resistanceByType.TryGetValue(type, out EntityParameter resistance))
+                return ApplyResistance(damage, target, resistance);
+            return type is DamageType.Physical ? ApplyArmor(damage, source, target) : damage;
+            // Pure and DoT statuses (Poison/Burning/Bleed) are unmitigated; their rules land here when defined
+        }
+
+        private static float ApplyResistance(float damage, IFightable target, EntityParameter resistance)
+        {
+            float resist = Mathf.Clamp(target.Parameters.GetValueForParameter(resistance), 0f, MaxResistance);
+            return damage * (1 - resist);
+        }
+
+        private static float ApplyArmor(float damage, IFightable source, IFightable target)
+        {
+            float effectiveArmor = target.Parameters.Armor * (1 - source.Parameters.ArmorPenetration);
+            return damage * (1 - effectiveArmor / (effectiveArmor + ArmorScalingFactor));
+        }
+
 
         public static void CalculateSucceeded(IAttackContext context)
         {

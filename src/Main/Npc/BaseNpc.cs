@@ -69,7 +69,6 @@ namespace LastBreath.Npc
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public ICombatComponent CombatComponent { get; }
         public IAbilityBookComponent AbilityBook { get; private set; }
-
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -223,7 +222,9 @@ namespace LastBreath.Npc
             if (context.Amount <= 0) return;
             if (context.ConvertToDamage)
             {
-                TakeDamage(new DamageContext { Source = context.Source, Damage = context.Amount, Type = DamageType.Normal, Cause = DamageCause.Passive });
+                var convertedDamage = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
+                convertedDamage.Add(DamageType.Pure, context.Amount);
+                TakeDamage(convertedDamage);
                 return;
             }
 
@@ -284,17 +285,16 @@ namespace LastBreath.Npc
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
-                        Calculations.CalculateFinalDamage(context);
+                        Calculations.CalculateInitialAttackDamage(context);
                         var damageContext = new DamageContext
                         {
                             Source = context.Attacker,
-                            Damage = context.FinalDamage,
-                            Type = DamageType.Normal,
                             Cause = DamageCause.Attack,
                             IsCrit = context.ForceCriticalAttack || context.IsCritical
                         };
+                        damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.Damage; // actual damage dealt to target (barrier-absorbed included)
+                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
@@ -342,10 +342,12 @@ namespace LastBreath.Npc
 
         public Task TakeDamage(IDamageContext context)
         {
-            // TODO: Here i need to calculate final damage with armor/resistance etc
+            ModifierHandler.Apply(context);
+            context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+            Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.Damage;
+            float remaining = context.TotalDamage;
             if (CurrentBarrier > 0)
             {
                 float absorbed = Mathf.Min(CurrentBarrier, remaining);

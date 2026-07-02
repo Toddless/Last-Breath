@@ -6,7 +6,6 @@
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Godot;
-    using PassiveSkills;
     using Stateless;
 
     public partial class EntitySpot : Node2D
@@ -111,19 +110,6 @@
             _eventBus = battleEventBus;
             _eventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnPlayerSelectingAbilityTarget);
             _eventBus.Subscribe<CancelSelectionEvent>(OnSelectionCancel);
-            _eventBus.Subscribe<DamageTakenEvent>(OnDamageTaken);
-            _eventBus.Subscribe<EntityHealedEvent>(OnHealed);
-        }
-
-        private void OnHealed(EntityHealedEvent obj)
-        {
-            // TODO: Why some character after evade attack them self?
-            if (Entity?.InstanceId != obj.Healed.InstanceId) return;
-            int healed = Mathf.RoundToInt(obj.Amount);
-
-            var numbers = FlyNumbers.Initialize().Instantiate<FlyNumbers>();
-            numbers.PlayHealNumbers(healed);
-            CallDeferred(Node.MethodName.AddChild, numbers);
         }
 
         private void OnSelectionCancel(CancelSelectionEvent obj)
@@ -136,18 +122,6 @@
         {
             if (Entity == null || _stateMachine.State is State.CannotBeSelected) return;
             _stateMachine.Fire(_candidateForAbility, evnt.SelectionId);
-        }
-
-        private void OnDamageTaken(DamageTakenEvent evnt)
-        {
-            if (Entity?.InstanceId != evnt.Target.InstanceId) return;
-            float damage = evnt.Context.Damage;
-            var type = evnt.Context.Type;
-            bool isCrit = evnt.Context.IsCrit;
-
-            var flyNumbers = FlyNumbers.Initialize().Instantiate<FlyNumbers>();
-            flyNumbers.PlayDamageNumbers(Mathf.RoundToInt(damage), type, isCrit);
-            CallDeferred(Node.MethodName.AddChild, flyNumbers);
         }
 
         private void OnEntityDead(IFightable obj)

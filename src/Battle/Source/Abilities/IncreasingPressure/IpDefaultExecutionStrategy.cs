@@ -29,11 +29,13 @@
                     float damage = owner.Parameters.Damage * increase;
                     var context = new AttackContext(owner, target, damage, rnd, scheduler)
                     {
-                        RawCriticalChance = owner.Parameters.CriticalChance, RawCriticalDamage = owner.Parameters.CriticalDamage, AdditionalDamage = additionalDamage
+                        RawCriticalChance = owner.Parameters.CriticalChance,
+                        RawCriticalDamage = owner.Parameters.CriticalDamage,
+                        AdditionalDamage = additionalDamage,
+                        Index = i,
+                        TotalCount = (int)ability.Attacks
                     };
 
-                    context.Index = i;
-                    context.TotalCount = (int)ability.Attacks;
                     foreach (var modifier in ability.AttackModifiers)
                         modifier.Apply(context);
 
