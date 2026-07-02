@@ -1,6 +1,8 @@
 ﻿namespace Battle.Source
 {
+    using Abilities;
     using Core.Data;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.UI;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,7 @@
         public static IServiceCollection AddBattleSystemModuleDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
+            services.AddSingleton<IAbilityProvider, AbilityProvider>();
             return services;
         }
 

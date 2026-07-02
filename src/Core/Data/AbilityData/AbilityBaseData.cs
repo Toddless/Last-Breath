@@ -16,6 +16,6 @@
         [JsonProperty("weaponDamageScale")] public float WeaponDamageScale { get; init; }
         [JsonProperty("spellDamageScale")] public float SpellDamageScale { get; init; }
         [JsonProperty("abilityProperties")] public Dictionary<string, float> AbilityProperties { get; init; } = [];
-        [JsonProperty("upgrades")] public Dictionary<int, List<AbilityUpgradeData>> Upgrades { get; init; } = [];
+        [JsonProperty("upgrades")] public List<AbilityUpgradeData> Upgrades { get; init; } = [];
     };
 }

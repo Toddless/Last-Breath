@@ -1,13 +1,13 @@
 namespace Core.Components
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Constants;
     using Enums;
+    using System;
+    using Constants;
+    using System.Linq;
+    using Interfaces.Entity;
     using Interfaces.Abilities;
     using Interfaces.Components;
-    using Interfaces.Entity;
+    using System.Collections.Generic;
 
     public class AbilityBookComponent(
         IFightable owner,

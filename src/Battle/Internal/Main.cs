@@ -2,6 +2,7 @@
 {
     using System;
     using Core.Data;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
@@ -24,6 +25,7 @@
             if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
+            var ability = _provider.GetService<IAbilityProvider>().CreateAbility("Ability_Series_Of_Attacks");
         }
 
         private async void OnBattleInitialized(BattleInitializedEvent evnt)
