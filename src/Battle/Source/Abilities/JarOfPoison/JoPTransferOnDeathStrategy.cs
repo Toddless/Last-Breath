@@ -7,6 +7,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
+    using Core.Interfaces.Events.GameEvents;
     using Effects;
 
     /// <summary>
@@ -27,13 +28,14 @@ namespace Battle.Source.Abilities.JarOfPoison
 
         private static void SubscribeTransfer(IFightable target, IFightable owner, IBattleField field)
         {
-            target.Dead += OnDead;
+            target.CombatEvents.Subscribe<EntityDiedEvent>(OnDead);
             return;
 
-            void OnDead(IFightable dead)
+            void OnDead(EntityDiedEvent dead)
             {
-                dead.Dead -= OnDead;
-                TransferPoison(dead, owner, field);
+                if(dead.Entity.InstanceId != target.InstanceId) return;
+                target.CombatEvents.Unsubscribe<EntityDiedEvent>(OnDead);
+                TransferPoison(dead.Entity, owner, field);
             }
         }
 

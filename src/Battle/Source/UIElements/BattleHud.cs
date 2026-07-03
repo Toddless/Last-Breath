@@ -9,11 +9,11 @@
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Components;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
     using Godot;
-    using Utilities;
 
     public partial class BattleHud : Control, IHud
     {
@@ -77,14 +77,16 @@
         {
             if (!IsNodeReady()) await ToSignal(this, Node.SignalName.Ready);
             _battleEventBus = battleEventBus;
-            _battleEventBus.Subscribe<PlayerManaChangesEvent>(OnPlayerManaChanges);
-            _battleEventBus.Subscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
-            _battleEventBus.Subscribe<PlayerHealthChangesEvent>(OnPlayerHealthChanges);
-            _battleEventBus.Subscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
+            // Bar values are replay-driven: the BattleDirector republishes these events at the
+            // moment the corresponding beat is shown, and the Vitals snapshot carries the numbers.
+            _battleEventBus.Subscribe<DamageTakenEvent>(OnDamageTakenReplayed);
+            _battleEventBus.Subscribe<EntityHealedEvent>(OnHealedReplayed);
+            _battleEventBus.Subscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
 
-            _battleEventBus.Subscribe<EntityHealthChangesEvent>(OnEntityHealthChanges);
+            // Max values change rarely (effects/level-ups) and stay live until a restore pipeline exists.
+            _battleEventBus.Subscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
+            _battleEventBus.Subscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
             _battleEventBus.Subscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
-            _battleEventBus.Subscribe<EntityManaChangesEvent>(OnEntityManaChanges);
             _battleEventBus.Subscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
 
             _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
@@ -153,24 +155,20 @@
             _playerBars?.UpdateMaxHealth(obj.Value);
         }
 
-        private void OnPlayerHealthChanges(PlayerHealthChangesEvent obj)
-        {
-            _playerBars?.UpdateHealth(obj.Value);
-        }
+        private void OnDamageTakenReplayed(DamageTakenEvent evnt) => UpdateVitals(evnt.Target, evnt.Vitals);
 
-        private void OnPlayerManaChanges(PlayerManaChangesEvent obj)
-        {
-            _playerBars?.UpdateMana(obj.Value);
-        }
+        private void OnHealedReplayed(EntityHealedEvent evnt) => UpdateVitals(evnt.Healed, evnt.Vitals);
 
-        private void OnEntityManaChanges(EntityManaChangesEvent obj)
-        {
-            GetCharacterBar(obj.Entity.InstanceId)?.UpdateMana(obj.Value);
-        }
+        private void OnAbilityActivatedReplayed(AbilityActivatedEvent evnt) => UpdateVitals(evnt.Caster, evnt.Vitals);
 
-        private void OnEntityHealthChanges(EntityHealthChangesEvent obj)
+        /// <summary>Bars always show the snapshot, never live state — live state is "from the future" during replay.</summary>
+        private void UpdateVitals(IFightable entity, VitalsSnapshot vitals)
         {
-            GetCharacterBar(obj.Entity.InstanceId)?.UpdateHealth(obj.Value);
+            var bar = entity is IPlayer ? _playerBars : GetCharacterBar(entity.InstanceId);
+            if (bar == null) return;
+
+            bar.UpdateHealth(vitals.Health);
+            bar.UpdateMana(vitals.Mana);
         }
 
         private void OnEntityMaxManaChanges(EntityMaxManaChangesEvent obj)

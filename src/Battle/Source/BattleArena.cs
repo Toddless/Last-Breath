@@ -23,6 +23,8 @@
         private readonly RandomNumberGenerator _rnd = new();
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
+        private readonly BattleTimeline _timeline = new();
+        private TaskCompletionSource<IFightable?>? _playerTargetTcs;
         private IBattleEventBus? _battleEventBus;
         private List<IFightable> _fighters = [];
         private int _playersEnemiesCount;
@@ -30,11 +32,13 @@
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
         private CombatTextPresenter? _combatTextPresenter;
+        private Presentation.BattleDirector? _battleDirector;
         private IPlayer? _player;
         private IFightable? _currentFighter;
         private bool _fightEnds;
 
-        private TaskCompletionSource<IFightable?>? _playerTargetTcs;
+        /// <summary>The ordered record of the current battle; the presentation layer replays it.</summary>
+        public IBattleTimeline Timeline => _timeline;
 
         public override void _Ready()
         {
@@ -43,9 +47,11 @@
             _fightEnds = false;
         }
 
+
         public override void _ExitTree()
         {
             _battleEventBus = null;
+            _timeline.DetachAll();
             foreach (EntitySpot entitySpot in _spots)
                 entitySpot.RemoveBattleEventBus();
         }
@@ -81,7 +87,6 @@
                 Tracker.TrackException("Failed to activate ability", e, this);
             }
         }
-
 
         public void SetPlayer(IFightable player)
         {
@@ -183,6 +188,8 @@
 
             _playerSpot?.SetBattleEventBus(_battleEventBus);
             SetupCombatTextPresenter(_battleEventBus);
+            StartTimelineRecording();
+            SetupBattleDirector(_battleEventBus);
 
             var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
@@ -257,10 +264,26 @@
             return _battleOutcome?.Results ?? BattleResults.BattleAbandoned;
         }
 
+        private void SetupBattleDirector(IBattleEventBus battleEventBus)
+        {
+            _battleDirector = new Presentation.BattleDirector();
+            AddChild(_battleDirector);
+            _battleDirector.Setup(_timeline, battleEventBus);
+        }
+
+        /// <summary>Every fighter's personal bus feeds the shared timeline; entries arrive in causal order.</summary>
+        private void StartTimelineRecording()
+        {
+            _timeline.Clear();
+            foreach (var fighter in _fighters)
+                _timeline.Attach(fighter.CombatEvents);
+        }
+
         private void EndBattle(BattleOutcome outcome)
         {
             if (_battleOutcome != null) return;
             _battleOutcome = outcome;
+            _timeline.DetachAll();
 
             if (_playerTargetTcs is { Task.IsCompleted: false })
                 _playerTargetTcs.SetResult(null);

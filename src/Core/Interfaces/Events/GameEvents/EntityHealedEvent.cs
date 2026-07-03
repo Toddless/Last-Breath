@@ -1,7 +1,9 @@
-﻿namespace Core.Interfaces.Events.GameEvents
+namespace Core.Interfaces.Events.GameEvents
 {
     using Battle;
+    using Data;
     using Entity;
 
-    public record EntityHealedEvent(IFightable Healed, float Amount) : IBattleEvent, ICombatEvent;
+    /// <summary><paramref name="Vitals"/> is the entity's state right after the heal was applied.</summary>
+    public record EntityHealedEvent(IFightable Healed, float Amount, VitalsSnapshot Vitals) : IBattleEvent, ICombatEvent;
 }

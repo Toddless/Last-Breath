@@ -1,6 +1,5 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using System.Linq;
     using Core.Interfaces.Abilities;
 
     /// <summary>L2 upgrade: each successful attack extends the poison duration on the target by 1 turn.</summary>

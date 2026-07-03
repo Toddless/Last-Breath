@@ -1,6 +1,5 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using System.Linq;
     using Core.Interfaces.Abilities;
 
     /// <summary>L3 upgrade: each attack also deals 45% of the damage to a random enemy on the battlefield.</summary>

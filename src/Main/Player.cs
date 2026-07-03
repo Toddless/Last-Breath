@@ -220,9 +220,10 @@
             }
 
             float amount = context.Amount;
-            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
-            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
-            CurrentHealth += amount;
+            CurrentHealth += amount; // applied before publishing so the snapshot reflects the post-heal state
+            var healed = new EntityHealedEvent(this, amount, VitalsSnapshot.From(this));
+            CombatEvents.Publish(healed);
+            _battleEventBus?.Publish(healed);
         }
 
         public void ConsumeResource(Costs type, float amount)
@@ -284,11 +285,9 @@
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        // await Animations.PlayAnimationAsync("Fight_Blocked");
                         break;
                     case AttackResults.Evaded:
                         CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        //     await Animations.PlayAnimationAsync("Fight_Evaded");
                         break;
                 }
 
@@ -305,7 +304,6 @@
         {
             CombatEvents.Publish(new BeforeAttackEvent(context));
             context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
-            //  await Animations.PlayAnimationAsync("Fight_Attack");
             return Task.CompletedTask;
         }
 
@@ -343,9 +341,9 @@
 
             if (remaining > 0) CurrentHealth -= remaining;
 
-            CombatEvents.Publish(new DamageTakenEvent(context, this));
-            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
-            //  await Animations.PlayAnimationAsync("Fight_Hurt");
+            var damageTaken = new DamageTakenEvent(context, this, VitalsSnapshot.From(this));
+            CombatEvents.Publish(damageTaken);
+            _battleEventBus?.Publish(damageTaken);
 
             return Task.CompletedTask;
         }
@@ -430,7 +428,6 @@
             _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
             _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
 
-            // Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
         }
 

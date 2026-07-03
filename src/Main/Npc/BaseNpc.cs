@@ -211,7 +211,6 @@ namespace LastBreath.Npc
 
         public void SetupBattleEventBus(IBattleEventBus bus)
         {
-            // TODO:
             _battleEventBus = bus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
@@ -229,9 +228,10 @@ namespace LastBreath.Npc
             }
 
             float amount = context.Amount;
-            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
-            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
-            CurrentHealth += amount;
+            CurrentHealth += amount; // applied before publishing so the snapshot reflects the post-heal state
+            var healed = new EntityHealedEvent(this, amount, VitalsSnapshot.From(this));
+            CombatEvents.Publish(healed);
+            _battleEventBus?.Publish(healed);
         }
 
         public void ConsumeResource(Costs type, float amount)
@@ -298,11 +298,9 @@ namespace LastBreath.Npc
                         break;
                     case AttackResults.Blocked:
                         CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        //   await Animations.PlayAnimationAsync("Blocked");
                         break;
                     case AttackResults.Evaded:
                         CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        //  await Animations.PlayAnimationAsync("Evaded");
                         break;
                 }
 
@@ -319,8 +317,6 @@ namespace LastBreath.Npc
         {
             context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
             CombatEvents.Publish(new BeforeAttackEvent(context));
-            //    await Animations.PlayAnimationAsync("Attack");
-
             return Task.CompletedTask;
         }
 
@@ -358,9 +354,9 @@ namespace LastBreath.Npc
 
             if (remaining > 0) CurrentHealth -= remaining;
 
-            CombatEvents.Publish(new DamageTakenEvent(context, this));
-            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
-            // await Animations.PlayAnimationAsync("Hurt");
+            var damageTaken = new DamageTakenEvent(context, this, VitalsSnapshot.From(this));
+            CombatEvents.Publish(damageTaken);
+            _battleEventBus?.Publish(damageTaken);
             return Task.CompletedTask;
         }
 
@@ -454,7 +450,6 @@ namespace LastBreath.Npc
             _gameEventBus?.Publish<EntityDiedEvent>(new(this));
             _battleEventBus?.Publish<EntityDiedEvent>(new(this));
 
-            // Animations.PlayAnimation("Dead");
             Dead?.Invoke(this);
         }
 

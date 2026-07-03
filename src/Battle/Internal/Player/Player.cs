@@ -251,12 +251,7 @@ namespace Battle.Internal.Player
                 {
                     case AttackResults.Succeed:
                         Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = new DamageContext
-                        {
-                            Source = context.Attacker,
-                            Cause = DamageCause.Attack,
-                            IsCrit = context.ForceCriticalAttack || context.IsCritical
-                        };
+                        var damageContext = new DamageContext { Source = context.Attacker, Cause = DamageCause.Attack, IsCrit = context.ForceCriticalAttack || context.IsCritical };
                         damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);
                         context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
@@ -278,15 +273,15 @@ namespace Battle.Internal.Player
             }
         }
 
-        public async Task Attack(IAttackContext context)
+        public Task Attack(IAttackContext context)
         {
             // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
             CombatEvents.Publish(new BeforeAttackEvent(context));
             context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
-            await Animations.PlayAnimationAsync("Fight_Attack");
+            return Task.CompletedTask;
         }
 
-        public async Task TakeDamage(IDamageContext context)
+        public Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
             context.Source.ModifierHandler.Apply(context);
@@ -304,9 +299,10 @@ namespace Battle.Internal.Player
 
             if (remaining > 0) CurrentHealth -= remaining;
 
-            CombatEvents.Publish(new DamageTakenEvent(context, this));
-            _battleEventBus?.Publish(new DamageTakenEvent(context, this));
-            await Animations.PlayAnimationAsync("Fight_Hurt");
+            // Combat bus only: the timeline records it and the BattleDirector republishes it
+            // to the battle bus at replay time, so UI reacts when the hit is SHOWN, not resolved.
+            CombatEvents.Publish(new DamageTakenEvent(context, this, VitalsSnapshot.From(this)));
+            return Task.CompletedTask;
         }
 
         public void Heal(IHealContext context)
@@ -322,9 +318,8 @@ namespace Battle.Internal.Player
             }
 
             float amount = context.Amount;
-            CombatEvents.Publish<EntityHealedEvent>(new(this, amount));
-            _battleEventBus?.Publish(new EntityHealedEvent(this, amount));
-            CurrentHealth += amount;
+            CurrentHealth += amount; // applied before publishing so the snapshot reflects the post-heal state
+            CombatEvents.Publish(new EntityHealedEvent(this, amount, VitalsSnapshot.From(this)));
         }
 
         public void OnTurnStart()
@@ -420,11 +415,9 @@ namespace Battle.Internal.Player
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
-            _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
-
-            Animations.PlayAnimation("Dead");
-            Dead?.Invoke(this);
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
+            CombatEvents.Publish<EntityDiedEvent>(new(this));
         }
 
         private void NotifyHealthChanges(float value)

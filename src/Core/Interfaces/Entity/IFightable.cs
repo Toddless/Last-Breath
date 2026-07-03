@@ -42,9 +42,6 @@ namespace Core.Interfaces.Entity
         event Action<float>? CurrentManaChanged;
         event Action<float>? CurrentBarrierChanged;
         event Action<float>? CurrentHealthChanged;
-        event Action<IFightable>? Dead;
-
-
 
         float GetDamage();
         void ConsumeResource(Costs type, float amount);

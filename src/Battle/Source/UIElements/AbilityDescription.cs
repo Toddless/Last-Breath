@@ -1,6 +1,5 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.UI;
     using Godot;

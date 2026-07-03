@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
@@ -104,9 +105,8 @@
             Owner.ModifierHandler.Apply(context);
             StartCooldown(context.Cooldown);
             ConsumeResource(context);
-            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this));
+            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner)));
             await ExecuteInternal(targets, Owner, field);
-            await Owner.Animations.PlayAnimationAsync(Id);
             PostActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
         }
 

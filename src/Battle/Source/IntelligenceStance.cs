@@ -1,6 +1,5 @@
 ﻿namespace Battle.Source
 {
-    using Abilities;
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Modifiers;

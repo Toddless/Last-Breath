@@ -77,7 +77,6 @@
         public void RemoveEntityFromSpot()
         {
             if (Entity == null) return;
-            Entity.Dead -= OnEntityDead;
             Entity.Effects.EffectAdded -= OnEffectAdded;
             var node = Entity as Node;
             RemoveChild(node);
@@ -85,7 +84,6 @@
 
         public void SetEntity(IFightable entity)
         {
-            entity.Dead += OnEntityDead;
             entity.Effects.EffectAdded += OnEffectAdded;
             var body = entity as CharacterBody2D;
             Entity = entity;
@@ -110,6 +108,7 @@
             _eventBus = battleEventBus;
             _eventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnPlayerSelectingAbilityTarget);
             _eventBus.Subscribe<CancelSelectionEvent>(OnSelectionCancel);
+            _eventBus.Subscribe<EntityDiedEvent>(OnEntityDead);
         }
 
         private void OnSelectionCancel(CancelSelectionEvent obj)
@@ -124,11 +123,11 @@
             _stateMachine.Fire(_candidateForAbility, evnt.SelectionId);
         }
 
-        private void OnEntityDead(IFightable obj)
+        private void OnEntityDead(EntityDiedEvent @event)
         {
+            if (@event.Entity.InstanceId != Entity?.InstanceId) return;
+            // Пока что просто устанавливаем "Не может быть выбран". В будущем возможно появление способностей воскрешения.
             _stateMachine.Fire(Trigger.SetCannotBeSelected);
-            Entity?.Dead -= OnEntityDead;
-            Entity = null;
         }
     }
 }
