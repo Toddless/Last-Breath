@@ -1,9 +1,9 @@
-﻿namespace LastBreath.Services
+namespace Core.Services
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Events;
+    using Interfaces.Events;
 
     public class GameEventBus : IGameEventBus
     {
@@ -15,7 +15,7 @@
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
                 return;
 
-            foreach (var handler in handlers.Cast<Action<T>>())
+            foreach (var handler in handlers.Cast<Action<T>>().ToList())
                 handler(evnt);
         }
 
@@ -35,10 +35,7 @@
             where T : IGameEvent
         {
             if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                // TODO: Tracker
                 return;
-            }
 
             handlers.Remove(handler);
             if (handlers.Count == 0)

@@ -1,11 +1,15 @@
-﻿namespace LastBreath.Services
+namespace Core.Services
 {
     using System;
     using System.Collections.Generic;
-    using Core.Interfaces.UI;
     using Godot;
+    using Interfaces.UI;
 
-    public class UIWindowPositionStorage : IUIWindowPositionStorage
+    /// <summary>
+    /// Window positions survive the fresh-instance UI policy here: draggable windows save
+    /// their position on close/drag and restore it on the next open.
+    /// </summary>
+    public class UiWindowPositionStorage : IUIWindowPositionStorage
     {
         private readonly Dictionary<Type, Vector2> _windowPositions = [];
 
