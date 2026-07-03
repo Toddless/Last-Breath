@@ -47,7 +47,7 @@ namespace Battle.Source.Abilities
             // Crit damage is a pure additive multiplier by design: bonuses only ever add to it
             if (isCritical) damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
 
-            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical };
+            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical, CastId = CastId };
             context.Add(plan.DamageType, damage);
             await target.TakeDamage(context);
 

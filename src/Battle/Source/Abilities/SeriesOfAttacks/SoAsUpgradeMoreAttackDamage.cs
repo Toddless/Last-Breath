@@ -4,9 +4,9 @@
     using Decorators;
 
     public class SoAsUpgradeMoreAttackDamage(string id, string[] tags, int tier, float multiplier)
-        : SimpleUpgrade<SeriesOfDamagings, SeriesOfDamagings.Parameters>(id, tags, tier,
-            new SimpleAbilityParameterDecorator<SeriesOfDamagings.Parameters>(
-                SeriesOfDamagings.Parameters.DamageMultiplier,
+        : SimpleUpgrade<SeriesOfAttacks, SeriesOfAttacks.Parameters>(id, tags, tier,
+            new SimpleAbilityParameterDecorator<SeriesOfAttacks.Parameters>(
+                SeriesOfAttacks.Parameters.DamageMultiplier,
                 Priority.Weak,
                 OperationType.Add, multiplier,
                 "Ability_Parameter_Decorator_SoA_Attack_Damage",

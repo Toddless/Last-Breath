@@ -29,6 +29,9 @@ namespace Battle.Source.Abilities.IceShards
         float shrapnelDamage,
         float shrapnelWeaponDamageScale,
         float shrapnelSpellDamageScale,
+        float secondStageDamage,
+        float secondStageWeaponDamageScale,
+        float secondStageSpellDamageScale,
         Costs costType = Costs.Mana)
         : MulticastVolleyAbility(id: "Ability_Ice_Shards", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
@@ -47,6 +50,9 @@ namespace Battle.Source.Abilities.IceShards
                     [Parameters.ShrapnelDamage] = new Module<Parameters>(() => shrapnelDamage, Parameters.ShrapnelDamage),
                     [Parameters.ShrapnelWeaponDamageScale] = new Module<Parameters>(() => shrapnelWeaponDamageScale, Parameters.ShrapnelWeaponDamageScale),
                     [Parameters.ShrapnelSpellDamageScale] = new Module<Parameters>(() => shrapnelSpellDamageScale, Parameters.ShrapnelSpellDamageScale),
+                    [Parameters.SecondStageDamage] = new Module<Parameters>(() => secondStageDamage, Parameters.SecondStageDamage),
+                    [Parameters.SecondStageWeaponDamageScale] = new Module<Parameters>(() => secondStageWeaponDamageScale, Parameters.SecondStageWeaponDamageScale),
+                    [Parameters.SecondStageSpellDamageScale] = new Module<Parameters>(() => secondStageSpellDamageScale, Parameters.SecondStageSpellDamageScale),
                     // Zero by default; the L3 upgrade raises it with a decorator — the ability knows nothing about the upgrade
                     [Parameters.ShrapnelBarrierLeach] = new Module<Parameters>(() => 0f, Parameters.ShrapnelBarrierLeach),
                 });
@@ -62,7 +68,10 @@ namespace Battle.Source.Abilities.IceShards
             ShrapnelDamage,
             ShrapnelWeaponDamageScale,
             ShrapnelSpellDamageScale,
-            ShrapnelBarrierLeach
+            ShrapnelBarrierLeach,
+            SecondStageDamage,
+            SecondStageWeaponDamageScale,
+            SecondStageSpellDamageScale
         }
 
         public int Shards => (int)this[Parameters.Shards];
@@ -95,8 +104,11 @@ namespace Battle.Source.Abilities.IceShards
 
         public override IAbility Copy()
         {
-            var copy = new IceShards(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                Shards, shrapnelDamage, shrapnelWeaponDamageScale, shrapnelSpellDamageScale, costType) { ShardEffectFactory = ShardEffectFactory };
+            var copy = new IceShards(Tags, (int)Cooldown, CostValue,
+                Damage, WeaponDamageScale, SpellDamageScale,
+                Shards,
+                shrapnelDamage, shrapnelWeaponDamageScale, shrapnelSpellDamageScale,
+                secondStageDamage, secondStageWeaponDamageScale, secondStageSpellDamageScale, CostType) { ShardEffectFactory = ShardEffectFactory };
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }

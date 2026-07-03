@@ -10,11 +10,11 @@
 
     public class SoAsApplyBuffStrategy(int attacksNeedForBuff, IEffect toApply) : SoAsDefaultExecutionStrategy
     {
-        private SeriesOfDamagings? _ability;
+        private SeriesOfAttacks? _ability;
         private IFightable? _owner;
         private int _successfulAttacks;
 
-        public override async Task Execute(SeriesOfDamagings ability, IFightable owner, List<IFightable> targets, IBattleField field)
+        public override async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             _successfulAttacks = 0;
             Subscribe(owner);

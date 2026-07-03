@@ -14,6 +14,7 @@
     using Core.Interfaces.UI;
     using Godot;
     using Godot.Collections;
+    using Presentation;
     using UIElements;
     using Utilities;
 
@@ -31,8 +32,8 @@
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
+        [Export] private BattleDirector? _director;
         private CombatTextPresenter? _combatTextPresenter;
-        private Presentation.BattleDirector? _battleDirector;
         private IPlayer? _player;
         private IFightable? _currentFighter;
         private bool _fightEnds;
@@ -209,16 +210,30 @@
                 if (_currentFighter is not { IsAlive: true }) continue;
                 _currentFighter.OnTurnStart();
 
-                var target = await ResolveTargetAsync(_currentFighter);
-                if (target is { IsAlive: true })
+                var skipCause = _currentFighter.StatusEffects.GetSkipTurnCause();
+                if (skipCause != StatusEffects.None)
                 {
-                    var context = CreateAttackContext(_currentFighter, target);
-                    context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
-                    _attackContextScheduler.Schedule(context);
-                    await _attackContextScheduler.DrainQueue();
+                    // The turn starts and immediately ends: start/end effects, dots and
+                    // cooldowns still tick, only the action phase is skipped.
+                    _currentFighter.CombatEvents.Publish(new TurnSkippedEvent(_currentFighter, skipCause));
+                }
+                else
+                {
+                    var target = await ResolveTargetAsync(_currentFighter);
+                    if (target is { IsAlive: true })
+                    {
+                        var context = CreateAttackContext(_currentFighter, target);
+                        context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
+                        _attackContextScheduler.Schedule(context);
+                        await _attackContextScheduler.DrainQueue();
+                    }
                 }
 
                 _currentFighter.OnTurnEnd();
+
+                // Turn gate: the whole turn resolved instantly above; the next fighter
+                // doesn't start until the director has shown everything recorded so far.
+                await WaitForPresentationAsync();
 
                 var queue = _queueScheduler.RefillIfEmpty(_fighters);
                 if (queue.Count > 1)
@@ -261,14 +276,22 @@
                 #endregion
             }
 
+            // Final gate: death and battle-ending beats must finish before the results are handled.
+            await WaitForPresentationAsync();
+
             return _battleOutcome?.Results ?? BattleResults.BattleAbandoned;
+        }
+
+        /// <summary>Turn gate between logic time and presentation time.</summary>
+        private async Task WaitForPresentationAsync()
+        {
+            if (_director == null) return;
+            await _director.WaitUntilIdleAsync();
         }
 
         private void SetupBattleDirector(IBattleEventBus battleEventBus)
         {
-            _battleDirector = new Presentation.BattleDirector();
-            AddChild(_battleDirector);
-            _battleDirector.Setup(_timeline, battleEventBus);
+            _director?.Setup(_timeline, battleEventBus);
         }
 
         /// <summary>Every fighter's personal bus feeds the shared timeline; entries arrive in causal order.</summary>
@@ -308,6 +331,9 @@
         private void OnAttackTargetSelected(AttackTargetSelectedEvent obj)
         {
             if (_currentFighter is not IPlayer) return;
+            // The input window is closed while beats are playing: an attack clicked
+            // mid-animation (e.g. during an ability cast being shown) must not resolve.
+            if (_director?.IsPlaying == true) return;
             if (_playerTargetTcs == null || _playerTargetTcs.Task.IsCompleted) return;
 
             _playerTargetTcs.SetResult(obj.Target);

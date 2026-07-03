@@ -19,6 +19,7 @@
             OperationType.Divide => base.GetValue() / Value,
             OperationType.Multiply => base.GetValue() * Value,
             OperationType.Subtract => base.GetValue() - Value,
+            OperationType.Override => Value,
             _ => base.GetValue()
         };
 

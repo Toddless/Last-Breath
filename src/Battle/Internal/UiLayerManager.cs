@@ -1,11 +1,11 @@
-﻿namespace Battle.Internal
+namespace Battle.Internal
 {
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
     using Godot;
     using Services;
 
-    internal partial class UiLayerManager : Node
+    internal partial class UiLayerManager : Node, ILayerManager
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _tooltipLayer, _notificationLayer;
 
@@ -28,6 +28,9 @@
             if (window is Control cWindow)
                 _windowLayer?.CallDeferred(Node.MethodName.AddChild, cWindow);
         }
+
+        public void ShowNotification(Control notification) =>
+            _notificationLayer?.CallDeferred(Node.MethodName.AddChild, notification);
 
         public void CloseAllWindows()
         {

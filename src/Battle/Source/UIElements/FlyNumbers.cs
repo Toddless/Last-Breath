@@ -37,6 +37,18 @@
             tween.Finished += QueueFree;
         }
 
+        /// <summary>Floating status text (e.g. the skip-turn reason) instead of a number.</summary>
+        public void PlayStatusText(string text)
+        {
+            _label?.Text = text;
+            _label?.Modulate = Colors.LightGray;
+
+            var tween = CreateTween();
+            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
+            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
+            tween.Finished += QueueFree;
+        }
+
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         private Color DefineColor(DamageType type, bool isCritical = false)

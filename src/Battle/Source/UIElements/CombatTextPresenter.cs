@@ -24,6 +24,7 @@ namespace Battle.Source.UIElements
             _resolveAnchor = resolveAnchor;
             _eventBus.Subscribe<DamageTakenEvent>(OnDamageTaken);
             _eventBus.Subscribe<EntityHealedEvent>(OnHealed);
+            _eventBus.Subscribe<TurnSkippedEvent>(OnTurnSkipped);
             _eventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
@@ -46,6 +47,17 @@ namespace Battle.Source.UIElements
             numbers?.PlayHealNumbers(Mathf.RoundToInt(evnt.Amount));
         }
 
+        private void OnTurnSkipped(TurnSkippedEvent evnt)
+        {
+            var numbers = SpawnNumbersAt(evnt.Fighter.InstanceId);
+            numbers?.PlayStatusText(SkipTurnText(evnt.Cause));
+        }
+
+        // TODO(Todd): заменить хардкод на локализацию и поправить ключи/текст как надо.
+        // private static string SkipTurnText(StatusEffects cause) => Localization.Localize($"Status_{cause}");
+        private static string SkipTurnText(StatusEffects cause) =>
+            (cause & StatusEffects.Freeze) != 0 ? "Заморожен" : "Оглушён";
+
         private FlyNumbers? SpawnNumbersAt(string instanceId)
         {
             var anchor = _resolveAnchor?.Invoke(instanceId);
@@ -64,6 +76,7 @@ namespace Battle.Source.UIElements
             {
                 _eventBus.Unsubscribe<DamageTakenEvent>(OnDamageTaken);
                 _eventBus.Unsubscribe<EntityHealedEvent>(OnHealed);
+                _eventBus.Unsubscribe<TurnSkippedEvent>(OnTurnSkipped);
                 _eventBus.Unsubscribe<BattleEndEvent>(OnBattleEnd);
             }
 

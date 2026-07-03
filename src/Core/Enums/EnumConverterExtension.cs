@@ -5,6 +5,12 @@
 
     public static class EnumConverterExtension
     {
+        /// <summary>Statuses that make the fighter skip the action phase of the turn.</summary>
+        private const StatusEffects SkipTurnStatuses = StatusEffects.Stun | StatusEffects.Freeze;
+
+        /// <summary>Which of the fighter's statuses (if any) forces the turn to be skipped.</summary>
+        public static StatusEffects GetSkipTurnCause(this StatusEffects effects) => effects & SkipTurnStatuses;
+
         public static EquipmentCategory ConvertEquipmentPartToCategory(this EquipmentPiece equipment) => equipment switch
         {
             EquipmentPiece.Body => EquipmentCategory.Armor,

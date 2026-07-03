@@ -20,8 +20,11 @@
                 data.AbilityProperties.GetValueOrDefault("shrapnelDamage", 50f),
                 data.AbilityProperties.GetValueOrDefault("shrapnelWeaponDamageScale", 0.15f),
                 data.AbilityProperties.GetValueOrDefault("shrapnelSpellDamageScale", 0.55f),
+                data.AbilityProperties.GetValueOrDefault("secondStageDamage", 120f),
+                data.AbilityProperties.GetValueOrDefault("secondStageWeaponDamageScale", 0.35f),
+                data.AbilityProperties.GetValueOrDefault("secondStageSpellDamageScale", 1.2f),
                 data.CostsType),
-            ["Ability_Series_Of_Attacks"] = data => new SeriesOfAttacks.SeriesOfDamagings(
+            ["Ability_Series_Of_Attacks"] = data => new SeriesOfAttacks.SeriesOfAttacks(
                 data.Tags,
                 data.Cooldown,
                 data.CostValue,

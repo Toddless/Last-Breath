@@ -24,6 +24,7 @@
         private Dictionary<string, QueueSlot> _queueSlots = [];
         private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[BattleConstants.AbilitySlotsPerStance];
         private IAbilityBookComponent? _abilityBook;
+        private bool _isPlayerTurn, _isPresenting;
         [Export] private Button? _returnButton;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
@@ -93,6 +94,8 @@
             _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
 
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
+            _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
+            _battleEventBus.Subscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
 
             foreach (AbilitySlot slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
@@ -201,8 +204,38 @@
 
         private void OnTurnStart(TurnStartEvent obj)
         {
-            if (obj.StartedTurn is IPlayer) _buttonsContainer?.Show();
+            _isPlayerTurn = obj.StartedTurn is IPlayer;
+            if (_isPlayerTurn) _buttonsContainer?.Show();
             else _buttonsContainer?.Hide();
+
+            ApplyInputWindow();
+        }
+
+        private void OnTurnEnd(TurnEndEvent obj)
+        {
+            _isPlayerTurn = false;
+            ApplyInputWindow();
+        }
+
+        private void OnPresentationStateChanged(PresentationStateChangedEvent evnt)
+        {
+            _isPresenting = evnt.IsPlaying;
+            ApplyInputWindow();
+        }
+
+        /// <summary>
+        /// The player input window: clicks and hotkeys work only during the player's turn
+        /// while nothing is being animated. Slots stay visible (tooltips keep working),
+        /// only activation input is blocked. A stunned player never gets an open window:
+        /// his TurnStart and TurnEnd resolve within one synchronous logic run.
+        /// </summary>
+        private void ApplyInputWindow()
+        {
+            bool open = _isPlayerTurn && !_isPresenting;
+            foreach (AbilitySlot slot in _abilitySlotsInstances)
+                slot.SetInputEnabled(open);
+            foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
+                stanceSlot.Disabled = !open;
         }
     }
 }

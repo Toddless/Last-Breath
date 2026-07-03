@@ -622,7 +622,10 @@
                 "projectiles": 3,
                 "shrapnelDamage": 50,
                 "shrapnelWeaponDamageScale": 0.15,
-                "shrapnelSpellDamageScale": 0.55
+                "shrapnelSpellDamageScale": 0.55,
+                "secondStageDamage": 120,
+                "secondStageWeaponDamageScale": 0.35,
+                "secondStageSpellDamageScale": 1.2
             },
             "upgrades": [
                 {

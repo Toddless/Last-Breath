@@ -1,14 +1,22 @@
-﻿namespace Core.Interfaces.UI
+namespace Core.Interfaces.UI
 {
     using System;
-    using Godot;
 
+    /// <summary>
+    /// The single creation point of top-level UI (HUDs and windows). Projects register scene
+    /// factories at bootstrap; every open creates a FRESH instance with services injected,
+    /// every close frees it. Persistent UI state (window positions etc.) belongs in dedicated
+    /// services like <see cref="IUIWindowPositionStorage"/>, not in kept-alive nodes.
+    /// </summary>
     public interface IUiElementsManager
     {
-        void Subscribe(Node layer);
+        void Subscribe(ILayerManager layers);
+
         IHud ChangeHud(Type hudType);
+
+        /// <summary>Toggle: opening an already open window closes it instead.</summary>
         IWindow OpenWindow(Type windowType);
-        void ClearCache();
+
         bool RegisterHudFactory(Type hudType, Func<IHud> factory);
         bool RegisterWindowFactory(Type windowType, Func<IWindow> factory);
     }

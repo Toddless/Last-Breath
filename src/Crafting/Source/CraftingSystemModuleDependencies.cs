@@ -38,10 +38,12 @@
             return services;
         }
 
+        /// <summary>Shared crafting UI (Source types only — Internal windows are registered by each project's bootstrap).</summary>
         public static void AddCraftingWindowFactories(this IGameServiceProvider provider)
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(CraftingItems), () => CraftingItems.Initialize().Instantiate<CraftingItems>());
             uiElementManager.RegisterWindowFactory(typeof(Recipes), () => Recipes.Initialize().Instantiate<Recipes>());
         }
     }

@@ -31,6 +31,9 @@
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
         private bool _isMouseInside = false, _isOnCooldown = false, _isEnoughResources = false;
+        // The player input window (see BattleHud.ApplyInputWindow): closed outside the player's
+        // turn and while animations play. Blocks activation only — tooltips keep working.
+        private bool _inputEnabled;
         private IAbility? _ability;
         private Key _slotNumber;
         private string _selectionId = string.Empty;
@@ -40,7 +43,7 @@
 
         public override void _Input(InputEvent @event)
         {
-            if (_ability == null) return;
+            if (!_inputEnabled || _ability == null) return;
             switch (true)
             {
                 case var _ when @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && _stateMachine.State is State.SelectingTargets:
@@ -57,7 +60,7 @@
         public override void _GuiInput(InputEvent @event)
         {
             // TODO: Shortcuts
-            if (!_isMouseInside || _ability == null || _stateMachine.State is State.NotAvailable) return;
+            if (!_inputEnabled || !_isMouseInside || _ability == null || _stateMachine.State is State.NotAvailable) return;
             //  Something usefully on RMB?
             if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
                 TryActivateAbility();
@@ -110,6 +113,15 @@
             _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
             _ability?.CooldownLeftChanges -= OnCooldownChanges;
             _ability = null;
+        }
+
+        /// <summary>Closing the window mid target selection cancels it, otherwise the selection would hang.</summary>
+        public void SetInputEnabled(bool enabled)
+        {
+            if (_inputEnabled == enabled) return;
+            _inputEnabled = enabled;
+            if (!enabled && _stateMachine.State is State.SelectingTargets)
+                CancelTargetSelecting();
         }
 
         public void SetNumber(int number)

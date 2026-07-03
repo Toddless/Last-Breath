@@ -12,9 +12,9 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Module;
-    using Source.Decorators;
+    using Decorators;
 
-    public class SeriesOfDamagings(
+    public class SeriesOfAttacks(
         string[] tags,
         int cooldown,
         int costValue,
@@ -86,11 +86,12 @@
 
         public override IAbility Copy()
         {
-            var copy = new SeriesOfDamagings(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, MinAttacks, MaxAttacks, DamageMultiplier, CostType);
+            var copy = new SeriesOfAttacks(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, MinAttacks, MaxAttacks, DamageMultiplier, CostType);
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
 
-        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => await ExecutionStrategy.Execute(this, owner, targets, field);
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
+            await ExecutionStrategy.Execute(this, owner, targets, field);
     }
 }

@@ -18,7 +18,7 @@
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
         private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
-        [Export] private Node? _uiLayerManager;
+        [Export] private Source.UI.Layers.UILayersManager? _uiLayerManager;
 
         public override void _Ready()
         {

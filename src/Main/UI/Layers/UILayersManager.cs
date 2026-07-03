@@ -8,7 +8,7 @@
     using Godot;
     using Services;
 
-    public partial class UILayersManager : Node
+    public partial class UILayersManager : Node, ILayerManager
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _notificationLayer;
 

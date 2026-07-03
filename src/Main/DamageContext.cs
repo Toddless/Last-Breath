@@ -16,6 +16,7 @@
         public float TotalDamage => _components.Values.Sum();
         public DamageCause Cause { get; set; }
         public bool IsCrit { get; set; } = false;
+        public string? CastId { get; set; }
         public float AbsorbedByBarrier { get; set; }
 
         public void Add(DamageType type, float amount) => _components[type] = _components.GetValueOrDefault(type, 0f) + amount;

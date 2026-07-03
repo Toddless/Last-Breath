@@ -1,54 +1,27 @@
 namespace LootGeneration.Services
 {
-    using System;
-    using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
-    using Godot;
     using Internal;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
     using Utilities;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + LootGeneration registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
-        public static GameServiceProvider Instance { get; } = new();
+        public static IGameServiceProvider Instance { get; } =
+            Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
 
-        private GameServiceProvider()
+        private static void RegisterProjectServices(IServiceCollection services)
         {
-            _serviceProvider = RegisterServices();
-        }
-
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>(_ =>
-            {
-                var instance = new GameMessageBus(this);
-                return instance;
-            });
-            services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>();
-            services.AddSingleton<RandomNumberGenerator>(_ =>
-            {
-                var rnd = new RandomNumberGenerator();
-                rnd.Randomize();
-                return rnd;
-            });
             services.AddSingleton<INpcModifierProvider, NpcModifierProvider>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();
-            return services.BuildServiceProvider();
         }
     }
 }

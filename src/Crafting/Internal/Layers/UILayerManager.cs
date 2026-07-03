@@ -1,4 +1,4 @@
-﻿namespace Crafting.Internal.Layers
+namespace Crafting.Internal.Layers
 {
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
@@ -6,7 +6,7 @@
     using Services;
 
     [GlobalClass]
-    internal partial class UILayerManager : Node
+    internal partial class UILayerManager : Node, ILayerManager
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _notificationLayer;
 
@@ -33,14 +33,17 @@
             if (window is Control cWindow)
                 _windowLayer?.CallDeferred(Node.MethodName.AddChild, cWindow);
         }
-        public void ShowNotification(Control notificaton) => _notificationLayer?.CallDeferred(Node.MethodName.AddChild, notificaton);
-        public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.AddChild, hud);
-        public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(Node.MethodName.AddChild, window);
+
+        public void ShowNotification(Control notification) => _notificationLayer?.CallDeferred(Node.MethodName.AddChild, notification);
+
+        public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.RemoveChild, hud);
+
+        public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(Node.MethodName.RemoveChild, window);
 
         public void CloseAllWindows()
         {
             foreach (var child in _windowLayer?.GetChildren() ?? [])
-                _windowLayer?.CallDeferred(Node.MethodName.AddChild, child);
+                _windowLayer?.CallDeferred(Node.MethodName.RemoveChild, child);
         }
     }
 }

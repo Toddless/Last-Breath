@@ -1,47 +1,18 @@
 namespace Battle.Services
 {
-    using System;
-    using System.Collections.Generic;
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
-    using Godot;
-    using Microsoft.Extensions.DependencyInjection;
     using Source;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + Battle registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
-        public static GameServiceProvider Instance { get; } = new();
+        public static IGameServiceProvider Instance { get; } = CreateProvider();
 
-        private GameServiceProvider()
+        private static IGameServiceProvider CreateProvider()
         {
-            _serviceProvider = RegisterServices();
-        }
-
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<RandomNumberGenerator>(_ =>
-            {
-                var instance = new RandomNumberGenerator();
-                instance.Randomize();
-                return instance;
-            });
-            services.AddSingleton<IGameEventBus, GameEventBus>();
-            services.AddSingleton<IUiElementsManager, UiElementManager>(_ =>
-            {
-                var instance = new UiElementManager(this);
-                return instance;
-            });
-            services.AddBattleSystemModuleDependencies();
-            return services.BuildServiceProvider();
+            var provider = Core.Services.GameServiceProvider.Initialize(services => services.AddBattleSystemModuleDependencies());
+            provider.AddBattleUiElementsFactory();
+            return provider;
         }
     }
 }

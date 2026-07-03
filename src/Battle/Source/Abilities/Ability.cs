@@ -45,6 +45,13 @@
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
 
+        /// <summary>
+        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
+        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
+        /// can play the whole cast as one chord.
+        /// </summary>
+        protected string CastId { get; private set; } = string.Empty;
+
         public int CooldownLeft
         {
             get;
@@ -83,6 +90,7 @@
         public virtual async Task Execute(List<IFightable> targets, IBattleField field)
         {
             if (Owner == null) return;
+            CastId = Guid.NewGuid().ToString();
             // Single gate for every activation path (UI, hotkey, future AI). Events cannot veto, so the check lives here.
             if (IsOwnerParalyzed)
             {
@@ -105,7 +113,7 @@
             Owner.ModifierHandler.Apply(context);
             StartCooldown(context.Cooldown);
             ConsumeResource(context);
-            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner)));
+            Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner), CastId));
             await ExecuteInternal(targets, Owner, field);
             PostActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
         }

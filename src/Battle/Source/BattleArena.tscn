@@ -2,26 +2,32 @@
 
 [ext_resource type="Script" uid="uid://cbv0p52cgcqon" path="res://Source/BattleArena.cs" id="1_ggikp"]
 [ext_resource type="PackedScene" uid="uid://chwl8e6atuhnk" path="res://Source/EntitySpot.tscn" id="2_vrr7q"]
+[ext_resource type="Script" uid="uid://bugdh26htjy7b" path="res://Source/Presentation/BattleDirector.cs" id="3_0lpwi"]
 
-[node name="BattleArena" type="Node2D" node_paths=PackedStringArray("_spots", "_playerSpot")]
+[node name="BattleArena" type="Node2D" unique_id=1123925940 node_paths=PackedStringArray("_spots", "_playerSpot", "_director")]
 script = ExtResource("1_ggikp")
 _spots = [NodePath("FirstSpot"), NodePath("SecondSpot"), NodePath("ThirdSpot"), NodePath("FourthSpot"), NodePath("FifthSpot")]
 _playerSpot = NodePath("PlayerSpot")
+_director = NodePath("BattleDirector")
 
-[node name="PlayerSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="PlayerSpot" parent="." unique_id=921963223 instance=ExtResource("2_vrr7q")]
 position = Vector2(400, 550)
 
-[node name="FirstSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="FirstSpot" parent="." unique_id=568755574 instance=ExtResource("2_vrr7q")]
 position = Vector2(1300, 550)
 
-[node name="SecondSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="SecondSpot" parent="." unique_id=564689499 instance=ExtResource("2_vrr7q")]
 position = Vector2(1460, 400)
 
-[node name="ThirdSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="ThirdSpot" parent="." unique_id=949907775 instance=ExtResource("2_vrr7q")]
 position = Vector2(1460, 700)
 
-[node name="FourthSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="FourthSpot" parent="." unique_id=1813705089 instance=ExtResource("2_vrr7q")]
 position = Vector2(1670, 400)
 
-[node name="FifthSpot" parent="." instance=ExtResource("2_vrr7q")]
+[node name="FifthSpot" parent="." unique_id=1312273221 instance=ExtResource("2_vrr7q")]
 position = Vector2(1670, 700)
+
+[node name="BattleDirector" type="Node" parent="." unique_id=1853309863]
+script = ExtResource("3_0lpwi")
+metadata/_custom_type_script = "uid://bugdh26htjy7b"

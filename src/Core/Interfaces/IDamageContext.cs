@@ -17,6 +17,12 @@ namespace Core.Interfaces
         DamageCause Cause { get; set; }
         bool IsCrit { get; set; }
 
+        /// <summary>
+        /// Groups hits of one ability activation for presentation: the BattleDirector plays
+        /// entries sharing a CastId as one parallel "chord". Null = ungrouped, plays sequentially.
+        /// </summary>
+        string? CastId { get; set; }
+
         /// <summary>Amount of this hit that was soaked by the target's barrier. Health damage = <see cref="TotalDamage"/> - this.</summary>
         float AbsorbedByBarrier { get; set; }
 

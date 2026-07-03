@@ -1,65 +1,42 @@
-﻿namespace Crafting.Services
+namespace Crafting.Services
 {
-    using System;
-    using System.Collections.Generic;
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Inventory;
-    using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
-    using Godot;
     using Internal;
     using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
 
-    internal class GameServiceProvider : IGameServiceProvider
+    /// <summary>Project bootstrap: the shared Core provider + Crafting registrations. The only place touching the static root.</summary>
+    internal static class GameServiceProvider
     {
-        private readonly ServiceProvider _serviceProvider;
+        public static IGameServiceProvider Instance { get; } = CreateProvider();
 
-        public static GameServiceProvider Instance
+        private static IGameServiceProvider CreateProvider()
         {
-            get
-            {
-                if (field != null) return field;
-
-                field = new GameServiceProvider();
-                return field;
-            }
+            var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
+            provider.AddCraftingWindowFactories();
+            RegisterProjectWindows(provider);
+            return provider;
         }
 
-        private GameServiceProvider()
+        private static void RegisterProjectServices(IServiceCollection services)
         {
-            _serviceProvider = RegisterServices();
-        }
-
-        public T GetService<T>() => _serviceProvider.GetService<T>() ?? throw new NullReferenceException();
-        public T GetKeyedService<T>(string key) => _serviceProvider.GetKeyedService<T>(key) ?? throw new NullReferenceException();
-
-        public IEnumerable<T> GetServices<T>() => _serviceProvider.GetServices<T>();
-
-        private ServiceProvider RegisterServices()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
-            services.AddSingleton<IUiElementsManager, UiElementManager>(_ =>
-            {
-                var instance = new UiElementManager(this);
-                return instance;
-            });
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddSingleton<IItemDataProvider, ItemDataProvider>();
-            services.AddSingleton(_ =>
-            {
-                var instance = new RandomNumberGenerator();
-                instance.Randomize();
-                return instance;
-            });
             services.AddCraftingSystemModuleDependencies();
-            return services.BuildServiceProvider();
+        }
+
+        /// <summary>Windows living in Internal are project-private and can't be registered by the shared module extension.</summary>
+        private static void RegisterProjectWindows(IGameServiceProvider provider)
+        {
+            var uiElements = provider.GetService<IUiElementsManager>();
+            uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>());
         }
     }
 }
