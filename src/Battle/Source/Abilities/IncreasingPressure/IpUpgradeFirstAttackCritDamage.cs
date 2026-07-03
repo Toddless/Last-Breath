@@ -1,6 +1,7 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
     using Core.Interfaces.Abilities;
+    using Modifiers;
 
     /// <summary>L2 upgrade: the first attack has +130% critical damage bonus.</summary>
     public class IpUpgradeFirstAttackCritDamage(string id, string[] tags, int tier, FirstAttackCritModifier modifier)

@@ -1,9 +1,10 @@
-﻿namespace Core.Interfaces.Abilities
+namespace Core.Interfaces.Abilities
 {
     using System.Threading.Tasks;
 
+    /// <summary>Reaction fired after the ability finished executing (buffs/debuffs applied on cast).</summary>
     public interface IAbilityPostActivationModifier : IIdentifiable
     {
-        Task Apply(AbilityActivationContext context);
+        Task Apply(IAbilityActivationContext context);
     }
 }

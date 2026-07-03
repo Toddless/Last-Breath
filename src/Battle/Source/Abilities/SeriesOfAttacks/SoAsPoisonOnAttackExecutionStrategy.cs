@@ -14,10 +14,10 @@
 
     public class SoAsPoisonOnAttackExecutionStrategy(int duration) : SoAsDefaultExecutionStrategy
     {
-        private SeriesOfAttacks? _ability;
+        private SeriesOfDamagings? _ability;
         private IFightable? _owner;
 
-        public override async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
+        public override async Task Execute(SeriesOfDamagings ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             Subscribe(ability, owner);
             await base.Execute(ability, owner, targets, field);
@@ -49,7 +49,7 @@
             }
         }
 
-        private void Subscribe(SeriesOfAttacks ability, IFightable owner)
+        private void Subscribe(SeriesOfDamagings ability, IFightable owner)
         {
             _ability = ability;
             _owner = owner;

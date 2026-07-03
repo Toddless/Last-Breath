@@ -7,8 +7,10 @@
     using CriticalCalculation;
     using DarkShroud;
     using Effects;
+    using IceShrapnel;
     using IncreasingPressure;
     using JarOfPoison;
+    using Modifiers;
     using PoisonCoating;
     using PoisonExplosion;
     using SeriesOfAttacks;
@@ -421,6 +423,52 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cost", 30)),
+            ["Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost"] = data =>
+                new AbilityUpgradeReduceCooldownAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 2),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 100)),
+            ["Ability_Is_Upgrade_Additional_Scales"] = data =>
+                new AbilityUpgradeAdditionalScales(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.05f),
+                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.15f)),
+            ["Ability_Is_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 70)),
+            ["Ability_Is_Upgrade_Additional_Crit_Damage"] = data =>
+                new AbilityUpgradeAdditionalCritDamage(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.75f)),
+            ["Ability_Is_Upgrade_Additional_Crit_Chance"] = data =>
+                new AbilityUpgradeAdditionalCritChance(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.35f)),
+            ["Ability_Is_Upgrade_Barrier_From_Shrapnel"] = data =>
+                new IsUpgradeBarrierFromShrapnel(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("leachPercent", 0.15f)),
+            ["Ability_Is_Upgrade_Apply_Fragility"] = data =>
+                new IsUpgradeApplyFragility(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                    (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
+                    data.UpgradeProperties.GetValueOrDefault("critDamageAmp", 0.35f)),
         };
     }
 }

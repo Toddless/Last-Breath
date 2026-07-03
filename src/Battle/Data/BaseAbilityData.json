@@ -607,6 +607,85 @@
                     }
                 }
             ]
+        },
+        {
+            "id": "Ability_Ice_Shards",
+            "tags": [],
+            "stance": 2,
+            "cooldown": 4,
+            "costValue": 200,
+            "costType": 0,
+            "damage": 80,
+            "weaponDamageScale": 0.25,
+            "spellDamageScale": 0.90,
+            "abilityProperties": {
+                "projectiles": 3,
+                "shrapnelDamage": 50,
+                "shrapnelWeaponDamageScale": 0.15,
+                "shrapnelSpellDamageScale": 0.55
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Is_Upgrade_Barrier_From_Shrapnel",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "leachPercent": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Apply_Fragility",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "duration": 3,
+                        "maxStacks": 3,
+                        "critDamageAmp": 0.35
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Additional_Crit_Damage",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.75
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Additional_Crit_Chance",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.35
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 2,
+                        "additionalCost": 100
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Additional_Scales",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "weaponDamageScale": 0.05,
+                        "spellDamageScale": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Is_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 70
+                    }
+                }
+            ]
         }
     ]
 }

@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.DarkShroud
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L3 upgrade: while the shroud is active, the caster gains additional accuracy.

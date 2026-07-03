@@ -1,6 +1,6 @@
 ﻿namespace Core.Interfaces.Abilities
 {
-    public interface IAttackAbility : IAbility
+    public interface IDamagingAbility : IAbility
     {
         float Damage { get; }
         float WeaponDamageScale { get; }

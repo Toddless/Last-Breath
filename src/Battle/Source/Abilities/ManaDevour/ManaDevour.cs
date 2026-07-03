@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities
+﻿namespace Battle.Source.Abilities.ManaDevour
 {
     using System.Collections.Generic;
     using System.Linq;

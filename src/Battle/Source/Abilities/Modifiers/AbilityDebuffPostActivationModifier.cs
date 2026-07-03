@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities
+﻿namespace Battle.Source.Abilities.Modifiers
 {
     using System;
     using System.Linq;
@@ -11,7 +11,7 @@
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 
-        public async Task Apply(AbilityActivationContext context)
+        public async Task Apply(IAbilityActivationContext context)
         {
             var copy = debuff.Copy();
             if (applyOnSelf)
@@ -20,8 +20,9 @@
                 return;
             }
 
-            foreach (var applyingContext in context.Targets.Select(contextTarget =>
-                         new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = contextTarget }))
+            foreach (var applyingContext in context.Targets
+                         .Select(contextTarget =>
+                             new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = contextTarget }))
             {
                 var clone = debuff.Copy();
                 await clone.Apply(applyingContext);

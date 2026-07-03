@@ -6,7 +6,7 @@
     using Core.Interfaces.Components.Module;
     using Module;
 
-    public abstract class AttackAbility(
+    public abstract class DamagingAbility(
         string id,
         string[] tags,
         int cooldown,
@@ -15,7 +15,7 @@
         float weaponDamageScale,
         float spellDamageScale,
         Costs costsType = Costs.Mana)
-        : Ability(id, tags, cooldown, costValue, costsType), IAttackAbility
+        : Ability(id, tags, cooldown, costValue, costsType), IDamagingAbility
     {
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];

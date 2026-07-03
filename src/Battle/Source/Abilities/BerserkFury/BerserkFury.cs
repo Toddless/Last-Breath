@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities
+﻿namespace Battle.Source.Abilities.BerserkFury
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -16,7 +16,7 @@
         float damage,
         float weaponDamageScale,
         float spellDamageScale,
-        Costs costType = Costs.Mana) : AttackAbility(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        Costs costType = Costs.Mana) : DamagingAbility(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private async Task PerformMultipleAttacks(List<IFightable> targets)
         {

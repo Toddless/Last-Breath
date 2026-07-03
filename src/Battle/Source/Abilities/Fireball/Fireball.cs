@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.Abilities
+﻿namespace Battle.Source.Abilities.Fireball
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -10,7 +10,7 @@
     using Godot;
     using Utilities;
 
-    public class Fireball : AttackAbility
+    public class Fireball : DamagingAbility
     {
         private readonly float _damage;
         private readonly float _baseCriticalChance;

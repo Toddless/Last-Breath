@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L2: on cast, applies "Reinforced Defense" (critical-damage mitigation) to the caster.

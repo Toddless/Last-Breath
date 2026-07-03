@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L2: on cast, buffs the caster with a critical-damage boost that also raises crit chance

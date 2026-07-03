@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L2: while the ability's buff is active, the caster's critical attacks heal it for a percentage

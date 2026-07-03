@@ -4,6 +4,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Enums;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Entity;
 
     /// <summary>
     /// Disables the target's passive skills while present. Suppression lifts only when
@@ -31,7 +32,7 @@ namespace Battle.Source.Effects
 
         public override IEffect Copy() => new SealOfOblivion(Duration, MaxStacks);
 
-        private void ResumeIfLastSeal(Core.Interfaces.Entity.IFightable target)
+        private void ResumeIfLastSeal(IFightable target)
         {
             bool anotherSealExists = target.Effects.GetBy(effect => effect.Id == Id).Any();
             if (!anotherSealExists) target.PassiveSkills.Resume();

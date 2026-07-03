@@ -9,7 +9,19 @@
     {
         private readonly Dictionary<string, Func<AbilityBaseData, IAbility>> _abilityFactories = new()
         {
-            ["Ability_Series_Of_Attacks"] = data => new SeriesOfAttacks.SeriesOfAttacks(
+            ["Ability_Ice_Shards"] = data => new IceShards.IceShards(
+                data.Tags,
+                data.Cooldown,
+                data.CostValue,
+                data.Damage,
+                data.WeaponDamageScale,
+                data.SpellDamageScale,
+                (int)data.AbilityProperties.GetValueOrDefault("projectiles", 3),
+                data.AbilityProperties.GetValueOrDefault("shrapnelDamage", 50f),
+                data.AbilityProperties.GetValueOrDefault("shrapnelWeaponDamageScale", 0.15f),
+                data.AbilityProperties.GetValueOrDefault("shrapnelSpellDamageScale", 0.55f),
+                data.CostsType),
+            ["Ability_Series_Of_Attacks"] = data => new SeriesOfAttacks.SeriesOfDamagings(
                 data.Tags,
                 data.Cooldown,
                 data.CostValue,

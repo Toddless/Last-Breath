@@ -2,6 +2,7 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities;
+    using Abilities.Modifiers;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;

@@ -11,7 +11,7 @@
 
     public class SoAsDefaultExecutionStrategy : ISoAExecutionStrategy
     {
-        public virtual async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
+        public virtual async Task Execute(SeriesOfDamagings ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             // условно
             var rnd = new RandomNumberGenerator();

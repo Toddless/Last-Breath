@@ -1,4 +1,4 @@
-namespace Battle.Source.Abilities
+namespace Battle.Source.Abilities.Modifiers
 {
     using System;
     using Core.Enums;

@@ -61,7 +61,7 @@
             if (s_resistanceByType.TryGetValue(type, out EntityParameter resistance))
                 return ApplyResistance(damage, target, resistance);
             return type is DamageType.Physical ? ApplyArmor(damage, source, target) : damage;
-            // Pure and DoT statuses (Poison/Burning/Bleed) are unmitigated; their rules land here when defined
+            // Pure and DoT statuses (Poison/Burning/Bleed) are unmitigated; their rules land here if defined
         }
 
         private static float ApplyResistance(float damage, IFightable target, EntityParameter resistance)

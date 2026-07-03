@@ -1,6 +1,7 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
     using Core.Interfaces.Abilities;
+    using Modifiers;
 
     /// <summary>L2 upgrade: attacks cannot be evaded.</summary>
     public class IpUpgradeUnevadable(string id, string[] tags, int tier, UnevadableAttackModifier modifier)

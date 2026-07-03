@@ -1,7 +1,5 @@
-﻿namespace Core.Interfaces.Abilities
+namespace Core.Interfaces.Abilities
 {
-    public interface IAbilityActivationModifier : IIdentifiable
-    {
-        void Apply(AbilityActivationContext context);
-    }
+    /// <summary>Mutates the cast context (cost, cooldown, targets) before resources are consumed.</summary>
+    public interface IAbilityActivationModifier : IContextModifier<IAbilityActivationContext>;
 }

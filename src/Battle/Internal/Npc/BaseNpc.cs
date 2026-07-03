@@ -128,8 +128,6 @@ namespace Battle.Internal.Npc
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
         public event Action<IFightable>? Dead;
-        public event Action<float, DamageType, bool>? DamageTaken;
-
 
         public override void _Ready()
         {
@@ -147,7 +145,9 @@ namespace Battle.Internal.Npc
             Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
             ModifierHandler = new ModifierHandlerComponent();
+            // ________________
             AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
+            // ________________
             Effects.EffectAdded += OnEffectAdded;
             Effects.EffectRemoved += OnEffectRemoved;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
@@ -169,6 +169,7 @@ namespace Battle.Internal.Npc
             _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
+        // TODO: Изменить позже. Позднее придумать алгоритм спавна нпс (не полагаемся целиком на рандом, необходимы определенные правила)
         private Stance GetRandomStance()
         {
             var stances = Enum.GetValues<Stance>();
@@ -312,7 +313,6 @@ namespace Battle.Internal.Npc
 
         public void SetupBattleEventBus(IBattleEventBus bus)
         {
-            // TODO:
             _battleEventBus = bus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }

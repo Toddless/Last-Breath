@@ -1,4 +1,4 @@
-namespace Battle.Source.Abilities
+namespace Battle.Source.Abilities.Modifiers
 {
     using System;
     using System.Threading.Tasks;
@@ -20,7 +20,7 @@ namespace Battle.Source.Abilities
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 
-        public async Task Apply(AbilityActivationContext context)
+        public async Task Apply(IAbilityActivationContext context)
         {
             if (applyOnCaster)
                 await effectFactory().Apply(new EffectApplyingContext { Caster = context.Caster, Source = InstanceId, Target = context.Caster });

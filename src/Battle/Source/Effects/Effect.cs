@@ -63,15 +63,13 @@
         public virtual Task Apply(EffectApplyingContext context)
         {
             Context = context;
-            var target = context.Target;
-            var caster = context.Caster;
-            Target = target;
+            Target = context.Target;
             Source = context.Source;
             Target.Effects.AddEffect(this);
             // Single-stack rules may reject this instance in favor of a stronger existing one
-            IsApplied = Target.Effects.GetBy(e => e.IsSame(InstanceId)).Any();
+            IsApplied = Target.Effects.GetBy(e => e.IsSame(Id)).Any();
             // here we need to notify caster that he applied some effect. Target will get notified within TryApplyStatusEffect
-            if (target.TryApplyStatusEffect(Status)) caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
+            if (Target.TryApplyStatusEffect(Status)) context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
             return Task.CompletedTask;
         }
 
@@ -102,7 +100,7 @@
         {
         }
 
-        public bool IsSame(string otherId) => InstanceId.Equals(otherId);
+        public bool IsSame(string otherId) => Id.Equals(otherId);
 
         public virtual bool IsStronger(IEffect otherEffect) => false;
 

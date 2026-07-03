@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.DarkShroud
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L2 upgrade: casting the shroud additionally restores a percentage of the caster's maximum mana.

@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L3 upgrade: on cast, applies a Seal of Oblivion debuff to the targets.

@@ -30,6 +30,5 @@
             modifier?.Detach(owner);
             if (modifier != null) _modifiers.Remove(modifier);
         }
-
     }
 }

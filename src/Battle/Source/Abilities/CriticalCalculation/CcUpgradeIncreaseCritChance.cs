@@ -2,6 +2,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Interfaces.Abilities;
     using Effects;
+    using Modifiers;
 
     /// <summary>
     /// L3: on cast, additionally raises the caster's critical chance for the ability's buff duration.

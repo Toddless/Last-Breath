@@ -89,13 +89,24 @@
                 return;
             }
 
-            var context = new AbilityActivationContext { Caster = Owner, Field = field, Targets = targets };
+            var context = new AbilityActivationContext
+            {
+                Ability = this,
+                Caster = Owner,
+                Field = field,
+                Targets = targets,
+                Cost = CostValue,
+                CostType = CostType,
+                Cooldown = Cooldown
+            };
+            // Cast mutators run before anything is paid: ability-scoped first, then entity-scoped (items/effects)
             ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
-            StartCooldown();
-            ConsumeResource();
+            Owner.ModifierHandler.Apply(context);
+            StartCooldown(context.Cooldown);
+            ConsumeResource(context);
             Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this));
-            await Owner.Animations.PlayAnimationAsync(Id);
             await ExecuteInternal(targets, Owner, field);
+            await Owner.Animations.PlayAnimationAsync(Id);
             PostActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
         }
 
@@ -153,13 +164,14 @@
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
 
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
+
         public abstract IAbility Copy();
 
-        protected void ConsumeResource() => Owner?.ConsumeResource(CostType, CostValue);
+        protected void ConsumeResource(IAbilityActivationContext context) => Owner?.ConsumeResource(context.CostType, context.Cost);
 
         protected abstract Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field);
 
-        protected void StartCooldown() => CooldownLeft = (int)Cooldown;
+        protected void StartCooldown(float cd) => CooldownLeft = (int)cd;
 
         protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);
 

@@ -4,9 +4,9 @@
     using Decorators;
 
     public class SoAsUpgradeMaxAmountAttacks(string id, string[] tags, int tier, int additionalAmountAttacks)
-        : SimpleUpgrade<SeriesOfAttacks, SeriesOfAttacks.Parameters>(id, tags, tier,
-            new SimpleAbilityParameterDecorator<SeriesOfAttacks.Parameters>(
-                SeriesOfAttacks.Parameters.MaxAttacks,
+        : SimpleUpgrade<SeriesOfDamagings, SeriesOfDamagings.Parameters>(id, tags, tier,
+            new SimpleAbilityParameterDecorator<SeriesOfDamagings.Parameters>(
+                SeriesOfDamagings.Parameters.MaxAttacks,
                 Priority.Weak,
                 OperationType.Add,
                 additionalAmountAttacks,

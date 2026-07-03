@@ -38,6 +38,10 @@
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
+        public float CriticalDamageMitigation => Mathf.Clamp(this[EntityParameter.CriticalDamageMitigation], 0f, 1f);
+        public float LightningResistance => Mathf.Clamp(this[EntityParameter.LightningResistance], 0f, 0.8f);
+        public float FireResistance => Mathf.Clamp(this[EntityParameter.FireResistance], 0f, 0.8f);
+        public float ColdResistance => Mathf.Clamp(this[EntityParameter.ColdResistance], 0f, 0.8f);
 
         public event Action<EntityParameter, float>? ParameterChanged;
 

@@ -1,5 +1,6 @@
 namespace Core.Interfaces.Components
 {
+    using Abilities;
     using Battle;
 
     /// <summary>
@@ -12,13 +13,16 @@ namespace Core.Interfaces.Components
         void Add(IAttackModifier modifier);
         void Add(IDamageModifier modifier);
         void Add(IHealModifier modifier);
+        void Add(IAbilityActivationModifier modifier);
 
         void Remove(IAttackModifier modifier);
         void Remove(IDamageModifier modifier);
         void Remove(IHealModifier modifier);
+        void Remove(IAbilityActivationModifier modifier);
 
         void Apply(IAttackContext context);
         void Apply(IDamageContext context);
         void Apply(IHealContext context);
+        void Apply(IAbilityActivationContext context);
     }
 }
