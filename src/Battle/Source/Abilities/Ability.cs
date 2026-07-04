@@ -15,7 +15,7 @@
     using Core.Interfaces.Events.GameEvents;
     using Godot;
     using Module;
-    using Source.Decorators;
+    using Decorators;
     using Utilities;
 
     public abstract class Ability(
@@ -40,6 +40,7 @@
 
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
+        public Stance Stance { get; set; }
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -66,7 +67,8 @@
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
         public Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; } = [];
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
-        public Dictionary<int, IAbilityUpgrade> CurrentUpgrades { get; set; } = [];
+        public IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades => _currentUpgrades;
+        private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
         public float Cooldown => this[AbilityParameter.Cooldown];
         public string Description => FormatDescription();
         public string DisplayName => Localization.Localize(Id);
@@ -86,6 +88,29 @@
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
         public void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades) => Upgrades = upgrades;
+
+        /// <summary>One chosen upgrade per tier: selecting a new one removes the previous choice first.</summary>
+        public void SelectUpgrade(int tier, string upgradeInstanceId)
+        {
+            if (!Upgrades.TryGetValue(tier, out var tierUpgrades)) return;
+            var upgrade = tierUpgrades.FirstOrDefault(u => u.IsSame(upgradeInstanceId));
+            if (upgrade == null) return;
+            if (_currentUpgrades.TryGetValue(tier, out var current))
+            {
+                if (current.IsSame(upgradeInstanceId)) return;
+                current.Remove(this);
+            }
+
+            upgrade.Apply(this);
+            _currentUpgrades[tier] = upgrade;
+        }
+
+        public void ClearUpgrade(int tier)
+        {
+            if (!_currentUpgrades.TryGetValue(tier, out var current)) return;
+            current.Remove(this);
+            _currentUpgrades.Remove(tier);
+        }
 
         public virtual async Task Execute(List<IFightable> targets, IBattleField field)
         {

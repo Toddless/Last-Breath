@@ -24,19 +24,16 @@
             _gameServiceProvider = provider;
             _battleEventBus = eventBus;
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDiedEvent);
-            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEndEvent);
         }
 
-        public void Dispose()
+        /// <summary>
+        /// Awards the accumulated experience. Called explicitly by BattleContext with the battle
+        /// results — a BattleEndEvent subscription would be dead: that event goes to the game bus
+        /// (published by Main AFTER the context is disposed), not to the battle bus.
+        /// </summary>
+        public void CompleteBattle(BattleResults results)
         {
-            _battleEventBus.Unsubscribe<EntityDiedEvent>(OnEntityDiedEvent);
-            _battleEventBus.Unsubscribe<BattleEndEvent>(OnBattleEndEvent);
-            _diedEntities.Clear();
-        }
-
-        private void OnBattleEndEvent(BattleEndEvent obj)
-        {
-            _totalExp = obj.Results switch
+            int awarded = results switch
             {
                 BattleResults.PlayerLost => Mathf.RoundToInt(_totalExp * 0.3f),
                 BattleResults.BattleAbandoned => 0,
@@ -44,8 +41,14 @@
             };
 
             var martialArtMastery = _gameServiceProvider.GetService<IMartialArtMastery>();
-            martialArtMastery.AddExperience(_totalExp);
+            martialArtMastery.AddExperience(awarded);
             _totalExp = 0;
+        }
+
+        public void Dispose()
+        {
+            _battleEventBus.Unsubscribe<EntityDiedEvent>(OnEntityDiedEvent);
+            _diedEntities.Clear();
         }
 
         private void OnEntityDiedEvent(EntityDiedEvent obj)

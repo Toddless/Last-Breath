@@ -11,7 +11,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Module;
-    using Source.Decorators;
+    using Decorators;
 
     public class JarOfPoison(
         string[] tags,

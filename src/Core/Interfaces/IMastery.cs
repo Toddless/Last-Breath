@@ -15,5 +15,8 @@
         void AddBonusLevel();
         void RemoveBonusLevel();
         int ExpToNextLevelRemain();
+
+        /// <summary>Full cost of the next level (for progress bars); 0 at the level cap.</summary>
+        int ExpToNextLevelTotal();
     }
 }

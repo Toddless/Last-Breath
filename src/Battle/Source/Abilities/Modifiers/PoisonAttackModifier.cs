@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System;
-    using Battle.Source.Effects;
+    using Effects;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;

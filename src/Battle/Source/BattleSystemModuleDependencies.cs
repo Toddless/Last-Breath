@@ -21,7 +21,8 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
-            uiElementManager.RegisterWindowFactory(typeof(MartialArtMastery), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>());
         }
     }
 }

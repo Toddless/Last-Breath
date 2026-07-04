@@ -106,6 +106,8 @@
 
         public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
 
+        public int ExpToNextLevelTotal() => CurrentLevel >= MaxLevel ? 0 : ExpToNextLevel(CurrentLevel);
+
         public float GetCurrentSkillChance(float skillBonus = 0)
         {
             float baseChance = CalculateBase(BaseSkillChance, TargetSkillChance, GetProgressFactor());
@@ -188,7 +190,7 @@
                 {
                     CurrentExperience -= need;
                     CurrentLevel++;
-                    gameMessageBus.PublishMessageAsync(new SendNotificationMessageMessage($"Crafting Mastery reached lvl: {CurrentLevel}"));
+                    gameMessageBus.PublishMessageAsync(new SendNotificationMessageMessage("Notification_Crafting_Mastery_Level_Up"));
                 }
                 else
                     break;

@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Battle.Source.Decorators;
+    using Decorators;
     using Core.Enums;
     using Core.Interfaces.Abilities;
 

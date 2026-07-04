@@ -48,7 +48,9 @@
 
             _battleArena.SetPlayer(_player);
             if (!_battleArena.PrepareBattleArena(_entities)) return await Task.FromResult(BattleResults.BattleAbandoned);
-            return await _battleArena.RunBattleAsync();
+            var results = await _battleArena.RunBattleAsync();
+            _battleExperienceProcessor.CompleteBattle(results);
+            return results;
         }
 
         public void Dispose()

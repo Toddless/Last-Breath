@@ -4,6 +4,7 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Godot;
+    using Interfaces;
     using Interfaces.Events;
     using Interfaces.MessageBus;
     using Interfaces.UI;
@@ -57,6 +58,11 @@ namespace Core.Services
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
+            services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
+            services.AddSingleton<NotificationService>();
+            // The same instance handles the messages: Setup is called on the singleton by the bootstrap
+            services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(
+                provider => provider.GetRequiredService<NotificationService>());
             services.AddSingleton(_ => CreateRandomizedGenerator());
         }
 

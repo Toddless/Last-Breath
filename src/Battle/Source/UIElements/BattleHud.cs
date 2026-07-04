@@ -22,7 +22,7 @@
         private IUiElementsManager? _uiElementProvider;
         private Dictionary<string, CharacterBar> _characterBars = [];
         private Dictionary<string, QueueSlot> _queueSlots = [];
-        private AbilitySlot[] _abilitySlotsInstances = new AbilitySlot[BattleConstants.AbilitySlotsPerStance];
+        private AbilityButton[] _abilitySlotsInstances = new AbilityButton[BattleConstants.AbilitySlotsPerStance];
         private IAbilityBookComponent? _abilityBook;
         private bool _isPlayerTurn, _isPresenting;
         [Export] private Button? _returnButton;
@@ -38,7 +38,7 @@
             {
                 for (int i = 0; i < BattleConstants.AbilitySlotsPerStance; i++)
                 {
-                    var slot = AbilitySlot.Initialize().Instantiate<AbilitySlot>();
+                    var slot = AbilityButton.Initialize().Instantiate<AbilityButton>();
                     slot.SetNumber(i + 1);
                     _abilitySlots?.AddChild(slot);
                     _abilitySlotsInstances[i] = slot;
@@ -97,7 +97,7 @@
             _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
             _battleEventBus.Subscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
 
-            foreach (AbilitySlot slot in _abilitySlotsInstances)
+            foreach (AbilityButton slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.SetBattleEventBus(_battleEventBus);
@@ -232,7 +232,7 @@
         private void ApplyInputWindow()
         {
             bool open = _isPlayerTurn && !_isPresenting;
-            foreach (AbilitySlot slot in _abilitySlotsInstances)
+            foreach (AbilityButton slot in _abilitySlotsInstances)
                 slot.SetInputEnabled(open);
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.Disabled = !open;

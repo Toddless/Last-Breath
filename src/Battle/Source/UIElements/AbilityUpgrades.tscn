@@ -1,0 +1,254 @@
+[gd_scene format=3 uid="uid://cfjcrk0kkryi8"]
+
+[ext_resource type="Script" uid="uid://cg4xsia76rx1o" path="res://Source/UIElements/AbilityUpgrades.cs" id="1_pnr16"]
+[ext_resource type="Script" uid="uid://dim0wd65fb70e" path="res://Source/UIElements/UpgradeButton.cs" id="2_wf1hs"]
+
+[node name="AbilityUpgrades" type="MarginContainer" unique_id=1136465602 node_paths=PackedStringArray("_tierOne", "_tierTwo", "_tierThree")]
+offset_right = 450.0
+offset_bottom = 707.0
+script = ExtResource("1_pnr16")
+_tierOne = NodePath("TierContainers/TierOne")
+_tierTwo = NodePath("TierContainers/TierTwo")
+_tierThree = NodePath("TierContainers/TierThree")
+
+[node name="TierContainers" type="VBoxContainer" parent="." unique_id=1877953650]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TierOne" type="VBoxContainer" parent="TierContainers" unique_id=1918072596]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="UpgradeOne" type="Button" parent="TierContainers/TierOne" unique_id=749324636]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+mouse_filter = 1
+toggle_mode = true
+alignment = 0
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="MarginContainer" type="MarginContainer" parent="TierContainers/TierOne/UpgradeOne" unique_id=590139064]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierOne/UpgradeOne/MarginContainer" unique_id=2039340331]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeTwo" type="Button" parent="TierContainers/TierOne" unique_id=130484667]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierOne/UpgradeTwo" unique_id=488795666]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierOne/UpgradeTwo/VBoxContainer" unique_id=1622823073]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeThree" type="Button" parent="TierContainers/TierOne" unique_id=1181434894]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierOne/UpgradeThree" unique_id=425648165]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierOne/UpgradeThree/VBoxContainer" unique_id=149220159]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TierTwo" type="VBoxContainer" parent="TierContainers" unique_id=816727705]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="UpgradeOne" type="Button" parent="TierContainers/TierTwo" unique_id=1035019236]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierTwo/UpgradeOne" unique_id=828284768]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierTwo/UpgradeOne/VBoxContainer" unique_id=388682924]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeTwo" type="Button" parent="TierContainers/TierTwo" unique_id=1212944317]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierTwo/UpgradeTwo" unique_id=607917010]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierTwo/UpgradeTwo/VBoxContainer" unique_id=802918040]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeThree" type="Button" parent="TierContainers/TierTwo" unique_id=571596800]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierTwo/UpgradeThree" unique_id=188184162]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierTwo/UpgradeThree/VBoxContainer" unique_id=910705230]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TierThree" type="VBoxContainer" parent="TierContainers" unique_id=1896018381]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="UpgradeOne" type="Button" parent="TierContainers/TierThree" unique_id=310511604]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierThree/UpgradeOne" unique_id=655556587]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierThree/UpgradeOne/VBoxContainer" unique_id=360095178]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeTwo" type="Button" parent="TierContainers/TierThree" unique_id=451404001]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierThree/UpgradeTwo" unique_id=818114130]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierThree/UpgradeTwo/VBoxContainer" unique_id=416412076]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UpgradeThree" type="Button" parent="TierContainers/TierThree" unique_id=1621273985]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 0
+toggle_mode = true
+autowrap_trim_flags = 192
+script = ExtResource("2_wf1hs")
+
+[node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierThree/UpgradeThree" unique_id=289265314]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="RichTextLabel" parent="TierContainers/TierThree/UpgradeThree/VBoxContainer" unique_id=1225943055]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+theme_override_font_sizes/normal_font_size = 14
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1

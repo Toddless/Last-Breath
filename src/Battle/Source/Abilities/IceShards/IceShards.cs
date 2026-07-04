@@ -105,8 +105,7 @@ namespace Battle.Source.Abilities.IceShards
         public override IAbility Copy()
         {
             var copy = new IceShards(Tags, (int)Cooldown, CostValue,
-                Damage, WeaponDamageScale, SpellDamageScale,
-                Shards,
+                Damage, WeaponDamageScale, SpellDamageScale, Shards,
                 shrapnelDamage, shrapnelWeaponDamageScale, shrapnelSpellDamageScale,
                 secondStageDamage, secondStageWeaponDamageScale, secondStageSpellDamageScale, CostType) { ShardEffectFactory = ShardEffectFactory };
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());

@@ -30,6 +30,9 @@
         /// <summary>The stance an ability belongs to — the ability book partitions by it on Learn.</summary>
         public Stance GetAbilityStance(string abilityId) => GetBaseData(abilityId).Stance;
 
+        /// <summary>The mastery level at which the ability becomes learnable.</summary>
+        public int GetMasteryLevel(string abilityId) => GetBaseData(abilityId).MasteryLevel;
+
         private AbilityBaseData GetBaseData(string abilityId) =>
             _abilityBaseData.GetValueOrDefault(abilityId)
             ?? throw new KeyNotFoundException($"No base data loaded for ability '{abilityId}'");

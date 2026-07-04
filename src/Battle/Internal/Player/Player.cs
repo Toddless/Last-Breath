@@ -49,9 +49,7 @@ namespace Battle.Internal.Player
         }
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
-
         private readonly Dictionary<Stance, IStance> _stances = [];
-
         private readonly RandomNumberGenerator _rnd = new();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
@@ -139,6 +137,8 @@ namespace Battle.Internal.Player
 
             _rnd.Randomize();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            // The player is a scene node, not a container-built service: self-register for UI/services
+            GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);

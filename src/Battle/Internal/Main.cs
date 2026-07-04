@@ -2,13 +2,17 @@
 {
     using System;
     using Core.Data;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
     using Godot;
     using Services;
     using Source;
+    using Source.UIElements;
     using Utilities;
+    using NotificationService = Core.Services.NotificationService;
 
     public partial class Main : Node2D
     {
@@ -21,9 +25,34 @@
         public override void _Ready()
         {
             _uiElementProvider = _provider.GetService<IUiElementsManager>();
-            if (_layerManager != null) _uiElementProvider.Subscribe(_layerManager);
+            if (_layerManager != null)
+            {
+                _uiElementProvider.Subscribe(_layerManager);
+                // Wire the notification pipeline: the layer manager is the sink, the factory builds the
+                // popup on demand. Returns null until Todd's NotificationPopup.tscn UID is set — the
+                // service drops the message rather than crashing.
+                _provider.GetService<NotificationService>().Setup(_layerManager, CreateNotificationPopup);
+            }
+
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
+
+            var player = _provider.GetService<IPlayerAccessor>();
+            var abilityProvider = _provider.GetService<IAbilityProvider>();
+            var ids = abilityProvider.KnownAbilityIds;
+            foreach (string id in ids)
+            {
+                var ability = abilityProvider.CreateAbility(id);
+                player.Player?.AbilityBook?.Learn(ability.Stance, ability);
+            }
+
+            _uiElementProvider.OpenWindow(typeof(MartialArtMasteryWindow));
+        }
+
+        private static Control? CreateNotificationPopup()
+        {
+            var scene = NotificationPopup.Initialize();
+            return scene?.Instantiate<NotificationPopup>();
         }
 
         private async void OnBattleInitialized(BattleInitializedEvent evnt)

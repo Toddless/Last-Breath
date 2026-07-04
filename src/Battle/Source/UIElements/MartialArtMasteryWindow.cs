@@ -1,41 +1,60 @@
-﻿namespace Battle.Source.UIElements
+namespace Battle.Source.UIElements
 {
     using Core.Data;
+    using Core.Interfaces;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Events;
+    using Core.Interfaces.Components;
     using Core.Interfaces.UI;
     using Godot;
 
+    /// <summary>
+    /// The ability learning screen: mastery level with progress, every known ability per stance
+    /// (learned / learnable / locked behind a mastery level) and the upgrade selection
+    /// (one of three per tier, changeable freely) for learned abilities.
+    /// The content is built in code; the scene only hosts the root node — restyle freely later.
+    /// </summary>
+    [GlobalClass]
     public partial class MartialArtMasteryWindow : Control, IWindow
     {
         private const string UID = "uid://ds0wq0f8ha2x5";
         private IMartialArtMastery? _mastery;
-        private IGameEventBus? _gameEventBus;
-        public bool IsAlreadyVisible => IsInsideTree() && IsAlreadyVisible;
+        private IAbilityProvider? _abilityProvider;
+        private IPlayerAccessor? _playerAccessor;
+
+        [Export] private StanceTree? _dexTree, _strTree, _intTree;
+        [Export] private Label? _levelLabel;
+        [Export] private Label? _experienceLabel;
+        [Export] private TextureProgressBar? _experienceBar;
+
+        private string? _selectedAbilityId;
+
+        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public void InjectServices(IGameServiceProvider provider)
         {
             _mastery = provider.GetService<IMartialArtMastery>();
-            _gameEventBus = provider.GetService<IGameEventBus>();
-            _mastery.BonusLevelChange += OnMasteryBonusLevelChanges;
-            _mastery.CurrentLevelChange += OnMasteryCurrentLevelChanges;
-            _mastery.ExperienceChange += OnMasteryExperienceChange;
+            _abilityProvider = provider.GetService<IAbilityProvider>();
+            _playerAccessor = provider.GetService<IPlayerAccessor>();
+
+            _dexTree?.InjectServices(provider);
+            _strTree?.InjectServices(provider);
+            _intTree?.InjectServices(provider);
+        }
+
+
+        public override void _Ready()
+        {
+        }
+
+        public override void _ExitTree()
+        {
         }
 
         public void Close() => GetParent().RemoveChild(this);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private void OnMasteryExperienceChange(int amount)
-        {
-        }
-
-        private void OnMasteryCurrentLevelChanges(int level)
-        {
-        }
-
-        private void OnMasteryBonusLevelChanges(int bonusLevel)
-        {
-        }
+        private IAbilityBookComponent? Book => _playerAccessor?.Player?.AbilityBook;
     }
 }

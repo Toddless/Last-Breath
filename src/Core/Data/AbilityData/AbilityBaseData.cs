@@ -12,6 +12,8 @@
         [JsonProperty("costValue")] public int CostValue { get; init; }
         [JsonProperty("costType")] public Costs CostsType { get; init; } = Costs.Mana;
         [JsonProperty("stance")] public Stance Stance { get; init; } = Stance.Dexterity;
+        /// <summary>The mastery level at which the ability becomes learnable.</summary>
+        [JsonProperty("masteryLevel")] public int MasteryLevel { get; init; } = 1;
         [JsonProperty("damage")] public float Damage { get; init; }
         [JsonProperty("weaponDamageScale")] public float WeaponDamageScale { get; init; }
         [JsonProperty("spellDamageScale")] public float SpellDamageScale { get; init; }

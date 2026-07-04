@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://bcq7vkx5c2o4"]
+
+[ext_resource type="Script" uid="uid://cofhduqd3oiv0" path="res://Source/UIElements/AbilityButton.cs" id="1_qwsp7"]
+
+[node name="AbilityButton" type="Control" unique_id=1565065276 node_paths=PackedStringArray("_background", "_icon", "_frame", "_number")]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_qwsp7")
+_background = NodePath("Background")
+_icon = NodePath("Icon")
+_frame = NodePath("Frame")
+_number = NodePath("Number")
+
+[node name="Background" type="TextureRect" parent="." unique_id=219232674]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1764325252]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Frame" type="TextureRect" parent="." unique_id=2044993500]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Number" type="Label" parent="." unique_id=1120811465]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0

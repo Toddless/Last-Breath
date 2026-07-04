@@ -3,9 +3,11 @@
         {
             "id": "Ability_Series_Of_Attacks",
             "tags": [],
+            "stance": 1,
             "cooldown": 1,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 1,
             "damage": 30,
             "weaponDamageScale": 0.50,
             "spellDamageScale": 0.25,
@@ -96,9 +98,11 @@
         {
             "id": "Ability_Increasing_Pressure",
             "tags": [],
+            "stance": 1,
             "cooldown": 7,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 1,
             "damage": 35,
             "weaponDamageScale": 0.15,
             "spellDamageScale": 0.35,
@@ -178,9 +182,11 @@
         {
             "id": "Ability_Jar_Of_Poison",
             "tags": [],
+            "stance": 1,
             "cooldown": 3,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 1,
             "damage": 50,
             "weaponDamageScale": 0.35,
             "spellDamageScale": 0.5,
@@ -266,9 +272,11 @@
         {
             "id": "Ability_Dark_Shroud",
             "tags": [],
+            "stance": 1,
             "cooldown": 5,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 1,
             "abilityProperties": {
                 "duration": 3,
                 "effectiveness": 1,
@@ -356,9 +364,11 @@
         {
             "id": "Ability_Critical_Calculation",
             "tags": [],
+            "stance": 1,
             "cooldown": 5,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 5,
             "abilityProperties": {
                 "buffDuration": 3,
                 "additionalDurationAmount": 1
@@ -443,9 +453,11 @@
         {
             "id": "Ability_Poison_Explosion",
             "tags": [],
+            "stance": 1,
             "cooldown": 7,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 10,
             "abilityProperties": {
                 "multiplier": 0,
                 "executionThreshold": 1
@@ -523,9 +535,11 @@
         {
             "id": "Ability_Poison_Coating",
             "tags": [],
+            "stance": 1,
             "cooldown": 7,
             "costValue": 100,
             "costType": 0,
+            "masteryLevel": 15,
             "abilityProperties": {
                 "poisonMultiplier": 0.45,
                 "buffDuration": 3,
@@ -611,10 +625,11 @@
         {
             "id": "Ability_Ice_Shards",
             "tags": [],
-            "stance": 2,
+            "stance": 3,
             "cooldown": 4,
             "costValue": 200,
             "costType": 0,
+            "masteryLevel": 1,
             "damage": 80,
             "weaponDamageScale": 0.25,
             "spellDamageScale": 0.90,

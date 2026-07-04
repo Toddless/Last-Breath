@@ -63,9 +63,9 @@
 
         public void AddExperience(int experience)
         {
+            // TODO: Calculate exp up to max level (need for progress bar)
             if (experience <= 0) return;
             CurrentExperience += experience;
-            ExperienceChange?.Invoke(experience);
             if (CurrentLevel >= MaxLevel) return;
             CheckForLevel();
         }
@@ -75,6 +75,8 @@
         public void RemoveBonusLevel() => BonusLevel--;
 
         public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
+
+        public int ExpToNextLevelTotal() => CurrentLevel >= MaxLevel ? 0 : ExpToNextLevel(CurrentLevel);
 
         private float GetProgressFactor() =>
             Mathf.Clamp((CurrentLevel + BonusLevel - 1) / ((float)MaxLevel + BonusLevel - 1), 0f, 1f) + 1;
@@ -90,7 +92,7 @@
                 {
                     CurrentExperience -= need;
                     CurrentLevel++;
-                    bus.PublishMessageAsync(new SendNotificationMessageMessage("Martial art mastery level up!"));
+                    bus.PublishMessageAsync(new SendNotificationMessageMessage("Notification_Martial_Art_Mastery_Level_Up"));
                 }
                 else break;
             }

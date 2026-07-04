@@ -1,6 +1,5 @@
 namespace Battle.Internal
 {
-    using Core.Interfaces.MessageBus;
     using Core.Interfaces.UI;
     using Godot;
     using Services;
@@ -9,12 +8,9 @@ namespace Battle.Internal
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _tooltipLayer, _notificationLayer;
 
-        private IGameMessageBus? _messageBus;
-
         public override void _Ready()
         {
             var serviceProvider = GameServiceProvider.Instance;
-            _messageBus = serviceProvider.GetService<IGameMessageBus>();
         }
 
         public void ShowHud(IHud hud)

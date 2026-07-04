@@ -1,12 +1,112 @@
 [gd_scene format=3 uid="uid://ds0wq0f8ha2x5"]
 
 [ext_resource type="Script" uid="uid://cq2nb2bnie0iy" path="res://Source/UIElements/MartialArtMasteryWindow.cs" id="1_j6uko"]
+[ext_resource type="PackedScene" uid="uid://dxxuu85fbrdj" path="res://Source/UIElements/StanceTree.tscn" id="2_c8hsu"]
 
-[node name="MartialArtMasteryWindow" type="Control" unique_id=1752609098]
-layout_mode = 3
+[sub_resource type="LabelSettings" id="LabelSettings_c8hsu"]
+font_size = 32
+
+[sub_resource type="Gradient" id="Gradient_j6uko"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fx85w"]
+gradient = SubResource("Gradient_j6uko")
+
+[sub_resource type="Gradient" id="Gradient_c8hsu"]
+colors = PackedColorArray(1, 0.6862745, 0, 1, 1, 0.57254905, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_5f5v3"]
+gradient = SubResource("Gradient_c8hsu")
+
+[node name="MartialArtMasteryWindow" type="MarginContainer" unique_id=2129741938 node_paths=PackedStringArray("_dexTree", "_strTree", "_intTree")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_j6uko")
+_dexTree = NodePath("MainContainer/StanceContainer/DexTree")
+_strTree = NodePath("MainContainer/StanceContainer/StrTree")
+_intTree = NodePath("MainContainer/StanceContainer/IntTree")
+
+[node name="MainContainer" type="VBoxContainer" parent="." unique_id=453287758]
+layout_mode = 2
+
+[node name="HeaderContainer" type="VBoxContainer" parent="MainContainer" unique_id=430542623]
+layout_mode = 2
+size_flags_stretch_ratio = 0.1
+
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/HeaderContainer" unique_id=1826889312]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="CloseBtn" type="Button" parent="MainContainer/HeaderContainer/MarginContainer" unique_id=26804662]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 8
+text = "X"
+
+[node name="LabelContainer" type="MarginContainer" parent="MainContainer/HeaderContainer" unique_id=1061457159]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="MainContainer/HeaderContainer/LabelContainer" unique_id=1308692245]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Martial Art Mastery"
+label_settings = SubResource("LabelSettings_c8hsu")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StanceContainer" type="HBoxContainer" parent="MainContainer" unique_id=616486023]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.9
+
+[node name="Progress" type="MarginContainer" parent="MainContainer/StanceContainer" unique_id=2095626328]
+layout_mode = 2
+size_flags_stretch_ratio = 0.15
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/StanceContainer/Progress" unique_id=112561463]
+layout_mode = 2
+
+[node name="CurrentLevel" type="Label" parent="MainContainer/StanceContainer/Progress/VBoxContainer" unique_id=1341235646]
+layout_mode = 2
+
+[node name="Progression" type="TextureProgressBar" parent="MainContainer/StanceContainer/Progress/VBoxContainer" unique_id=1217125120]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+value = 7.0
+exp_edit = true
+fill_mode = 2
+nine_patch_stretch = true
+stretch_margin_left = 25
+stretch_margin_top = 25
+stretch_margin_right = 25
+stretch_margin_bottom = 25
+texture_under = SubResource("GradientTexture1D_fx85w")
+texture_progress = SubResource("GradientTexture1D_5f5v3")
+
+[node name="DexTree" parent="MainContainer/StanceContainer" unique_id=1660126089 instance=ExtResource("2_c8hsu")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StrTree" parent="MainContainer/StanceContainer" unique_id=161316437 node_paths=PackedStringArray("_abilitySlots") instance=ExtResource("2_c8hsu")]
+layout_mode = 2
+size_flags_horizontal = 3
+_abilitySlots = [NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotTwo"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotTwo"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdThree"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFour"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFive")]
+_stance = 1
+
+[node name="IntTree" parent="MainContainer/StanceContainer" unique_id=507348343 node_paths=PackedStringArray("_abilitySlots") instance=ExtResource("2_c8hsu")]
+layout_mode = 2
+size_flags_horizontal = 3
+_abilitySlots = [NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotTwo"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotTwo"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdThree"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFour"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFive")]
+_stance = 2
