@@ -14,7 +14,7 @@ namespace Battle.Source.Abilities.Modifiers
         string id,
         Func<IEffect> effectFactory,
         bool applyOnCaster = true,
-        bool applyOnTargets = false) : IAbilityPostActivationModifier
+        bool applyOnTargets = false) : IActivationRider
     {
         public string Id => id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();

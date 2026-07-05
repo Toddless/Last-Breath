@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
-    public class AbilityBuffPostActivationModifier(IEffect buff) : IAbilityPostActivationModifier
+    public class AbilityBuffPostActivationModifier(IEffect buff) : IActivationRider
     {
         public string Id => $"Ability_Apply_{buff.Id}_Post_Activation_Modifier";
         public string InstanceId { get; } = Guid.NewGuid().ToString();

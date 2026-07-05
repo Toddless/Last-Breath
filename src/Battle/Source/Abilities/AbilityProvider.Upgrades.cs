@@ -13,6 +13,7 @@
     using Modifiers;
     using PoisonCoating;
     using PoisonExplosion;
+    using Riders;
     using SeriesOfAttacks;
 
     public partial class AbilityProvider
@@ -152,7 +153,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new AbilityDebuffPostActivationModifier(
+                    new ApplyEffectImpactRider(
                         new Clumsiness(
                             (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                             (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
@@ -162,7 +163,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new AbilityDebuffPostActivationModifier(new BlindEffect(
+                    new ApplyEffectImpactRider(new BlindEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
                         data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
@@ -171,7 +172,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new AbilityDebuffPostActivationModifier(new Weakness(
+                    new ApplyEffectImpactRider(new Weakness(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
                         data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),

@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
-    public class AbilityDebuffPostActivationModifier(IEffect debuff, bool applyOnSelf = false) : IAbilityPostActivationModifier
+    public class AbilityDebuffPostActivationModifier(IEffect debuff, bool applyOnSelf = false) : IActivationRider
     {
         public string Id => $"Ability_Apply_{debuff.Id}_Post_Activation_Modifier";
         public string InstanceId { get; } = Guid.NewGuid().ToString();

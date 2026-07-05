@@ -1,24 +1,25 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
     using Core.Interfaces.Abilities;
+    using HitDelivery;
 
     /// <summary>L3 upgrade: applies poison to all enemies on the battlefield.</summary>
     public class JoPUpgradeAllTargets(string id, string[] tags, int tier)
         : AbilityUpgrade<JarOfPoison>(id, tags, tier)
     {
-        private IJoPExecutionStrategy? _previousStrategy;
+        private IHitSequenceStrategy? _previousDelivery;
 
         public override void ApplyUpgrade(JarOfPoison ability)
         {
-            _previousStrategy = ability.ExecutionStrategy;
-            ability.ExecutionStrategy = new JoPAllTargetsStrategy();
+            _previousDelivery = ability.HitSequence;
+            ability.HitSequence = new AllEnemiesHits();
         }
 
         public override void RemoveUpgrade(JarOfPoison ability)
         {
-            if (_previousStrategy == null) return;
-            ability.ExecutionStrategy = _previousStrategy;
-            _previousStrategy = null;
+            if (_previousDelivery == null) return;
+            ability.HitSequence = _previousDelivery;
+            _previousDelivery = null;
         }
 
         public override IAbilityUpgradeWrap<JarOfPoison> Copy() =>

@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.JarOfPoison
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
@@ -10,6 +11,8 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Interfaces.Components.Decorator;
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
+    using Effects;
+    using HitDelivery;
     using Module;
     using Decorators;
 
@@ -40,7 +43,9 @@ namespace Battle.Source.Abilities.JarOfPoison
         }
 
         public int PoisonDuration => (int)this[Parameters.PoisonDuration];
-        public IJoPExecutionStrategy ExecutionStrategy { get; set; } = new JoPDefaultExecutionStrategy();
+
+        /// <summary>How the jar reaches its victims: the selected target, N bounces or every enemy (L3 upgrades swap it).</summary>
+        public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
         public enum Parameters : byte
         {
@@ -76,7 +81,24 @@ namespace Battle.Source.Abilities.JarOfPoison
             return copy;
         }
 
-        protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
-            ExecutionStrategy.Execute(this, owner, targets, field);
+        /// <summary>Each landing applies a poison stack AND fires the impact riders — every touched target gets the L2 debuffs.</summary>
+        protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
+        {
+            foreach (IFightable target in HitSequence.GetHitSequence(owner, targets, field))
+            {
+                if (!target.IsAlive) continue;
+                await ApplyPoison(owner, target);
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field));
+            }
+        }
+
+        private async Task ApplyPoison(IFightable owner, IFightable target)
+        {
+            float damage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
+
+            var context = new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId, Damage = damage };
+            var poison = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison);
+            await poison.Apply(context);
+        }
     }
 }

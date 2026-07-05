@@ -19,10 +19,10 @@
                 "Ability_Apply_Effect_Additional_Hit_Chance_Buff_Post_Activation_Modifier",
                 () => new AdditionalHitChanceEffect((int)ability.Duration, 1, amount));
             _modifierId = modifier.Id;
-            ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
+            ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }
 
-        public override void RemoveUpgrade(DarkShroud ability) => ability.PostActivationEffect.Remove(_modifierId);
+        public override void RemoveUpgrade(DarkShroud ability) => ability.ActivationRiders.Remove(_modifierId);
 
         public override IAbilityUpgrade Copy() => new DsUpgradeAdditionalAttackChance(Id, Tags, Tier, amount);
     }

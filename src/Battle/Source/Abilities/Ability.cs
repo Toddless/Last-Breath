@@ -13,9 +13,9 @@
     using Core.Interfaces.Components.Module;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events.GameEvents;
+    using Decorators;
     using Godot;
     using Module;
-    using Decorators;
     using Targeting;
     using Utilities;
 
@@ -68,7 +68,8 @@
         }
 
         public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
-        public Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; } = [];
+        public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
+        public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
         public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
         public IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades => _currentUpgrades;
         private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
@@ -139,11 +140,21 @@
             // Cast mutators run before anything is paid: ability-scoped first, then entity-scoped (items/effects)
             ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
             Owner.ModifierHandler.Apply(context);
+
             StartCooldown(context.Cooldown);
             ConsumeResource(context);
+
             Owner.CombatEvents.Publish<AbilityActivatedEvent>(new(this, Owner, VitalsSnapshot.From(Owner), CastId));
             await ExecuteInternal(targets, Owner, field);
-            PostActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
+            foreach (var rider in ActivationRiders.Values.ToList())
+                await rider.Apply(context);
+        }
+
+        /// <summary>Delivery implementations call this on every impact so per-impact riders fire for each touched target.</summary>
+        protected async Task ApplyImpactRiders(AbilityImpact impact)
+        {
+            foreach (var rider in ImpactRiders.Values.ToList())
+                await rider.Apply(impact);
         }
 
         public virtual void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)

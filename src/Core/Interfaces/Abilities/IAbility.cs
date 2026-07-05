@@ -21,7 +21,12 @@
         /// <summary>How the ability selects its targets. Swappable per ability.</summary>
         ITargetingStrategy Targeting { get; }
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
-        Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; }
+
+        /// <summary>Riders fired once per cast, after execution (self-buffs, cast-scoped debuffs).</summary>
+        Dictionary<string, IActivationRider> ActivationRiders { get; }
+
+        /// <summary>Riders fired on every delivery impact (per hit / bounce / attack of a series).</summary>
+        Dictionary<string, IImpactRider> ImpactRiders { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; }
 
         /// <summary>The chosen upgrade per tier (one of three); selection is changeable outside battle.</summary>

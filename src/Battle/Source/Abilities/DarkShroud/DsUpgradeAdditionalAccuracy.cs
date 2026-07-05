@@ -19,10 +19,10 @@ namespace Battle.Source.Abilities.DarkShroud
                 "Ability_Apply_Effect_Accuracy_Buff_Post_Activation_Modifier",
                 () => new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, amount));
             _modifierId = modifier.Id;
-            ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
+            ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }
 
-        public override void RemoveUpgrade(DarkShroud ability) => ability.PostActivationEffect.Remove(_modifierId);
+        public override void RemoveUpgrade(DarkShroud ability) => ability.ActivationRiders.Remove(_modifierId);
 
         public override IAbilityUpgrade Copy() => new DsUpgradeAdditionalAccuracy(Id, Tags, Tier, amount);
     }

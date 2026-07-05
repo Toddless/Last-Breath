@@ -18,10 +18,10 @@ namespace Battle.Source.Abilities.DarkShroud
                 "Ability_Apply_Effect_Mana_Regeneration_Post_Activation_Modifier",
                 () => new ManaRegenerationEffect(regenAmount * ability.Effectiveness, (int)ability.Duration, 1));
             _modifierId = modifier.Id;
-            ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
+            ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }
 
-        public override void RemoveUpgrade(DarkShroud ability) => ability.PostActivationEffect.Remove(_modifierId);
+        public override void RemoveUpgrade(DarkShroud ability) => ability.ActivationRiders.Remove(_modifierId);
 
         public override IAbilityUpgrade Copy() => new DsUpgradeManaRegen(Id, Tags, Tier, regenAmount);
     }

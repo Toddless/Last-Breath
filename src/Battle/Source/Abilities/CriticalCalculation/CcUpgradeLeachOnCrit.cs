@@ -17,10 +17,10 @@ namespace Battle.Source.Abilities.CriticalCalculation
         {
             var modifier = new AbilityBuffPostActivationModifier(new CritLeechEffect(duration, 1, amount));
             _modifierId = modifier.Id;
-            ability.PostActivationEffect.TryAdd(modifier.Id, modifier);
+            ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }
 
-        public override void RemoveUpgrade(CriticalCalculation ability) => ability.PostActivationEffect.Remove(_modifierId);
+        public override void RemoveUpgrade(CriticalCalculation ability) => ability.ActivationRiders.Remove(_modifierId);
 
         public override IAbilityUpgrade Copy() => new CcUpgradeLeachOnCrit(Id, Tags, Tier, amount, duration);
     }

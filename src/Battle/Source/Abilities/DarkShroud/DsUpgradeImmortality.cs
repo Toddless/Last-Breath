@@ -10,12 +10,12 @@ namespace Battle.Source.Abilities.DarkShroud
     public class DsUpgradeImmortality(string id, string[] tags, int tier, float lifeToRecover, int duration, int activations)
         : AbilityUpgrade<DarkShroud>(id, tags, tier)
     {
-        private readonly IAbilityPostActivationModifier _modifier =
+        private readonly IActivationRider _modifier =
             new AbilityBuffPostActivationModifier(new LifeGivingShadeEffect(lifeToRecover, duration, activations));
 
-        public override void ApplyUpgrade(DarkShroud ability) => ability.PostActivationEffect.TryAdd(_modifier.Id, _modifier);
+        public override void ApplyUpgrade(DarkShroud ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 
-        public override void RemoveUpgrade(DarkShroud ability) => ability.PostActivationEffect.Remove(_modifier.Id);
+        public override void RemoveUpgrade(DarkShroud ability) => ability.ActivationRiders.Remove(_modifier.Id);
 
         public override IAbilityUpgrade Copy() => new DsUpgradeImmortality(Id, Tags, Tier, lifeToRecover, duration, activations);
     }
