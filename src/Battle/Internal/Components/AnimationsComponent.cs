@@ -14,20 +14,17 @@
         public async Task PlayAnimationAsync(string animation)
         {
             if (_animatedSprite2D == null) return;
-           _previousAnimation = _animatedSprite2D.GetAnimation();
+            _previousAnimation = _animatedSprite2D.GetAnimation();
             try
             {
-                if (animation.StartsWith("Ability"))
-                {
-                    await ToSignal(GetTree().CreateTimer(0.5f), "timeout");
-                    GD.Print("Ability animation finished");
-                }
-                else
+                if (_animatedSprite2D.SpriteFrames is { } sf && sf.HasAnimation(animation))
                 {
                     _animatedSprite2D.Play(animation);
                     await ToSignal(_animatedSprite2D, "animation_finished");
                     _animatedSprite2D.Play(_previousAnimation);
                 }
+                else
+                    await ToSignal(GetTree().CreateTimer(0.5f), "timeout");
             }
             catch (Exception e)
             {

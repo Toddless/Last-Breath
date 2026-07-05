@@ -11,6 +11,7 @@
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
+    using Core.Views;
 
     public class EffectsComponent(IFightable owner) : IEffectsComponent
     {
@@ -21,6 +22,14 @@
         public IReadOnlyList<IEffect> Effects => _orderedEffects;
         public event Action<IEffect>? EffectAdded;
         public event Action<IEffect>? EffectRemoved;
+        public event Action? EffectsChanged;
+
+        /// <summary>One view per effect id: stacks = number of instances, duration = the longest remaining.</summary>
+        public IReadOnlyList<EffectView> GetEffectViews() =>
+            _orderedEffects
+                .GroupBy(effect => effect.Id)
+                .Select(group => new EffectView(group.Key, group.First().Icon, group.Count(), group.Max(effect => effect.Duration), group.First().Description))
+                .ToList();
 
         public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effectsBySource.Values.ToList().SelectMany(list => list.Where(predicate));
         public IEnumerable<IEffect> GetBySource(string source) => _effectsBySource.GetValueOrDefault(source, []);
@@ -50,6 +59,7 @@
             _dotTicks.RemoveAll(dot => dot.Source == effect.InstanceId);
             if (effects?.Count == 0) _effectsBySource.Remove(source);
             EffectRemoved?.Invoke(effect);
+            EffectsChanged?.Invoke();
         }
 
         public void RemoveEffectByStatus(StatusEffects status)
@@ -81,6 +91,7 @@
             {
                 foreach (var effect in GetEffects())
                     effect.TurnEnd();
+                EffectsChanged?.Invoke();
                 await ApplyDotDamage();
             }
             catch (Exception exception)
@@ -93,6 +104,7 @@
         {
             foreach (var effect in GetEffects())
                 effect.TurnStart();
+            EffectsChanged?.Invoke();
         }
 
         private List<IEffect> GetEffects() => [.. _orderedEffects];
@@ -164,6 +176,7 @@
             sourceEffects.Add(newEffect);
             _orderedEffects.Add(newEffect);
             EffectAdded?.Invoke(newEffect);
+            EffectsChanged?.Invoke();
         }
 
         private List<IEffect> FindSameEffects(string newEffectId, List<IEffect> effects) => effects.Where(x => x.Id == newEffectId).ToList();

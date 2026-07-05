@@ -16,6 +16,7 @@
     using Godot;
     using Module;
     using Decorators;
+    using Targeting;
     using Utilities;
 
     public abstract class Ability(
@@ -41,7 +42,9 @@
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public Stance Stance { get; set; }
+        public ITargetingStrategy Targeting { get; set; } = new SingleTargetTargeting(TargetRelation.Enemies);
         public int CostValue => (int)this[AbilityParameter.CostValue];
+        public int MasteryLevel { get; set; }
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
@@ -75,12 +78,12 @@
 
         public Texture2D? Icon
         {
-            get;
-            // {
-            //     if (field != null) return field;
-            //     field = ResourceLoader.Load<Texture2D>($"res://Source/Abilities/{Id}.png");
-            //     return field;
-            // }
+            get
+            {
+                if (field != null) return field;
+                field = ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Icons/{Id}.png");
+                return field;
+            }
         }
 
         public event Action<Enum>? OnParameterChanged;

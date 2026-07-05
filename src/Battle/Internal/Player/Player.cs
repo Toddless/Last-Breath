@@ -149,8 +149,7 @@ namespace Battle.Internal.Player
             Intelligence = new Intelligence(ParameterModifiers);
             ModifierHandler = new ModifierHandlerComponent();
             AbilityBook = new AbilityBookComponent(this);
-            Effects.EffectAdded += OnEffectAdded;
-            Effects.EffectRemoved += OnEffectRemoved;
+            Effects.EffectsChanged += OnEffectsChanged;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
@@ -394,14 +393,9 @@ namespace Battle.Internal.Player
         {
         }
 
-        private void OnEffectRemoved(IEffect effect)
+        private void OnEffectsChanged()
         {
-            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
-        }
-
-        private void OnEffectAdded(IEffect effect)
-        {
-            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
+            _battleEventBus?.Publish<EffectsChangedEvent>(new(this, Effects.GetEffectViews()));
         }
 
         private void OnBattleEnds(BattleEndEvent obj)
@@ -464,10 +458,10 @@ namespace Battle.Internal.Player
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 1000;
+                        value = 10000;
                         break;
                     case EntityParameter.Mana:
-                        value = 500;
+                        value = 5000;
                         break;
                     case EntityParameter.Intelligence:
                     case EntityParameter.Strength:
@@ -487,6 +481,9 @@ namespace Battle.Internal.Player
                         break;
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;
+                        break;
+                    case EntityParameter.MulticastChance:
+                        value = 1f;
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:

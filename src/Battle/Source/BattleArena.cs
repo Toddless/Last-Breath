@@ -26,6 +26,7 @@
         private readonly QueueScheduler _queueScheduler = new();
         private readonly BattleTimeline _timeline = new();
         private TaskCompletionSource<IFightable?>? _playerTargetTcs;
+        private TargetSelectionController? _selectionController;
         private IBattleEventBus? _battleEventBus;
         private List<IFightable> _fighters = [];
         private int _playersEnemiesCount;
@@ -74,12 +75,7 @@
         {
             try
             {
-                var targets = _spots
-                    .Where(s => s.SelectionId == obj.SelectionId)
-                    .Select(s => s.Entity)
-                    .OfType<IFightable>()
-                    .ToList();
-
+                var targets = _selectionController?.TakeCommittedTargets(obj.SelectionId).ToList() ?? [];
                 await obj.Ability.Execute(targets, this);
             }
             catch (Exception e)
@@ -123,6 +119,14 @@
         {
             foreach (var spot in _spots)
                 spot.RemoveEntityFromSpot();
+        }
+
+        private void SetupTargetSelectionController()
+        {
+            if (_battleEventBus == null) return;
+            var allSpots = _spots.Where(spot => spot != null).ToList();
+            if (_playerSpot != null) allSpots.Add(_playerSpot);
+            _selectionController = new TargetSelectionController(_battleEventBus, this, allSpots);
         }
 
         private void SetupCombatTextPresenter(IBattleEventBus battleEventBus)
@@ -188,6 +192,7 @@
             }
 
             _playerSpot?.SetBattleEventBus(_battleEventBus);
+            SetupTargetSelectionController();
             SetupCombatTextPresenter(_battleEventBus);
             StartTimelineRecording();
             SetupBattleDirector(_battleEventBus);
@@ -320,7 +325,15 @@
             }
 
             _playerTargetTcs = new TaskCompletionSource<IFightable?>();
-            return await _playerTargetTcs.Task;
+            _selectionController?.BeginBasicAttack(fighter);
+            try
+            {
+                return await _playerTargetTcs.Task;
+            }
+            finally
+            {
+                _selectionController?.EndTargeting();
+            }
         }
 
         private void OnQueueContainLessThenTwoFighters()

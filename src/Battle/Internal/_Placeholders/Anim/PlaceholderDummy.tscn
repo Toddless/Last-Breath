@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="SpriteFrames" path="res://Internal/_Placeholders/Anim/PlaceholderFrames.tres" id="1_ph"]
+
+[node name="PlaceholderDummy" type="Node2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
+sprite_frames = ExtResource("1_ph")
+animation = &"Idle_Down"
+autoplay = "Idle_Down"

@@ -15,7 +15,7 @@ script = ExtResource("1_qll2p")
 _buttonsContainer = NodePath("VBoxContainer")
 _playerBars = NodePath("CharacterHealthBar")
 _stanceButtons = NodePath("VBoxContainer/StanceSlots")
-_entityBars = NodePath("HBoxContainer/GridContainer")
+_entityBars = NodePath("HBoxContainer")
 _abilitySlots = NodePath("VBoxContainer/AbilitySlots")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=284745788]
@@ -33,6 +33,8 @@ grow_vertical = 0
 
 [node name="StanceSlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1680529311]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="AbilitySlots" type="HBoxContainer" parent="VBoxContainer" unique_id=1938591861]
 layout_mode = 2
@@ -40,15 +42,12 @@ layout_mode = 2
 [node name="CharacterHealthBar" parent="." unique_id=2145971479 instance=ExtResource("2_5gjf2")]
 layout_mode = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1675317335]
+[node name="HBoxContainer" type="VBoxContainer" parent="." unique_id=653788985]
+custom_minimum_size = Vector2(150, 75)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
+offset_left = -150.0
+offset_bottom = 75.0
 grow_horizontal = 0
-
-[node name="GridContainer" type="GridContainer" parent="HBoxContainer" unique_id=2050438703]
-layout_mode = 2
-size_flags_horizontal = 0

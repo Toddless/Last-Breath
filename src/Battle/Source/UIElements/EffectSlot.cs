@@ -1,53 +1,41 @@
-﻿namespace Battle.Source.UIElements
+namespace Battle.Source.UIElements
 {
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.UI;
+    using Core.Views;
     using Godot;
 
     public partial class EffectSlot : Control, IInitializable
     {
         private const string UID = "uid://5n5bfrh72v8s";
-        private IEffect? _effect;
+        private string _description = string.Empty;
+        private int _duration;
         [Export] private TextureRect? _effectIcon;
         [Export] private Label? _effectStacks;
 
-        public int Stacks
-        {
-            get;
-            set
-            {
-                if (field == value) return;
-                field = value;
-                UpdateStacks();
-            }
-        }
+        public string EffectId { get; private set; } = string.Empty;
 
         public override GodotObject _MakeCustomTooltip(string forText)
         {
-            var richText = new RichTextLabel { Text = _effect?.Description, AutowrapMode = TextServer.AutowrapMode.Off, FitContent = true, BbcodeEnabled = true};
+            var richText = new RichTextLabel { Text = $"{_description}\n Duration: {_duration}", AutowrapMode = TextServer.AutowrapMode.Off, FitContent = true, BbcodeEnabled = true };
             return richText;
         }
 
-        public void AddEffect(IEffect effect)
+        /// <summary>Binds the aggregated view: icon, stack count (hidden when 1) and remaining duration.</summary>
+        public void SetView(EffectView view)
         {
-            _effect = effect;
-            _effectIcon?.Texture = _effect.Icon;
-            _effectStacks?.Text = string.Empty;
+            EffectId = view.Id;
+            _description = view.Description;
+            _duration = view.Duration;
+            _effectIcon?.Texture = view.Icon;
+            _effectStacks?.Text = view.Stacks <= 1 ? string.Empty : view.Stacks.ToString();
         }
 
         public void RemoveEffect()
         {
-            _effectStacks?.Text = string.Empty;
-            _effectIcon?.Texture = null;
-            _effect = null;
+            EffectId = string.Empty;
             QueueFree();
         }
 
-        public bool HasEffect(IEffect effect) => effect.Id.Equals(_effect?.Id);
-        public bool HasOwner() => _effect?.Target != null;
-
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        private void UpdateStacks() => _effectStacks?.Text = Stacks <= 1 ? string.Empty : $"{Stacks}";
     }
 }

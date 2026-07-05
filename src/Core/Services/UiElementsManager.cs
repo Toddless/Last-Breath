@@ -40,6 +40,16 @@ namespace Core.Services
             return window;
         }
 
+        public IWindow GetOrOpenWindow(Type windowType)
+        {
+            if (TryGetOpenWindow(windowType, out var openWindow)) return openWindow;
+
+            var window = CreateElement(_windowFactories, windowType);
+            _openWindows[windowType] = window;
+            _layers?.ShowWindow(window);
+            return window;
+        }
+
         public bool RegisterHudFactory(Type hudType, Func<IHud> factory) => _hudFactories.TryAdd(hudType, factory);
 
         public bool RegisterWindowFactory(Type windowType, Func<IWindow> factory) => _windowFactories.TryAdd(windowType, factory);
@@ -81,7 +91,7 @@ namespace Core.Services
         private bool TryGetOpenWindow(Type windowType, out IWindow window)
         {
             if (!_openWindows.TryGetValue(windowType, out window!)) return false;
-            if (window is Node node && GodotObject.IsInstanceValid(node) && node.IsInsideTree()) return true;
+            if (window is Node node && GodotObject.IsInstanceValid(node)) return true;
 
             _openWindows.Remove(windowType);
             return false;

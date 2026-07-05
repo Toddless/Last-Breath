@@ -4,14 +4,16 @@
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
+    using Core.Interfaces.Battle;
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
+    using Core.Services;
     using Godot;
-    using Services;
     using Source;
     using Source.UIElements;
     using Utilities;
+    using GameServiceProvider = Services.GameServiceProvider;
     using NotificationService = Core.Services.NotificationService;
 
     public partial class Main : Node2D
@@ -34,19 +36,18 @@
                 _provider.GetService<NotificationService>().Setup(_layerManager, CreateNotificationPopup);
             }
 
+            // Resolve once so it subscribes to mastery/player changes and auto-learns unlocked abilities.
+            _provider.GetService<IAbilityUnlockService>();
+            var mastery = _provider.GetService<IMartialArtMastery>();
+            mastery.AddExperience(500000);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
+        }
 
-            var player = _provider.GetService<IPlayerAccessor>();
-            var abilityProvider = _provider.GetService<IAbilityProvider>();
-            var ids = abilityProvider.KnownAbilityIds;
-            foreach (string id in ids)
-            {
-                var ability = abilityProvider.CreateAbility(id);
-                player.Player?.AbilityBook?.Learn(ability.Stance, ability);
-            }
-
-            _uiElementProvider.OpenWindow(typeof(MartialArtMasteryWindow));
+        public override void _Input(InputEvent @event)
+        {
+            if (@event is InputEventKey { Keycode: Key.N, Pressed: true })
+                _uiElementProvider?.OpenWindow(typeof(MartialArtMasteryWindow));
         }
 
         private static Control? CreateNotificationPopup()

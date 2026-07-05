@@ -14,8 +14,12 @@
         float Cooldown { get; }
         int CooldownLeft { get; set; }
         int CostValue { get; }
+        int MasteryLevel { get; set; }
         Costs CostType { get; }
         Stance Stance { get; }
+
+        /// <summary>How the ability selects its targets. Swappable per ability.</summary>
+        ITargetingStrategy Targeting { get; }
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
         Dictionary<string, IAbilityPostActivationModifier> PostActivationEffect { get; }
         Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; }

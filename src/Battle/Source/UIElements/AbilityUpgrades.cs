@@ -1,12 +1,15 @@
-﻿namespace Battle.Source.UIElements
+namespace Battle.Source.UIElements
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
+    using Core.Views;
     using Godot;
-    using Utilities;
 
+    /// <summary>
+    /// The three tiers of upgrade radio-buttons. Fed pure view data (no domain object); reports the
+    /// chosen upgrade up by instance id + tier. One selection per tier is enforced by the ButtonGroups.
+    /// </summary>
     public partial class AbilityUpgrades : Control
     {
         private const string UID = "uid://cfjcrk0kkryi8";
@@ -21,22 +24,27 @@
             CreateButtonGroup(_tierThree);
         }
 
-        public void SetUpgradesInTier(int tier, List<IAbilityUpgrade> upgrades)
+        public void SetOptions(IReadOnlyList<UpgradeOptionView> options)
         {
-            var buttons = GetButtonsInTier(tier);
-            int count = 0;
-            foreach (var upgrade in upgrades)
-            {
-                var button = buttons[count];
-                button.Text = Localization.Localize(upgrade.Id);
-                button.SetUpgradeTaken(upgrade.Learned);
-                button.SetUpgradeTier(tier);
-                button.SetUpgradeInstanceId(upgrade.InstanceId);
-                count++;
-            }
+            foreach (var tier in options.GroupBy(option => option.Tier))
+                SetTier(tier.Key, tier.ToList());
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        private void SetTier(int tier, List<UpgradeOptionView> options)
+        {
+            var buttons = GetButtonsInTier(tier);
+            for (int i = 0; i < buttons.Length && i < options.Count; i++)
+            {
+                var button = buttons[i];
+                var option = options[i];
+                button.Text = option.DisplayName;
+                button.SetUpgradeTaken(option.Selected);
+                button.SetUpgradeTier(tier);
+                button.SetUpgradeInstanceId(option.UpgradeInstanceId);
+            }
+        }
 
         private void CreateButtonGroup(BoxContainer? container)
         {
@@ -51,10 +59,7 @@
             }
         }
 
-        private void OnUpgradeSelected(string upgradeInstanceId, int tier)
-        {
-            AbilityUpgradeSelected?.Invoke(upgradeInstanceId, tier);
-        }
+        private void OnUpgradeSelected(string upgradeInstanceId, int tier) => AbilityUpgradeSelected?.Invoke(upgradeInstanceId, tier);
 
         private UpgradeButton[] GetButtonsInTier(int tier) => tier switch
         {

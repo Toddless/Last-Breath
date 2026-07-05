@@ -23,7 +23,7 @@
         {
             var data = GetBaseData(abilityId);
             var ability = GetFactory(abilityId).Invoke(data);
-            ability.SetAbilityUpgrades(CreateAbilityUpgrades(data.Upgrades));
+            ability.SetAbilityUpgrades(CopyAbilityUpgrades(data.Upgrades));
             return ability;
         }
 
@@ -41,7 +41,7 @@
             _abilityFactories.GetValueOrDefault(abilityId)
             ?? throw new KeyNotFoundException($"No factory registered for ability '{abilityId}'");
 
-        private Dictionary<int, List<IAbilityUpgrade>> CreateAbilityUpgrades(List<AbilityUpgradeData> data) =>
+        private Dictionary<int, List<IAbilityUpgrade>> CopyAbilityUpgrades(List<AbilityUpgradeData> data) =>
             data.GroupBy(upgrade => upgrade.Tier)
                 .ToDictionary(tier => tier.Key, tier => tier.Select(CreateUpgrade).OfType<IAbilityUpgrade>().ToList());
 
@@ -69,8 +69,8 @@
         {
             var root = JsonConvert.DeserializeObject<AbilityDataRoot>(json)
                        ?? throw new InvalidOperationException("Failed to deserialize ability data");
-            foreach (AbilityBaseData ability in root.Abilities)
-                _abilityBaseData[ability.Id] = ability;
+            foreach (AbilityBaseData abilityData in root.Abilities)
+                _abilityBaseData[abilityData.Id] = abilityData;
             return Task.CompletedTask;
         }
     }

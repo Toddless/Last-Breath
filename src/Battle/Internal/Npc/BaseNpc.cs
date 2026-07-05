@@ -24,6 +24,7 @@ namespace Battle.Internal.Npc
 
     public partial class BaseNpc : CharacterBody2D, IFightableNpc
     {
+        private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
         private IGameEventBus? _gameEventBus;
@@ -148,8 +149,7 @@ namespace Battle.Internal.Npc
             // ________________
             AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
             // ________________
-            Effects.EffectAdded += OnEffectAdded;
-            Effects.EffectRemoved += OnEffectRemoved;
+            Effects.EffectsChanged += OnEffectsChanged;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
@@ -163,6 +163,8 @@ namespace Battle.Internal.Npc
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
         }
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public void InjectServices(IGameServiceProvider provider)
         {
@@ -406,14 +408,9 @@ namespace Battle.Internal.Npc
             _battleEventBus = null;
         }
 
-        private void OnEffectRemoved(IEffect effect)
+        private void OnEffectsChanged()
         {
-            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
-        }
-
-        private void OnEffectAdded(IEffect effect)
-        {
-            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
+            _battleEventBus?.Publish<EffectsChangedEvent>(new(this, Effects.GetEffectViews()));
         }
 
         private void NotifyHealthChanges(float value)

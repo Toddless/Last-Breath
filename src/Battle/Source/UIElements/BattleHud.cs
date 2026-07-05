@@ -29,7 +29,7 @@
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
         [Export] private HBoxContainer? _stanceButtons;
-        [Export] private GridContainer? _entityBars;
+        [Export] private VBoxContainer? _entityBars;
         [Export] private HBoxContainer? _abilitySlots;
 
         public override void _Ready()
@@ -89,9 +89,7 @@
             _battleEventBus.Subscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
             _battleEventBus.Subscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
             _battleEventBus.Subscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
-
-            _battleEventBus.Subscribe<EffectAddedEvent>(OnEffectAdded);
-            _battleEventBus.Subscribe<EffectRemovedEvent>(OnEffectRemoved);
+            _battleEventBus.Subscribe<EffectsChangedEvent>(OnEffectsChanged);
 
             _battleEventBus.Subscribe<TurnStartEvent>(OnTurnStart);
             _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
@@ -184,22 +182,10 @@
             GetCharacterBar(obj.Entity.InstanceId)?.UpdateMaxHealth(obj.Value);
         }
 
-        private void OnEffectRemoved(EffectRemovedEvent obj)
+        private void OnEffectsChanged(EffectsChangedEvent obj)
         {
-            var target = obj.Target;
-            var effect = obj.Effect;
-
-            if (target is IPlayer) _playerBars?.RemoveEffect(effect);
-            else GetCharacterBar(target.InstanceId)?.RemoveEffect(effect);
-        }
-
-        private void OnEffectAdded(EffectAddedEvent obj)
-        {
-            var target = obj.Target;
-            var effect = obj.Effect;
-
-            if (target is IPlayer) _playerBars?.AddEffect(effect);
-            else GetCharacterBar(target.InstanceId)?.AddEffect(effect);
+            var bar = obj.Target is IPlayer ? _playerBars : GetCharacterBar(obj.Target.InstanceId);
+            bar?.SetEffects(obj.Effects);
         }
 
         private void OnTurnStart(TurnStartEvent obj)

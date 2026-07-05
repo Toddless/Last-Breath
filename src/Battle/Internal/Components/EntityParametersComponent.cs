@@ -27,7 +27,7 @@
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
         public float CriticalChance => Mathf.Clamp(this[EntityParameter.CriticalChance], 0f, 1f);
         public float AdditionalHit => Mathf.Clamp(this[EntityParameter.AdditionalHitChance], 0f, 0.75f);
-        public float MulticastChance => Mathf.Clamp(this[EntityParameter.MulticastChance], 0f, 0.75f);
+        public float MulticastChance => Mathf.Clamp(this[EntityParameter.MulticastChance], 0f, 1f);
         public float SpellDamage => this[EntityParameter.SpellDamage];
         public float Accuracy => this[EntityParameter.Accuracy];
         public float Armor => this[EntityParameter.Armor];

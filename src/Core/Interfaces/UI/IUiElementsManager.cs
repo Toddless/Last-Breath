@@ -17,6 +17,9 @@ namespace Core.Interfaces.UI
         /// <summary>Toggle: opening an already open window closes it instead.</summary>
         IWindow OpenWindow(Type windowType);
 
+        /// <summary>Returns the already open window if there is one, otherwise opens a fresh one. Never closes.</summary>
+        IWindow GetOrOpenWindow(Type windowType);
+
         bool RegisterHudFactory(Type hudType, Func<IHud> factory);
         bool RegisterWindowFactory(Type windowType, Func<IWindow> factory);
     }

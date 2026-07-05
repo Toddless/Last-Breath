@@ -93,6 +93,7 @@
                     CurrentExperience -= need;
                     CurrentLevel++;
                     bus.PublishMessageAsync(new SendNotificationMessageMessage("Notification_Martial_Art_Mastery_Level_Up"));
+                    GD.Print($"Notification_Martial_Art_Mastery_Level_Up {CurrentLevel}");
                 }
                 else break;
             }

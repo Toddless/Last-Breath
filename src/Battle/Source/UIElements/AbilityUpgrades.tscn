@@ -75,6 +75,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 0
+toggle_mode = true
 script = ExtResource("2_wf1hs")
 
 [node name="VBoxContainer" type="MarginContainer" parent="TierContainers/TierOne/UpgradeThree" unique_id=425648165]
@@ -153,6 +154,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 0
+toggle_mode = true
 autowrap_trim_flags = 192
 script = ExtResource("2_wf1hs")
 

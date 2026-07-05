@@ -40,6 +40,10 @@
                 _ => _totalExp
             };
 
+            // TODO:
+            // Необходимо сменить на GameMessageBus.PublishAsync<BattleExperienceGainedMessage>
+            // и создать обработчик данного сообщения. Внутри обработчика начисляем опыт мастерству. Там же позднее будем записывать статистику (для ачивок/глобальная статистика)
+
             var martialArtMastery = _gameServiceProvider.GetService<IMartialArtMastery>();
             martialArtMastery.AddExperience(awarded);
             _totalExp = 0;

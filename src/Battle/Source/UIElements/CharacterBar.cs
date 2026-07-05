@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.UI;
+    using Core.Views;
     using Godot;
 
     [GlobalClass]
@@ -36,33 +36,30 @@
         public void UpdateMaxHealth(float value) => HealthBar?.MaxValue = value;
         public void UpdateMaxMana(float value) => ManaBar?.MaxValue = value;
 
-        public void AddEffect(IEffect effect)
+        /// <summary>Reconciles the effect icons with the aggregated snapshot: one slot per effect id.</summary>
+        public void SetEffects(IReadOnlyList<EffectView> effects)
         {
-            var slots = GetEffectSlots().ToList();
-            var alreadyExistInSlot = slots.FirstOrDefault(x => x.HasEffect(effect));
-            if (alreadyExistInSlot == null)
-            {
-                var slot = EffectSlot.Initialize().Instantiate<EffectSlot>();
-                CharacterEffects?.CallDeferred(Node.MethodName.AddChild, slot);
-                slot.AddEffect(effect);
-                slot.Stacks++;
-            }
-            else
-            {
-                if (!alreadyExistInSlot.HasOwner())
-                    alreadyExistInSlot.AddEffect(effect);
-                alreadyExistInSlot.Stacks++;
-            }
-        }
+            var slotsById = new Dictionary<string, EffectSlot>();
+            foreach (var slot in GetEffectSlots())
+                if (!string.IsNullOrEmpty(slot.EffectId)) slotsById[slot.EffectId] = slot;
 
-        public void RemoveEffect(IEffect effect)
-        {
-            var slots = GetEffectSlots().ToList();
-            var existing = slots.FirstOrDefault(x => x.HasEffect(effect));
-            if (existing == null) return;
+            foreach (var view in effects)
+            {
+                if (slotsById.TryGetValue(view.Id, out var slot))
+                {
+                    slot.SetView(view);
+                    continue;
+                }
 
-            if (existing.Stacks > 1) existing.Stacks--;
-            else existing.RemoveEffect();
+                var newSlot = EffectSlot.Initialize().Instantiate<EffectSlot>();
+                CharacterEffects?.AddChild(newSlot);
+                newSlot.SetView(view);
+                slotsById[view.Id] = newSlot;
+            }
+
+            var activeIds = effects.Select(view => view.Id).ToHashSet();
+            foreach (var (id, slot) in slotsById)
+                if (!activeIds.Contains(id)) slot.RemoveEffect();
         }
 
         public void ClearEffects()

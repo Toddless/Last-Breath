@@ -26,9 +26,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_j6uko")
-_dexTree = NodePath("MainContainer/StanceContainer/DexTree")
-_strTree = NodePath("MainContainer/StanceContainer/StrTree")
-_intTree = NodePath("MainContainer/StanceContainer/IntTree")
+_dexTree = NodePath("MainContainer/StanceContainer/Dex")
+_strTree = NodePath("MainContainer/StanceContainer/Str")
+_intTree = NodePath("MainContainer/StanceContainer/Int")
 
 [node name="MainContainer" type="VBoxContainer" parent="." unique_id=453287758]
 layout_mode = 2
@@ -95,18 +95,16 @@ stretch_margin_bottom = 25
 texture_under = SubResource("GradientTexture1D_fx85w")
 texture_progress = SubResource("GradientTexture1D_5f5v3")
 
-[node name="DexTree" parent="MainContainer/StanceContainer" unique_id=1660126089 instance=ExtResource("2_c8hsu")]
+[node name="Dex" parent="MainContainer/StanceContainer" unique_id=1660126089 instance=ExtResource("2_c8hsu")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="StrTree" parent="MainContainer/StanceContainer" unique_id=161316437 node_paths=PackedStringArray("_abilitySlots") instance=ExtResource("2_c8hsu")]
+[node name="Str" parent="MainContainer/StanceContainer" unique_id=2062901391 instance=ExtResource("2_c8hsu")]
 layout_mode = 2
 size_flags_horizontal = 3
-_abilitySlots = [NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotTwo"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotTwo"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdThree"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFour"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFive")]
 _stance = 1
 
-[node name="IntTree" parent="MainContainer/StanceContainer" unique_id=507348343 node_paths=PackedStringArray("_abilitySlots") instance=ExtResource("2_c8hsu")]
+[node name="Int" parent="MainContainer/StanceContainer" unique_id=1487744250 instance=ExtResource("2_c8hsu")]
 layout_mode = 2
 size_flags_horizontal = 3
-_abilitySlots = [NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdOneSlotTwo"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotOne"), NodePath("../DexTree/VBoxContainer/GridContainer/ThresholdTwoSlotTwo"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdThree"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFour"), NodePath("../DexTree/VBoxContainer/HBoxContainer/ThresholdFive")]
 _stance = 2

@@ -18,9 +18,6 @@ namespace Battle.Source.UIElements
     public partial class MartialArtMasteryWindow : Control, IWindow
     {
         private const string UID = "uid://ds0wq0f8ha2x5";
-        private IMartialArtMastery? _mastery;
-        private IAbilityProvider? _abilityProvider;
-        private IPlayerAccessor? _playerAccessor;
 
         [Export] private StanceTree? _dexTree, _strTree, _intTree;
         [Export] private Label? _levelLabel;
@@ -33,28 +30,13 @@ namespace Battle.Source.UIElements
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _mastery = provider.GetService<IMartialArtMastery>();
-            _abilityProvider = provider.GetService<IAbilityProvider>();
-            _playerAccessor = provider.GetService<IPlayerAccessor>();
-
             _dexTree?.InjectServices(provider);
             _strTree?.InjectServices(provider);
             _intTree?.InjectServices(provider);
         }
 
-
-        public override void _Ready()
-        {
-        }
-
-        public override void _ExitTree()
-        {
-        }
-
         public void Close() => GetParent().RemoveChild(this);
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        private IAbilityBookComponent? Book => _playerAccessor?.Player?.AbilityBook;
     }
 }

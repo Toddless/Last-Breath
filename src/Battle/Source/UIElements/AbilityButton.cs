@@ -1,4 +1,4 @@
-﻿namespace Battle.Source.UIElements
+namespace Battle.Source.UIElements
 {
     using System;
     using Core.Enums;
@@ -17,7 +17,6 @@
         {
             Ready,
             SelectingTargets,
-            Activate,
             NotAvailable,
         }
 
@@ -25,12 +24,15 @@
         {
             Ready,
             SelectingTargets,
-            Activate,
             NotAvailable,
         }
 
+        // Icon tints that tell the two "not available" causes apart: on cooldown vs. not enough resource.
+        private static readonly Color s_cooldownTint = new(0.35f, 0.35f, 0.4f, 1f);
+        private static readonly Color s_noResourceTint = new(0.5f, 0.55f, 0.85f, 1f);
+
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
-        private bool _isMouseInside = false, _isOnCooldown = false, _isEnoughResources = false;
+        private bool _isMouseInside, _isEnoughResources;
         // The player input window (see BattleHud.ApplyInputWindow): closed outside the player's
         // turn and while animations play. Blocks activation only — tooltips keep working.
         private bool _inputEnabled;
@@ -39,31 +41,20 @@
         private string _selectionId = string.Empty;
         private IBattleEventBus? _battleEventBus;
         [Export] private TextureRect? _background, _icon, _frame;
-        [Export] private Label? _number;
+        [Export] private Label? _number, _cooldownLabel;
 
         public override void _Input(InputEvent @event)
         {
             if (!_inputEnabled || _ability == null) return;
-            switch (true)
-            {
-                case var _ when @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && _stateMachine.State is State.SelectingTargets:
-                    CancelTargetSelecting();
-                    AcceptEvent();
-                    break;
-                case var _ when @event is InputEventKey { Pressed: true } input && input.Keycode == _slotNumber:
-                    TryActivateAbility();
-                    break;
-            }
+            if (@event is InputEventKey { Pressed: true } input && input.Keycode == _slotNumber)
+                ActivateOrConfirm();
         }
-
 
         public override void _GuiInput(InputEvent @event)
         {
-            // TODO: Shortcuts
             if (!_inputEnabled || !_isMouseInside || _ability == null || _stateMachine.State is State.NotAvailable) return;
-            //  Something usefully on RMB?
             if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
-                TryActivateAbility();
+                ActivateOrConfirm();
         }
 
         public override void _Ready()
@@ -73,14 +64,14 @@
             ConfigureStateMachine();
         }
 
-        public override GodotObject? _MakeCustomTooltip(string forText)
-        {
-            if (_ability == null) return null;
-
-            var abilityDescription = AbilityDescription.Initialize().Instantiate<AbilityDescription>();
-            abilityDescription.SetupFullAbilityDescription(_ability);
-            return abilityDescription;
-        }
+        // public override GodotObject? _MakeCustomTooltip(string forText)
+        // {
+        //     if (_ability == null) return null;
+        //
+        //     var abilityDescription = AbilityDescription.Initialize().Instantiate<AbilityDescription>();
+        //     abilityDescription.SetupFullAbilityDescription(_ability);
+        //     return abilityDescription;
+        // }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -88,6 +79,7 @@
         {
             _battleEventBus = battleEventBus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
+            _battleEventBus.Subscribe<TargetSelectionResolvedEvent>(OnSelectionResolved);
         }
 
         public void SetAbility(IAbility ability)
@@ -96,6 +88,7 @@
             _ability = ability;
             _ability.CooldownLeftChanges += OnCooldownChanges;
             _ability.AbilityResourceChanges += OnAbilityResourceChanges;
+            _isEnoughResources = ability.IsEnoughResource();
             _icon?.Texture = _ability.Icon;
             CheckAbilityAvailable();
         }
@@ -104,6 +97,7 @@
         {
             DetachCurrentAbility();
             _icon?.Texture = null;
+            UpdateVisuals();
             if (_stateMachine.State is not State.NotAvailable && _stateMachine.CanFire(Trigger.NotAvailable))
                 _stateMachine.Fire(Trigger.NotAvailable);
         }
@@ -130,7 +124,12 @@
             _number?.Text = number.ToString();
         }
 
-        private void TryActivateAbility()
+        /// <summary>
+        /// First press opens the target-selection phase; a second press confirms it (commits Few/auto
+        /// modes; the controller treats a confirm with nothing picked as a cancel). Single-target modes
+        /// commit on the target click, so a second press there just cancels.
+        /// </summary>
+        private void ActivateOrConfirm()
         {
             switch (_stateMachine.State)
             {
@@ -138,7 +137,7 @@
                     _stateMachine.Fire(Trigger.SelectingTargets);
                     break;
                 case State.SelectingTargets:
-                    _stateMachine.Fire(Trigger.Activate);
+                    _battleEventBus?.Publish<ConfirmSelectionEvent>(new(_selectionId));
                     break;
             }
 
@@ -158,7 +157,6 @@
         {
             _stateMachine.Configure(State.Ready)
                 .Permit(Trigger.NotAvailable, State.NotAvailable)
-                .Permit(Trigger.Activate, State.Activate)
                 .Permit(Trigger.SelectingTargets, State.SelectingTargets);
 
             _stateMachine.Configure(State.SelectingTargets)
@@ -169,21 +167,21 @@
                     _battleEventBus?.Publish<PlayerSelectingTargetForAbilityEvent>(new(_ability, _selectionId));
                 })
                 .Permit(Trigger.Ready, State.Ready)
-                .Permit(Trigger.Activate, State.Activate);
-
-            _stateMachine.Configure(State.Activate)
-                .OnEntry(() =>
-                {
-                    if (_ability == null) return;
-                    _battleEventBus?.Publish<AbilityActivationEvent>(new(_ability, _selectionId));
-                    _selectionId = string.Empty;
-                })
                 .Permit(Trigger.NotAvailable, State.NotAvailable);
 
             _stateMachine.Configure(State.NotAvailable)
                 .OnEntry(() => { _frame?.SetModulate(new Color(1, 1, 1, 0.7f)); })
                 .OnExit(() => { _frame?.SetModulate(new Color(1, 1, 1, 0)); })
                 .Permit(Trigger.Ready, State.Ready);
+        }
+
+        /// <summary>The controller ended the selection (commit or cancel): reset and re-check availability.</summary>
+        private void OnSelectionResolved(TargetSelectionResolvedEvent evt)
+        {
+            if (evt.SelectionId != _selectionId || _stateMachine.State is not State.SelectingTargets) return;
+            _selectionId = string.Empty;
+            _stateMachine.Fire(Trigger.Ready);
+            CheckAbilityAvailable();
         }
 
         private bool CheckAbilityAvailable()
@@ -202,7 +200,31 @@
                     break;
             }
 
+            UpdateVisuals();
             return isAvailable;
+        }
+
+        /// <summary>Cooldown countdown over the icon; icon tint distinguishes cooldown from lack of resource.</summary>
+        private void UpdateVisuals()
+        {
+            if (_ability == null)
+            {
+                _cooldownLabel?.Hide();
+                _icon?.SetModulate(Colors.White);
+                return;
+            }
+
+            int cooldownLeft = _ability.CooldownLeft;
+            if (cooldownLeft > 0)
+            {
+                _cooldownLabel?.Show();
+                _cooldownLabel?.Text = cooldownLeft.ToString();
+                _icon?.SetModulate(s_cooldownTint);
+                return;
+            }
+
+            _cooldownLabel?.Hide();
+            _icon?.SetModulate(_isEnoughResources ? Colors.White : s_noResourceTint);
         }
 
         private void OnMouseExit() => _isMouseInside = false;

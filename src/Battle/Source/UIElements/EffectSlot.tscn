@@ -2,21 +2,20 @@
 
 [ext_resource type="Script" uid="uid://ogfdhlfivkew" path="res://Source/UIElements/EffectSlot.cs" id="1_qp1m6"]
 
-[node name="EffectSlot" type="Control" unique_id=1031434720 node_paths=PackedStringArray("_effectIcon", "_effectStacks")]
-layout_mode = 3
-anchors_preset = 0
+[node name="EffectSlot" type="MarginContainer" unique_id=1673289740 node_paths=PackedStringArray("_effectIcon", "_effectStacks")]
+offset_right = 25.0
+offset_bottom = 25.0
+mouse_filter = 0
 script = ExtResource("1_qp1m6")
 _effectIcon = NodePath("TextureRect")
-_effectStacks = NodePath("TextureRect/Label")
+_effectStacks = NodePath("TextureRect/Stacks")
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=815293909]
-custom_minimum_size = Vector2(25, 25)
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
 expand_mode = 1
 
-[node name="Label" type="Label" parent="TextureRect" unique_id=715019399]
+[node name="Stacks" type="Label" parent="TextureRect" unique_id=715019399]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 1
 anchors_preset = 3
