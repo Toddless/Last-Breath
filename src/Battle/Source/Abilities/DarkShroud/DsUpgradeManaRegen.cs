@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L2 upgrade: casting the shroud additionally restores a percentage of the caster's maximum mana.
@@ -14,7 +15,7 @@ namespace Battle.Source.Abilities.DarkShroud
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new DeferredEffectPostActivationModifier(
+            var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Effect_Mana_Regeneration_Post_Activation_Modifier",
                 () => new ManaRegenerationEffect(regenAmount * ability.Effectiveness, (int)ability.Duration, 1));
             _modifierId = modifier.Id;

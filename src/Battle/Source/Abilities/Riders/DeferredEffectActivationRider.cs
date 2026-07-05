@@ -1,4 +1,4 @@
-namespace Battle.Source.Abilities.Modifiers
+namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace Battle.Source.Abilities.Modifiers
     /// snapshot at apply time. Can buff the caster, debuff the targets, or both.
     /// A new effect instance is produced per application, so every target gets its own stack lifetime.
     /// </summary>
-    public class DeferredEffectPostActivationModifier(
+    public class DeferredEffectActivationRider(
         string id,
         Func<IEffect> effectFactory,
         bool applyOnCaster = true,

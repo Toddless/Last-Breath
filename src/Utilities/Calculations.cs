@@ -79,7 +79,7 @@
 
         public static void CalculateSucceeded(IAttackContext context)
         {
-            if (!context.IsUnevadable && ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.Attacker.Parameters.Accuracy), context.Rnd.Randf()))
+            if (!context.IsUnevadable && ChanceSuccessful(CalculateEvasionChance(context.Target.Parameters.Evade, context.RawAccuracy), context.Rnd.Randf()))
             {
                 context.Result = AttackResults.Evaded;
                 context.Attacker.CombatEvents.Publish<TargetEvadedAttackEvent>(new(context));

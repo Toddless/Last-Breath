@@ -17,6 +17,7 @@
             priority: Priority.Weak,
             statusEffect: StatusEffects.Blind)
     {
-        public override IEffect Copy() => new BlindEffect(Duration, MaxStacks, Value);
+        // Copy takes the primary-ctor value, not the transformed base Value — re-inverting would flip it.
+        public override IEffect Copy() => new BlindEffect(Duration, MaxStacks, value);
     }
 }

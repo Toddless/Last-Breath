@@ -3,18 +3,30 @@
     using System;
     using System.Collections.Generic;
     using Core.Data.AbilityData;
+    using Core.Enums;
     using Core.Interfaces.Abilities;
     using CriticalCalculation;
     using DarkShroud;
+    using AresBlessing;
+    using Armageddon;
+    using BerserkFury;
+    using DoubleStrike;
     using Effects;
+    using HeadButt;
     using IceShrapnel;
     using IncreasingPressure;
     using JarOfPoison;
     using Modifiers;
     using PoisonCoating;
     using PoisonExplosion;
+    using PassiveSkills;
+    using Porcupine;
     using Riders;
+    using Sacrifice;
     using SeriesOfAttacks;
+    using SacrificeAbility = Sacrifice.Sacrifice;
+    using PorcupineAbility = Porcupine.Porcupine;
+    using ArmageddonAbility = Armageddon.Armageddon;
 
     public partial class AbilityProvider
     {
@@ -195,6 +207,400 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Arm_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Arm_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Arm_Upgrade_Extend_Stun"] = data =>
+                new ArmUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ArmageddonAbility.Parameters.StunDuration,
+                    data.UpgradeProperties.GetValueOrDefault("duration", 1)),
+            ["Ability_Arm_Upgrade_Reduce_Hp_Cost"] = data =>
+                new ArmUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ArmageddonAbility.Parameters.HpCostMultiplier,
+                    -data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Arm_Upgrade_Stage1_Damage"] = data =>
+                new ArmUpgradeStage1Override(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("damage", 400f),
+                    data.UpgradeProperties.GetValueOrDefault("weaponScale", 1f),
+                    data.UpgradeProperties.GetValueOrDefault("spellScale", 1f)),
+            ["Ability_Arm_Upgrade_Stage3_Burning"] = data =>
+                new ArmUpgradeStage3Burning(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("stacks", 3),
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                    data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 0.7f)),
+            ["Ability_Arm_Upgrade_Missing_Hp_Damage"] = data =>
+                new ArmUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ArmageddonAbility.Parameters.MissingHpRate,
+                    data.UpgradeProperties.GetValueOrDefault("rate", 1f)),
+            ["Ability_Arm_Upgrade_Shatter_Armor"] = data =>
+                new AbilityUpgradeImpactRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ApplyEffectImpactRider(new ArmorReductionEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("reduceBy", 1f)))),
+            ["Ability_Arm_Upgrade_All_Targets"] = data =>
+                new ArmUpgradeAllTargets(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("additionalCooldown", 3)),
+            ["Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost"] = data =>
+                new AbilityUpgradeReduceCooldownAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cooldown", 2),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 30)),
+            ["Ability_Porc_Upgrade_Cooldown_Chance"] = data =>
+                new PorcUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    PorcupineAbility.Parameters.CooldownReduceChance,
+                    data.UpgradeProperties.GetValueOrDefault("chance", 0.15f)),
+            ["Ability_Porc_Upgrade_Armor_Buff"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new ArmorBuffEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.25f))),
+            ["Ability_Porc_Upgrade_Heal_On_Hit"] = data =>
+                new PorcUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    PorcupineAbility.Parameters.HealOnHit,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.07f)),
+            ["Ability_Porc_Upgrade_More_Armor_Return"] = data =>
+                new PorcUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    PorcupineAbility.Parameters.ArmorReturn,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Porc_Upgrade_More_Damage_Return"] = data =>
+                new PorcUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    PorcupineAbility.Parameters.DamageReturn,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.20f)),
+            ["Ability_Porc_Upgrade_Echo"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new TemporarySkillEffect("Effect_Echo", ((PorcupineAbility)ability).Duration,
+                        new EchoPassiveSkill(
+                            data.UpgradeProperties.GetValueOrDefault("delayedPercent", 0.3f),
+                            (int)data.UpgradeProperties.GetValueOrDefault("turns", 2)))),
+            ["Ability_Porc_Upgrade_Incoming_Reduction"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new IncomingDamageReductionEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
+            ["Ability_Porc_Upgrade_Crit_Mitigation"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new EnhanceDefenseEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
+            ["Ability_Sac_Upgrade_Additional_Charge"] = data =>
+                new SacUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    SacrificeAbility.Parameters.Charges,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 1)),
+            ["Ability_Sac_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Sac_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 25)),
+            ["Ability_Sac_Upgrade_Additional_Rate"] = data =>
+                new SacUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    SacrificeAbility.Parameters.RatePerHundred,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.015f)),
+            ["Ability_Sac_Upgrade_More_Sacrifice"] = data =>
+                new SacUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    SacrificeAbility.Parameters.SacrificePercent,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.10f)),
+            ["Ability_Sac_Upgrade_Cost_Type_Health"] = data =>
+                new AbilityUpgradeCostTypeOverride(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    Costs.Health),
+            ["Ability_Sac_Upgrade_Heal_From_Damage"] = data =>
+                new SacUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    SacrificeAbility.Parameters.HealPercent,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Sac_Upgrade_Incoming_Reduction"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    _ => new IncomingDamageReductionEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
+            ["Ability_Sac_Upgrade_Free_Cast"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new FreeCastEffect(ability.Id)),
+            ["Ability_Bf_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Bf_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 120)),
+            ["Ability_Bf_Upgrade_Fury_Duration"] = data =>
+                new BfUpgradeFuryDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("duration", 1)),
+            ["Ability_Bf_Upgrade_Cost_Type_Health"] = data =>
+                new AbilityUpgradeCostTypeOverride(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    Costs.Health),
+            ["Ability_Bf_Upgrade_More_Burn"] = data =>
+                new BfUpgradeFuryBurn(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.035f)),
+            ["Ability_Bf_Upgrade_Less_Burn"] = data =>
+                new BfUpgradeFuryBurn(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    -data.UpgradeProperties.GetValueOrDefault("amount", 0.02f)),
+            ["Ability_Bf_Upgrade_Burning_Fury"] = data =>
+                new BfUpgradeFuryVariant(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (duration, healthPercent) => new BurningFuryEffect(duration, maxStacks: 1, healthPercent)
+                    {
+                        HealthAsDamageMultiplier = data.UpgradeProperties.GetValueOrDefault("healthAsDamageMultiplier", 1f),
+                        BurningDuration = (int)data.UpgradeProperties.GetValueOrDefault("burningDuration", 3),
+                        BurningMaxStacks = (int)data.UpgradeProperties.GetValueOrDefault("burningMaxStacks", 3)
+                    }),
+            ["Ability_Bf_Upgrade_Primal_Fury"] = data =>
+                new BfUpgradeFuryVariant(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (duration, healthPercent) => new PrimalFuryEffect(duration, maxMaxStacks: 1, healthPercent)
+                    {
+                        DamageMultiplier = data.UpgradeProperties.GetValueOrDefault("damageMultiplier", 1.5f)
+                    }),
+            ["Ability_Bf_Upgrade_Healing_Fury"] = data =>
+                new BfUpgradeFuryVariant(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (duration, healthPercent) => new HealingFuryEffect(duration, maxStacks: 1, healthPercent)
+                    {
+                        HealAmount = data.UpgradeProperties.GetValueOrDefault("healAmount", 0.5f)
+                    }),
+            ["Ability_Ar_Upgrade_Buff_Duration"] = data =>
+                new ArUpgradeBuffDuration(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("duration", 1)),
+            ["Ability_Ar_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Ar_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 40)),
+            ["Ability_Ar_Upgrade_Recovery_Bonus"] = data =>
+                new ArUpgradeBlessingBonus(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    healthBonus: 0f,
+                    data.UpgradeProperties.GetValueOrDefault("recoveryBonus", 0.15f)),
+            ["Ability_Ar_Upgrade_Health_Bonus"] = data =>
+                new ArUpgradeBlessingBonus(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("healthBonus", 0.15f),
+                    recoveryBonus: 0f),
+            ["Ability_Ar_Upgrade_Both_Bonuses"] = data =>
+                new ArUpgradeBlessingBonus(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("healthBonus", 0.07f),
+                    data.UpgradeProperties.GetValueOrDefault("recoveryBonus", 0.07f)),
+            ["Ability_Ar_Upgrade_Incoming_Reduction"] = data =>
+                new ArUpgradeAdditionalCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new IncomingDamageReductionEffect(ability.Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
+            ["Ability_Ar_Upgrade_Turn_End_Heal"] = data =>
+                new ArUpgradeAdditionalCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new HealthRegenerationEffect(
+                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.08f), ability.Duration, maxStacks: 1)),
+            ["Ability_Ar_Upgrade_Damage_Buff"] = data =>
+                new ArUpgradeAdditionalCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new DamageBuffEffect(ability.Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.55f))),
+            ["Ability_Dst_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
+            ["Ability_Dst_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Dst_Upgrade_Accuracy"] = data =>
+                new DstUpgradeAccuracy(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Dst_Upgrade_Damage_Multiplier"] = data =>
+                new DstUpgradeDamageMultiplier(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.25f)),
+            ["Ability_Dst_Upgrade_Both_Hits_Buff"] = data =>
+                new DstUpgradeBothHitsBuff(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.25f),
+                    (int)data.UpgradeProperties.GetValueOrDefault("duration", 3)),
+            ["Ability_Dst_Upgrade_Restore_On_Hit"] = data =>
+                new DstUpgradeRestoreOnHit(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("healthRestore", 0.07f),
+                    data.UpgradeProperties.GetValueOrDefault("manaRestore", 0.07f)),
+            ["Ability_Hb_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
+            ["Ability_Hb_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Hb_Upgrade_Additional_Scales"] = data =>
+                new AbilityUpgradeAdditionalScales(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.15f),
+                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.15f)),
+            ["Ability_Hb_Upgrade_Extend_Stun_Add_Cost"] = data =>
+                new HbUpgradeExtendStunAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("stunDuration", 1),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
+            ["Ability_Hb_Upgrade_Armor_Debuff"] = data =>
+                new AbilityUpgradeImpactRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ApplyEffectImpactRider(new ArmorReductionEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
+                        data.UpgradeProperties.GetValueOrDefault("reduceArmorBy", 0.25f)))),
+            ["Ability_Hb_Upgrade_Additional_Lunges"] = data =>
+                new HbUpgradeAdditionalLunges(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("amount", 1)),
             ["Ability_Cc_Upgrade_Additional_Attack_Chance"] = data =>
                 new CcUpgradeAdditionalAttackChance(
                     data.Id,

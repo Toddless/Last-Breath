@@ -1,13 +1,13 @@
-﻿namespace Battle.Source.Abilities.Modifiers
+﻿namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
-    public class AbilityDebuffPostActivationModifier(IEffect debuff, bool applyOnSelf = false) : IActivationRider
+    public class AbilityDebuffActivationRider(IEffect debuff, bool applyOnSelf = false) : IActivationRider
     {
-        public string Id => $"Ability_Apply_{debuff.Id}_Post_Activation_Modifier";
+        public string Id => $"Ability_Apply_{debuff.Id}_Activation_Rider";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 

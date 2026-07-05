@@ -3,6 +3,7 @@
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3 upgrade: while the shroud is active, the caster gains additional-attack chance.
@@ -15,7 +16,7 @@
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new DeferredEffectPostActivationModifier(
+            var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Effect_Additional_Hit_Chance_Buff_Post_Activation_Modifier",
                 () => new AdditionalHitChanceEffect((int)ability.Duration, 1, amount));
             _modifierId = modifier.Id;

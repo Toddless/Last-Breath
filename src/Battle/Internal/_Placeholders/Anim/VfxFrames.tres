@@ -1,108 +1,36 @@
-[gd_resource type="SpriteFrames" load_steps=57 format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://bwh6ukljuub2w"]
 
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_ice.png" id="1_vfx_ice"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_poison_jar.png" id="2_vfx_poison_jar"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_poison_explosion.png" id="3_vfx_poison_explosion"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_aura_poison.png" id="4_vfx_aura_poison"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_aura_dark.png" id="5_vfx_aura_dark"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_crit.png" id="6_vfx_crit"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_slash.png" id="7_vfx_slash"]
-[ext_resource type="Texture2D" path="res://Internal/_Placeholders/Art/Vfx/vfx_pressure.png" id="8_vfx_pressure"]
+[ext_resource type="Texture2D" uid="uid://bd7il5hjjrgrc" path="res://Internal/_Placeholders/Art/Vfx/vfx_ice.png" id="1_vfx_ice"]
+[ext_resource type="Texture2D" uid="uid://b3imnf4do3vjq" path="res://Internal/_Placeholders/Art/Vfx/vfx_poison_jar.png" id="2_vfx_poison_jar"]
+[ext_resource type="Texture2D" uid="uid://bk4fmtx1m4q0y" path="res://Internal/_Placeholders/Art/Vfx/vfx_poison_explosion.png" id="3_vfx_poison_explosion"]
+[ext_resource type="Texture2D" uid="uid://b85gdmixpkw7j" path="res://Internal/_Placeholders/Art/Vfx/vfx_aura_poison.png" id="4_vfx_aura_poison"]
+[ext_resource type="Texture2D" uid="uid://byh4tww40oeu5" path="res://Internal/_Placeholders/Art/Vfx/vfx_aura_dark.png" id="5_vfx_aura_dark"]
+[ext_resource type="Texture2D" uid="uid://bhjjysevndwjl" path="res://Internal/_Placeholders/Art/Vfx/vfx_crit.png" id="6_vfx_crit"]
+[ext_resource type="Texture2D" uid="uid://vifr5hotjqvb" path="res://Internal/_Placeholders/Art/Vfx/vfx_slash.png" id="7_vfx_slash"]
+[ext_resource type="Texture2D" uid="uid://odnf5kc7pvw4" path="res://Internal/_Placeholders/Art/Vfx/vfx_pressure.png" id="8_vfx_pressure"]
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_0"]
-atlas = ExtResource("1_vfx_ice")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_0"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(0, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_1"]
-atlas = ExtResource("1_vfx_ice")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_1"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(128, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_2"]
-atlas = ExtResource("1_vfx_ice")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_2"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(256, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_3"]
-atlas = ExtResource("1_vfx_ice")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_3"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(384, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_4"]
-atlas = ExtResource("1_vfx_ice")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_4"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(512, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_ice_5"]
-atlas = ExtResource("1_vfx_ice")
-region = Rect2(640, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_0"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(0, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_1"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(128, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_2"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(256, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_3"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(384, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_4"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(512, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_5"]
-atlas = ExtResource("2_vfx_poison_jar")
-region = Rect2(640, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_0"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(0, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_1"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(128, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_2"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(256, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_3"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(384, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_4"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(512, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_5"]
-atlas = ExtResource("3_vfx_poison_explosion")
-region = Rect2(640, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_0"]
-atlas = ExtResource("4_vfx_aura_poison")
-region = Rect2(0, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_1"]
-atlas = ExtResource("4_vfx_aura_poison")
-region = Rect2(128, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_2"]
-atlas = ExtResource("4_vfx_aura_poison")
-region = Rect2(256, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_3"]
-atlas = ExtResource("4_vfx_aura_poison")
-region = Rect2(384, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_4"]
-atlas = ExtResource("4_vfx_aura_poison")
-region = Rect2(512, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_5"]
-atlas = ExtResource("4_vfx_aura_poison")
+[sub_resource type="AtlasTexture" id="At_vfx_crit_5"]
+atlas = ExtResource("6_vfx_crit")
 region = Rect2(640, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="At_vfx_aura_dark_0"]
@@ -129,52 +57,28 @@ region = Rect2(512, 0, 128, 128)
 atlas = ExtResource("5_vfx_aura_dark")
 region = Rect2(640, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_0"]
-atlas = ExtResource("6_vfx_crit")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_0"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(0, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_1"]
-atlas = ExtResource("6_vfx_crit")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_1"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(128, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_2"]
-atlas = ExtResource("6_vfx_crit")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_2"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(256, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_3"]
-atlas = ExtResource("6_vfx_crit")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_3"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(384, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_4"]
-atlas = ExtResource("6_vfx_crit")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_4"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(512, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="At_vfx_crit_5"]
-atlas = ExtResource("6_vfx_crit")
-region = Rect2(640, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_0"]
-atlas = ExtResource("7_vfx_slash")
-region = Rect2(0, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_1"]
-atlas = ExtResource("7_vfx_slash")
-region = Rect2(128, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_2"]
-atlas = ExtResource("7_vfx_slash")
-region = Rect2(256, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_3"]
-atlas = ExtResource("7_vfx_slash")
-region = Rect2(384, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_4"]
-atlas = ExtResource("7_vfx_slash")
-region = Rect2(512, 0, 128, 128)
-
-[sub_resource type="AtlasTexture" id="At_vfx_slash_5"]
-atlas = ExtResource("7_vfx_slash")
+[sub_resource type="AtlasTexture" id="At_vfx_ice_5"]
+atlas = ExtResource("1_vfx_ice")
 region = Rect2(640, 0, 128, 128)
 
 [sub_resource type="AtlasTexture" id="At_vfx_pressure_0"]
@@ -201,229 +105,285 @@ region = Rect2(512, 0, 128, 128)
 atlas = ExtResource("8_vfx_pressure")
 region = Rect2(640, 0, 128, 128)
 
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_0"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_1"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_2"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_3"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_4"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_jar_5"]
+atlas = ExtResource("2_vfx_poison_jar")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_0"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_1"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_2"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_3"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_4"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_aura_poison_5"]
+atlas = ExtResource("4_vfx_aura_poison")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_0"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_1"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_2"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_3"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_4"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_poison_explosion_5"]
+atlas = ExtResource("3_vfx_poison_explosion")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_0"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_1"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_2"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_3"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_4"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="At_vfx_slash_5"]
+atlas = ExtResource("7_vfx_slash")
+region = Rect2(640, 0, 128, 128)
+
 [resource]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("At_vfx_ice_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_ice_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_ice_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_ice_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_ice_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_ice_5")
-}],
-"loop": false,
-"name": &"Ability_Ice_Shards",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_jar_5")
-}],
-"loop": false,
-"name": &"Ability_Jar_Of_Poison",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_poison_explosion_5")
-}],
-"loop": false,
-"name": &"Ability_Poison_Explosion",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_poison_5")
-}],
-"loop": false,
-"name": &"Ability_Poison_Coating",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_0")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_1")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_2")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_3")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_4")
-},
-{
-"duration": 1.0,
-"texture": SubResource("At_vfx_aura_dark_5")
-}],
-"loop": false,
-"name": &"Ability_Dark_Shroud",
-"speed": 12.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("At_vfx_crit_0")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_crit_1")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_crit_2")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_crit_3")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_crit_4")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_crit_5")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Ability_Critical_Calculation",
 "speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_0")
-},
-{
+"texture": SubResource("At_vfx_aura_dark_0")
+}, {
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_1")
-},
-{
+"texture": SubResource("At_vfx_aura_dark_1")
+}, {
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_2")
-},
-{
+"texture": SubResource("At_vfx_aura_dark_2")
+}, {
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_3")
-},
-{
+"texture": SubResource("At_vfx_aura_dark_3")
+}, {
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_4")
-},
-{
+"texture": SubResource("At_vfx_aura_dark_4")
+}, {
 "duration": 1.0,
-"texture": SubResource("At_vfx_slash_5")
+"texture": SubResource("At_vfx_aura_dark_5")
 }],
-"loop": false,
-"name": &"Ability_Series_Of_Attacks",
+"loop": 0,
+"name": &"Ability_Dark_Shroud",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_ice_5")
+}],
+"loop": 0,
+"name": &"Ability_Ice_Shards",
 "speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_0")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_1")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_2")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_3")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_4")
-},
-{
+}, {
 "duration": 1.0,
 "texture": SubResource("At_vfx_pressure_5")
 }],
-"loop": false,
+"loop": 0,
 "name": &"Ability_Increasing_Pressure",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_jar_5")
+}],
+"loop": 0,
+"name": &"Ability_Jar_Of_Poison",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_aura_poison_5")
+}],
+"loop": 0,
+"name": &"Ability_Poison_Coating",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_poison_explosion_5")
+}],
+"loop": 0,
+"name": &"Ability_Poison_Explosion",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("At_vfx_slash_5")
+}],
+"loop": 0,
+"name": &"Ability_Series_Of_Attacks",
 "speed": 12.0
 }]

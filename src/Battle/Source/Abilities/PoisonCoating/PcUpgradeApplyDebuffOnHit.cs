@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     using System;
     using Core.Interfaces.Abilities;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3 upgrade: while the coating buff is active, each successful attack additionally
@@ -11,7 +12,7 @@ namespace Battle.Source.Abilities.PoisonCoating
     public class PcUpgradeApplyDebuffOnHit(string id, string[] tags, int tier, Func<IEffect> debuffFactory)
         : AbilityUpgrade<PoisonCoating>(id, tags, tier)
     {
-        private readonly IActivationRider _modifier = new AbilityDebuffPostActivationModifier(debuffFactory());
+        private readonly IActivationRider _modifier = new AbilityDebuffActivationRider(debuffFactory());
 
         public override void ApplyUpgrade(PoisonCoating ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 

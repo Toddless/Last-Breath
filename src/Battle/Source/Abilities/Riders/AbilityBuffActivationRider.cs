@@ -1,12 +1,12 @@
-﻿namespace Battle.Source.Abilities.Modifiers
+﻿namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Threading.Tasks;
     using Core.Interfaces.Abilities;
 
-    public class AbilityBuffPostActivationModifier(IEffect buff) : IActivationRider
+    public class AbilityBuffActivationRider(IEffect buff) : IActivationRider
     {
-        public string Id => $"Ability_Apply_{buff.Id}_Post_Activation_Modifier";
+        public string Id => $"Ability_Apply_{buff.Id}_Activation_Rider";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public bool IsSame(string otherId) => Id.Equals(otherId);
 

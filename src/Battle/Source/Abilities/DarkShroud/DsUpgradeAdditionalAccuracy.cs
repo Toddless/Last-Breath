@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3 upgrade: while the shroud is active, the caster gains additional accuracy.
@@ -15,7 +16,7 @@ namespace Battle.Source.Abilities.DarkShroud
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            var modifier = new DeferredEffectPostActivationModifier(
+            var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Effect_Accuracy_Buff_Post_Activation_Modifier",
                 () => new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, amount));
             _modifierId = modifier.Id;

@@ -14,6 +14,9 @@
         float BaseDamage { get; }
         float RawCriticalChance { get; set; }
         float RawCriticalDamage { get; set; }
+
+        /// <summary>Accuracy of THIS attack, initialized from the attacker's parameter; pre-attack modifiers may boost it.</summary>
+        float RawAccuracy { get; set; }
         float AdditionalDamage { get; set; }
 
         /// <summary>

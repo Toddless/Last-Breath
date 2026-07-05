@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.DarkShroud
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3 upgrade ("Immortality"): while the shroud is active, the caster is under Life-Giving Shade
@@ -11,7 +12,7 @@ namespace Battle.Source.Abilities.DarkShroud
         : AbilityUpgrade<DarkShroud>(id, tags, tier)
     {
         private readonly IActivationRider _modifier =
-            new AbilityBuffPostActivationModifier(new LifeGivingShadeEffect(lifeToRecover, duration, activations));
+            new AbilityBuffActivationRider(new LifeGivingShadeEffect(lifeToRecover, duration, activations));
 
         public override void ApplyUpgrade(DarkShroud ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 

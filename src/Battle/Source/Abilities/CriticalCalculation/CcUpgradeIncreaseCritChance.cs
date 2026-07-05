@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3: on cast, additionally raises the caster's critical chance for the ability's buff duration.
@@ -14,7 +15,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
-            var modifier = new DeferredEffectPostActivationModifier(
+            var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Cc_Crit_Chance_Buff_Post_Activation_Modifier",
                 () => new CriticalChanceBuffEffect(ability.BuffDuration, 1, criticalChance));
             _modifierId = modifier.Id;

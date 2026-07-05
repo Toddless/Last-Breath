@@ -18,6 +18,7 @@
             statusEffect: StatusEffects.None)
 
     {
-        public override IEffect Copy() => new Weakness(Duration, MaxStacks, Value);
+        // Copy takes the primary-ctor value, not the transformed base Value — re-inverting would flip it.
+        public override IEffect Copy() => new Weakness(Duration, MaxStacks, value);
     }
 }

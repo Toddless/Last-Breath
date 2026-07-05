@@ -1,11 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://djqermf4jhet3"]
 
-[ext_resource type="SpriteFrames" path="res://Internal/_Placeholders/Anim/PlaceholderFrames.tres" id="1_ph"]
+[ext_resource type="SpriteFrames" uid="uid://dt3xafsf7jodd" path="res://Internal/_Placeholders/Anim/PlaceholderFrames.tres" id="1_ph"]
 
-[node name="PlaceholderDummy" type="Node2D"]
+[node name="PlaceholderDummy" type="Node2D" unique_id=860067623]
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1446042202]
 scale = Vector2(0.35, 0.35)
 sprite_frames = ExtResource("1_ph")
-animation = &"Idle_Down"
+animation = &"Ability_Jar_Of_Poison"
 autoplay = "Idle_Down"

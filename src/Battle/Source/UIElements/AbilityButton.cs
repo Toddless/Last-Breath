@@ -16,6 +16,7 @@ namespace Battle.Source.UIElements
         private enum State
         {
             Ready,
+            Charging,
             SelectingTargets,
             NotAvailable,
         }
@@ -23,9 +24,13 @@ namespace Battle.Source.UIElements
         private enum Trigger
         {
             Ready,
+            Charging,
             SelectingTargets,
             NotAvailable,
         }
+
+        /// <summary>Hold-to-charge pace for <see cref="IChargedAbility"/>: one stage per this many seconds.</summary>
+        private const float ChargeSecondsPerStage = 0.5f;
 
         // Icon tints that tell the two "not available" causes apart: on cooldown vs. not enough resource.
         private static readonly Color s_cooldownTint = new(0.35f, 0.35f, 0.4f, 1f);
@@ -33,6 +38,8 @@ namespace Battle.Source.UIElements
 
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
         private bool _isMouseInside, _isEnoughResources;
+        private float _chargeTime;
+        private int _chargeStage;
         // The player input window (see BattleHud.ApplyInputWindow): closed outside the player's
         // turn and while animations play. Blocks activation only — tooltips keep working.
         private bool _inputEnabled;
@@ -46,15 +53,26 @@ namespace Battle.Source.UIElements
         public override void _Input(InputEvent @event)
         {
             if (!_inputEnabled || _ability == null) return;
-            if (@event is InputEventKey { Pressed: true } input && input.Keycode == _slotNumber)
-                ActivateOrConfirm();
+            switch (@event)
+            {
+                case InputEventKey { Pressed: true, Echo: false } key when key.Keycode == _slotNumber:
+                    OnActivationPressed();
+                    break;
+                case InputEventKey { Pressed: false } key when key.Keycode == _slotNumber && _stateMachine.State is State.Charging:
+                    FinishCharging();
+                    break;
+                // The release may happen anywhere on screen, so it is handled globally, not in _GuiInput.
+                case InputEventMouseButton { Pressed: false, ButtonIndex: MouseButton.Left } when _stateMachine.State is State.Charging:
+                    FinishCharging();
+                    break;
+            }
         }
 
         public override void _GuiInput(InputEvent @event)
         {
             if (!_inputEnabled || !_isMouseInside || _ability == null || _stateMachine.State is State.NotAvailable) return;
             if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
-                ActivateOrConfirm();
+                OnActivationPressed();
         }
 
         public override void _Ready()
@@ -62,6 +80,22 @@ namespace Battle.Source.UIElements
             MouseEntered += OnMouseEnter;
             MouseExited += OnMouseExit;
             ConfigureStateMachine();
+            SetProcess(false);
+        }
+
+        public override void _Process(double delta)
+        {
+            if (_stateMachine.State is not State.Charging || _ability is not IChargedAbility charged)
+            {
+                SetProcess(false);
+                return;
+            }
+
+            _chargeTime += (float)delta;
+            int stage = Mathf.Min(1 + (int)(_chargeTime / ChargeSecondsPerStage), Mathf.Min(charged.MaxStage, charged.MaxAffordableStage));
+            if (stage == _chargeStage) return;
+            _chargeStage = stage;
+            ShowChargeStage();
         }
 
         // public override GodotObject? _MakeCustomTooltip(string forText)
@@ -114,14 +148,28 @@ namespace Battle.Source.UIElements
         {
             if (_inputEnabled == enabled) return;
             _inputEnabled = enabled;
-            if (!enabled && _stateMachine.State is State.SelectingTargets)
-                CancelTargetSelecting();
+            if (enabled) return;
+            if (_stateMachine.State is State.SelectingTargets) CancelTargetSelecting();
+            if (_stateMachine.State is State.Charging) _stateMachine.Fire(Trigger.Ready);
         }
 
         public void SetNumber(int number)
         {
             _slotNumber = number.GetKeyAssociatedWithNumber();
             _number?.Text = number.ToString();
+        }
+
+        /// <summary>Charged abilities enter the hold-to-charge phase first; everything else activates directly.</summary>
+        private void OnActivationPressed()
+        {
+            if (_stateMachine.State is State.Ready && _ability is IChargedAbility)
+            {
+                StartCharging();
+                AcceptEvent();
+                return;
+            }
+
+            ActivateOrConfirm();
         }
 
         /// <summary>
@@ -144,6 +192,29 @@ namespace Battle.Source.UIElements
             AcceptEvent();
         }
 
+        private void StartCharging()
+        {
+            _chargeTime = 0f;
+            _chargeStage = 1;
+            _stateMachine.Fire(Trigger.Charging);
+            ShowChargeStage();
+            SetProcess(true);
+        }
+
+        /// <summary>Button released: the stage is locked in and the usual target-selection phase begins.</summary>
+        private void FinishCharging()
+        {
+            if (_ability is IChargedAbility charged) charged.PendingStage = _chargeStage;
+            _stateMachine.Fire(Trigger.SelectingTargets);
+            AcceptEvent();
+        }
+
+        private void ShowChargeStage()
+        {
+            _cooldownLabel?.Show();
+            _cooldownLabel?.Text = _chargeStage.ToString();
+        }
+
         private void CancelTargetSelecting()
         {
             if (_selectionId == string.Empty) return;
@@ -157,7 +228,18 @@ namespace Battle.Source.UIElements
         {
             _stateMachine.Configure(State.Ready)
                 .Permit(Trigger.NotAvailable, State.NotAvailable)
+                .Permit(Trigger.Charging, State.Charging)
                 .Permit(Trigger.SelectingTargets, State.SelectingTargets);
+
+            _stateMachine.Configure(State.Charging)
+                .OnExit(() =>
+                {
+                    SetProcess(false);
+                    UpdateVisuals();
+                })
+                .Permit(Trigger.SelectingTargets, State.SelectingTargets)
+                .Permit(Trigger.Ready, State.Ready)
+                .Permit(Trigger.NotAvailable, State.NotAvailable);
 
             _stateMachine.Configure(State.SelectingTargets)
                 .OnEntry(() =>

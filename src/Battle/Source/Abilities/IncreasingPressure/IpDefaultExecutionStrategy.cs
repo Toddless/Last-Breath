@@ -36,11 +36,16 @@
                         TotalCount = (int)ability.Attacks
                     };
 
-                    foreach (var modifier in ability.AttackModifiers)
-                        modifier.Apply(context);
+                    ability.AttackModifiers.ApplyAll(context);
 
                     if (!context.Schedule()) break;
-                    await scheduler.DrainQueue(cts.Token);
+                    // Every owner attack processed within the series counts as an ability hit —
+                    // including extra attacks spawned by reactions — so impact riders fire for each.
+                    await foreach (var processed in scheduler.RunQueue(cts.Token))
+                    {
+                        if (processed.Attacker.InstanceId != owner.InstanceId) continue;
+                        await ability.ApplyImpactRiders(processed.ToImpact(field));
+                    }
 
                     if (context.Result is AttackResults.Succeed) increase += ability.AttackDamageMultiplier;
                 }

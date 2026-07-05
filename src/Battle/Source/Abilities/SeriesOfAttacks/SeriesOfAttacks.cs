@@ -27,8 +27,6 @@
         Costs costType = Costs.Mana)
         : DamagingAbility(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
-        private Dictionary<string, IAttackModifier> _attackModifiers = [];
-
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
         {
             get
@@ -50,7 +48,7 @@
         public int MaxAttacks => (int)this[Parameters.MaxAttacks];
         public float DamageMultiplier => this[Parameters.DamageMultiplier];
         public ISoAExecutionStrategy ExecutionStrategy { get; set; } = new SoAsDefaultExecutionStrategy();
-        public IReadOnlyList<IAttackModifier> AttackModifiers => _attackModifiers.Values.ToList();
+        public AttackModifierPipeline AttackModifiers { get; } = new();
 
         public enum Parameters : byte
         {
@@ -81,8 +79,8 @@
             AbilityParameterDecorator.RemoveDecorator(id, parameter);
         }
 
-        public void AddAttackModifier(IAttackModifier modifier) => _attackModifiers.TryAdd(modifier.Id, modifier);
-        public void RemoveAttackModifier(string id) => _attackModifiers.Remove(id);
+        public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);
+        public void RemoveAttackModifier(string id) => AttackModifiers.Remove(id);
 
         public override IAbility Copy()
         {

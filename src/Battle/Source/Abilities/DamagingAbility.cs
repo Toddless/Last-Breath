@@ -20,7 +20,8 @@
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
-        public bool IsEvadable { get; set; }
+        // True by design: an evade interrupts an attack series; the "unevadable" upgrades set it to false.
+        public bool IsEvadable { get; set; } = true;
 
         protected override Dictionary<AbilityParameter, IParameterModule<AbilityParameter>> CreateBaseModules()
         {

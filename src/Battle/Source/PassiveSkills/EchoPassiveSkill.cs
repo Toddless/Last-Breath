@@ -68,15 +68,16 @@
         {
             if (Owner == null) return;
 
-            _delayedDamage.Clear();
             float totalDamage = 0;
-            var delayed = _delayedDamage.ToList();
-            foreach (var damageEntry in delayed.Where(damageEntry => damageEntry.Turns-- <= 0))
+            foreach (var damageEntry in _delayedDamage.ToList())
             {
+                damageEntry.Turns--;
+                if (damageEntry.Turns > 0) continue;
                 totalDamage += damageEntry.Damage;
                 _delayedDamage.Remove(damageEntry);
             }
 
+            if (totalDamage <= 0) return;
             var context = new DamageContext { Source = Owner, Cause = DamageCause.Passive, IsCrit = false };
             context.Add(DamageType.Pure, totalDamage);
             Owner.TakeDamage(context);

@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L3 upgrade: on cast, applies a Seal of Oblivion debuff to the targets.
@@ -11,7 +12,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         : AbilityUpgrade<PoisonExplosion>(id, tags, tier)
     {
         private readonly IActivationRider _modifier =
-            new AbilityDebuffPostActivationModifier(new SealOfOblivion(duration, maxStacks));
+            new AbilityDebuffActivationRider(new SealOfOblivion(duration, maxStacks));
 
         public override void ApplyUpgrade(PoisonExplosion ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 

@@ -16,6 +16,7 @@
         public AttackResults Result { get; set; }
         public float RawCriticalChance { get; set; }
         public float RawCriticalDamage { get; set; }
+        public float RawAccuracy { get; set; } = attacker.Parameters.Accuracy;
         public float AdditionalDamage { get; set; }
         public float FinalDamage { get; set; }
         public bool IsCritical { get; set; }

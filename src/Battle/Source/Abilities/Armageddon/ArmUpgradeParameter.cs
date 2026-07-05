@@ -1,0 +1,22 @@
+namespace Battle.Source.Abilities.Armageddon
+{
+    using Core.Enums;
+    using Core.Interfaces.Abilities;
+    using Decorators;
+
+    /// <summary>Additive bump of one Armageddon parameter (stun duration / hp-cost multiplier / missing-hp rate).</summary>
+    public class ArmUpgradeParameter(string id, string[] tags, int tier, Armageddon.Parameters parameter, float amount)
+        : AbilityUpgrade<Armageddon>(id, tags, tier)
+    {
+        private string DecoratorId => $"Ability_Parameter_Decorator_Arm_{parameter}";
+
+        public override void ApplyUpgrade(Armageddon ability) =>
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<Armageddon.Parameters>(
+                parameter, Priority.Weak, OperationType.Add, amount, DecoratorId, Id));
+
+        public override void RemoveUpgrade(Armageddon ability) =>
+            ability.RemoveParameterDecorator(DecoratorId, parameter);
+
+        public override IAbilityUpgrade Copy() => new ArmUpgradeParameter(Id, Tags, Tier, parameter, amount);
+    }
+}

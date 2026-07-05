@@ -26,11 +26,15 @@
                     RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
                 };
 
-                foreach (IAttackModifier attackModifier in ability.AttackModifiers)
-                    attackModifier.Apply(context);
+                ability.AttackModifiers.ApplyAll(context);
 
                 if (!context.Schedule()) break;
-                await scheduler.DrainQueue(cts.Token);
+                // Riders fire for every owner attack processed in the window, extra attacks included.
+                await foreach (var processed in scheduler.RunQueue(cts.Token))
+                {
+                    if (processed.Attacker.InstanceId != owner.InstanceId) continue;
+                    await ability.ApplyImpactRiders(processed.ToImpact(field));
+                }
             }
         }
 

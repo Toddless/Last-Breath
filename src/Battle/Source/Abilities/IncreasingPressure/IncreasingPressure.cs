@@ -28,7 +28,6 @@
         : DamagingAbility(id: "Ability_Increasing_Pressure", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
-        private Dictionary<string, IAttackModifier> _attackModifiers = [];
 
         public IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
@@ -46,7 +45,7 @@
             }
         }
 
-        public IReadOnlyList<IAttackModifier> AttackModifiers => _attackModifiers.Values.ToList();
+        public AttackModifierPipeline AttackModifiers { get; } = new();
         public float Attacks => this[Parameters.Attacks];
         public float AttackDamageMultiplier => this[Parameters.AttackDamageStepMultiplier];
         public IIpExecutionStrategy ExecutionStrategy = new IpDefaultExecutionStrategy();
@@ -87,8 +86,8 @@
             return copy;
         }
 
-        public void AddAttackModifier(IAttackModifier modifier) => _attackModifiers.TryAdd(modifier.Id, modifier);
-        public void RemoveAttackModifier(string id) => _attackModifiers.Remove(id);
+        public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);
+        public void RemoveAttackModifier(string id) => AttackModifiers.Remove(id);
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);

@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L2: while the ability's buff is active, the caster's critical attacks heal it for a percentage
@@ -15,7 +16,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
-            var modifier = new AbilityBuffPostActivationModifier(new CritLeechEffect(duration, 1, amount));
+            var modifier = new AbilityBuffActivationRider(new CritLeechEffect(duration, 1, amount));
             _modifierId = modifier.Id;
             ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }

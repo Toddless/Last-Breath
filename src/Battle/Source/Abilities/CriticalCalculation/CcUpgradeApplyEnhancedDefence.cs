@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
     using Core.Interfaces.Abilities;
     using Effects;
     using Modifiers;
+    using Riders;
 
     /// <summary>
     /// L2: on cast, applies "Reinforced Defense" (critical-damage mitigation) to the caster.
@@ -11,7 +12,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
         : AbilityUpgrade<CriticalCalculation>(id, tags, tier)
     {
         private readonly IActivationRider _modifier =
-            new AbilityBuffPostActivationModifier(new EnhanceDefenseEffect(duration, maxStacks, value));
+            new AbilityBuffActivationRider(new EnhanceDefenseEffect(duration, maxStacks, value));
 
         public override void ApplyUpgrade(CriticalCalculation ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 

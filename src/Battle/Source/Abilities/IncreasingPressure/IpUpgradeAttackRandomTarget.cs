@@ -1,25 +1,17 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
     using Core.Interfaces.Abilities;
+    using Riders;
 
-    /// <summary>L3 upgrade: each attack also deals 45% of the damage to a random enemy on the battlefield.</summary>
+    /// <summary>L3 upgrade: each successful attack also deals a percentage of the damage to a random enemy.</summary>
     public class IpUpgradeAttackRandomTarget(string id, string[] tags, int tier, float splashPercent)
         : AbilityUpgrade<IncreasingPressure>(id, tags, tier)
     {
-        private IIpExecutionStrategy? _previousStrategy;
+        private readonly IImpactRider _rider = new SplashRandomTargetRider(splashPercent);
 
-        public override void ApplyUpgrade(IncreasingPressure ability)
-        {
-            _previousStrategy = ability.ExecutionStrategy;
-            ability.ExecutionStrategy = new IpDamageRandomTargetStrategy(splashPercent);
-        }
+        public override void ApplyUpgrade(IncreasingPressure ability) => ability.ImpactRiders.TryAdd(_rider.Id, _rider);
 
-        public override void RemoveUpgrade(IncreasingPressure ability)
-        {
-            if (_previousStrategy == null) return;
-            ability.ExecutionStrategy = _previousStrategy;
-            _previousStrategy = null;
-        }
+        public override void RemoveUpgrade(IncreasingPressure ability) => ability.ImpactRiders.Remove(_rider.Id);
 
         public override IAbilityUpgradeWrap<IncreasingPressure> Copy() =>
             new IpUpgradeAttackRandomTarget(Id, Tags, Tier, splashPercent);

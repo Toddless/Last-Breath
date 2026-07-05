@@ -148,10 +148,12 @@
             await ExecuteInternal(targets, Owner, field);
             foreach (var rider in ActivationRiders.Values.ToList())
                 await rider.Apply(context);
+            Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
         }
 
-        /// <summary>Delivery implementations call this on every impact so per-impact riders fire for each touched target.</summary>
-        protected async Task ApplyImpactRiders(AbilityImpact impact)
+        /// <summary>Delivery implementations (internal loops and execution strategies) call this on every
+        /// impact so per-impact riders fire for each touched target.</summary>
+        public async Task ApplyImpactRiders(AbilityImpact impact)
         {
             foreach (var rider in ImpactRiders.Values.ToList())
                 await rider.Apply(impact);
