@@ -22,7 +22,11 @@
 | Ability_Double_Strike | Crossed slashes | Lorc |
 | Ability_Sacrifice | Sacrificial dagger | Lorc |
 | Ability_Porcupine | Porcupine | Lorc |
+| Ability_Chain_Lightning | Chain lightning | Lorc (сверить) |
+| Ability_Overload | Overload | Lorc (сверить) |
+| Ability_Ice_Aegis | Ice shield | Lorc |
+| Ability_Ice_Block | Ice spear | Lorc |
 
 Строка для титров: "Ability icons by Lorc and Delapouite (game-icons.net), CC BY 3.0."
 
-Пометка "(сверить)" — страница на game-icons.net при проверке не отвечала; уточнить автора перед релизом (в т.ч. `meteor-impact`, `punch`).
+Пометка "(сверить)" — страница на game-icons.net при проверке не отвечала; уточнить автора перед релизом.

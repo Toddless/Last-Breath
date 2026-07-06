@@ -17,6 +17,9 @@ namespace Core.Interfaces
         DamageCause Cause { get; set; }
         bool IsCrit { get; set; }
 
+        /// <summary>Elemental resistances (Fire/Cold/Lightning) are skipped in mitigation for this hit.</summary>
+        bool IgnoreResistances { get; set; }
+
         /// <summary>
         /// Groups hits of one ability activation for presentation: the BattleDirector plays
         /// entries sharing a CastId as one parallel "chord". Null = ungrouped, plays sequentially.

@@ -39,7 +39,9 @@ namespace Battle.Source.UIElements
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.NotAvailable);
         private bool _isMouseInside, _isEnoughResources;
         private float _chargeTime;
+
         private int _chargeStage;
+
         // The player input window (see BattleHud.ApplyInputWindow): closed outside the player's
         // turn and while animations play. Blocks activation only — tooltips keep working.
         private bool _inputEnabled;

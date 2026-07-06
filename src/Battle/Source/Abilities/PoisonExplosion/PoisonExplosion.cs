@@ -112,7 +112,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
             // Sum all remaining damage (DamagePerTick × remaining Duration) for each stack
             float totalDamage = poisonStacks.Sum(dot => dot.DamagePerTick * dot.Duration) * (1 + DamageMultiplier);
 
-            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability };
+            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
             context.Add(DamageType.Poison, totalDamage);
             await target.TakeDamage(context);
 

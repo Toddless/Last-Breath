@@ -68,6 +68,7 @@
             Target.Effects.AddEffect(this);
             // Single-stack rules may reject this instance in favor of a stronger existing one
             IsApplied = Target.Effects.GetBy(e => e.IsSame(Id)).Any();
+            if (IsApplied) Target.CombatEvents.Publish(new EffectAppliedEvent(this, Target, context.Caster));
             // here we need to notify caster that he applied some effect. Target will get notified within TryApplyStatusEffect
             if (Target.TryApplyStatusEffect(Status)) context.Caster.CombatEvents.Publish(new StatusEffectAppliedEvent(Status));
             return Task.CompletedTask;

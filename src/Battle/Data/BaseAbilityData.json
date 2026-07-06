@@ -1237,6 +1237,237 @@
             ]
         },
         {
+            "id": "Ability_Ice_Block",
+            "tags": [],
+            "stance": 2,
+            "targetType": 0,
+            "cooldown": 5,
+            "costValue": 300,
+            "costType": 1,
+            "masteryLevel": 5,
+            "damage": 230,
+            "weaponDamageScale": 0.50,
+            "spellDamageScale": 1.30,
+            "abilityProperties": {
+                "stunDuration": 1,
+                "witheringDuration": 3,
+                "witheringMaxStacks": 3,
+                "witheringValue": 0.15,
+                "extraBlocks": 3,
+                "extraBlockDamagePercent": 0.5
+            },
+            "upgrades": []
+        },
+        {
+            "id": "Ability_Overload",
+            "tags": [],
+            "stance": 2,
+            "targetType": 0,
+            "cooldown": 5,
+            "costValue": 100,
+            "costType": 1,
+            "masteryLevel": 5,
+            "damage": 100,
+            "weaponDamageScale": 0.15,
+            "spellDamageScale": 0.40,
+            "abilityProperties": {
+                "manaBurnPercent": 0.25,
+                "damagePerMana": 1.5,
+                "stageTwoDamagePerMana": 2,
+                "stageThreeCritRefund": 0.15
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Ov_Upgrade_Kill_Resets_Cooldown",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Damage_Per_Mana",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.5
+                    }
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Additional_Crit_Chance",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.25
+                    }
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Mana_Flow",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "regenAmount": 0.05,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 1
+                    }
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Burn_Add_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "burnPercent": 0.30,
+                        "additionalCost": 50
+                    }
+                },
+                {
+                    "id": "Ability_Ov_Upgrade_Additional_Scales",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "weaponDamageScale": 0.05,
+                        "spellDamageScale": 0.15
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Ability_Chain_Lightning",
+            "tags": [],
+            "stance": 2,
+            "targetType": 0,
+            "cooldown": 9,
+            "costValue": 500,
+            "costType": 1,
+            "masteryLevel": 10,
+            "damage": 140,
+            "weaponDamageScale": 0.25,
+            "spellDamageScale": 1.20,
+            "abilityProperties": {
+                "jumps": 2,
+                "damageFalloff": 0.25,
+                "stageThreeFalloffReduction": 0.15,
+                "stageFourLastJumpMultiplier": 2
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Cl_Upgrade_Ignore_Resistances",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Cl_Upgrade_Additional_Jump",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 1
+                    }
+                },
+                {
+                    "id": "Ability_Cl_Upgrade_Reduce_Falloff",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.10
+                    }
+                },
+                {
+                    "id": "Ability_Cl_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 3
+                    }
+                },
+                {
+                    "id": "Ability_Cl_Upgrade_Scales_Add_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "weaponDamageScale": 0.15,
+                        "spellDamageScale": 0.35,
+                        "additionalCost": 50
+                    }
+                },
+                {
+                    "id": "Ability_Cl_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 80
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Ability_Ice_Aegis",
+            "tags": [],
+            "stance": 2,
+            "targetType": 2,
+            "cooldown": 9,
+            "costValue": 500,
+            "costType": 1,
+            "masteryLevel": 10,
+            "abilityProperties": {
+                "barrierBase": 300,
+                "perIntelligenceScale": 35,
+                "duration": 3,
+                "stageTwoScaleBonus": 15,
+                "clumsinessDuration": 3,
+                "clumsinessMaxStacks": 5,
+                "clumsinessValue": 0.15,
+                "freezeDuration": 1
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Ia_Upgrade_Additional_Scale",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 5
+                    }
+                },
+                {
+                    "id": "Ability_Ia_Upgrade_Additional_Duration",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 1
+                    }
+                },
+                {
+                    "id": "Ability_Ia_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 100
+                    }
+                },
+                {
+                    "id": "Ability_Ia_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 2
+                    }
+                },
+                {
+                    "id": "Ability_Ia_Upgrade_Additional_Barrier",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 300
+                    }
+                }
+            ]
+        },
+        {
             "id": "Ability_Ice_Shards",
             "tags": [],
             "stance": 2,

@@ -24,9 +24,15 @@
     using Riders;
     using Sacrifice;
     using SeriesOfAttacks;
+    using ChainLightning;
+    using IceAegis;
+    using Overload;
     using SacrificeAbility = Sacrifice.Sacrifice;
     using PorcupineAbility = Porcupine.Porcupine;
     using ArmageddonAbility = Armageddon.Armageddon;
+    using OverloadAbility = Overload.Overload;
+    using ChainLightningAbility = ChainLightning.ChainLightning;
+    using IceAegisAbility = IceAegis.IceAegis;
 
     public partial class AbilityProvider
     {
@@ -207,6 +213,128 @@
                     data.Tags,
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Ov_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Ov_Upgrade_Burn_Add_Cost"] = data =>
+                new OvUpgradeBurnAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("burnPercent", 0.30f),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
+            ["Ability_Ov_Upgrade_Additional_Scales"] = data =>
+                new AbilityUpgradeAdditionalScales(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.05f),
+                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.15f)),
+            ["Ability_Ov_Upgrade_Damage_Per_Mana"] = data =>
+                new OvUpgradeDamagePerMana(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.5f)),
+            ["Ability_Ov_Upgrade_Additional_Crit_Chance"] = data =>
+                new AbilityUpgradeAdditionalCritChance(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.25f)),
+            ["Ability_Ov_Upgrade_Mana_Flow"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    _ => new ManaRegenerationEffect(
+                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.05f),
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        maxStacks: 1)),
+            ["Ability_Ov_Upgrade_Kill_Resets_Cooldown"] = data =>
+                new DelegateUpgrade<OverloadAbility>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ResetCooldownOnKill = true,
+                    ability => ability.ResetCooldownOnKill = false),
+            ["Ability_Cl_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 3)),
+            ["Ability_Cl_Upgrade_Scales_Add_Cost"] = data =>
+                new ClUpgradeScalesAddCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.15f),
+                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.35f),
+                    data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
+            ["Ability_Cl_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 80)),
+            ["Ability_Cl_Upgrade_Additional_Jump"] = data =>
+                new ClUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ChainLightningAbility.Parameters.Jumps,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 1)),
+            ["Ability_Cl_Upgrade_Reduce_Falloff"] = data =>
+                new ClUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ChainLightningAbility.Parameters.DamageFalloff,
+                    -data.UpgradeProperties.GetValueOrDefault("amount", 0.10f)),
+            ["Ability_Cl_Upgrade_Ignore_Resistances"] = data =>
+                new DelegateUpgrade<ChainLightningAbility>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.IgnoreResistances = true,
+                    ability => ability.IgnoreResistances = false),
+            ["Ability_Ia_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Ia_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Ia_Upgrade_Additional_Barrier"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegisAbility.Parameters.BarrierBase,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 300f)),
+            ["Ability_Ia_Upgrade_Additional_Scale"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegisAbility.Parameters.PerIntelligenceScale,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 5f)),
+            ["Ability_Ia_Upgrade_Additional_Duration"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegisAbility.Parameters.Duration,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 1f)),
             ["Ability_Arm_Upgrade_Reduce_Cost"] = data =>
                 new AbilityUpgradeReduceCost(
                     data.Id,

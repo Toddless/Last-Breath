@@ -2,7 +2,5 @@
 {
     using Battle;
 
-    public record AttackBlockedEvent(IAttackContext Context) : ICombatEvent
-    {
-    }
+    public record AttackBlockedEvent(IAttackContext Context) : ICombatEvent, IBattleEvent;
 }

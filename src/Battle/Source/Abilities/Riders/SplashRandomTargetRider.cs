@@ -29,7 +29,7 @@ namespace Battle.Source.Abilities.Riders
 
             var splashTarget = enemies[_rnd.RandiRange(0, enemies.Count - 1)];
             var damageContext = new DamageContext { Source = impact.Caster, Cause = DamageCause.Ability };
-            damageContext.Add(DamageType.Pure, impact.Damage * splashDamagePercent);
+            damageContext.Add(DamageType.Physical, impact.Damage * splashDamagePercent);
             await splashTarget.TakeDamage(damageContext);
         }
 

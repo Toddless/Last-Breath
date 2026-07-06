@@ -3,12 +3,14 @@
 [ext_resource type="Script" uid="uid://cbv0p52cgcqon" path="res://Source/BattleArena.cs" id="1_ggikp"]
 [ext_resource type="PackedScene" uid="uid://chwl8e6atuhnk" path="res://Source/EntitySpot.tscn" id="2_vrr7q"]
 [ext_resource type="Script" uid="uid://bugdh26htjy7b" path="res://Source/Presentation/BattleDirector.cs" id="3_0lpwi"]
+[ext_resource type="Resource" uid="uid://bh87hiqb74wbh" path="res://Internal/_Placeholders/Anim/AbilityVisuals.tres" id="4_visuals"]
 
 [node name="BattleArena" type="Node2D" unique_id=1123925940 node_paths=PackedStringArray("_spots", "_playerSpot", "_director")]
 script = ExtResource("1_ggikp")
 _spots = [NodePath("FirstSpot"), NodePath("SecondSpot"), NodePath("ThirdSpot"), NodePath("FourthSpot"), NodePath("FifthSpot")]
 _playerSpot = NodePath("PlayerSpot")
 _director = NodePath("BattleDirector")
+_visualLibrary = ExtResource("4_visuals")
 
 [node name="PlayerSpot" parent="." unique_id=921963223 instance=ExtResource("2_vrr7q")]
 position = Vector2(400, 550)

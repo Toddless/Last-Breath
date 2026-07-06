@@ -10,7 +10,6 @@ namespace Battle.Internal.Player
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;

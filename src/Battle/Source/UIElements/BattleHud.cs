@@ -29,6 +29,7 @@
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
         [Export] private HBoxContainer? _stanceButtons;
+        [Export] private BattleLog? _battleLog;
         [Export] private VBoxContainer? _entityBars;
         [Export] private HBoxContainer? _abilitySlots;
 
@@ -99,6 +100,7 @@
                 slot.SetBattleEventBus(_battleEventBus);
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.SetBattleEventBus(_battleEventBus);
+            _battleLog?.SetBattleEventBus(_battleEventBus);
         }
 
         public void SetAbilityBook(IAbilityBookComponent abilityBook)

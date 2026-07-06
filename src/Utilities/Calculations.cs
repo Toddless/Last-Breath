@@ -53,14 +53,14 @@
         {
             // Snapshot: Set() mutates the collection we are iterating
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
-                context.Set(type, MitigateComponent(type, damage, context.Source, target));
+                context.Set(type, MitigateComponent(type, damage, context, target));
         }
 
-        private static float MitigateComponent(DamageType type, float damage, IFightable source, IFightable target)
+        private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
-            if (s_resistanceByType.TryGetValue(type, out EntityParameter resistance))
+            if (!context.IgnoreResistances && s_resistanceByType.TryGetValue(type, out EntityParameter resistance))
                 return ApplyResistance(damage, target, resistance);
-            return type is DamageType.Physical ? ApplyArmor(damage, source, target) : damage;
+            return type is DamageType.Physical ? ApplyArmor(damage, context.Source, target) : damage;
             // Pure and DoT statuses (Poison/Burning/Bleed) are unmitigated; their rules land here if defined
         }
 

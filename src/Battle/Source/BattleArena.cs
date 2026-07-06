@@ -34,6 +34,7 @@
         [Export] private Array<EntitySpot> _spots = [];
         [Export] private EntitySpot? _playerSpot;
         [Export] private BattleDirector? _director;
+        [Export] private AbilityVisualLibrary? _visualLibrary;
         private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
@@ -296,7 +297,21 @@
 
         private void SetupBattleDirector(IBattleEventBus battleEventBus)
         {
-            _director?.Setup(_timeline, battleEventBus);
+            _director?.Setup(_timeline, battleEventBus, CreateVfxPresenter());
+        }
+
+        /// <summary>VFX live in arena space (spot anchors); without a library the director plays without ability VFX.</summary>
+        private AbilityVfxPresenter? CreateVfxPresenter()
+        {
+            if (_visualLibrary == null)
+            {
+                GD.PushWarning("BattleArena: _visualLibrary is not assigned — ability VFX are disabled.");
+                return null;
+            }
+            var presenter = new AbilityVfxPresenter();
+            AddChild(presenter);
+            presenter.Setup(FindSpotFor, _visualLibrary);
+            return presenter;
         }
 
         /// <summary>Every fighter's personal bus feeds the shared timeline; entries arrive in causal order.</summary>

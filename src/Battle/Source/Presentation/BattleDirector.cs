@@ -36,14 +36,16 @@ namespace Battle.Source.Presentation
         private Dictionary<Type, Func<object, Task>> _beatHandlers = [];
         private IBattleTimeline? _timeline;
         private IBattleEventBus? _battleEventBus;
+        private AbilityVfxPresenter? _vfx;
         private Task _playback = Task.CompletedTask;
 
         public bool IsPlaying => !_playback.IsCompleted;
 
-        public void Setup(IBattleTimeline timeline, IBattleEventBus battleEventBus)
+        public void Setup(IBattleTimeline timeline, IBattleEventBus battleEventBus, AbilityVfxPresenter? vfx = null)
         {
             _beatHandlers = CreateBeatHandlers();
             _battleEventBus = battleEventBus;
+            _vfx = vfx;
             _shownDead.Clear();
             _timeline = timeline;
             _timeline.EntryRecorded += OnEntryRecorded;
@@ -156,7 +158,18 @@ namespace Battle.Source.Presentation
             [typeof(DamageTakenEvent)] = evnt => PlayDamageTaken((DamageTakenEvent)evnt),
             [typeof(EntityHealedEvent)] = evnt => PlayHealed((EntityHealedEvent)evnt),
             [typeof(TurnSkippedEvent)] = evnt => PlayTurnSkipped((TurnSkippedEvent)evnt),
+            // Republish-only beats: no animation of their own (yet), the UI (battle log) reacts at show time.
+            [typeof(AttackEvadedEvent)] = evnt => RepublishBeat((AttackEvadedEvent)evnt),
+            [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
+            [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
         };
+
+        private Task RepublishBeat<T>(T evnt)
+            where T : IBattleEvent
+        {
+            Republish(evnt);
+            return Task.CompletedTask;
+        }
 
         private static Task PlayAttack(BeforeAttackEvent evnt) =>
             evnt.Context.Attacker.Animations.PlayAnimationAsync(AttackAnimation);
@@ -187,6 +200,9 @@ namespace Battle.Source.Presentation
             EntityHealedEvent healed => IsShownDead(healed.Healed),
             AbilityActivatedEvent ability => IsShownDead(ability.Caster),
             TurnSkippedEvent skipped => IsShownDead(skipped.Fighter),
+            AttackEvadedEvent evaded => IsShownDead(evaded.Context.Attacker),
+            AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
+            EffectAppliedEvent applied => IsShownDead(applied.Target),
             _ => false,
         };
 
@@ -206,8 +222,9 @@ namespace Battle.Source.Presentation
         }
 
         /// <summary>
-        /// One ability activation as a single visual phrase: cast animation, then all hits —
-        /// parallel across targets, staggered numbers within a target, riders replayed inline.
+        /// One ability activation as a single visual phrase: cast animation, the ability's own VFX
+        /// (flight/appearance per its visual config), then the hits — Chain plays them sequentially in
+        /// recorded order, everything else parallel across targets with staggered numbers within one.
         /// The cast animation is named after the ability id, matching the pre-replay convention.
         /// </summary>
         private async Task PlayCastChord(AbilityActivatedEvent cast, List<object> chord)
@@ -223,8 +240,19 @@ namespace Battle.Source.Presentation
                 foreach (object rider in chord.Where(evnt => evnt is not DamageTakenEvent))
                     ReplayInstant(rider);
 
-                var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
-                await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList())));
+                var visual = _vfx?.GetConfig(cast.Ability.Id);
+                if (hits.Count == 0)
+                {
+                    if (visual != null && _vfx != null) await PlayHitlessCast(cast, chord, visual);
+                }
+                else if (visual is { Delivery: VfxDeliveryKind.Chain } && _vfx != null)
+                    await PlayChain(cast, hits, visual);
+                else
+                {
+                    var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
+                    await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId)));
+                }
+
                 await WaitAsync(DelayBetweenBeats);
             }
             catch (Exception e)
@@ -233,10 +261,17 @@ namespace Battle.Source.Presentation
             }
         }
 
-        /// <summary>All hits of one cast on one target: a single hurt animation with staggered numbers.</summary>
-        private async Task PlayHitGroup(List<DamageTakenEvent> hits)
+        /// <summary>
+        /// All hits of one cast on one target: the projectile arrives first, then the impact clip,
+        /// hurt animation and staggered numbers play together.
+        /// </summary>
+        private async Task PlayHitGroup(List<DamageTakenEvent> hits, AbilityVisualConfig? visual, string casterInstanceId)
         {
             var target = hits[0].Target;
+            if (visual is { Delivery: VfxDeliveryKind.Projectile } && _vfx != null)
+                await _vfx.PlayTravelAsync(visual, casterInstanceId, target.InstanceId);
+
+            Task impact = visual != null && _vfx != null ? _vfx.PlayImpactAsync(visual, target.InstanceId) : Task.CompletedTask;
             var hurt = target.Animations.PlayAnimationAsync(HurtAnimation);
             foreach (var hit in hits)
             {
@@ -245,13 +280,79 @@ namespace Battle.Source.Presentation
             }
 
             await hurt;
+            await impact;
             if (hits[^1].Vitals.IsDead) ShowDeath(target);
+        }
+
+        /// <summary>
+        /// A cast that dealt no direct damage (pure-effect abilities — the poison jar puts a DoT and
+        /// touches nobody with a hit): the VFX targets are taken from the applied effects instead,
+        /// so the flight/impact still show. Self-casts play the aura.
+        /// </summary>
+        private async Task PlayHitlessCast(AbilityActivatedEvent cast, List<object> chord, AbilityVisualConfig visual)
+        {
+            if (visual.Delivery is VfxDeliveryKind.SelfAura)
+            {
+                await _vfx!.PlayAuraAsync(visual, cast.Caster.InstanceId);
+                return;
+            }
+
+            var targets = chord.OfType<EffectAppliedEvent>()
+                .Where(applied => !applied.Target.IsSame(cast.Caster.InstanceId) && !IsShownDead(applied.Target))
+                .Select(applied => applied.Target)
+                .DistinctBy(target => target.InstanceId)
+                .ToList();
+
+            if (visual.Delivery is VfxDeliveryKind.Chain)
+            {
+                string from = cast.Caster.InstanceId;
+                foreach (var target in targets)
+                {
+                    await _vfx!.PlayTravelAsync(visual, from, target.InstanceId);
+                    await _vfx.PlayImpactAsync(visual, target.InstanceId);
+                    from = target.InstanceId;
+                }
+
+                return;
+            }
+
+            await Task.WhenAll(targets.Select(async target =>
+            {
+                if (visual.Delivery is VfxDeliveryKind.Projectile)
+                    await _vfx!.PlayTravelAsync(visual, cast.Caster.InstanceId, target.InstanceId);
+                await _vfx!.PlayImpactAsync(visual, target.InstanceId);
+            }));
+        }
+
+        /// <summary>Chain delivery: hits play in recorded (jump) order, the clip flies target → target.</summary>
+        private async Task PlayChain(AbilityActivatedEvent cast, List<DamageTakenEvent> hits, AbilityVisualConfig visual)
+        {
+            string from = cast.Caster.InstanceId;
+            foreach (var hit in hits)
+            {
+                await _vfx!.PlayTravelAsync(visual, from, hit.Target.InstanceId);
+                Task impact = _vfx.PlayImpactAsync(visual, hit.Target.InstanceId);
+                var hurt = hit.Target.Animations.PlayAnimationAsync(HurtAnimation);
+                Republish(hit);
+                await hurt;
+                await impact;
+                if (hit.Vitals.IsDead) ShowDeath(hit.Target);
+                from = hit.Target.InstanceId;
+            }
         }
 
         /// <summary>Rider events inside a chord have no animation of their own — the UI just learns about them.</summary>
         private void ReplayInstant(object evnt)
         {
-            if (evnt is EntityHealedEvent healed && !IsShownDead(healed.Healed)) Republish(healed);
+            switch (evnt)
+            {
+                case EntityHealedEvent healed when !IsShownDead(healed.Healed):
+                    Republish(healed);
+                    break;
+                case EffectAppliedEvent applied when !IsShownDead(applied.Target):
+                    Republish(applied);
+                    break;
+            }
         }
 
         private void Republish<T>(T evnt)
