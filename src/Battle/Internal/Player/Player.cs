@@ -127,8 +127,6 @@ namespace Battle.Internal.Player
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IFightable>? Dead;
-
 
         public override void _Ready()
         {
@@ -350,21 +348,13 @@ namespace Battle.Internal.Player
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Idle)
-                .OnEntry(() =>
-                {
-                    Animations.PlayAnimation($"{_stateMachine.State}_{_direction}");
-                    GD.Print("Idle");
-                })
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
                 .Permit(Trigger.Fight, State.Fight);
 
             _stateMachine.Configure(State.Walk)
-                .OnEntry(() =>
-                {
-                    Animations.PlayAnimation($"{_stateMachine.State}_{_direction}");
-                    GD.Print("Walk");
-                })
+                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
                 .PermitReentry(Trigger.Walk)
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Fight, State.Fight);
@@ -375,13 +365,11 @@ namespace Battle.Internal.Player
                     Animations.PlayAnimation($"Idle_{_direction}");
                     CanMove = false;
                     _lastPosition = Position;
-                    GD.Print("Fight entry");
                 })
                 .OnExit(() =>
                 {
                     CanMove = true;
                     Position = _lastPosition;
-                    GD.Print("Fight exit");
                 })
                 .Permit(Trigger.Idle, State.Idle);
         }

@@ -75,29 +75,6 @@ namespace Utilities
             return Task.FromResult(resources);
         }
 
-        public Task<Dictionary<string, List<NpcModifierData>>> ParseNpcModifiers(string json)
-        {
-            var data = JsonConvert.DeserializeObject<ModifiersData>(json) ?? throw new InvalidOperationException();
-            var modifiers = new Dictionary<string, List<NpcModifierData>>();
-            foreach (var npcModifiers in data.Mods)
-            {
-                List<NpcModifierData> mods = npcModifiers.Key switch
-                {
-                    "scale" => CreateNpcModifier<ScaleModifierData>(npcModifiers.Modifiers),
-                    "tierUpgrade" => CreateNpcModifier<TierUpgradeData>(npcModifiers.Modifiers),
-                    "guaranteedItems" => CreateNpcModifier<GuaranteedItemsData>(npcModifiers.Modifiers),
-                    "tierMultiplier" => CreateNpcModifier<TierMultiplierData>(npcModifiers.Modifiers),
-                    "itemEffects" => CreateNpcModifier<ItemEffectData>(npcModifiers.Modifiers),
-                    "minRarity" => CreateNpcModifier<MinRarityModifierData>(npcModifiers.Modifiers),
-                    "rarityUpgrade" => CreateNpcModifier<RarityUpgradeModifierData>(npcModifiers.Modifiers),
-                    _ => []
-                };
-                modifiers.Add(npcModifiers.Key, mods);
-            }
-
-            return Task.FromResult(modifiers);
-        }
-
         public Task ParseEquipItemModifierPools(string json, ref Dictionary<string, List<IModifier>> equipItemModifierPools)
         {
             var data = JsonConvert.DeserializeObject<EquipModifiersPoolRoot>(json, s_settings) ?? throw new InvalidOperationException();
@@ -301,9 +278,6 @@ namespace Utilities
                 materialModifier.Scope = ParseScope(m.Scope);
                 return materialModifier;
             }).ToList();
-
-        private static List<NpcModifierData> CreateNpcModifier<T>(List<JToken> tokens) where T : NpcModifierData =>
-            tokens.Select(t => t.ToObject<T>()).Where(item => item != null).Cast<NpcModifierData>().ToList();
 
         private static bool ParseEnum<TEnum>(string enumAsString, out TEnum result)
             where TEnum : struct => Enum.TryParse(enumAsString, true, out result);

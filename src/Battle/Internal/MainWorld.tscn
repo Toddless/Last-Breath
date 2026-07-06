@@ -2,42 +2,31 @@
 
 [ext_resource type="Script" uid="uid://du2345234q7kt" path="res://Internal/MainWorld.cs" id="1_xch8j"]
 [ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Internal/Player/Player.tscn" id="2_pbpt3"]
-[ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Internal/Npc/TestNpc.tscn" id="3_8osjy"]
-[ext_resource type="Script" uid="uid://nheqclen8jyv" path="res://Internal/Tools/NpcSpawnTool.cs" id="4_yxprl"]
-[ext_resource type="Script" uid="uid://ds3khakjju4tk" path="res://Internal/Tools/NpcStatSpec.cs" id="5_7yswm"]
+[ext_resource type="Script" uid="uid://dm5518qnmrhqv" path="res://Internal/Npc/DayNightTint.cs" id="5_7yswm"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://Internal/Npc/NpcSpawnPoint.cs" id="6_b5cil"]
-
-[sub_resource type="Resource" id="Resource_7yswm"]
-script = ExtResource("5_7yswm")
-Value = 5000.0
-metadata/_custom_type_script = "uid://ds3khakjju4tk"
-
-[sub_resource type="Resource" id="Resource_b5cil"]
-script = ExtResource("5_7yswm")
-Parameter = 13
-Value = 2000.0
-metadata/_custom_type_script = "uid://ds3khakjju4tk"
+[ext_resource type="Script" uid="uid://by0f8rrg2jn6v" path="res://Internal/Npc/NpcWorldDirector.cs" id="7_qqm7e"]
 
 [node name="MainWorld" type="Node2D" unique_id=2029729586]
 script = ExtResource("1_xch8j")
 
 [node name="Player" parent="." unique_id=2109795083 instance=ExtResource("2_pbpt3")]
 
-[node name="TestNpc" parent="." unique_id=283522954 instance=ExtResource("3_8osjy")]
-position = Vector2(284, 87)
-
-[node name="Spawn" type="Node2D" parent="." unique_id=1073511758 node_paths=PackedStringArray("_world")]
-position = Vector2(763, 274)
-script = ExtResource("4_yxprl")
-_world = NodePath("..")
-_count = 4
-_stats = Array[ExtResource("5_7yswm")]([SubResource("Resource_7yswm"), SubResource("Resource_b5cil"), null])
-_npcIds = PackedStringArray("Npc_Bandit")
-
 [node name="NpcSpawnPoint" type="Node2D" parent="." unique_id=154585184]
-position = Vector2(968, 535)
+position = Vector2(626, 750)
 script = ExtResource("6_b5cil")
-_npcIds = PackedStringArray("Npc_Bandit")
-_maxCount = 1
-_spawnAsGroup = true
+_npcIds = PackedStringArray("Npc_Skeleton_Mage", "Npc_Grave_Revenant")
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="NpcWorldDirector" type="Node" parent="." unique_id=1264220592]
+script = ExtResource("7_qqm7e")
+metadata/_custom_type_script = "uid://by0f8rrg2jn6v"
+
+[node name="NpcSpawnPoint2" type="Node2D" parent="." unique_id=1588714628]
+position = Vector2(1520, 184)
+script = ExtResource("6_b5cil")
+_npcIds = PackedStringArray("Npc_Bandit_Veteran", "Npc_Bandit")
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="DayNightTint" type="CanvasModulate" parent="." unique_id=1092795079]
+script = ExtResource("5_7yswm")
+metadata/_custom_type_script = "uid://dm5518qnmrhqv"

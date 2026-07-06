@@ -1,0 +1,28 @@
+{
+    "relations": [
+        { "from": "Dwarf", "to": "Undead", "level": "Hostility" },
+        { "from": "Dwarf", "to": "Elf", "level": "Dislike" },
+        { "from": "Dwarf", "to": "Human", "level": "Neutral" },
+
+        { "from": "Elf", "to": "Undead", "level": "Hostility" },
+        { "from": "Elf", "to": "Dwarf", "level": "Dislike" },
+        { "from": "Elf", "to": "Human", "level": "Neutral" },
+
+        { "from": "Undead", "to": "Human", "level": "Hostility" },
+        { "from": "Undead", "to": "Elf", "level": "Hostility" },
+        { "from": "Undead", "to": "Dwarf", "level": "Hostility" },
+        { "from": "Undead", "to": "Demon", "level": "Hostility" },
+
+        { "from": "Human", "to": "Undead", "level": "Hostility" },
+        { "from": "Human", "to": "Dwarf", "level": "Neutral" },
+        { "from": "Human", "to": "Elf", "level": "Neutral" },
+
+        { "from": "Demon", "to": "Dwarf", "level": "Neutral" },
+        { "from": "Demon", "to": "Elf", "level": "Neutral" },
+        { "from": "Demon", "to": "Human", "level": "Neutral" },
+        { "from": "Demon", "to": "Undead", "level": "Neutral" }
+    ],
+    "playerDefaults": [
+        { "fraction": "Undead", "level": "Hatred" }
+    ]
+}

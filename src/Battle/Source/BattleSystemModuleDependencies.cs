@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Abilities;
+    using Core.Ai.World.Skirmish;
     using Core.Data;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
@@ -25,6 +26,11 @@
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
             services.AddSingleton<INpcProvider, NpcProvider>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
+            services.AddSingleton<IFactionRelationService, FactionRelationService>();
+            services.AddSingleton<INpcWorldRegistry, NpcWorldRegistry>();
+            services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
+            services.AddSingleton<INpcModifierProvider, Utilities.NpcModifierProvider>();
+            services.AddSingleton<Core.Ai.World.Time.IWorldClock, World.GameWorldClock>();
 
             services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
             services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();

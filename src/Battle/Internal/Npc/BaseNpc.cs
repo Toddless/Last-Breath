@@ -2,12 +2,16 @@ namespace Battle.Internal.Npc
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Attribute;
     using Components;
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Ai.World.Skirmish;
+    using Core.Ai.World.Time;
     using Core.Components;
+    using Core.Components.NpcModifiers;
     using Core.Data;
     using Core.Data.NpcData;
     using Core.Enums;
@@ -22,10 +26,11 @@ namespace Battle.Internal.Npc
     using Godot;
     using Services;
     using Source;
+    using Source.Npc;
     using Stateless;
     using Utilities;
 
-    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant
     {
         /// <summary>Close enough to a movement destination to stop.</summary>
         private const float ArriveDistance = 5f;
@@ -33,6 +38,11 @@ namespace Battle.Internal.Npc
         /// <summary>How close the player must stand to burn a body.</summary>
         private const float BurnDistance = 150f;
 
+        /// <summary>Hostile NPCs this close start an abstract skirmish (NPC-vs-NPC contact distance).</summary>
+        private const float SkirmishEngageDistance = 90f;
+
+        /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
+        private const float SkirmishScanInterval = 0.5f;
         private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
@@ -40,38 +50,20 @@ namespace Battle.Internal.Npc
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
         private IPlayerAccessor? _playerAccessor;
+        private IFactionRelationService? _factionRelations;
+        private INpcWorldRegistry? _npcRegistry;
+        private INpcSkirmishService? _skirmishService;
+        private IWorldClock? _worldClock;
         private WorldBrain? _brain;
         private NpcLifecycle? _lifecycle;
+        private bool _hostileToPlayer;
+        private float _skirmishScanCooldown;
         private IReadOnlyList<Vector2>? _patrolRoute;
         private Vector2? _moveDestination;
         private float _moveSpeed;
         private string _lastMoveAnimation = string.Empty;
 
-        private enum State
-        {
-            Idle,
-            Walk,
-            Battle,
-        }
-
-        private enum Trigger
-        {
-            Idle,
-            Walk,
-            Battle,
-        }
-
-        private enum Direction
-        {
-            Up,
-            Down,
-            Left,
-            Right
-        }
-
-        private Direction _direction;
         private float _baseSpeed = 500;
-        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
@@ -105,6 +97,14 @@ namespace Battle.Internal.Npc
         public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
         public BehaviorProfile? Behavior { get; set; }
+
+        // ---- IWorldAgent (the brain's view of this body) ----
+        public Vector2 HomePosition { get; private set; }
+
+        /// <summary>World-space position; Node2D.Position is parent-local and must not leak into the brain.</summary>
+        Vector2 IWorldAgent.Position => GlobalPosition;
+
+        Vector2 ISkirmishParticipant.Position => GlobalPosition;
 
         public float CurrentHealth
         {
@@ -146,11 +146,9 @@ namespace Battle.Internal.Npc
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IFightable>? Dead;
 
         public override void _Ready()
         {
-            Animations.PlayAnimation("Idle_Down");
             _interactionArea?.BodyEntered += OnBodyEnter;
             _interactionArea?.InputEvent += OnInteractionAreaInput;
 
@@ -165,9 +163,7 @@ namespace Battle.Internal.Npc
             Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
             ModifierHandler = new ModifierHandlerComponent();
-            // ________________
-            AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
-            // ________________
+            AbilityBook = new AbilityBookComponent(this);
             Effects.EffectsChanged += OnEffectsChanged;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
@@ -175,11 +171,15 @@ namespace Battle.Internal.Npc
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-            ConfigureStateMachine();
             SetBaseValuesForParameters();
 
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
+            _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
+            _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
+            _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
+            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            _npcRegistry?.Register(this);
             _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
@@ -194,15 +194,11 @@ namespace Battle.Internal.Npc
             }
 
             _brain?.Tick((float)delta);
+            TryScanForSkirmish((float)delta);
             ProcessLocomotion();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
-
-        public void InjectServices(IGameServiceProvider provider)
-        {
-            _gameEventBus = provider.GetService<IGameEventBus>();
-        }
 
         /// <summary>
         /// Turns the randomly-initialized NPC into a data-driven one: overrides the rolled base
@@ -225,6 +221,9 @@ namespace Battle.Internal.Npc
             foreach (var ability in definition.Abilities)
                 AbilityBook.Learn(definition.Stance, ability);
 
+            // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
+            NpcModifiers.AddModifiers(definition.Modifiers.ToList());
+
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
 
@@ -243,41 +242,87 @@ namespace Battle.Internal.Npc
             HomePosition = GlobalPosition;
             if (config == null) return;
 
-            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), _patrolRoute);
+            _hostileToPlayer = config.HostileToPlayer;
+            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), _patrolRoute, _worldClock);
             CanMove = true;
         }
 
-        // ---- IWorldAgent (the brain's view of this body) ----
-
-        public Vector2 HomePosition { get; private set; }
-
-        /// <summary>World-space position; Node2D.Position is parent-local and must not leak into the brain.</summary>
-        Vector2 IWorldAgent.Position => GlobalPosition;
-
         public void MoveTo(Vector2 destination, float speed)
         {
+            CanMove = true; // symmetric to StopMoving's freeze: a new intent unfreezes the body
             _moveDestination = destination;
             _moveSpeed = speed;
         }
 
         public void StopMoving()
         {
+            CanMove = false;
+            _lastPosition = Position;
             _moveDestination = null;
             Velocity = Vector2.Zero;
         }
 
         /// <summary>
-        /// Vision by distance polling of the player (no physics layers involved).
-        /// TODO: line-of-sight raycast and NPC-vs-NPC sightings when factions get relations.
+        /// Vision by distance polling (no physics layers involved). Only enemies are reported —
+        /// the nearest of: the player (personal override or faction standing) and hostile NPCs
+        /// (faction matrix). TODO: line-of-sight raycast when collision layers are defined.
         /// </summary>
         public TargetSighting? GetSighting(float visionRadius)
         {
-            if (_playerAccessor?.Player is not { IsAlive: true } player) return null;
-            if (player is not Node2D playerNode) return null;
+            Vector2? nearest = null;
+            float nearestDistance = visionRadius;
 
-            return GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= visionRadius
-                ? new TargetSighting(playerNode.GlobalPosition)
-                : null;
+            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode)
+                Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
+
+            if (_npcRegistry != null && _factionRelations != null)
+            {
+                foreach (var other in _npcRegistry.All)
+                {
+                    if (!IsSkirmishableEnemy(other)) continue;
+                    Consider(other.Position, ref nearest, ref nearestDistance);
+                }
+            }
+
+            return nearest == null ? null : new TargetSighting(nearest.Value);
+        }
+
+        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's faction standing.</summary>
+        private bool ConsidersPlayerAnEnemy() =>
+            _hostileToPlayer || _factionRelations?.IsHostileToPlayer(Fraction) == true;
+
+        private void Consider(Vector2 candidate, ref Vector2? nearest, ref float nearestDistance)
+        {
+            float distance = GlobalPosition.DistanceTo(candidate);
+            if (distance > nearestDistance) return;
+            nearest = candidate;
+            nearestDistance = distance;
+        }
+
+        /// <summary>An NPC worth chasing/fighting: alive, free and hostile in either direction.</summary>
+        private bool IsSkirmishableEnemy(ISkirmishParticipant other)
+        {
+            if (other.InstanceId == InstanceId || !other.IsAlive || other.IsFighting) return false;
+            return _factionRelations!.IsHostile(Fraction, other.Fraction) ||
+                   _factionRelations.IsHostile(other.Fraction, Fraction);
+        }
+
+        /// <summary>Hostile NPC at contact distance → the abstract skirmish takes both squads over.</summary>
+        private void TryScanForSkirmish(float delta)
+        {
+            if (_brain == null || _skirmishService == null || _npcRegistry == null || _factionRelations == null) return;
+            if (IsFighting) return;
+
+            _skirmishScanCooldown -= delta;
+            if (_skirmishScanCooldown > 0) return;
+            _skirmishScanCooldown = SkirmishScanInterval;
+
+            foreach (var other in _npcRegistry.All)
+            {
+                if (!IsSkirmishableEnemy(other)) continue;
+                if (GlobalPosition.DistanceTo(other.Position) > SkirmishEngageDistance) continue;
+                if (_skirmishService.TryStart(this, other)) return;
+            }
         }
 
         /// <summary>
@@ -313,41 +358,6 @@ namespace Battle.Internal.Npc
         }
 
         private void OnWorldStimulus(WorldStimulusEvent evnt) => _brain?.OnStimulus(evnt.Stimulus);
-
-        // TODO: Изменить позже. Позднее придумать алгоритм спавна нпс (не полагаемся целиком на рандом, необходимы определенные правила)
-        private Stance GetRandomStance()
-        {
-            var stances = Enum.GetValues<Stance>();
-            return stances[_rnd.RandiRange(0, stances.Length - 1)];
-        }
-
-        private void ConfigureStateMachine()
-        {
-            _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { Animations.PlayAnimation("Idle_Up"); })
-                .PermitReentry(Trigger.Idle)
-                .Permit(Trigger.Walk, State.Walk)
-                .Permit(Trigger.Battle, State.Battle);
-
-            _stateMachine.Configure(State.Walk)
-                .PermitReentry(Trigger.Walk)
-                .Permit(Trigger.Idle, State.Idle)
-                .Permit(Trigger.Battle, State.Battle);
-
-            _stateMachine.Configure(State.Battle)
-                .OnEntry(() =>
-                {
-                    Animations.PlayAnimation("Idle_Left");
-                    CanMove = false;
-                    _lastPosition = Position;
-                })
-                .OnExit(() =>
-                {
-                    CanMove = true;
-                    Position = _lastPosition;
-                })
-                .Permit(Trigger.Idle, State.Idle);
-        }
 
         public void AddItemToInventory(IItem item)
         {
@@ -521,7 +531,6 @@ namespace Battle.Internal.Npc
                 else
                     fighters.Add(this);
 
-                _stateMachine.Fire(Trigger.Battle);
                 StopMoving();
                 _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
                 // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
@@ -551,7 +560,8 @@ namespace Battle.Internal.Npc
         private void OnBattleEnd(BattleEndEvent obj)
         {
             Effects.RemoveAllEffects();
-            _stateMachine.Fire(Trigger.Idle); // Battle.OnExit restores the pre-battle world position for both outcomes
+            CanMove = true;
+            Position = _lastPosition;
 
             if (IsAlive) _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
             else BecomeBody();
@@ -579,6 +589,24 @@ namespace Battle.Internal.Npc
             Animations.PlayAnimation("Dead");
         }
 
+        /// <summary>Dies outside a player battle (lost skirmish): the body lifecycle takes over.</summary>
+        public void DefeatInWorld()
+        {
+            CurrentHealth = 0;
+            IsFighting = false;
+            BecomeBody();
+        }
+
+        /// <summary>Burns the lying body — final death; the spawn point spawns a replacement.</summary>
+        public bool TryBurnBody()
+        {
+            if (_lifecycle?.TryBurn() != true) return false;
+
+            _gameEventBus?.Publish(new NpcFinalDeathEvent(InstanceId, Id, GlobalPosition));
+            QueueFree();
+            return true;
+        }
+
         /// <summary>Click on a lying body with the player standing next to it — burn it for good.</summary>
         private void OnInteractionAreaInput(Node viewport, InputEvent @event, long shapeIdx)
         {
@@ -586,9 +614,7 @@ namespace Battle.Internal.Npc
             if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
             if (!IsPlayerWithin(BurnDistance)) return;
 
-            if (!_lifecycle.TryBurn()) return;
-            _gameEventBus?.Publish(new NpcFinalDeathEvent(InstanceId, Id, GlobalPosition));
-            QueueFree();
+            TryBurnBody();
         }
 
         private bool IsPlayerWithin(float distance) =>
@@ -697,6 +723,7 @@ namespace Battle.Internal.Npc
         {
             if (!disposing) return;
 
+            _npcRegistry?.Unregister(this);
             _gameEventBus?.Unsubscribe<WorldStimulusEvent>(OnWorldStimulus);
             _battleEventBus = null;
             _gameEventBus = null;

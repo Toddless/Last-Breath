@@ -7,8 +7,8 @@ namespace LootGeneration.Internal
     using Core.Enums;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
+    using Core.Components.NpcModifiers;
     using Godot;
-    using LootGeneration.Source.NpcModifiers;
     using Utilities;
 
     public class Spawner

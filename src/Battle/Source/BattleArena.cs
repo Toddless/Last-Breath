@@ -129,7 +129,7 @@
         private void SetupTargetSelectionController()
         {
             if (_battleEventBus == null) return;
-            var allSpots = _spots.Where(spot => spot != null).ToList();
+            var allSpots = _spots.Where(_ => true).ToList();
             if (_playerSpot != null) allSpots.Add(_playerSpot);
             _selectionController = new TargetSelectionController(_battleEventBus, this, allSpots);
         }
@@ -254,42 +254,6 @@
                 var queue = _queueScheduler.RefillIfEmpty(_fighters);
                 if (queue.Count > 1)
                     _battleEventBus?.Publish(new BattleQueueDefinedEvent(queue));
-
-                #region OldLogic
-
-                // if (!_queueScheduler.TryGetNextFighter(out _currentFighter)) break;
-                //
-                // if (_currentFighter is not { IsAlive: true }) continue;
-                //
-                // _currentFighter.OnTurnStart();
-                // if (_currentFighter is IPlayer)
-                // {
-                //     _playerTargetTcs = new TaskCompletionSource<IFightable?>();
-                //
-                //     var target = await _playerTargetTcs.Task;
-                //
-                //     if (target is not { IsAlive: true }) continue;
-                //     var context = CreateAttackContext(_currentFighter, target);
-                //     context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
-                //     _attackContextScheduler.Schedule(context);
-                // }
-                // else
-                // {
-                //     var target = GetEntityTarget();
-                //     if (target is not { IsAlive: true }) continue;
-                //     var context = CreateAttackContext(_currentFighter, target);
-                //     context.RawCriticalChance = _currentFighter.Parameters.CriticalChance;
-                //     _attackContextScheduler.Schedule(context);
-                // }
-                //
-                // await _attackContextScheduler.DrainQueue();
-                //
-                // _currentFighter.OnTurnEnd();
-                //
-                // var queue = _queueScheduler.RefillIfEmpty(_fighters);
-                // if (queue.Count > 1) _battleEventBus?.Publish<BattleQueueDefinedEvent>(new(queue));
-
-                #endregion
             }
 
             // Final gate: death and battle-ending beats must finish before the results are handled.

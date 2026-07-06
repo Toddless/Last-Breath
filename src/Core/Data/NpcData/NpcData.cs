@@ -55,9 +55,22 @@ namespace Core.Data.NpcData
         [JsonProperty("searchSeconds")] public float SearchSeconds { get; init; } = 5f;
         [JsonProperty("postBattleGraceSeconds")] public float PostBattleGraceSeconds { get; init; } = 5f;
         [JsonProperty("aggressive")] public bool Aggressive { get; init; } = true;
+        [JsonProperty("hostileToPlayer")] public bool HostileToPlayer { get; init; }
         [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
         [JsonProperty("wanderRadius")] public float WanderRadius { get; init; } = 250f;
         [JsonProperty("activityPauseSeconds")] public float ActivityPauseSeconds { get; init; } = 2f;
+
+        /// <summary>Daily routine: "HH:MM" windows switching the Calm activity; gaps fall back to "activity".</summary>
+        [JsonProperty("schedule")] public List<NpcScheduleSlotData> Schedule { get; init; } = [];
+    }
+
+    /// <summary>One schedule window; 22:00–06:00 style entries wrap through midnight.</summary>
+    public record NpcScheduleSlotData
+    {
+        [JsonProperty("from")] public string From { get; init; } = "00:00";
+        [JsonProperty("to")] public string To { get; init; } = "00:00";
+        [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
+        [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
     }
 
     public record NpcsData

@@ -2,8 +2,8 @@ namespace Core.Ai.World.Activities
 {
     using Godot;
 
-    /// <summary>Strolls between random points around home, pausing at each.</summary>
-    public class WanderActivity : IWorldActivity
+    /// <summary>Strolls between random points around home, pausing at each. Schedule slots may override the radius.</summary>
+    public class WanderActivity(float? radiusOverride = null) : IWorldActivity
     {
         private Vector2? _destination;
         private float _pauseLeft;
@@ -28,7 +28,7 @@ namespace Core.Ai.World.Activities
 
         private void PickDestination(WorldBrain brain)
         {
-            float radius = brain.Config.WanderRadius;
+            float radius = radiusOverride ?? brain.Config.WanderRadius;
             var offset = new Vector2(
                 brain.Rnd.RandFloatRange(-radius, radius),
                 brain.Rnd.RandFloatRange(-radius, radius));

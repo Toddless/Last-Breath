@@ -1,0 +1,9 @@
+{
+    "realMinutesPerGameDay": 24,
+    "startDay": 1,
+    "startHour": 21,
+    "morningStartHour": 6,
+    "dayStartHour": 10,
+    "eveningStartHour": 18,
+    "nightStartHour": 22
+}

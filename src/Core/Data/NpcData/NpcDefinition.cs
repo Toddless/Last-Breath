@@ -4,6 +4,7 @@ namespace Core.Data.NpcData
     using Ai;
     using Enums;
     using Interfaces.Abilities;
+    using Interfaces.Entity;
 
     /// <summary>
     /// A fully rolled NPC ready to be applied to an entity: the provider resolved the stance,
@@ -19,6 +20,9 @@ namespace Core.Data.NpcData
         public Stance Stance { get; init; }
         public required IReadOnlyDictionary<EntityParameter, float> Parameters { get; init; }
         public required IReadOnlyList<IAbility> Abilities { get; init; }
+
+        /// <summary>Rolled NPC modifiers (count = type × rarity); copies, ready to attach.</summary>
+        public IReadOnlyList<INpcModifier> Modifiers { get; init; } = [];
         public BehaviorProfile? Behavior { get; init; }
 
         /// <summary>World-mode brain tuning; null = the NPC stands still like before.</summary>

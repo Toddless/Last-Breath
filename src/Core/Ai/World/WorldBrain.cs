@@ -5,6 +5,7 @@ namespace Core.Ai.World
     using Godot;
     using Interfaces.Components;
     using Stateless;
+    using Time;
 
     /// <summary>
     /// World-mode mind of one NPC: the alertness FSM (Calm/Suspicious/Alert/Search) around
@@ -33,21 +34,23 @@ namespace Core.Ai.World
         private float _lingerLeft;
         private float _graceLeft;
 
-        public WorldBrain(IWorldAgent agent, WorldBrainConfig config, IRandomNumberGenerator rnd, IReadOnlyList<Vector2>? patrolRoute = null)
-        {
-            Agent = agent;
-            Config = config;
-            Rnd = rnd;
-            _activity = CreateActivity(config, patrolRoute);
-            _fsm = new StateMachine<AlertnessState, Trigger>(AlertnessState.Calm);
-            ConfigureFsm();
-            _activity.Enter(this);
-        }
 
         public IWorldAgent Agent { get; }
         public WorldBrainConfig Config { get; }
         public IRandomNumberGenerator Rnd { get; }
         public AlertnessState State => _fsm.State;
+
+        public WorldBrain(IWorldAgent agent, WorldBrainConfig config, IRandomNumberGenerator rnd,
+            IReadOnlyList<Vector2>? patrolRoute = null, IWorldClock? clock = null)
+        {
+            Agent = agent;
+            Config = config;
+            Rnd = rnd;
+            _activity = CreateActivity(config, patrolRoute, clock);
+            _fsm = new StateMachine<AlertnessState, Trigger>(AlertnessState.Calm);
+            ConfigureFsm();
+            _activity.Enter(this);
+        }
 
         public bool IsNear(Vector2 point) => Agent.Position.DistanceTo(point) <= ArriveDistance;
 
@@ -189,11 +192,18 @@ namespace Core.Ai.World
             return true;
         }
 
-        private static IWorldActivity CreateActivity(WorldBrainConfig config, IReadOnlyList<Vector2>? patrolRoute) => config.Activity switch
+        /// <summary>A schedule (when authored and a clock exists) wraps the base activity as its fallback.</summary>
+        private static IWorldActivity CreateActivity(WorldBrainConfig config, IReadOnlyList<Vector2>? patrolRoute, IWorldClock? clock)
         {
-            WorldActivityType.Wander => new WanderActivity(),
-            WorldActivityType.Patrol when patrolRoute is { Count: > 0 } => new PatrolActivity(patrolRoute),
-            _ => new IdleActivity()
-        };
+            var baseActivity = WorldActivityFactory.Create(config.Activity, patrolRoute);
+            if (clock == null || config.Schedule.Count == 0) return baseActivity;
+
+            var slots = new List<ScheduleSlot>();
+            foreach (var slot in config.Schedule)
+                slots.Add(new ScheduleSlot(slot.FromMinuteOfDay, slot.ToMinuteOfDay,
+                    WorldActivityFactory.Create(slot.Activity, patrolRoute, slot.WanderRadius)));
+
+            return new ScheduledActivity(clock, slots, baseActivity);
+        }
     }
 }

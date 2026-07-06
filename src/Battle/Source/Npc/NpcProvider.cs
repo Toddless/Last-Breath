@@ -7,6 +7,7 @@ namespace Battle.Source.Npc
     using Core.Ai;
     using Core.Ai.World;
     using Core.Components;
+    using Core.Data;
     using Core.Data.NpcData;
     using Core.Enums;
     using Core.Interfaces.Abilities;
@@ -37,11 +38,13 @@ namespace Battle.Source.Npc
         private readonly Dictionary<string, NpcData> _npcs = [];
         private readonly Dictionary<Stance, NpcBehaviorData> _behaviors = [];
         private readonly IAbilityProvider _abilityProvider;
+        private readonly INpcModifierProvider _modifierProvider;
         private readonly IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator();
 
-        public NpcProvider(IAbilityProvider abilityProvider)
+        public NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider)
         {
             _abilityProvider = abilityProvider;
+            _modifierProvider = modifierProvider;
             _ = LoadDataAsync();
         }
 
@@ -57,12 +60,14 @@ namespace Battle.Source.Npc
             var behaviorData = _behaviors.GetValueOrDefault(stance)
                                ?? throw new KeyNotFoundException($"No behavior archetype loaded for stance '{stance}'");
             int level = _rnd.RandIntRange(data.LevelMin, NpcTypeDefaults.MaxLevel(entityType));
+            var rarity = RollRarity();
 
             return new NpcDefinition
             {
                 NpcId = data.Id,
                 Level = level,
-                Rarity = RollRarity(),
+                Rarity = rarity,
+                Modifiers = RollModifiers(entityType, rarity),
                 EntityType = entityType,
                 Fraction = ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
@@ -92,10 +97,28 @@ namespace Battle.Source.Npc
             SearchSeconds = data.SearchSeconds,
             PostBattleGraceSeconds = data.PostBattleGraceSeconds,
             Aggressive = data.Aggressive,
+            HostileToPlayer = data.HostileToPlayer,
             Activity = ParseEnum<WorldActivityType>(data.Activity),
             WanderRadius = data.WanderRadius,
             ActivityPauseSeconds = data.ActivityPauseSeconds,
+            Schedule = data.Schedule.Select(BuildScheduleSlot).ToList(),
         };
+
+        private static ScheduleSlotConfig BuildScheduleSlot(NpcScheduleSlotData data) => new(
+            ParseMinuteOfDay(data.From),
+            ParseMinuteOfDay(data.To),
+            ParseEnum<WorldActivityType>(data.Activity),
+            data.WanderRadius);
+
+        /// <summary>"HH:MM" → minutes since midnight.</summary>
+        private static int ParseMinuteOfDay(string time)
+        {
+            string[] parts = time.Split(':');
+            if (parts.Length != 2 || !int.TryParse(parts[0], out int hours) || !int.TryParse(parts[1], out int minutes))
+                throw new FormatException($"'{time}' is not a valid HH:MM time");
+
+            return Math.Clamp(hours, 0, 23) * 60 + Math.Clamp(minutes, 0, 59);
+        }
 
         private Stance RollStance(NpcData data)
         {
@@ -108,6 +131,24 @@ namespace Battle.Source.Npc
         {
             long index = _rnd.RandWeighted(s_rarityWeights.Select(entry => entry.Weight).ToArray());
             return s_rarityWeights[Math.Max(0, (int)index)].Rarity;
+        }
+
+        /// <summary>Weighted pick without replacement from the shared modifier pool; count = type × rarity.</summary>
+        private List<INpcModifier> RollModifiers(EntityType entityType, Rarity rarity)
+        {
+            int count = NpcTypeDefaults.ModifierCount(entityType, rarity);
+            var pool = _modifierProvider.GetAllModifiers().ToList();
+
+            List<INpcModifier> rolled = [];
+            while (rolled.Count < count && pool.Count > 0)
+            {
+                long index = _rnd.RandWeighted(pool.Select(modifier => modifier.Weight).ToArray());
+                var picked = pool[Math.Max(0, (int)index)];
+                pool.Remove(picked);
+                rolled.Add(_modifierProvider.GetModifier(picked.Id));
+            }
+
+            return rolled;
         }
 
         private Dictionary<EntityParameter, float> ScaleParameters(NpcData data, int level)

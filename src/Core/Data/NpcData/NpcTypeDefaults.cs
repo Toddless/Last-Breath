@@ -33,6 +33,25 @@ namespace Core.Data.NpcData
             [EntityType.Archon] = AllAbilities,
         };
 
+        /// <summary>Base NPC-modifier count by type; rarity adds on top (см. RarityModifierBonus).</summary>
+        private static readonly Dictionary<EntityType, int> s_modifierCount = new()
+        {
+            [EntityType.Regular] = 1,
+            [EntityType.Special] = 2,
+            [EntityType.Elit] = 3,
+            [EntityType.Unique] = 4,
+            [EntityType.Boss] = 5,
+            [EntityType.Archon] = 6,
+        };
+
+        private static readonly Dictionary<Rarity, int> s_rarityModifierBonus = new()
+        {
+            [Rarity.Epic] = 1,
+            [Rarity.Legendary] = 1,
+            [Rarity.Mythic] = 2,
+            [Rarity.Unique] = 2,
+        };
+
         /// <summary>Parameters that grow with level; chances and multipliers stay flat.</summary>
         private static readonly HashSet<EntityParameter> s_levelScaled =
         [
@@ -54,6 +73,10 @@ namespace Core.Data.NpcData
         public static int MaxLevel(EntityType type) => s_maxLevel.GetValueOrDefault(type, 15);
 
         public static int DefaultAbilityCount(EntityType type) => s_abilityCount.GetValueOrDefault(type, 2);
+
+        /// <summary>NPC-modifier count = base by type + rarity bonus (согласованная таблица «тип × редкость»).</summary>
+        public static int ModifierCount(EntityType type, Rarity rarity) =>
+            s_modifierCount.GetValueOrDefault(type, 1) + s_rarityModifierBonus.GetValueOrDefault(rarity, 0);
 
         public static bool ScalesWithLevel(EntityParameter parameter) => s_levelScaled.Contains(parameter);
     }

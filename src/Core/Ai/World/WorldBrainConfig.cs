@@ -1,5 +1,7 @@
 namespace Core.Ai.World
 {
+    using System.Collections.Generic;
+
     public enum WorldActivityType : byte
     {
         Idle,
@@ -31,6 +33,12 @@ namespace Core.Ai.World
         /// <summary>False = never chases (city dwellers): investigates noises but does not attack.</summary>
         public bool Aggressive { get; init; } = true;
 
+        /// <summary>
+        /// Personal override: treats the player as an enemy regardless of the faction standing
+        /// (bandits, beasts). Without it hostility comes from IFactionRelationService.
+        /// </summary>
+        public bool HostileToPlayer { get; init; }
+
         public WorldActivityType Activity { get; init; } = WorldActivityType.Idle;
 
         /// <summary>Wander destinations are rolled within this radius around home.</summary>
@@ -38,5 +46,14 @@ namespace Core.Ai.World
 
         /// <summary>Pause at a reached wander/patrol point before picking the next one.</summary>
         public float ActivityPauseSeconds { get; init; } = 2f;
+
+        /// <summary>
+        /// Daily routine (the "schedule" section): time windows switching the Calm activity.
+        /// Empty = the single <see cref="Activity"/> runs all day. Gaps fall back to it too.
+        /// </summary>
+        public IReadOnlyList<ScheduleSlotConfig> Schedule { get; init; } = [];
     }
+
+    /// <summary>One schedule window in minutes of day (wrap through midnight allowed).</summary>
+    public record ScheduleSlotConfig(int FromMinuteOfDay, int ToMinuteOfDay, WorldActivityType Activity, float? WanderRadius = null);
 }

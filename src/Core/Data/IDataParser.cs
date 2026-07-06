@@ -7,7 +7,6 @@ namespace Core.Data
     using Interfaces.Items;
     using LootTable;
     using Modifiers;
-    using NpcModifiersData;
 
     public interface IDataParser
     {
@@ -18,7 +17,6 @@ namespace Core.Data
             ref List<LootTableTierData> basicTable);
 
         Task<Dictionary<string, Dictionary<string, int>>> ParseEquipItemResources(string json);
-        Task<Dictionary<string, List<NpcModifierData>>> ParseNpcModifiers(string json);
         Task ParseEquipItemModifierPools(string json, ref Dictionary<string, List<IModifier>> equipItemModifierPools);
         Task<List<IItem>> ParseItems(string json);
         Task<List<IItem>> ParseEquipItems(string json);
