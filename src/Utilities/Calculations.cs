@@ -31,9 +31,10 @@
 
         public static void CalculateInitialAttackDamage(IAttackContext context)
         {
-            float baseDamage = context.BaseDamage;
-            float additionalDamage = context.AdditionalDamage;
-            context.FinalDamage = baseDamage + additionalDamage;
+            // TODO:
+            // for now all attacks are physical. Later if we have modifiers like "deal 30% attack damage as cold"
+            // where we calculate it damage?
+            context.FinalDamage = context.BaseDamage + context.AdditionalDamage;
             if (context is { IsCritical: false, ForceCriticalAttack: false }) return;
 
             // Mitigation is 0 for most targets -> factor is 1 (no-op). Clamped so over-stacking can't invert damage.

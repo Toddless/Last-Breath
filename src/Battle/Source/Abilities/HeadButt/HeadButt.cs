@@ -104,7 +104,8 @@ namespace Battle.Source.Abilities.HeadButt
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
                         AdditionalDamage = additionalDamage,
                         Index = i,
-                        TotalCount = Attacks
+                        TotalCount = Attacks,
+                        SourceAbilityId = Id
                     };
 
                     if (!context.Schedule()) break;

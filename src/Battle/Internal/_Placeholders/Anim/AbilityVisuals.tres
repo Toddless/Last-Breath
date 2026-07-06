@@ -8,24 +8,29 @@
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Armageddon"
 Delivery = 3
+CastClip = "Ability_Armageddon"
 ImpactClip = "Ability_Armageddon_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_51yah"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Ares_Blessing"
+Delivery = 4
+CastClip = "Ability_Ares_Blessing"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_h4frm"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Berserk_Fury"
+CastClip = "Ability_Berserk_Fury"
 ImpactClip = "Ability_Berserkk_Fury_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_07b7h"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Chain_Lightning"
-Delivery = 1
+Delivery = 2
+CastClip = "Ability_Chain_Lightning"
 TravelClip = "Ability_Chain_Lightning_Projectile"
 ImpactClip = "Ability_Chain_Lightning_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
@@ -34,17 +39,20 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Critical_Calculation"
 Delivery = 4
+CastClip = "Ability_Critical_Calculation"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_x17su"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Dark_Shroud"
 Delivery = 4
+CastClip = "Ability_Dark_Shroud"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_uq0r6"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Double_Strike"
+CastClip = "Ability_Double_Strike"
 ImpactClip = "Ability_Double_Strike_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
@@ -52,6 +60,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Fireball"
 Delivery = 1
+CastClip = "Ability_Fireball"
 TravelClip = "Ability_Fireball_Projectile"
 ImpactClip = "Ability_Fireball_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
@@ -59,6 +68,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 [sub_resource type="Resource" id="Resource_y4wtc"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Head_Butt"
+CastClip = "Ability_Head_Butt"
 ImpactClip = "Ability_Head_Butt_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
@@ -66,12 +76,14 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Ice_Aegis"
 Delivery = 4
+CastClip = "Ability_Ice_Aegis"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_s6stb"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Ice_Block"
 Delivery = 1
+CastClip = "Ability_Ice_Block"
 TravelClip = "Ability_Ice_Block_Projectile"
 ImpactClip = "Ability_Ice_Block_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
@@ -80,6 +92,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Ice_Shards"
 Delivery = 1
+CastClip = "Ability_Ice_Shards"
 TravelClip = "Ability_Ice_Shards_Projectile"
 ImpactClip = "Ability_Ice_Shards_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
@@ -87,6 +100,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 [sub_resource type="Resource" id="Resource_k1pnu"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Increasing_Pressure"
+CastClip = "Ability_Increasing_Pressure"
 ImpactClip = "Ability_Increasing_Pressure_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
@@ -94,6 +108,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Jar_Of_Poison"
 Delivery = 1
+CastClip = "Ability_Jar_Of_Poison"
 TravelClip = "Ability_Jar_Of_Poison_Projectile"
 ImpactClip = "Ability_Jar_Of_Poison_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
@@ -102,6 +117,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Overload"
 Delivery = 3
+CastClip = "Ability_Overload"
 ImpactClip = "Ability_Overload_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
@@ -109,18 +125,21 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Poison_Coating"
 Delivery = 4
+CastClip = "Ability_Poison_Coating"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_e5upl"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Mana_Devour"
 Delivery = 3
+CastClip = "Ability_Mana_Devour"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_qhn0n"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Poison_Explosion"
 Delivery = 3
+CastClip = "Ability_Poison_Explosion"
 ImpactClip = "Ability_Poison_Explosion_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
@@ -128,17 +147,20 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Porcupine"
 Delivery = 4
+CastClip = "Ability_Porcupine"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_2ifwd"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Sacrifice"
 Delivery = 4
+CastClip = "Ability_Sacrifice"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_secfd"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Series_Of_Attacks"
+CastClip = "Ability_Series_Of_Attacks"
 ImpactClip = "Ability_Series_Of_Attacks_Impact"
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 

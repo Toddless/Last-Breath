@@ -2,7 +2,6 @@ namespace Battle.Source.Abilities.PoisonExplosion
 {
     using Core.Interfaces.Abilities;
     using Effects;
-    using Modifiers;
     using Riders;
 
     /// <summary>

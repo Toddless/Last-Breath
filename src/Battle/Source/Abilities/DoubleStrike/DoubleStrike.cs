@@ -135,7 +135,8 @@ namespace Battle.Source.Abilities.DoubleStrike
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
                         AdditionalDamage = StrikeDamage(strike, owner),
                         Index = strike,
-                        TotalCount = 2
+                        TotalCount = 2,
+                        SourceAbilityId = Id
                     };
                     AttackModifiers.ApplyAll(context);
 

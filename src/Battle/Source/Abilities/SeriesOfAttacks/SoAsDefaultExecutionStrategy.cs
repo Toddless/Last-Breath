@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
@@ -34,7 +33,8 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         AdditionalDamage = additionalDamage,
                         Index = i,
-                        TotalCount = ability.MaxAttacks
+                        TotalCount = ability.MaxAttacks,
+                        SourceAbilityId = ability.Id
                     };
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.
                     ability.AttackModifiers.ApplyAll(context);
@@ -50,11 +50,10 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                             await ability.ApplyImpactRiders(processed.ToImpact(field));
                         }
 
-                        if (processed.Result is AttackResults.Evaded && ability.IsEvadable && processedCount >= 2)
-                        {
-                            await cts.CancelAsync();
-                            return;
-                        }
+                        if (processed.Result is not AttackResults.Evaded || !ability.IsEvadable || processedCount < 2) continue;
+
+                        await cts.CancelAsync();
+                        return;
                     }
                 }
             }

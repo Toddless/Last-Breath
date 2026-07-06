@@ -7,7 +7,6 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Godot;
-    using Utilities;
 
     public class IpDefaultExecutionStrategy : IIpExecutionStrategy
     {
@@ -33,7 +32,8 @@
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
                         AdditionalDamage = additionalDamage,
                         Index = i,
-                        TotalCount = (int)ability.Attacks
+                        TotalCount = (int)ability.Attacks,
+                        SourceAbilityId = ability.Id
                     };
 
                     ability.AttackModifiers.ApplyAll(context);

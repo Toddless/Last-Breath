@@ -8,7 +8,6 @@ namespace Battle.Source.RequestHandlers
     using Core.Interfaces.Battle;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
-    using Core.Services;
     using Core.Views;
     using Godot;
 

@@ -32,6 +32,9 @@ namespace Battle.Source.Presentation
         [Export] public string AbilityId { get; set; } = string.Empty;
         [Export] public VfxDeliveryKind Delivery { get; set; } = VfxDeliveryKind.None;
 
+        /// <summary>Activation VFX on the caster, played TOGETHER with the cast pose (any delivery kind).</summary>
+        [Export] public string CastClip { get; set; } = string.Empty;
+
         /// <summary>Flight clip (Projectile/Chain) or the aura clip (SelfAura).</summary>
         [Export] public string TravelClip { get; set; } = string.Empty;
 

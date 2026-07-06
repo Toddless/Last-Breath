@@ -2,7 +2,6 @@ namespace Battle.Source.Abilities.PoisonCoating
 {
     using System;
     using Core.Interfaces.Abilities;
-    using Modifiers;
     using Riders;
 
     /// <summary>

@@ -32,6 +32,10 @@
         bool IsUnblockable { get; set; }
         bool IsValid { get; }
 
+        /// <summary>Id of the ability this attack belongs to (null = a plain basic attack).
+        /// Carried onto the damage context so the presentation can play the ability's impact VFX per attack.</summary>
+        string? SourceAbilityId { get; set; }
+
         /// <summary>Position of this attack within a multi-hit sequence (folded-in AttackMetadata). Single attacks: Index 0, TotalCount 1.</summary>
         int Index { get; set; }
         int TotalCount { get; set; }

@@ -9,7 +9,6 @@
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
     using Core.Interfaces.UI;
-    using Core.Services;
     using Core.Views;
     using Microsoft.Extensions.DependencyInjection;
     using RequestHandlers;

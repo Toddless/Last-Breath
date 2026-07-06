@@ -1,16 +1,12 @@
 namespace Battle.Source
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
     using Core.Interfaces.MessageBus;
-    using Core.Services;
-    using Godot;
 
     /// <summary>
     /// Owns the "mastery threshold -> ability becomes available" rule (variant A: reaching the
@@ -55,7 +51,6 @@ namespace Battle.Source
         /// <summary>Learns every ability whose threshold the player has reached but hasn't learned yet.</summary>
         public void Reconcile(bool notify)
         {
-            GD.Print("Reconcile");
             var book = _playerAccessor.Player?.AbilityBook;
             if (book == null) return;
 
@@ -73,7 +68,6 @@ namespace Battle.Source
                 if (notify)
                 {
                     _messageBus.PublishMessageAsync(new SendNotificationMessageMessage(UnlockNotificationId));
-                    GD.Print($"Ability learned: {abilityId}");
                 }
             }
         }

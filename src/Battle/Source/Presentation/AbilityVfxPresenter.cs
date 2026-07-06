@@ -47,6 +47,10 @@ namespace Battle.Source.Presentation
             sprite.QueueFree();
         }
 
+        /// <summary>Activation VFX on the caster's spot — the director runs it together with the cast pose.</summary>
+        public Task PlayCastAsync(AbilityVisualConfig config, string casterInstanceId) =>
+            PlayOnSpotAsync(config.CastClip, config.Scale, casterInstanceId);
+
         /// <summary>The impact clip lands on the target's spot.</summary>
         public Task PlayImpactAsync(AbilityVisualConfig config, string targetInstanceId) =>
             PlayOnSpotAsync(config.ImpactClip, config.Scale, targetInstanceId);
@@ -70,7 +74,7 @@ namespace Battle.Source.Presentation
         private bool TryGetClip(string clip, out SpriteFrames frames)
         {
             frames = _library?.Frames!;
-            return frames != null && !string.IsNullOrEmpty(clip) && frames.HasAnimation(clip);
+            return !string.IsNullOrEmpty(clip) && frames.HasAnimation(clip);
         }
 
         private AnimatedSprite2D SpawnSprite(SpriteFrames frames, string clip, float scale)

@@ -3,11 +3,9 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core.Interfaces;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Godot;
-    using Utilities;
 
     public class IpSingleAttackExecutionStrategy : IIpExecutionStrategy
     {
@@ -24,6 +22,7 @@
                 var context = new AttackContext(owner, target, totalDamage, rnd, scheduler)
                 {
                     RawCriticalDamage = owner.Parameters.CriticalDamage, RawCriticalChance = owner.Parameters.CriticalChance,
+                    SourceAbilityId = ability.Id
                 };
 
                 ability.AttackModifiers.ApplyAll(context);

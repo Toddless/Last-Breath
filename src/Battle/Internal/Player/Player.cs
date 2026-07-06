@@ -249,7 +249,7 @@ namespace Battle.Internal.Player
                 {
                     case AttackResults.Succeed:
                         Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = new DamageContext { Source = context.Attacker, Cause = DamageCause.Attack, IsCrit = context.ForceCriticalAttack || context.IsCritical };
+                        var damageContext = new DamageContext { Source = context.Attacker, Cause = DamageCause.Attack, IsCrit = context.ForceCriticalAttack || context.IsCritical, SourceAbilityId = context.SourceAbilityId };
                         damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);
                         context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
@@ -281,8 +281,11 @@ namespace Battle.Internal.Player
 
         public Task TakeDamage(IDamageContext context)
         {
+            // Apply modifiers like "Reduce all damage taken"
             ModifierHandler.Apply(context);
+            // apply attackers modifiers like "increase all damage dealt"
             context.Source.ModifierHandler.Apply(context);
+            // passive/effects that react right before we are about to take some damage
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 

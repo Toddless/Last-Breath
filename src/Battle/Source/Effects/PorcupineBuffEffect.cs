@@ -1,7 +1,6 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Events.GameEvents;

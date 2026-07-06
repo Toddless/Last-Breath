@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities.ChainLightning
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Data;
     using Core.Enums;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;

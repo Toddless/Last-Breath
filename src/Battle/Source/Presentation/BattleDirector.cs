@@ -177,8 +177,18 @@ namespace Battle.Source.Presentation
         private async Task PlayDamageTaken(DamageTakenEvent evnt)
         {
             Republish(evnt);
+            // Attacks of an ability (SourceAbilityId stamped) show the ability's impact clip with the hurt.
+            Task impact = PlayAttackImpact(evnt);
             await evnt.Target.Animations.PlayAnimationAsync(HurtAnimation);
+            await impact;
             if (evnt.Vitals.IsDead) ShowDeath(evnt.Target);
+        }
+
+        private Task PlayAttackImpact(DamageTakenEvent evnt)
+        {
+            if (_vfx == null || evnt.Context.SourceAbilityId is not { } abilityId) return Task.CompletedTask;
+            var visual = _vfx.GetConfig(abilityId);
+            return visual == null ? Task.CompletedTask : _vfx.PlayImpactAsync(visual, evnt.Target.InstanceId);
         }
 
         private void ShowDeath(IFightable target)
@@ -234,13 +244,16 @@ namespace Battle.Source.Presentation
             try
             {
                 Republish(cast);
+                var visual = _vfx?.GetConfig(cast.Ability.Id);
+                // The caster's pose and the ability's activation VFX play together.
+                Task castVfx = visual != null && _vfx != null ? _vfx.PlayCastAsync(visual, cast.Caster.InstanceId) : Task.CompletedTask;
                 await cast.Caster.Animations.PlayAnimationAsync(cast.Ability.Id);
+                await castVfx;
 
                 var hits = chord.OfType<DamageTakenEvent>().Where(hit => !IsShownDead(hit.Target)).ToList();
                 foreach (object rider in chord.Where(evnt => evnt is not DamageTakenEvent))
                     ReplayInstant(rider);
 
-                var visual = _vfx?.GetConfig(cast.Ability.Id);
                 if (hits.Count == 0)
                 {
                     if (visual != null && _vfx != null) await PlayHitlessCast(cast, chord, visual);
@@ -327,6 +340,12 @@ namespace Battle.Source.Presentation
         /// <summary>Chain delivery: hits play in recorded (jump) order, the clip flies target → target.</summary>
         private async Task PlayChain(AbilityActivatedEvent cast, List<DamageTakenEvent> hits, AbilityVisualConfig visual)
         {
+            // TODO:
+            // For now logic looks like: travel => hurt => impact => travel
+            //                                 > impact
+            // Should be : travel => parallel            => travel
+            //                                 > hurt
+            // so more like actual chain. We get  chain proj, chain proj move on to the next target, previous target react to impact
             string from = cast.Caster.InstanceId;
             foreach (var hit in hits)
             {

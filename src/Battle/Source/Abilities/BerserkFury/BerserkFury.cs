@@ -122,7 +122,8 @@ namespace Battle.Source.Abilities.BerserkFury
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
                         AdditionalDamage = additionalDamage,
-                        Index = attackIndex++
+                        Index = attackIndex++,
+                        SourceAbilityId = Id
                     };
                     AttackModifiers.ApplyAll(context);
 

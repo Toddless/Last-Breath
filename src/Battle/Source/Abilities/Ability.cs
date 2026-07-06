@@ -82,6 +82,7 @@
             get
             {
                 if (field != null) return field;
+                // Change path to the actual assets
                 field = ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Icons/{Id}.png");
                 return field;
             }

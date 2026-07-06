@@ -171,7 +171,13 @@
             if (bar == null) return;
 
             bar.UpdateHealth(vitals.Health);
+            bar.UpdateMaxHealth(vitals.MaxHealth);
             bar.UpdateMana(vitals.Mana);
+            bar.UpdateMaxMana(vitals.MaxMana);
+            // TODO:
+            // new character bar logic with barrier/max barrier in it (poe like stile. Barrier over health)
+            // bar.UpdateBarrier(vitals.Barrier);
+            // bar.UpdateMaxBarrier(vitals.MaxBarrier);
         }
 
         private void OnEntityMaxManaChanges(EntityMaxManaChangesEvent obj)

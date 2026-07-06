@@ -9,7 +9,6 @@ namespace Battle.Internal.Npc
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Components;
     using Core.Interfaces.Entity;
@@ -223,7 +222,8 @@ namespace Battle.Internal.Npc
                         {
                             Source = context.Attacker,
                             Cause = DamageCause.Attack,
-                            IsCrit = context.ForceCriticalAttack || context.IsCritical
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical,
+                            SourceAbilityId = context.SourceAbilityId
                         };
                         damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);

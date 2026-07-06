@@ -23,6 +23,7 @@
         public bool ForceCriticalAttack { get; set; }
         public bool IsUnevadable { get; set; }
         public bool IsUnblockable { get; set; }
+        public string? SourceAbilityId { get; set; }
 
         public int Index { get; set; }
         public int TotalCount { get; set; } = 1;

@@ -18,6 +18,7 @@
         public bool IsCrit { get; set; }
         public bool IgnoreResistances { get; set; }
         public string? CastId { get; set; }
+        public string? SourceAbilityId { get; set; }
         public float AbsorbedByBarrier { get; set; }
 
         public void Add(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;

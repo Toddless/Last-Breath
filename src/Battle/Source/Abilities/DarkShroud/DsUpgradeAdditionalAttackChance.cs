@@ -2,7 +2,6 @@
 {
     using Core.Interfaces.Abilities;
     using Effects;
-    using Modifiers;
     using Riders;
 
     /// <summary>
