@@ -1,0 +1,150 @@
+{
+    "npcs": [
+        {
+            "id": "Npc_Bandit",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [ "Dexterity", "Strength" ],
+            "levelMin": 1,
+            "levelScaling": 0.04,
+            "abilityCount": 2,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 0,
+                "Mana": 250,
+                "Strength": 3,
+                "Dexterity": 4,
+                "Intelligence": 1,
+                "Armor": 150,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "Damage": 120,
+                "SpellDamage": 40,
+                "Accuracy": 300,
+                "Evade": 250
+            },
+            "world": {
+                "visionRadius": 320,
+                "hearingRadius": 650,
+                "leashRadius": 900,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.6,
+                "activity": "Wander",
+                "wanderRadius": 220
+            },
+            "lifecycle": {
+                "resurrectMinSeconds": 20,
+                "resurrectMaxSeconds": 90,
+                "maxStrengthBonus": 1.0
+            }
+        },
+        {
+            "id": "Npc_Bandit_Veteran",
+            "fraction": "Human",
+            "entityType": "Elit",
+            "aiIntellect": "Tactical",
+            "stances": [ "Dexterity", "Strength" ],
+            "levelMin": 10,
+            "levelScaling": 0.05,
+            "abilityCount": 4,
+            "baseParameters": {
+                "Health": 1600,
+                "Barrier": 300,
+                "Mana": 400,
+                "Strength": 6,
+                "Dexterity": 7,
+                "Intelligence": 2,
+                "Armor": 350,
+                "CriticalChance": 0.25,
+                "AdditionalHitChance": 0.2,
+                "CriticalDamage": 1.6,
+                "Damage": 220,
+                "SpellDamage": 60,
+                "Accuracy": 550,
+                "Evade": 450
+            },
+            "world": {
+                "visionRadius": 420,
+                "hearingRadius": 800,
+                "leashRadius": 1200,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 8,
+                "activity": "Patrol"
+            }
+        },
+        {
+            "id": "Npc_Skeleton_Mage",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [ "Intelligence" ],
+            "levelMin": 3,
+            "levelScaling": 0.04,
+            "abilityCount": 2,
+            "baseParameters": {
+                "Health": 700,
+                "Barrier": 400,
+                "Mana": 500,
+                "Strength": 1,
+                "Dexterity": 2,
+                "Intelligence": 6,
+                "Armor": 100,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "Damage": 80,
+                "SpellDamage": 200,
+                "Accuracy": 350,
+                "Evade": 200
+            },
+            "world": {
+                "visionRadius": 280,
+                "hearingRadius": 500,
+                "leashRadius": 700,
+                "moveSpeed": 80,
+                "chaseSpeedMultiplier": 1.4,
+                "suspiciousSeconds": 6,
+                "activity": "Wander",
+                "wanderRadius": 180
+            }
+        },
+        {
+            "id": "Npc_Grave_Revenant",
+            "fraction": "Undead",
+            "entityType": "Unique",
+            "aiIntellect": "Mastermind",
+            "stances": [ "Intelligence", "Strength" ],
+            "levelMin": 25,
+            "levelScaling": 0.06,
+            "abilityCount": 5,
+            "baseParameters": {
+                "Health": 2800,
+                "Barrier": 800,
+                "Mana": 700,
+                "Strength": 9,
+                "Dexterity": 5,
+                "Intelligence": 12,
+                "Armor": 500,
+                "CriticalChance": 0.3,
+                "AdditionalHitChance": 0.25,
+                "CriticalDamage": 1.8,
+                "Damage": 300,
+                "SpellDamage": 380,
+                "Accuracy": 800,
+                "Evade": 600
+            },
+            "world": {
+                "visionRadius": 500,
+                "hearingRadius": 1000,
+                "leashRadius": 1500,
+                "moveSpeed": 140,
+                "chaseSpeedMultiplier": 1.8,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        }
+    ]
+}

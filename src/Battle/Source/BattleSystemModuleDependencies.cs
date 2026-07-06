@@ -6,11 +6,13 @@
     using Core.Interfaces;
     using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
+    using Core.Interfaces.Entity;
     using Core.Interfaces.MessageBus;
     using Core.Interfaces.MessageBus.Requests;
     using Core.Interfaces.UI;
     using Core.Views;
     using Microsoft.Extensions.DependencyInjection;
+    using Npc;
     using RequestHandlers;
     using UIElements;
 
@@ -21,6 +23,8 @@
             services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
             services.AddSingleton<IAbilityProvider, AbilityProvider>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
+            services.AddSingleton<INpcProvider, NpcProvider>();
+            services.AddSingleton<INpcPopulationService, NpcPopulationService>();
 
             services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
             services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();

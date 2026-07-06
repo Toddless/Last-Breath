@@ -11,6 +11,7 @@
         public float Weight { get; set; } = weight;
         public ModifierValueType ModifierValueType { get; } = valueType;
         public EntityParameter EntityParameter { get; } = parameter;
+        public ModifierScope Scope { get; set; } = ModifierScope.Global;
         public float BaseValue { get; } = value;
         public float Value { get; set; } = value;
         public string InstanceId { get; } = Guid.NewGuid().ToString();

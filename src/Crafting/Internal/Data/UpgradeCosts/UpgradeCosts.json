@@ -1,0 +1,66 @@
+{
+    "upgrade": [
+        {
+            "category": "Weapon",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Weapon_Rune",
+                    "amount": 1
+                }
+            ]
+        },
+        {
+            "category": "Armor",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Blacksmith_Rune",
+                    "amount": 1
+                }
+            ]
+        },
+        {
+            "category": "Jewellery",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Jeweler_Rune",
+                    "amount": 1
+                }
+            ]
+        }
+    ],
+    "recraft": [
+        {
+            "category": "Weapon",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Weapon_Dust",
+                    "amount": 1
+                }
+            ]
+        },
+        {
+            "category": "Armor",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Armor_Dust",
+                    "amount": 1
+                }
+            ]
+        },
+        {
+            "category": "Jewellery",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Jewellery_Dust",
+                    "amount": 1
+                }
+            ]
+        }
+    ]
+}

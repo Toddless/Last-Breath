@@ -6,7 +6,7 @@
     using Godot;
     using Utilities;
 
-    public class PassiveSkillProvider
+    public class PassiveSkillProvider : ISkillProvider
     {
         private const string SkillDataPath = "res://TestResources/Skills/";
         private Dictionary<string, ISkill> _skills = [];

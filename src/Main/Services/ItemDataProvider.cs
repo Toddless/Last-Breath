@@ -6,6 +6,7 @@ namespace LastBreath.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Data;
+    using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
@@ -20,6 +21,7 @@ namespace LastBreath.Services
         private readonly Dictionary<string, IItem> _itemData = [];
         private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
         private Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
+        private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>> _upgradeCosts = [];
         private readonly IDataParser _dataParser;
 
         public ItemDataProvider(IDataParser dataParser)
@@ -45,6 +47,9 @@ namespace LastBreath.Services
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) =>
             _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
+
+        public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => GetCost(CraftingMode.Upgrade, category);
+        public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => GetCost(CraftingMode.Recraft, category);
 
         public string GetRecipeResultItemId(string recipeId)
         {
@@ -93,8 +98,10 @@ namespace LastBreath.Services
             var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"),
                 async s => { _equipItemsResources = await _dataParser.ParseEquipItemResources(s); });
             var items = LoadDataFromJson(Path.Combine(dataPath, "Items"), async s => AddItems(await _dataParser.ParseItems(s)));
+            var upgradeCosts = LoadDataFromJson(Path.Combine(dataPath, "UpgradeCosts"),
+                async s => { _upgradeCosts = await _dataParser.ParseUpgradeCosts(s); });
 
-            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, items);
+            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources, items, upgradeCosts);
         }
 
         private void AddItems(List<IItem> data)
@@ -113,10 +120,13 @@ namespace LastBreath.Services
                 while (fileName != string.Empty)
                 {
                     string filePath = Path.Combine(path, fileName);
-                    if (!filePath.EndsWith(".json")) continue;
-                    using var openFile = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
-                    string jsonContent = openFile.GetAsText() ?? throw new FileLoadException();
-                    await loadDataFunc(jsonContent);
+                    if (filePath.EndsWith(".json"))
+                    {
+                        using var openFile = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
+                        string jsonContent = openFile.GetAsText() ?? throw new FileLoadException();
+                        await loadDataFunc(jsonContent);
+                    }
+
                     fileName = dir.GetNext();
                 }
             }
@@ -129,6 +139,9 @@ namespace LastBreath.Services
                 dir.ListDirEnd();
             }
         }
+
+        private IReadOnlyList<IRequirement> GetCost(CraftingMode mode, EquipmentCategory category) =>
+            _upgradeCosts.TryGetValue(mode, out var categories) && categories.TryGetValue(category, out var requirements) ? requirements : [];
 
         private IItem? TryGetItem(string id)
         {

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Crafting;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
@@ -13,7 +14,7 @@
     using Godot;
     using Utilities;
 
-    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery) : IItemUpgrader
+    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider) : IItemUpgrader
     {
         private const float P0 = 0.95f;
         private const float P5 = 0.70f;
@@ -23,65 +24,25 @@
 
         private static readonly float s_r = Mathf.Pow(P12 / P9, 1.0f / 3.0f);
 
+        public List<IRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory) =>
+            ScaleByRarity(itemDataProvider.GetUpgradeCost(itemCategory), itemRarity);
 
-        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _upgradeRequirements = new()
-        {
-            [EquipmentCategory.Weapon] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Weapon_Rune"),
-            ],
-            [EquipmentCategory.Armor] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Blacksmith_Rune"),
-            ],
-            [EquipmentCategory.Jewellery] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Jeweler_Rune")
-            ]
-        };
-
-        private readonly Dictionary<EquipmentCategory, List<IRequirement>> _recraftRequirements = new()
-        {
-            [EquipmentCategory.Weapon] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Weapon_Dust")
-            ],
-            [EquipmentCategory.Jewellery] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Jewellery_Dust")
-            ],
-            [EquipmentCategory.Armor] =
-            [
-                new Requirement(RequirementType.Resource, "Upgrade_Resource_Armor_Dust")
-            ]
-        };
-
-
-        public List<IRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory)
-        {
-            var requirements = _upgradeRequirements[itemCategory].ToList();
-            var newReq = new List<IRequirement>();
-            int amount = GetAmount(itemRarity);
-            requirements.ForEach(req => newReq.Add(new Requirement(req.Type, req.Id, req.Amount + amount)));
-            return newReq;
-        }
-
-        private int GetAmount(Rarity itemRarity) => itemRarity switch
+        private static int GetAmount(Rarity itemRarity) => itemRarity switch
         {
             Rarity.Common or Rarity.Uncommon => 1,
             Rarity.Rare => 2,
             Rarity.Epic => 3,
-            Rarity.Legendary or Rarity.Unique => 5,
+            Rarity.Legendary or Rarity.Unique or Rarity.Mythic => 5,
             _ => throw new ArgumentOutOfRangeException(nameof(itemRarity), itemRarity, null)
         };
 
-        public List<IRequirement> GetRecraftResourceCost(Rarity itemRarity, EquipmentCategory itemCategory)
-        {
-            var requirements = _recraftRequirements[itemCategory].ToList();
-            var newRequirements = new List<IRequirement>();
-            requirements.ForEach(req => newRequirements.Add(new Requirement(req.Type, req.Id, req.Amount + GetAmount(itemRarity))));
+        public List<IRequirement> GetRecraftResourceCost(Rarity itemRarity, EquipmentCategory itemCategory) =>
+            ScaleByRarity(itemDataProvider.GetRecraftCost(itemCategory), itemRarity);
 
-            return newRequirements;
+        private static List<IRequirement> ScaleByRarity(IReadOnlyList<IRequirement> requirements, Rarity itemRarity)
+        {
+            int amount = GetAmount(itemRarity);
+            return requirements.Select(IRequirement (req) => new Requirement(req.Type, req.Id, req.Amount + amount)).ToList();
         }
 
         public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers)

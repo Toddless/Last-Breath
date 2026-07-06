@@ -11,10 +11,26 @@
     public class ParameterModifiersComponent : IParameterModifiersComponent
     {
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _modifiers = [];
+        private readonly List<IParameterModifierSource> _sources = [];
 
         public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> EntityModifiers => _modifiers;
 
         public event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
+
+        public void RegisterSource(IParameterModifierSource source)
+        {
+            if (_sources.Contains(source)) return;
+            _sources.Add(source);
+            source.SourceChanged += OnSourceChanged;
+            OnSourceChanged(source.AffectedParameters);
+        }
+
+        public void UnregisterSource(IParameterModifierSource source)
+        {
+            if (!_sources.Remove(source)) return;
+            source.SourceChanged -= OnSourceChanged;
+            OnSourceChanged(source.AffectedParameters);
+        }
 
         public IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter) => GetCombinedModifiers(parameter);
 
@@ -105,7 +121,14 @@
             var modifiers = new List<IModifierInstance>();
             if (this._modifiers.TryGetValue(parameter, out var permanent))
                 modifiers.AddRange(permanent);
+            foreach (var source in _sources)
+                modifiers.AddRange(source.GetModifiers(parameter));
             return modifiers;
+        }
+
+        private void OnSourceChanged(IReadOnlyCollection<EntityParameter> parameters)
+        {
+            foreach (var parameter in parameters) RaiseEvent(parameter);
         }
 
         private void RaiseEvent(EntityParameter parameter) => ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(parameter, GetCombinedModifiers(parameter)));

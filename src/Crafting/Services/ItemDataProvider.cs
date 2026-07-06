@@ -5,6 +5,7 @@ namespace Crafting.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Data;
+    using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
@@ -16,7 +17,8 @@ namespace Crafting.Services
     {
         private const string itemDataPath = "res://Internal/Data/";
         private readonly Dictionary<string, IItem> _itemData = [];
-        private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>> _upgradeCosts = [];
         private readonly IDataParser _dataParser;
 
         public ItemDataProvider(IItemGameDataFactory factory)
@@ -37,6 +39,9 @@ namespace Crafting.Services
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
         public List<IModifier> GetEquipItemBaseModifierPool(string id) => throw new NotImplementedException();
+
+        public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => GetCost(CraftingMode.Upgrade, category);
+        public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => GetCost(CraftingMode.Recraft, category);
 
         public List<IRequirement> GetRecipeRequirements(string id)
         {
@@ -94,21 +99,27 @@ namespace Crafting.Services
                 string filePath = System.IO.Path.Combine(dataPath, fileName);
                 if (dir.CurrentIsDir())
                     await LoadDataFromDirectory(filePath);
-                else
+                else if (filePath.EndsWith(".json"))
                 {
-                    if (!filePath.EndsWith(".json")) continue;
                     using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new System.IO.FileLoadException();
                     string jsonContent = file.GetAsText() ?? throw new System.IO.FileNotFoundException();
 
-                    List<IItem> data = dataPath switch
+                    if (dataPath.EndsWith("ModifierPools"))
+                        await _dataParser.ParseEquipItemModifierPools(jsonContent, ref _equipItemModifierPools);
+                    else if (dataPath.EndsWith("UpgradeCosts"))
+                        _upgradeCosts = await _dataParser.ParseUpgradeCosts(jsonContent);
+                    else
                     {
-                        _ when dataPath.EndsWith("EquipItems") => await _dataParser.ParseEquipItems(jsonContent),
-                        _ when dataPath.EndsWith("Recipes") => await _dataParser.ParseRecipes(jsonContent),
-                        _ when dataPath.EndsWith("CraftingResources") => await _dataParser.ParseResources(jsonContent),
-                        _ => []
-                    };
+                        List<IItem> data = dataPath switch
+                        {
+                            _ when dataPath.EndsWith("EquipItems") => await _dataParser.ParseEquipItems(jsonContent),
+                            _ when dataPath.EndsWith("Recipes") => await _dataParser.ParseRecipes(jsonContent),
+                            _ when dataPath.EndsWith("CraftingResources") => await _dataParser.ParseResources(jsonContent),
+                            _ => []
+                        };
 
-                    data.ForEach(item => _itemData.TryAdd(item.Id, item));
+                        data.ForEach(item => _itemData.TryAdd(item.Id, item));
+                    }
                 }
 
                 fileName = dir.GetNext();
@@ -116,6 +127,9 @@ namespace Crafting.Services
 
             dir.ListDirEnd();
         }
+
+        private IReadOnlyList<IRequirement> GetCost(CraftingMode mode, EquipmentCategory category) =>
+            _upgradeCosts.TryGetValue(mode, out var categories) && categories.TryGetValue(category, out var requirements) ? requirements : [];
 
         private IItem? TryGetItem(string id)
         {

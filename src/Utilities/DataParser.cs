@@ -12,6 +12,7 @@ namespace Utilities
     using Core.Data.LootTable;
     using Core.Data.NpcModifiersData;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
     using Core.Modifiers;
@@ -106,7 +107,9 @@ namespace Utilities
                 {
                     ParseEnum(modifier.Parameter, out EntityParameter param);
                     ParseEnum(modifier.ModifierType, out ModifierValueType type);
-                    return factory.CreateModifier(param, type, modifier.Value, modifier.Weight);
+                    var itemModifier = factory.CreateModifier(param, type, modifier.Value, modifier.Weight);
+                    itemModifier.Scope = ParseScope(modifier.Scope);
+                    return itemModifier;
                 }).ToList();
 
                 equipItemModifierPools.TryAdd(modifierPool.Id, itemModifiers);
@@ -138,16 +141,15 @@ namespace Utilities
                 var additionalModifiers = LoadModifiers(item.Modifiers);
                 ParseEnum<Rarity>(item.Rarity, out var rarity);
                 ParseEnum<EquipmentPiece>(item.EquipmentPart, out var equipmentType);
-                ParseEnum<AttributeType>(item.AttributeType, out var attributeType);
 
-                var newItem = factory.CreateEquipItem(equipmentType, item.Id, item.Tags);
-                newItem.AttributeType = attributeType;
+                var newItem = CreateEquipItem(item, equipmentType);
                 newItem.Rarity = rarity;
                 newItem.UpdateLevel = item.UpdateLevel;
                 newItem.MaxUpdateLevel = item.MaxUpdateLevel;
                 newItem.SetItemEffect(item.EffectId);
                 newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem.InstanceId));
                 newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem.InstanceId));
+                LoadGrants(item, newItem);
                 items.Add(newItem);
             }
 
@@ -200,12 +202,32 @@ namespace Utilities
             return await Task.FromResult(items);
         }
 
+        private void LoadGrants(EquipItemData itemData, IEquipItem item)
+        {
+            foreach (var grantData in itemData.Grants)
+            {
+                ParseEnum<GrantKind>(grantData.Kind, out var kind);
+                var grant = factory.CreateGrant(kind, grantData.Id, LoadModifiers(grantData.Modifiers));
+                if (grant != null) item.AddGrant(grant);
+            }
+        }
+
+        private IEquipItem CreateEquipItem(EquipItemData item, EquipmentPiece equipmentType)
+        {
+            if (equipmentType != EquipmentPiece.Weapon)
+                return factory.CreateEquipItem(equipmentType, item.Id, item.Tags);
+
+            ParseEnum<WeaponType>(item.WeaponType, out var weaponType);
+            ParseEnum<Handedness>(item.Handedness, out var handedness);
+            return factory.CreateWeaponItem(weaponType, handedness, item.Damage, item.CritChance, item.CritDamage, item.Id, item.Tags);
+        }
+
         private List<IModifier> LoadModifiers(List<ItemModifier> modifiers) =>
             modifiers.Select(IModifier (m) =>
             {
                 var type = s_typeMap.GetValueOrDefault(m.ModifierType);
                 ParseEnum<EntityParameter>(m.Parameter, out var parameter);
-                return new Modifier(type, parameter, m.Value);
+                return new Modifier(type, parameter, m.Value) { Scope = ParseScope(m.Scope) };
             }).ToList();
 
         private List<IUpgradingResource> LoadUpgradeResources(List<UpgradeResourceData> upgradeResourceData) =>
@@ -233,7 +255,9 @@ namespace Utilities
                 var materialModifiers = craftingData.Material.Modifiers.Select(m =>
                 {
                     ParseEnum<EntityParameter>(m.Parameter, out var parameter);
-                    return factory.CreateMaterialModifier(parameter, s_typeMap.GetValueOrDefault(m.ModifierType), m.BaseValue, m.Weight);
+                    var materialModifier = factory.CreateMaterialModifier(parameter, s_typeMap.GetValueOrDefault(m.ModifierType), m.BaseValue, m.Weight);
+                    materialModifier.Scope = ParseScope(m.Scope);
+                    return materialModifier;
                 }).ToList();
 
                 ParseEnum<Rarity>(craftingData.Rarity, out var rarity);
@@ -244,11 +268,38 @@ namespace Utilities
             return items;
         }
 
+        public Task<Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>>> ParseUpgradeCosts(string json)
+        {
+            var data = JsonConvert.DeserializeObject<UpgradeCostsData>(json, s_settings) ?? throw new InvalidOperationException();
+            var costs = new Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>>
+            {
+                [CraftingMode.Upgrade] = LoadCategoryRequirements(data.Upgrade),
+                [CraftingMode.Recraft] = LoadCategoryRequirements(data.Recraft)
+            };
+            return Task.FromResult(costs);
+        }
+
+        private Dictionary<EquipmentCategory, List<IRequirement>> LoadCategoryRequirements(List<CategoryRequirementsData> categories)
+        {
+            var result = new Dictionary<EquipmentCategory, List<IRequirement>>();
+            foreach (var categoryData in categories)
+            {
+                ParseEnum<EquipmentCategory>(categoryData.Category, out var category);
+                result[category] = categoryData.Requirements
+                    .Select(requirement => factory.CreateRequirement(Enum.Parse<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
+                    .ToList();
+            }
+
+            return result;
+        }
+
         private List<IModifier> LoadMaterialModifiers(MaterialCategoryData categoryData) =>
             categoryData.Modifiers.Select(m =>
             {
                 ParseEnum<EntityParameter>(m.Parameter, out var parameter);
-                return factory.CreateMaterialModifier(parameter, s_typeMap.GetValueOrDefault(m.ModifierType), m.BaseValue, m.Weight);
+                var materialModifier = factory.CreateMaterialModifier(parameter, s_typeMap.GetValueOrDefault(m.ModifierType), m.BaseValue, m.Weight);
+                materialModifier.Scope = ParseScope(m.Scope);
+                return materialModifier;
             }).ToList();
 
         private static List<NpcModifierData> CreateNpcModifier<T>(List<JToken> tokens) where T : NpcModifierData =>
@@ -256,5 +307,11 @@ namespace Utilities
 
         private static bool ParseEnum<TEnum>(string enumAsString, out TEnum result)
             where TEnum : struct => Enum.TryParse(enumAsString, true, out result);
+
+        private static ModifierScope ParseScope(string? scope)
+        {
+            ParseEnum(scope ?? string.Empty, out ModifierScope result);
+            return result;
+        }
     }
 }

@@ -36,6 +36,9 @@
         /// Carried onto the damage context so the presentation can play the ability's impact VFX per attack.</summary>
         string? SourceAbilityId { get; set; }
 
+        /// <summary>Weapon the attack is delivered with (null = unarmed). Hook for weapon masteries.</summary>
+        WeaponType? WeaponType => Attacker.Equipment?.Weapon?.WeaponType;
+
         /// <summary>Position of this attack within a multi-hit sequence (folded-in AttackMetadata). Single attacks: Index 0, TotalCount 1.</summary>
         int Index { get; set; }
         int TotalCount { get; set; }

@@ -8,6 +8,7 @@
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
+    using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.UI;
     using Godot;
     using UIElements;
@@ -50,6 +51,9 @@
             if (!_battleArena.PrepareBattleArena(_entities)) return await Task.FromResult(BattleResults.BattleAbandoned);
             var results = await _battleArena.RunBattleAsync();
             _battleExperienceProcessor.CompleteBattle(results);
+            // The battle-bus subscribers (Player/NPC state machines, ability buttons, presenters)
+            // exit their fight state here; Main separately publishes the game-bus copy for loot.
+            _localBus.Publish(new BattleEndEvent(results));
             return results;
         }
 
@@ -69,7 +73,10 @@
                 _battleArena.RemovePlayerFromArena();
                 foreach (var entity in _entities)
                 {
-                    if (!entity.IsAlive || entity is not Node2D asNode) continue;
+                    if (entity is not Node2D asNode) continue;
+                    // Dead NPCs return too: the body stays in the world (resurrection/burning
+                    // lifecycle). Legacy NPCs without body rules free themselves on battle end.
+                    if (!GodotObject.IsInstanceValid(asNode) || asNode.IsQueuedForDeletion()) continue;
                     _mainWorld.AddChild(asNode);
                 }
             }

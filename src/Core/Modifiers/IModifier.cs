@@ -7,6 +7,7 @@
     {
         ModifierValueType ModifierValueType { get; }
         EntityParameter EntityParameter { get; }
+        ModifierScope Scope { get; set; }
         float BaseValue { get; }
         float Value { get; set; }
     }

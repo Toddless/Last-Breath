@@ -6,6 +6,7 @@ namespace LastBreath.Npc
     using Attribute;
     using Battle.Source;
     using Components;
+    using Core.Ai;
     using Core.Components;
     using Core.Data;
     using Core.Enums;
@@ -87,6 +88,7 @@ namespace LastBreath.Npc
         public EntityType EntityType { get; } = EntityType.Regular;
         public Fractions Fraction { get; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
+        public BehaviorProfile? Behavior { get; set; }
 
         public float CurrentHealth
         {

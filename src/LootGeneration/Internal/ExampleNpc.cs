@@ -3,6 +3,7 @@ namespace LootGeneration.Internal
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Ai;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
@@ -65,6 +66,7 @@ namespace LootGeneration.Internal
         public ICombatComponent CombatComponent { get; }
         public IAbilityBookComponent AbilityBook { get; }
         public INpcModifiersComponent NpcModifiers { get; set; }
+        public BehaviorProfile? Behavior { get; set; }
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }

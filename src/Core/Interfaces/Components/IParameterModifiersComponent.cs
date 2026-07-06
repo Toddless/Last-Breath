@@ -18,5 +18,7 @@
         void RemoveModifierBySource(string source);
         void UpdateModifier(IModifierInstance newModifier);
         void UpdateModifiers(IEnumerable<IModifierInstance> modifiers);
+        void RegisterSource(IParameterModifierSource source);
+        void UnregisterSource(IParameterModifierSource source);
     }
 }

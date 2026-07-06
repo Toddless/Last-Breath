@@ -1,7 +1,7 @@
 <Project Sdk="MSTest.Sdk/3.6.1">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
@@ -20,7 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Battle\Battle.csproj" />
     <ProjectReference Include="..\Crafting\Crafting.csproj" />
-    <ProjectReference Include="..\Last Breath\LastBreath.csproj" />
   </ItemGroup>
 
   <ItemGroup>

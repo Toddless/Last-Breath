@@ -81,11 +81,11 @@ namespace Battle.Internal.Player
         public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
         public IParameterModifiersComponent ParameterModifiers { get; private set; }
+        public IEquipmentComponent Equipment { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
         public string Name { get; private set; } = string.Empty;
-        public static Player? Instance { get; private set; }
 
         public float CurrentHealth
         {
@@ -141,6 +141,9 @@ namespace Battle.Internal.Player
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);
+            Equipment = new EquipmentComponent(this);
+            ParameterModifiers.RegisterSource(Equipment);
+            Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
             Dexterity = new Dexterity(ParameterModifiers);
@@ -159,7 +162,6 @@ namespace Battle.Internal.Player
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
-            Instance = this;
 
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
@@ -249,7 +251,13 @@ namespace Battle.Internal.Player
                 {
                     case AttackResults.Succeed:
                         Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = new DamageContext { Source = context.Attacker, Cause = DamageCause.Attack, IsCrit = context.ForceCriticalAttack || context.IsCritical, SourceAbilityId = context.SourceAbilityId };
+                        var damageContext = new DamageContext
+                        {
+                            Source = context.Attacker,
+                            Cause = DamageCause.Attack,
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical,
+                            SourceAbilityId = context.SourceAbilityId
+                        };
                         damageContext.Add(DamageType.Physical, context.FinalDamage);
                         await TakeDamage(damageContext);
                         context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
@@ -342,13 +350,21 @@ namespace Battle.Internal.Player
         private void ConfigureStateMachine()
         {
             _stateMachine.Configure(State.Idle)
-                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                .OnEntry(() =>
+                {
+                    Animations.PlayAnimation($"{_stateMachine.State}_{_direction}");
+                    GD.Print("Idle");
+                })
                 .PermitReentry(Trigger.Idle)
                 .Permit(Trigger.Walk, State.Walk)
                 .Permit(Trigger.Fight, State.Fight);
 
             _stateMachine.Configure(State.Walk)
-                .OnEntry(() => { Animations.PlayAnimation($"{_stateMachine.State}_{_direction}"); })
+                .OnEntry(() =>
+                {
+                    Animations.PlayAnimation($"{_stateMachine.State}_{_direction}");
+                    GD.Print("Walk");
+                })
                 .PermitReentry(Trigger.Walk)
                 .Permit(Trigger.Idle, State.Idle)
                 .Permit(Trigger.Fight, State.Fight);
@@ -356,14 +372,16 @@ namespace Battle.Internal.Player
             _stateMachine.Configure(State.Fight)
                 .OnEntry(() =>
                 {
-                    Animations.PlayAnimation("Idle_Right");
+                    Animations.PlayAnimation($"Idle_{_direction}");
                     CanMove = false;
                     _lastPosition = Position;
+                    GD.Print("Fight entry");
                 })
                 .OnExit(() =>
                 {
                     CanMove = true;
                     Position = _lastPosition;
+                    GD.Print("Fight exit");
                 })
                 .Permit(Trigger.Idle, State.Idle);
         }
@@ -453,48 +471,31 @@ namespace Battle.Internal.Player
         private void SetBaseValuesForParameters()
         {
             foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
-            {
-                float value = 0;
+                Parameters.SetBaseValueForParameter(entityParameter, GetUnarmedBaseValue(entityParameter));
+        }
 
-                switch (entityParameter)
-                {
-                    case EntityParameter.Health:
-                    case EntityParameter.Barrier:
-                        value = 10000;
-                        break;
-                    case EntityParameter.Mana:
-                        value = 5000;
-                        break;
-                    case EntityParameter.Intelligence:
-                    case EntityParameter.Strength:
-                    case EntityParameter.Dexterity:
-                        value = 5f;
-                        break;
-                    case EntityParameter.Evade:
-                    case EntityParameter.Armor:
-                    case EntityParameter.Accuracy:
-                        value = 500;
-                        break;
-                    case EntityParameter.CriticalChance:
-                        value = 0.25f;
-                        break;
-                    case EntityParameter.AdditionalHitChance:
-                        value = 0.6f;
-                        break;
-                    case EntityParameter.CriticalDamage:
-                        value = 1.5f;
-                        break;
-                    case EntityParameter.MulticastChance:
-                        value = 1f;
-                        break;
-                    case EntityParameter.Damage:
-                    case EntityParameter.SpellDamage:
-                        value = 300;
-                        break;
-                }
+        private static float GetUnarmedBaseValue(EntityParameter parameter) => parameter switch
+        {
+            EntityParameter.Health or EntityParameter.Barrier => 10000,
+            EntityParameter.Mana => 5000,
+            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
+            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 500,
+            EntityParameter.CriticalChance => 0.25f,
+            EntityParameter.AdditionalHitChance => 0.6f,
+            EntityParameter.CriticalDamage => 1.5f,
+            EntityParameter.MulticastChance => 1f,
+            EntityParameter.Damage or EntityParameter.SpellDamage => 300,
+            _ => 0f
+        };
 
-                Parameters.SetBaseValueForParameter(entityParameter, value);
-            }
+        // Weapon replaces the base of these parameters (not a modifier): base = weapon stats, unarmed profile otherwise.
+        private void OnEquipmentChanged(EquipmentPiece piece, IEquipItem? item)
+        {
+            if (piece != EquipmentPiece.Weapon) return;
+            var weapon = Equipment.Weapon;
+            Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));
         }
 
         public Vector2 GetCameraPosition() => GlobalPosition;

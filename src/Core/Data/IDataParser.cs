@@ -3,6 +3,7 @@ namespace Core.Data
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Enums;
+    using Interfaces;
     using Interfaces.Items;
     using LootTable;
     using Modifiers;
@@ -23,5 +24,6 @@ namespace Core.Data
         Task<List<IItem>> ParseEquipItems(string json);
         Task<List<IItem>> ParseRecipes(string json);
         Task<List<IItem>> ParseResources(string json);
+        Task<Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>>> ParseUpgradeCosts(string json);
     }
 }

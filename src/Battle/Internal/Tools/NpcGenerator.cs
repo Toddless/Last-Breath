@@ -1,10 +1,13 @@
 namespace Battle.Internal.Tools
 {
+    using System;
     using System.Collections.Generic;
     using Battle.Internal.Npc;
     using Battle.Source;
+    using Core.Interfaces.Entity;
     using Core.Modifiers;
     using Godot;
+    using Services;
 
     /// <summary>
     /// Dev helper: instantiates configured <see cref="BaseNpc"/>s, applies stat modifiers and puts them in
@@ -15,7 +18,8 @@ namespace Battle.Internal.Tools
     {
         private const string ModifierSource = "DevTool_NpcGenerator";
 
-        public static List<BaseNpc> SpawnGroup(Node2D world, Vector2 origin, int count, IReadOnlyList<NpcStatSpec>? stats, float spacing)
+        public static List<BaseNpc> SpawnGroup(Node2D world, Vector2 origin, int count, IReadOnlyList<NpcStatSpec>? stats, float spacing,
+            IReadOnlyList<string>? npcIds = null, IReadOnlyList<Vector2>? patrolRoute = null)
         {
             List<BaseNpc> spawned = [];
             if (count <= 0) return spawned;
@@ -27,12 +31,31 @@ namespace Battle.Internal.Tools
                 var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
                 world.AddChild(npc); // enters the tree -> _Ready builds the components we configure below
                 npc.GlobalPosition = origin + new Vector2(i * spacing, 0f);
+                ApplyDefinition(npc, npcIds, i, patrolRoute);
                 ApplyStats(npc, stats);
                 group.TryAddToGroup(npc);
                 spawned.Add(npc);
             }
 
             return spawned;
+        }
+
+        /// <summary>Data-driven spawn: rolls a definition from Npc.json; ids cycle when count exceeds them.</summary>
+        private static void ApplyDefinition(BaseNpc npc, IReadOnlyList<string>? npcIds, int index, IReadOnlyList<Vector2>? patrolRoute)
+        {
+            if (npcIds == null || npcIds.Count == 0) return;
+
+            string npcId = npcIds[index % npcIds.Count];
+            try
+            {
+                var provider = GameServiceProvider.Instance.GetService<INpcProvider>();
+                if (patrolRoute is { Count: > 0 }) npc.SetPatrolRoute(patrolRoute); // before ApplyDefinition: the brain takes the route at construction
+                npc.ApplyDefinition(provider.CreateDefinition(npcId));
+            }
+            catch (Exception e)
+            {
+                GD.PrintErr($"NpcGenerator: failed to apply definition '{npcId}': {e.Message}");
+            }
         }
 
         private static void ApplyStats(BaseNpc npc, IReadOnlyList<NpcStatSpec>? stats)

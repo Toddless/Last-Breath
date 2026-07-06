@@ -11,6 +11,8 @@ namespace Core.Data
     {
         IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags);
         IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags);
+        IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags);
+        IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers);
         IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight);
         IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight);
         IRequirement CreateRequirement(RequirementType type, string id, int amount);

@@ -1,6 +1,7 @@
 ﻿namespace Core.Data
 {
     using System.Collections.Generic;
+    using Enums;
     using Godot;
     using Interfaces;
     using Interfaces.Crafting;
@@ -22,5 +23,7 @@
         List<IModifier> GetEquipItemModifierPool(string id);
         Dictionary<string, int> GetEquipItemResources(string itemId);
         List<IModifier> GetEquipItemBaseModifierPool(string id);
+        IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category);
+        IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category);
     }
 }

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Internal/Npc/TestNpc.tscn" id="3_8osjy"]
 [ext_resource type="Script" uid="uid://nheqclen8jyv" path="res://Internal/Tools/NpcSpawnTool.cs" id="4_yxprl"]
 [ext_resource type="Script" uid="uid://ds3khakjju4tk" path="res://Internal/Tools/NpcStatSpec.cs" id="5_7yswm"]
+[ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://Internal/Npc/NpcSpawnPoint.cs" id="6_b5cil"]
 
 [sub_resource type="Resource" id="Resource_7yswm"]
 script = ExtResource("5_7yswm")
@@ -31,3 +32,12 @@ script = ExtResource("4_yxprl")
 _world = NodePath("..")
 _count = 4
 _stats = Array[ExtResource("5_7yswm")]([SubResource("Resource_7yswm"), SubResource("Resource_b5cil"), null])
+_npcIds = PackedStringArray("Npc_Bandit")
+
+[node name="NpcSpawnPoint" type="Node2D" parent="." unique_id=154585184]
+position = Vector2(968, 535)
+script = ExtResource("6_b5cil")
+_npcIds = PackedStringArray("Npc_Bandit")
+_maxCount = 1
+_spawnAsGroup = true
+metadata/_custom_type_script = "uid://ctta8cas4isp7"

@@ -86,6 +86,7 @@
         public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
         public IParameterModifiersComponent ParameterModifiers { get; private set; }
+        public IEquipmentComponent Equipment { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
@@ -145,6 +146,9 @@
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);
+            Equipment = new EquipmentComponent(this);
+            ParameterModifiers.RegisterSource(Equipment);
+            Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
             Dexterity = new Dexterity(ParameterModifiers);
@@ -468,45 +472,30 @@
         private void SetBaseValuesForParameters()
         {
             foreach (EntityParameter entityParameter in Enum.GetValues<EntityParameter>())
-            {
-                float value = 0;
+                Parameters.SetBaseValueForParameter(entityParameter, GetUnarmedBaseValue(entityParameter));
+        }
 
-                switch (entityParameter)
-                {
-                    case EntityParameter.Health:
-                    case EntityParameter.Barrier:
-                        value = 1000;
-                        break;
-                    case EntityParameter.Mana:
-                        value = 500;
-                        break;
-                    case EntityParameter.Intelligence:
-                    case EntityParameter.Strength:
-                    case EntityParameter.Dexterity:
-                        value = 5f;
-                        break;
-                    case EntityParameter.Evade:
-                    case EntityParameter.Armor:
-                    case EntityParameter.Accuracy:
-                        value = 500;
-                        break;
-                    case EntityParameter.CriticalChance:
-                        value = 0.25f;
-                        break;
-                    case EntityParameter.AdditionalHitChance:
-                        value = 0.6f;
-                        break;
-                    case EntityParameter.CriticalDamage:
-                        value = 1.5f;
-                        break;
-                    case EntityParameter.Damage:
-                    case EntityParameter.SpellDamage:
-                        value = 300;
-                        break;
-                }
+        private static float GetUnarmedBaseValue(EntityParameter parameter) => parameter switch
+        {
+            EntityParameter.Health or EntityParameter.Barrier => 1000,
+            EntityParameter.Mana => 500,
+            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
+            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 500,
+            EntityParameter.CriticalChance => 0.25f,
+            EntityParameter.AdditionalHitChance => 0.6f,
+            EntityParameter.CriticalDamage => 1.5f,
+            EntityParameter.Damage or EntityParameter.SpellDamage => 300,
+            _ => 0f
+        };
 
-                Parameters.SetBaseValueForParameter(entityParameter, value);
-            }
+        // Weapon replaces the base of these parameters (not a modifier): base = weapon stats, unarmed profile otherwise.
+        private void OnEquipmentChanged(EquipmentPiece piece, IEquipItem? item)
+        {
+            if (piece != EquipmentPiece.Weapon) return;
+            var weapon = Equipment.Weapon;
+            Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));
         }
 
         public Vector2 GetCameraPosition() => GlobalPosition;

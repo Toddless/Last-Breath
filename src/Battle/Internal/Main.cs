@@ -51,7 +51,7 @@
         private static Control? CreateNotificationPopup()
         {
             var scene = NotificationPopup.Initialize();
-            return scene?.Instantiate<NotificationPopup>();
+            return scene.Instantiate<NotificationPopup>();
         }
 
         private async void OnBattleInitialized(BattleInitializedEvent evnt)

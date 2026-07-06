@@ -1,45 +1,59 @@
-﻿namespace LootGeneration.Internal
+namespace LootGeneration.Internal
 {
     using System;
     using System.Collections.Generic;
+    using Core.Crafting;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
+    using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
 
-    public class ItemGameDataFactory: IItemGameDataFactory
+    public class ItemGameDataFactory : IItemGameDataFactory
     {
-            public IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags) =>
-                throw new NotImplementedException("LootGeneration does not use basic items.");
+        public IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags) =>
+            throw new NotImplementedException("LootGeneration does not use basic items.");
 
-            public IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags) =>
-                new ExampleEquipItem(piece, id, tags);
+        public IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags) =>
+            new EquipItem(piece, id, tags);
 
-            public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
-                new Modifier(valueType, parameter, value, weight);
+        public IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags) =>
+            new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
 
-            public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight) =>
-                new ExampleMaterialModifier(parameter, valueType, baseValue, weight);
+        // LootGeneration has no skill infrastructure yet: passive grants resolve to nothing until a provider appears.
+        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers) => kind switch
+        {
+            GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
+            GrantKind.Passive => new PassiveSkillGrant(id, id, static () => null),
+            _ => null
+        };
 
-            public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
-                new ExampleRequirement(type, id, amount);
+        public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
+            new Modifier(valueType, parameter, value, weight);
 
-            public ICraftingRecipe CreateRecipe(string id, string resultItemId, string[] tags, Rarity rarity,
-                List<IRequirement> requirements, ItemType itemType, bool isOpened, string[] optionalResourceCategories) =>
-                new ExampleCraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, isOpened);
+        public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight) =>
+            new Modifier(valueType, parameter, baseValue, weight);
 
-            public IMaterialCategory CreateMaterialCategory(List<IModifier> modifiers, string id) =>
-                new ExampleMaterialCategory(modifiers, id);
+        public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
+            new Requirement(type, id, amount);
 
-            public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory category, int maxStackSize) =>
-                new ExampleUpgradeResource(id, tags, rarity, category, maxStackSize);
+        public ICraftingRecipe CreateRecipe(string id, string resultItemId, string[] tags, Rarity rarity,
+            List<IRequirement> requirements, ItemType itemType, bool isOpened, string[] optionalResourceCategories) =>
+            new CraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, isOpened);
 
-            public IMaterial CreateMaterial(List<IModifier> modifiers, IMaterialCategory category) =>
-                new ExampleMaterialType(modifiers, category);
+        public IMaterialCategory CreateMaterialCategory(List<IModifier> modifiers, string id) =>
+            new Core.Crafting.MaterialCategory(modifiers, id);
 
-            public ICraftingResource CreateCraftingResource(string id, int maxStackSize, string[] tags, IMaterial material, Rarity rarity) =>
-                new ExampleCraftingResource(id, maxStackSize, tags, material, rarity);
+        public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory category, int maxStackSize) =>
+            new UpgradeResource(id, tags, rarity, category, maxStackSize);
+
+        public IMaterial CreateMaterial(List<IModifier> modifiers, IMaterialCategory category) =>
+            new MaterialType(modifiers, category);
+
+        public ICraftingResource CreateCraftingResource(string id, int maxStackSize, string[] tags, IMaterial material, Rarity rarity) =>
+            new CraftingResource(id, maxStackSize, tags, material, rarity);
     }
 }

@@ -26,6 +26,9 @@ namespace Core.Interfaces.Entity
         IEntityAttribute Intelligence { get; }
         IEntityGroup? Group { get; set; }
 
+        /// <summary>Equipped gear. Default null: NPCs don't carry equipment.</summary>
+        IEquipmentComponent? Equipment => null;
+
         // Combat wiring
         ICombatEventBus CombatEvents { get; }
         IStance CurrentStance { get; }

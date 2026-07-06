@@ -1,0 +1,92 @@
+namespace Core.Ai.World
+{
+    using System;
+    using Interfaces.Components;
+
+    public enum NpcLifeStage : byte
+    {
+        Alive,
+
+        /// <summary>A non-undead body: the resurrection timer is running unless it gets burned.</summary>
+        Defeated,
+
+        /// <summary>A defeated undead ("anabiosis"): lies indefinitely, only burning finishes it.</summary>
+        Dormant,
+
+        /// <summary>Burned. The spawn point that owned this NPC generates a replacement.</summary>
+        FinalDead
+    }
+
+    /// <summary>The "lifecycle" section of Npc.json; defaults follow the design (1–10 minutes).</summary>
+    public class NpcLifecycleConfig
+    {
+        public float ResurrectMinSeconds { get; init; } = 60f;
+        public float ResurrectMaxSeconds { get; init; } = 600f;
+
+        /// <summary>Parameter bonus of a maximum-timer rising (fraction, 1 = +100%).</summary>
+        public float MaxStrengthBonus { get; init; } = 1f;
+    }
+
+    /// <summary>
+    /// Post-defeat fate of an NPC body: humans/animals rise as undead after a rolled delay
+    /// (the longer it takes, the stronger the rising), undead lie dormant; burning is final
+    /// and the only way to keep a body down. Pure logic — the node ticks it and reacts to events.
+    /// </summary>
+    public class NpcLifecycle(NpcLifecycleConfig config, IRandomNumberGenerator rnd)
+    {
+        private float _resurrectDelay;
+        private float _elapsed;
+
+        public NpcLifeStage Stage { get; private set; } = NpcLifeStage.Alive;
+
+        /// <summary>
+        /// Fired once when the timer completes; the argument is the parameter bonus of the rising
+        /// (StrengthFraction × MaxStrengthBonus, e.g. 0.4 = +40% to the boosted parameters).
+        /// </summary>
+        public event Action<float>? ResurrectionReady;
+
+        /// <summary>The first health zero-out. Undead go dormant, everyone else starts the rise timer.</summary>
+        public void OnDefeated(bool isUndead)
+        {
+            if (Stage != NpcLifeStage.Alive) return;
+
+            if (isUndead)
+            {
+                Stage = NpcLifeStage.Dormant;
+                return;
+            }
+
+            Stage = NpcLifeStage.Defeated;
+            _elapsed = 0;
+            _resurrectDelay = rnd.RandFloatRange(config.ResurrectMinSeconds, config.ResurrectMaxSeconds);
+        }
+
+        public void Tick(float delta)
+        {
+            if (Stage != NpcLifeStage.Defeated) return;
+
+            _elapsed += delta;
+            if (_elapsed < _resurrectDelay) return;
+
+            Stage = NpcLifeStage.Alive;
+            ResurrectionReady?.Invoke(StrengthFraction() * config.MaxStrengthBonus);
+        }
+
+        /// <summary>True while the body lies and can be burned (both fresh corpses and dormant undead).</summary>
+        public bool CanBeBurned => Stage is NpcLifeStage.Defeated or NpcLifeStage.Dormant;
+
+        public bool TryBurn()
+        {
+            if (!CanBeBurned) return false;
+            Stage = NpcLifeStage.FinalDead;
+            return true;
+        }
+
+        /// <summary>How strong the rising is: 0 at the minimum possible delay, 1 at the maximum.</summary>
+        public float StrengthFraction()
+        {
+            float range = config.ResurrectMaxSeconds - config.ResurrectMinSeconds;
+            return range <= 0 ? 1f : Math.Clamp((_resurrectDelay - config.ResurrectMinSeconds) / range, 0f, 1f);
+        }
+    }
+}

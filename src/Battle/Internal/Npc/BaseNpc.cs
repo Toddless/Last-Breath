@@ -5,8 +5,11 @@ namespace Battle.Internal.Npc
     using System.Threading.Tasks;
     using Attribute;
     using Components;
+    using Core.Ai;
+    using Core.Ai.World;
     using Core.Components;
     using Core.Data;
+    using Core.Data.NpcData;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Battle;
@@ -15,19 +18,34 @@ namespace Battle.Internal.Npc
     using Core.Interfaces.Events;
     using Core.Interfaces.Events.GameEvents;
     using Core.Interfaces.Items;
+    using Core.Modifiers;
     using Godot;
     using Services;
     using Source;
     using Stateless;
     using Utilities;
 
-    public partial class BaseNpc : CharacterBody2D, IFightableNpc
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent
     {
+        /// <summary>Close enough to a movement destination to stop.</summary>
+        private const float ArriveDistance = 5f;
+
+        /// <summary>How close the player must stand to burn a body.</summary>
+        private const float BurnDistance = 150f;
+
+        private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
+        private IPlayerAccessor? _playerAccessor;
+        private WorldBrain? _brain;
+        private NpcLifecycle? _lifecycle;
+        private IReadOnlyList<Vector2>? _patrolRoute;
+        private Vector2? _moveDestination;
+        private float _moveSpeed;
+        private string _lastMoveAnimation = string.Empty;
 
         private enum State
         {
@@ -81,11 +99,12 @@ namespace Battle.Internal.Npc
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
-        public int Level { get; } = 150;
-        public Rarity Rarity { get; } = Rarity.Legendary;
-        public EntityType EntityType { get; } = EntityType.Regular;
-        public Fractions Fraction { get; } = Fractions.Human;
+        public int Level { get; private set; } = 150;
+        public Rarity Rarity { get; private set; } = Rarity.Legendary;
+        public EntityType EntityType { get; private set; } = EntityType.Regular;
+        public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
+        public BehaviorProfile? Behavior { get; set; }
 
         public float CurrentHealth
         {
@@ -133,6 +152,7 @@ namespace Battle.Internal.Npc
         {
             Animations.PlayAnimation("Idle_Down");
             _interactionArea?.BodyEntered += OnBodyEnter;
+            _interactionArea?.InputEvent += OnInteractionAreaInput;
 
             _rnd.Randomize();
             Parameters = new EntityParametersComponent();
@@ -159,8 +179,22 @@ namespace Battle.Internal.Npc
             SetBaseValuesForParameters();
 
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
+            _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+        }
+
+        public override void _PhysicsProcess(double delta)
+        {
+            if (!IsAlive)
+            {
+                _lifecycle?.Tick((float)delta); // a lying body: only the resurrection timer runs
+                return;
+            }
+
+            _brain?.Tick((float)delta);
+            ProcessLocomotion();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -169,6 +203,116 @@ namespace Battle.Internal.Npc
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
         }
+
+        /// <summary>
+        /// Turns the randomly-initialized NPC into a data-driven one: overrides the rolled base
+        /// parameters, fixes the stance, learns the rolled abilities (Learn auto-equips them)
+        /// and attaches the combat behavior. Call after _Ready has built the components.
+        /// </summary>
+        public void ApplyDefinition(NpcDefinition definition)
+        {
+            Id = definition.NpcId;
+            Level = definition.Level;
+            Rarity = definition.Rarity;
+            EntityType = definition.EntityType;
+            Fraction = definition.Fraction;
+            Behavior = definition.Behavior;
+
+            foreach ((EntityParameter parameter, float value) in definition.Parameters)
+                Parameters.SetBaseValueForParameter(parameter, value);
+
+            AbilityBook.SetStance(definition.Stance);
+            foreach (var ability in definition.Abilities)
+                AbilityBook.Learn(definition.Stance, ability);
+
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+
+            AttachWorldBrain(definition.World);
+
+            _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
+            _lifecycle.ResurrectionReady += OnResurrectionReady;
+        }
+
+        /// <summary>Must be set before <see cref="ApplyDefinition"/> — the brain takes the route at construction.</summary>
+        public void SetPatrolRoute(IReadOnlyList<Vector2> points) => _patrolRoute = points;
+
+        /// <summary>The spawn position becomes home: the leash and calm activities anchor to it.</summary>
+        private void AttachWorldBrain(WorldBrainConfig? config)
+        {
+            HomePosition = GlobalPosition;
+            if (config == null) return;
+
+            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), _patrolRoute);
+            CanMove = true;
+        }
+
+        // ---- IWorldAgent (the brain's view of this body) ----
+
+        public Vector2 HomePosition { get; private set; }
+
+        /// <summary>World-space position; Node2D.Position is parent-local and must not leak into the brain.</summary>
+        Vector2 IWorldAgent.Position => GlobalPosition;
+
+        public void MoveTo(Vector2 destination, float speed)
+        {
+            _moveDestination = destination;
+            _moveSpeed = speed;
+        }
+
+        public void StopMoving()
+        {
+            _moveDestination = null;
+            Velocity = Vector2.Zero;
+        }
+
+        /// <summary>
+        /// Vision by distance polling of the player (no physics layers involved).
+        /// TODO: line-of-sight raycast and NPC-vs-NPC sightings when factions get relations.
+        /// </summary>
+        public TargetSighting? GetSighting(float visionRadius)
+        {
+            if (_playerAccessor?.Player is not { IsAlive: true } player) return null;
+            if (player is not Node2D playerNode) return null;
+
+            return GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= visionRadius
+                ? new TargetSighting(playerNode.GlobalPosition)
+                : null;
+        }
+
+        /// <summary>
+        /// Straight-line steering with collision sliding — enough for the small open 2D world.
+        /// Seam for later: swap the direction source to NavigationAgent2D once a navmesh exists.
+        /// </summary>
+        private void ProcessLocomotion()
+        {
+            if (_moveDestination == null || !CanMove || IsFighting) return;
+
+            var toDestination = _moveDestination.Value - GlobalPosition;
+            if (toDestination.Length() <= ArriveDistance)
+            {
+                StopMoving();
+                return;
+            }
+
+            Velocity = toDestination.Normalized() * _moveSpeed;
+            MoveAndSlide();
+            UpdateMoveAnimation(Velocity);
+        }
+
+        // TODO: switch to Walk_* clips when they exist; Idle_* keeps the direction readable for now.
+        private void UpdateMoveAnimation(Vector2 velocity)
+        {
+            string clip = Mathf.Abs(velocity.X) >= Mathf.Abs(velocity.Y)
+                ? velocity.X >= 0 ? "Idle_Right" : "Idle_Left"
+                : velocity.Y >= 0 ? "Idle_Down" : "Idle_Up";
+
+            if (clip == _lastMoveAnimation) return;
+            _lastMoveAnimation = clip;
+            Animations.PlayAnimation(clip);
+        }
+
+        private void OnWorldStimulus(WorldStimulusEvent evnt) => _brain?.OnStimulus(evnt.Stimulus);
 
         // TODO: Изменить позже. Позднее придумать алгоритм спавна нпс (не полагаемся целиком на рандом, необходимы определенные правила)
         private Stance GetRandomStance()
@@ -364,7 +508,7 @@ namespace Battle.Internal.Npc
 
         private void OnBodyEnter(Node2D body)
         {
-            if (IsFighting) return;
+            if (IsFighting || !IsAlive) return; // a lying body must not start battles
             if (body is not IPlayer player) return;
             try
             {
@@ -378,7 +522,10 @@ namespace Battle.Internal.Npc
                     fighters.Add(this);
 
                 _stateMachine.Fire(Trigger.Battle);
+                StopMoving();
                 _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
+                // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
+                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
             }
             catch (Exception e)
             {
@@ -404,8 +551,69 @@ namespace Battle.Internal.Npc
         private void OnBattleEnd(BattleEndEvent obj)
         {
             Effects.RemoveAllEffects();
-            if (IsAlive) _stateMachine.Fire(Trigger.Idle);
+            _stateMachine.Fire(Trigger.Idle); // Battle.OnExit restores the pre-battle world position for both outcomes
+
+            if (IsAlive) _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+            else BecomeBody();
+
             _battleEventBus = null;
+        }
+
+        /// <summary>
+        /// The defeat is not the end: the body stays in the world. Non-undead start the rise
+        /// timer, undead lie dormant; either can be burned by the player (final death).
+        /// NPCs without a data definition have no body rules — free them instead of leaking.
+        /// </summary>
+        private void BecomeBody()
+        {
+            if (_lifecycle == null)
+            {
+                QueueFree();
+                return;
+            }
+
+            Group?.RemoveFromGroup(this);
+            Group = null;
+            StopMoving();
+            _lifecycle.OnDefeated(Fraction == Fractions.Undead);
+            Animations.PlayAnimation("Dead");
+        }
+
+        /// <summary>Click on a lying body with the player standing next to it — burn it for good.</summary>
+        private void OnInteractionAreaInput(Node viewport, InputEvent @event, long shapeIdx)
+        {
+            if (_lifecycle is not { CanBeBurned: true }) return;
+            if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
+            if (!IsPlayerWithin(BurnDistance)) return;
+
+            if (!_lifecycle.TryBurn()) return;
+            _gameEventBus?.Publish(new NpcFinalDeathEvent(InstanceId, Id, GlobalPosition));
+            QueueFree();
+        }
+
+        private bool IsPlayerWithin(float distance) =>
+            _playerAccessor?.Player is Node2D playerNode && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
+
+        private void OnResurrectionReady(float parameterBonus)
+        {
+            var previousFraction = Fraction;
+            Fraction = Fractions.Undead;
+            ApplyRisingBonus(parameterBonus);
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+            Modulate = new Color(0.65f, 1f, 0.75f); // placeholder undead look until dedicated sprites exist
+            Animations.PlayAnimation("Idle_Down");
+            _gameEventBus?.Publish(new NpcFactionChangedEvent(InstanceId, Id, previousFraction, Fractions.Undead, GlobalPosition));
+        }
+
+        /// <summary>The longer the body lay, the stronger the rising — Increase modifiers on the core parameters.</summary>
+        private void ApplyRisingBonus(float bonus)
+        {
+            if (bonus <= 0) return;
+
+            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.Damage, EntityParameter.SpellDamage, EntityParameter.Armor];
+            foreach (var parameter in boosted)
+                ParameterModifiers.AddModifier(ModifiersCreator.CreateModifierInstance(parameter, ModifierValueType.Increase, bonus, UndeadRisingModifierSource));
         }
 
         private void OnEffectsChanged()
@@ -489,8 +697,10 @@ namespace Battle.Internal.Npc
         {
             if (!disposing) return;
 
+            _gameEventBus?.Unsubscribe<WorldStimulusEvent>(OnWorldStimulus);
             _battleEventBus = null;
             _gameEventBus = null;
+            _brain = null;
         }
     }
 }

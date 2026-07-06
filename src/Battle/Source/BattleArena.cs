@@ -4,9 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Ai;
+    using Core.Components;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
+    using Core.Interfaces.Abilities;
     using Core.Interfaces.Battle;
     using Core.Interfaces.Entity;
     using Core.Interfaces.Events;
@@ -18,10 +21,11 @@
     using UIElements;
     using Utilities;
 
-    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField
+    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField, ICombatEnvironment
     {
         private const string UID = "uid://bcj35twqggu1d";
         private readonly RandomNumberGenerator _rnd = new();
+        private readonly ICombatTurnPlanner _turnPlanner = new UtilityTurnPlanner(new DefaultRandomNumberGenerator());
         private readonly AttackContextScheduler _attackContextScheduler = new();
         private readonly QueueScheduler _queueScheduler = new();
         private readonly BattleTimeline _timeline = new();
@@ -223,8 +227,14 @@
                     // cooldowns still tick, only the action phase is skipped.
                     _currentFighter.CombatEvents.Publish(new TurnSkippedEvent(_currentFighter, skipCause));
                 }
+                else if (_currentFighter is IFightableNpc { Behavior: { } behavior } npc)
+                {
+                    // Data-driven NPC: the planner plays the whole turn (free casts + closing attack).
+                    await _turnPlanner.PlayTurnAsync(npc, behavior, this);
+                }
                 else
                 {
+                    // Player turn and the legacy fallback for NPCs without a behavior profile.
                     var target = await ResolveTargetAsync(_currentFighter);
                     if (target is { IsAlive: true })
                     {
@@ -308,6 +318,7 @@
                 GD.PushWarning("BattleArena: _visualLibrary is not assigned — ability VFX are disabled.");
                 return null;
             }
+
             var presenter = new AbilityVfxPresenter();
             AddChild(presenter);
             presenter.Setup(FindSpotFor, _visualLibrary);
@@ -369,6 +380,21 @@
 
         private IAttackContext CreateAttackContext(IFightable currentFighter, IFightable target) => new AttackContext(currentFighter, target,
             currentFighter.GetDamage(), new RandomNumberGenerator(), _attackContextScheduler);
+
+        // ICombatEnvironment: the primitives the NPC turn planner acts through.
+        IBattleField ICombatEnvironment.Field => this;
+
+        /// <summary>NPC cast path: straight to Execute — TargetSelectionController is the player's UI path.</summary>
+        public Task CastAbilityAsync(IFightable caster, IAbility ability, IReadOnlyList<IFightable> targets) =>
+            ability.Execute(targets.ToList(), this);
+
+        public async Task BasicAttackAsync(IFightable attacker, IFightable target)
+        {
+            var context = CreateAttackContext(attacker, target);
+            context.RawCriticalChance = attacker.Parameters.CriticalChance;
+            _attackContextScheduler.Schedule(context);
+            await _attackContextScheduler.DrainQueue();
+        }
 
         private void OnEntityDead(EntityDiedEvent obj)
         {

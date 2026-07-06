@@ -8,13 +8,14 @@
     {
         public EntityParameter EntityParameter { get; } = entityParameter;
         public ModifierValueType ModifierValueType { get; } = valueType;
+        public ModifierScope Scope { get; set; } = ModifierScope.Global;
         public float Value { get; set; } = value;
         public float BaseValue { get; } = value;
         public string Source { get; } = source;
         public float Weight { get; set; } = weight;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
-        public IModifierInstance Copy() => new SimpleModifier(EntityParameter, ModifierValueType, Value, Source, Weight);
+        public IModifierInstance Copy() => new SimpleModifier(EntityParameter, ModifierValueType, Value, Source, Weight) { Scope = Scope };
 
         public void ApplyTo(IFightable target) => target.ParameterModifiers.AddModifier(this);
 

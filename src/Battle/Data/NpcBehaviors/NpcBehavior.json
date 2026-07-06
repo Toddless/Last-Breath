@@ -1,0 +1,59 @@
+{
+    "behaviors": [
+        {
+            "id": "Behavior_Aggressive",
+            "stance": "Dexterity",
+            "maxCastsPerTurn": 2,
+            "temperature": 0.15,
+            "aggression": 1.3,
+            "caution": 0.7,
+            "greed": 1.0,
+            "castScoreThreshold": 0.35,
+            "abilities": [
+                { "id": "Ability_Series_Of_Attacks", "weight": 1.0, "role": "Damage" },
+                { "id": "Ability_Increasing_Pressure", "weight": 0.9, "role": "Damage" },
+                { "id": "Ability_Poison_Explosion", "weight": 0.9, "role": "Damage" },
+                { "id": "Ability_Jar_Of_Poison", "weight": 0.8, "role": "Debuff" },
+                { "id": "Ability_Poison_Coating", "weight": 0.7, "role": "Buff" },
+                { "id": "Ability_Critical_Calculation", "weight": 0.6, "role": "Buff" },
+                { "id": "Ability_Dark_Shroud", "weight": 0.5, "role": "Buff" }
+            ]
+        },
+        {
+            "id": "Behavior_Defensive",
+            "stance": "Strength",
+            "maxCastsPerTurn": 2,
+            "temperature": 0.15,
+            "aggression": 0.9,
+            "caution": 1.3,
+            "greed": 0.8,
+            "castScoreThreshold": 0.35,
+            "abilities": [
+                { "id": "Ability_Head_Butt", "weight": 1.0, "role": "Control" },
+                { "id": "Ability_Porcupine", "weight": 0.9, "role": "Buff" },
+                { "id": "Ability_Ares_Blessing", "weight": 0.9, "role": "Heal" },
+                { "id": "Ability_Double_Strike", "weight": 0.8, "role": "Damage" },
+                { "id": "Ability_Berserk_Fury", "weight": 0.7, "role": "Damage" },
+                { "id": "Ability_Sacrifice", "weight": 0.5, "role": "Buff" },
+                { "id": "Ability_Armageddon", "weight": 0.7, "role": "Damage" }
+            ]
+        },
+        {
+            "id": "Behavior_Mixed",
+            "stance": "Intelligence",
+            "maxCastsPerTurn": 2,
+            "temperature": 0.2,
+            "aggression": 1.0,
+            "caution": 1.0,
+            "greed": 1.0,
+            "castScoreThreshold": 0.35,
+            "abilities": [
+                { "id": "Ability_Ice_Shards", "weight": 1.0, "role": "Damage" },
+                { "id": "Ability_Chain_Lightning", "weight": 0.9, "role": "Damage" },
+                { "id": "Ability_Overload", "weight": 0.8, "role": "Damage" },
+                { "id": "Ability_Ice_Block", "weight": 0.8, "role": "Control" },
+                { "id": "Ability_Ice_Aegis", "weight": 0.9, "role": "Buff" }
+            ]
+        }
+    ]
+}

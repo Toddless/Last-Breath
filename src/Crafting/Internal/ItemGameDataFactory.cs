@@ -1,14 +1,16 @@
-﻿namespace Crafting.Internal
+namespace Crafting.Internal
 {
     using System;
     using System.Collections.Generic;
+    using Core.Crafting;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
+    using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
-    using Source;
 
     internal sealed class ItemGameDataFactory : IItemGameDataFactory
     {
@@ -16,13 +18,23 @@
             throw new NotImplementedException("Crafting module does not use basic items.");
 
         public IEquipItem CreateEquipItem(EquipmentPiece piece, string id, string[] tags) =>
-            new TestEquipItem(piece, id, tags);
+            new EquipItem(piece, id, tags);
+
+        public IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags) =>
+            new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
+
+        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers) => kind switch
+        {
+            GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
+            GrantKind.Passive => new PassiveSkillGrant(id, id, static () => PassiveSkillProvider.Instance),
+            _ => null
+        };
 
         public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
             new Modifier(valueType, parameter, value, weight);
 
         public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight) =>
-            new MaterialModifier(parameter, valueType, baseValue, weight);
+            new Modifier(valueType, parameter, baseValue, weight);
 
         public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
             new Requirement(type, id, amount);
@@ -32,7 +44,7 @@
             new CraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, isOpened);
 
         public IMaterialCategory CreateMaterialCategory(List<IModifier> modifiers, string id) =>
-            new Source.MaterialCategory(modifiers, id);
+            new Core.Crafting.MaterialCategory(modifiers, id);
 
         public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory category, int maxStackSize) =>
             new UpgradeResource(id, tags, rarity, category, maxStackSize);

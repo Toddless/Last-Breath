@@ -16,6 +16,7 @@
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _temporaryModifiers = [];
         // mo
         private readonly Dictionary<EntityParameter, List<IModifierInstance>> _battleModifiers = [];
+        private readonly List<IParameterModifierSource> _sources = [];
 
         public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> EntityModifiers => _permanentModifiers;
         public IReadOnlyDictionary<EntityParameter, List<IModifierInstance>> TemporaryModifiers => _temporaryModifiers;
@@ -24,6 +25,21 @@
         public event EventHandler<IModifiersChangedEventArgs>? ModifiersChanged;
 
         public IReadOnlyList<IModifierInstance> GetModifiers(EntityParameter parameter) => [];
+
+        public void RegisterSource(IParameterModifierSource source)
+        {
+            if (_sources.Contains(source)) return;
+            _sources.Add(source);
+            source.SourceChanged += OnSourceChanged;
+            OnSourceChanged(source.AffectedParameters);
+        }
+
+        public void UnregisterSource(IParameterModifierSource source)
+        {
+            if (!_sources.Remove(source)) return;
+            source.SourceChanged -= OnSourceChanged;
+            OnSourceChanged(source.AffectedParameters);
+        }
         public void AddModifier(IModifierInstance modifier) => AddToCategory(_permanentModifiers, modifier);
         public void AddTemporaryModifier(IModifierInstance modifier) => AddToCategory(_temporaryModifiers, modifier);
 
@@ -56,8 +72,15 @@
                 modifiers.AddRange(temp);
             if (_battleModifiers.TryGetValue(entityParameter, out var battle))
                 modifiers.AddRange(battle);
+            foreach (var source in _sources)
+                modifiers.AddRange(source.GetModifiers(entityParameter));
 
             return modifiers;
+        }
+
+        private void OnSourceChanged(IReadOnlyCollection<EntityParameter> parameters)
+        {
+            foreach (var parameter in parameters) RaiseEvent(parameter);
         }
 
         private void RaiseEvent(EntityParameter entityParameter) => ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(GetCombinedModifiers(entityParameter), entityParameter));

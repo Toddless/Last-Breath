@@ -6,6 +6,7 @@
     {
         public ModifierValueType ModifierValueType { get; } = valueType;
         public EntityParameter EntityParameter { get; } = entityParameter;
+        public ModifierScope Scope { get; set; } = ModifierScope.Global;
         public float BaseValue { get; } = baseValue;
         public float Value { get; set; } = baseValue;
         public float Weight { get; set; } = weight;

@@ -22,6 +22,7 @@
         {
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
+            services.AddSingleton<IItemAscender, ItemAscender>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
@@ -30,6 +31,7 @@
             services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
+            services.AddTransient<IRequestHandler<AscendEquipItemRequest, AscensionResult>, AscendEquipItemRequestHandler>();
 
             services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();
             services.AddTransient<IMessageHandler<GainCraftingExpirienceMessage>, GainCraftingExperienceMessageHandler>();

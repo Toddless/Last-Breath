@@ -6,6 +6,7 @@ namespace LootGeneration.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Data;
+    using Core.Enums;
     using Core.Interfaces;
     using Core.Interfaces.Crafting;
     using Core.Interfaces.Items;
@@ -46,6 +47,10 @@ namespace LootGeneration.Services
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) =>
             _equipItemsResources.TryGetValue(itemId, out var res) ? res.ToDictionary() : [];
+
+        // LootGeneration never upgrades or recrafts items — costs live in the crafting-side data.
+        public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => [];
+        public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => [];
 
         public string GetRecipeResultItemId(string recipeId)
         {
