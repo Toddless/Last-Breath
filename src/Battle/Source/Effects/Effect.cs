@@ -19,7 +19,6 @@
         StatusEffects statusEffect = StatusEffects.None) : IEffect
     {
         private readonly List<Action> _unsubscribes = [];
-
         protected EffectApplyingContext? Context { get; private set; }
 
         /// <summary>True when the stacking rules actually accepted this instance (see EffectsComponent).</summary>
@@ -117,7 +116,18 @@
             _unsubscribes.Add(() => bus.Unsubscribe(handler));
         }
 
-        protected virtual string FormatDescription() => Localization.LocalizeDescription(Id);
+        /// <summary>
+        /// Named values for the description template. The base gives every effect {Duration}
+        /// (usable as {Duration|turn|turns}) and {MaxStacks}; descendants extend the dictionary
+        /// with their own values ({Damage}, {Stacks}...) on top of base.DescriptionValues.
+        /// </summary>
+        protected virtual Dictionary<string, object?> DescriptionValues => new()
+        {
+            ["Duration"] = Duration,
+            ["MaxStacks"] = MaxStacks,
+        };
+
+        protected virtual string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
 
         private void ClearSubscriptions()
         {

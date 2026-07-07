@@ -28,6 +28,10 @@ project/assembly_name="Crafting"
 
 timers/tooltip_delay_sec=0.4
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://Internal/Data/Shared/Localization/en.po", "res://Internal/Data/Shared/Localization/ru.po")
+
 [input]
 
 ui_crafting={

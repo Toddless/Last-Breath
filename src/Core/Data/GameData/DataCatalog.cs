@@ -12,6 +12,7 @@ namespace Core.Data.GameData
         public const string NpcBuffs = "NpcBuffs";
         public const string NpcModifiers = "NpcModifiers";
         public const string Factions = "Factions";
+        public const string Formatting = "Formatting";
         public const string World = "World";
         public const string Player = "Player";
         public const string LootTables = "LootTables";
@@ -20,7 +21,6 @@ namespace Core.Data.GameData
         public const string EquipItemResources = "EquipItemResources";
         public const string Recipes = "Recipes";
         public const string Resources = "Resources";
-        public const string CraftingResources = "CraftingResources";
         public const string ModifierPools = "ModifierPools";
         public const string UpgradeCosts = "UpgradeCosts";
     }

@@ -54,7 +54,13 @@
 
         private IAbilityUpgrade? CreateUpgrade(AbilityUpgradeData data)
         {
-            if (_abilityUpgrades.TryGetValue(data.Id, out var factory)) return factory(data);
+            if (_abilityUpgrades.TryGetValue(data.Id, out var factory))
+            {
+                var upgrade = factory(data);
+                // Placeholder = json property name; live upgrade descriptions come for free
+                upgrade.DescriptionValues = data.UpgradeProperties.ToDictionary(entry => entry.Key, object? (entry) => entry.Value);
+                return upgrade;
+            }
 
             Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
             return null;

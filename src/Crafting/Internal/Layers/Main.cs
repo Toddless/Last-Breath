@@ -21,13 +21,13 @@
         {
             if (@event is InputEventKey { Pressed: true, Keycode: Key.C })
             {
-                _elementsManager?.OpenWindow(typeof(CraftingWindow));
+                _elementsManager?.ToggleWindow(typeof(CraftingWindow));
                 GetViewport().SetInputAsHandled();
             }
 
             if (@event is InputEventKey { Pressed: true, Keycode: Key.I })
             {
-                _elementsManager?.OpenWindow(typeof(InventoryWindow));
+                _elementsManager?.ToggleWindow(typeof(InventoryWindow));
                 GetViewport().SetInputAsHandled();
             }
         }

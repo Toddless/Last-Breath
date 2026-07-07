@@ -1,6 +1,7 @@
 ﻿namespace Core.Components
 {
     using System;
+    using System.Collections.Generic;
     using Decorator;
 
     public interface IModuleManager<TKey, TModule, TDecorator>
@@ -9,6 +10,9 @@
         where TDecorator : IModuleDecorator<TKey, TModule>
     {
         event Action<TKey>? ModuleChanges;
+
+        /// <summary>Keys with a base module — the ability's own parameter set (description values are built from it).</summary>
+        IReadOnlyCollection<TKey> Keys { get; }
 
         TModule GetModule(TKey key);
         bool AddBaseModule(TKey key, TModule module);

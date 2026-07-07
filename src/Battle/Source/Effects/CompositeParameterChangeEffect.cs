@@ -6,6 +6,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
+    using Core.Localization;
     using Decorators;
 
     /// <summary>One parameter change of a composite effect.</summary>
@@ -24,6 +25,18 @@ namespace Battle.Source.Effects
         StatusEffects statusEffect = StatusEffects.None) : Effect(id, duration, maxStacks, statusEffect)
     {
         public IReadOnlyList<ParameterChange> Changes { get; } = changes;
+
+        /// <summary>{Changes} — the whole list as one display string: "+300 Health, +10% Health Recovery".</summary>
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["Changes"] = string.Join(", ", Changes.Select(change =>
+                    $"{Localization.FormatParameterChange(change.Parameter, change.Value, change.Type, TextFormat.Rich)} {Localization.Localize(change.Parameter.ToString())}"));
+                return values;
+            }
+        }
 
         public override async Task Apply(EffectApplyingContext context)
         {

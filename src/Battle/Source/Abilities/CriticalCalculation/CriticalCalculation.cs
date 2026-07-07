@@ -32,7 +32,9 @@ namespace Battle.Source.Abilities.CriticalCalculation
             costValue,
             costType)
     {
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
+
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -46,8 +48,19 @@ namespace Battle.Source.Abilities.CriticalCalculation
             }
         }
 
-        public int BuffStacks => (int)AbilityParameterDecorator.GetModule(Parameters.Stacks).GetValue();
-        public int BuffDuration => (int)AbilityParameterDecorator.GetModule(Parameters.Duration).GetValue();
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
+            }
+        }
+
+
+        public int BuffStacks => (int)this[Parameters.Stacks];
+        public int BuffDuration => (int)this[Parameters.Duration];
 
         /// <summary>
         /// The buff the ability stacks on cast, built from the given duration. Default is the crit-chance
@@ -71,7 +84,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -82,7 +95,7 @@ namespace Battle.Source.Abilities.CriticalCalculation
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()

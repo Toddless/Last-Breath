@@ -15,25 +15,25 @@ anchor_bottom = 1.0
 offset_right = 500.0
 grow_vertical = 2
 script = ExtResource("1_iw8cd")
-_abilityUpgrades = NodePath("VBoxContainer2/ScrollContainer/Upgrades/AbilityUpgrades")
-_abilityName = NodePath("VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Name")
-_cost = NodePath("VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cost")
-_cooldown = NodePath("VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cooldown")
-_abilityIcon = NodePath("VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Icon")
-_abilityDescription = NodePath("VBoxContainer2/Panel/MarginContainer/VBoxContainer/MarginContainer/Description")
-_close = NodePath("VBoxContainer2/Panel/MarginContainer/Button")
+_abilityUpgrades = NodePath("MainContainer/ScrollContainer/Upgrades/AbilityUpgrades")
+_abilityName = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Name")
+_cost = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cost")
+_cooldown = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cooldown")
+_abilityIcon = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Icon")
+_abilityDescription = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/MarginContainer/Description")
+_close = NodePath("MainContainer/Panel/MarginContainer/Button")
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="." unique_id=851026477]
+[node name="MainContainer" type="VBoxContainer" parent="." unique_id=851026477]
 layout_mode = 2
 
-[node name="Panel" type="Panel" parent="VBoxContainer2" unique_id=2007721563]
+[node name="Panel" type="Panel" parent="MainContainer" unique_id=2007721563]
 custom_minimum_size = Vector2(500, 350)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.3
 mouse_filter = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer2/Panel" unique_id=1683076850]
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/Panel" unique_id=1683076850]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,39 +45,39 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer2/Panel/MarginContainer" unique_id=240283676]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/Panel/MarginContainer" unique_id=240283676]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer" unique_id=1852709718]
+[node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer" unique_id=1852709718]
 layout_mode = 2
 
-[node name="Icon" type="TextureRect" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1785913081]
+[node name="Icon" type="TextureRect" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1785913081]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 expand_mode = 1
 
-[node name="Properties" type="VBoxContainer" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=650728701]
+[node name="Properties" type="VBoxContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=650728701]
 layout_mode = 2
 
-[node name="Name" type="Label" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1663069818]
+[node name="Name" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1663069818]
 layout_mode = 2
 text = "Ледяная шрапнель"
 label_settings = SubResource("LabelSettings_fx85w")
 
-[node name="Cost" type="Label" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=523355465]
+[node name="Cost" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=523355465]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Стоимость: 400"
 label_settings = SubResource("LabelSettings_awghw")
 
-[node name="Cooldown" type="Label" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1664994067]
+[node name="Cooldown" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1664994067]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Перезарядка: 4"
 label_settings = SubResource("LabelSettings_awghw")
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer" unique_id=1438409670]
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer" unique_id=1438409670]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.8
@@ -85,7 +85,7 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Description" type="RichTextLabel" parent="VBoxContainer2/Panel/MarginContainer/VBoxContainer/MarginContainer" unique_id=268001755]
+[node name="Description" type="RichTextLabel" parent="MainContainer/Panel/MarginContainer/VBoxContainer/MarginContainer" unique_id=268001755]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
@@ -96,23 +96,23 @@ text = "Выстреливает тремя осколками льдя. Каж�
 Уровень активации 3: Выстреливает осколками по всем целям на поле боя.
 Уровень активации 4: При критическом ударе осколки распадаются на шрапнель, нанося 50 + (15% + 55%) урона всем противникам на поле боя."
 
-[node name="Button" type="Button" parent="VBoxContainer2/Panel/MarginContainer" unique_id=465040569]
+[node name="Button" type="Button" parent="MainContainer/Panel/MarginContainer" unique_id=465040569]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 text = "X"
 flat = true
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer2" unique_id=910815124]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer" unique_id=910815124]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.7
 
-[node name="Upgrades" type="VBoxContainer" parent="VBoxContainer2/ScrollContainer" unique_id=962574055]
+[node name="Upgrades" type="VBoxContainer" parent="MainContainer/ScrollContainer" unique_id=962574055]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AbilityUpgrades" parent="VBoxContainer2/ScrollContainer/Upgrades" unique_id=1136465602 instance=ExtResource("2_441g7")]
+[node name="AbilityUpgrades" parent="MainContainer/ScrollContainer/Upgrades" unique_id=1136465602 instance=ExtResource("2_441g7")]
 layout_mode = 2
 size_flags_vertical = 3

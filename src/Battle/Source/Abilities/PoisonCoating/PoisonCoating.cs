@@ -32,7 +32,9 @@ namespace Battle.Source.Abilities.PoisonCoating
             costValue,
             costType)
     {
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
+
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -47,9 +49,19 @@ namespace Battle.Source.Abilities.PoisonCoating
             }
         }
 
-        public int CoatingDuration => (int)AbilityParameterDecorator.GetModule(Parameters.CoatingDuration).GetValue();
-        public int PoisonDuration => (int)AbilityParameterDecorator.GetModule(Parameters.PoisonDuration).GetValue();
-        public float PoisonDamagePercent => AbilityParameterDecorator.GetModule(Parameters.PoisonMultiplier).GetValue();
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
+            }
+        }
+
+        public int CoatingDuration => (int)this[Parameters.CoatingDuration];
+        public int PoisonDuration => (int)this[Parameters.PoisonDuration];
+        public float PoisonDamagePercent => this[Parameters.PoisonMultiplier];
 
         public enum Parameters : byte
         {
@@ -66,7 +78,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -77,7 +89,7 @@ namespace Battle.Source.Abilities.PoisonCoating
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()

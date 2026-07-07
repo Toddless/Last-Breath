@@ -26,9 +26,9 @@ namespace Battle.Source.Abilities.JarOfPoison
         Costs costType = Costs.Mana)
         : DamagingAbility(id: "Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
-        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
+        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
 
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -40,6 +40,17 @@ namespace Battle.Source.Abilities.JarOfPoison
                 return field;
             }
         }
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
+            }
+        }
+
 
         public int PoisonDuration => (int)this[Parameters.PoisonDuration];
 
@@ -59,7 +70,7 @@ namespace Battle.Source.Abilities.JarOfPoison
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -70,7 +81,7 @@ namespace Battle.Source.Abilities.JarOfPoison
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()

@@ -76,7 +76,7 @@ namespace Battle.Source.UIElements
                 var view = await _messageBus.SendRequest<GetAbilityUpgradeViewRequest, AbilityUpgradeView>(
                     new GetAbilityUpgradeViewRequest(abilityId));
 
-                if (_uiElementsManager.GetOrOpenWindow(typeof(AbilityUpgradeWindow)) is not AbilityUpgradeWindow window) return;
+                if (_uiElementsManager.OpenWindow(typeof(AbilityUpgradeWindow)) is not AbilityUpgradeWindow window) return;
                 window.Show(view);
             }
             catch (Exception e)

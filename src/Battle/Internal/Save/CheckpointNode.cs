@@ -31,7 +31,7 @@ namespace Battle.Internal.Save
             if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
             if (!IsPlayerWithin(InteractDistance)) return;
 
-            _uiElements?.OpenWindow(typeof(SaveLoadWindow));
+            _uiElements?.ToggleWindow(typeof(SaveLoadWindow));
         }
 
         private bool IsPlayerWithin(float distance) =>

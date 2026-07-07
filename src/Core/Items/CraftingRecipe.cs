@@ -47,8 +47,8 @@ namespace Core.Items
         public ItemType ItemType { get; }
         public string[] OptionalResourceCategories { get; }
         public List<IRequirement> Requirements { get; set; }
-        public string DisplayName => TranslationServer.Translate(Id);
-        public string Description => TranslationServer.Translate(Id + "_Description");
+        public string DisplayName => Localization.Localization.Localize(Id);
+        public string Description => Localization.Localization.LocalizeDescription(Id);
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);

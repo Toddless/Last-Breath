@@ -35,6 +35,8 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
+        // TODO:
+        // старый подход. Инжектим uiElementsManager и открываем окна с его помощью
         private void OnCraftingBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(CraftingWindow)));
         private void OnQuestBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(QuestsWindow)));
         private void OnInventoryBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(InventoryWindow)));

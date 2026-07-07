@@ -8,11 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Last Breath"
 run/main_scene="uid://bd5wylwyowomd"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 run/max_fps=144
 config/icon="res://icon.svg"
 
@@ -137,7 +141,7 @@ ui_dialog={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Localization/en.po", "res://Localization/ru.po")
+locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "res://Data/Shared/Localization/ru.po")
 
 [rendering]
 

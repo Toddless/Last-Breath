@@ -16,7 +16,7 @@ script = ExtResource("1_xch8j")
 
 [node name="Player" parent="." unique_id=2109795083 instance=ExtResource("2_pbpt3")]
 
-[node name="NpcSpawnPoint" type="Node2D" parent="." unique_id=154585184]
+[node name="UndeadSpawnPoint" type="Node2D" parent="." unique_id=154585184]
 position = Vector2(626, 750)
 script = ExtResource("6_b5cil")
 _npcIds = PackedStringArray("Npc_Skeleton_Mage", "Npc_Grave_Revenant")
@@ -26,7 +26,7 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 script = ExtResource("7_qqm7e")
 metadata/_custom_type_script = "uid://by0f8rrg2jn6v"
 
-[node name="NpcSpawnPoint2" type="Node2D" parent="." unique_id=1588714628]
+[node name="BanditSpawnPoint" type="Node2D" parent="." unique_id=1588714628]
 position = Vector2(1520, 184)
 script = ExtResource("6_b5cil")
 _npcIds = PackedStringArray("Npc_Bandit_Veteran", "Npc_Bandit")

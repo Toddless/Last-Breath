@@ -1,0 +1,206 @@
+{
+	"craftingRecipes": [
+		{
+			"id": "Recipe_Creators_Ring",
+			"resultItemId": "Ring_of_Creators",
+			"tags": [
+				"Ring",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Gold_Ore",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Emerald_Gem",
+					"amount": 2
+				},
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Ruby_Gem",
+					"amount": 2
+				},
+				{
+					"type": "MasteryLevel",
+					"id": "Crafting_Mastery",
+					"amount": 5
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Ring_Of_Fire_Demon",
+			"resultItemId": "Ring_Of_Fire_Demon",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "ResourceCategory",
+					"id": "Leather",
+					"amount": 4
+				},
+				{
+					"type": "ResourceCategory",
+					"id": "Metal",
+					"amount": 4
+				},
+				{
+					"type": "ResourceCategory",
+					"id": "Fabric",
+					"amount": 3
+				},
+				{
+					"type": "MasteryLevel",
+					"id": "Crafting_Mastery",
+					"amount": 10
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Body_Strength_Iron_Bastion",
+			"resultItemId": "Body_Strength_Iron_Bastion",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Silk_Fabric",
+					"amount": 2
+				},
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Wild_Boar_Leather",
+					"amount": 2
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Body_Intelligence_Aegis",
+			"resultItemId": "Body_Intelligence_Aegis",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Deer_Leather",
+					"amount": 2
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Generic_Boots",
+			"resultItemId": "Boots",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Wild_Boar_Leather",
+					"amount": 2
+				},
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Silk_Fabric",
+					"amount": 2
+				}
+			]
+		},
+		{
+			"id": "Recipe_Generic_Gloves",
+			"resultItemId": "Gloves",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Silk_Fabric",
+					"amount": 2
+				},
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Wild_Boar_Leather",
+					"amount": 2
+				}
+			]
+		},
+		{
+			"id": "Recipe_Generic_Helmet",
+			"resultItemId": "Helmet",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment",
+				"Generic"
+			],
+			"rarity": "Rare",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Deer_Leather",
+					"amount": 2
+				}
+			]
+		}
+	]
+}

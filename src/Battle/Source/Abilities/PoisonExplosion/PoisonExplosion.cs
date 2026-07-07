@@ -36,9 +36,9 @@ namespace Battle.Source.Abilities.PoisonExplosion
             ExecuteCondition = new PoisonStackExecuteCondition(() => ExecutionThreshold);
         }
 
-        private float this[Parameters parameters] => AbilityParameterDecorator.GetModule(parameters).GetValue();
+        private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
 
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -49,6 +49,17 @@ namespace Battle.Source.Abilities.PoisonExplosion
                     [Parameters.ExecutionThreshold] = new Module<Parameters>(() => _executionThreshold, Parameters.ExecutionThreshold),
                 });
                 return field;
+            }
+        }
+
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
             }
         }
 
@@ -73,7 +84,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -84,7 +95,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()

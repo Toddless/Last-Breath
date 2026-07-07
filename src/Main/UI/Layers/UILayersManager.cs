@@ -1,4 +1,4 @@
-﻿namespace LastBreath.UI.Layers
+namespace LastBreath.UI.Layers
 {
     using Core.Constants;
     using Core.Events;
@@ -11,12 +11,16 @@
     {
         [Export] private CanvasLayer? _mainLayer, _windowLayer, _notificationLayer;
 
+        public event System.Action? OverlaysCleared;
+
         private IGameMessageBus? _gameMessageBus;
+        private IUiElementsManager? _uiElements;
 
         public override void _Ready()
         {
             var serviceProvider = GameServiceProvider.Instance;
             _gameMessageBus = serviceProvider.GetService<IGameMessageBus>();
+            _uiElements = serviceProvider.GetService<IUiElementsManager>();
         }
 
         public override void _UnhandledInput(InputEvent @event)
@@ -33,8 +37,9 @@
                     _gameMessageBus?.PublishMessageAsync(new OpenCharacterWindowMessage());
                     break;
                 case var _ when @event.IsActionPressed(Settings.Cancel):
-                    CloseAllWindows();
-                    _gameMessageBus?.PublishMessageAsync(new PauseGameMessage());
+                    // Layer by layer: overlays, then windows; pause only when there was nothing left to close
+                    if (_uiElements?.HandleEscape() != true)
+                        _gameMessageBus?.PublishMessageAsync(new PauseGameMessage());
                     break;
                 default: return;
             }
@@ -52,14 +57,31 @@
             if (window is Control cWindow) _windowLayer?.CallDeferred(Node.MethodName.AddChild, cWindow);
         }
 
-        public void ShowNotification(Control notification) => _notificationLayer?.CallDeferred(Node.MethodName.AddChild, notification);
+        public void ShowOverlay(IPopup overlay)
+        {
+            if (overlay is Control cOverlay)
+                _notificationLayer?.CallDeferred(Node.MethodName.AddChild, cOverlay);
+        }
         public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.RemoveChild, hud);
         public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(Node.MethodName.RemoveChild, window);
 
         public void CloseAllWindows()
         {
             foreach (var child in _windowLayer?.GetChildren() ?? [])
-                _windowLayer?.CallDeferred(Node.MethodName.RemoveChild, child);
+                child.QueueFree();
+        }
+
+        public bool CloseOverlays()
+        {
+            bool closedAny = false;
+            foreach (var child in _notificationLayer?.GetChildren() ?? [])
+            {
+                child.QueueFree();
+                closedAny = true;
+            }
+
+            if (closedAny) OverlaysCleared?.Invoke();
+            return closedAny;
         }
     }
 }

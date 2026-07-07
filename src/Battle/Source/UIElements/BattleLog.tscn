@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpnxcv1yd5d7g"]
+[gd_scene format=3 uid="uid://cpnxcv1yd5d7g"]
 
-[ext_resource type="Script" path="res://Source/UIElements/BattleLog.cs" id="1_log"]
+[ext_resource type="Script" uid="uid://cmpwcx42ssncj" path="res://Source/UIElements/BattleLog.cs" id="1_log"]
 
 [node name="BattleLog" type="MarginContainer" unique_id=1622440562 node_paths=PackedStringArray("_text", "_collapseButton", "_damageFilter", "_attackFilter", "_healFilter", "_abilityFilter", "_effectFilter")]
 custom_minimum_size = Vector2(460, 0)
@@ -32,35 +32,41 @@ layout_mode = 2
 
 [node name="Collapse" type="Button" parent="Panel/VBox/Header" unique_id=1310158668]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 text = "Лог"
 
 [node name="DamageFilter" type="Button" parent="Panel/VBox/Header" unique_id=1310158669]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 button_pressed = true
 text = "Урон"
 
 [node name="AttackFilter" type="Button" parent="Panel/VBox/Header" unique_id=1310158670]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 button_pressed = true
 text = "Атаки"
 
 [node name="HealFilter" type="Button" parent="Panel/VBox/Header" unique_id=1310158671]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 button_pressed = true
 text = "Лечение"
 
 [node name="AbilityFilter" type="Button" parent="Panel/VBox/Header" unique_id=1310158672]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 button_pressed = true
 text = "Способн."
 
 [node name="EffectFilter" type="Button" parent="Panel/VBox/Header" unique_id=1310158673]
 layout_mode = 2
+focus_mode = 0
 toggle_mode = true
 button_pressed = true
 text = "Эффекты"
@@ -70,5 +76,4 @@ custom_minimum_size = Vector2(440, 200)
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-scroll_active = true
 scroll_following = true

@@ -47,6 +47,16 @@ namespace Battle.Source.Abilities.HeadButt
             }
         }
 
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParameterDecorator);
+                return values;
+            }
+        }
+
         public int StunDuration => (int)this[Parameters.StunDuration];
         public int Attacks => (int)this[Parameters.Attacks];
 
@@ -84,6 +94,7 @@ namespace Battle.Source.Abilities.HeadButt
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
+
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {

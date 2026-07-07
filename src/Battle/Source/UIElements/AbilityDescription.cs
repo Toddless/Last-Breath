@@ -13,6 +13,8 @@
         [Export] private Label? _name;
 
 
+        public override void _Ready() => KeywordLinks.Attach(_description);
+
         public void SetupFullAbilityDescription(IAbility ability)
         {
             SetAbilityName(ability.DisplayName);

@@ -1,7 +1,6 @@
 namespace Battle.Source.UIElements
 {
-    using System;
-    using Core;
+    using System.Threading.Tasks;
     using Core.Localization;
     using Core.Views.UI;
     using Godot;
@@ -18,53 +17,57 @@ namespace Battle.Source.UIElements
     /// </summary>
     public partial class NotificationPopup : Control, INotificationPopup
     {
-        // TODO(Todd): replace with the real UID after creating NotificationPopup.tscn.
         private const string UID = "uid://b3e1nusmv0gds";
-        private const float FadeSeconds = 0.4f;
-        private const float HoldSeconds = 2.0f;
+        private const float FadeSeconds = 0.5f;
+        private const float HoldSeconds = 3.0f;
 
         // Button to close early
         [Export] private Button? _close;
         [Export] private Label? _label;
         private string _text = string.Empty;
 
+        public PopupLifetime Lifetime => PopupLifetime.Timed;
+
+        /// <summary>Resolved by the NotificationService from the message category before showing.</summary>
+        public OverlayRegion Region { get; private set; }
+
         /// <summary>Localizes and stores the text; display starts in _Ready, once the node is in the tree.</summary>
-        public void SetNotification(string notificationId) => _text = Localization.Localize(notificationId);
+        public void SetNotification(string notificationId, OverlayRegion region)
+        {
+            _text = Localization.Localize(notificationId);
+            Region = region;
+        }
+
+        public void Close() => QueueFree();
 
         public override void _Ready()
         {
             _label?.Text = _text;
-            _close?.Pressed += OnPressed;
-            PlayLifecycleAsync();
+            _close?.Pressed += Close;
+            _ = PlayLifecycleAsync();
         }
-
-        private void OnPressed() => QueueFree();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private async void PlayLifecycleAsync()
+        public async Task PlayLifecycleAsync()
         {
-            try
-            {
-                Modulate = new Color(Modulate, 0);
+            // The service starts the lifecycle right after ShowOverlay, but the layer adds the
+            // node DEFERRED — tweens and timers need the tree, so wait for _Ready first
+            if (!IsInsideTree()) await ToSignal(this, Node.SignalName.Ready);
 
-                var fadeIn = CreateTween();
-                fadeIn.TweenProperty(this, "modulate:a", 1.0f, FadeSeconds);
-                await ToSignal(fadeIn, Tween.SignalName.Finished);
+            Modulate = new Color(Modulate, 0);
 
-                await ToSignal(GetTree().CreateTimer(HoldSeconds), SceneTreeTimer.SignalName.Timeout);
+            var fadeIn = CreateTween();
+            fadeIn.TweenProperty(this, "modulate:a", 1.0f, FadeSeconds);
+            await ToSignal(fadeIn, Tween.SignalName.Finished);
 
-                var fadeOut = CreateTween();
-                fadeOut.TweenProperty(this, "modulate:a", 0.0f, FadeSeconds);
-                await ToSignal(fadeOut, Tween.SignalName.Finished);
+            await ToSignal(GetTree().CreateTimer(HoldSeconds), SceneTreeTimer.SignalName.Timeout);
 
-                QueueFree();
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackException($"Failed to play the animation: {ex.Message}", ex, this);
-                GD.Print($"Failed to play the animation: {ex.Message}, {ex.StackTrace}");
-            }
+            var fadeOut = CreateTween();
+            fadeOut.TweenProperty(this, "modulate:a", 0.0f, FadeSeconds);
+            await ToSignal(fadeOut, Tween.SignalName.Finished);
+
+            QueueFree();
         }
     }
 }

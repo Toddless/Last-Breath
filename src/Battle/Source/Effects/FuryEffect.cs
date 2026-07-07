@@ -1,11 +1,11 @@
 namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
     using Core.Events.GameEvents;
-    using Core.Localization;
     using Godot;
 
     public class FuryEffect(
@@ -44,7 +44,15 @@ namespace Battle.Source.Effects
         {
         }
 
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent);
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["HealthPercent"] = HealthPercent * 100f;
+                return values;
+            }
+        }
 
         public override IEffect Copy() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);
     }

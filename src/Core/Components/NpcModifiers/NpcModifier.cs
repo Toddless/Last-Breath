@@ -19,8 +19,8 @@ namespace Core.Components.NpcModifiers
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         // Same key conventions as Utilities.Localization (which Core cannot reference).
-        public string DisplayName => TranslationServer.Translate(Id);
-        public string Description => TranslationServer.Translate(Id + "_Description");
+        public string DisplayName => Localization.Localization.Localize(Id);
+        public string Description => Localization.Localization.LocalizeDescription(Id);
 
         // TODO:
         // Here we  attach an buff to the npc.

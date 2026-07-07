@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System;
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Localization;
@@ -12,9 +13,15 @@
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; }
-        public string Description => Localization.Localize(Id);
-        public string DisplayName => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
 
+        public string Description =>
+            DescriptionValues is { } values
+                ? Localization.RenderDescription(Id, values, TextFormat.Rich)
+                : Localization.LocalizeDescription(Id);
+
+        /// <summary>Named values for the description template ({Chance}, {Threshold}...); null = static text.</summary>
+        protected virtual IReadOnlyDictionary<string, object?>? DescriptionValues => null;
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public abstract void Attach(IFightable owner);

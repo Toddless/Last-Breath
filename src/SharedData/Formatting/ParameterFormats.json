@@ -1,0 +1,14 @@
+{
+	"parameters": [
+		{ "parameter": "CriticalChance", "unit": "Percent" },
+		{ "parameter": "CriticalDamage", "unit": "Percent" },
+		{ "parameter": "AdditionalHitChance", "unit": "Percent" },
+		{ "parameter": "ArmorPenetration", "unit": "Percent" },
+		{ "parameter": "BlockChance", "unit": "Percent" },
+		{ "parameter": "MulticastChance", "unit": "Percent" },
+		{ "parameter": "CriticalDamageMitigation", "unit": "Percent" },
+		{ "parameter": "FireResistance", "unit": "Percent" },
+		{ "parameter": "ColdResistance", "unit": "Percent" },
+		{ "parameter": "LightningResistance", "unit": "Percent" }
+	]
+}

@@ -1,0 +1,788 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Language: ru\n"
+
+# ------------------------------
+# Parameters
+# ------------------------------
+
+#. Player damage stat
+msgid "Damage"
+msgstr "Урон"
+
+#. Player health stat
+msgid "Health"
+msgstr "Здоровье"
+
+#. Player critical chance
+msgid "CriticalChance"
+msgstr "Шанс критического удара"
+
+
+#. Critical damage multiplier
+msgid "CriticalDamage"
+msgstr "Критический урон"
+
+#. Additional hit chance
+msgid "AdditionalHitChance"
+msgstr "Шанс дополнительного удара"
+
+
+#. Dexterity attribute
+msgid "Dexterity"
+msgstr "Ловкость"
+
+#. Strength attribute
+msgid "Strength"
+msgstr "Сила"
+
+#. Intelligence attribute
+msgid "Intelligence"
+msgstr "Интеллект"
+
+#. Armor stat
+msgid "Armor"
+msgstr "Броня"
+
+#. Evasion stat
+msgid "Evade"
+msgstr "Уклонение"
+
+
+#. Spell damage stat
+msgid "SpellDamage"
+msgstr "Урон от заклинаний"
+
+
+#. Suppression stat
+msgid "Suppress"
+msgstr "Подавление"
+
+
+# ------------------------------
+
+
+
+
+# ------------------------------
+
+
+
+# -----------------------------
+# Item stats
+# -----------------------------
+
+# Extra Health
+
+
+# Extra Armor
+
+
+# Extra Energy Barrier
+
+
+# Extra Evade
+
+
+# Extra Damage
+
+
+# Extra Suppress
+
+
+# Extra Spell Damage
+
+
+
+
+
+
+# ------------------------
+# Buttons
+# ------------------------
+
+msgid "CraftingCreateBtn"
+msgstr "Создать"
+
+msgid "CraftingUpgradeBtn"
+msgstr "Улучшить"
+
+msgid "CraftingAscendBtn"
+msgstr "Возвысить"
+
+msgid "NewGameBtn"
+msgstr "Новая игра"
+
+msgid "LoadGameBtn"
+msgstr "Загрузить"
+
+msgid "OptionsBtn"
+msgstr "Настройки"
+
+msgid "QuitBtn"
+msgstr "Выход"
+
+msgid "ContinueBtn"
+msgstr "Продолжить"
+
+msgid "MainMenuBtn"
+msgstr "Главное меню"
+
+msgid "CharacterBtn"
+msgstr "Персонаж"
+
+msgid "InventoryBtn"
+msgstr "Инвентарь"
+
+msgid "CraftingBtn"
+msgstr "Ремесло"
+
+msgid "QuestsBtn"
+msgstr "Квесты"
+
+msgid "ApplyBtn"
+msgstr "Применить"
+
+msgid "ReturnBtn"
+msgstr "Вернуться"
+
+msgid "DeleteBtn"
+msgstr "Удалить"
+
+msgid "LoadBtn"
+msgstr "Загрузить"
+
+# -----------------------
+# Texts
+# -----------------------
+
+msgid "RandomStats"
+msgstr "Случайные хар-ки"
+
+msgid "BaseStats"
+msgstr "Базовые хар-ки"
+
+msgid "GameTitle"
+msgstr "Last Breath"
+
+msgid "VideoSettings"
+msgstr "Видео"
+
+msgid "ResolutionSetting"
+msgstr "Разрешение"
+
+msgid "WindowModeSetting"
+msgstr "Режим окна"
+
+msgid "SoundSettings"
+msgstr "Звук"
+
+msgid "MasterVolumeSetting"
+msgstr "Общая громкость"
+
+msgid "MusicVolumeSetting"
+msgstr "Громкость музыки"
+
+msgid "SFXVolumeSetting"
+msgstr "Громкость SFX"
+
+msgid "UISettings"
+msgstr "UI"
+
+msgid "LanguageSetting"
+msgstr "Язык"
+
+msgid "SaveLoadLabel"
+msgstr "Сохранить/Загрузить"
+
+
+# ------------------------------
+# TODO: перевод (ключи добавлены автоматически)
+# ------------------------------
+
+
+
+
+
+msgid "Ability_Fireball"
+msgstr ""
+
+msgid "Ability_Fireball_Description"
+msgstr ""
+
+
+
+msgid "Ability_Mana_Devour"
+msgstr ""
+
+msgid "Ability_Mana_Devour_Description"
+msgstr ""
+
+
+
+msgid "Amulet"
+msgstr ""
+
+msgid "Barrier"
+msgstr ""
+
+msgid "Belt"
+msgstr ""
+
+msgid "BodyArmor"
+msgstr ""
+
+msgid "Boots"
+msgstr ""
+
+msgid "Cloak"
+msgstr ""
+
+msgid "Consumable"
+msgstr ""
+
+msgid "Cooldown"
+msgstr ""
+
+msgid "Cost"
+msgstr ""
+
+msgid "Crafting_Resource_Armor_Essence"
+msgstr ""
+
+msgid "Crafting_Resource_Cooper_Ore"
+msgstr ""
+
+msgid "Crafting_Resource_Crit_Essence"
+msgstr ""
+
+msgid "Crafting_Resource_Damage_Essence"
+msgstr ""
+
+msgid "Crafting_Resource_Deer_Leather"
+msgstr ""
+
+msgid "Crafting_Resource_Diamond_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Emerald_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Evade_Essence"
+msgstr ""
+
+msgid "Crafting_Resource_Gold_Ore"
+msgstr ""
+
+msgid "Crafting_Resource_Iron_Ore"
+msgstr ""
+
+msgid "Crafting_Resource_Life_Essence"
+msgstr ""
+
+msgid "Crafting_Resource_Linen_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Ruby_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Silk_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Wild_Boar_Leather"
+msgstr ""
+
+msgid "Effect_Burning_Fury"
+msgstr ""
+
+msgid "Effect_Burning_Fury_Description"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Bleed"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Bleed_Description"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Burning"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Burning_Description"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Description"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Poison"
+msgstr ""
+
+msgid "Effect_Damage_Over_Turn_Poison_Description"
+msgstr ""
+
+msgid "Effect_Fury"
+msgstr "Ярость"
+
+msgid "Effect_Fury_Description"
+msgstr ""
+
+msgid "Effect_Life_Giving_Shade"
+msgstr ""
+
+msgid "Effect_Life_Giving_Shade_Description"
+msgstr ""
+
+msgid "Effect_Life_Giving_Shade_Regeneration"
+msgstr ""
+
+msgid "Effect_Life_Giving_Shade_Regeneration_Description"
+msgstr ""
+
+msgid "Effect_Regeneration"
+msgstr ""
+
+msgid "Effect_Regeneration_Description"
+msgstr ""
+
+msgid "Gloves"
+msgstr ""
+
+msgid "Helmet"
+msgstr ""
+
+msgid "Mana"
+msgstr ""
+
+msgid "MaxTargets"
+msgstr ""
+
+msgid "Modifier_Flat"
+msgstr ""
+
+msgid "Modifier_Increase"
+msgstr ""
+
+msgid "Modifier_Multiplicative"
+msgstr ""
+
+msgid "Notification_Game_Saved"
+msgstr ""
+
+msgid "Passive_Skill_Battle_Mastery"
+msgstr ""
+
+msgid "Passive_Skill_Crafting_Mastery"
+msgstr ""
+
+msgid "Passive_Skill_Enhanced_Mastery"
+msgstr ""
+
+msgid "Passive_Skill_Enhanced_Mastery_Description"
+msgstr ""
+
+msgid "Passive_Skill_Experienced_Recycler"
+msgstr ""
+
+msgid "Passive_Skill_Experienced_Recycler_Description"
+msgstr ""
+
+msgid "Passive_Skill_Fishing_Mastery"
+msgstr ""
+
+msgid "Passive_Skill_Master_Apprentice"
+msgstr ""
+
+msgid "Passive_Skill_Master_Apprentice_Description"
+msgstr ""
+
+msgid "Passive_Skill_Precise_Technique"
+msgstr ""
+
+msgid "Passive_Skill_Precise_Technique_Description"
+msgstr ""
+
+msgid "Passive_Skill_Sword_Mastery"
+msgstr ""
+
+msgid "Passive_Skill_Touch_Of_God"
+msgstr ""
+
+msgid "Passive_Skill_Touch_Of_God_Description"
+msgstr ""
+
+msgid "Quest"
+msgstr ""
+
+msgid "Recipe_Body_Four_Mods"
+msgstr ""
+
+msgid "Recipe_Generic_Belt"
+msgstr ""
+
+msgid "Recipe_Generic_Boots"
+msgstr ""
+
+msgid "Recipe_Generic_Gloves"
+msgstr ""
+
+msgid "Recipe_Generic_Ring"
+msgstr ""
+
+msgid "Recipe_Test_Belt"
+msgstr ""
+
+msgid "Recipe_Test_Boots"
+msgstr ""
+
+msgid "Recipe_Test_Gloves"
+msgstr ""
+
+msgid "Recipe_Test_Ring"
+msgstr ""
+
+msgid "Resource"
+msgstr ""
+
+msgid "Ring"
+msgstr ""
+
+msgid "Selfcast"
+msgstr ""
+
+msgid "Target"
+msgstr ""
+
+msgid "Test_Belt"
+msgstr ""
+
+msgid "Test_Belt_Description"
+msgstr ""
+
+msgid "Test_Body_Four_Mods"
+msgstr ""
+
+msgid "Test_Body_Four_Mods_Description"
+msgstr ""
+
+msgid "Test_Boots"
+msgstr ""
+
+msgid "Test_Boots_Description"
+msgstr ""
+
+msgid "Test_Gloves"
+msgstr ""
+
+msgid "Test_Gloves_Description"
+msgstr ""
+
+msgid "Test_Ring"
+msgstr ""
+
+msgid "Test_Ring_Description"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "UI_Load"
+msgstr ""
+
+msgid "UI_Save"
+msgstr ""
+
+msgid "Upgrade_Resource_Armor_Dust"
+msgstr ""
+
+msgid "Upgrade_Resource_Blacksmith_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Jeweler_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Jewellery_Dust"
+msgstr ""
+
+msgid "Upgrade_Resource_Weapon_Dust"
+msgstr ""
+
+msgid "Upgrade_Resource_Weapon_Rune"
+msgstr ""
+
+msgid "Weapon"
+msgstr ""
+
+
+
+
+
+
+msgid "Log_Turn"
+msgstr ""
+
+msgid "Log_AbilityUsed"
+msgstr ""
+
+msgid "Log_DamageDealt"
+msgstr ""
+
+msgid "Log_Death"
+msgstr ""
+
+msgid "Log_Heal"
+msgstr ""
+
+msgid "Log_Evade"
+msgstr ""
+
+msgid "Log_Block"
+msgstr ""
+
+msgid "Log_EffectApplied"
+msgstr ""
+
+msgid "Log_EffectAppliedFrom"
+msgstr ""
+
+msgid "Log_TurnSkipped"
+msgstr ""
+
+msgid "Log_Cause_Frozen"
+msgstr ""
+
+msgid "Log_Cause_Stunned"
+msgstr ""
+
+msgid "Log_Crit"
+msgstr ""
+
+msgid "Log_Player"
+msgstr ""
+
+msgid "Log_Enemy"
+msgstr ""
+
+msgid "DamageType_Pure"
+msgstr ""
+
+msgid "DamageType_Physical"
+msgstr ""
+
+msgid "DamageType_Fire"
+msgstr ""
+
+msgid "DamageType_Cold"
+msgstr ""
+
+msgid "DamageType_Lightning"
+msgstr ""
+
+msgid "DamageType_Poison"
+msgstr ""
+
+msgid "DamageType_Burning"
+msgstr ""
+
+msgid "DamageType_Bleed"
+msgstr ""
+
+msgid "Effect_Ares_Blessing"
+msgstr ""
+
+msgid "Effect_Ares_Blessing_Description"
+msgstr ""
+
+msgid "BlockChance"
+msgstr ""
+
+msgid "MulticastChance"
+msgstr ""
+
+msgid "ArmorPenetration"
+msgstr ""
+
+msgid "Accuracy"
+msgstr ""
+
+msgid "ManaRecovery"
+msgstr ""
+
+
+msgid "HealthRecovery"
+msgstr ""
+
+msgid "CriticalDamageMitigation"
+msgstr ""
+
+msgid "FireResistance"
+msgstr ""
+
+msgid "ColdResistance"
+msgstr ""
+
+msgid "LightningResistance"
+msgstr ""
+
+msgid "MoveSpeed"
+msgstr ""
+
+msgid "UI_AbilityCost"
+msgstr ""
+
+msgid "UI_AbilityCooldown"
+msgstr ""
+
+# ------------------------------
+# Способности (тексты Todd, 2026-07-07)
+# ------------------------------
+
+msgid "turn"
+msgid_plural "turns"
+msgstr[0] "ход"
+msgstr[1] "хода"
+msgstr[2] "ходов"
+
+msgid "stack"
+msgid_plural "stacks"
+msgstr[0] "стак"
+msgstr[1] "стака"
+msgstr[2] "стаков"
+
+msgid "lunge"
+msgid_plural "lunges"
+msgstr[0] "выпад"
+msgstr[1] "выпада"
+msgstr[2] "выпадов"
+
+msgid "Ability_Poison_Coating"
+msgstr "Ядовитое покрытие"
+
+msgid "Ability_Poison_Coating_Description"
+msgstr "В течение 3 ходов все атаки накладывают стак яда. Каждый стак наносит 75% от нанесённого урона в течение 5 ходов."
+
+msgid "Ability_Poison_Explosion"
+msgstr "Взрыв яда"
+
+msgid "Ability_Poison_Explosion_Description"
+msgstr "Снимает с цели все стаки яда и наносит весь их суммарный урон разом. Казнит цель с 42 или более стаками."
+
+msgid "Ability_Critical_Calculation"
+msgstr "Критический расчёт"
+
+msgid "Ability_Critical_Calculation_Description"
+msgstr "На 3 хода увеличивает шанс критического удара на 45%. Критическая атака продлевает действие бафа на 1 ход."
+
+msgid "Ability_Dark_Shroud"
+msgstr "Тёмный покров"
+
+msgid "Ability_Dark_Shroud_Description"
+msgstr "На 4 хода увеличивает уклонение на 35%. В начале каждого хода восстанавливает 5% здоровья."
+
+msgid "Ability_Jar_Of_Poison"
+msgstr "Банка с ядом"
+
+msgid "Ability_Jar_Of_Poison_Description"
+msgstr "Накладывает стак яда, наносящий 50 + (35% + 50%) урона каждый ход в течение 3 ходов."
+
+msgid "Ability_Increasing_Pressure"
+msgstr "Возрастающий натиск"
+
+msgid "Ability_Increasing_Pressure_Description"
+msgstr "Серия до {Attacks} усиливающихся атак. Каждая атака наносит дополнительно {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) базового урона. Каждый успешный удар усиливает следующий на {AttackDamageStepMultiplier:%}."
+
+msgid "Ability_Series_Of_Attacks"
+msgstr "Серия атак"
+
+msgid "Ability_Series_Of_Attacks_Description"
+msgstr "Серия из 2-5 атак. Атаки наносят дополнительно 30 + (50% + 25%) базового урона. Уклонение цели прерывает серию."
+
+msgid "Ability_Berserk_Fury"
+msgstr "Ярость берсерка"
+
+msgid "Ability_Berserk_Fury_Description"
+msgstr "Совершает последовательные атаки: шанс нанести следующий удар зависит от текущего здоровья — чем оно ниже, тем ниже шанс продолжить серию. Активация накладывает эффект {@Effect_Fury}."
+
+msgid "Ability_Armageddon"
+msgstr "Армагедон"
+
+msgid "Ability_Armageddon_Description"
+msgstr "Удержание активации накапливает до трёх стадий. Первая стадия поглощает 5% здоровья и наносит 300 + (75% + 75%) базового урона. Вторая поглощает 15% здоровья и наносит 600 + (120% + 120%). Третья поглощает 30% здоровья, наносит 1000 + (180% + 180%) и дополнительно оглушает цель на 2 хода. При нехватке здоровья активируется последняя достигнутая стадия."
+
+msgid "Ability_Double_Strike"
+msgstr "Двойной удар"
+
+msgid "Ability_Double_Strike_Description"
+msgstr "Наносит два последовательных удара. Первый наносит 120 + (80% + 65%) базового урона и при попадании снижает броню цели. Второй наносит 60 + (100% + 25%) базового урона и при попадании снижает уклонение цели."
+
+msgid "Ability_Head_Butt"
+msgstr "Удар в голову"
+
+msgid "Ability_Head_Butt_Description"
+msgstr "Одиночный выпад: наносит {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) базового урона и оглушает цель на {StunDuration|turn|turns}."
+
+msgid "Ability_Porcupine"
+msgstr "Дикобраз"
+
+msgid "Ability_Porcupine_Description"
+msgstr "На 3 хода возвращает атакующему 25% нанесённого урона + 15% от брони."
+
+msgid "Ability_Ares_Blessing"
+msgstr "Благословение Ареса"
+
+msgid "Ability_Ares_Blessing_Description"
+msgstr "На 3 хода увеличивает здоровье и восстановление здоровья на 30%."
+
+msgid "Ability_Sacrifice"
+msgstr "Жертва"
+
+msgid "Ability_Sacrifice_Description"
+msgstr "Жертвует 15% текущего здоровья. За каждую единицу потерянного здоровья следующая активированная способность получает 1% чистого урона."
+
+msgid "Ability_Ice_Shards"
+msgstr "Ледяные осколки"
+
+msgid "Ability_Ice_Shards_Description"
+msgstr "Выстреливает тремя осколками льда. Каждый осколок наносит цели 80 + (25% + 90%) урона.\nУровень активации 2: урон осколков увеличивается до 120 + (35% + 120%).\nУровень активации 3: осколки летят во все цели на поле боя.\nУровень активации 4: при критическом ударе осколки распадаются на шрапнель, нанося 50 + (15% + 55%) урона всем противникам."
+
+msgid "Ability_Ice_Block"
+msgstr "Глыба льда"
+
+msgid "Ability_Ice_Block_Description"
+msgstr "Роняет на цель огромную глыбу льда: 230 + (50% + 130%) урона и оглушение на 1 ход.\nУровень активации 2: оглушение продлевается на 1 ход.\nУровень активации 3: накладывает стак {@Effect_Withering_Curse}.\nУровень активации 4: на цель падают три дополнительных глыбы, каждая наносит 50% урона первоначальной."
+
+msgid "Ability_Overload"
+msgstr "Перегрузка"
+
+msgid "Ability_Overload_Description"
+msgstr "Сжигает 25% текущей маны цели. Наносит 100 + (15% + 40%) урона + 1.5 урона за каждую единицу сожжённой маны.\nУровень активации 2: множитель 2 за единицу сожжённой маны.\nУровень активации 3: при крите восстанавливает 15% сожжённой маны.\nУровень активации 4: урон становится чистым."
+
+msgid "Ability_Chain_Lightning"
+msgstr "Цепная молния"
+
+msgid "Ability_Chain_Lightning_Description"
+msgstr "Наносит цели 140 + (25% + 120%) базового урона и перескакивает на случайного противника до двух раз. Каждый прыжок теряет 25% урона.\nУровень активации 2: +1 прыжок.\nУровень активации 3: потеря урона за прыжок снижена на 15%.\nУровень активации 4: последний прыжок наносит удвоенный урон."
+
+msgid "Ability_Ice_Aegis"
+msgstr "Ледяная эгида"
+
+msgid "Ability_Ice_Aegis_Description"
+msgstr "Накладывает барьер, равный 300 + 35 за каждую единицу интеллекта, на 3 хода.\nУровень активации 2: дополнительный скейл за единицу интеллекта: +15.\nУровень активации 3: пока действует барьер, атакующие получают стак {@Effect_Clumsiness}.\nУровень активации 4: при разрушении барьера до окончания действия замораживает всех противников на поле боя."
+
+msgid "Effect_Fury_Tooltip"
+msgstr "Сжигает часть здоровья при каждой атаке."
+
+msgid "Effect_Clumsiness"
+msgstr "Неповоротливость"
+
+msgid "Effect_Clumsiness_Tooltip"
+msgstr "Снижает уклонение цели."
+
+msgid "Effect_Withering_Curse"
+msgstr "Проклятье увядания"
+
+msgid "Effect_Withering_Curse_Tooltip"
+msgstr "Снижает максимальное здоровье."

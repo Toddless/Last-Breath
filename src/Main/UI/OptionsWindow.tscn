@@ -1,9 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://crpiglshqam38"]
+[gd_scene format=3 uid="uid://crpiglshqam38"]
 
-[ext_resource type="Script" uid="uid://dl4hun7bcr7l" path="res://Script/UI/View/OptionsWindow.cs" id="1_up0l5"]
-[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Assets/UI/Fonts/SettingsMenu.tres" id="2_ew5qt"]
-[ext_resource type="Script" uid="uid://d0j1nts8hqfnb" path="res://Script/UI/LocalizableLabel.cs" id="3_ew5qt"]
-[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="4_ew5qt"]
+[ext_resource type="Script" uid="uid://eavxx2vl1dkg" path="res://UI/View/PauseMenu.cs" id="1_up0l5"]
+[ext_resource type="LabelSettings" path="res://Assets/UI/Fonts/SettingsMenu.tres" id="2_ew5qt"]
+[ext_resource type="Script" path="res://Script/UI/LocalizableLabel.cs" id="3_ew5qt"]
+[ext_resource type="Script" path="res://Script/UI/LocalizableButton.cs" id="4_ew5qt"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ixu47"]
 font_size = 48

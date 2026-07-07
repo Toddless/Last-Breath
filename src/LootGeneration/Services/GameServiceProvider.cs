@@ -28,7 +28,7 @@ namespace LootGeneration.Services
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();
-            services.AddGameData("res://Data/");
+            services.AddGameData("res://Data/", "res://Data/Shared/");
         }
     }
 }

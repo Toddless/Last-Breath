@@ -1,122 +1,98 @@
-﻿namespace Core.Localization
+namespace Core.Localization
 {
     using System;
-    using System.Collections.Generic;
+    using System.Globalization;
     using Enums;
     using Modifiers;
-    using Godot;
 
-    public class ModifierFormatter(Func<string, string> localize)
+    /// <summary>
+    /// Turns a modifier into a localized phrase through .po templates:
+    /// Modifier_Flat / Modifier_Increase / Modifier_Multiplicative with {value} and {parameter}.
+    /// Percent parameters follow IParameterFormatProvider (data stores fractions: 0.5 = 50%).
+    /// </summary>
+    public class ModifierFormatter(ILocalizationProvider localization, IParameterFormatProvider formats)
     {
-        private static readonly List<EntityParameter> s_percentParameters =
-        [
-            EntityParameter.CriticalChance,
-            EntityParameter.CriticalDamage,
-            EntityParameter.AdditionalHitChance,
-            EntityParameter.ArmorPenetration,
-            EntityParameter.BlockChance,
-            EntityParameter.MulticastChance
-        ];
-
-        public string FormatModifier(IModifier modifier, float rangeMinValue, float rangeMaxValue) => modifier.ModifierValueType switch
+        public string Format(IModifier modifier, TextFormat format = TextFormat.Plain) => modifier.ModifierValueType switch
         {
-            ModifierValueType.Flat => FormatFlatRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
-            ModifierValueType.Increase => FormatIncreaseRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
-            ModifierValueType.Multiplicative => FormatMultiplicativeRanged(modifier.Value, modifier.EntityParameter, rangeMinValue, rangeMaxValue),
-            _ => string.Empty
+            ModifierValueType.Flat => RenderFlat(modifier, 1f, 1f, format),
+            ModifierValueType.Increase => RenderIncrease(modifier, 1f, 1f, format),
+            ModifierValueType.Multiplicative => RenderMultiplicative(modifier, 1f, 1f, format),
+            _ => RenderFallback(modifier, format)
         };
 
-        public string FormatModifier(IModifier modifier)
+        /// <summary>Crafting preview: the value rolls within [min..max] multipliers of the base.</summary>
+        public string FormatRanged(IModifier modifier, float rangeMinValue, float rangeMaxValue, TextFormat format = TextFormat.Plain) => modifier.ModifierValueType switch
         {
-            return modifier.ModifierValueType switch
+            ModifierValueType.Flat => RenderFlat(modifier, rangeMinValue, rangeMaxValue, format),
+            ModifierValueType.Increase => RenderIncrease(modifier, rangeMinValue, rangeMaxValue, format),
+            ModifierValueType.Multiplicative => RenderMultiplicative(modifier, rangeMinValue, rangeMaxValue, format),
+            _ => RenderFallback(modifier, format)
+        };
+
+        private string RenderFlat(IModifier modifier, float rangeMin, float rangeMax, TextFormat format)
+        {
+            bool isPercent = formats.GetUnit(modifier.EntityParameter) == ParameterUnit.Percent;
+            float scale = isPercent ? 100f : 1f;
+            string value = SignedRange(modifier.Value * rangeMin * scale, modifier.Value * rangeMax * scale, isPercent);
+            return Render("Modifier_Flat", value, modifier.EntityParameter, format);
+        }
+
+        private string RenderIncrease(IModifier modifier, float rangeMin, float rangeMax, TextFormat format)
+        {
+            string value = SignedRange(modifier.Value * rangeMin * 100f, modifier.Value * rangeMax * 100f, isPercent: true);
+            return Render("Modifier_Increase", value, modifier.EntityParameter, format);
+        }
+
+        private string RenderMultiplicative(IModifier modifier, float rangeMin, float rangeMax, TextFormat format)
+        {
+            float deltaMin = (modifier.Value * rangeMin - 1f) * 100f;
+            float deltaMax = (modifier.Value * rangeMax - 1f) * 100f;
+            string value = SignedRange(deltaMin, deltaMax, isPercent: true);
+            return Render("Modifier_Multiplicative", value, modifier.EntityParameter, format);
+        }
+
+        /// <summary>
+        /// One ParameterChange as a display value, unit-aware: Add CriticalChance 0.05 → "+5%",
+        /// Multiply 1.2 → "+20%", Override → the absolute value without a sign.
+        /// </summary>
+        public string FormatParameterChange(EntityParameter parameter, float value, OperationType operation, TextFormat format = TextFormat.Plain)
+        {
+            bool isPercent = formats.GetUnit(parameter) == ParameterUnit.Percent;
+            float scale = isPercent ? 100f : 1f;
+            string text = operation switch
             {
-                ModifierValueType.Flat => FormatFlat(modifier.Value, modifier.EntityParameter),
-                ModifierValueType.Increase => FormatIncrease(modifier.Value, modifier.EntityParameter),
-                ModifierValueType.Multiplicative => FormatMultiplicative(modifier.Value, modifier.EntityParameter),
-                _ => FormatFallback(modifier.Value, modifier.EntityParameter)
+                OperationType.Add => SignedRange(value * scale, value * scale, isPercent),
+                OperationType.Subtract => SignedRange(-value * scale, -value * scale, isPercent),
+                OperationType.Multiply => SignedRange((value - 1f) * 100f, (value - 1f) * 100f, isPercent: true),
+                OperationType.Divide => SignedRange((1f / value - 1f) * 100f, (1f / value - 1f) * 100f, isPercent: true),
+                _ => Number(value * scale) + (isPercent ? "%" : string.Empty)
             };
+            return format == TextFormat.Rich ? TextPalette.ColorizeNumber(text) : text;
         }
 
-        private string FormatFlat(float value, EntityParameter entityParameter)
+        /// <summary>Uninitialized modifier type in legacy data: fractions read as increase, the rest as flat.</summary>
+        private string RenderFallback(IModifier modifier, TextFormat format) =>
+            MathF.Abs(modifier.Value) is > 0f and < 1f
+                ? RenderIncrease(modifier, 1f, 1f, format)
+                : RenderFlat(modifier, 1f, 1f, format);
+
+        private string Render(string templateKey, string value, EntityParameter parameter, TextFormat format)
         {
-            string number = FormatSignedNumber(value);
-            string percentSign = GetPercentSigh(entityParameter);
-            return $"{number + percentSign} {localize.Invoke("Flat")} {localize.Invoke(entityParameter.ToString())}";
+            string styledValue = format == TextFormat.Rich ? TextPalette.ColorizeNumber(value) : value;
+            return localization.Translate(templateKey)
+                .Replace("{value}", styledValue)
+                .Replace("{parameter}", localization.Translate(parameter.ToString()));
         }
 
-        private string FormatIncrease(float value, EntityParameter entityParameter)
+        private static string SignedRange(float min, float max, bool isPercent)
         {
-            string percent = FormatSignedPercent(value * 100f);
-            return $"{percent} {localize.Invoke("Increase")} {localize.Invoke(entityParameter.ToString())}";
+            string sign = min >= 0 ? "+" : "-";
+            string suffix = isPercent ? "%" : string.Empty;
+            string minText = Number(MathF.Abs(min));
+            if (MathF.Abs(max - min) < 0.0001f) return $"{sign}{minText}{suffix}";
+            return $"{sign}{minText}-{Number(MathF.Abs(max))}{suffix}";
         }
 
-        private string FormatMultiplicative(float value, EntityParameter entityParameter)
-        {
-            float deltaPercent = (value - 1f) * 100f;
-            string percent = FormatSignedPercent(deltaPercent);
-            return $"{percent} {localize.Invoke("Multiplicative")} {localize.Invoke(entityParameter.ToString())}";
-        }
-
-        private string FormatFlatRanged(float modifierValue, EntityParameter entityParameter, float rangeMinValue, float rangeMaxValue)
-        {
-            string formatedNumber = FormatSignedNumbersRanged(modifierValue * rangeMinValue, modifierValue * rangeMaxValue);
-            string percentSign = GetPercentSigh(entityParameter);
-            return $"{formatedNumber + percentSign} {localize.Invoke("Flat")} {localize.Invoke(entityParameter.ToString())}";
-        }
-
-        private string FormatIncreaseRanged(float modifierValue, EntityParameter entityParameter, float rangeMinValue, float rangeMaxValue)
-        {
-            string formatedNumber = FormatSignedPercentRanged((modifierValue * rangeMinValue) * 100, (modifierValue * rangeMaxValue) * 100);
-            return $"{formatedNumber} {localize.Invoke("Increase")} {localize.Invoke(entityParameter.ToString())}";
-        }
-
-
-        private string FormatMultiplicativeRanged(float modifierValue, EntityParameter entityParameter, float rangeMinValue, float rangeMaxValue)
-        {
-            float deltaMinPercent = (modifierValue * rangeMinValue - 1f) * 100f;
-            float deltaMaxPercent = (modifierValue * rangeMaxValue - 1f) * 100f;
-            string formatedNumber = FormatSignedPercentRanged(deltaMinPercent, deltaMaxPercent);
-            return $"{formatedNumber} {localize.Invoke("Multiplicative")} {localize.Invoke(entityParameter.ToString())}";
-        }
-
-
-        private string FormatFallback(float value, EntityParameter entityParameter)
-        {
-            float abs = MathF.Abs(value);
-            return abs is > 0f and < 1f ? FormatIncrease(value, entityParameter) : FormatFlat(value, entityParameter);
-        }
-
-        private string FormatSignedNumber(float value)
-        {
-            string sign = value >= 0 ? "+" : "-";
-            float abs = MathF.Abs(value);
-            return $"{sign}{(abs % 1 < 0.0001f ? Mathf.RoundToInt(abs) : abs.ToString("0.#"))}";
-        }
-
-        private string FormatSignedPercent(float percent)
-        {
-            string sign = percent >= 0 ? "+" : "-";
-            float abs = MathF.Abs(percent);
-            return $"{sign}{abs:0.#}%";
-        }
-
-        private string FormatSignedNumbersRanged(float minValue, float maxValue)
-        {
-            string sign = minValue >= 0 ? "+" : "-";
-            float absMin = Mathf.Abs(minValue);
-            float absMax = Mathf.Abs(maxValue);
-            return
-                $"{sign}{(absMin % 1 < 0.0001f ? Mathf.RoundToInt(absMin) : absMin.ToString("0.#"))} - {(absMax % 1 < 0.0001f ? Mathf.RoundToInt(absMax) : absMax.ToString("0.#"))}";
-        }
-
-        private string FormatSignedPercentRanged(float minValue, float maxValue)
-        {
-            string sign = minValue >= 0 ? "+" : "-";
-            float absMin = Mathf.Abs(minValue);
-            float absMax = Mathf.Abs(maxValue);
-            return $"{sign}{absMin:0.#}-{absMax:0.#}%";
-        }
-
-        private string GetPercentSigh(EntityParameter entityParameter) => s_percentParameters.Contains(entityParameter) ? "%" : string.Empty;
+        private static string Number(float value) => value.ToString("0.#", CultureInfo.InvariantCulture);
     }
 }

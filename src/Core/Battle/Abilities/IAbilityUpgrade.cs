@@ -1,12 +1,21 @@
 ﻿namespace Core.Battle.Abilities
 {
     using System;
+    using System.Collections.Generic;
     using Interfaces;
 
     public interface IAbilityUpgrade : IDisplayable, IIdentifiable
     {
         int Tier { get; }
         bool Learned { get; }
+
+        /// <summary>
+        /// Named values for the description template; the provider fills it from the JSON
+        /// upgradeProperties at creation, so placeholder = property name ({poisonDuration},
+        /// fractions via {criticalChance:%}). Empty = static text.
+        /// </summary>
+        IReadOnlyDictionary<string, object?> DescriptionValues { get; set; }
+
         event Action? AbilityUpgradeChanged;
 
         /// <summary>

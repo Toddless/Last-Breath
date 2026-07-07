@@ -20,6 +20,9 @@ namespace Battle.Source.UIElements
 
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
+        /// <summary>A dead end by design: Esc must not dismiss the game-over screen.</summary>
+        public bool IsDismissable => false;
+
         public override void _Ready()
         {
             if (_loadButton != null) _loadButton.Pressed += OpenSaveLoad;
@@ -31,12 +34,12 @@ namespace Battle.Source.UIElements
             _uiElements = provider.GetService<IUiElementsManager>();
         }
 
-        public void Close() => GetParent().RemoveChild(this);
+        public void Close() => QueueFree();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         // The save/load window on top: save buttons are disabled (CanSave requires a living
         // player), so only loading is actionable — exactly what a game over offers.
-        private void OpenSaveLoad() => _uiElements?.GetOrOpenWindow(typeof(SaveLoadWindow));
+        private void OpenSaveLoad() => _uiElements?.OpenWindow(typeof(SaveLoadWindow));
     }
 }

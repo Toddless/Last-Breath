@@ -2,6 +2,7 @@ namespace Core.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Data;
     using Godot;
     using Views.UI;
@@ -11,7 +12,9 @@ namespace Core.Services
     {
         private readonly Dictionary<Type, Func<IHud>> _hudFactories = [];
         private readonly Dictionary<Type, Func<IWindow>> _windowFactories = [];
+        private readonly Dictionary<Type, Func<IPopup>> _popupFactories = [];
         private readonly Dictionary<Type, IWindow> _openWindows = [];
+        private readonly Dictionary<Type, IPopup> _openPopups = [];
         private ILayerManager? _layers;
         private IHud? _currentHud;
 
@@ -26,43 +29,77 @@ namespace Core.Services
             return hud;
         }
 
-        public IWindow OpenWindow(Type windowType)
+        public IWindow ToggleWindow(Type windowType)
         {
-            if (TryGetOpenWindow(windowType, out var openWindow))
-            {
-                CloseWindow(windowType, openWindow);
-                return openWindow;
-            }
+            if (!TryGetOpenWindow(windowType, out var openWindow)) return OpenFreshWindow(windowType);
 
-            var window = CreateElement(_windowFactories, windowType);
-            _openWindows[windowType] = window;
-            _layers?.ShowWindow(window);
-            return window;
+            CloseWindow(windowType, openWindow);
+            return openWindow;
         }
 
-        public IWindow GetOrOpenWindow(Type windowType)
-        {
-            if (TryGetOpenWindow(windowType, out var openWindow)) return openWindow;
+        public IWindow OpenWindow(Type windowType) =>
+            TryGetOpenWindow(windowType, out var openWindow) ? openWindow : OpenFreshWindow(windowType);
 
-            var window = CreateElement(_windowFactories, windowType);
-            _openWindows[windowType] = window;
-            _layers?.ShowWindow(window);
-            return window;
+        public IPopup ShowPopup(Type popupType)
+        {
+            if (_openPopups.Remove(popupType, out var previous))
+                FreeIfValid(previous);
+
+            var popup = CreateElement(_popupFactories, popupType);
+            _openPopups[popupType] = popup;
+            _layers?.ShowOverlay(popup);
+            return popup;
+        }
+
+        public bool HandleEscape()
+        {
+            if (CloseOverlayLayer()) return true;
+            return CloseDismissableWindows();
         }
 
         public bool RegisterHudFactory(Type hudType, Func<IHud> factory) => _hudFactories.TryAdd(hudType, factory);
 
         public bool RegisterWindowFactory(Type windowType, Func<IWindow> factory) => _windowFactories.TryAdd(windowType, factory);
 
+        public bool RegisterPopupFactory(Type popupType, Func<IPopup> factory) => _popupFactories.TryAdd(popupType, factory);
+
+        private IWindow OpenFreshWindow(Type windowType)
+        {
+            var window = CreateElement(_windowFactories, windowType);
+            _openWindows[windowType] = window;
+            _layers?.ShowWindow(window);
+            return window;
+        }
+
+        private bool CloseOverlayLayer()
+        {
+            _openPopups.Clear(); // the layer frees the nodes below
+            return _layers?.CloseOverlays() ?? false;
+        }
+
+        private bool CloseDismissableWindows()
+        {
+            bool closedAny = false;
+            foreach ((Type type, IWindow window) in _openWindows.ToList())
+            {
+                if (!TryGetOpenWindow(type, out _)) continue; // stale entry, already gone
+                if (!window.IsDismissable) continue;
+                CloseWindow(type, window);
+                closedAny = true;
+            }
+
+            return closedAny;
+        }
+
         private TElement CreateElement<TElement>(Dictionary<Type, Func<TElement>> factories, Type type)
-            where TElement : IRequireServices
         {
             if (!factories.TryGetValue(type, out var factory))
                 throw new KeyNotFoundException(
                     $"No factory registered for UI element '{type.Name}'. Register it in the project's bootstrap.");
 
             var element = factory();
-            element.InjectServices(provider);
+            if (element is IRequireServices requireServices)
+                requireServices.InjectServices(provider);
             return element;
         }
 

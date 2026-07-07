@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
     using Core.Events.GameEvents;
-    using Core.Localization;
     using Core.Modifiers;
 
     public class LifeGivingShadeEffect : Effect
@@ -49,7 +49,17 @@
             base.Remove();
         }
 
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, _modifier.Value, Activations, LifeToRecover);
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["Evade"] = _modifier.Value * 100f;
+                values["Stacks"] = Activations;
+                values["Regeneration"] = LifeToRecover;
+                return values;
+            }
+        }
 
         public override IEffect Copy() => new LifeGivingShadeEffect(LifeToRecover, Duration, Activations, Status);
     }

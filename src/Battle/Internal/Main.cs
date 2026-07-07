@@ -52,12 +52,12 @@
         }
 
         private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
-            _uiElementProvider?.GetOrOpenWindow(typeof(GameOverWindow));
+            _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
 
         public override void _Input(InputEvent @event)
         {
             if (@event is InputEventKey { Keycode: Key.N, Pressed: true })
-                _uiElementProvider?.OpenWindow(typeof(MartialArtMasteryWindow));
+                _uiElementProvider?.ToggleWindow(typeof(MartialArtMasteryWindow));
         }
 
         private static Control? CreateNotificationPopup()

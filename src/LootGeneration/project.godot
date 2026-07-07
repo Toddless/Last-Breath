@@ -26,3 +26,7 @@ window/size/viewport_height=920
 [dotnet]
 
 project/assembly_name="LootGeneration"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "res://Data/Shared/Localization/ru.po")

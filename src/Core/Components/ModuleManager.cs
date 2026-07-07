@@ -22,6 +22,8 @@
 
         public event Action<TKey>? ModuleChanges;
 
+        public IReadOnlyCollection<TKey> Keys => _baseModules.Keys;
+
         public bool AddBaseModule(TKey key, TModule module) => _baseModules.TryAdd(key, module);
 
         public TModule GetModule(TKey key)

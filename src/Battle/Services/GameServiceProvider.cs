@@ -16,7 +16,7 @@ namespace Battle.Services
         {
             var provider = Core.Services.GameServiceProvider.Initialize(services => services
                 .AddBattleSystemModuleDependencies()
-                .AddGameData("res://Data/")
+                .AddGameData("res://Data/", "res://Data/Shared/")
                 // Project-private bindings: only the bootstrap may know Internal classes
                 .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>());
             provider.AddBattleUiElementsFactory();

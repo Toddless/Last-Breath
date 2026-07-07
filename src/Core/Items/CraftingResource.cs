@@ -35,8 +35,8 @@ namespace Core.Items
         public Texture2D? Icon { get; set; }
         public Rarity Rarity { get; set; }
         public IMaterial? Material { get; }
-        public string DisplayName => TranslationServer.Translate(Id);
-        public string Description => TranslationServer.Translate(Id + "_Description");
+        public string DisplayName => Localization.Localization.Localize(Id);
+        public string Description => Localization.Localization.LocalizeDescription(Id);
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);

@@ -11,27 +11,13 @@ namespace Battle.Source.UIElements
 
     /// <summary>
     /// Turns replay-time battle events into ready battle-log lines (BBCode). The single place that
-    /// knows how domain events read as text — the log control only renders entries.
-    /// Feeds off the battle bus, so lines appear in sync with what is SHOWN, not with the resolve.
+    /// knows how domain events read as text — the log control only renders entries. Texts are
+    /// Log_* templates in .po, colors come from TextPalette; values arrive pre-colored, so
+    /// templates render Plain (no double styling). Feeds off the battle bus, so lines appear in
+    /// sync with what is SHOWN, not with the resolve.
     /// </summary>
     public class BattleLogPresenter
     {
-        private const string PlayerName = "Игрок";
-        private const string UnknownName = "Противник";
-        private const string CritMark = " [color=#ffd75e][b]КРИТ[/b][/color]";
-
-        private static readonly Dictionary<DamageType, (string Name, string Color)> s_damageTypes = new()
-        {
-            [DamageType.Pure] = ("чистый", "#ffd75e"),
-            [DamageType.Physical] = ("физ.", "#d0d0d0"),
-            [DamageType.Fire] = ("огонь", "#ff7043"),
-            [DamageType.Cold] = ("холод", "#6ec6ff"),
-            [DamageType.Lightning] = ("молния", "#b39dff"),
-            [DamageType.Poison] = ("яд", "#7ccb64"),
-            [DamageType.Burning] = ("горение", "#ff9d45"),
-            [DamageType.Bleed] = ("кровь", "#e05555"),
-        };
-
         public event Action<BattleLogEntry>? EntryAdded;
 
         public BattleLogPresenter(IBattleEventBus bus)
@@ -47,57 +33,80 @@ namespace Battle.Source.UIElements
         }
 
         private void OnTurnStart(TurnStartEvent evt) =>
-            Emit(BattleLogCategory.System, $"[color=#909090]Ход: {Name(evt.StartedTurn)}[/color]");
+            Emit(BattleLogCategory.System, TextPalette.Colorize(
+                Render("Log_Turn", new() { ["Name"] = Name(evt.StartedTurn) }), TextPalette.System));
 
         private void OnAbilityActivated(AbilityActivatedEvent evt) =>
-            Emit(BattleLogCategory.Ability, $"{Name(evt.Caster)} применяет [color=#8fd4e8]«{evt.Ability.DisplayName}»[/color]");
+            Emit(BattleLogCategory.Ability, Render("Log_AbilityUsed", new()
+            {
+                ["Caster"] = Name(evt.Caster),
+                ["Ability"] = TextPalette.Colorize($"«{evt.Ability.DisplayName}»", TextPalette.AbilityName),
+            }));
 
         private void OnDamageTaken(DamageTakenEvent evt)
         {
             var context = evt.Context;
             string parts = string.Join(" + ", context.DamageComponents
                 .Where(component => component.Value >= 1)
-                .Select(component => Colored($"{component.Value:0} {TypeName(component.Key)}", TypeColor(component.Key))));
+                .Select(component => TextPalette.Colorize(
+                    $"{component.Value:0} {Localization.Localize($"DamageType_{component.Key}")}",
+                    TextPalette.DamageColor(component.Key))));
             if (parts.Length == 0) return;
 
-            string crit = context.IsCrit ? CritMark : string.Empty;
-            Emit(BattleLogCategory.Damage, $"{Name(context.Source)} наносит {Name(evt.Target)}: {parts}{crit}");
+            string crit = context.IsCrit
+                ? " " + TextPalette.Colorize($"[b]{Localization.Localize("Log_Crit")}[/b]", TextPalette.Crit)
+                : string.Empty;
+            Emit(BattleLogCategory.Damage, Render("Log_DamageDealt", new()
+            {
+                ["Attacker"] = Name(context.Source),
+                ["Target"] = Name(evt.Target),
+                ["Damage"] = parts + crit,
+            }));
             if (evt.Vitals.IsDead)
-                Emit(BattleLogCategory.Damage, $"[color=#e05555]{Name(evt.Target)} погибает[/color]");
+                Emit(BattleLogCategory.Damage, TextPalette.Colorize(
+                    Render("Log_Death", new() { ["Name"] = Name(evt.Target) }), TextPalette.Death));
         }
 
         private void OnHealed(EntityHealedEvent evt) =>
-            Emit(BattleLogCategory.Heal, $"[color=#7ccb64]{Name(evt.Healed)} восстанавливает {evt.Amount:0} HP[/color]");
+            Emit(BattleLogCategory.Heal, TextPalette.Colorize(
+                Render("Log_Heal", new() { ["Name"] = Name(evt.Healed), ["Amount"] = $"{evt.Amount:0}" }), TextPalette.Heal));
 
         private void OnAttackEvaded(AttackEvadedEvent evt) =>
-            Emit(BattleLogCategory.AttackResult, $"[color=#b8b8b8]{Name(evt.Context.Target)} уворачивается от атаки {Name(evt.Context.Attacker)}[/color]");
+            Emit(BattleLogCategory.AttackResult, TextPalette.Colorize(
+                Render("Log_Evade", new() { ["Target"] = Name(evt.Context.Target), ["Attacker"] = Name(evt.Context.Attacker) }), TextPalette.Muted));
 
         private void OnAttackBlocked(AttackBlockedEvent evt) =>
-            Emit(BattleLogCategory.AttackResult, $"[color=#b8b8b8]{Name(evt.Context.Target)} блокирует атаку {Name(evt.Context.Attacker)}[/color]");
+            Emit(BattleLogCategory.AttackResult, TextPalette.Colorize(
+                Render("Log_Block", new() { ["Target"] = Name(evt.Context.Target), ["Attacker"] = Name(evt.Context.Attacker) }), TextPalette.Muted));
 
         private void OnEffectApplied(EffectAppliedEvent evt)
         {
-            string source = evt.Caster.IsSame(evt.Target.InstanceId) ? string.Empty : $" от {Name(evt.Caster)}";
-            Emit(BattleLogCategory.Effect, $"{Name(evt.Target)}: [color=#c9a0e8]«{evt.Effect.DisplayName}»[/color]{source}");
+            string key = evt.Caster.IsSame(evt.Target.InstanceId) ? "Log_EffectApplied" : "Log_EffectAppliedFrom";
+            Emit(BattleLogCategory.Effect, Render(key, new()
+            {
+                ["Target"] = Name(evt.Target),
+                ["Effect"] = TextPalette.Colorize($"«{evt.Effect.DisplayName}»", TextPalette.EffectName),
+                ["Caster"] = Name(evt.Caster),
+            }));
         }
 
         private void OnTurnSkipped(TurnSkippedEvent evt)
         {
-            string cause = (evt.Cause & StatusEffects.Freeze) != 0 ? "заморожен" : "оглушён";
-            Emit(BattleLogCategory.Effect, $"{Name(evt.Fighter)} пропускает ход ({cause})");
+            string cause = Localization.Localize((evt.Cause & StatusEffects.Freeze) != 0 ? "Log_Cause_Frozen" : "Log_Cause_Stunned");
+            Emit(BattleLogCategory.Effect, Render("Log_TurnSkipped", new() { ["Name"] = Name(evt.Fighter), ["Cause"] = cause }));
         }
 
         private void Emit(BattleLogCategory category, string text) => EntryAdded?.Invoke(new BattleLogEntry(category, text));
 
+        /// <summary>Values are pre-colored strings — Plain render keeps the engine from re-styling them.</summary>
+        private static string Render(string key, Dictionary<string, object?> values) =>
+            Localization.Render(key, values, TextFormat.Plain);
+
         private static string Name(IFightable fighter)
         {
-            if (fighter is IPlayer) return PlayerName;
+            if (fighter is IPlayer) return Localization.Localize("Log_Player");
             if (!string.IsNullOrEmpty(fighter.DisplayName)) return fighter.DisplayName;
-            return string.IsNullOrEmpty(fighter.Id) ? UnknownName : Localization.Localize(fighter.Id);
+            return string.IsNullOrEmpty(fighter.Id) ? Localization.Localize("Log_Enemy") : Localization.Localize(fighter.Id);
         }
-
-        private static string Colored(string text, string color) => $"[color={color}]{text}[/color]";
-        private static string TypeName(DamageType type) => s_damageTypes.GetValueOrDefault(type, (Name: type.ToString(), Color: "#ffffff")).Name;
-        private static string TypeColor(DamageType type) => s_damageTypes.GetValueOrDefault(type, (Name: type.ToString(), Color: "#ffffff")).Color;
     }
 }

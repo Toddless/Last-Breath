@@ -41,8 +41,8 @@ namespace Core.Items
         public int MaxUpdateLevel { get; set; } = 12;
         public string ItemEffect { get; private set; } = string.Empty;
         public bool IsSealed { get; private set; }
-        public string DisplayName => TranslationServer.Translate(Id);
-        public string Description => TranslationServer.Translate(Id + "_Description");
+        public string DisplayName => Localization.Localization.Localize(Id);
+        public string Description => Localization.Localization.LocalizeDescription(Id);
 
         public IReadOnlyList<IModifier> Implicits => [.. _baseModifiers];
         public IReadOnlyList<IModifier> Modifiers => [.. _additionalModifiers];

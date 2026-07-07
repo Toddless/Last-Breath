@@ -10,6 +10,7 @@
     using Core.Localization;
     using Godot;
 
+    // dead ability. need attention later
     public class Fireball : DamagingAbility
     {
         private readonly float _damage;
@@ -42,16 +43,5 @@
         }
 
         protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => throw new System.NotImplementedException();
-
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, Damage);
-
-        private float GetCurrentCriticalChance() => Owner == null
-            ? _baseCriticalChance
-            : Owner.Parameters.CalculateForBase(EntityParameter.CriticalChance, _baseCriticalChance);
-
-        // Not sure about this. Modifiers will be apply twice. Once for entity spell damage parameter and once for ability spell damage
-        private float GetCurrentDamage() => Owner == null
-            ? _damage
-            : Owner.Parameters.CalculateForBase(EntityParameter.SpellDamage, _damage);
     }
 }

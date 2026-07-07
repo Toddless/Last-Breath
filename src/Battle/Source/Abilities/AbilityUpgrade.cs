@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.Abilities
 {
     using System;
+    using System.Collections.Generic;
     using Core;
     using Core.Battle.Abilities;
     using Core.Localization;
@@ -15,7 +16,12 @@
         public Texture2D? Icon { get; }
         public int Tier { get; } = tier;
         public bool Learned { get; private set; }
-        public string Description => Localization.LocalizeDescription(Id);
+        public IReadOnlyDictionary<string, object?> DescriptionValues { get; set; } = new Dictionary<string, object?>();
+
+        public string Description => DescriptionValues.Count > 0
+            ? Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich)
+            : Localization.LocalizeDescription(Id);
+
         public string DisplayName => Localization.Localize(Id);
 
         public event Action? AbilityUpgradeChanged;

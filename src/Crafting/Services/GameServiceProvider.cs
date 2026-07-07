@@ -33,7 +33,7 @@ namespace Crafting.Services
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
             services.AddCraftingSystemModuleDependencies();
-            services.AddGameData("res://Internal/Data/");
+            services.AddGameData("res://Internal/Data/", "res://Internal/Data/Shared/");
         }
 
         /// <summary>Windows living in Internal are project-private and can't be registered by the shared module extension.</summary>

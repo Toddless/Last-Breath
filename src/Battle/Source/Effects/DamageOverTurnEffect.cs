@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Data;
     using Core.Enums;
-    using Core.Localization;
     using Godot;
 
     public class DamageOverTurnEffect(
@@ -22,7 +22,7 @@
         {
             // Copies (transfer/bounce/spread) arrive with DamagePerTick already carried over via Copy().
             // Recalculating it here would scale the damage by PercentFromBase a second time.
-            
+
             if (DamagePerTick == 0) DamagePerTick = context.Damage * PercentFromBase;
             await base.Apply(context);
         }
@@ -41,10 +41,17 @@
             return DamagePerTick > other.DamagePerTick;
         }
 
-        protected override string FormatDescription()
+        // Fine for a getter: Description is read on EffectsChanged (tooltip rebuild), not per frame.
+        protected override Dictionary<string, object?> DescriptionValues
         {
-            float damage = Target?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().Sum(x => x.DamagePerTick) ?? DamagePerTick;
-            return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(damage));
+            get
+            {
+                var values = base.DescriptionValues;
+                var effects = Target?.Effects.GetBy(x => x.Id == Id).Cast<DamageOverTurnEffect>().ToList();
+                values["Damage"] = Mathf.RoundToInt(effects?.Sum(x => x.DamagePerTick) ?? DamagePerTick);
+                if (effects is { Count: > 0 }) values["Duration"] = effects.Max(x => x.Duration); // max across stacks
+                return values;
+            }
         }
 
         public override IEffect Copy() => new DamageOverTurnEffect(Duration, Status, MaxStacks, PercentFromBase) { DamagePerTick = DamagePerTick };

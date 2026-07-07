@@ -1,11 +1,14 @@
 ﻿namespace Battle.Source.Effects
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
+    using Core.Localization;
     using Decorators;
+    using Godot;
 
     public abstract class ParameterChangeEffect(
         string id,
@@ -18,8 +21,22 @@
         StatusEffects statusEffect = StatusEffects.None) : Effect(id, duration, maxStacks, statusEffect)
     {
         private string _decoratorId = string.Empty;
+
         public EntityParameter Parameter { get; } = parameter;
         public float Value { get; } = value;
+
+        /// <summary>The base knows everything a buff/debuff text needs: {Parameter} (localized name)
+        /// and {Value} (unit-aware display value, e.g. "+5%") on top of {Duration}/{MaxStacks}.</summary>
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["Parameter"] = Localization.Localize(Parameter.ToString());
+                values["Value"] = Localization.FormatParameterChange(Parameter, Value, type, TextFormat.Rich);
+                return values;
+            }
+        }
 
         public override async Task Apply(EffectApplyingContext context)
         {

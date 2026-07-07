@@ -23,7 +23,7 @@ namespace Crafting.Services
         [
             DataCatalog.EquipItems,
             DataCatalog.Recipes,
-            DataCatalog.CraftingResources,
+            DataCatalog.Resources,
             DataCatalog.ModifierPools,
             DataCatalog.UpgradeCosts,
         ];
@@ -38,7 +38,7 @@ namespace Crafting.Services
                 case DataCatalog.Recipes:
                     AddItems(dataParser.ParseRecipes(file.Json));
                     break;
-                case DataCatalog.CraftingResources:
+                case DataCatalog.Resources:
                     AddItems(dataParser.ParseResources(file.Json));
                     break;
                 case DataCatalog.ModifierPools:

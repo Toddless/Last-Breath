@@ -25,7 +25,9 @@
         Costs costType = Costs.Mana)
         : DamagingAbility(id: "Ability_Series_Of_Attacks", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
+
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -41,7 +43,16 @@
             }
         }
 
-        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
+            }
+        }
+
         public int MinAttacks => (int)this[Parameters.MinAttacks];
         public int MaxAttacks => (int)this[Parameters.MaxAttacks];
         public float DamageMultiplier => this[Parameters.DamageMultiplier];
@@ -63,7 +74,7 @@
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -74,7 +85,7 @@
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);

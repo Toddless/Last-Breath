@@ -10,7 +10,6 @@
     using Core.Components.Module;
     using Core.Entity;
     using Core.Enums;
-    using Core.Localization;
     using Decorators;
 
     public class IncreasingPressure(
@@ -27,7 +26,7 @@
     {
         private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
 
-        public IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -40,6 +39,16 @@
                         [Parameters.AttackDamageStepMultiplier] = new Module<Parameters>(() => increaseAttackDamageStep, Parameters.AttackDamageStepMultiplier),
                     });
                 return field;
+            }
+        }
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
             }
         }
 
@@ -89,7 +98,5 @@
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             await ExecutionStrategy.Execute(this, owner, targets, field);
-
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, maxAttacks, increaseAttackDamageStep * 100);
     }
 }

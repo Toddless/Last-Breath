@@ -58,6 +58,16 @@ namespace Battle.Source.Abilities.DoubleStrike
             }
         }
 
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParameterDecorator);
+                return values;
+            }
+        }
+
         public float SecondDamage => this[Parameters.SecondDamage];
         public float SecondWeaponScale => this[Parameters.SecondWeaponScale];
         public float SecondSpellScale => this[Parameters.SecondSpellScale];

@@ -39,6 +39,31 @@
         }
 
         protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
+
+        /// <summary>
+        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
+        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
+        /// can play the whole cast as one chord.
+        /// </summary>
+        protected string CastId { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Named values for the description template: placeholder = parameter name ({Cooldown},
+        /// {Damage}, {StunDuration}...). Values go through decorators, so upgrades change the text
+        /// automatically. Descendants with their own parameter enum add it via
+        /// <see cref="AddModuleValues{TKey}"/>; percent-fractions are rescaled in place (×100).
+        /// </summary>
+        protected virtual Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = new Dictionary<string, object?>();
+                AddModuleValues(values, ModuleManager);
+                values.Remove(nameof(AbilityParameter.CostType)); // enum stored as float — meaningless as a number
+                return values;
+            }
+        }
+
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public Stance Stance { get; set; }
         public ITargetingStrategy Targeting { get; set; } = new SingleTargetTargeting(TargetRelation.Enemies);
@@ -47,13 +72,6 @@
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = tags;
-
-        /// <summary>
-        /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
-        /// Damage-dealing descendants stamp it onto their DamageContexts so the BattleDirector
-        /// can play the whole cast as one chord.
-        /// </summary>
-        protected string CastId { get; private set; } = string.Empty;
 
         public int CooldownLeft
         {
@@ -86,6 +104,7 @@
                 return field;
             }
         }
+
 
         public event Action<Enum>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
@@ -225,7 +244,17 @@
 
         protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);
 
-        protected virtual string FormatDescription() => Localization.LocalizeDescriptionFormated(Id);
+        protected string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
+
+        /// <summary>Adds every parameter of a module manager under its enum name; decorated values, not base ones.</summary>
+        protected static void AddModuleValues<TKey>(
+            Dictionary<string, object?> values,
+            IModuleManager<TKey, IParameterModule<TKey>, AbilityParameterDecorator<TKey>> manager)
+            where TKey : struct, Enum
+        {
+            foreach (TKey key in manager.Keys)
+                values[key.ToString()] = manager.GetModule(key).GetValue();
+        }
 
         protected void OnTurnEnd(TurnEndEvent obj)
         {

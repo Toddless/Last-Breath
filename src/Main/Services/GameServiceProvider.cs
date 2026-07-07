@@ -32,7 +32,7 @@ namespace LastBreath.Services
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
-            services.AddGameData("res://Data/");
+            services.AddGameData("res://Data/", "res://Data/Shared/");
             services.AddTransient<IMessageHandler<OpenWindowMessage>, OpenWindowMessageHandler>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();

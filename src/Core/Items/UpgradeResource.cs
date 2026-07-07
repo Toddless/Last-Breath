@@ -26,8 +26,8 @@ namespace Core.Items
         public Rarity Rarity { get; set; } = rarity;
         public EquipmentCategory Category { get; } = category;
         public int MaxStackSize { get; } = maxStackSize;
-        public string DisplayName => TranslationServer.Translate(Id);
-        public string Description => TranslationServer.Translate(Id + "_Description");
+        public string DisplayName => Localization.Localization.Localize(Id);
+        public string Description => Localization.Localization.LocalizeDescription(Id);
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);

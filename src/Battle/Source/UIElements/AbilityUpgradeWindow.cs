@@ -1,5 +1,7 @@
 namespace Battle.Source.UIElements
 {
+    using System;
+    using Core;
     using Core.Data;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
@@ -10,7 +12,7 @@ namespace Battle.Source.UIElements
     /// <summary>
     /// Shared ability detail window. Renders a pure view DTO (no domain object) and turns an upgrade
     /// pick into an <see cref="ApplyAbilityUpgradeRequest"/>, re-rendering from the returned view.
-    /// The tree opens it via GetOrOpenWindow and calls <see cref="Show"/>; the first Show may arrive
+    /// The tree opens it via OpenWindow and calls <see cref="Show"/>; the first Show may arrive
     /// before the node is in the tree (deferred add), so rendering also runs from <see cref="_Ready"/>.
     /// </summary>
     public partial class AbilityUpgradeWindow : Control, IWindow
@@ -32,6 +34,7 @@ namespace Battle.Source.UIElements
         {
             _abilityUpgrades?.AbilityUpgradeSelected += OnUpgradeSelectedAsync;
             _close?.Pressed += QueueFree;
+            KeywordLinks.Attach(_abilityDescription);
             if (_view != null) Render();
         }
 
@@ -52,18 +55,26 @@ namespace Battle.Source.UIElements
         {
             if (_view == null) return;
             _abilityName?.Text = _view.Name;
-            _cost?.Text = $"Cost: {_view.Cost}";
-            _cooldown?.Text = $"Cooldown: {_view.Cooldown}";
+            _cost?.Text = _view.Cost;
+            _cooldown?.Text = _view.Cooldown;
             _abilityDescription?.Text = _view.Description;
             _abilityUpgrades?.SetOptions(_view.Options);
         }
 
         private async void OnUpgradeSelectedAsync(string upgradeInstanceId, int tier)
         {
-            if (_messageBus == null || _view == null) return;
-            _view = await _messageBus.SendRequest<ApplyAbilityUpgradeRequest, AbilityUpgradeView>(
-                new ApplyAbilityUpgradeRequest(_view.AbilityId, upgradeInstanceId, tier));
-            Render();
+            try
+            {
+                if (_messageBus == null || _view == null) return;
+                _view = await _messageBus.SendRequest<ApplyAbilityUpgradeRequest, AbilityUpgradeView>(
+                    new ApplyAbilityUpgradeRequest(_view.AbilityId, upgradeInstanceId, tier));
+                Render();
+            }
+            catch (Exception e)
+            {
+                Tracker.TrackError($"Failed to upgrade ability: {e.Message}", this);
+                GD.Print($"Failed to upgrade ability: {e.Message}, {e.StackTrace}");
+            }
         }
     }
 }

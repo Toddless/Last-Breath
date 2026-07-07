@@ -1,18 +1,23 @@
 namespace Core.Data.GameData
 {
+    using System;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
 
     public static class GameDataDependencies
     {
         /// <summary>
-        /// Registers the data source rooted at the project's data folder plus the load
+        /// Registers the data source(s) rooted at the project's data folders plus the load
         /// orchestrator. Called by the project BOOTSTRAP (modules only register participants),
         /// which also calls <see cref="IGameDataService.LoadAll"/> right after the container is built.
+        /// Several roots layer up (project-local first, then Shared): a catalog is served
+        /// wholly by the first root that has it.
         /// </summary>
-        public static IServiceCollection AddGameData(this IServiceCollection services, string dataRootPath)
+        public static IServiceCollection AddGameData(this IServiceCollection services, params string[] dataRootPaths)
         {
-            services.TryAddSingleton<IGameDataSource>(_ => new GodotDataSource(dataRootPath));
+            services.TryAddSingleton<IGameDataSource>(_ => dataRootPaths.Length == 1
+                ? new GodotDataSource(dataRootPaths[0])
+                : new CompositeDataSource(Array.ConvertAll(dataRootPaths, IGameDataSource (root) => new GodotDataSource(root))));
             services.TryAddSingleton<IGameDataService>(provider =>
             {
                 var service = new GameDataService(

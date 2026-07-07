@@ -19,6 +19,7 @@
         [Export] private Label[] _labels = [];
 
         private ISettingsHandler? _settings;
+
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()

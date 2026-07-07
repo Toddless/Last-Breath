@@ -130,6 +130,49 @@ namespace LastBreathTest.BattleSystemTests
     }
 
     [TestClass]
+    public class CompositeDataSourceTests
+    {
+        private sealed class StubSource(Dictionary<string, List<GameDataFile>> catalogs) : IGameDataSource
+        {
+            public IReadOnlyList<GameDataFile> ReadCatalog(string catalog) =>
+                catalogs.TryGetValue(catalog, out var files)
+                    ? files
+                    : throw new DirectoryNotFoundException(catalog);
+        }
+
+        [TestMethod]
+        public void CatalogIsServedWhollyByFirstSourceThatHasIt()
+        {
+            var local = new StubSource(new() { ["Npc"] = [new GameDataFile("Local.json", "local")] });
+            var shared = new StubSource(new() { ["Npc"] = [new GameDataFile("Shared.json", "shared")] });
+
+            var files = new CompositeDataSource([local, shared]).ReadCatalog("Npc");
+
+            Assert.AreEqual(1, files.Count);
+            Assert.AreEqual("Local.json", files[0].FileName);
+        }
+
+        [TestMethod]
+        public void FallsThroughToNextSourceWhenCatalogMissing()
+        {
+            var local = new StubSource([]);
+            var shared = new StubSource(new() { ["Factions"] = [new GameDataFile("FactionRelations.json", "{}")] });
+
+            var files = new CompositeDataSource([local, shared]).ReadCatalog("Factions");
+
+            Assert.AreEqual(1, files.Count);
+            Assert.AreEqual("FactionRelations.json", files[0].FileName);
+        }
+
+        [TestMethod]
+        public void MissingInAllSourcesThrows()
+        {
+            var composite = new CompositeDataSource([new StubSource([]), new StubSource([])]);
+            Assert.ThrowsException<DirectoryNotFoundException>(() => composite.ReadCatalog("Nope"));
+        }
+    }
+
+    [TestClass]
     public class DataParseTests
     {
         private enum Sample { None, First, Second }

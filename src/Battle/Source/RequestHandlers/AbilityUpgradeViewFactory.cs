@@ -1,5 +1,6 @@
 namespace Battle.Source.RequestHandlers
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Abilities;
     using Core.Localization;
@@ -24,8 +25,12 @@ namespace Battle.Source.RequestHandlers
             return new AbilityUpgradeView(
                 abilityId,
                 ability.DisplayName,
-                $"{ability.CostValue} {ability.CostType}",
-                Mathf.RoundToInt(ability.Cooldown).ToString(),
+                Localization.Render("UI_AbilityCost", new Dictionary<string, object?>
+                {
+                    ["Value"] = ability.CostValue,
+                    ["Resource"] = Localization.Localize(ability.CostType.ToString()),
+                }),
+                Localization.Render("UI_AbilityCooldown", new Dictionary<string, object?> { ["Value"] = Mathf.RoundToInt(ability.Cooldown) }),
                 ability.Description,
                 options);
         }

@@ -11,11 +11,26 @@ _layerManager = NodePath("LayerManager")
 
 [node name="MainWorld" parent="." unique_id=945794615 instance=ExtResource("2_hwo8b")]
 
-[node name="LayerManager" type="Node" parent="." unique_id=168124133 node_paths=PackedStringArray("_mainLayer", "_windowLayer")]
+[node name="LayerManager" type="Node" parent="." unique_id=168124133 node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_overlayLayer", "_bottomRightRegion")]
 script = ExtResource("3_4pd56")
-_mainLayer = NodePath("MainLayer")
-_windowLayer = NodePath("Window")
+_mainLayer = NodePath("HudLayer")
+_windowLayer = NodePath("WindowLayer")
+_overlayLayer = NodePath("OverlayLayer")
+_bottomRightRegion = NodePath("OverlayLayer/VBoxContainer")
 
-[node name="MainLayer" type="CanvasLayer" parent="LayerManager" unique_id=821723647]
+[node name="HudLayer" type="CanvasLayer" parent="LayerManager" unique_id=821723647]
 
-[node name="Window" type="CanvasLayer" parent="LayerManager" unique_id=1605729262]
+[node name="WindowLayer" type="CanvasLayer" parent="LayerManager" unique_id=1605729262]
+
+[node name="OverlayLayer" type="CanvasLayer" parent="LayerManager" unique_id=1190445978]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LayerManager/OverlayLayer" unique_id=2068471719]
+custom_minimum_size = Vector2(300, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+alignment = 2

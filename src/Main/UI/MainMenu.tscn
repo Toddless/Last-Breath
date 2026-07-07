@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bd5wylwyowomd"]
+[gd_scene format=3 uid="uid://bd5wylwyowomd"]
 
-[ext_resource type="Script" uid="uid://cue26ig8hk3wm" path="res://Source/UI/View/MainMenu.cs" id="1_ogonq"]
+[ext_resource type="Script" uid="uid://cnvk83d3n3xme" path="res://UI/View/MainMenu.cs" id="1_ogonq"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gssjr"]
 

@@ -17,11 +17,11 @@ namespace Crafting.Source.EventHandlers
         {
             if (!message.IsItem || string.IsNullOrWhiteSpace(message.Id))
             {
-                uiElementsManager.OpenWindow(typeof(CraftingWindow));
+                uiElementsManager.ToggleWindow(typeof(CraftingWindow));
                 return;
             }
 
-            var window = (CraftingWindow)uiElementsManager.OpenWindow(typeof(CraftingWindow));
+            var window = (CraftingWindow)uiElementsManager.ToggleWindow(typeof(CraftingWindow));
             var item = inventory.GetItem<IEquipItem>(message.Id);
             if (item == null) return;
             switch (message.CraftingMode)

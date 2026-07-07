@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bgrx4b6urnx6t" path="res://Source/UIElements/NotificationPopup.cs" id="1_3bwvw"]
 
 [node name="NotificationPopup" type="MarginContainer" unique_id=1002943596 node_paths=PackedStringArray("_close", "_label")]
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_right = 250.0
+offset_bottom = 120.0
 script = ExtResource("1_3bwvw")
 _close = NodePath("Panel/VBoxContainer/Button")
 _label = NodePath("Panel/MessageLabel")

@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
-    using Core.Localization;
     using Godot;
 
     public class RegenerationEffect(
@@ -15,6 +15,18 @@
         StatusEffects statusEffect = StatusEffects.Regeneration)
         : Effect(id: "Effect_Regeneration", duration, maxStacks, statusEffect)
     {
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                float totalRegeneration = Target?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
+                values["Amount"] = Mathf.RoundToInt(totalRegeneration);
+                return values;
+            }
+        }
+
         public bool IsPercent => isPercent;
         public float Amount { get; } = amount;
 
@@ -24,12 +36,6 @@
             base.TurnEnd();
         }
 
-        protected override string FormatDescription()
-        {
-            float totalRegeneration = Target?.Effects.GetBy(effect => effect.Id == Id).Cast<RegenerationEffect>().Sum(effect => effect.Amount) ?? Amount;
-
-            return Localization.LocalizeDescriptionFormated(Id, Mathf.RoundToInt(totalRegeneration));
-        }
 
         public override IEffect Copy() => new RegenerationEffect(Amount, Duration, MaxStacks, IsPercent, Status);
     }

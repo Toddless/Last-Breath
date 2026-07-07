@@ -3,6 +3,7 @@ namespace Core.Services
     using System;
     using System.Collections.Generic;
     using Data;
+    using Data.GameData;
     using Events;
     using Godot;
     using Interfaces;
@@ -56,6 +57,12 @@ namespace Core.Services
             services.AddSingleton<IGameServiceProvider>(this);
             services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
+            services.AddSingleton<Localization.ILocalizationProvider, Localization.GodotLocalizationProvider>();
+            services.AddGameDataParticipant<Localization.IParameterFormatProvider, Localization.ParameterFormatProvider>();
+            services.AddSingleton<Localization.ModifierFormatter>();
+            services.AddSingleton<Localization.ITextFormatter, Localization.ModifierTextFormatter>();
+            services.AddSingleton<Localization.ILocalizationService, Localization.LocalizationService>();
+            services.AddSingleton<Localization.IKeywordProvider, Localization.LocalizationKeywordProvider>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();

@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Enums;
     using Core.Events.GameEvents;
-    using Core.Localization;
 
     public class BurningFuryEffect(
         int duration,
@@ -41,7 +41,15 @@
             return HealthAsDamageMultiplier > fury.HealthAsDamageMultiplier;
         }
 
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, HealthPercent, HealthAsDamageMultiplier);
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["BurnPercent"] = HealthAsDamageMultiplier * 100f;
+                return values;
+            }
+        }
 
         public override IEffect Copy() => new BurningFuryEffect(Duration, MaxStacks, HealthPercent, Status)
         {

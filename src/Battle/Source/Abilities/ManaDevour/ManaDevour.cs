@@ -35,7 +35,16 @@
 
         protected override Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) => throw new System.NotImplementedException();
 
-        protected override string FormatDescription() => Localization.LocalizeDescriptionFormated(Id, PercentToConsume * 100, IncreaseBonusPerManaConsumed * 100);
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["ConsumePercent"] = PercentToConsume * 100f;
+                values["SpellDamagePerMana"] = IncreaseBonusPerManaConsumed * 100f;
+                return values;
+            }
+        }
 
         private void OnAbilityActivated(AbilityActivationEvent obj)
         {

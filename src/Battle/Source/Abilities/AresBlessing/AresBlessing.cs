@@ -28,9 +28,9 @@ namespace Battle.Source.Abilities.AresBlessing
         Costs costType = Costs.Mana)
         : Ability(id: "Ability_Ares_Blessing", tags, cooldown, costValue, costType)
     {
-        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
+        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
 
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
+        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
             {
@@ -42,6 +42,16 @@ namespace Battle.Source.Abilities.AresBlessing
                     [Parameters.RecoveryBonus] = new Module<Parameters>(() => recoveryBonus, Parameters.RecoveryBonus)
                 });
                 return field;
+            }
+        }
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                AddModuleValues(values, AbilityParametersModuleManager);
+                return values;
             }
         }
 
@@ -64,7 +74,7 @@ namespace Battle.Source.Abilities.AresBlessing
                 return;
             }
 
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
+            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
         }
 
         public override void RemoveParameterDecorator<T>(string id, T key)
@@ -75,7 +85,7 @@ namespace Battle.Source.Abilities.AresBlessing
                 return;
             }
 
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
+            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
         public override IAbility Copy()

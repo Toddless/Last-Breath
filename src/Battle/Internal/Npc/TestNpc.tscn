@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://dtcqxb7rqpu70" path="res://Internal/Npc/Right - Idle.png" id="5_lhems"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
+radius = 32.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8osjy"]
 radius = 35.0
