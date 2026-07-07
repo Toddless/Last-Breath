@@ -13,7 +13,7 @@ namespace Battle.Source.UIElements
     [GlobalClass]
     public partial class SaveLoadWindow : Control, IWindow
     {
-        private const string ScenePath = "res://Source/UIElements/SaveLoadWindow.tscn";
+        private const string ScenePath = "uid://cua8akmbr326r";
 
         [Export] private VBoxContainer? _slotsContainer;
         [Export] private Button? _closeButton;

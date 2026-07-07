@@ -33,6 +33,8 @@ namespace Battle.Source.Npc
         public bool TryStart(ISkirmishParticipant initiator, ISkirmishParticipant target)
         {
             if (!CanFight(initiator) || !CanFight(target)) return false;
+            // группы сущности сравниваются по InstanceId вместо референса?
+            // TODO: Проверить как сохраняются/загружаются группы нпс
             if (initiator.Group != null && ReferenceEquals(initiator.Group, target.Group)) return false;
             if (!relations.IsHostile(initiator.Fraction, target.Fraction) &&
                 !relations.IsHostile(target.Fraction, initiator.Fraction)) return false;
@@ -58,7 +60,7 @@ namespace Battle.Source.Npc
                 _active[i].Tick(delta);
         }
 
-        private static bool CanFight(ISkirmishParticipant npc) => npc.IsAlive && !npc.IsFighting;
+        private static bool CanFight(ISkirmishParticipant npc) => npc is { IsAlive: true, IsFighting: false };
 
         /// <summary>The whole group joins the fight (same rule as player encounters with grouped NPCs).</summary>
         private static List<ISkirmishParticipant> ExpandSquad(ISkirmishParticipant member)
@@ -70,6 +72,8 @@ namespace Battle.Source.Npc
             return squad;
         }
 
+        // TODO:
+        // Эвент публикуется, но на текущий момент его никто не слушает. Заготовка под анимации если игрок неподалеку
         private void OnRoundResolved(NpcSkirmish skirmish, SkirmishRound round)
         {
             var roundWinners = round.SideAWon ? skirmish.SideA : skirmish.SideB;
@@ -90,12 +94,16 @@ namespace Battle.Source.Npc
             {
                 loser.IsFighting = false;
                 loser.DefeatInWorld();
+                // TODO: Анимация сожжения тела. Победители поджигают, пораженные горят
+
                 // The living burn undead bodies after a victory — deliberately not always.
                 if (winnersAreLiving && loser.Fraction == Fractions.Undead && _rnd.RandFloat() < _config.UndeadBurnChance)
                     loser.TryBurnBody();
             }
 
             var position = skirmish.Losers.Count > 0 ? skirmish.Losers[0].Position : skirmish.Winners[0].Position;
+            //TODO:
+            // на текущий момент ноль подписок на данный эвент.
             gameEventBus.Publish(new NpcSkirmishEndedEvent(position, Ids(skirmish.Winners), Ids(skirmish.Losers)));
         }
 

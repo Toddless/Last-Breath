@@ -40,7 +40,9 @@ namespace Battle.Source.Save
         }
 
         public int SlotCount => Slots;
-        public bool CanSave => _playerAccessor.Player is { IsFighting: false };
+
+        /// <summary>No saving in battle or while lying dead (checkpoints are unreachable in both — this is the backstop).</summary>
+        public bool CanSave => _playerAccessor.Player is { IsFighting: false, IsAlive: true };
         public bool HasPendingLoad => _pendingLoad != null;
 
         public bool HasSave(int slot) => _storage.Exists(slot);
@@ -72,6 +74,7 @@ namespace Battle.Source.Save
 
             _pendingLoad = file;
             _population.Reset(); // the reload frees NPC nodes without final-death events
+            Engine.TimeScale = 1; // loading from the game-over screen: the death fast-forward must not leak
             playerNode.GetTree().CallDeferred(SceneTree.MethodName.ReloadCurrentScene);
             return true;
         }

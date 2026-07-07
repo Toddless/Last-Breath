@@ -429,19 +429,19 @@
                 "categoryId": "Category_Fabric",
                 "modifiers": [
                     {
-                        "parameter": "Resource",
+                        "parameter": "Mana",
                         "modifierType": "flat",
                         "baseValue": 5,
                         "weight": 100
                     },
                     {
-                        "parameter": "Resource",
+                        "parameter": "Mana",
                         "modifierType": "inc",
                         "baseValue": 0.1,
                         "weight": 80
                     },
                     {
-                        "parameter": "ResourceRecovery",
+                        "parameter": "ManaRecovery",
                         "modifierType": "flat",
                         "baseValue": 5,
                         "weight": 150

@@ -2,6 +2,7 @@ namespace LastBreath.Services
 {
     using Battle.Source;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Events;
     using Core.Interfaces;
     using Core.Inventory;
@@ -22,6 +23,7 @@ namespace LastBreath.Services
         {
             var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
             RegisterUiFactories(provider);
+            provider.GetService<IGameDataService>().LoadAll();
             return provider;
         }
 
@@ -29,7 +31,8 @@ namespace LastBreath.Services
         {
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>();
+            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
+            services.AddGameData("res://Data/");
             services.AddTransient<IMessageHandler<OpenWindowMessage>, OpenWindowMessageHandler>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();

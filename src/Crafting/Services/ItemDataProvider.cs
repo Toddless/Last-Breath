@@ -3,28 +3,52 @@ namespace Crafting.Services
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using Core;
     using Core.Crafting;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Items;
     using Core.Modifiers;
     using Godot;
 
-    internal class ItemDataProvider : IItemDataProvider
+    internal class ItemDataProvider(IDataParser dataParser) : IItemDataProvider, IGameDataParticipant
     {
-        private const string itemDataPath = "res://Internal/Data/";
         private readonly Dictionary<string, IItem> _itemData = [];
-        private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
         private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>> _upgradeCosts = [];
-        private readonly IDataParser _dataParser;
 
-        public ItemDataProvider(IItemGameDataFactory factory)
+        public IReadOnlyList<string> Catalogs =>
+        [
+            DataCatalog.EquipItems,
+            DataCatalog.Recipes,
+            DataCatalog.CraftingResources,
+            DataCatalog.ModifierPools,
+            DataCatalog.UpgradeCosts,
+        ];
+
+        public void Apply(string catalog, GameDataFile file)
         {
-            _dataParser = new DataParser(factory);
-            LoadData();
+            switch (catalog)
+            {
+                case DataCatalog.EquipItems:
+                    AddItems(dataParser.ParseEquipItems(file.Json));
+                    break;
+                case DataCatalog.Recipes:
+                    AddItems(dataParser.ParseRecipes(file.Json));
+                    break;
+                case DataCatalog.CraftingResources:
+                    AddItems(dataParser.ParseResources(file.Json));
+                    break;
+                case DataCatalog.ModifierPools:
+                    foreach ((string id, var pool) in dataParser.ParseEquipItemModifierPools(file.Json))
+                        _equipItemModifierPools.TryAdd(id, pool);
+                    break;
+                case DataCatalog.UpgradeCosts:
+                    _upgradeCosts = dataParser.ParseUpgradeCosts(file.Json);
+                    break;
+            }
         }
 
         public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
@@ -74,59 +98,7 @@ namespace Crafting.Services
 
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
 
-        public async void LoadData()
-        {
-            try
-            {
-                await LoadDataFromDirectory(itemDataPath);
-            }
-            catch (Exception ex)
-            {
-                GD.Print($"Failed to load item data: {ex.Message}\n{ex.StackTrace}");
-                Tracker.TrackException("Data loading failed.", ex, this);
-            }
-        }
-
-        private async Task LoadDataFromDirectory(string dataPath)
-        {
-            using var dir = DirAccess.Open(dataPath);
-            if (dir == null) return;
-
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-            while (fileName != string.Empty)
-            {
-                string filePath = System.IO.Path.Combine(dataPath, fileName);
-                if (dir.CurrentIsDir())
-                    await LoadDataFromDirectory(filePath);
-                else if (filePath.EndsWith(".json"))
-                {
-                    using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new System.IO.FileLoadException();
-                    string jsonContent = file.GetAsText() ?? throw new System.IO.FileNotFoundException();
-
-                    if (dataPath.EndsWith("ModifierPools"))
-                        await _dataParser.ParseEquipItemModifierPools(jsonContent, ref _equipItemModifierPools);
-                    else if (dataPath.EndsWith("UpgradeCosts"))
-                        _upgradeCosts = await _dataParser.ParseUpgradeCosts(jsonContent);
-                    else
-                    {
-                        List<IItem> data = dataPath switch
-                        {
-                            _ when dataPath.EndsWith("EquipItems") => await _dataParser.ParseEquipItems(jsonContent),
-                            _ when dataPath.EndsWith("Recipes") => await _dataParser.ParseRecipes(jsonContent),
-                            _ when dataPath.EndsWith("CraftingResources") => await _dataParser.ParseResources(jsonContent),
-                            _ => []
-                        };
-
-                        data.ForEach(item => _itemData.TryAdd(item.Id, item));
-                    }
-                }
-
-                fileName = dir.GetNext();
-            }
-
-            dir.ListDirEnd();
-        }
+        private void AddItems(List<IItem> data) => data.ForEach(item => _itemData.TryAdd(item.Id, item));
 
         private IReadOnlyList<IRequirement> GetCost(CraftingMode mode, EquipmentCategory category) =>
             _upgradeCosts.TryGetValue(mode, out var categories) && categories.TryGetValue(category, out var requirements) ? requirements : [];

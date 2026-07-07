@@ -59,6 +59,7 @@ namespace Battle.Internal.Npc
         private INpcLifecycle? _lifecycle;
         private bool _hostileToPlayer;
         private float _skirmishScanCooldown;
+        private float _corpseScanCooldown;
         private IReadOnlyList<Vector2>? _patrolRoute;
         private Vector2? _moveDestination;
         private float _moveSpeed;
@@ -211,7 +212,23 @@ namespace Battle.Internal.Npc
 
             _brain?.Tick((float)delta);
             TryScanForSkirmish((float)delta);
+            TryScanForPlayerCorpse((float)delta);
             ProcessLocomotion();
+        }
+
+        /// <summary>Humanoid passers-by may burn the player's corpse (the lifecycle rolls the
+        /// chance ONCE per NPC per death — standing next to the body doesn't re-roll).</summary>
+        private void TryScanForPlayerCorpse(float delta)
+        {
+            _corpseScanCooldown -= delta;
+            if (_corpseScanCooldown > 0) return;
+            _corpseScanCooldown = SkirmishScanInterval;
+
+            if (Fraction is not (Fractions.Human or Fractions.Dwarf or Fractions.Elf)) return;
+            if (_playerAccessor?.Player is not Player.Player { IsAlive: false, Lifecycle: { } lifecycle } corpse) return;
+            if (GlobalPosition.DistanceTo(corpse.GlobalPosition) > lifecycle.Config.BurnRadius) return;
+
+            lifecycle.TryBurnRoll(InstanceId); // the player reacts to the Burned event itself
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -537,7 +554,10 @@ namespace Battle.Internal.Npc
         private void OnBodyEnter(Node2D body)
         {
             if (IsFighting || !IsAlive) return; // a lying body must not start battles
-            if (body is not IPlayer player) return;
+            // The player's flag guards the battle-start window: a second NPC touching in the same
+            // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
+            // not a battle target.
+            if (body is not IPlayer player || player.IsFighting || !player.IsAlive) return;
             try
             {
                 List<IFightable> fighters = [];
@@ -604,6 +624,8 @@ namespace Battle.Internal.Npc
             Group = null;
             StopMoving();
             _lifecycle.OnDefeated(Fraction == Fractions.Undead);
+            // TODO:
+            // новая анимация данного состояния.
             Animations.PlayAnimation("Dead");
         }
 
@@ -619,7 +641,6 @@ namespace Battle.Internal.Npc
         public bool TryBurnBody()
         {
             if (_lifecycle?.TryBurn() != true) return false;
-
             _gameEventBus?.Publish(new NpcFinalDeathEvent(InstanceId, Id, GlobalPosition));
             QueueFree();
             return true;

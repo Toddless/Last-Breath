@@ -1,35 +1,20 @@
 namespace Battle.Source.World
 {
     using System;
-    using System.Threading.Tasks;
-    using Core;
+    using System.Collections.Generic;
     using Core.Ai.World.Time;
-    using Core.Data;
+    using Core.Data.GameData;
     using Core.Data.WorldData;
     using Newtonsoft.Json;
 
-    /// <summary>The runtime world clock: the pure WorldClock configured from res://Data/World/.</summary>
-    public class GameWorldClock : WorldClock
+    /// <summary>The runtime world clock: the pure WorldClock configured from the World catalog.</summary>
+    public class GameWorldClock : WorldClock, IGameDataParticipant
     {
-        private const string DataPath = "res://Data/World/";
+        public IReadOnlyList<string> Catalogs => [DataCatalog.World];
 
-        public GameWorldClock() => _ = LoadDataAsync();
-
-        private async Task LoadDataAsync()
+        public void Apply(string catalog, GameDataFile file)
         {
-            try
-            {
-                await DataLoader.LoadDataFromJson(DataPath, ParseConfig);
-            }
-            catch (Exception e)
-            {
-                Tracker.TrackException("Failed to load world clock data", e);
-            }
-        }
-
-        private Task ParseConfig(string json)
-        {
-            var data = JsonConvert.DeserializeObject<WorldClockData>(json)
+            var data = JsonConvert.DeserializeObject<WorldClockData>(file.Json)
                        ?? throw new InvalidOperationException("Failed to deserialize world clock data");
             Configure(new WorldClockConfig
             {
@@ -41,7 +26,6 @@ namespace Battle.Source.World
                 EveningStartHour = data.EveningStartHour,
                 NightStartHour = data.NightStartHour,
             });
-            return Task.CompletedTask;
         }
     }
 }

@@ -6,8 +6,8 @@ namespace Core.Ai.World.Skirmish
         public int Rounds { get; init; } = 3;
 
         /// <summary>Each d20 roll happens after a random pause in this window.</summary>
-        public float MinRollIntervalSeconds { get; init; } = 30f;
-        public float MaxRollIntervalSeconds { get; init; } = 120f;
+        public float MinRollIntervalSeconds { get; init; } = 10f;
+        public float MaxRollIntervalSeconds { get; init; } = 30f;
 
         /// <summary>Chance that non-undead winners burn each undead loser's body (deliberately not 100%).</summary>
         public float UndeadBurnChance { get; init; } = 0.6f;

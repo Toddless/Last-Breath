@@ -5,7 +5,7 @@ namespace Core.Ai.World.Skirmish
     using Enums;
 
     /// <summary>
-    /// The "Сила" of a squad added to its d20 rolls. Level, rarity, type and headcount only
+    /// The "Power" of a squad added to its d20 rolls. Level, rarity, type and headcount only
     /// ADD chances (never guarantee): a strong squad shifts the roll, the dice still decide.
     /// </summary>
     public static class SquadStrength

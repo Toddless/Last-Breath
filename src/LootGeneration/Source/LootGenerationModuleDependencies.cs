@@ -1,8 +1,7 @@
 namespace LootGeneration.Source
 {
-    using System;
     using System.Collections.Generic;
-    using Core.Data;
+    using Core.Data.GameData;
     using Core.Data.LootTable;
     using Core.Enums;
     using Core.Events;
@@ -15,12 +14,7 @@ namespace LootGeneration.Source
     {
         public static IServiceCollection AddLootGenerationServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILootTableProvider, LootTableProvider>(provider =>
-            {
-                var instance = new LootTableProvider(provider.GetService<IItemGameDataFactory>() ?? throw new ArgumentNullException(nameof(IItemGameDataFactory), "Not register"));
-                instance.LoadData();
-                return instance;
-            });
+            services.AddGameDataParticipant<ILootTableProvider, LootTableProvider>();
             services.AddSingleton<ILootGenerationService, LootGenerationService>(provider =>
                 {
                     var instance = new LootGenerationService(

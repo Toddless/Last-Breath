@@ -4,6 +4,8 @@ namespace Battle.Internal.Player
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core;
+    using Core.Ai.World;
+    using Core.Ai.World.Time;
     using Core.Attribute;
     using Core.Battle;
     using Core.Components;
@@ -29,6 +31,7 @@ namespace Battle.Internal.Player
             Idle,
             Walk,
             Fight,
+            Dead,
         }
 
         private enum Trigger
@@ -36,6 +39,8 @@ namespace Battle.Internal.Player
             Idle,
             Walk,
             Fight,
+            Die,
+            Revive,
         }
 
         private enum Direction
@@ -57,6 +62,11 @@ namespace Battle.Internal.Player
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
+        private IWorldClock? _worldClock;
+        private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
+
+        /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
+        public PlayerLifecycle? Lifecycle { get; private set; }
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -134,6 +144,8 @@ namespace Battle.Internal.Player
 
             _rnd.Randomize();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
             // The player is a scene node, not a container-built service: self-register for UI/services
             GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
             Parameters = new EntityParametersComponent();
@@ -168,6 +180,12 @@ namespace Battle.Internal.Player
 
         public override void _PhysicsProcess(double delta)
         {
+            if (!IsAlive)
+            {
+                Lifecycle?.Tick(); // lying at the defeat spot: only the revive timer runs (game minutes)
+                return;
+            }
+
             if (!CanMove) return;
             Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
             Velocity = inputDirection * _baseSpeed;
@@ -371,7 +389,24 @@ namespace Battle.Internal.Player
                     CanMove = true;
                     Position = _lastPosition;
                 })
-                .Permit(Trigger.Idle, State.Idle);
+                .Permit(Trigger.Idle, State.Idle)
+                .Permit(Trigger.Die, State.Dead)
+                // A duplicate battle-start signal must degrade to a no-op: throwing here used to
+                // kill the whole battle setup before the NPCs reached the arena.
+                .Ignore(Trigger.Fight);
+
+            _stateMachine.Configure(State.Dead)
+                .OnEntry(() =>
+                {
+                    Animations.PlayAnimation("Dead");
+                    CanMove = false; // after Fight.OnExit restored it
+                })
+                .OnExit(() => CanMove = true)
+                .Permit(Trigger.Revive, State.Idle)
+                // A corpse has no other transitions; stray signals must not throw.
+                .Ignore(Trigger.Idle)
+                .Ignore(Trigger.Walk)
+                .Ignore(Trigger.Fight);
         }
 
         private void SwitchState(Vector2 direction)
@@ -411,8 +446,53 @@ namespace Battle.Internal.Player
             _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
             Effects.RemoveAllEffects();
-            _stateMachine.Fire(Trigger.Idle);
+            if (IsAlive) _stateMachine.Fire(Trigger.Idle);
+            else BeginDeathRest();
             _battleEventBus = null;
+        }
+
+        /// <summary>Lost the battle: the body lies at the defeat spot for several game hours while
+        /// the world is fast-forwarded; then revives with a fraction of health — unless a passer-by
+        /// burns the corpse first (final death).</summary>
+        private void BeginDeathRest()
+        {
+            _stateMachine.Fire(Trigger.Die);
+            var config = _lifecycleConfigProvider?.Config ?? new PlayerLifecycleConfig();
+            Lifecycle = new PlayerLifecycle(config, _worldClock!, new DefaultRandomNumberGenerator());
+            Lifecycle.ReviveReady += OnReviveReady;
+            Lifecycle.Burned += OnCorpseBurned;
+            Lifecycle.OnDefeated();
+            // NUANCE: Engine.TimeScale multiplies the PHYSICS tick rate of every node too, not just
+            // the clocks. Fine at ~20 world NPCs; if the world grows to hundreds, switch to scaling
+            // only the game timers (world clock + lifecycles) instead of the engine clock.
+            Engine.TimeScale = config.DeadTimeScale;
+        }
+
+        private void OnReviveReady()
+        {
+            var config = Lifecycle!.Config;
+            ClearLifecycle();
+            Engine.TimeScale = 1;
+            CurrentBarrier = 0;
+            CurrentHealth = Parameters.MaxHealth * config.ReviveHealthPercent;
+            CurrentMana = Parameters.MaxMana * config.ReviveManaPercent;
+            _stateMachine.Fire(Trigger.Revive);
+        }
+
+        private void OnCorpseBurned()
+        {
+            ClearLifecycle();
+            Engine.TimeScale = 1;
+            // The body stays lying; the UI layer answers with the game-over screen.
+            _gameEventBus?.Publish(new PlayerFinalDeathEvent());
+        }
+
+        private void ClearLifecycle()
+        {
+            if (Lifecycle == null) return;
+            Lifecycle.ReviveReady -= OnReviveReady;
+            Lifecycle.Burned -= OnCorpseBurned;
+            Lifecycle = null;
         }
 
         private void NotifyShouldDie()
@@ -420,6 +500,10 @@ namespace Battle.Internal.Player
             _gameEventBus?.Publish<EntityDiedEvent>(new(this));
             _battleEventBus?.Publish<EntityDiedEvent>(new(this));
             CombatEvents.Publish<EntityDiedEvent>(new(this));
+            // The arena deliberately ignores the player's EntityDiedEvent: PlayerDiedEvent is
+            // the battle-ending signal (PlayerLost). Without it the battle loop never exits.
+            _gameEventBus?.Publish<PlayerDiedEvent>(new(this));
+            _battleEventBus?.Publish<PlayerDiedEvent>(new(this));
         }
 
         private void NotifyHealthChanges(float value)

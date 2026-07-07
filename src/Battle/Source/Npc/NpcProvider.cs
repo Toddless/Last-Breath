@@ -3,13 +3,12 @@ namespace Battle.Source.Npc
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
-    using Core;
     using Core.Ai;
     using Core.Ai.World;
     using Core.Battle.Abilities;
     using Core.Components;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Data.NpcData;
     using Core.Entity;
     using Core.Enums;
@@ -20,11 +19,8 @@ namespace Battle.Source.Npc
     /// stance from the allowed set (the behavior archetype follows it), level within the
     /// EntityType cap, rarity by weight, a weighted ability pick from the archetype pool.
     /// </summary>
-    public class NpcProvider : INpcProvider
+    public class NpcProvider : INpcProvider, IGameDataParticipant
     {
-        private const string NpcDataPath = "res://Data/Npc/";
-        private const string BehaviorDataPath = "res://Data/NpcBehaviors/";
-
         private static readonly (Rarity Rarity, float Weight)[] s_rarityWeights =
         [
             (Rarity.Uncommon, 40f),
@@ -44,10 +40,17 @@ namespace Battle.Source.Npc
         {
             _abilityProvider = abilityProvider;
             _modifierProvider = modifierProvider;
-            _ = LoadDataAsync();
         }
 
+        public IReadOnlyList<string> Catalogs => [DataCatalog.Npc, DataCatalog.NpcBehaviors];
+
         public IReadOnlyCollection<string> KnownNpcIds => _npcs.Keys;
+
+        public void Apply(string catalog, GameDataFile file)
+        {
+            if (catalog == DataCatalog.Npc) ParseNpcs(file.Json);
+            else ParseBehaviors(file.Json);
+        }
 
         public NpcDefinition CreateDefinition(string npcId) => CreateDefinition(npcId, null);
 
@@ -56,7 +59,7 @@ namespace Battle.Source.Npc
             var data = _npcs.GetValueOrDefault(npcId)
                        ?? throw new KeyNotFoundException($"No NPC data loaded for '{npcId}'");
 
-            var entityType = ParseEnum<EntityType>(data.EntityType);
+            var entityType = DataParse.ParseEnum<EntityType>(data.EntityType);
             var stance = overrides?.Stance ?? RollStance(data);
             var behaviorData = _behaviors.GetValueOrDefault(stance)
                                ?? throw new KeyNotFoundException($"No behavior archetype loaded for stance '{stance}'");
@@ -70,11 +73,11 @@ namespace Battle.Source.Npc
                 Rarity = rarity,
                 Modifiers = RollModifiers(entityType, rarity),
                 EntityType = entityType,
-                Fraction = ParseEnum<Fractions>(data.Fraction),
+                Fraction = DataParse.ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
                 Parameters = ScaleParameters(data, level),
                 Abilities = PickAbilities(data, behaviorData, entityType),
-                Behavior = BuildProfile(behaviorData, ParseEnum<AiIntellect>(data.AiIntellect)),
+                Behavior = BuildProfile(behaviorData, DataParse.ParseEnum<AiIntellect>(data.AiIntellect)),
                 World = BuildWorldConfig(data.World),
                 Lifecycle = BuildLifecycleConfig(data.Lifecycle),
             };
@@ -99,7 +102,7 @@ namespace Battle.Source.Npc
             PostBattleGraceSeconds = data.PostBattleGraceSeconds,
             Aggressive = data.Aggressive,
             HostileToPlayer = data.HostileToPlayer,
-            Activity = ParseEnum<WorldActivityType>(data.Activity),
+            Activity = DataParse.ParseEnum<WorldActivityType>(data.Activity),
             WanderRadius = data.WanderRadius,
             ActivityPauseSeconds = data.ActivityPauseSeconds,
             Schedule = data.Schedule.Select(BuildScheduleSlot).ToList(),
@@ -108,7 +111,7 @@ namespace Battle.Source.Npc
         private static ScheduleSlotConfig BuildScheduleSlot(NpcScheduleSlotData data) => new(
             ParseMinuteOfDay(data.From),
             ParseMinuteOfDay(data.To),
-            ParseEnum<WorldActivityType>(data.Activity),
+            DataParse.ParseEnum<WorldActivityType>(data.Activity),
             data.WanderRadius);
 
         /// <summary>"HH:MM" → minutes since midnight.</summary>
@@ -125,7 +128,7 @@ namespace Battle.Source.Npc
         {
             if (data.Stances.Count == 0) return Stance.Dexterity;
             string rolled = data.Stances[_rnd.RandIntRange(0, data.Stances.Count - 1)];
-            return ParseEnum<Stance>(rolled);
+            return DataParse.ParseEnum<Stance>(rolled);
         }
 
         private Rarity RollRarity()
@@ -158,7 +161,7 @@ namespace Battle.Source.Npc
             float levelFactor = 1f + (level - 1) * data.LevelScaling;
             foreach ((string key, float value) in data.BaseParameters)
             {
-                var parameter = ParseEnum<EntityParameter>(key);
+                var parameter = DataParse.ParseEnum<EntityParameter>(key);
                 parameters[parameter] = NpcTypeDefaults.ScalesWithLevel(parameter) ? value * levelFactor : value;
             }
 
@@ -186,7 +189,7 @@ namespace Battle.Source.Npc
         private static BehaviorProfile BuildProfile(NpcBehaviorData data, AiIntellect intellect) => new()
         {
             Id = data.Id,
-            Stance = ParseEnum<Stance>(data.Stance),
+            Stance = DataParse.ParseEnum<Stance>(data.Stance),
             Intellect = intellect,
             MaxCastsPerTurn = data.MaxCastsPerTurn,
             Temperature = data.Temperature,
@@ -197,43 +200,23 @@ namespace Battle.Source.Npc
             FleeHealthThreshold = data.FleeHealthThreshold,
             Abilities = data.Abilities.ToDictionary(
                 entry => entry.Id,
-                entry => new AbilityBehavior(entry.Id, entry.Weight, ParseEnum<AbilityRole>(entry.Role))),
+                entry => new AbilityBehavior(entry.Id, entry.Weight, DataParse.ParseEnum<AbilityRole>(entry.Role))),
         };
 
-        private static T ParseEnum<T>(string value) where T : struct, Enum =>
-            Enum.TryParse(value, ignoreCase: true, out T result)
-                ? result
-                : throw new FormatException($"'{value}' is not a valid {typeof(T).Name}");
-
-        private async Task LoadDataAsync()
-        {
-            try
-            {
-                await DataLoader.LoadDataFromJson(NpcDataPath, ParseNpcs);
-                await DataLoader.LoadDataFromJson(BehaviorDataPath, ParseBehaviors);
-            }
-            catch (Exception e)
-            {
-                Tracker.TrackException("Failed to load NPC data", e);
-            }
-        }
-
-        private Task ParseNpcs(string json)
+        private void ParseNpcs(string json)
         {
             var root = JsonConvert.DeserializeObject<NpcsData>(json)
                        ?? throw new InvalidOperationException("Failed to deserialize NPC data");
             foreach (var npc in root.Npcs)
                 _npcs[npc.Id] = npc;
-            return Task.CompletedTask;
         }
 
-        private Task ParseBehaviors(string json)
+        private void ParseBehaviors(string json)
         {
             var root = JsonConvert.DeserializeObject<NpcBehaviorsData>(json)
                        ?? throw new InvalidOperationException("Failed to deserialize NPC behavior data");
             foreach (var behavior in root.Behaviors)
-                _behaviors[ParseEnum<Stance>(behavior.Stance)] = behavior;
-            return Task.CompletedTask;
+                _behaviors[DataParse.ParseEnum<Stance>(behavior.Stance)] = behavior;
         }
     }
 }

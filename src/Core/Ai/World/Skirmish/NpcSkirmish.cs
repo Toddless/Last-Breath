@@ -4,6 +4,8 @@ namespace Core.Ai.World.Skirmish
     using System.Collections.Generic;
     using Components;
 
+    // TODO:
+    // На текущий момент никто не считывает роллы участников боя.
     /// <summary>One resolved d20 roll of a skirmish. SideAWon decides who plays the attack beat.</summary>
     public record SkirmishRound(int Number, float RollA, float RollB, bool SideAWon);
 
@@ -23,6 +25,15 @@ namespace Core.Ai.World.Skirmish
         private int _sideAWins;
         private float _nextRollIn;
 
+        public IReadOnlyList<ISkirmishParticipant> SideA { get; }
+        public IReadOnlyList<ISkirmishParticipant> SideB { get; }
+        public bool IsCompleted { get; private set; }
+        public IReadOnlyList<ISkirmishParticipant> Winners { get; private set; } = [];
+        public IReadOnlyList<ISkirmishParticipant> Losers { get; private set; } = [];
+
+        public event Action<SkirmishRound>? RoundResolved;
+        public event Action<NpcSkirmish>? Completed;
+
         public NpcSkirmish(IReadOnlyList<ISkirmishParticipant> sideA, IReadOnlyList<ISkirmishParticipant> sideB,
             IRandomNumberGenerator rnd, SkirmishConfig? config = null)
         {
@@ -34,15 +45,6 @@ namespace Core.Ai.World.Skirmish
             _strengthB = SquadStrength.Calculate(sideB);
             ScheduleNextRoll();
         }
-
-        public IReadOnlyList<ISkirmishParticipant> SideA { get; }
-        public IReadOnlyList<ISkirmishParticipant> SideB { get; }
-        public bool IsCompleted { get; private set; }
-        public IReadOnlyList<ISkirmishParticipant> Winners { get; private set; } = [];
-        public IReadOnlyList<ISkirmishParticipant> Losers { get; private set; } = [];
-
-        public event Action<SkirmishRound>? RoundResolved;
-        public event Action<NpcSkirmish>? Completed;
 
         public void Tick(float delta)
         {

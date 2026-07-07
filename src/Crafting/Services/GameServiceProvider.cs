@@ -1,6 +1,7 @@
 namespace Crafting.Services
 {
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Inventory;
     using Core.Services;
     using Core.Views.UI;
@@ -19,17 +20,20 @@ namespace Crafting.Services
             var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
             provider.AddCraftingWindowFactories();
             RegisterProjectWindows(provider);
+            provider.GetService<IGameDataService>().LoadAll();
             return provider;
         }
 
         private static void RegisterProjectServices(IServiceCollection services)
         {
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
+            services.AddSingleton<IDataParser, DataParser>();
             services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
-            services.AddSingleton<IItemDataProvider, ItemDataProvider>();
+            services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();
             services.AddCraftingSystemModuleDependencies();
+            services.AddGameData("res://Internal/Data/");
         }
 
         /// <summary>Windows living in Internal are project-private and can't be registered by the shared module extension.</summary>

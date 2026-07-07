@@ -264,7 +264,7 @@
 					"value": 25
 				},
 				{
-					"parameter": "Multicast",
+					"parameter": "MulticastChance",
 					"modifierType": "flat",
 					"value": 0.15
 				}
@@ -290,7 +290,7 @@
 					"value": 25
 				},
 				{
-					"parameter": "Multicast",
+					"parameter": "MulticastChance",
 					"modifierType": "flat",
 					"value": 0.15
 				}
@@ -311,7 +311,7 @@
 			"maxUpdateLevel": 0,
 			"implicits": [
 				{
-					"parameter": "CriticalDamge",
+					"parameter": "CriticalDamage",
 					"modifierType": "flat",
 					"value": 150
 				},
@@ -353,7 +353,7 @@
 			"id": "Ring_Hell_Servant",
 			"equipmentPart": "Ring",
 			"maxStackSize": 1,
-			"rarity": "Unuqie",
+			"rarity": "Unique",
 			"tags": [
 				"Ring",
 				"Equipment"

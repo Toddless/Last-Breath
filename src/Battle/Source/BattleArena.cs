@@ -175,6 +175,14 @@
         public bool PrepareBattleArena(List<IFightable> fighters)
         {
             if (_battleEventBus == null) return false;
+            if (fighters.Count > _spots.Count)
+            {
+                // A clean abort instead of an index crash mid-setup; the context's finally
+                // still publishes BattleEndEvent, so nothing is left stuck in Fight.
+                Tracker.TrackError($"Not enough arena spots: {fighters.Count} fighters for {_spots.Count} spots", this);
+                return false;
+            }
+
             int enemiesCount = fighters.Count;
 
             for (int i = 0; i < enemiesCount; i++)

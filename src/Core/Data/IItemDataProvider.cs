@@ -19,7 +19,6 @@
         string GetRecipeResultItemId(string recipeId);
         IReadOnlyList<IModifier> GetResourceModifiers(string id);
         bool IsItemHasTag(string id, string tag);
-        void LoadData();
         List<IModifier> GetEquipItemModifierPool(string id);
         Dictionary<string, int> GetEquipItemResources(string itemId);
         List<IModifier> GetEquipItemBaseModifierPool(string id);

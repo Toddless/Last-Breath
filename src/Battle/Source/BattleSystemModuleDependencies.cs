@@ -7,6 +7,7 @@
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Entity;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
@@ -26,16 +27,17 @@
         public static IServiceCollection AddBattleSystemModuleDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
-            services.AddSingleton<IAbilityProvider, AbilityProvider>();
+            services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
-            services.AddSingleton<INpcProvider, NpcProvider>();
+            services.AddGameDataParticipant<INpcProvider, NpcProvider>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
-            services.AddSingleton<IFactionRelationService, FactionRelationService>();
+            services.AddGameDataParticipant<IFactionRelationService, FactionRelationService>();
             services.AddSingleton<INpcWorldRegistry, NpcWorldRegistry>();
             services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
-            services.AddSingleton<INpcModifierProvider, NpcModifierProvider>();
-            services.AddSingleton<INpcBuffProvider, NpcBuffProvider>();
-            services.AddSingleton<Core.Ai.World.Time.IWorldClock, World.GameWorldClock>();
+            services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
+            services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();
+            services.AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, World.GameWorldClock>();
+            services.AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, World.PlayerLifecycleConfigProvider>();
 
             services.AddSingleton<LoadScope>();
             services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
@@ -77,6 +79,7 @@
             uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
             uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>());
             uiElementManager.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
         }
     }
 }

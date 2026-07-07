@@ -2,31 +2,54 @@ namespace LootGeneration.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
     using Core;
     using Core.Crafting;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Enums;
     using Core.Interfaces;
     using Core.Items;
     using Core.Modifiers;
     using Godot;
-    using FileAccess = Godot.FileAccess;
 
-    internal class ItemDataProvider : IItemDataProvider
+    internal class ItemDataProvider(IDataParser dataParser) : IItemDataProvider, IGameDataParticipant
     {
-        private const string DataPath = "res://Data/";
         private readonly Dictionary<string, IItem> _itemData = [];
-        private Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
-        private Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
-        private readonly IDataParser _dataParser;
+        private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
+        private readonly Dictionary<string, Dictionary<string, int>> _equipItemsResources = [];
 
-        public ItemDataProvider(IDataParser dataParser)
+        public IReadOnlyList<string> Catalogs =>
+        [
+            DataCatalog.EquipItems,
+            DataCatalog.Recipes,
+            DataCatalog.Resources,
+            DataCatalog.ModifierPools,
+            DataCatalog.EquipItemResources,
+        ];
+
+        public void Apply(string catalog, GameDataFile file)
         {
-            _dataParser = dataParser;
-            LoadData();
+            switch (catalog)
+            {
+                case DataCatalog.EquipItems:
+                    AddItems(dataParser.ParseEquipItems(file.Json));
+                    break;
+                case DataCatalog.Recipes:
+                    AddItems(dataParser.ParseRecipes(file.Json));
+                    break;
+                case DataCatalog.Resources:
+                    AddItems(dataParser.ParseResources(file.Json));
+                    break;
+                case DataCatalog.ModifierPools:
+                    foreach ((string id, var pool) in dataParser.ParseEquipItemModifierPools(file.Json))
+                        _equipItemModifierPools.TryAdd(id, pool);
+                    break;
+                case DataCatalog.EquipItemResources:
+                    foreach ((string id, var resources) in dataParser.ParseEquipItemResources(file.Json))
+                        _equipItemsResources.TryAdd(id, resources);
+                    break;
+            }
         }
 
         public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
@@ -77,69 +100,13 @@ namespace LootGeneration.Services
 
         public IEnumerable<ICraftingRecipe> GetCraftingRecipes() => [.. _itemData.Values.Where(x => x is ICraftingRecipe).Cast<ICraftingRecipe>()];
 
-        public async void LoadData()
-        {
-            try
-            {
-                await LoadDataFromDirectory(DataPath);
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackException("Data loading failed.", ex, this);
-            }
-        }
-
-        private async Task LoadDataFromDirectory(string dataPath)
-        {
-            var equip = LoadDataFromJson(Path.Combine(dataPath, "EquipItems"), async s => AddItems(await _dataParser.ParseEquipItems(s)));
-            var recipes = LoadDataFromJson(Path.Combine(dataPath, "Recipes"), async s => AddItems(await _dataParser.ParseRecipes(s)));
-            var resources = LoadDataFromJson(Path.Combine(dataPath, "Resources"), async s => AddItems(await _dataParser.ParseResources(s)));
-            var modifiers = LoadDataFromJson(Path.Combine(dataPath, "ModifierPools"), async s => await _dataParser.ParseEquipItemModifierPools(s, ref _equipItemModifierPools));
-            var equipResources = LoadDataFromJson(Path.Combine(dataPath, "EquipItemResources"),
-                async s => { _equipItemsResources = await _dataParser.ParseEquipItemResources(s); });
-
-            await Task.WhenAll(equip, recipes, resources, modifiers, equipResources);
-        }
-
-        private void AddItems(List<IItem> data)
-        {
-            lock (_itemData)
-                data.ForEach(item => _itemData.TryAdd(item.Id, item));
-        }
-
-        private static async Task LoadDataFromJson(string path, Func<string, Task> loadDataFunc)
-        {
-            var dir = DirAccess.Open(path);
-            dir.ListDirBegin();
-            try
-            {
-                string fileName = dir.GetNext();
-                while (fileName != string.Empty)
-                {
-                    string filePath = Path.Combine(path, fileName);
-                    if (!filePath.EndsWith(".json")) continue;
-                    using var openFile = FileAccess.Open(filePath, FileAccess.ModeFlags.Read) ?? throw new FileLoadException();
-                    string jsonContent = openFile.GetAsText() ?? throw new FileLoadException();
-                    await loadDataFunc(jsonContent);
-                    fileName = dir.GetNext();
-                }
-            }
-            catch (Exception e)
-            {
-                Tracker.TrackException("Failed to load item data", e);
-            }
-            finally
-            {
-                dir.ListDirEnd();
-            }
-        }
+        private void AddItems(List<IItem> data) => data.ForEach(item => _itemData.TryAdd(item.Id, item));
 
         private IItem? TryGetItem(string id)
         {
             if (_itemData.TryGetValue(id, out var data)) return data;
 
             Tracker.TrackNotFound($"Item with id: {id}", this);
-            GD.Print($"Item with id: {id} not found");
             return null;
         }
     }

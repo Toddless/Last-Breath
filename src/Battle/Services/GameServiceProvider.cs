@@ -1,6 +1,7 @@
 namespace Battle.Services
 {
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Entity;
     using Internal.Npc;
     using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +16,11 @@ namespace Battle.Services
         {
             var provider = Core.Services.GameServiceProvider.Initialize(services => services
                 .AddBattleSystemModuleDependencies()
+                .AddGameData("res://Data/")
                 // Project-private bindings: only the bootstrap may know Internal classes
                 .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>());
             provider.AddBattleUiElementsFactory();
+            provider.GetService<IGameDataService>().LoadAll();
             return provider;
         }
     }

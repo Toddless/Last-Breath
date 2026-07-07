@@ -3,22 +3,28 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using Core;
     using Core.Battle.Abilities;
-    using Core.Data;
     using Core.Data.AbilityData;
+    using Core.Data.GameData;
     using Core.Enums;
     using Newtonsoft.Json;
 
-    public partial class AbilityProvider : IAbilityProvider
+    public partial class AbilityProvider : IAbilityProvider, IGameDataParticipant
     {
-        private const string DataPath = "res://Data/";
         private readonly Dictionary<string, AbilityBaseData> _abilityBaseData = [];
 
-        public AbilityProvider() => _ = LoadDataAsync();
+        public IReadOnlyList<string> Catalogs => [DataCatalog.Abilities];
 
         public IReadOnlyCollection<string> KnownAbilityIds => _abilityBaseData.Keys;
+
+        public void Apply(string catalog, GameDataFile file)
+        {
+            var root = JsonConvert.DeserializeObject<AbilityDataRoot>(file.Json)
+                       ?? throw new InvalidOperationException("Failed to deserialize ability data");
+            foreach (AbilityBaseData abilityData in root.Abilities)
+                _abilityBaseData[abilityData.Id] = abilityData;
+        }
 
         public IAbility CreateAbility(string abilityId)
         {
@@ -52,27 +58,6 @@
 
             Tracker.TrackNotFound($"Upgrade factory '{data.Id}'", this);
             return null;
-        }
-
-        private async Task LoadDataAsync()
-        {
-            try
-            {
-                await DataLoader.LoadDataFromJson(DataPath, ParseAbilities);
-            }
-            catch (Exception e)
-            {
-                Tracker.TrackException("Failed to load ability data", e);
-            }
-        }
-
-        private Task ParseAbilities(string json)
-        {
-            var root = JsonConvert.DeserializeObject<AbilityDataRoot>(json)
-                       ?? throw new InvalidOperationException("Failed to deserialize ability data");
-            foreach (AbilityBaseData abilityData in root.Abilities)
-                _abilityBaseData[abilityData.Id] = abilityData;
-            return Task.CompletedTask;
         }
     }
 }

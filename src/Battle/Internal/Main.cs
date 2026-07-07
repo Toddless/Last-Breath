@@ -40,7 +40,19 @@
             mastery.AddExperience(500000);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
+            _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
         }
+
+        public override void _ExitTree()
+        {
+            // The game bus outlives the scene (save-load reloads it): stale subscriptions would
+            // keep calling handlers on a freed node.
+            _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
+            _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
+        }
+
+        private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
+            _uiElementProvider?.GetOrOpenWindow(typeof(GameOverWindow));
 
         public override void _Input(InputEvent @event)
         {
@@ -56,20 +68,26 @@
 
         private async void OnBattleInitialized(BattleInitializedEvent evnt)
         {
+            BattleContext? context = null;
             try
             {
                 ArgumentNullException.ThrowIfNull(_uiElementProvider);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
-                var context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
+                context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
                 await ToSignal(GetTree(), "process_frame");
                 var result = await context.RunBattleAsync();
                 _gameEventBus?.Publish(new BattleEndEvent(result));
-                context.Dispose();
             }
             catch (Exception es)
             {
                 GD.Print($"Exception: {es.Message}, Stack Trace: {es.StackTrace}");
                 Tracker.TrackException("Failed to instantiate BattleArena", es, this);
+            }
+            finally
+            {
+                // Dispose must survive a crashed battle: it returns the fighters to the world
+                // and frees the arena — otherwise the NPCs vanish with the leaked arena node.
+                context?.Dispose();
             }
         }
     }

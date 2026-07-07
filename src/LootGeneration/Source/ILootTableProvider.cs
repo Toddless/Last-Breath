@@ -7,6 +7,5 @@ namespace LootGeneration.Source
     {
         List<LootTableTierData> BasicTable { get; }
         List<LootTableTierData> GetLootTable<TKey>(TKey key);
-        void LoadData();
     }
 }
