@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities.Modifiers
 {
     using System;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
 
     public class HealReductionModifier(Priority priority, float reduceBy, string id = "Context_Modifier_Heal_Reduction") : IHealModifier
     {

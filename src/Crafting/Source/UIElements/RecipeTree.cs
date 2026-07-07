@@ -30,11 +30,11 @@
             switch (true)
             {
                 case var _ when mb.ButtonIndex == MouseButton.Left:
-                    if (mb.CtrlPressed) EmitSignal(SignalName.CtrLeftClick, meta, item);
-                    else EmitSignal(SignalName.LeftClick, meta);
+                    if (mb.CtrlPressed) EmitSignal(global::Crafting.Source.UIElements.RecipeTree.SignalName.CtrLeftClick, meta, item);
+                    else EmitSignal(global::Crafting.Source.UIElements.RecipeTree.SignalName.LeftClick, meta);
                     break;
                 case var _ when mb.ButtonIndex == MouseButton.Right:
-                    EmitSignal(SignalName.RightClick, meta, item);
+                    EmitSignal(global::Crafting.Source.UIElements.RecipeTree.SignalName.RightClick, meta, item);
                     break;
             }
 

@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>L2 upgrades: the debuff rides every landing of the jar — each touched target gets a stack.</summary>
     public class JoPDebuffUpgrade(string id, string[] tags, int tier, IImpactRider rider)

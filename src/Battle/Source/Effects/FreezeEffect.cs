@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Skip-turn debuff, the cold twin of <see cref="StunEffect"/>: applies <see cref="StatusEffects.Freeze"/>,

@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
 
     public abstract class PassiveFactory
     {

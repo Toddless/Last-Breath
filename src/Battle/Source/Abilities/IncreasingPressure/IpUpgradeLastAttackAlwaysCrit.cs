@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Modifiers;
 
     /// <summary>L3 upgrade: the last attack in the series always scores a critical hit.</summary>

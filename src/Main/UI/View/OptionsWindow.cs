@@ -5,9 +5,9 @@
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
-    using Script.Helpers;
+    using Helpers;
 
     public partial class OptionsWindow : Control, IWindow
     {

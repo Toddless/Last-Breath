@@ -2,9 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities.Modifiers;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// "Хрупкость": the target takes <c>critDamageAmp</c> more damage from critical hits per stack.

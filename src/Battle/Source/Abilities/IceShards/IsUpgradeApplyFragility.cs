@@ -1,8 +1,7 @@
-namespace Battle.Source.Abilities.IceShrapnel
+namespace Battle.Source.Abilities.IceShards
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Effects;
-    using IceShards;
 
     /// <summary>L3 upgrade: every landed shard applies a Fragility stack to its target.</summary>
     public class IsUpgradeApplyFragility(string id, string[] tags, int tier, int duration, int maxStacks, float critDamageAmp)

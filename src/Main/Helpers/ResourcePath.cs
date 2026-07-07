@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Helpers
+﻿namespace LastBreath.Helpers
 {
     public static class ResourcePath
     {

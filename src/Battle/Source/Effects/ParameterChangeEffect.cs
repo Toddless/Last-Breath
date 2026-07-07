@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Effects
 {
-    using Decorators;
-    using Core.Enums;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
+    using Core.Enums;
+    using Decorators;
 
     public abstract class ParameterChangeEffect(
         string id,

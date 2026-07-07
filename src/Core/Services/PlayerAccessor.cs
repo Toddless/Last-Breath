@@ -1,6 +1,7 @@
 namespace Core.Services
 {
     using System;
+    using Entity;
     using Interfaces;
 
     public class PlayerAccessor : IPlayerAccessor

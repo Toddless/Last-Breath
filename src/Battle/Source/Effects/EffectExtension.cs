@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     public static class EffectExtension
     {

@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     public class UIWindowStateStorage : IUIWindowPositionStorage

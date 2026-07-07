@@ -3,9 +3,9 @@
     using System;
     using System.Linq;
     using Core.Enums;
-    using Core.Interfaces.Items;
+    using Core.Items;
+    using Core.Localization;
     using Godot;
-    using Utilities;
 
     [Tool]
     [GlobalClass]

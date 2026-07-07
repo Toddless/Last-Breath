@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System;
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Cast mutator: the ability activates without a cooldown. Skips the excluded ability (its own source).</summary>
     public class NoCooldownActivationModifier(string excludedAbilityId) : IAbilityActivationModifier

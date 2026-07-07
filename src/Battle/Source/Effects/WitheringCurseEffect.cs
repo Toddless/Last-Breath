@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>"Проклятье увядания": reduces the target's max health by <c>value</c> (0.15 = −15%) per stack.</summary>
     public class WitheringCurseEffect(int duration, int maxStacks, float value)

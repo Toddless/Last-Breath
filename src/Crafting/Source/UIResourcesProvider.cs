@@ -2,9 +2,9 @@ namespace Crafting.Source
 {
     using System.Collections.Generic;
     using System.IO;
+    using Core;
     using Core.Data;
     using Godot;
-    using Utilities;
 
     public class UIResourcesProvider : IUIResourcesProvider
     {

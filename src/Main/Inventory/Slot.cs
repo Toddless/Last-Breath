@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Inventory
 {
     using System;
-    using Core.Interfaces.Items;
+    using Core;
+    using Core.Items;
     using Godot;
     using Godot.Collections;
-    using Utilities;
 
     public abstract partial class Slot : Control
     {

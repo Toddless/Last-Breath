@@ -1,0 +1,18 @@
+﻿namespace Core.Components
+{
+    using System;
+    using Decorator;
+
+    public interface IModuleManager<TKey, TModule, TDecorator>
+        where TKey : struct, Enum
+        where TModule : class
+        where TDecorator : IModuleDecorator<TKey, TModule>
+    {
+        event Action<TKey>? ModuleChanges;
+
+        TModule GetModule(TKey key);
+        bool AddBaseModule(TKey key, TModule module);
+        void AddDecorator(TDecorator newDecorator);
+        void RemoveDecorator(string decoratorId, TKey key);
+    }
+}

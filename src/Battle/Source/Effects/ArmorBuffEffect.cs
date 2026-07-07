@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Buff: raises the bearer's armor by <c>value</c> (0..1) per stack, multiplicatively.</summary>
     public class ArmorBuffEffect(int duration, int maxStacks, float value)

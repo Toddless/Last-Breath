@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
     using System.Collections.Generic;
+    using Core.Battle;
     using Core.Data;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Entity;
     using Godot;
 
     public class ChooseRandomTarget(IGameServiceProvider provider) : ITargetChooser

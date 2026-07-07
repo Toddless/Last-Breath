@@ -3,16 +3,16 @@ namespace Battle.Source.Abilities.ChainLightning
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Components;
+    using Core.Components.Decorator;
+    using Core.Components.Module;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Godot;
-    using Module;
     using Decorators;
+    using Godot;
 
     /// <summary>Cast plan of the Chain Lightning: the strike sequence knobs, mutated by stages.</summary>
     public class ChainPlan

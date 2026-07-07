@@ -1,9 +1,9 @@
 namespace Battle.Source.Abilities.Targeting
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
 
     /// <summary>Targets the caster; no player clicks — the controller resolves and commits at once.</summary>
     public sealed class SelfTargeting : ITargetingStrategy

@@ -3,7 +3,7 @@ namespace Core.Services
     using System;
     using System.Collections.Generic;
     using Godot;
-    using Interfaces.UI;
+    using Views.UI;
 
     /// <summary>
     /// Window positions survive the fresh-instance UI policy here: draggable windows save

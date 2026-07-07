@@ -4,9 +4,9 @@ namespace Core.Ai
     using System.Linq;
     using System.Threading.Tasks;
     using Actions;
+    using Components;
     using Considerations;
-    using Interfaces.Components;
-    using Interfaces.Entity;
+    using Entity;
 
     /// <summary>
     /// Utility-scored NPC turn: greedy cast loop with re-evaluation after every cast
@@ -20,11 +20,20 @@ namespace Core.Ai
             new FinisherConsideration(),
             new SelfPreservationConsideration(),
             new ManaBudgetConsideration(),
+            new AlreadyAffectedConsideration(),
         ];
 
-        public async Task PlayTurnAsync(IFightable self, BehaviorProfile profile, ICombatEnvironment environment)
+        public async Task PlayTurnAsync(IFightable self, IBehaviorProfile profile, ICombatEnvironment environment)
         {
             var board = new CombatBlackboard(self, profile, environment, rnd);
+
+            board.Refresh();
+            if (ShouldFlee(board))
+            {
+                await environment.FleeBattleAsync(self); // broken morale consumes the whole turn
+                return;
+            }
+
             int castBudget = profile.Intellect == AiIntellect.Simple ? 1 : profile.MaxCastsPerTurn;
 
             while (board.CastsThisTurn < castBudget && self.IsAlive)
@@ -44,6 +53,12 @@ namespace Core.Ai
             if (attack.CanExecute(board))
                 await attack.ExecuteAsync(board);
         }
+
+        /// <summary>Fleeing only makes sense while enemies still stand — a won fight is no reason to run.</summary>
+        private static bool ShouldFlee(CombatBlackboard board) =>
+            board.Profile.FleeHealthThreshold > 0
+            && board.HasLivingEnemies
+            && CombatBlackboard.HealthRatio(board.Self) <= board.Profile.FleeHealthThreshold;
 
         private CastAbilityAction? PickBestCast(CombatBlackboard board)
         {

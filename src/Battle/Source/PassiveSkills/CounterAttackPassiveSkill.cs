@@ -1,9 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
+    using Core.Context;
+    using Core.Entity;
+    using Core.Events.GameEvents;
 
     public class CounterAttackPassiveSkill(float chance = 0.5f) : Skill(id: "Passive_Skill_Counter_Attack")
     {

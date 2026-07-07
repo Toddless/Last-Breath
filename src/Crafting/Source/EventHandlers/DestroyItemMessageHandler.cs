@@ -1,11 +1,11 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
+    using Core.Crafting;
     using Core.Data;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
     using Godot;
 
     public class DestroyItemMessageHandler(

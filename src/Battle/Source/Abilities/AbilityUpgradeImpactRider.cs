@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>Generic upgrade: attaches an impact rider to the ability — it fires on every delivery impact.</summary>
     public class AbilityUpgradeImpactRider(string id, string[] tags, int tier, IImpactRider rider)

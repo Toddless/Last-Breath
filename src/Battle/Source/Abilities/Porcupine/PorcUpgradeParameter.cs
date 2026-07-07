@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Porcupine
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>Additive bump of one Porcupine parameter (returns / heal share / cooldown chance / armor).</summary>

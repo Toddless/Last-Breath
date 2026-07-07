@@ -1,10 +1,10 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
     using System.Linq;
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
 
     /// <summary>
     /// L3 upgrade: the number of poison stacks applied per attack equals the number of

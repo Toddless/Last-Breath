@@ -2,10 +2,9 @@ namespace Core.Items
 {
     using System;
     using System.Linq;
+    using Crafting;
     using Enums;
     using Godot;
-    using Interfaces.Crafting;
-    using Interfaces.Items;
 
     public class CraftingResource : ICraftingResource, IItem
     {

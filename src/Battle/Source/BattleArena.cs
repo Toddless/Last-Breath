@@ -4,22 +4,24 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Ai;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Components;
+    using Core.Context;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Extensions;
     using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
     using Presentation;
     using UIElements;
-    using Utilities;
 
     public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField, ICombatEnvironment
     {
@@ -42,7 +44,7 @@
         private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
-        private bool _fightEnds;
+        private readonly HashSet<string> _fledIds = [];
 
         /// <summary>The ordered record of the current battle; the presentation layer replays it.</summary>
         public IBattleTimeline Timeline => _timeline;
@@ -50,8 +52,6 @@
         public override void _Ready()
         {
             _rnd.Randomize();
-            _queueScheduler.QueueContainLessThenTwoFighters += OnQueueContainLessThenTwoFighters;
-            _fightEnds = false;
         }
 
 
@@ -218,6 +218,7 @@
                 }
 
                 if (_currentFighter is not { IsAlive: true }) continue;
+                if (_fledIds.Contains(_currentFighter.InstanceId)) continue; // fled fighters may linger in the current queue
                 _currentFighter.OnTurnStart();
 
                 var skipCause = _currentFighter.StatusEffects.GetSkipTurnCause();
@@ -258,6 +259,7 @@
 
             // Final gate: death and battle-ending beats must finish before the results are handled.
             await WaitForPresentationAsync();
+            _timeline.DetachAll();
 
             return _battleOutcome?.Results ?? BattleResults.BattleAbandoned;
         }
@@ -297,11 +299,15 @@
                 _timeline.Attach(fighter.CombatEvents);
         }
 
+        /// <summary>
+        /// Locks the outcome; the loop exits on the next iteration. The timeline keeps recording —
+        /// the killing cast's trailing events must still reach the presentation; detach happens
+        /// after the final gate in RunBattleAsync.
+        /// </summary>
         private void EndBattle(BattleOutcome outcome)
         {
             if (_battleOutcome != null) return;
             _battleOutcome = outcome;
-            _timeline.DetachAll();
 
             if (_playerTargetTcs is { Task.IsCompleted: false })
                 _playerTargetTcs.SetResult(null);
@@ -326,10 +332,6 @@
             }
         }
 
-        private void OnQueueContainLessThenTwoFighters()
-        {
-            _fightEnds = true;
-        }
 
         private void OnAttackTargetSelected(AttackTargetSelectedEvent obj)
         {
@@ -360,21 +362,40 @@
             await _attackContextScheduler.DrainQueue();
         }
 
-        private void OnEntityDead(EntityDiedEvent obj)
+        /// <summary>
+        /// The fighter leaves the battle alive: out of the fighter list and the enemy count,
+        /// its state restores with everyone else on battle end. Counts toward victory like a death.
+        /// </summary>
+        public Task FleeBattleAsync(IFightable fighter)
         {
-            _playersEnemiesCount--;
-            _fighters.Remove(obj.Entity);
-            if (_playersEnemiesCount <= 0 && _currentFighter is IPlayer && _playerTargetTcs is { Task.IsCompleted: false })
-            {
-                _playerTargetTcs?.SetResult(null);
-                _fightEnds = true;
-            }
+            if (!_fledIds.Add(fighter.InstanceId)) return Task.CompletedTask;
+
+            // Timeline for the future flee beat/log entry; battle bus for the XP processor.
+            fighter.CombatEvents.Publish(new EntityFledBattleEvent(fighter));
+            _battleEventBus?.Publish(new EntityFledBattleEvent(fighter));
+            RemoveEnemyFromFight(fighter);
+            return Task.CompletedTask;
         }
 
-        private void OnPlayerDead(PlayerDiedEvent evnt)
+        private void OnEntityDead(EntityDiedEvent obj)
         {
-            _fightEnds = true;
+            if (obj.Entity is IPlayer) return; // the player's defeat resolves through PlayerDiedEvent
+            RemoveEnemyFromFight(obj.Entity);
         }
+
+        private void RemoveEnemyFromFight(IFightable entity)
+        {
+            _playersEnemiesCount--;
+            _fighters.Remove(entity);
+            if (_playersEnemiesCount > 0) return;
+
+            // No standing enemies: dead or fled, the player took the field.
+            if (_playerTargetTcs is { Task.IsCompleted: false })
+                _playerTargetTcs.SetResult(null);
+            EndBattle(new BattleOutcome(BattleResults.PlayerWon));
+        }
+
+        private void OnPlayerDead(PlayerDiedEvent evnt) => EndBattle(new BattleOutcome(BattleResults.PlayerLost));
 
         private class BattleOutcome(BattleResults results)
         {

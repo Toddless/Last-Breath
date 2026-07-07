@@ -1,8 +1,9 @@
 ﻿namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
 
     public class HealingFuryEffect(
         int duration,

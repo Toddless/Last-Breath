@@ -3,19 +3,19 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core;
     using Core.Constants;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.Items;
+    using Core.Localization;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Modifiers;
     using Core.Results;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     public partial class CraftingWindow : Control, IWindow
     {

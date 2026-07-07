@@ -3,12 +3,11 @@ namespace Battle.Source.Abilities
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Module;
+    using Core.Battle;
+    using Core.Components.Module;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

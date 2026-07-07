@@ -1,10 +1,10 @@
 namespace Battle.Source.UIElements
 {
     using Core.Data;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Views;
+    using Core.Views.UI;
     using Godot;
 
     /// <summary>

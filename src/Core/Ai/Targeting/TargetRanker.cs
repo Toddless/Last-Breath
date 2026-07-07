@@ -2,7 +2,7 @@ namespace Core.Ai.Targeting
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Interfaces.Entity;
+    using Entity;
 
     /// <summary>
     /// Orders a valid-target set by desirability for the given role.

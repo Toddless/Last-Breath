@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>
     /// L2 upgrade: when the target dies, its remaining poison stacks transfer to a random enemy.

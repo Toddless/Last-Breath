@@ -4,10 +4,10 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Localization;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     [GlobalClass]
     public partial class CraftingItems : Control, IWindow

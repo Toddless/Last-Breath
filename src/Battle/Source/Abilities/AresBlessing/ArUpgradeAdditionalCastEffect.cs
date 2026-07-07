@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using System;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Riders;
 
     /// <summary>

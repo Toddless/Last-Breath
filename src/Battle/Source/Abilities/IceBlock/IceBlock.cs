@@ -2,10 +2,11 @@ namespace Battle.Source.Abilities.IceBlock
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
     using Effects;
 
     /// <summary>Cast plan of the Ice Block: the volley fields plus the stage-mutable stun length.</summary>

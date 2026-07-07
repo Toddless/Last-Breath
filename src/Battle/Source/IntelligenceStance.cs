@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source
 {
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Core.Modifiers;
 
     public class IntelligenceStance(IFightable owner)

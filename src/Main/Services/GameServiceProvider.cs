@@ -2,17 +2,16 @@ namespace LastBreath.Services
 {
     using Battle.Source;
     using Core.Data;
+    using Core.Events;
     using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Services;
+    using Core.Views.UI;
     using Crafting.Source;
     using Inventory;
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
-    using Source;
     using UI.View;
-    using Utilities;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
     public static class GameServiceProvider

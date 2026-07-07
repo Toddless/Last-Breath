@@ -5,8 +5,8 @@ namespace LootGeneration.Internal
     using System.Globalization;
     using System.Linq;
     using Core.Enums;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
 
     internal partial class LootGenerationHud : Control

@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Helpers.Extensions
+﻿namespace LastBreath.Helpers.Extensions
 {
     using Godot;
 

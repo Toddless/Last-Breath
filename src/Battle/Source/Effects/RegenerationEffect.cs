@@ -1,10 +1,11 @@
 ﻿namespace Battle.Source.Effects
 {
     using System.Linq;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
+    using Core.Localization;
     using Godot;
-    using Utilities;
 
     public class RegenerationEffect(
         float amount,

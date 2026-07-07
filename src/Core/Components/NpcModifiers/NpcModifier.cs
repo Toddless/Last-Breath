@@ -1,9 +1,10 @@
 namespace Core.Components.NpcModifiers
 {
     using System;
+    using Context;
+    using Entity;
     using Godot;
     using Interfaces;
-    using Interfaces.Entity;
 
     public abstract class NpcModifier(string id, float weight, float difficultyMultiplier, bool isUnique, string npcBuffId) : INpcModifier
     {
@@ -21,10 +22,12 @@ namespace Core.Components.NpcModifiers
         public string DisplayName => TranslationServer.Translate(Id);
         public string Description => TranslationServer.Translate(Id + "_Description");
 
+        // TODO:
+        // Here we  attach an buff to the npc.
+        // do not forget about scaling (buff value * TotalScale)
         public virtual void Attach(IFightable to)
         {
         }
-
         public virtual void Detach(IFightable from)
         {
         }

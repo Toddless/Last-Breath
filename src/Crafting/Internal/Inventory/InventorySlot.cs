@@ -2,8 +2,8 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Views.UI;
     using Godot;
 
     internal partial class InventorySlot : Slot, IInventorySlot, IInitializable

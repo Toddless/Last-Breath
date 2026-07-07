@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Conditions
 {
+    using Core.Battle;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
 
     public class HealthThresholdExecuteCondition(float baseThreshold = 0.3f) : IExecuteCondition
     {

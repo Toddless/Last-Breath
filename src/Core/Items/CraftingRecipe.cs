@@ -3,11 +3,10 @@ namespace Core.Items
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Crafting;
     using Enums;
     using Godot;
     using Interfaces;
-    using Interfaces.Crafting;
-    using Interfaces.Items;
 
     public class CraftingRecipe : ICraftingRecipe, IItem
     {

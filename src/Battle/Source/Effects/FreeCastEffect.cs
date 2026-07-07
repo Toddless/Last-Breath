@@ -2,8 +2,8 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities.Modifiers;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Battle.Abilities;
+    using Core.Events.GameEvents;
 
     /// <summary>
     /// "The next activated ability has no cooldown": puts a cast mutator on the owner and removes

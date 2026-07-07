@@ -1,7 +1,7 @@
 namespace Crafting.Internal.Layers
 {
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
     using Services;
 

@@ -2,8 +2,8 @@
 {
     using System;
     using Godot;
+    using Helpers;
     using QuestSystem;
-    using Script.Helpers;
 
     public partial class QuestOption : Button
     {

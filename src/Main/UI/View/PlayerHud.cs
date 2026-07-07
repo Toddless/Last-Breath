@@ -1,9 +1,9 @@
 ﻿namespace LastBreath.UI.View
 {
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Crafting.Source.UIElements;
     using Godot;
     using Inventory;

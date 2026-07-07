@@ -2,8 +2,8 @@ namespace Battle.Source.Abilities
 {
     using System;
     using System.Collections.Generic;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
 
     /// <summary>
     /// Mutable plan of a multicast cast. The base stage fills it from the ability's current

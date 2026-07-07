@@ -1,6 +1,6 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Godot;
 
     public partial class AbilityButton : TextureButton

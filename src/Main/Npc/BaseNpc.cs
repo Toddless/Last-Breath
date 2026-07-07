@@ -6,23 +6,27 @@ namespace LastBreath.Npc
     using Attribute;
     using Battle.Source;
     using Components;
+    using Core;
     using Core.Ai;
+    using Core.Ai.World;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Components;
     using Core.Components.NpcModifiers;
+    using Core.Context;
     using Core.Data;
+    using Core.Data.NpcData;
+    using Core.Entity;
     using Core.Enums;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
+    using Core.Items;
     using Godot;
     using Services;
     using Stateless;
-    using Utilities;
+    using DamageContext = DamageContext;
+    using EntityParametersComponent = Core.Components.EntityParametersComponent;
 
     public partial class BaseNpc : CharacterBody2D, IFightableNpc
     {
@@ -87,8 +91,12 @@ namespace LastBreath.Npc
         public Rarity Rarity { get; } = Rarity.Legendary;
         public EntityType EntityType { get; } = EntityType.Regular;
         public Fractions Fraction { get; } = Fractions.Human;
+        public INpcLifecycle? Lifecycle { get; }
+
         public INpcModifiersComponent NpcModifiers { get; private set; }
-        public BehaviorProfile? Behavior { get; set; }
+        public IBehaviorProfile? Behavior { get; set; }
+        public float RisingBonus { get; }
+        public bool IsRisen { get; }
 
         public float CurrentHealth
         {
@@ -165,6 +173,13 @@ namespace LastBreath.Npc
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
         }
+
+        public void ApplyDefinition(NpcDefinition definition) => throw new NotImplementedException();
+
+        public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed) => throw new NotImplementedException();
+
+        public void RestoreAsRisen(float parameterBonus) => throw new NotImplementedException();
+
 
         public void InjectServices(IGameServiceProvider provider)
         {

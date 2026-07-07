@@ -5,14 +5,14 @@ namespace LastBreath.Services
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
+    using Core.Crafting;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
+    using Core.Items;
     using Core.Modifiers;
     using Godot;
-    using Utilities;
     using FileAccess = Godot.FileAccess;
 
     internal class ItemDataProvider : IItemDataProvider

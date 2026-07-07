@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Modifiers;
 
     /// <summary>L2 upgrade: attacks cannot be evaded.</summary>

@@ -1,10 +1,10 @@
 namespace LootGeneration.Source
 {
     using System.Threading.Tasks;
+    using Core.Crafting;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
+    using Core.Items;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
 

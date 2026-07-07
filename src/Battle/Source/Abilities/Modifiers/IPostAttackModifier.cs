@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Battle;
+    using Core.Battle;
 
     public interface IPostAttackModifier
     {

@@ -3,13 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Battle;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Views.UI;
     using Godot;
     using UIElements;
 

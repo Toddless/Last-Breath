@@ -2,9 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities.Modifiers;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Debuff: reduces all incoming healing on the target by <c>reduceBy</c> (0..1).</summary>
     public class HealReductionEffect(int duration, int maxStacks, float reduceBy)

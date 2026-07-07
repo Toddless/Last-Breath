@@ -1,6 +1,6 @@
 ﻿namespace Core.Data
 {
-    using Interfaces.Items;
+    using Items;
 
     public class DragPayload(IItem item, int quantity, object source)
     {

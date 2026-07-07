@@ -1,12 +1,14 @@
 namespace Core.Ai.Considerations
 {
     using System.Collections.Generic;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
+    using System.Linq;
+    using Battle.Abilities;
+    using Entity;
 
     /// <summary>
-    /// Heals score with missing health: near-useless at full health, urgent when low.
-    /// Other roles are untouched — buffs are fine to open a turn with at full health.
+    /// Heals score with the missing health of the most wounded planned target (self or an ally):
+    /// near-useless on the healthy, urgent on the dying. Falls back to the caster when the
+    /// targeting resolves automatically at execution. Other roles are untouched.
     /// </summary>
     public class SelfPreservationConsideration : ICombatConsideration
     {
@@ -17,8 +19,10 @@ namespace Core.Ai.Considerations
         {
             if (role != AbilityRole.Heal) return 1f;
 
-            float missing = 1f - CombatBlackboard.HealthRatio(board.Self);
-            return FullHealthFloor + missing * UrgencyScale;
+            float lowestRatio = targets.Count > 0
+                ? targets.Min(CombatBlackboard.HealthRatio)
+                : CombatBlackboard.HealthRatio(board.Self);
+            return FullHealthFloor + (1f - lowestRatio) * UrgencyScale;
         }
     }
 }

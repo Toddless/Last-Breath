@@ -4,11 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
+    using Core.Battle.Abilities;
+    using Core.Data;
     using Core.Data.AbilityData;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Newtonsoft.Json;
-    using Utilities;
 
     public partial class AbilityProvider : IAbilityProvider
     {

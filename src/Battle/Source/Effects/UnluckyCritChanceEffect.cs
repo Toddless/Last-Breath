@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Decorators;
+    using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components.Decorator;
+    using Decorators;
 
     public class UnluckyCritChanceEffect(
         int duration,

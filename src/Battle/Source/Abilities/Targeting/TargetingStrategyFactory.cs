@@ -1,9 +1,9 @@
 namespace Battle.Source.Abilities.Targeting
 {
     using System;
+    using Core.Battle.Abilities;
     using Core.Data.AbilityData;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Builds the default targeting strategy from ability data. Abilities that target randomly
     /// (or otherwise specially) set their own strategy in <see cref="AbilityProvider"/> instead.</summary>

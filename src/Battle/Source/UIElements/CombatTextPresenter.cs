@@ -2,10 +2,10 @@ namespace Battle.Source.UIElements
 {
     using System;
     using System.Linq;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

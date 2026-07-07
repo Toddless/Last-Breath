@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Riders;
 
     /// <summary>L3 upgrade: remaining poison stacks transfer to another enemy when the target dies.</summary>

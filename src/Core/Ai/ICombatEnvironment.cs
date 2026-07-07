@@ -2,9 +2,9 @@ namespace Core.Ai
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Interfaces.Abilities;
-    using Interfaces.Battle;
-    using Interfaces.Entity;
+    using Battle;
+    using Battle.Abilities;
+    using Entity;
 
     /// <summary>
     /// Battle primitives the planner acts through. Implemented by the arena: casting goes
@@ -16,5 +16,8 @@ namespace Core.Ai
         IBattleField Field { get; }
         Task CastAbilityAsync(IFightable caster, IAbility ability, IReadOnlyList<IFightable> targets);
         Task BasicAttackAsync(IFightable attacker, IFightable target);
+
+        /// <summary>The fighter leaves the battle alive (broken morale). Consumes its turn.</summary>
+        Task FleeBattleAsync(IFightable fighter);
     }
 }

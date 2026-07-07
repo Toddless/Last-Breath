@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using Core.Battle.Skills;
+    using Core.Components.Decorator;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Decorators;
 
     public class LuckyCriticalChancePassiveSkill() : Skill(id: "Passive_Skill_LuckyCriticalChance")

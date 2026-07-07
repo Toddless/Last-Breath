@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// "Усиленная защита" — additively raises the bearer's critical-damage mitigation

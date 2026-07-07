@@ -1,7 +1,6 @@
 namespace Core.Crafting
 {
     using System.Collections.Generic;
-    using Interfaces.Crafting;
     using Modifiers;
 
     public class MaterialCategory(List<IModifier> modifiers, string id) : IMaterialCategory

@@ -1,6 +1,7 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
     using Godot;
+    using Services;
 
     public partial class BaseControl : Control
     {

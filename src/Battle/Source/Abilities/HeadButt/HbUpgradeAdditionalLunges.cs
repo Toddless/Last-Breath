@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.HeadButt
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>L3 upgrade: the head butt performs additional lunges (two in total).</summary>

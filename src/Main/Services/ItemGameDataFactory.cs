@@ -5,12 +5,10 @@ namespace LastBreath.Services
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
     using Core.Items;
     using Core.Items.Grants;
     using Core.Modifiers;
-    using LastBreath.Items;
+    using Items;
 
     public sealed class ItemGameDataFactory : IItemGameDataFactory
     {

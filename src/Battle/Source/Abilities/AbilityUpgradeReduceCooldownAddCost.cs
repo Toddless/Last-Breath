@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>Reduces the ability's cooldown at the price of an increased resource cost.</summary>

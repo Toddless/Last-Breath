@@ -14,12 +14,6 @@ namespace Core.Ai.World.Time
         private WorldClockConfig _config;
         private double _secondsOfDay;
 
-        public WorldClock(WorldClockConfig? config = null)
-        {
-            _config = config ?? new WorldClockConfig();
-            ResetToStart();
-        }
-
         public int Day { get; private set; }
         public int Hour => (int)(_secondsOfDay / 3600);
         public int Minute => (int)(_secondsOfDay % 3600 / 60);
@@ -29,6 +23,12 @@ namespace Core.Ai.World.Time
 
         public event Action<int>? HourPassed;
         public event Action<DayPhase>? PhaseChanged;
+
+        public WorldClock(WorldClockConfig? config = null)
+        {
+            _config = config ?? new WorldClockConfig();
+            ResetToStart();
+        }
 
         public void Tick(float realDelta)
         {
@@ -42,6 +42,18 @@ namespace Core.Ai.World.Time
                 _secondsOfDay -= GameDaySeconds;
                 Day++;
             }
+
+            if (Hour != previousHour) HourPassed?.Invoke(Hour);
+            if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);
+        }
+
+        public void RestoreState(int day, int minuteOfDay)
+        {
+            int previousHour = Hour;
+            var previousPhase = Phase;
+
+            Day = Math.Max(0, day);
+            _secondsOfDay = Math.Clamp(minuteOfDay, 0, (24 * 60) - 1) * 60.0;
 
             if (Hour != previousHour) HourPassed?.Invoke(Hour);
             if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);

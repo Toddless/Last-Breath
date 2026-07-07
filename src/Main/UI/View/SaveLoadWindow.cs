@@ -1,8 +1,8 @@
 ﻿namespace LastBreath.UI.View
 {
     using Core.Data;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
 
     public partial class SaveLoadWindow : Control, IWindow

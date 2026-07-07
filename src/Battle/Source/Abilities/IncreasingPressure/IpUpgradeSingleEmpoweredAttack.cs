@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>
     /// L3 upgrade: replaces the series with one empowered strike that deals

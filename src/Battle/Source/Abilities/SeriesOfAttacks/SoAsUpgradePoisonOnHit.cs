@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Riders;
 
     /// <summary>L3 upgrade: every successful attack of the series puts a poison stack on the target.</summary>

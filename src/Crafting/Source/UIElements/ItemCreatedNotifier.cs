@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     [GlobalClass]
@@ -18,7 +18,7 @@
 
         public override void _Ready()
         {
-            if (_okButton != null) _okButton.Pressed += QueueFree; 
+            if (_okButton != null) _okButton.Pressed += QueueFree;
             if (_destroyButton != null) _destroyButton.Pressed += OnDestroyPressed;
         }
 

@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Components;
     using Core.Enums;
-    using Core.Interfaces.Components;
     using Core.Modifiers;
     using Godot;
 

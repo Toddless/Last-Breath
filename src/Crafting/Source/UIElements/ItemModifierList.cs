@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
 
@@ -49,7 +49,7 @@
         private void OnItemSelected(int identifier)
         {
             _lastSelectedLabelIdentifier = identifier;
-            EmitSignal(SignalName.ItemSelected, _lastSelectedLabelIdentifier, this);
+            EmitSignal(global::Crafting.Source.UIElements.ItemModifierList.SignalName.ItemSelected, _lastSelectedLabelIdentifier, this);
         }
     }
 }

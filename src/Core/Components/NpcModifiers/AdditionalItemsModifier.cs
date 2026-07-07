@@ -2,9 +2,10 @@ namespace Core.Components.NpcModifiers
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Context;
     using Data.LootTable;
+    using Entity;
     using Interfaces;
-    using Interfaces.Entity;
 
     public class AdditionalItemsModifier(
         string id,

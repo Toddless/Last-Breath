@@ -17,6 +17,7 @@ namespace Core.Data.NpcData
         [JsonProperty("caution")] public float Caution { get; init; } = 1f;
         [JsonProperty("greed")] public float Greed { get; init; } = 1f;
         [JsonProperty("castScoreThreshold")] public float CastScoreThreshold { get; init; } = 0.35f;
+        [JsonProperty("fleeHealthThreshold")] public float FleeHealthThreshold { get; init; }
         [JsonProperty("abilities")] public List<NpcAbilityBehaviorData> Abilities { get; init; } = [];
     }
 

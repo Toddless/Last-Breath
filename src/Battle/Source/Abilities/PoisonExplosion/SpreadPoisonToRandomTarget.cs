@@ -2,10 +2,10 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
     using Effects;
 
     public class SpreadPoisonToRandomTarget : IPoisonSpreadMode

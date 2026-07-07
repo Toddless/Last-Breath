@@ -1,10 +1,10 @@
 namespace Battle.Source
 {
     using System.Collections.Generic;
+    using Core.Battle;
+    using Core.Battle.Skills;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
 
     public abstract class StanceBase(IFightable owner, IStanceActivationEffect effect, Stance stanceType) : IStance
     {

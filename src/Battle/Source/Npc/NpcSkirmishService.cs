@@ -4,11 +4,10 @@ namespace Battle.Source.Npc
     using System.Linq;
     using Core.Ai.World.Skirmish;
     using Core.Components;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
 
     /// <summary>Runs the abstract NPC-vs-NPC skirmishes; ticked by NpcWorldDirector.</summary>
     public interface INpcSkirmishService

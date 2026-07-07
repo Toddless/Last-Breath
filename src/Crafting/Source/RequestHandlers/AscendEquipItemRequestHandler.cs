@@ -1,13 +1,13 @@
 namespace Crafting.Source.RequestHandlers
 {
     using System.Threading.Tasks;
+    using Core.Crafting;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Results;
 
     public class AscendEquipItemRequestHandler(IInventory inventory, IItemAscender itemAscender, IGameMessageBus gameMessageBus)

@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Decorators;
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
+    using Decorators;
 
     public class ParameterEqualsEffect(
         string id,

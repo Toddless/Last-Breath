@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Abilities.Modifiers
 {
     using System;
+    using Core.Battle;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
 
     public class LeechOnCritAttackModifier(Priority priority, float leechPercent) : IAttackModifier
     {

@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Effects;
     using Riders;
 

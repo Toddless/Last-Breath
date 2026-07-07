@@ -1,8 +1,9 @@
 ﻿namespace LastBreath
 {
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Entity;
 
     public record HealContext(IFightable Source, IFightable Target) : IHealContext
     {

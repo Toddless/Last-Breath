@@ -3,9 +3,9 @@ namespace Battle.Source.Abilities.Targeting
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
 
     /// <summary>Picks up to <paramref name="maxTargets"/> random targets — no player choice. Assigned in the
     /// ability factory to abilities that target randomly.</summary>

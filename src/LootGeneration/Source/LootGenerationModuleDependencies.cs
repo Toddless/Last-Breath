@@ -5,9 +5,9 @@ namespace LootGeneration.Source
     using Core.Data;
     using Core.Data.LootTable;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
+    using Core.Events;
+    using Core.MessageBus;
+    using Core.Services;
     using Godot;
     using Microsoft.Extensions.DependencyInjection;
 

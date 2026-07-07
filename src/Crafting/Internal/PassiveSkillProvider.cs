@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.IO;
-    using Core.Interfaces.Skills;
+    using Core;
+    using Core.Battle.Skills;
     using Godot;
-    using Utilities;
 
     public class PassiveSkillProvider : ISkillProvider
     {

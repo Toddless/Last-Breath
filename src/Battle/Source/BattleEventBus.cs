@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Events;
+    using Core.Events;
 
     public class BattleEventBus : IBattleEventBus
     {

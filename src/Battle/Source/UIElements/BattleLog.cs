@@ -1,7 +1,7 @@
 namespace Battle.Source.UIElements
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Events;
+    using Core.Events;
     using Godot;
 
     /// <summary>

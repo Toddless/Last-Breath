@@ -2,11 +2,12 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Entity;
     using Godot;
-    using Utilities;
 
     public record DamageContext : IDamageContext
     {

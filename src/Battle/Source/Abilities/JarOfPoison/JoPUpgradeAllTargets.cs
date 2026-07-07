@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using HitDelivery;
 
     /// <summary>L3 upgrade: applies poison to all enemies on the battlefield.</summary>

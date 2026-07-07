@@ -4,11 +4,11 @@ namespace LootGeneration.Source
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Data;
     using Core.Data.LootTable;
     using Core.Enums;
     using Godot;
-    using Utilities;
 
     public class LootTableProvider(IItemGameDataFactory factory) : ILootTableProvider
     {

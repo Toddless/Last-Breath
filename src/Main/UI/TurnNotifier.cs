@@ -1,8 +1,8 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
-    using Core.Interfaces.Entity;
+    using Core.Entity;
     using Godot;
-    using Script.Helpers;
+    using Helpers;
 
     public partial class TurnNotifier : Panel
     {

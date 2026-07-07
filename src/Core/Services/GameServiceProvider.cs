@@ -3,12 +3,12 @@ namespace Core.Services
     using System;
     using System.Collections.Generic;
     using Data;
+    using Events;
     using Godot;
     using Interfaces;
-    using Interfaces.Events;
-    using Interfaces.MessageBus;
-    using Interfaces.UI;
+    using MessageBus;
     using Microsoft.Extensions.DependencyInjection;
+    using Views.UI;
 
     /// <summary>
     /// The shared composition root. A project bootstraps it ONCE with its own registrations:

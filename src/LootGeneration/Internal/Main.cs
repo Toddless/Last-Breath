@@ -2,11 +2,10 @@ namespace LootGeneration.Internal
 {
     using System;
     using Core.Data;
-    using Core.Interfaces.Events;
+    using Core.Events;
     using Godot;
     using Services;
     using Source;
-    using Spawner = Internal.Spawner;
 
     internal partial class Main : Node2D
     {

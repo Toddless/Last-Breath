@@ -2,14 +2,14 @@ namespace Battle.Source.UIElements
 {
     using System;
     using System.Collections.Generic;
+    using Core;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Views;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     /// <summary>
     /// Renders one stance's mastery tree. Fills its fixed threshold slots from a domain request

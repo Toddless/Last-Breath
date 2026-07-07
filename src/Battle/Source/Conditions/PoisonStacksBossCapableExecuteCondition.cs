@@ -2,9 +2,9 @@
 {
     using System;
     using System.Linq;
+    using Core.Battle;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
 
     public class PoisonStacksBossCapableExecuteCondition(Func<int> stackThreshold, float bossThresholdMultiplier = 1f) : IExecuteCondition
     {

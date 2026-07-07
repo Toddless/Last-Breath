@@ -3,11 +3,12 @@ namespace Battle.Source.Npc
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core;
+    using Core.Data;
     using Core.Data.FactionData;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Newtonsoft.Json;
-    using Utilities;
 
     /// <summary>
     /// Loads FactionRelations.json and answers hostility questions. Directed matrix: an entry

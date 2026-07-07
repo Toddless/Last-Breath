@@ -1,9 +1,9 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Entity;
 
     /// <summary>
     /// Outgoing-damage mutator: adds <c>bonus</c> (0.5 = +50%) of the context's total as PURE damage.

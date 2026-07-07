@@ -2,12 +2,12 @@
 {
     using System.Threading.Tasks;
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.Localization;
+    using Core.Views.UI;
     using UIElements;
-    using Utilities;
 
     public class ItemCreatedMessageHandler(IUiElementsManager manager, IInventory inventory)
         : IMessageHandler<ItemCreatedMessage>

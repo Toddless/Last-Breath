@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
+    using Core.Views.UI;
     using UIElements;
 
     public class OpenCraftingItemsWindowRequestHandler(IUiElementsManager uIElementManager) : IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>

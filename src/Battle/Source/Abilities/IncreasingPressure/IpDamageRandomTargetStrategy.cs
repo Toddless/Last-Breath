@@ -3,10 +3,11 @@ namespace Battle.Source.Abilities.IncreasingPressure
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

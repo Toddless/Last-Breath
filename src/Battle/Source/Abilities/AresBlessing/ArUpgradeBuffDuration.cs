@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>L1 upgrade: the blessing lasts longer.</summary>

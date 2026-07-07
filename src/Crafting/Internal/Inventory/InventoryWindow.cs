@@ -4,10 +4,10 @@ namespace Crafting.Internal.Inventory
     using System.Linq;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
 
     internal partial class InventoryWindow : Control, IWindow

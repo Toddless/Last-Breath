@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Modifiers;
 
     /// <summary>L2 upgrade: both strikes gain bonus accuracy.</summary>

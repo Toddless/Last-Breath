@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     public partial class NotificationMessage : Control, IInitializable

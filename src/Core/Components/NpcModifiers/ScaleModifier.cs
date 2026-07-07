@@ -1,6 +1,6 @@
 namespace Core.Components.NpcModifiers
 {
-    using Interfaces.Entity;
+    using Entity;
 
     public class ScaleModifier(
         string id,
@@ -28,6 +28,7 @@ namespace Core.Components.NpcModifiers
             npc.NpcModifiers.ModifierAdded -= OnModifierAdded;
         }
 
+        // Empty override because Scale modifier DOES NOT scale other scale modifiers
         public override void ScaleUp(IScaleModifier modifier)
         {
         }

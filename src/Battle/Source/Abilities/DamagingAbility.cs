@@ -1,10 +1,9 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Core.Enums;
     using System.Collections.Generic;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components.Module;
-    using Module;
+    using Core.Battle.Abilities;
+    using Core.Components.Module;
+    using Core.Enums;
 
     public abstract class DamagingAbility(
         string id,

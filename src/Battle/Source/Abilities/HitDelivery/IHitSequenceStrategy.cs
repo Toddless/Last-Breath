@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.HitDelivery
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Entity;
 
     /// <summary>
     /// Delivery for direct-hit abilities (no attack pipeline): yields the sequence of targets the cast

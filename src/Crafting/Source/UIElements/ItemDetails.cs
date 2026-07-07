@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Data;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
 

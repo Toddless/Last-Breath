@@ -1,9 +1,9 @@
 namespace Crafting.Services
 {
     using Core.Data;
-    using Core.Interfaces;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Services;
+    using Core.Views.UI;
     using Internal;
     using Internal.Inventory;
     using Microsoft.Extensions.DependencyInjection;

@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Effects;
 
     public class SpreadPoisonToAll : IPoisonSpreadMode

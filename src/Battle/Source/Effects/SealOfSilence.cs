@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Forbids using active abilities while present: applies <see cref="StatusEffects.Paralysis"/>,

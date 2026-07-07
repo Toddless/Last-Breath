@@ -4,17 +4,16 @@ namespace Battle.Source.Npc
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Battle.Abilities;
     using Core.Components;
     using Core.Data;
     using Core.Data.NpcData;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
     using Newtonsoft.Json;
-    using Utilities;
 
     /// <summary>
     /// Loads Npc.json + NpcBehavior.json and rolls ready-to-apply <see cref="NpcDefinition"/>s:
@@ -50,17 +49,19 @@ namespace Battle.Source.Npc
 
         public IReadOnlyCollection<string> KnownNpcIds => _npcs.Keys;
 
-        public NpcDefinition CreateDefinition(string npcId)
+        public NpcDefinition CreateDefinition(string npcId) => CreateDefinition(npcId, null);
+
+        public NpcDefinition CreateDefinition(string npcId, NpcDefinitionOverrides? overrides)
         {
             var data = _npcs.GetValueOrDefault(npcId)
                        ?? throw new KeyNotFoundException($"No NPC data loaded for '{npcId}'");
 
             var entityType = ParseEnum<EntityType>(data.EntityType);
-            var stance = RollStance(data);
+            var stance = overrides?.Stance ?? RollStance(data);
             var behaviorData = _behaviors.GetValueOrDefault(stance)
                                ?? throw new KeyNotFoundException($"No behavior archetype loaded for stance '{stance}'");
-            int level = _rnd.RandIntRange(data.LevelMin, NpcTypeDefaults.MaxLevel(entityType));
-            var rarity = RollRarity();
+            int level = overrides?.Level ?? _rnd.RandIntRange(data.LevelMin, NpcTypeDefaults.MaxLevel(entityType));
+            var rarity = overrides?.Rarity ?? RollRarity();
 
             return new NpcDefinition
             {
@@ -193,6 +194,7 @@ namespace Battle.Source.Npc
             Caution = data.Caution,
             Greed = data.Greed,
             CastScoreThreshold = data.CastScoreThreshold,
+            FleeHealthThreshold = data.FleeHealthThreshold,
             Abilities = data.Abilities.ToDictionary(
                 entry => entry.Id,
                 entry => new AbilityBehavior(entry.Id, entry.Weight, ParseEnum<AbilityRole>(entry.Role))),

@@ -1,6 +1,6 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     [GlobalClass]

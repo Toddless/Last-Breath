@@ -2,10 +2,10 @@ namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
     using Core.Enums;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.Views.UI;
     using UIElements;
 
     public class OpenCraftingWindowMessageHandler(

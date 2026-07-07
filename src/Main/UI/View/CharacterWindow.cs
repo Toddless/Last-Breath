@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.UI.View
 {
     using Core.Data;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     public partial class CharacterWindow : Control, IWindow

@@ -4,13 +4,13 @@ namespace Battle.Source.Presentation
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
+    using Core.Battle;
     using Core.Data;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Entity;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
-    using Utilities;
 
     /// <summary>
     /// The presentation player: logic resolves a turn instantly and fills the timeline,

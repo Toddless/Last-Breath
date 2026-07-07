@@ -4,7 +4,7 @@ namespace Core.Data
     using System.Threading.Tasks;
     using Enums;
     using Interfaces;
-    using Interfaces.Items;
+    using Items;
     using LootTable;
     using Modifiers;
 

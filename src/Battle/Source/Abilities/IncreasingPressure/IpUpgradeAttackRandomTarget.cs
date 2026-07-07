@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.IncreasingPressure
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Riders;
 
     /// <summary>L3 upgrade: each successful attack also deals a percentage of the damage to a random enemy.</summary>

@@ -4,7 +4,7 @@
     using Battle.Source;
     using Core.Data;
     using Core.Interfaces;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Crafting.Source;
     using Godot;
     using Services;

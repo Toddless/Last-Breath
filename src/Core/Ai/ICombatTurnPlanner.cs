@@ -1,7 +1,7 @@
 namespace Core.Ai
 {
     using System.Threading.Tasks;
-    using Interfaces.Entity;
+    using Entity;
 
     /// <summary>
     /// Plays one full NPC turn: zero or more free ability casts, then the closing basic attack.
@@ -9,6 +9,6 @@ namespace Core.Ai
     /// </summary>
     public interface ICombatTurnPlanner
     {
-        Task PlayTurnAsync(IFightable self, BehaviorProfile profile, ICombatEnvironment environment);
+        Task PlayTurnAsync(IFightable self, IBehaviorProfile profile, ICombatEnvironment environment);
     }
 }

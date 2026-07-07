@@ -3,14 +3,13 @@ namespace Battle.Source.Abilities.Overload
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Components;
+    using Core.Components.Decorator;
+    using Core.Components.Module;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Module;
     using Decorators;
 
     /// <summary>Cast plan of the Overload: the volley fields plus the mana-conversion knobs.</summary>

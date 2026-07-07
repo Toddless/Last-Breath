@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Targeting
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Entity;
 
     /// <summary>Which side of the field a targeting strategy pulls its candidates from.</summary>
     public enum TargetRelation

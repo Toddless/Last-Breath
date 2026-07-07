@@ -2,7 +2,7 @@ namespace Core.Ai.World.Skirmish
 {
     using System;
     using System.Collections.Generic;
-    using Interfaces.Components;
+    using Components;
 
     /// <summary>One resolved d20 roll of a skirmish. SideAWon decides who plays the attack beat.</summary>
     public record SkirmishRound(int Number, float RollA, float RollB, bool SideAWon);

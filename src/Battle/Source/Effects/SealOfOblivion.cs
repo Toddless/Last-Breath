@@ -2,9 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
 
     /// <summary>
     /// Disables the target's passive skills while present. Suppression lifts only when

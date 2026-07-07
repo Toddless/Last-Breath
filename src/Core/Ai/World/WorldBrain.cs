@@ -2,8 +2,8 @@ namespace Core.Ai.World
 {
     using System.Collections.Generic;
     using Activities;
+    using Components;
     using Godot;
-    using Interfaces.Components;
     using Stateless;
     using Time;
 
@@ -13,7 +13,7 @@ namespace Core.Ai.World
     /// ticked with real delta by the node. Suspended entirely while the entity fights; battle
     /// itself starts by physical contact (the brain only chases into it).
     /// </summary>
-    public class WorldBrain
+    public class WorldBrain : IWorldBrain
     {
         /// <summary>Close enough to a destination to count as arrived.</summary>
         private const float ArriveDistance = 25f;
@@ -24,13 +24,15 @@ namespace Core.Ai.World
             HearNoise,
             LoseTrack,
             Timeout,
-            GiveUp
+            GiveUp,
+            Frighten
         }
 
         private readonly StateMachine<AlertnessState, Trigger> _fsm;
         private readonly IWorldActivity _activity;
         private Vector2 _investigationPoint;
         private Vector2 _lastKnownTargetPosition;
+        private Vector2 _threatPoint;
         private float _lingerLeft;
         private float _graceLeft;
 
@@ -73,14 +75,27 @@ namespace Core.Ai.World
                 case AlertnessState.Search:
                     TickSearch(delta);
                     break;
+                case AlertnessState.Flee:
+                    TickFlee(delta);
+                    break;
             }
         }
 
-        /// <summary>World events routed by the body (the adapter filters by hearing radius).</summary>
+        /// <summary>
+        /// World events routed by the body (the adapter filters by hearing radius).
+        /// The aggressive go looking; civilians run away from any commotion.
+        /// </summary>
         public void OnStimulus(Stimulus stimulus)
         {
             if (Agent.IsFighting) return;
             if (Agent.Position.DistanceTo(stimulus.Position) > Config.HearingRadius) return;
+
+            if (!Config.Aggressive)
+            {
+                _threatPoint = stimulus.Position;
+                _fsm.Fire(Trigger.Frighten);
+                return;
+            }
 
             _investigationPoint = stimulus.Position;
             _fsm.Fire(Trigger.HearNoise);
@@ -100,12 +115,14 @@ namespace Core.Ai.World
                 .OnExit(() => _activity.Exit(this))
                 .Permit(Trigger.Spot, AlertnessState.Alert)
                 .Permit(Trigger.HearNoise, AlertnessState.Suspicious)
+                .Permit(Trigger.Frighten, AlertnessState.Flee)
                 .Ignore(Trigger.Timeout);
 
             _fsm.Configure(AlertnessState.Suspicious)
                 .OnEntry(() => _lingerLeft = Config.SuspiciousSeconds)
                 .PermitReentry(Trigger.HearNoise) // a fresher noise wins
                 .Permit(Trigger.Spot, AlertnessState.Alert)
+                .Permit(Trigger.Frighten, AlertnessState.Flee)
                 .Permit(Trigger.Timeout, AlertnessState.Calm);
 
             _fsm.Configure(AlertnessState.Alert)
@@ -119,7 +136,15 @@ namespace Core.Ai.World
                 .OnEntry(() => _lingerLeft = Config.SearchSeconds)
                 .Permit(Trigger.Spot, AlertnessState.Alert)
                 .Permit(Trigger.HearNoise, AlertnessState.Suspicious)
+                .Permit(Trigger.Frighten, AlertnessState.Flee)
                 .Permit(Trigger.Timeout, AlertnessState.Calm);
+
+            _fsm.Configure(AlertnessState.Flee)
+                .OnEntry(() => _lingerLeft = Config.FleeSeconds)
+                .PermitReentry(Trigger.Frighten) // a fresher threat resets the panic
+                .Permit(Trigger.Timeout, AlertnessState.Calm)
+                .Ignore(Trigger.HearNoise)
+                .Ignore(Trigger.Spot);
         }
 
         private void TickCalm(float delta)
@@ -179,13 +204,45 @@ namespace Core.Ai.World
             if (_lingerLeft <= 0) _fsm.Fire(Trigger.Timeout);
         }
 
-        /// <summary>Escalates to Alert on visual contact. Non-aggressive NPCs never escalate.</summary>
+        private void TickFlee(float delta)
+        {
+            // A threat still in sight keeps the panic (and its position) fresh.
+            var sighting = Agent.GetSighting(Config.VisionRadius);
+            if (sighting != null)
+            {
+                _threatPoint = sighting.Value.Position;
+                _lingerLeft = Config.FleeSeconds;
+            }
+
+            Agent.MoveTo(AwayFromThreat(), Config.MoveSpeed * Config.ChaseSpeedMultiplier);
+
+            _lingerLeft -= delta;
+            if (_lingerLeft <= 0) _fsm.Fire(Trigger.Timeout); // Calm's activity walks it home
+        }
+
+        /// <summary>A point straight away from the threat; home when the threat is on top of us.</summary>
+        private Vector2 AwayFromThreat()
+        {
+            var fromThreat = Agent.Position - _threatPoint;
+            return fromThreat.LengthSquared() < 1f
+                ? Agent.HomePosition
+                : Agent.Position + fromThreat.Normalized() * Config.FleeDistance;
+        }
+
+        /// <summary>Visual contact: the aggressive escalate to a chase, civilians bolt.</summary>
         private bool TrySpot()
         {
-            if (!Config.Aggressive || _graceLeft > 0) return false;
+            if (_graceLeft > 0) return false;
 
             var sighting = Agent.GetSighting(Config.VisionRadius);
             if (sighting == null) return false;
+
+            if (!Config.Aggressive)
+            {
+                _threatPoint = sighting.Value.Position;
+                _fsm.Fire(Trigger.Frighten);
+                return true;
+            }
 
             _lastKnownTargetPosition = sighting.Value.Position;
             _fsm.Fire(Trigger.Spot);

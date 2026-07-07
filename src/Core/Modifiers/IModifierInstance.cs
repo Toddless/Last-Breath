@@ -1,6 +1,6 @@
 ﻿namespace Core.Modifiers
 {
-    using Interfaces.Entity;
+    using Entity;
 
     public interface IModifierInstance : IModifier
     {

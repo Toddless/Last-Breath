@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.ChainLightning
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>L1 upgrade: bigger damage scales at the price of an increased resource cost.</summary>

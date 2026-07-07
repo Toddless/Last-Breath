@@ -3,14 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
     using Effects;
     using Godot;
-    using Utilities;
 
     public class SoAsPoisonOnAttackExecutionStrategy(int duration) : SoAsDefaultExecutionStrategy
     {

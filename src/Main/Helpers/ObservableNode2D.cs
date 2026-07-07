@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Helpers
+﻿namespace LastBreath.Helpers
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;

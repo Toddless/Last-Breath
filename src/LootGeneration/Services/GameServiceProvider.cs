@@ -1,11 +1,10 @@
 namespace LootGeneration.Services
 {
     using Core.Data;
-    using Core.Interfaces;
+    using Core.Services;
     using Internal;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
-    using Utilities;
 
     /// <summary>Project bootstrap: the shared Core provider + LootGeneration registrations. The only place touching the static root.</summary>
     internal static class GameServiceProvider

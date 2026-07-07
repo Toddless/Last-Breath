@@ -1,9 +1,10 @@
 namespace Battle.Source.UIElements
 {
     using System;
-    using Core.Interfaces.UI;
+    using Core;
+    using Core.Localization;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     /// <summary>
     /// The single notification popup: one visual for every notification, only the text changes.

@@ -1,8 +1,8 @@
 namespace Core.Ai.Considerations
 {
     using System.Collections.Generic;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
+    using Battle.Abilities;
+    using Entity;
 
     /// <summary>
     /// One multiplicative factor of a cast's utility. 1 = neutral, below dampens, above boosts.

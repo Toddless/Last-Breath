@@ -3,8 +3,8 @@ namespace Core.Services
     using System.Linq;
     using System.Threading.Tasks;
     using Data;
-    using Interfaces.Events;
-    using Interfaces.MessageBus;
+    using Events;
+    using MessageBus;
 
     /// <summary>Resolves handlers through the injected provider — no static service locator.</summary>
     public class GameMessageBus(IGameServiceProvider serviceProvider) : IGameMessageBus

@@ -8,7 +8,7 @@ namespace Core.Ai
     /// The archetype follows the stance: Dexterity = aggressive, Strength = defensive,
     /// Intelligence = mixed. All planner tuning lives here — the planner itself is stateless.
     /// </summary>
-    public class BehaviorProfile
+    public class BehaviorProfile : IBehaviorProfile
     {
         public required string Id { get; init; }
         public Stance Stance { get; init; }
@@ -31,6 +31,9 @@ namespace Core.Ai
 
         /// <summary>Casts scoring below this are not worth a slot — the NPC proceeds to the basic attack.</summary>
         public float CastScoreThreshold { get; init; } = 0.35f;
+
+        /// <summary>Health ratio at which the NPC flees the battle instead of playing its turn. 0 = fearless.</summary>
+        public float FleeHealthThreshold { get; init; }
 
         /// <summary>Ability pool of the archetype keyed by ability id.</summary>
         public required IReadOnlyDictionary<string, AbilityBehavior> Abilities { get; init; }

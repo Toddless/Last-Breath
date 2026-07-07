@@ -1,9 +1,8 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System;
+    using Core.Battle;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
 
     public class UnevadableAttackModifier : IAttackModifier
     {

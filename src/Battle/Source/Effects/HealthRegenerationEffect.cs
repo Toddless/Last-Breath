@@ -1,7 +1,8 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     public class HealthRegenerationEffect(
         float percentRegeneration,

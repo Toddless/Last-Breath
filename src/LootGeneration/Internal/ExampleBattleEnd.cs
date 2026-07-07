@@ -1,6 +1,6 @@
 namespace LootGeneration.Internal
 {
-    using Core.Interfaces.Events;
+    using Core.Events;
 
     public record ExampleBattleEnd : IGameEvent;
 }

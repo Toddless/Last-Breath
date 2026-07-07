@@ -2,8 +2,8 @@ namespace Battle.Source.Abilities.HitDelivery
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
+    using Core.Battle;
+    using Core.Entity;
     using Godot;
 
     /// <summary>

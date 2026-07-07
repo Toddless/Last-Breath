@@ -1,7 +1,6 @@
 namespace Core.Items
 {
     using Enums;
-    using Interfaces.Items;
 
     public class WeaponItem : EquipItem, IWeaponItem
     {

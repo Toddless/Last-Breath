@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.HeadButt
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>L2 upgrade: the stun lasts longer at the price of an increased resource cost.</summary>

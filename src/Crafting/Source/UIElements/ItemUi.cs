@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System.Collections.Generic;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
 
@@ -61,6 +61,6 @@
         public void SetItemAdditionalStats(List<(string ModifierText, int Identifier)> additionalStats) => _additionalStats?.AddModifiersToList(additionalStats);
 
         private void OnModifierItemSelected(int identifier, ItemModifierList source) =>
-            EmitSignal(SignalName.ModifierSelected, identifier, source);
+            EmitSignal(global::Crafting.Source.UIElements.ItemUi.SignalName.ModifierSelected, identifier, source);
     }
 }

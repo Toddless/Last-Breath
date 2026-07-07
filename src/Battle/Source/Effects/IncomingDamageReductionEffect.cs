@@ -2,9 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities.Modifiers;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Buff: the target takes <c>reduce</c> less damage from all incoming hits per stack.

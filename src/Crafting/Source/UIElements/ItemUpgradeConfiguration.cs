@@ -1,9 +1,9 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System.Linq;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
-    using Utilities;
+    using Core.Items;
+    using Core.Localization;
+    using Core.Views.UI;
 
     public class ItemUpgradeConfiguration(IEquipItem item) : IItemUiConfiguration
     {

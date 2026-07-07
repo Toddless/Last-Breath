@@ -2,8 +2,8 @@ namespace Battle.Source.Abilities.Modifiers
 {
     using System;
     using System.Linq;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces;
 
     /// <summary>Amplifies every damage component of incoming CRITICAL hits by <c>amp</c> (0.35 = +35%).</summary>
     public class CritDamageTakenModifier(Priority priority, float amp, string id = "Context_Modifier_Crit_Damage_Taken") : IDamageModifier

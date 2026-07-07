@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
 
     public class PassiveSkillProvider
     {

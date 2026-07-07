@@ -1,6 +1,6 @@
 namespace Core.Components.NpcModifiers
 {
-    using Interfaces.Entity;
+    using Entity;
 
     public class TierMultiplierModifier(
         string id,

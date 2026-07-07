@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Battle.Abilities;
     using Core.Data.AbilityData;
-    using Core.Interfaces.Abilities;
     using Targeting;
 
     public partial class AbilityProvider

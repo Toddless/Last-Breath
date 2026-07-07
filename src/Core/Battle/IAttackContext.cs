@@ -1,0 +1,50 @@
+﻿namespace Core.Battle
+{
+    using Enums;
+    using Entity;
+    using Godot;
+
+    public interface IAttackContext
+    {
+        RandomNumberGenerator Rnd { get; }
+        IFightable Attacker { get; }
+        IFightable Target { get; }
+        IAttackContextScheduler AttackContextScheduler { get; }
+        AttackResults Result { get; set; }
+        float BaseDamage { get; }
+        float RawCriticalChance { get; set; }
+        float RawCriticalDamage { get; set; }
+
+        /// <summary>Accuracy of THIS attack, initialized from the attacker's parameter; pre-attack modifiers may boost it.</summary>
+        float RawAccuracy { get; set; }
+        float AdditionalDamage { get; set; }
+
+        /// <summary>
+        ///  <c>TakeDamage</c>: overwritten with the damage actually dealt to the target
+        /// (post incoming-mitigation, barrier-absorbed portion included). Post-attack reactions
+        /// (leech, damage-scaled DoTs, splash) should read it after the hit is applied.
+        /// </summary>
+        float FinalDamage { get; set; }
+
+        bool IsCritical { get; set; }
+        bool ForceCriticalAttack { get; set; }
+        bool IsUnevadable { get; set; }
+        bool IsUnblockable { get; set; }
+        bool IsValid { get; }
+
+        /// <summary>Id of the ability this attack belongs to (null = a plain basic attack).
+        /// Carried onto the damage context so the presentation can play the ability's impact VFX per attack.</summary>
+        string? SourceAbilityId { get; set; }
+
+        /// <summary>Weapon the attack is delivered with (null = unarmed). Hook for weapon masteries.</summary>
+        WeaponType? WeaponType => Attacker.Equipment?.Weapon?.WeaponType;
+
+        /// <summary>Position of this attack within a multi-hit sequence (folded-in AttackMetadata). Single attacks: Index 0, TotalCount 1.</summary>
+        int Index { get; set; }
+        int TotalCount { get; set; }
+        bool IsFirst { get; }
+        bool IsLast { get; }
+
+        bool Schedule();
+    }
+}

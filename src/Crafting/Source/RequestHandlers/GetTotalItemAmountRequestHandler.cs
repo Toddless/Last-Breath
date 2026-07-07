@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.Inventory;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
 
     public class GetTotalItemAmountRequestHandler : IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>
     {

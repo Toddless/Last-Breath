@@ -3,16 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
     using Core.Crafting;
     using Core.Data;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
+    using Core.Items;
     using Core.Modifiers;
     using Core.Results;
     using Godot;
-    using Utilities;
 
     public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider) : IItemUpgrader
     {

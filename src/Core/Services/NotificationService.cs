@@ -2,9 +2,9 @@ namespace Core.Services
 {
     using System;
     using System.Threading.Tasks;
+    using Events;
     using Godot;
-    using Interfaces.Events;
-    using Interfaces.UI;
+    using Views.UI;
 
     /// <summary>
     /// The single consumer of <see cref="SendNotificationMessageMessage"/>: creates a fresh popup

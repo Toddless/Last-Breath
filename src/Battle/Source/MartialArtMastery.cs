@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source
 {
     using System;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
+    using Core.Battle;
+    using Core.Events;
+    using Core.Localization;
+    using Core.MessageBus;
     using Godot;
-    using Utilities;
 
     public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery
     {
@@ -68,6 +68,12 @@
             CurrentExperience += experience;
             if (CurrentLevel >= MaxLevel) return;
             CheckForLevel();
+        }
+
+        public void RestoreState(int baseLevel, int experience)
+        {
+            CurrentLevel = Mathf.Clamp(baseLevel, 1, MaxLevel);
+            CurrentExperience = Mathf.Max(0, experience);
         }
 
         public void AddBonusLevel() => BonusLevel++;

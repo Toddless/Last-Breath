@@ -1,6 +1,6 @@
 namespace Battle.Internal
 {
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Services;
 

@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Source.UI.Layers
+﻿namespace LastBreath.UI.Layers
 {
     using Godot;
 

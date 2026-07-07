@@ -3,15 +3,16 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Data;
     using Core.Enums;
+    using Core.Events;
     using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Utilities;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
+    using Core.Services;
 
     public class CreateEquipItemRequestHandler(
         IItemCreationService creationService,

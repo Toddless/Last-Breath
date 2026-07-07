@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     public class BlindEffect(
         int duration,

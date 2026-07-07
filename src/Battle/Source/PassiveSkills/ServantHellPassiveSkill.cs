@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Events.GameEvents;
 
     public class ServantHellPassiveSkill(float chance) : Skill(id: "Passive_Skill_Servant_Hell")
     {

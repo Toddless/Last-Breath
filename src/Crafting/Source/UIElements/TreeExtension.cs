@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
+    using Core.Localization;
     using Godot;
-    using Utilities;
 
     public static class TreeExtension
     {

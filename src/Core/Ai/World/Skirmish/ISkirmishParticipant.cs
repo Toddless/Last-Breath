@@ -1,8 +1,8 @@
 namespace Core.Ai.World.Skirmish
 {
+    using Entity;
     using Enums;
     using Godot;
-    using Interfaces.Entity;
 
     /// <summary>
     /// An NPC as the abstract NPC-vs-NPC combat sees it: the strength inputs (level, rarity,

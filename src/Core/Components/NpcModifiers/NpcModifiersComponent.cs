@@ -3,7 +3,7 @@ namespace Core.Components.NpcModifiers
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Interfaces.Entity;
+    using Entity;
 
     public class NpcModifiersComponent(IFightable owner) : INpcModifiersComponent
     {

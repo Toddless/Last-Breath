@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     public class AbilityBuffActivationRider(IEffect buff) : IActivationRider
     {

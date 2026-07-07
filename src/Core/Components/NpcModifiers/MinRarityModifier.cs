@@ -1,8 +1,9 @@
 namespace Core.Components.NpcModifiers
 {
+    using Context;
+    using Entity;
     using Enums;
     using Interfaces;
-    using Interfaces.Entity;
 
     public class MinRarityModifier(
         string id,

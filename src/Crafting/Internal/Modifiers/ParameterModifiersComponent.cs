@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
+    using Core.Components;
     using Core.Enums;
-    using Core.Interfaces.Components;
     using Core.Modifiers;
-    using Utilities;
 
     internal class ParameterModifiersComponent : IParameterModifiersComponent
     {

@@ -2,8 +2,8 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World.Skirmish;
     using Core.Components;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
     using Godot;
 
     [TestClass]

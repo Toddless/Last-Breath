@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
     using Core.Enums;
     using Godot;

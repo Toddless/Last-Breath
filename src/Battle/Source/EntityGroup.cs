@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
 
     public class EntityGroup(int maxMembers = 2) : IEntityGroup
     {

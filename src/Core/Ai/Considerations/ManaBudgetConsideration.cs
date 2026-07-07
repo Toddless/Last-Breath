@@ -2,9 +2,9 @@ namespace Core.Ai.Considerations
 {
     using System;
     using System.Collections.Generic;
+    using Battle.Abilities;
+    using Entity;
     using Enums;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
 
     /// <summary>
     /// Discourages burning most of the mana pool on one cast: the tighter the cast sits

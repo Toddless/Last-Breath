@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Buff: increases the target's dealt damage by <c>value</c> (0..1) per stack, multiplicatively.</summary>
     public class DamageBuffEffect(int duration, int maxStacks, float value)

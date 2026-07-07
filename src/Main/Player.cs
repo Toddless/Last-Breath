@@ -5,23 +5,21 @@
     using System.Threading.Tasks;
     using Attribute;
     using Battle.Source;
-    using Components;
+    using Core;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Components;
     using Core.Constants;
+    using Core.Context;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Items;
     using Godot;
     using Services;
     using Stateless;
-    using Utilities;
     using AnimationsComponent = Components.AnimationsComponent;
 
     public partial class Player : CharacterBody2D, IPlayer
@@ -91,6 +89,7 @@
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
         public string Name { get; private set; } = string.Empty;
+        public IEquipmentComponent EquipmentComponent { get; }
         public static Player? Instance { get; private set; }
 
         public float CurrentHealth

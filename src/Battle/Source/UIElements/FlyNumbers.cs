@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.UIElements
 {
     using Core.Enums;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     public partial class FlyNumbers : Node2D, IInitializable

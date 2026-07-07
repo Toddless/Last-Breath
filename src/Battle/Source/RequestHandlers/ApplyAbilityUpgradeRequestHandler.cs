@@ -2,9 +2,9 @@ namespace Battle.Source.RequestHandlers
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
+    using Core.Services;
     using Core.Views;
 
     /// <summary>

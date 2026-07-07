@@ -1,6 +1,6 @@
 ﻿namespace Crafting.Internal.Layers
 {
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Inventory;
     using Services;

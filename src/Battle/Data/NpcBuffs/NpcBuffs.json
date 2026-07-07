@@ -1,0 +1,30 @@
+{
+    "buffs": [
+        {
+            "id": "Npc_Buff_Double_Health",
+            "modifiers": [
+                { "parameter": "Health", "type": "Increase", "value": 1.0 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Damage",
+            "modifiers": [
+                { "parameter": "Damage", "type": "Increase", "value": 1.0 },
+                { "parameter": "SpellDamage", "type": "Increase", "value": 1.0 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Defence",
+            "modifiers": [
+                { "parameter": "Armor", "type": "Increase", "value": 1.0 },
+                { "parameter": "Evade", "type": "Increase", "value": 0.5 }
+            ]
+        },
+        {
+            "id": "Npc_Buff_Double_Health_Recovery",
+            "modifiers": [
+                { "parameter": "HealthRecovery", "type": "Increase", "value": 1.0 }
+            ]
+        }
+    ]
+}

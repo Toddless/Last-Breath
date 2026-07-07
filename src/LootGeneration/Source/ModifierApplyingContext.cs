@@ -2,9 +2,9 @@ namespace LootGeneration.Source
 {
     using System;
     using System.Collections.Generic;
+    using Core.Context;
     using Core.Data.LootTable;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Modifiers;
 
     public class ModifierApplyingContext : IModifierApplyingContext

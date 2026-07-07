@@ -3,25 +3,24 @@ namespace Battle.Internal.Player
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Attribute;
-    using Components;
+    using Core;
+    using Core.Attribute;
+    using Core.Battle;
     using Core.Components;
     using Core.Constants;
+    using Core.Context;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Items;
+    using Core.Services;
     using Godot;
-    using Services;
     using Source;
     using Stateless;
-    using Utilities;
     using AnimationsComponent = Components.AnimationsComponent;
+    using GameServiceProvider = Services.GameServiceProvider;
 
     public partial class Player : CharacterBody2D, IPlayer
     {
@@ -71,6 +70,7 @@ namespace Battle.Internal.Player
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IAbilityBookComponent AbilityBook { get; private set; }
+        public IEquipmentComponent EquipmentComponent { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -160,7 +160,7 @@ namespace Battle.Internal.Player
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
-
+            EquipmentComponent = new EquipmentComponent(this);
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
             _stances.Add(Stance.Dexterity, new DexterityStance(this));

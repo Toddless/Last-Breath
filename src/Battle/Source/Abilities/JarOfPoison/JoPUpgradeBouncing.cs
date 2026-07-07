@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using HitDelivery;
 
     /// <summary>L3 upgrade: the jar bounces 5 times between random enemies, applying poison each time.</summary>

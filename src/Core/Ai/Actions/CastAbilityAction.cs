@@ -4,9 +4,9 @@ namespace Core.Ai.Actions
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Battle.Abilities;
     using Considerations;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
+    using Entity;
     using Targeting;
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace Core.Ai.Actions
             return ranked.Take(Math.Max(1, strategy.MaxTargets)).ToList();
         }
 
-        private float ArchetypeBias(BehaviorProfile profile) => behavior.Role switch
+        private float ArchetypeBias(IBehaviorProfile profile) => behavior.Role switch
         {
             AbilityRole.Damage or AbilityRole.Debuff => profile.Aggression,
             AbilityRole.Heal or AbilityRole.Buff or AbilityRole.Control => profile.Caution,
@@ -77,7 +77,7 @@ namespace Core.Ai.Actions
             return temperature <= 0 ? 1f : 1f + board.Rnd.RandFloatRange(-temperature, temperature);
         }
 
-        private void ChargeIfCharged(BehaviorProfile profile)
+        private void ChargeIfCharged(IBehaviorProfile profile)
         {
             if (Ability is not IChargedAbility charged) return;
             int stage = (int)MathF.Round(charged.MaxAffordableStage * profile.Greed);

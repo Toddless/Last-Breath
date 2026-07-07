@@ -4,20 +4,19 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Components;
+    using Core.Components.Decorator;
+    using Core.Components.Module;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
+    using Core.Localization;
     using Decorators;
     using Godot;
-    using Module;
     using Targeting;
-    using Utilities;
 
     public abstract class Ability(
         string id,
@@ -94,15 +93,16 @@
 
         public void SetAbilityUpgrades(Dictionary<int, List<IAbilityUpgrade>> upgrades) => Upgrades = upgrades;
 
-        /// <summary>One chosen upgrade per tier: selecting a new one removes the previous choice first.</summary>
-        public void SelectUpgrade(int tier, string upgradeInstanceId)
+        /// <summary>One chosen upgrade per tier: selecting a new one removes the previous choice first.
+        /// Matches by stable data Id (save/load) or InstanceId (UI selection).</summary>
+        public void SelectUpgrade(int tier, string upgradeId)
         {
             if (!Upgrades.TryGetValue(tier, out var tierUpgrades)) return;
-            var upgrade = tierUpgrades.FirstOrDefault(u => u.IsSame(upgradeInstanceId));
+            var upgrade = tierUpgrades.FirstOrDefault(u => u.IsSame(upgradeId) || u.Id == upgradeId);
             if (upgrade == null) return;
             if (_currentUpgrades.TryGetValue(tier, out var current))
             {
-                if (current.IsSame(upgradeInstanceId)) return;
+                if (current.IsSame(upgrade.InstanceId)) return;
                 current.Remove(this);
             }
 

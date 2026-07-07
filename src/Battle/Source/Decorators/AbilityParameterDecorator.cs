@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.Decorators
 {
     using System;
+    using Core.Components.Decorator;
+    using Core.Components.Module;
     using Core.Enums;
-    using Core.Interfaces.Components.Decorator;
-    using Core.Interfaces.Components.Module;
 
     public abstract class AbilityParameterDecorator<TParameter>(TParameter abilityParameter, Priority priority, string id, string source)
         : IParameterModule<TParameter>, IModuleDecorator<TParameter, IParameterModule<TParameter>>

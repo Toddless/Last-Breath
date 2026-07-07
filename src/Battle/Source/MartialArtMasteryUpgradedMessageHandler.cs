@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source
 {
     using System.Threading.Tasks;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events;
+    using Core.Battle.Abilities;
+    using Core.Events;
+    using Core.Services;
 
     public class MartialArtMasteryUpgradedMessageHandler(
         IPlayerAccessor Player,

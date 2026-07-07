@@ -2,13 +2,13 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core.Crafting;
     using Core.Enums;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
 
     public class GetEquipItemUpgradeCostRequestHandler(IInventory inventory, IItemUpgrader itemUpgrader)
         : IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>

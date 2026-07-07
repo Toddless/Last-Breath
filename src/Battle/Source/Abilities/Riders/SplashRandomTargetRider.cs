@@ -3,9 +3,10 @@ namespace Battle.Source.Abilities.Riders
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Godot;
 
     /// <summary>Impact rider: every SUCCESSFUL impact splashes a share of its damage as pure damage

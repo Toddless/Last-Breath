@@ -1,16 +1,16 @@
 ﻿namespace Crafting.Source
 {
     using System.Collections.Generic;
+    using Core.Crafting;
     using Core.Data;
+    using Core.Events;
     using Core.Interfaces;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
     using Core.Modifiers;
     using Core.Results;
+    using Core.Views.UI;
     using EventHandlers;
     using Microsoft.Extensions.DependencyInjection;
     using RequestHandlers;

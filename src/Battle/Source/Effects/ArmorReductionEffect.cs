@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Debuff: reduces the target's armor by <c>reduceBy</c> (0..1) per stack.

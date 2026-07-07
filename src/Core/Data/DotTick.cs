@@ -1,7 +1,7 @@
 ﻿namespace Core.Data
 {
+    using Entity;
     using Enums;
-    using Interfaces.Entity;
 
     public record DotTick(float Damage, StatusEffects Status, string Source, IFightable From);
 }

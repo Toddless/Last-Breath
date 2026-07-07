@@ -3,7 +3,7 @@
     using System.Linq;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Quest = QuestSystem.Quest;
 

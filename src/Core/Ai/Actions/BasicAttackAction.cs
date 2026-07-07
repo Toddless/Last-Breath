@@ -1,7 +1,7 @@
 namespace Core.Ai.Actions
 {
     using System.Threading.Tasks;
-    using Interfaces.Entity;
+    using Entity;
     using Targeting;
 
     /// <summary>The turn-closing basic attack against the highest-value living enemy.</summary>

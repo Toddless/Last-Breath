@@ -1,7 +1,7 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System;
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     [Tool]

@@ -1,8 +1,8 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Abilities;
+    using Core.Battle.Skills;
 
     /// <summary>
     /// Wraps a passive skill into a timed effect: the skill's mechanics run only while the effect

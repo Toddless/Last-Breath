@@ -2,11 +2,11 @@ namespace Battle.Source
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
+    using Core.Events;
+    using Core.Events.GameEvents;
 
     /// <summary>
     /// Owns the player's target-selection phase. Highlights valid spots per the ability's

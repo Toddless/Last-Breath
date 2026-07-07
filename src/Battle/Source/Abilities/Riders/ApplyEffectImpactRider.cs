@@ -2,8 +2,8 @@ namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
     using Core.Data;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Impact rider that puts a fresh copy of the effect on every SUCCESSFUL impact target — a bounce

@@ -2,9 +2,9 @@ namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>Impact rider: every SUCCESSFUL impact extends the poison stacks on its target.</summary>
     public class ExtendPoisonOnHitRider(int duration) : IImpactRider

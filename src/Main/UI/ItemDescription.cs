@@ -1,8 +1,8 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
     using System.Collections.Generic;
     using Godot;
-    using Script.Helpers;
+    using Helpers;
 
     public partial class ItemDescription : Panel
     {

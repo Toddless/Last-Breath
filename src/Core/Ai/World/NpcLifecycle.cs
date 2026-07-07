@@ -1,7 +1,7 @@
 namespace Core.Ai.World
 {
     using System;
-    using Interfaces.Components;
+    using Components;
 
     public enum NpcLifeStage : byte
     {
@@ -32,12 +32,15 @@ namespace Core.Ai.World
     /// (the longer it takes, the stronger the rising), undead lie dormant; burning is final
     /// and the only way to keep a body down. Pure logic — the node ticks it and reacts to events.
     /// </summary>
-    public class NpcLifecycle(NpcLifecycleConfig config, IRandomNumberGenerator rnd)
+    public class NpcLifecycle(NpcLifecycleConfig config, IRandomNumberGenerator rnd) : INpcLifecycle
     {
-        private float _resurrectDelay;
-        private float _elapsed;
-
         public NpcLifeStage Stage { get; private set; } = NpcLifeStage.Alive;
+
+        /// <summary>The rolled rise delay of the current Defeated stage (save system reads it).</summary>
+        public float ResurrectDelay { get; private set; }
+
+        /// <summary>Seconds already lain of the current Defeated stage (save system reads it).</summary>
+        public float Elapsed { get; private set; }
 
         /// <summary>
         /// Fired once when the timer completes; the argument is the parameter bonus of the rising
@@ -57,16 +60,25 @@ namespace Core.Ai.World
             }
 
             Stage = NpcLifeStage.Defeated;
-            _elapsed = 0;
-            _resurrectDelay = rnd.RandFloatRange(config.ResurrectMinSeconds, config.ResurrectMaxSeconds);
+            Elapsed = 0;
+            ResurrectDelay = rnd.RandFloatRange(config.ResurrectMinSeconds, config.ResurrectMaxSeconds);
+        }
+
+        /// <summary>Save-load path: puts a freshly built body straight into a lying stage with its timer.</summary>
+        public void RestoreState(NpcLifeStage stage, float resurrectDelay, float elapsed)
+        {
+            if (stage is not (NpcLifeStage.Defeated or NpcLifeStage.Dormant)) return;
+            Stage = stage;
+            ResurrectDelay = resurrectDelay;
+            Elapsed = elapsed;
         }
 
         public void Tick(float delta)
         {
             if (Stage != NpcLifeStage.Defeated) return;
 
-            _elapsed += delta;
-            if (_elapsed < _resurrectDelay) return;
+            Elapsed += delta;
+            if (Elapsed < ResurrectDelay) return;
 
             Stage = NpcLifeStage.Alive;
             ResurrectionReady?.Invoke(StrengthFraction() * config.MaxStrengthBonus);
@@ -86,7 +98,7 @@ namespace Core.Ai.World
         public float StrengthFraction()
         {
             float range = config.ResurrectMaxSeconds - config.ResurrectMinSeconds;
-            return range <= 0 ? 1f : Math.Clamp((_resurrectDelay - config.ResurrectMinSeconds) / range, 0f, 1f);
+            return range <= 0 ? 1f : Math.Clamp((ResurrectDelay - config.ResurrectMinSeconds) / range, 0f, 1f);
         }
     }
 }

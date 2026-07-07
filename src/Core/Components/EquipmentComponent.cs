@@ -3,10 +3,9 @@ namespace Core.Components
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Entity;
     using Enums;
-    using Interfaces.Components;
-    using Interfaces.Entity;
-    using Interfaces.Items;
+    using Items;
     using Modifiers;
 
     public class EquipmentComponent(IFightable owner) : IEquipmentComponent

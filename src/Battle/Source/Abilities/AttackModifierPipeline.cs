@@ -2,8 +2,7 @@ namespace Battle.Source.Abilities
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
+    using Core.Battle;
 
     /// <summary>
     /// Ability-scoped pre-attack mutators (unevadable, first-attack-crit, ...), applied to every

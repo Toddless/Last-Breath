@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities
 {
+    using Core.Battle;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Battle;
 
     public static class AttackImpactExtensions
     {

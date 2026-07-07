@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Armageddon
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Effects;
 
     /// <summary>L2 upgrade: stage 3 additionally puts burning stacks on every hit target.</summary>

@@ -1,7 +1,7 @@
 namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     /// <summary>
     /// Skip-turn debuff: applies <see cref="StatusEffects.Stun"/>, which the turn loop checks —

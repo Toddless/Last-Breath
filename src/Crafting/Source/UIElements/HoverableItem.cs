@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Localization;
     using Core.Modifiers;
     using Godot;
-    using Utilities;
 
     public partial class HoverableItem : Panel
     {

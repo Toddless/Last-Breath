@@ -1,11 +1,10 @@
 namespace Battle.Source.Abilities.Modifiers
 {
     using System;
-    using Effects;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
+    using Effects;
 
     public class PoisonAttackModifier : IAttackModifier
     {

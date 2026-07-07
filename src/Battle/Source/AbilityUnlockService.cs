@@ -2,11 +2,13 @@ namespace Battle.Source
 {
     using System;
     using System.Linq;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Entity;
+    using Core.Events;
+    using Core.MessageBus;
+    using Core.Save;
+    using Core.Services;
 
     /// <summary>
     /// Owns the "mastery threshold -> ability becomes available" rule (variant A: reaching the
@@ -26,17 +28,20 @@ namespace Battle.Source
         private readonly IAbilityProvider _abilityProvider;
         private readonly IMartialArtMastery _mastery;
         private readonly IGameMessageBus _messageBus;
+        private readonly ILoadScope _loadScope;
 
         public AbilityUnlockService(
             IPlayerAccessor playerAccessor,
             IAbilityProvider abilityProvider,
             IMartialArtMastery mastery,
-            IGameMessageBus messageBus)
+            IGameMessageBus messageBus,
+            ILoadScope loadScope)
         {
             _playerAccessor = playerAccessor;
             _abilityProvider = abilityProvider;
             _mastery = mastery;
             _messageBus = messageBus;
+            _loadScope = loadScope;
 
             _mastery.CurrentLevelChange += OnLevelChanged;
             _playerAccessor.PlayerChanged += OnPlayerChanged;
@@ -65,7 +70,7 @@ namespace Battle.Source
                 book.Learn(_abilityProvider.GetAbilityStance(abilityId), ability);
                 // TODO:
                 // what message and what was learned
-                if (notify)
+                if (notify && !_loadScope.IsLoading) // restoring mastery re-learns silently
                 {
                     _messageBus.PublishMessageAsync(new SendNotificationMessageMessage(UnlockNotificationId));
                 }

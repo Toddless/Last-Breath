@@ -101,14 +101,30 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void NonAggressiveNpcNeverAlerts()
+        public void NonAggressiveNpcFleesFromASeenEnemy()
         {
             var agent = CreateAgent();
             var brain = CreateBrain(agent, aggressive: false);
             agent.Sighting = new TargetSighting(new Vector2(100, 0));
 
-            brain.Tick(0.1f);
+            brain.Tick(0.1f); // frighten
+            brain.Tick(0.1f); // run
 
+            Assert.AreEqual(AlertnessState.Flee, brain.State);
+            Assert.IsNotNull(agent.LastDestination);
+            Assert.IsTrue(agent.LastDestination.Value.X < 0, "must run AWAY from the threat at +X");
+        }
+
+        [TestMethod]
+        public void NonAggressiveNpcFleesFromNoiseAndCalmsDown()
+        {
+            var agent = CreateAgent();
+            var brain = CreateBrain(agent, aggressive: false);
+
+            brain.OnStimulus(new Stimulus(StimulusType.Noise, new Vector2(50, 0)));
+            Assert.AreEqual(AlertnessState.Flee, brain.State);
+
+            brain.Tick(10f); // longer than FleeSeconds, no threat in sight
             Assert.AreEqual(AlertnessState.Calm, brain.State);
         }
 

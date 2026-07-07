@@ -1,12 +1,12 @@
 ﻿namespace Crafting.Source.UIElements
 {
     using System.Collections.Generic;
+    using Core.Crafting;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
+    using Core.Items;
+    using Core.Localization;
     using Core.Modifiers;
-    using Utilities;
+    using Core.Views.UI;
 
     public class ItemCreationConfiguration(IEquipItem item, ICraftingMastery mastery) : IItemUiConfiguration
     {

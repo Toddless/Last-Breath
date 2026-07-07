@@ -1,18 +1,18 @@
 namespace Core.Ai
 {
     using System.Collections.Generic;
-    using Interfaces.Components;
-    using Interfaces.Entity;
+    using Components;
+    using Entity;
 
     /// <summary>
     /// Per-turn snapshot of the fight the planner reasons about. Refreshed after every cast
     /// because a cast may kill, heal or unlock anything. Reading live state is fine here —
     /// this is resolution-time logic, not presentation.
     /// </summary>
-    public class CombatBlackboard(IFightable self, BehaviorProfile profile, ICombatEnvironment environment, IRandomNumberGenerator rnd)
+    public class CombatBlackboard(IFightable self, IBehaviorProfile profile, ICombatEnvironment environment, IRandomNumberGenerator rnd)
     {
         public IFightable Self { get; } = self;
-        public BehaviorProfile Profile { get; } = profile;
+        public IBehaviorProfile Profile { get; } = profile;
         public ICombatEnvironment Environment { get; } = environment;
         public IRandomNumberGenerator Rnd { get; } = rnd;
 

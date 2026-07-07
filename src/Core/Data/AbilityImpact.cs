@@ -1,7 +1,7 @@
 namespace Core.Data
 {
-    using Interfaces.Battle;
-    using Interfaces.Entity;
+    using Battle;
+    using Entity;
 
     /// <summary>
     /// One delivery impact of an ability: a hit, a bounce landing, one attack of a series.

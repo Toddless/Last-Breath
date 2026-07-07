@@ -1,9 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using Core.Battle.Skills;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Events.GameEvents;
 
     public class PorcupinePassiveSkill(
         float damagePercentFromTakenDamageToBeReturned,

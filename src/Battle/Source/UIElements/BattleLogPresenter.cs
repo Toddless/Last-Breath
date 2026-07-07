@@ -3,12 +3,11 @@ namespace Battle.Source.UIElements
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Utilities;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Localization;
 
     /// <summary>
     /// Turns replay-time battle events into ready battle-log lines (BBCode). The single place that

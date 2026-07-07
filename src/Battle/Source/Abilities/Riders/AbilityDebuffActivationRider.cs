@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     public class AbilityDebuffActivationRider(IEffect debuff, bool applyOnSelf = false) : IActivationRider
     {

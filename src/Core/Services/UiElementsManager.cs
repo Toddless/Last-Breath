@@ -4,7 +4,7 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Godot;
-    using Interfaces.UI;
+    using Views.UI;
 
     /// <inheritdoc cref="IUiElementsManager"/>
     public class UiElementsManager(IGameServiceProvider provider) : IUiElementsManager

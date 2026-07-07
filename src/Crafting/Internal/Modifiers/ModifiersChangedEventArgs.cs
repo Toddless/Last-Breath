@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Internal.Modifiers
 {
     using System.Collections.Generic;
+    using Core.Components;
     using Core.Enums;
-    using Core.Interfaces.Components;
     using Core.Modifiers;
 
     internal class ModifiersChangedEventArgs(IReadOnlyList<IModifierInstance> modifiers, EntityParameter entityParameter) : IModifiersChangedEventArgs

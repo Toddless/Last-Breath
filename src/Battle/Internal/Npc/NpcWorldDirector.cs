@@ -2,8 +2,8 @@ namespace Battle.Internal.Npc
 {
     using Battle.Source.Npc;
     using Core.Ai.World.Time;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
     using Services;
 

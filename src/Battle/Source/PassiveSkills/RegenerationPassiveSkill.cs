@@ -1,8 +1,9 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
+    using Core.Context;
+    using Core.Entity;
+    using Core.Events.GameEvents;
 
     public class RegenerationPassiveSkill(float percentFromMaxHealth)
         : Skill(id: "Passive_Skill_Regeneration")

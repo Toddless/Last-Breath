@@ -1,10 +1,9 @@
-﻿namespace LastBreath.Source.UI.Layers
+﻿namespace LastBreath.UI.Layers
 {
-    using System;
     using Core.Constants;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
     using Services;
 

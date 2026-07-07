@@ -1,9 +1,9 @@
 ﻿namespace Battle.Source.UIElements
 {
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.UI;
+    using Core.Battle.Abilities;
+    using Core.Localization;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     public partial class AbilityDescription : Control, IInitializable
     {

@@ -1,9 +1,9 @@
 ﻿namespace Core.Modifiers
 {
     using System;
+    using Entity;
     using Enums;
     using Interfaces;
-    using Interfaces.Entity;
 
     public class ConditionalModifier(float weight, ModifierValueType valueType, EntityParameter parameter, float value, ICondition condition, string source)
         : IConditionalModifier

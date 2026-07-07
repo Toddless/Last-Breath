@@ -1,10 +1,10 @@
 ﻿namespace LastBreath.Inventory
 {
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
 
     public partial class InventoryWindow : Panel, IWindow

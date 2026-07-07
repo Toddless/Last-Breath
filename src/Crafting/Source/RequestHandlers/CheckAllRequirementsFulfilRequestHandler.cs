@@ -1,8 +1,8 @@
 ﻿namespace Crafting.Source.RequestHandlers
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
 
     public class CheckAllRequirementsFulfilRequestHandler : IRequestHandler<CheckAllRequirementsFulfillRequest, bool>
     {

@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>Adds flat bonuses to the ability's weapon and spell damage scales.</summary>

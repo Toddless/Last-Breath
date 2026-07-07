@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.Module.SkillModule
 {
     using System.Collections.Generic;
+    using Core.Battle.Skills;
+    using Core.Components.Module;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Components.Module;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
 
     public abstract class BaseSkillModule(IFightable owner, SkillType type, Priority priority) : ISkillModule
     {

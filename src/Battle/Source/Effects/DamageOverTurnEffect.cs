@@ -2,11 +2,11 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
+    using Core.Localization;
     using Godot;
-    using Utilities;
 
     public class DamageOverTurnEffect(
         int duration,

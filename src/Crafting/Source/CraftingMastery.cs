@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core.Crafting;
     using Core.Enums;
-    using Core.Interfaces.Crafting;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
+    using Core.Events;
+    using Core.Localization;
+    using Core.MessageBus;
     using Godot;
-    using Utilities;
 
     public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery
     {

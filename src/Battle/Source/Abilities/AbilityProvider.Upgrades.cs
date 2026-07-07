@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using Core.Data.AbilityData;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using CriticalCalculation;
     using DarkShroud;
     using AresBlessing;
@@ -13,7 +12,6 @@
     using DoubleStrike;
     using Effects;
     using HeadButt;
-    using IceShrapnel;
     using IncreasingPressure;
     using JarOfPoison;
     using Modifiers;
@@ -25,7 +23,9 @@
     using Sacrifice;
     using SeriesOfAttacks;
     using ChainLightning;
+    using Core.Battle.Abilities;
     using IceAegis;
+    using IceShards;
     using Overload;
     using SacrificeAbility = Sacrifice.Sacrifice;
     using PorcupineAbility = Porcupine.Porcupine;

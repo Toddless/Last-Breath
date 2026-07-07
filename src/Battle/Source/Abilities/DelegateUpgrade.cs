@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities
 {
     using System;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     public class DelegateUpgrade<T>(string id, string[] tags, int tier, Action<T> add, Action<T> remove)
         : AbilityUpgrade<T>(id, tags, tier) where T : IAbility

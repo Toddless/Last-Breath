@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Effects;
 
     /// <summary>L3 upgrade: landing BOTH strikes grants a damage buff for a few turns.</summary>

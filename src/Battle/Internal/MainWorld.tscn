@@ -4,7 +4,12 @@
 [ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Internal/Player/Player.tscn" id="2_pbpt3"]
 [ext_resource type="Script" uid="uid://dm5518qnmrhqv" path="res://Internal/Npc/DayNightTint.cs" id="5_7yswm"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://Internal/Npc/NpcSpawnPoint.cs" id="6_b5cil"]
+[ext_resource type="Script" uid="uid://chdsooqku2gc0" path="res://Internal/Save/SaveDirector.cs" id="6_qqm7e"]
+[ext_resource type="Script" uid="uid://cjeisreb3x27v" path="res://Internal/Save/CheckpointNode.cs" id="7_2o6ri"]
 [ext_resource type="Script" uid="uid://by0f8rrg2jn6v" path="res://Internal/Npc/NpcWorldDirector.cs" id="7_qqm7e"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
+radius = 62.05
 
 [node name="MainWorld" type="Node2D" unique_id=2029729586]
 script = ExtResource("1_xch8j")
@@ -30,3 +35,18 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 [node name="DayNightTint" type="CanvasModulate" parent="." unique_id=1092795079]
 script = ExtResource("5_7yswm")
 metadata/_custom_type_script = "uid://dm5518qnmrhqv"
+
+[node name="SaveDirector" type="Node" parent="." unique_id=551863823]
+script = ExtResource("6_qqm7e")
+metadata/_custom_type_script = "uid://chdsooqku2gc0"
+
+[node name="CheckpointNode" type="Node2D" parent="." unique_id=1027105469 node_paths=PackedStringArray("_interactionArea")]
+position = Vector2(820, 217)
+script = ExtResource("7_2o6ri")
+_interactionArea = NodePath("Area2D")
+metadata/_custom_type_script = "uid://cjeisreb3x27v"
+
+[node name="Area2D" type="Area2D" parent="CheckpointNode" unique_id=847696466]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CheckpointNode/Area2D" unique_id=56612728]
+shape = SubResource("CircleShape2D_fx85w")

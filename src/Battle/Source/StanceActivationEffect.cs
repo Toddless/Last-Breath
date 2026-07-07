@@ -2,9 +2,9 @@ namespace Battle.Source
 {
     using System;
     using System.Collections.Generic;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
+    using Core.Battle;
+    using Core.Battle.Skills;
+    using Core.Entity;
     using Core.Modifiers;
 
     public class StanceActivationEffect : IStanceActivationEffect

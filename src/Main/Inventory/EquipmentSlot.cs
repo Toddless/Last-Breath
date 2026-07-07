@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Inventory
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Items;
+    using Core.Entity;
+    using Core.Items;
     using Godot;
 
     public partial class EquipmentSlot : Slot

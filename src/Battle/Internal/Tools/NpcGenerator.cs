@@ -2,9 +2,9 @@ namespace Battle.Internal.Tools
 {
     using System;
     using System.Collections.Generic;
-    using Battle.Internal.Npc;
-    using Battle.Source;
-    using Core.Interfaces.Entity;
+    using Npc;
+    using Source;
+    using Core.Entity;
     using Core.Modifiers;
     using Godot;
     using Services;

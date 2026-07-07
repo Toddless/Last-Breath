@@ -1,7 +1,6 @@
 ﻿namespace LastBreath.Localization
 {
     using Godot;
-    using Source;
     using Player = Player;
 
     [GlobalClass]

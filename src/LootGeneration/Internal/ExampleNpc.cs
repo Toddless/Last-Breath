@@ -4,15 +4,19 @@ namespace LootGeneration.Internal
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Ai;
+    using Core.Ai.World;
+    using Core.Battle;
+    using Core.Components;
+    using Core.Context;
+    using Core.Data;
+    using Core.Data.NpcData;
+    using Core.Entity;
     using Core.Enums;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.UI;
+    using Core.Items;
+    using Core.Views.UI;
     using Godot;
 
     public partial class ExampleNpc : CharacterBody2D, IFightableNpc, IInitializable
@@ -49,6 +53,13 @@ namespace LootGeneration.Internal
         public IGameEventBus? GameEventBus { get; set; }
         public EntityType EntityType { get; set; }
         public Fractions Fraction { get; set; }
+        public INpcLifecycle? Lifecycle { get; }
+        public void ApplyDefinition(NpcDefinition definition) => throw new NotImplementedException();
+
+        public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed) => throw new NotImplementedException();
+
+        public void RestoreAsRisen(float parameterBonus) => throw new NotImplementedException();
+
         public Rarity Rarity { get; set; }
         public int Level { get; set; }
         public string Id { get; } = "Example_Npc";
@@ -66,7 +77,9 @@ namespace LootGeneration.Internal
         public ICombatComponent CombatComponent { get; }
         public IAbilityBookComponent AbilityBook { get; }
         public INpcModifiersComponent NpcModifiers { get; set; }
-        public BehaviorProfile? Behavior { get; set; }
+        public IBehaviorProfile? Behavior { get; set; }
+        public float RisingBonus { get; }
+        public bool IsRisen { get; }
         public IEntityAttribute Dexterity { get; }
         public IEntityAttribute Strength { get; }
         public IEntityAttribute Intelligence { get; }
@@ -178,5 +191,6 @@ namespace LootGeneration.Internal
 
         public bool IsSame(string otherId) => throw new NotImplementedException();
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+        public void InjectServices(IGameServiceProvider provider) => throw new NotImplementedException();
     }
 }

@@ -3,10 +3,9 @@ namespace Core.Items
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Entity;
     using Enums;
     using Godot;
-    using Interfaces.Entity;
-    using Interfaces.Items;
     using Modifiers;
 
     public class EquipItem : IEquipItem, IAscendable

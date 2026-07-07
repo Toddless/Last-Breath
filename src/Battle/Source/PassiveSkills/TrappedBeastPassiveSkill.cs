@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using Core.Battle.Skills;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Skills;
     using Core.Modifiers;
 
     public class TrappedBeastPassiveSkill : Skill

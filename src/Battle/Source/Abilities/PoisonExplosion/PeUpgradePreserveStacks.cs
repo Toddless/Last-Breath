@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>
     /// L3 upgrade: deals poison burst damage WITHOUT removing the stacks.

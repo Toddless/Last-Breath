@@ -2,13 +2,14 @@ namespace Battle.Internal.Npc
 {
     using System;
     using System.Collections.Generic;
+    using Core.Data;
+    using Core.Entity;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Source;
-    using Core.Interfaces;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Services;
     using Godot;
-    using Services;
+    using GameServiceProvider = Services.GameServiceProvider;
 
     /// <summary>
     /// A faction's home on the map (forest/camp/cemetery/city): keeps its population at
@@ -28,6 +29,7 @@ namespace Battle.Internal.Npc
 
         private readonly HashSet<string> _ownedInstanceIds = [];
         private readonly RandomNumberGenerator _rnd = new();
+        private IGameServiceProvider _gameServiceProvider;
         private INpcProvider? _provider;
         private IGameEventBus? _gameEventBus;
         private INpcPopulationService? _population;
@@ -38,9 +40,10 @@ namespace Battle.Internal.Npc
         public override void _Ready()
         {
             _rnd.Randomize();
-            _provider = GameServiceProvider.Instance.GetService<INpcProvider>();
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            _population = GameServiceProvider.Instance.GetService<INpcPopulationService>();
+            _gameServiceProvider = GameServiceProvider.Instance;
+            _provider = _gameServiceProvider.GetService<INpcProvider>();
+            _gameEventBus = _gameServiceProvider.GetService<IGameEventBus>();
+            _population = _gameServiceProvider.GetService<INpcPopulationService>();
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
             _gameEventBus?.Subscribe<NpcFactionChangedEvent>(OnFactionChanged);
 
@@ -84,6 +87,7 @@ namespace Battle.Internal.Npc
                 var definition = _provider!.CreateDefinition(npcId);
 
                 var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
+                npc.InjectServices(_gameServiceProvider);
                 world.AddChild(npc); // _Ready builds the components ApplyDefinition configures
                 npc.GlobalPosition = RollSpotInRadius();
                 npc.ApplyDefinition(definition);

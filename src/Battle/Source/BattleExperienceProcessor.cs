@@ -2,18 +2,20 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Battle;
     using Core.Data;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
 
     public class BattleExperienceProcessor : IDisposable
     {
         private const float BaseExp = 50;
+
+        /// <summary>A fled enemy is a partial victory: half the experience of a kill.</summary>
+        private const float FledExperienceFactor = 0.5f;
         private readonly IGameServiceProvider _gameServiceProvider;
         private readonly IBattleEventBus _battleEventBus;
         private readonly List<string> _diedEntities = [];
@@ -24,6 +26,7 @@
             _gameServiceProvider = provider;
             _battleEventBus = eventBus;
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDiedEvent);
+            _battleEventBus.Subscribe<EntityFledBattleEvent>(OnEntityFledEvent);
         }
 
         /// <summary>
@@ -52,16 +55,21 @@
         public void Dispose()
         {
             _battleEventBus.Unsubscribe<EntityDiedEvent>(OnEntityDiedEvent);
+            _battleEventBus.Unsubscribe<EntityFledBattleEvent>(OnEntityFledEvent);
             _diedEntities.Clear();
         }
 
-        private void OnEntityDiedEvent(EntityDiedEvent obj)
+        private void OnEntityDiedEvent(EntityDiedEvent obj) => AccrueFor(obj.Entity, 1f);
+
+        private void OnEntityFledEvent(EntityFledBattleEvent obj) => AccrueFor(obj.Entity, FledExperienceFactor);
+
+        private void AccrueFor(IFightable entity, float factor)
         {
-            if (!CanGetExperience(obj.Entity)) return;
-            var npc = obj.Entity as IFightableNpc;
-            int experienceAmount = Mathf.RoundToInt((BaseExp + npc!.Level) * CalculateTotalMultiplier(npc.EntityType, npc.Rarity));
+            if (!CanGetExperience(entity)) return;
+            var npc = entity as IFightableNpc;
+            int experienceAmount = Mathf.RoundToInt((BaseExp + npc!.Level) * CalculateTotalMultiplier(npc.EntityType, npc.Rarity) * factor);
             _totalExp += experienceAmount;
-            _diedEntities.Add(obj.Entity.InstanceId);
+            _diedEntities.Add(entity.InstanceId); // counted once: a fled enemy killed later doesn't double-dip
         }
 
         private bool CanGetExperience(IFightable entity) => entity is not IPlayer && entity is IFightableNpc && !_diedEntities.Contains(entity.InstanceId);

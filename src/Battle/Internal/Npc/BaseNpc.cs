@@ -4,33 +4,32 @@ namespace Battle.Internal.Npc
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Attribute;
     using Components;
+    using Core;
     using Core.Ai;
     using Core.Ai.World;
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
+    using Core.Attribute;
+    using Core.Battle;
     using Core.Components;
     using Core.Components.NpcModifiers;
+    using Core.Context;
     using Core.Data;
     using Core.Data.NpcData;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Items;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Items;
     using Core.Modifiers;
+    using Core.Services;
     using Godot;
-    using Services;
     using Source;
     using Source.Npc;
-    using Stateless;
-    using Utilities;
+    using GameServiceProvider = Services.GameServiceProvider;
 
-    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant, IRequireServices
     {
         /// <summary>Close enough to a movement destination to stop.</summary>
         private const float ArriveDistance = 5f;
@@ -43,6 +42,7 @@ namespace Battle.Internal.Npc
 
         /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
         private const float SkirmishScanInterval = 0.5f;
+
         private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
@@ -53,9 +53,10 @@ namespace Battle.Internal.Npc
         private IFactionRelationService? _factionRelations;
         private INpcWorldRegistry? _npcRegistry;
         private INpcSkirmishService? _skirmishService;
+        private INpcBuffProvider? _npcBuffProvider;
         private IWorldClock? _worldClock;
-        private WorldBrain? _brain;
-        private NpcLifecycle? _lifecycle;
+        private IWorldBrain? _brain;
+        private INpcLifecycle? _lifecycle;
         private bool _hostileToPlayer;
         private float _skirmishScanCooldown;
         private IReadOnlyList<Vector2>? _patrolRoute;
@@ -96,7 +97,16 @@ namespace Battle.Internal.Npc
         public EntityType EntityType { get; private set; } = EntityType.Regular;
         public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
-        public BehaviorProfile? Behavior { get; set; }
+        public IBehaviorProfile? Behavior { get; set; }
+
+        /// <summary>Body state for the save system; null until <see cref="ApplyDefinition"/> ran (legacy NPCs).</summary>
+        public INpcLifecycle? Lifecycle => _lifecycle;
+
+        /// <summary>True after this NPC rose as undead — the save system persists risen ones as world deviations.</summary>
+        public bool IsRisen { get; private set; }
+
+        /// <summary>The rising's parameter bonus, kept for the save round-trip.</summary>
+        public float RisingBonus { get; private set; }
 
         // ---- IWorldAgent (the brain's view of this body) ----
         public Vector2 HomePosition { get; private set; }
@@ -173,17 +183,23 @@ namespace Battle.Internal.Npc
             CombatEvents = new CombatEventBus();
             SetBaseValuesForParameters();
 
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+        }
+
+        public void InjectServices(IGameServiceProvider provider)
+        {
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
             _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
             _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
             _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            _npcBuffProvider = GameServiceProvider.Instance.GetService<INpcBuffProvider>();
             _npcRegistry?.Register(this);
             _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
-            CurrentHealth = Parameters.MaxHealth;
-            CurrentMana = Parameters.MaxMana;
         }
+
 
         public override void _PhysicsProcess(double delta)
         {
@@ -350,7 +366,9 @@ namespace Battle.Internal.Npc
         {
             string clip = Mathf.Abs(velocity.X) >= Mathf.Abs(velocity.Y)
                 ? velocity.X >= 0 ? "Idle_Right" : "Idle_Left"
-                : velocity.Y >= 0 ? "Idle_Down" : "Idle_Up";
+                : velocity.Y >= 0
+                    ? "Idle_Down"
+                    : "Idle_Up";
 
             if (clip == _lastMoveAnimation) return;
             _lastMoveAnimation = clip;
@@ -400,7 +418,7 @@ namespace Battle.Internal.Npc
             }
         }
 
-        public  Task Attack(IAttackContext context)
+        public Task Attack(IAttackContext context)
         {
             // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
             CombatEvents.Publish(new BeforeAttackEvent(context));
@@ -408,7 +426,7 @@ namespace Battle.Internal.Npc
             return Task.CompletedTask;
         }
 
-        public  Task TakeDamage(IDamageContext context)
+        public Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
             context.Source.ModifierHandler.Apply(context);
@@ -623,13 +641,35 @@ namespace Battle.Internal.Npc
         private void OnResurrectionReady(float parameterBonus)
         {
             var previousFraction = Fraction;
+            BecomeRisenUndead(parameterBonus);
+            _gameEventBus?.Publish(new NpcFactionChangedEvent(InstanceId, Id, previousFraction, Fractions.Undead, GlobalPosition));
+        }
+
+        /// <summary>Save-load path: rebuilds a lying body. Health drops through the normal property —
+        /// in Battle the game-bus death event has no subscribers; a future loot orchestrator in Main
+        /// must check ILoadScope before reacting to deaths.</summary>
+        public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed)
+        {
+            CurrentHealth = 0;
+            StopMoving();
+            _lifecycle?.RestoreState(stage, resurrectDelay, elapsed);
+            Animations.PlayAnimation("Dead");
+        }
+
+        /// <summary>Save-load path: rebuilds a wild risen undead. No NpcFactionChangedEvent —
+        /// the original spawn point already replaced this NPC before the save.</summary>
+        public void RestoreAsRisen(float parameterBonus) => BecomeRisenUndead(parameterBonus);
+
+        private void BecomeRisenUndead(float parameterBonus)
+        {
             Fraction = Fractions.Undead;
+            IsRisen = true;
+            RisingBonus = parameterBonus;
             ApplyRisingBonus(parameterBonus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
             Modulate = new Color(0.65f, 1f, 0.75f); // placeholder undead look until dedicated sprites exist
             Animations.PlayAnimation("Idle_Down");
-            _gameEventBus?.Publish(new NpcFactionChangedEvent(InstanceId, Id, previousFraction, Fractions.Undead, GlobalPosition));
         }
 
         /// <summary>The longer the body lay, the stronger the rising — Increase modifiers on the core parameters.</summary>

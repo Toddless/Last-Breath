@@ -39,6 +39,12 @@ namespace Core.Ai.World
         /// </summary>
         public bool HostileToPlayer { get; init; }
 
+        /// <summary>How far a non-aggressive NPC runs per flee leg (away from the threat).</summary>
+        public float FleeDistance { get; init; } = 400f;
+
+        /// <summary>Keeps fleeing this long after the threat was last seen/heard, then calms down.</summary>
+        public float FleeSeconds { get; init; } = 5f;
+
         public WorldActivityType Activity { get; init; } = WorldActivityType.Idle;
 
         /// <summary>Wander destinations are rolled within this radius around home.</summary>

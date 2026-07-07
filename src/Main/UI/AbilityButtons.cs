@@ -1,8 +1,8 @@
-﻿namespace LastBreath.Source.UI
+﻿namespace LastBreath.UI
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Godot;
 
     public partial class AbilityButtons : HBoxContainer

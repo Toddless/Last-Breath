@@ -117,6 +117,8 @@ namespace LastBreathTest.BattleSystemTests
             public void Tick(float realDelta)
             {
             }
+
+            public void RestoreState(int day, int minuteOfDay) => MinuteOfDay = minuteOfDay;
         }
 
         private class StubAgent : IWorldAgent

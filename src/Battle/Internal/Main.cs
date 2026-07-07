@@ -1,16 +1,16 @@
 ﻿namespace Battle.Internal
 {
     using System;
+    using Core;
+    using Core.Battle;
     using Core.Data;
-    using Core.Interfaces;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Services;
+    using Core.Views.UI;
     using Godot;
     using Source;
     using Source.UIElements;
-    using Utilities;
     using GameServiceProvider = Services.GameServiceProvider;
     using NotificationService = Core.Services.NotificationService;
 

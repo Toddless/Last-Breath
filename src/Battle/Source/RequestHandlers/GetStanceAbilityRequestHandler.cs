@@ -3,11 +3,11 @@ namespace Battle.Source.RequestHandlers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
+    using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
+    using Core.Services;
     using Core.Views;
     using Godot;
 

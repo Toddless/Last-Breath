@@ -4,8 +4,8 @@ namespace Battle.Source.Effects
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>One parameter change of a composite effect.</summary>

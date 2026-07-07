@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
     using Core.Enums;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
     using Godot;
-    using Utilities;
 
     public class Inventory : IInventory
     {

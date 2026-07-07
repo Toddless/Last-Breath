@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Script.Helpers.Extensions
+﻿namespace LastBreath.Helpers.Extensions
 {
     public static class SignalNameExtension
     {

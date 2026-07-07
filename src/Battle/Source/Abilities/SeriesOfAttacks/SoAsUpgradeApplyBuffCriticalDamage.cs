@@ -1,6 +1,6 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Effects;
 
     public class SoAsUpgradeApplyBuffCriticalDamage(string id, string[] tags, int tier, int amountAttack, float criticalDamage, int duration, int maxStacks)

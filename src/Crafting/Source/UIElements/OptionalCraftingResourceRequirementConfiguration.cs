@@ -3,14 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
     using Core.Data;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.MessageBus.Requests;
-    using Core.Interfaces.UI;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.Localization;
+    using Core.MessageBus;
+    using Core.MessageBus.Requests;
+    using Core.Views.UI;
     using Godot;
-    using Utilities;
 
     public class OptionalCraftingResourceRequirementConfiguration(string[] categories, IGameServiceProvider provider, Func<List<string>> resourcesAlreadyInSlots)
         : IRequirementUiConfiguration

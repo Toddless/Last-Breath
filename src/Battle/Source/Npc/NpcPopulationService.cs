@@ -1,9 +1,10 @@
 namespace Battle.Source.Npc
 {
     using System;
-    using Core.Interfaces;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Services;
+
     /// <summary>
     /// Counts every spawn-point NPC alive in the world. A reservation survives faction changes
     /// (the risen undead still walks the map) and frees itself on the final death event —
@@ -32,6 +33,14 @@ namespace Battle.Source.Npc
                 if (CurrentCount >= GlobalLimit) return false;
                 CurrentCount++;
                 return true;
+            }
+        }
+
+        public void Reset()
+        {
+            lock (_sync)
+            {
+                CurrentCount = 0;
             }
         }
 

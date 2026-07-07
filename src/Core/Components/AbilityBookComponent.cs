@@ -4,10 +4,9 @@ namespace Core.Components
     using System;
     using Constants;
     using System.Linq;
-    using Interfaces.Entity;
-    using Interfaces.Abilities;
-    using Interfaces.Components;
     using System.Collections.Generic;
+    using Battle.Abilities;
+    using Entity;
 
     public class AbilityBookComponent(
         IFightable owner,
@@ -27,6 +26,8 @@ namespace Core.Components
         public event Action? ActiveAbilitiesChanged;
 
         public IReadOnlyList<IAbility> GetAbilities(Stance stance) => GetLearned(stance);
+
+        public IReadOnlyList<IAbility?> GetSlotLayout(Stance stance) => GetSlots(stance);
 
         public void Learn(Stance stance, IAbility ability)
         {

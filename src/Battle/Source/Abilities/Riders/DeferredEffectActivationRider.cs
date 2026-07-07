@@ -2,7 +2,7 @@ namespace Battle.Source.Abilities.Riders
 {
     using System;
     using System.Threading.Tasks;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     /// <summary>
     /// Post-activation modifier that builds its effect fresh on each cast via <paramref name="effectFactory"/>,

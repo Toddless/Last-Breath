@@ -1,10 +1,10 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using System.Collections.Generic;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Abilities;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Events.GameEvents;
     using Effects;
 
     public class GiftFromTheGoddessPassiveSkill(float chance)

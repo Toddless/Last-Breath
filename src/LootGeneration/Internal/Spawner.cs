@@ -3,13 +3,13 @@ namespace LootGeneration.Internal
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
     using Core.Components.NpcModifiers;
+    using Core.Entity;
+    using Core.Events;
     using Godot;
-    using Utilities;
 
     public class Spawner
     {

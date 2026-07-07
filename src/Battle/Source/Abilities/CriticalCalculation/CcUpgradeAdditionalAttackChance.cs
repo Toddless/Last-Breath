@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
     using System;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
     using Effects;
 
     /// <summary>

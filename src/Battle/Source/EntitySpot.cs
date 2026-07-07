@@ -1,10 +1,10 @@
 namespace Battle.Source
 {
+    using Core.Battle.Abilities;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events;
+    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

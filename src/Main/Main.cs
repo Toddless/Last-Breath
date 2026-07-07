@@ -2,15 +2,16 @@
 {
     using System;
     using Battle.Source;
+    using Core;
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Views.UI;
     using Godot;
     using LootGeneration.Source;
     using Services;
+    using UI.Layers;
     using UI.View;
-    using Utilities;
 
     public partial class Main : Node2D
     {
@@ -18,7 +19,7 @@
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
         private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
-        [Export] private Source.UI.Layers.UILayersManager? _uiLayerManager;
+        [Export] private UILayersManager? _uiLayerManager;
 
         public override void _Ready()
         {

@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.PoisonExplosion
 {
     using Conditions;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
 
     public class PeUpgradeExecuteBosses(string id, string[] tags, int tier, float stacksMultiplier = 1f)
         : AbilityUpgrade<PoisonExplosion>(id, tags, tier)

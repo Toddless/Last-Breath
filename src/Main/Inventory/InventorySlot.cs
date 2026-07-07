@@ -2,10 +2,10 @@
 {
     using System;
     using Core.Enums;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Inventory;
-    using Core.Interfaces.Items;
-    using Core.Interfaces.MessageBus;
+    using Core.Events;
+    using Core.Inventory;
+    using Core.Items;
+    using Core.MessageBus;
     using Godot;
 
     public partial class InventorySlot : Slot, IInventorySlot

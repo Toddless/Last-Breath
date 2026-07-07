@@ -1,6 +1,6 @@
 namespace Core.Data
 {
-    using Interfaces.Entity;
+    using Entity;
 
     /// <summary>
     /// Point-in-time copy of an entity's survival numbers, captured when an event is published.

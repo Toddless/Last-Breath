@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Core.Interfaces.Components;
+    using Core.Components;
     using Godot;
 
     [GlobalClass]

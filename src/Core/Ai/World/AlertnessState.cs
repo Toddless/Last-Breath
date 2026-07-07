@@ -16,6 +16,9 @@ namespace Core.Ai.World
         Alert,
 
         /// <summary>Lost the target: lingers around the last known position, then calms down.</summary>
-        Search
+        Search,
+
+        /// <summary>Non-aggressive NPC running away from a threat until it feels safe again.</summary>
+        Flee
     }
 }

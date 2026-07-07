@@ -2,8 +2,8 @@ namespace Core.Ai.Considerations
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
+    using Battle.Abilities;
+    using Entity;
 
     /// <summary>Damage casts get more attractive the closer the best target is to death (kill-secure).</summary>
     public class FinisherConsideration(float pressure = 0.75f) : ICombatConsideration

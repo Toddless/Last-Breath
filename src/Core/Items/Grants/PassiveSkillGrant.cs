@@ -1,15 +1,17 @@
 namespace Core.Items.Grants
 {
     using System;
-    using Interfaces.Entity;
-    using Interfaces.Items;
-    using Interfaces.Skills;
+    using Battle.Skills;
+    using Entity;
 
     public class PassiveSkillGrant(string id, string skillId, Func<ISkillProvider?> providerAccessor) : IItemGrant
     {
         private ISkill? _skill;
 
         public string Id => id;
+
+        /// <summary>Read access for serialization (save system round-trips the grant).</summary>
+        public string SkillId => skillId;
 
         public void Attach(IFightable owner)
         {

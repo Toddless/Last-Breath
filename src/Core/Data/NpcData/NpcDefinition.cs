@@ -2,9 +2,9 @@ namespace Core.Data.NpcData
 {
     using System.Collections.Generic;
     using Ai;
+    using Battle.Abilities;
+    using Entity;
     using Enums;
-    using Interfaces.Abilities;
-    using Interfaces.Entity;
 
     /// <summary>
     /// A fully rolled NPC ready to be applied to an entity: the provider resolved the stance,

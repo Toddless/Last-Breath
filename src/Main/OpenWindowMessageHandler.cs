@@ -1,8 +1,8 @@
 ﻿namespace LastBreath
 {
     using System.Threading.Tasks;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Views.UI;
 
     public class OpenWindowMessageHandler(IUiElementsManager manager) : IMessageHandler<OpenWindowMessage>
     {

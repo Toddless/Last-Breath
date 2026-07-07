@@ -1,6 +1,6 @@
 ﻿namespace LastBreath.UI.View
 {
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
     using Godot.Collections;
 

@@ -2,9 +2,9 @@
 {
     using System;
     using Core.Data;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.MessageBus;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
 
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable

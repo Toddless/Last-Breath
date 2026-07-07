@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Effects
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
 
     // for now its kinda empty, later animations, sound effect, description will be added
     public class Clumsiness(

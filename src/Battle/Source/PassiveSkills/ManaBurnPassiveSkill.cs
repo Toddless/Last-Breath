@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
-    using Core.Interfaces.Entity;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.Skills;
+    using Core.Battle.Skills;
+    using Core.Entity;
+    using Core.Events.GameEvents;
 
     public class ManaBurnPassiveSkill(float percentToBurn)
         : Skill(id: "Passive_Skill_Mana_Burn")

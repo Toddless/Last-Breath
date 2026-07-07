@@ -2,8 +2,8 @@ namespace Battle.Source
 {
     using System;
     using System.Collections.Generic;
+    using Core.Battle;
     using Core.Data;
-    using Core.Interfaces.Battle;
 
     public class BattleTimeline : IBattleTimeline
     {

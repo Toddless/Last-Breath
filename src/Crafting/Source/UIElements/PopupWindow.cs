@@ -1,6 +1,6 @@
 ﻿namespace Crafting.Source.UIElements
 {
-    using Core.Interfaces.UI;
+    using Core.Views.UI;
     using Godot;
 
     public partial class PopupWindow : PanelContainer, IInitializable

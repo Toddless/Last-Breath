@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Overload
 {
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
     using Decorators;
 
     /// <summary>L2 upgrade: every burned mana point converts into more damage.</summary>

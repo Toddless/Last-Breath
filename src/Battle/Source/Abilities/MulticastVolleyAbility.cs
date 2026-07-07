@@ -2,8 +2,9 @@ namespace Battle.Source.Abilities
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Core.Context;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Entity;
 
     /// <summary>
     /// Damage-dealing multicast family: the plan is a volley of direct (non-attack) hits.

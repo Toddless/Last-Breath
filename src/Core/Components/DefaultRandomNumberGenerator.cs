@@ -1,7 +1,6 @@
 namespace Core.Components
 {
     using System;
-    using Interfaces.Components;
 
     /// <summary>
     /// Pure C# implementation of <see cref="IRandomNumberGenerator"/> (System.Random based),

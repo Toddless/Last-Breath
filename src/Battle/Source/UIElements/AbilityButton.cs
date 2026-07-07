@@ -1,11 +1,11 @@
 namespace Battle.Source.UIElements
 {
     using System;
+    using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events;
-    using Core.Interfaces.Events.GameEvents;
-    using Core.Interfaces.UI;
+    using Core.Events;
+    using Core.Events.GameEvents;
+    using Core.Views.UI;
     using Godot;
     using Stateless;
 

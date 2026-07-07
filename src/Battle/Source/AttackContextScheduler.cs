@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading;
-    using Core.Interfaces.Battle;
+    using Core.Battle;
 
     public class AttackContextScheduler : IAttackContextScheduler
     {

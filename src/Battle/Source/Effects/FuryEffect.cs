@@ -1,11 +1,12 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
+    using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Events.GameEvents;
+    using Core.Localization;
     using Godot;
-    using Utilities;
 
     public class FuryEffect(
         int duration,

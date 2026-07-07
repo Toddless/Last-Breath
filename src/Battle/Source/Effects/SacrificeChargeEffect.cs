@@ -2,8 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Abilities.Modifiers;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Events.GameEvents;
+    using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Events.GameEvents;
 
     /// <summary>
     /// The Sacrifice charge: the next <c>charges</c> activated abilities deal extra PURE damage equal to

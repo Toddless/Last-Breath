@@ -1,11 +1,11 @@
 namespace Battle.Source.RequestHandlers
 {
     using System.Linq;
-    using Core.Interfaces;
-    using Core.Interfaces.Abilities;
+    using Core.Battle.Abilities;
+    using Core.Localization;
+    using Core.Services;
     using Core.Views;
     using Godot;
-    using Utilities;
 
     /// <summary>Builds the detail DTO from the learned ability instance in the player's book (no domain object leaves).</summary>
     internal static class AbilityUpgradeViewFactory

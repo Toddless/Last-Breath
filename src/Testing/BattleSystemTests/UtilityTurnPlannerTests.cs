@@ -1,12 +1,11 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai;
+    using Core.Battle;
+    using Core.Battle.Abilities;
     using Core.Components;
+    using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces.Abilities;
-    using Core.Interfaces.Battle;
-    using Core.Interfaces.Components;
-    using Core.Interfaces.Entity;
     using Moq;
 
     [TestClass]
@@ -122,6 +121,42 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(2, charged.Object.PendingStage); // round(3 * 0.5) = 2
         }
 
+        [TestMethod]
+        public async Task BrokenMoraleFleesInsteadOfPlayingTheTurn()
+        {
+            var enemy = CreateFighter().Object;
+            var self = CreateSelf(CreateAbility("Ability_A").Object);
+            self.SetupGet(f => f.CurrentHealth).Returns(100f); // 10% of the 1000 max
+            var env = CreateEnvironment(self.Object, enemy);
+            var profile = new BehaviorProfile
+            {
+                Id = "Behavior_Coward",
+                Temperature = 0f,
+                FleeHealthThreshold = 0.15f,
+                Abilities = new Dictionary<string, AbilityBehavior> { ["Ability_A"] = new("Ability_A", 1f, AbilityRole.Damage) },
+            };
+
+            await CreatePlanner().PlayTurnAsync(self.Object, profile, env.Object);
+
+            env.Verify(e => e.FleeBattleAsync(self.Object), Times.Once);
+            env.Verify(e => e.CastAbilityAsync(It.IsAny<IFightable>(), It.IsAny<IAbility>(), It.IsAny<IReadOnlyList<IFightable>>()), Times.Never);
+            env.Verify(e => e.BasicAttackAsync(It.IsAny<IFightable>(), It.IsAny<IFightable>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task FearlessProfileNeverFlees()
+        {
+            var enemy = CreateFighter().Object;
+            var self = CreateSelf(CreateAbility("Ability_A").Object);
+            self.SetupGet(f => f.CurrentHealth).Returns(100f);
+            var env = CreateEnvironment(self.Object, enemy);
+
+            await CreatePlanner().PlayTurnAsync(self.Object, CreateProfile(("Ability_A", 1f, AbilityRole.Damage)), env.Object);
+
+            env.Verify(e => e.FleeBattleAsync(It.IsAny<IFightable>()), Times.Never);
+            env.Verify(e => e.BasicAttackAsync(self.Object, enemy), Times.Once);
+        }
+
         // ---- helpers ----
 
         private static UtilityTurnPlanner CreatePlanner() => new(new DefaultRandomNumberGenerator(seed: 42));
@@ -204,6 +239,8 @@ namespace LastBreathTest.BattleSystemTests
             env.Setup(e => e.CastAbilityAsync(It.IsAny<IFightable>(), It.IsAny<IAbility>(), It.IsAny<IReadOnlyList<IFightable>>()))
                 .Returns(Task.CompletedTask);
             env.Setup(e => e.BasicAttackAsync(It.IsAny<IFightable>(), It.IsAny<IFightable>()))
+                .Returns(Task.CompletedTask);
+            env.Setup(e => e.FleeBattleAsync(It.IsAny<IFightable>()))
                 .Returns(Task.CompletedTask);
             return env;
         }
