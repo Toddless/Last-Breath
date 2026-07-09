@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Data;
     using Core.Entity;
@@ -22,6 +23,8 @@
         private readonly List<IFightable> _entities;
         private readonly Node2D _mainWorld;
         private readonly IFightable _player;
+        private BattleHud? _battleHud;
+        private bool _battleRunning;
 
         public BattleContext(IFightable player, List<IFightable> entities, Node2D mainWorld, IGameServiceProvider provider, Node2D parent)
         {
@@ -32,7 +35,7 @@
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
             _localBus = new BattleEventBus();
             _battleArena.SetupEventBus(_localBus);
-            _battleExperienceProcessor = new BattleExperienceProcessor(_localBus, provider);
+            _battleExperienceProcessor = new BattleExperienceProcessor(_localBus, provider, player);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);
             // The context owns the fighting status: the flag goes up synchronously inside the
@@ -47,22 +50,25 @@
             var results = BattleResults.BattleAbandoned;
             try
             {
-                var battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
-                await battleHud.SetupEventBus(_localBus);
-                battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
-                battleHud.SetPlayerStance(_player.AbilityBook.CurrentStance);
-                battleHud.SetAbilityBook(_player.AbilityBook);
+                _battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
+                await _battleHud.SetupEventBus(_localBus);
+                _battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
+                _battleHud.SetPlayerStance(_player.AbilityBook.CurrentStance);
+                _battleHud.SetAbilityBook(_player.AbilityBook);
                 foreach (IFightable entity in _entities)
-                    battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth, entity.CurrentMana);
+                    _battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth,
+                        entity.CurrentMana);
 
                 _battleArena.SetPlayer(_player);
                 if (!_battleArena.PrepareBattleArena(_entities)) return results;
+                _battleRunning = true;
                 results = await _battleArena.RunBattleAsync();
                 _battleExperienceProcessor.CompleteBattle(results);
                 return results;
             }
             finally
             {
+                _battleRunning = false;
                 // The end signal must be unmissable — even when the battle aborts or throws.
                 // Without it the player's FSM stays in Fight forever and every next battle
                 // start dies with "Fight from Fight" before the NPCs reach the arena.
@@ -73,6 +79,26 @@
                 // exit their fight state here; Main separately publishes the game-bus copy for loot.
                 _localBus.Publish(new BattleEndEvent(results));
             }
+        }
+
+        /// <summary>
+        /// A latecomer joins the ongoing battle. The side is a parameter: enemies keep their own
+        /// group (multi-sided fights), future companions land in the player's group. Refusal
+        /// (no free spot / battle over) leaves the NPC in the world untouched.
+        /// </summary>
+        public bool TryJoinBattle(IFightable fighter, bool alliedWithPlayer)
+        {
+            if (!_battleRunning || !fighter.IsAlive || fighter.IsFighting) return false;
+            if (!_battleArena.TryJoinBattle(fighter, alliedWithPlayer)) return false;
+
+            fighter.SetupBattleEventBus(_localBus);
+            fighter.IsFighting = true;
+            if (fighter is Node2D node)
+                node.GetParent()?.RemoveChild(node); // the spot already claimed the node via deferred AddChild
+
+            _entities.Add(fighter); // the return-to-world list must include the latecomer
+            _battleHud?.CreateEntityBarsWithInitialValues(fighter.InstanceId, fighter.Parameters.MaxHealth, fighter.Parameters.MaxMana, fighter.CurrentHealth, fighter.CurrentMana);
+            return true;
         }
 
         public void Dispose()
@@ -87,21 +113,29 @@
         {
             try
             {
-                _battleArena.RemoveAliveEntitiesFromArena();
-                _battleArena.RemovePlayerFromArena();
+                _battleArena.RemoveEntitiesFromArenaSpots();
+                _battleArena.RemovePlayerFromArenaSpot();
+                // The context's list is the source of truth for the return: the arena works on its
+                // own copy, so the dead and the fled are still here — bodies must lie in the world.
+                ReturnToWorld(_player);
                 foreach (var entity in _entities)
-                {
-                    if (entity is not Node2D asNode) continue;
-                    // Dead NPCs return too: the body stays in the world (resurrection/burning
-                    // lifecycle). Legacy NPCs without body rules free themselves on battle end.
-                    if (!GodotObject.IsInstanceValid(asNode) || asNode.IsQueuedForDeletion()) continue;
-                    _mainWorld.AddChild(asNode);
-                }
+                    ReturnToWorld(entity);
             }
             catch (Exception ex)
             {
+                Tracker.TrackException("Failed to return participants to the world", ex, this);
                 GD.Print($"{ex.Message}, {ex.StackTrace}");
             }
+        }
+
+        private void ReturnToWorld(IFightable entity)
+        {
+            if (entity is not Node2D asNode) return;
+            // Legacy NPCs without body rules free themselves on battle end — don't resurrect the node.
+            if (!GodotObject.IsInstanceValid(asNode) || asNode.IsQueuedForDeletion()) return;
+            // Parked corpses live as arena children (their spot was freed for a latecomer).
+            asNode.GetParent()?.RemoveChild(asNode);
+            _mainWorld.AddChild(asNode);
         }
 
         private void RemoveParticipantFromWorld()

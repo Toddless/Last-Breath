@@ -1,4 +1,4 @@
-{
+﻿{
 	"items": [
 		{
 			"id": "Amulet_Of_Recovery",
@@ -184,7 +184,7 @@
 				{
 					"id": "Passive_Skill_Current_Health_Regeneration",
 					"kind": "Passive",
-					"parameters": {
+					"properties": {
 						"percentFromCurrentHealth": 0.05
 					}
 				}
@@ -212,10 +212,10 @@
 				{
 					"id": "Passive_Skill_Creators_Nature",
 					"kind": "Passive",
-					"parameters": {
+					"properties": {
 						"manaRecovery": 0.05,
 						"healthRecovery": 0.05,
-						"recoveryEfficiency ": 0.35
+						"recoveryEfficiency": 0.35
 					}
 				}
 			]

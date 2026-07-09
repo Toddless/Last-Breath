@@ -317,8 +317,9 @@ namespace Battle.Internal.Npc
             return nearest == null ? null : new TargetSighting(nearest.Value);
         }
 
-        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's faction standing.</summary>
-        private bool ConsidersPlayerAnEnemy() =>
+        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's faction standing.
+        /// Public: the battle-site marker asks it to turn arrivals into join requests.</summary>
+        public bool ConsidersPlayerAnEnemy() =>
             _hostileToPlayer || _factionRelations?.IsHostileToPlayer(Fraction) == true;
 
         private void Consider(Vector2 candidate, ref Vector2? nearest, ref float nearestDistance)

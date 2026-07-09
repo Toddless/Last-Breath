@@ -58,10 +58,34 @@ namespace Core.Data
             return result;
         }
 
+        public LootConfigurationParseResult ParseLootConfiguration(string json)
+        {
+            var data = JsonConvert.DeserializeObject<LootConfigurationData>(json, s_settings)
+                       ?? throw new InvalidOperationException("Failed to deserialize loot configuration");
+
+            if (data.TierPrices.Length == 0)
+                throw new InvalidOperationException("Loot configuration must define tierPrices.");
+            if (data.BaseTierChances.Length != data.TierPrices.Length)
+                throw new InvalidOperationException(
+                    $"Loot configuration mismatch: {data.TierPrices.Length} tierPrices but {data.BaseTierChances.Length} baseTierChances.");
+
+            return new LootConfigurationParseResult(
+                data.TierPrices,
+                data.BaseTierChances,
+                data.BaseRarityChances,
+                data.LevelCoefficient,
+                data.EquipItemEffectChance,
+                data.ItemModifierMultiplier,
+                data.BaseBudget.ToDictionary(kvp => EnumParser.ParseEnum<EntityType>(kvp.Key), kvp => kvp.Value),
+                data.RarityMultipliers.ToDictionary(kvp => EnumParser.ParseEnum<Rarity>(kvp.Key), kvp => kvp.Value));
+        }
+
         public Dictionary<string, Dictionary<string, int>> ParseEquipItemResources(string json)
         {
-            var data = JsonConvert.DeserializeObject<EquipItemResourcesData>(json) ?? throw new InvalidOperationException();
-            return data.Resources.ToDictionary(
+            // The shipped file is a bare array — deserializing the object wrapper here made the
+            // whole catalog silently fail to load (only visible as a Tracker line).
+            var data = JsonConvert.DeserializeObject<List<EquipItemResources>>(json) ?? throw new InvalidOperationException();
+            return data.ToDictionary(
                 e => e.ItemId,
                 e => e.Resources.ToDictionary(r => r.ResourceId, r => r.Amount));
         }

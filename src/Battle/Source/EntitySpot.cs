@@ -78,6 +78,7 @@ namespace Battle.Source
             Entity.Effects.EffectAdded -= OnEffectAdded;
             var node = Entity as Node;
             RemoveChild(node);
+            Entity = null;
         }
 
         public void SetEntity(IFightable entity)
@@ -85,6 +86,7 @@ namespace Battle.Source
             entity.Effects.EffectAdded += OnEffectAdded;
             var body = entity as CharacterBody2D;
             Entity = entity;
+            ClearToIdle(); // a spot freed by a death stays Unavailable otherwise — the newcomer would be untargetable
             body?.Position = Vector2.Zero;
             CallDeferred(Node.MethodName.AddChild, body);
         }

@@ -32,7 +32,16 @@
         public bool IsFirst => Index == 0;
         public bool IsLast => Index == TotalCount - 1;
 
+        public int ReactionDepth { get; private init; }
+
         public bool IsValid => Target.IsAlive && Attacker.IsAlive;
+
+        public IAttackContext CreateReaction(IFightable attacker, IFightable target, float baseDamage) =>
+            new AttackContext(attacker, target, baseDamage, Rnd, AttackContextScheduler)
+            {
+                ReactionDepth = ReactionDepth + 1,
+                RawCriticalChance = attacker.Parameters.CriticalChance
+            };
 
         public bool Schedule()
         {

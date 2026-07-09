@@ -17,7 +17,8 @@ namespace Battle.Source.Abilities.DarkShroud
         {
             var modifier = new DeferredEffectActivationRider(
                 "Ability_Apply_Effect_Accuracy_Buff_Post_Activation_Modifier",
-                () => new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, amount));
+                // Multiply wants the full multiplier: a raw 0.25 would CUT accuracy to a quarter.
+                () => new AccuracyBuff((int)ability.Duration, (int)ability.Stacks, 1 + amount));
             _modifierId = modifier.Id;
             ability.ActivationRiders.TryAdd(modifier.Id, modifier);
         }

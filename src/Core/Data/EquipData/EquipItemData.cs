@@ -10,8 +10,8 @@ namespace Core.Data.EquipData
         [JsonProperty("weaponType")] public string WeaponType { get; init; } = string.Empty;
         [JsonProperty("handedness")] public string Handedness { get; init; } = string.Empty;
         [JsonProperty("damage")] public float Damage { get; init; }
-        [JsonProperty("critChance")] public float CritChance { get; init; }
-        [JsonProperty("critDamage")] public float CritDamage { get; init; }
+        [JsonProperty("criticalChance")] public float CritChance { get; init; }
+        [JsonProperty("criticalDamage")] public float CritDamage { get; init; }
         [JsonProperty("maxStackSize")] public int MaxStackSize { get; init; } = 1;
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];

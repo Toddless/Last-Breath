@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities.DoubleStrike
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -128,16 +127,15 @@ namespace Battle.Source.Abilities.DoubleStrike
         {
             var rnd = new Godot.RandomNumberGenerator();
             rnd.Randomize();
-            var cts = new CancellationTokenSource();
 
             foreach (IFightable target in targets)
             {
-                var scheduler = new AttackContextScheduler();
+                var window = new AttackSeriesWindow(this, owner, field);
                 bool firstLanded = false, secondLanded = false;
                 for (int strike = 0; strike < 2; strike++)
                 {
                     if (!target.IsAlive) break;
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
@@ -148,12 +146,7 @@ namespace Battle.Source.Abilities.DoubleStrike
                     };
                     AttackModifiers.ApplyAll(context);
 
-                    if (!context.Schedule()) break;
-                    await foreach (var processed in scheduler.RunQueue(cts.Token))
-                    {
-                        if (processed.Attacker.InstanceId != owner.InstanceId) continue;
-                        await ApplyImpactRiders(processed.ToImpact(field));
-                    }
+                    if (!await window.ResolveAsync(context)) break;
 
                     if (context.Result is not AttackResults.Succeed) continue;
                     if (strike == 0)

@@ -375,10 +375,40 @@ msgstr ""
 msgid "Context_Modifier_BleedDuration"
 msgstr ""
 
-msgid "Context_Modifier_BurningBonusStacks"
+msgid "Context_Modifier_BleedDamage"
 msgstr ""
 
-msgid "Context_Modifier_BurningDotDamage"
+msgid "Context_Modifier_BurningStacks"
+msgstr ""
+
+msgid "Context_Modifier_BurningDamage"
+msgstr ""
+
+msgid "Context_Modifier_ManaOnHit"
+msgstr ""
+
+msgid "Context_Modifier_HealthOnHit"
+msgstr ""
+
+msgid "Belt_Life_Flow"
+msgstr ""
+
+msgid "Belt_Mana_Flow"
+msgstr ""
+
+msgid "Belt_Ether_Flow"
+msgstr ""
+
+msgid "Body_Power"
+msgstr ""
+
+msgid "Body_Ice_Mage"
+msgstr ""
+
+msgid "Effect_Incineration"
+msgstr ""
+
+msgid "Effect_Incineration_Description"
 msgstr ""
 
 msgid "Notification_Game_Saved"

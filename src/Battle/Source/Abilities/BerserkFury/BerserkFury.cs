@@ -3,7 +3,6 @@ namespace Battle.Source.Abilities.BerserkFury
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -117,16 +116,15 @@ namespace Battle.Source.Abilities.BerserkFury
 
             var rnd = new RandomNumberGenerator();
             rnd.Randomize();
-            var cts = new CancellationTokenSource();
 
             foreach (IFightable target in targets)
             {
-                var scheduler = new AttackContextScheduler();
+                var window = new AttackSeriesWindow(this, owner, field);
                 int attackIndex = 0;
                 while (owner.CurrentHealth > 1 && target.IsAlive)
                 {
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
@@ -136,12 +134,7 @@ namespace Battle.Source.Abilities.BerserkFury
                     };
                     AttackModifiers.ApplyAll(context);
 
-                    if (!context.Schedule()) break;
-                    await foreach (var processed in scheduler.RunQueue(cts.Token))
-                    {
-                        if (processed.Attacker.InstanceId != owner.InstanceId) continue;
-                        await ApplyImpactRiders(processed.ToImpact(field));
-                    }
+                    if (!await window.ResolveAsync(context)) break;
 
                     // Lower health — lower chance to keep swinging (fury burns health, so the series ends itself).
                     float chance = Mathf.Clamp(owner.CurrentHealth / owner.Parameters.MaxHealth, MinContinueChance, MaxContinueChance);

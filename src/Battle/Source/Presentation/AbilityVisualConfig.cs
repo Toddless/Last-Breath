@@ -45,5 +45,9 @@ namespace Battle.Source.Presentation
         [Export] public float TravelSpeed { get; set; } = 1200f;
 
         [Export] public float Scale { get; set; } = 1f;
+
+        /// <summary>Melee series: the caster runs up to the target and the hits land at arm's reach.
+        /// Basic attacks approach always — this flag exists for ability casts only.</summary>
+        [Export] public bool MeleeApproach { get; set; }
     }
 }

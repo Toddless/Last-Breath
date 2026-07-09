@@ -12,7 +12,7 @@ namespace Battle.Source.PassiveSkills
     /// ticking for a share of the attack damage.
     /// TODO (отложено): при достижении 9 стаков горения накладывать «Сожжение» на 2 хода.</summary>
     public class RighteousWrathPassiveSkill(float percentFromDamage, int duration, int stackThreshold, int incinerationDuration)
-        : Skill(id: "Passive_Skill_Undead_Burning")
+        : Skill(id: "Passive_Skill_Righteous_Wrath")
     {
         public float PercentFromDamage { get; } = percentFromDamage;
         public int Duration { get; } = duration;
@@ -40,7 +40,8 @@ namespace Battle.Source.PassiveSkills
             });
 
             if (context.Target.Effects.GetBy(x => x.Status == StatusEffects.Burning).Count() < StackThreshold) return;
-            _ = new Incineration(IncinerationDuration).Apply(new EffectApplyingContext { Target = context.Target, Source = InstanceId });
+            // Caster is mandatory: Effect.Apply runs the caster-side application pipeline.
+            _ = new Incineration(IncinerationDuration).Apply(new EffectApplyingContext { Caster = Owner, Target = context.Target, Source = InstanceId });
         }
 
         public override void Detach(IFightable owner)

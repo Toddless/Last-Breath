@@ -18,7 +18,7 @@ namespace Battle.Source
             ["Passive_Skill_Mana_Regeneration"] =
                 properties => new ManaRegenerationPassiveSkill(properties.Get("percent")),
             ["Passive_Skill_Current_Health_Regeneration"] =
-                properties => new CurrentHealthRegenerationPassiveSkill(properties.Get("percent")),
+                properties => new CurrentHealthRegenerationPassiveSkill(properties.Get("percentFromCurrentHealth")),
             ["Passive_Skill_Mana_To_Barrier"] =
                 properties => new ManaToBarrierPassiveSkill(properties.Get("percent")),
             ["Passive_Skill_Critical_Leech"] =
@@ -33,11 +33,19 @@ namespace Battle.Source
                 new PorcupinePassiveSkill(properties.Get("damagePercent"), properties.Get("armorPercent")),
             ["Passive_Skill_Bleeding"] = properties
                 => new BleedingPassiveSkill(properties.Get("percentFromDamage"), properties.GetInt("duration"), properties.GetInt("maxStacks")),
-            ["Passive_Skill_Bleed_Detonation"] = properties
+            ["Passive_Skill_Bloodthirsty"] = properties
                 => new BloodthirstyPassiveSkill(properties.GetInt("stackThreshold"), properties.Get("healPercent")),
-            ["Passive_Skill_Undead_Burning"] = properties
+            ["Passive_Skill_Righteous_Wrath"] = properties
                 => new RighteousWrathPassiveSkill(properties.Get("percentFromDamage"), properties.GetInt("burningDuration"), properties.GetInt("stackThreshold"),
                     properties.GetInt("incinerationDuration")),
+            ["Passive_Skill_Silent_Fury"] = properties
+                => new SilentFuryPassive(properties.Get("chance")),
+            ["Passive_Skill_Creators_Nature"] = properties
+                => new CreatorsNaturePassiveSkill(properties.Get("manaRecovery"), properties.Get("healthRecovery"), properties.Get("recoveryEfficiency")),
+            ["Passive_Skill_Meteor"] = properties
+                => new MeteorPassiveSkill(properties.Get("damage")),
+            ["Passive_Skill_Ice_Meteor"] = properties
+                => new IceMeteorPassiveSkill(properties.Get("damage")),
             ["Passive_Skill_Servant_Hell"] = properties
                 => new ServantHellPassiveSkill(properties.Get("chance")),
         };

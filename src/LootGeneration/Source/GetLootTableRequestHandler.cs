@@ -10,26 +10,25 @@ namespace LootGeneration.Source
     {
         public Task<Dictionary<int, List<TableRecord>>> HandleRequest(GetLootTableRequest request)
         {
-            var fractionTable = lootTableProvider.GetLootTable(request.Fraction);
-            var entityTable = lootTableProvider.GetLootTable(request.Type);
-            var individualTable = lootTableProvider.GetLootTable(request.Id);
-            var basicTable = lootTableProvider.BasicTable;
+            List<List<LootTableTierData>> sources =
+            [
+                lootTableProvider.GetLootTable(request.Fraction),
+                lootTableProvider.GetLootTable(request.Type),
+                lootTableProvider.GetLootTable(request.Id),
+                lootTableProvider.BasicTable
+            ];
 
+            // Tiers are looked up by their declared number, never by list position, so partial or unordered
+            // tables are fine. Combined lists are fresh copies: callers may append to them without touching
+            // the providers' cached data.
             var combined = new Dictionary<int, List<TableRecord>>();
-            for (int i = 0; i < basicTable.Count; i++)
+            foreach (var tierData in sources.SelectMany(source => source))
             {
-                GetLootTableRecords(fractionTable, i, out var fractionRecords);
-                GetLootTableRecords(entityTable, i, out var entityTypeRecords);
-                GetLootTableRecords(individualTable, i, out var individualRecords);
-                var basic = basicTable.FirstOrDefault(x => x.Tier == i)?.Items ?? [];
-                var combinedRecords = fractionRecords.Union(entityTypeRecords).Union(individualRecords).Union(basic).ToList();
-                combined.TryAdd(i, combinedRecords);
+                if (!combined.TryGetValue(tierData.Tier, out var records)) combined[tierData.Tier] = records = [];
+                records.AddRange(tierData.Items.Where(item => !records.Contains(item)));
             }
 
             return Task.FromResult(combined);
         }
-
-        private void GetLootTableRecords(List<LootTableTierData>? value, int tier, out List<TableRecord> records) =>
-            records = value != null && value.Exists(x => x.Tier == tier) ? records = value[tier].Items : records = [];
     }
 }

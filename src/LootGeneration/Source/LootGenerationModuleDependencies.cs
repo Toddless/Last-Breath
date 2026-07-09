@@ -3,11 +3,7 @@ namespace LootGeneration.Source
     using System.Collections.Generic;
     using Core.Data.GameData;
     using Core.Data.LootTable;
-    using Core.Enums;
-    using Core.Events;
     using Core.MessageBus;
-    using Core.Services;
-    using Godot;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class LootGenerationModuleDependencies
@@ -15,40 +11,8 @@ namespace LootGeneration.Source
         public static IServiceCollection AddLootGenerationServices(this IServiceCollection services)
         {
             services.AddGameDataParticipant<ILootTableProvider, LootTableProvider>();
-            services.AddSingleton<ILootGenerationService, LootGenerationService>(provider =>
-                {
-                    var instance = new LootGenerationService(
-                        provider.GetService<RandomNumberGenerator>(),
-                        provider.GetService<IGameEventBus>(),
-                        provider.GetService<IGameMessageBus>(),
-                        provider.GetService<IItemCreationService>(),
-                        new LootConfiguration(
-                            [600, 200, 50, 3],
-                            [0.004f, 0.006f, 0.3f, 0.6f],
-                            [0.003f, 0.15f, 0.27f, 0.55f],
-                            0.35f,
-                            0.15f,
-                            0.10f,
-                            new Dictionary<EntityType, float>
-                            {
-                                [EntityType.Regular] = 5f,
-                                [EntityType.Special] = 10f,
-                                [EntityType.Elit] = 20f,
-                                [EntityType.Unique] = 50f,
-                                [EntityType.Boss] = 100f,
-                                [EntityType.Archon] = 180f
-                            }, new Dictionary<Rarity, float>
-                            {
-                                [Rarity.Uncommon] = 1f,
-                                [Rarity.Rare] = 1.15f,
-                                [Rarity.Epic] = 1.3f,
-                                [Rarity.Legendary] = 1.45f,
-                                [Rarity.Unique] = 2f,
-                                [Rarity.Mythic] = 4f,
-                            }));
-                    return instance;
-                }
-            );
+            services.AddGameDataParticipant<ILootConfiguration, LootConfigurationProvider>();
+            services.AddSingleton<ILootGenerationService, LootGenerationService>();
             services.AddSingleton<ILootOrchestrator, LootOrchestrator>();
             services.AddTransient<IRequestHandler<GetLootTableRequest, Dictionary<int, List<TableRecord>>>, GetLootTableRequestHandler>();
             return services;

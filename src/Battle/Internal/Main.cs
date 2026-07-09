@@ -4,6 +4,7 @@
     using Core;
     using Core.Battle;
     using Core.Data;
+    using Core.Entity;
     using Core.Events;
     using Core.Events.GameEvents;
     using Core.Services;
@@ -19,6 +20,7 @@
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
         private IUiElementsManager? _uiElementProvider;
         private IGameEventBus? _gameEventBus;
+        private BattleContext? _activeContext;
         [Export] private MainWorld? _mainWorld;
         [Export] private UiLayerManager? _layerManager;
 
@@ -41,6 +43,7 @@
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
+            _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
         }
 
         public override void _ExitTree()
@@ -49,7 +52,12 @@
             // keep calling handlers on a freed node.
             _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
+            _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
         }
+
+        /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.</summary>
+        private void OnBattleJoinRequest(BattleJoinRequestEvent evnt) =>
+            _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer);
 
         private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
             _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
@@ -74,11 +82,14 @@
         private async void OnBattleInitialized(BattleInitializedEvent evnt)
         {
             BattleContext? context = null;
+            BattleSiteMarker? battleSite = null;
             try
             {
                 ArgumentNullException.ThrowIfNull(_uiElementProvider);
                 ArgumentNullException.ThrowIfNull(_mainWorld);
+                battleSite = CreateBattleSiteMarker(evnt.Player);
                 context = new BattleContext(evnt.Player, evnt.Entities, _mainWorld, _provider, this);
+                _activeContext = context;
                 await ToSignal(GetTree(), "process_frame");
                 var result = await context.RunBattleAsync();
                 _gameEventBus?.Publish(new BattleEndEvent(result));
@@ -92,8 +103,23 @@
             {
                 // Dispose must survive a crashed battle: it returns the fighters to the world
                 // and frees the arena — otherwise the NPCs vanish with the leaked arena node.
+                _activeContext = null;
+                battleSite?.QueueFree();
                 context?.Dispose();
             }
+        }
+
+        /// <summary>The world-side presence of the battle: the player's node leaves the world for the
+        /// arena, the marker stays at the engagement point so latecomers have something to reach.</summary>
+        private BattleSiteMarker? CreateBattleSiteMarker(IFightable player)
+        {
+            if (_mainWorld == null || _gameEventBus == null || player is not Node2D playerNode) return null;
+
+            var marker = new BattleSiteMarker();
+            _mainWorld.AddChild(marker);
+            marker.GlobalPosition = playerNode.GlobalPosition;
+            marker.Setup(_gameEventBus);
+            return marker;
         }
     }
 }

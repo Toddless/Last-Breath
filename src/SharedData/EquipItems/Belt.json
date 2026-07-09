@@ -129,6 +129,72 @@
 				{ "parameter": "Evade", "modifierType": "flat", "value": 800 }
 			],
 			"modifiers": []
+		},
+		{
+			"id": "Belt_Life_Flow",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Unique",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Health", "modifierType": "flat", "value": 300 }
+			],
+			"modifiers": [],
+			"grants": [
+				{
+					"id": "Passive_Skill_Regeneration",
+					"kind": "Passive",
+					"properties": {
+						"percent": 0.05
+					}
+				}
+			]
+		},
+		{
+			"id": "Belt_Mana_Flow",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Unique",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Mana", "modifierType": "flat", "value": 300 }
+			],
+			"modifiers": [],
+			"grants": [
+				{
+					"id": "Passive_Skill_Mana_Regeneration",
+					"kind": "Passive",
+					"properties": {
+						"percent": 0.05
+					}
+				}
+			]
+		},
+		{
+			"id": "Belt_Ether_Flow",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Unique",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "ManaRecovery", "modifierType": "flat", "value": 50 }
+			],
+			"modifiers": [],
+			"grants": [
+				{
+					"id": "Passive_Skill_Mana_To_Barrier",
+					"kind": "Passive",
+					"properties": {
+						"percent": 0.15
+					}
+				}
+			]
 		}
 	]
 }

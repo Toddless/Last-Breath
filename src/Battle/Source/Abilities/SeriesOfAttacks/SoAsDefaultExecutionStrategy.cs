@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.SeriesOfAttacks
 {
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Context;
@@ -15,7 +14,6 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
         {
             var rnd = new RandomNumberGenerator();
             rnd.Randomize();
-            var cts = new CancellationTokenSource();
             int attacks = rnd.RandiRange(ability.MinAttacks, ability.MaxAttacks);
 
             foreach (IFightable target in targets)
@@ -24,12 +22,11 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
 
             async Task ExecuteOnTarget(IFightable target)
             {
-                var scheduler = new AttackContextScheduler();
-                int processedCount = 0;
-                for (int i = 0; i < attacks && processedCount < ability.MaxAttacks; i++)
+                var window = new AttackSeriesWindow(ability, owner, field);
+                for (int i = 0; i < attacks && window.OwnerAttacks < ability.MaxAttacks; i++)
                 {
                     float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         AdditionalDamage = additionalDamage,
@@ -40,22 +37,10 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.
                     ability.AttackModifiers.ApplyAll(context);
 
-                    if (!context.Schedule()) break;
-                    await foreach (var processed in scheduler.RunQueue(cts.Token))
-                    {
-                        // Every owner attack processed within the series counts as an ability hit —
-                        // including extra attacks spawned by reactions — so impact riders fire for each.
-                        if (processed.Attacker.InstanceId == owner.InstanceId)
-                        {
-                            processedCount++;
-                            await ability.ApplyImpactRiders(processed.ToImpact(field));
-                        }
-
-                        if (processed.Result is not AttackResults.Evaded || !ability.IsEvadable || processedCount < 2) continue;
-
-                        await cts.CancelAsync();
-                        return;
-                    }
+                    // An evade past the second hit aborts the rest of the series (unless made unevadable).
+                    bool resolved = await window.ResolveAsync(context, processed =>
+                        Task.FromResult(processed.Result is not AttackResults.Evaded || !ability.IsEvadable || window.OwnerAttacks < 2));
+                    if (!resolved) return;
                 }
             }
         }

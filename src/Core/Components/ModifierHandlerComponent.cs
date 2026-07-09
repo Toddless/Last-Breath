@@ -11,28 +11,28 @@ namespace Core.Components
         private readonly ModifierList<IAttackContext> _attackModifiers = new();
         private readonly ModifierList<IDamageContext> _damageModifiers = new();
         private readonly ModifierList<IHealContext> _healModifiers = new();
-        private readonly ModifierList<IManaRecoveryContext> _manaRestoreModifiers = new();
+        private readonly ModifierList<IManaRecoveryContext> _manaRecoveryModifiers = new();
         private readonly ModifierList<IEffectApplicationContext> _effectApplicationModifiers = new();
         private readonly ModifierList<IAbilityActivationContext> _abilityActivationModifiers = new();
 
         public void Add(IAttackModifier modifier) => _attackModifiers.Add(modifier);
         public void Add(IDamageModifier modifier) => _damageModifiers.Add(modifier);
         public void Add(IHealModifier modifier) => _healModifiers.Add(modifier);
-        public void Add(IManaRecoveryModifier modifier) => _manaRestoreModifiers.Add(modifier);
+        public void Add(IManaRecoveryModifier modifier) => _manaRecoveryModifiers.Add(modifier);
         public void Add(IEffectApplicationModifier modifier) => _effectApplicationModifiers.Add(modifier);
         public void Add(IAbilityActivationModifier modifier) => _abilityActivationModifiers.Add(modifier);
 
         public void Remove(IAttackModifier modifier) => _attackModifiers.Remove(modifier);
         public void Remove(IDamageModifier modifier) => _damageModifiers.Remove(modifier);
         public void Remove(IHealModifier modifier) => _healModifiers.Remove(modifier);
-        public void Remove(IManaRecoveryModifier modifier) => _manaRestoreModifiers.Remove(modifier);
+        public void Remove(IManaRecoveryModifier modifier) => _manaRecoveryModifiers.Remove(modifier);
         public void Remove(IEffectApplicationModifier modifier) => _effectApplicationModifiers.Remove(modifier);
         public void Remove(IAbilityActivationModifier modifier) => _abilityActivationModifiers.Remove(modifier);
 
         public void Apply(IAttackContext context) => _attackModifiers.Apply(context);
         public void Apply(IDamageContext context) => _damageModifiers.Apply(context);
         public void Apply(IHealContext context) => _healModifiers.Apply(context);
-        public void Apply(IManaRecoveryContext context) => _manaRestoreModifiers.Apply(context);
+        public void Apply(IManaRecoveryContext context) => _manaRecoveryModifiers.Apply(context);
         public void Apply(IEffectApplicationContext context) => _effectApplicationModifiers.Apply(context);
         public void Apply(IAbilityActivationContext context) => _abilityActivationModifiers.Apply(context);
 

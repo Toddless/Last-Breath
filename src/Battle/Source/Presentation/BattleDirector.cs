@@ -26,6 +26,11 @@ namespace Battle.Source.Presentation
     {
         private const float DelayBetweenBeats = 0.1f;
         private const float HitStagger = 0.12f;
+        // Melee lunge: presentation-only movement between spot anchors — "who approaches" is never
+        // a logic decision. Tune the gap/timings to taste.
+        private const float MeleeGap = 120f;
+        private const float ApproachSeconds = 0.25f;
+        private const float ReturnSeconds = 0.20f;
         private const string AttackAnimation = "Fight_Attack";
         private const string HurtAnimation = "Fight_Hurt";
         private const string DeadAnimation = "Dead";
@@ -37,15 +42,17 @@ namespace Battle.Source.Presentation
         private IBattleTimeline? _timeline;
         private IBattleEventBus? _battleEventBus;
         private AbilityVfxPresenter? _vfx;
+        private Func<string, Node2D?>? _findSpot;
         private Task _playback = Task.CompletedTask;
 
         public bool IsPlaying => !_playback.IsCompleted;
 
-        public void Setup(IBattleTimeline timeline, IBattleEventBus battleEventBus, AbilityVfxPresenter? vfx = null)
+        public void Setup(IBattleTimeline timeline, IBattleEventBus battleEventBus, AbilityVfxPresenter? vfx = null, Func<string, Node2D?>? findSpot = null)
         {
             _beatHandlers = CreateBeatHandlers();
             _battleEventBus = battleEventBus;
             _vfx = vfx;
+            _findSpot = findSpot;
             _shownDead.Clear();
             _timeline = timeline;
             _timeline.EntryRecorded += OnEntryRecorded;
@@ -90,6 +97,7 @@ namespace Battle.Source.Presentation
                 while (_pending.Count > 0 && IsInsideTree())
                 {
                     if (TryCollectCastChord(out var cast, out var chord)) await PlayCastChord(cast, chord);
+                    else if (TryCollectAttackPhrase(out var attack, out var resolution)) await PlayAttackPhrase(attack, resolution);
                     else await PlayBeat(_pending.Dequeue());
                 }
             }
@@ -138,18 +146,90 @@ namespace Battle.Source.Presentation
         /// <summary>A failed beat must not stall the whole playback queue.</summary>
         private async Task PlayBeat(TimelineEntry entry)
         {
-            if (!_beatHandlers.TryGetValue(entry.Event.GetType(), out var handler)) return;
-            if (ShouldSkipPosthumous(entry.Event)) return;
-
             try
             {
-                await handler(entry.Event);
+                await PlayEvent(entry.Event);
                 await WaitAsync(DelayBetweenBeats);
             }
             catch (Exception e)
             {
                 Tracker.TrackException($"Beat playback failed for {entry.Event.GetType().Name}", e, this);
             }
+        }
+
+        private async Task PlayEvent(object evnt)
+        {
+            if (!_beatHandlers.TryGetValue(evnt.GetType(), out var handler)) return;
+            if (ShouldSkipPosthumous(evnt)) return;
+            await handler(evnt);
+        }
+
+        /// <summary>
+        /// One attack as a single visual phrase: the swing and its resolution (hurt/evade/block) play
+        /// at melee range. Attack resolution writes the entries strictly in order, so the resolution
+        /// is always the entry right after its BeforeAttackEvent.
+        /// </summary>
+        private bool TryCollectAttackPhrase(out BeforeAttackEvent attack, out object? resolution)
+        {
+            attack = null!;
+            resolution = null;
+            if (_pending.Peek().Event is not BeforeAttackEvent head) return false;
+
+            _pending.Dequeue();
+            attack = head;
+            if (_pending.Count > 0 && IsResolutionOf(head, _pending.Peek().Event))
+                resolution = _pending.Dequeue().Event;
+            return true;
+        }
+
+        private static bool IsResolutionOf(BeforeAttackEvent attack, object evnt) => evnt switch
+        {
+            DamageTakenEvent damage => ReferenceEquals(damage.Context.Source, attack.Context.Attacker) && damage.Target.IsSame(attack.Context.Target.InstanceId),
+            AttackEvadedEvent evaded => ReferenceEquals(evaded.Context, attack.Context),
+            AttackBlockedEvent blocked => ReferenceEquals(blocked.Context, attack.Context),
+            _ => false
+        };
+
+        private async Task PlayAttackPhrase(BeforeAttackEvent attack, object? resolution)
+        {
+            try
+            {
+                bool showAttacker = !IsShownDead(attack.Context.Attacker);
+                if (showAttacker) await MoveToMeleeRangeAsync(attack.Context.Attacker, attack.Context.Target);
+                if (showAttacker) await PlayAttack(attack);
+                if (resolution != null) await PlayEvent(resolution);
+                if (showAttacker) await ReturnToSpotAsync(attack.Context.Attacker);
+                await WaitAsync(DelayBetweenBeats);
+            }
+            catch (Exception e)
+            {
+                Tracker.TrackException("Attack phrase playback failed", e, this);
+            }
+        }
+
+        /// <summary>Runs the attacker's node from its spot to arm's reach of the target's spot.
+        /// Missing spot lookup degrades to attacking in place.</summary>
+        private async Task MoveToMeleeRangeAsync(IFightable attacker, IFightable target)
+        {
+            if (attacker is not Node2D node || _findSpot == null) return;
+            var attackerSpot = _findSpot(attacker.InstanceId);
+            var targetSpot = _findSpot(target.InstanceId);
+            if (attackerSpot == null || targetSpot == null || attackerSpot == targetSpot) return;
+
+            var direction = (attackerSpot.GlobalPosition - targetSpot.GlobalPosition).Normalized();
+            var anchor = targetSpot.GlobalPosition + (direction * MeleeGap);
+            var tween = node.CreateTween();
+            tween.TweenProperty(node, "global_position", anchor, ApproachSeconds);
+            await ToSignal(tween, Tween.SignalName.Finished);
+        }
+
+        /// <summary>Back to the spot origin (the fighter's node lives as the spot's child at zero).</summary>
+        private async Task ReturnToSpotAsync(IFightable attacker)
+        {
+            if (attacker is not Node2D node || node.Position == Vector2.Zero) return;
+            var tween = node.CreateTween();
+            tween.TweenProperty(node, "position", Vector2.Zero, ReturnSeconds);
+            await ToSignal(tween, Tween.SignalName.Finished);
         }
 
         private Dictionary<Type, Func<object, Task>> CreateBeatHandlers() => new()
@@ -162,7 +242,16 @@ namespace Battle.Source.Presentation
             [typeof(AttackEvadedEvent)] = evnt => RepublishBeat((AttackEvadedEvent)evnt),
             [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
             [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
+            // Deaths outside a damage beat (Incineration's Kill): the corpse must still fall on screen.
+            // No republish — the battle bus received the event at resolve time.
+            [typeof(EntityDiedEvent)] = evnt => PlayEntityDied((EntityDiedEvent)evnt),
         };
+
+        private Task PlayEntityDied(EntityDiedEvent evnt)
+        {
+            if (!IsShownDead(evnt.Entity)) ShowDeath(evnt.Entity);
+            return Task.CompletedTask;
+        }
 
         private Task RepublishBeat<T>(T evnt)
             where T : IBattleEvent
@@ -260,6 +349,18 @@ namespace Battle.Source.Presentation
                 }
                 else if (visual is { Delivery: VfxDeliveryKind.Chain } && _vfx != null)
                     await PlayChain(cast, hits, visual);
+                else if (visual is { MeleeApproach: true })
+                {
+                    // Melee series: the caster runs up to each target in turn, the hits land at
+                    // arm's reach, one return home at the end of the whole cast.
+                    foreach (var group in hits.GroupBy(hit => hit.Target.InstanceId))
+                    {
+                        await MoveToMeleeRangeAsync(cast.Caster, group.First().Target);
+                        await PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId);
+                    }
+
+                    await ReturnToSpotAsync(cast.Caster);
+                }
                 else
                 {
                     var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);

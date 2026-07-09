@@ -244,6 +244,12 @@ msgstr "Save/Load"
 # Effects (battle)
 # ------------------------------
 
+msgid "Effect_Incineration"
+msgstr "Incineration"
+
+msgid "Effect_Incineration_Description"
+msgstr "A burning target dies when critically hit. Lasts {Duration|turn|turns}."
+
 msgid "Effect_Fury"
 msgstr "Fury"
 
@@ -309,11 +315,20 @@ msgstr "Increases healing efficiency by {value}"
 msgid "Context_Modifier_BleedDuration"
 msgstr "Increases bleed duration by {value}"
 
-msgid "Context_Modifier_BurningBonusStacks"
+msgid "Context_Modifier_BleedDamage"
+msgstr "Increases bleed damage by {value}"
+
+msgid "Context_Modifier_BurningStacks"
 msgstr "Applies {value} additional burning stack"
 
-msgid "Context_Modifier_BurningDotDamage"
+msgid "Context_Modifier_BurningDamage"
 msgstr "Increases burning damage by {value}"
+
+msgid "Context_Modifier_ManaOnHit"
+msgstr "Restores {value} mana on hit"
+
+msgid "Context_Modifier_HealthOnHit"
+msgstr "Restores {value} health on hit"
 
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
@@ -949,6 +964,21 @@ msgstr ""
 
 msgid "Belt_Of_Life"
 msgstr "Belt of Life"
+
+msgid "Belt_Life_Flow"
+msgstr "Flow of Life"
+
+msgid "Belt_Mana_Flow"
+msgstr "Flow of Mana"
+
+msgid "Belt_Ether_Flow"
+msgstr "Flow of Ether"
+
+msgid "Body_Power"
+msgstr "Armor of Power"
+
+msgid "Body_Ice_Mage"
+msgstr "Ice Mage's Armor"
 
 msgid "Belt_Of_Life_Description"
 msgstr ""

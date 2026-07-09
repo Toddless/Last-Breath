@@ -73,9 +73,9 @@ namespace Core.Items
             EquipmentPiece = source.EquipmentPiece;
             Id = source.Id;
             Tags = [.. source.Tags];
-            // TODO:
-            // иконки загружаются лениво, что мы здесь передаем??
-            Icon = source.Icon;
+            // Icon is intentionally NOT copied: the path derives from Id, so the copy lazy-loads its
+            // own texture on first access. Reading source.Icon here would force a ResourceLoader call
+            // on every copy — and hard-crash hosts without the Godot runtime (tests, simulations).
             Rarity = source.Rarity;
             UpdateLevel = source.UpdateLevel;
             MaxUpdateLevel = source.MaxUpdateLevel;

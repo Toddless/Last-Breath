@@ -138,7 +138,63 @@
 				{ "parameter": "Barrier", "modifierType": "flat", "value": 350 },
 				{ "parameter": "Health", "modifierType": "flat", "value": 500 }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": [
+				{
+					"id": "Passive_Skill_Porcupine",
+					"kind": "Passive",
+					"properties": {
+						"damagePercent": 0.15,
+						"armorPercent": 0.25
+					}
+				}
+			]
+		},
+		{
+			"id": "Body_Power",
+			"equipmentPart": "Body",
+			"rarity": "Unique",
+			"tags": [ "Body", "Equipment" ],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Armor", "modifierType": "flat", "value": 600 }
+			],
+			"modifiers": [
+				{ "parameter": "Health", "modifierType": "inc", "value": 0.25 }
+			],
+			"grants": [
+				{
+					"id": "Passive_Skill_Meteor",
+					"kind": "Passive",
+					"properties": {
+						"damage": 300
+					}
+				}
+			]
+		},
+		{
+			"id": "Body_Ice_Mage",
+			"equipmentPart": "Body",
+			"rarity": "Unique",
+			"tags": [ "Body", "Equipment" ],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 600 }
+			],
+			"modifiers": [
+				{ "parameter": "Barrier", "modifierType": "inc", "value": 0.25 }
+			],
+			"grants": [
+				{
+					"id": "Passive_Skill_Ice_Meteor",
+					"kind": "Passive",
+					"properties": {
+						"damage": 300
+					}
+				}
+			]
 		},
 		{
 			"id": "Body_No_Way_Back",

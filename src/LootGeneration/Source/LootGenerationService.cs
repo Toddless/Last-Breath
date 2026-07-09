@@ -5,6 +5,7 @@ namespace LootGeneration.Source
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
+    using Core.Components;
     using Core.Context;
     using Core.Data.LootTable;
     using Core.Entity;
@@ -22,7 +23,7 @@ namespace LootGeneration.Source
     public class LootGenerationService : ILootGenerationService
     {
         private readonly Dictionary<string, Dictionary<int, List<TableRecord>>> _tableCache = [];
-        private readonly RandomNumberGenerator _rnd;
+        private readonly IRandomNumberGenerator _rnd;
         private readonly IGameMessageBus _gameMessageBus;
         private readonly IGameEventBus _gameEventBus;
         private readonly IItemCreationService _itemCreationService;
@@ -30,7 +31,7 @@ namespace LootGeneration.Source
         private ILootConfiguration _configuration;
 
         public LootGenerationService(
-            RandomNumberGenerator rnd,
+            IRandomNumberGenerator rnd,
             IGameEventBus eventBus,
             IGameMessageBus messageBus,
             IItemCreationService itemCreationService,
@@ -93,20 +94,44 @@ namespace LootGeneration.Source
         {
             Dictionary<int, int> tiersAmount = new() { [0] = 0, [1] = 0, [2] = 0, [3] = 0 };
             List<string> chosenItemsIds = [];
+            // A roll can fail without spending budget (empty tier, no affordable item) — cap those so a
+            // sparse loot table can never spin this loop forever.
+            int wastedRolls = 0;
+            const int MaxWastedRolls = 100;
             while (budget > tierPrices[^1])
             {
+                if (wastedRolls >= MaxWastedRolls)
+                {
+                    Tracker.TrackError($"Loot rolls aborted after {MaxWastedRolls} wasted rolls, remaining budget: {budget}.", this);
+                    break;
+                }
+
                 int chosenTier = MakeRoll(actualTierChances);
-                chosenTier = tryUpgradeTier(chosenTier, _rnd.Randf());
+                chosenTier = tryUpgradeTier(chosenTier, _rnd.RandFloat());
 
-                if (chosenTier < 0 || chosenTier >= tierPrices.Length) continue;
+                if (chosenTier < 0 || chosenTier >= tierPrices.Length)
+                {
+                    wastedRolls++;
+                    continue;
+                }
+
                 if (tierPrices[chosenTier] > budget) chosenTier = FindFirstSuitableTier(budget);
-                if (!modifiedTable.TryGetValue(chosenTier, out var tableRecords) || tableRecords.Count == 0) continue;
+                if (!modifiedTable.TryGetValue(chosenTier, out var tableRecords) || tableRecords.Count == 0)
+                {
+                    wastedRolls++;
+                    continue;
+                }
 
-                int randomNumber = _rnd.RandiRange(0, tableRecords.Count - 1);
+                int randomNumber = _rnd.RandIntRange(0, tableRecords.Count - 1);
                 var randomItem = tableRecords[randomNumber];
 
                 if (randomItem.Price > budget) randomItem = FindFirstSuitableItem(tableRecords, budget);
-                if (randomItem == null || string.IsNullOrWhiteSpace(randomItem.Id)) continue;
+                if (randomItem == null || string.IsNullOrWhiteSpace(randomItem.Id))
+                {
+                    wastedRolls++;
+                    continue;
+                }
+
                 tiersAmount[chosenTier]++;
                 budget -= randomItem.Price;
                 chosenItemsIds.Add(randomItem.Id);
@@ -121,42 +146,44 @@ namespace LootGeneration.Source
         {
             var items = new List<ItemStack>();
             var rarityAmount = Enum.GetValues<Rarity>().ToDictionary(x => x, _ => 0);
-            try
+            foreach (string id in chosenItemsIds)
             {
-                foreach (string id in chosenItemsIds)
+                if (string.IsNullOrWhiteSpace(id)) continue;
+
+                // looking for stackable item
+                var existingItemStack = items.FirstOrDefault(itemStack => itemStack.Item.Id == id && itemStack.Item is not IEquipItem);
+
+                if (existingItemStack != null)
                 {
-                    if (string.IsNullOrWhiteSpace(id)) continue;
+                    existingItemStack.Stack++;
+                    rarityAmount[existingItemStack.Item.Rarity]++;
+                    continue;
+                }
 
-                    // looking for stackable item
-                    var existingItemStack = items.FirstOrDefault(itemStack => itemStack.Item.Id == id && itemStack.Item is not IEquipItem);
-
-                    if (existingItemStack != null)
-                    {
-                        existingItemStack.Stack++;
-                        rarityAmount[existingItemStack.Item.Rarity]++;
-                        continue;
-                    }
-
+                // One bad id (a table entry without item data) must not swallow the rest of the drop —
+                // especially the guaranteed items appended after the rolled ones.
+                try
+                {
                     Rarity rarity = context.TryUpgradeRarity((Rarity)MakeRoll(actualRarityChances));
-                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance,
-                        _configuration.ItemModifierMultiplier * context.TotalDifficultyMultiplier);
+                    // ItemModifierMultiplier is the stat gain per point of total difficulty: no modifiers → items at data values.
+                    float modifierMultiplier = 1f + _configuration.ItemModifierMultiplier * context.TotalDifficultyMultiplier;
+                    var item = _itemCreationService.CreateItem(id, context.AdditionalItemEffects, rarity, _configuration.EquipItemEffectChance, modifierMultiplier);
                     rarityAmount[item.Rarity]++;
                     items.Add(new ItemStack(item) { Stack = 1 });
                 }
+                catch (Exception ex)
+                {
+                    Tracker.TrackException($"Failed to create loot item '{id}'.", ex, this);
+                }
+            }
 
-                _gameEventBus.Publish(new EquipRarityChosenEvent(rarityAmount));
-                return items;
-            }
-            catch (Exception ex)
-            {
-                Tracker.TrackException($"Failed to generate chosen items.", ex, this);
-                return items;
-            }
+            _gameEventBus.Publish(new EquipRarityChosenEvent(rarityAmount));
+            return items;
         }
 
         private int MakeRoll(float[] chances)
         {
-            float roll = _rnd.Randf();
+            float roll = _rnd.RandFloat();
             float cumulative = 0f;
 
             for (int i = 0; i < chances.Length; i++)
@@ -179,7 +206,8 @@ namespace LootGeneration.Source
             return tierPrices.Length - 1;
         }
 
-        private TableRecord? FindFirstSuitableItem(List<TableRecord> tableRecords, float budget) => tableRecords.FirstOrDefault(x => x.Price >= budget);
+        private TableRecord? FindFirstSuitableItem(List<TableRecord> tableRecords, float budget) =>
+            tableRecords.Where(x => x.Price <= budget).MaxBy(x => x.Price);
 
         private void OnBattleEnds(BattleEndEvent obj)
         {

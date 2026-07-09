@@ -35,16 +35,23 @@
         private TargetSelectionController? _selectionController;
         private IBattleEventBus? _battleEventBus;
         private List<IFightable> _fighters = [];
-        private int _playersEnemiesCount;
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
+
         [Export] private EntitySpot? _playerSpot;
+
+        // ВАЖНО: без назначенного директора бой не завершается победой — смерти доезжают до арены
+        // только репаблишем EntityDiedEvent при проигрыше битов (replay-модель). Headless/тестовой
+        // арене нужен фейковый директор, иначе цикл ходов крутится вечно.
         [Export] private BattleDirector? _director;
         [Export] private AbilityVisualLibrary? _visualLibrary;
         private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
         private readonly HashSet<string> _fledIds = [];
+        // Corpses freed their spots for latecomers but stay visible on the field until the
+        // context returns them to the world; they also serve as presentation anchors.
+        private readonly System.Collections.Generic.Dictionary<string, Node2D> _parkedCorpses = [];
 
         /// <summary>The ordered record of the current battle; the presentation layer replays it.</summary>
         public IBattleTimeline Timeline => _timeline;
@@ -99,28 +106,33 @@
             EnsureGroup(player); // ally/enemy semantics are group-based; companions will join this group later
         }
 
-        public void RemovePlayerFromArena() => _playerSpot?.RemoveEntityFromSpot();
+        public void RemovePlayerFromArenaSpot() => _playerSpot?.RemoveEntityFromSpot();
         public Vector2 GetCameraPosition() => GlobalPosition;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public IReadOnlyList<IFightable> GetEnemies(IFightable entity) =>
-            _fighters.Where(fighter => fighter.IsAlive && !AreAllies(entity, fighter)).ToList();
+            _fighters.Where(fighter => IsPresent(fighter) && !AreAllies(entity, fighter)).ToList();
 
         /// <summary>Living groupmates, the entity itself excluded.</summary>
         public IReadOnlyList<IFightable> GetAllies(IFightable entity) =>
-            _fighters.Where(fighter => fighter.IsAlive && !fighter.IsSame(entity.InstanceId) && AreAllies(entity, fighter)).ToList();
+            _fighters.Where(fighter => IsPresent(fighter) && !fighter.IsSame(entity.InstanceId) && AreAllies(entity, fighter)).ToList();
 
-        public IReadOnlyList<IFightable> GetAll() => _fighters.Where(x => x.IsAlive).ToList();
+        public IReadOnlyList<IFightable> GetAll() => _fighters.Where(IsPresent).ToList();
 
         public IFightable GetRandomEntity(IFightable entity)
         {
-            var alive = _fighters.Where(x => x.IsAlive).ToList();
+            var alive = _fighters.Where(IsPresent).ToList();
 
             return alive[_rnd.RandiRange(0, alive.Count - 1)];
         }
 
-        public void RemoveAliveEntitiesFromArena()
+        /// <summary>Still on the field: alive and not fled. Dead fighters stay in the roster
+        /// (the context returns their bodies to the world), so every query must filter here.</summary>
+        private bool IsPresent(IFightable fighter) =>
+            fighter.IsAlive && !_fledIds.Contains(fighter.InstanceId);
+
+        public void RemoveEntitiesFromArenaSpots()
         {
             foreach (var spot in _spots)
                 spot.RemoveEntityFromSpot();
@@ -141,11 +153,14 @@
             _combatTextPresenter.Setup(battleEventBus, FindSpotFor);
         }
 
-        /// <summary>Anchor for floating combat text: the spot currently holding the entity.</summary>
+        /// <summary>Anchor for floating combat text and melee approach: the spot currently holding
+        /// the entity, or the parked corpse node itself (its spot was freed for a latecomer).</summary>
         private Node2D? FindSpotFor(string instanceId)
         {
             if (_playerSpot?.Entity?.IsSame(instanceId) == true) return _playerSpot;
-            return _spots.FirstOrDefault(spot => spot.Entity?.IsSame(instanceId) == true);
+            var spot = _spots.FirstOrDefault(s => s.Entity?.IsSame(instanceId) == true);
+            if (spot != null) return spot;
+            return _parkedCorpses.GetValueOrDefault(instanceId);
         }
 
         public IFightable GetRandomAlly(IFightable entity)
@@ -156,20 +171,28 @@
             return allies[_rnd.RandiRange(0, allies.Count - 1)];
         }
 
-        /// <summary>
-        /// Ally/enemy semantics: same group = allies, everyone outside = enemies.
-        /// A fighter without a group is hostile to everyone and allied only with itself.
-        /// </summary>
-        private static bool AreAllies(IFightable first, IFightable second)
-        {
-            if (first.IsSame(second.InstanceId)) return true;
-            return first.Group != null && ReferenceEquals(first.Group, second.Group);
-        }
 
-        private static void EnsureGroup(IFightable entity)
+
+        /// <summary>
+        /// A latecomer enters the ongoing battle: takes a free spot, joins the roster and the
+        /// timeline (queue picks it up on the next round). Multi-sided by design — an enemy keeps
+        /// its own group, a companion joins the player's.
+        /// </summary>
+        public bool TryJoinBattle(IFightable fighter, bool alliedWithPlayer)
         {
-            if (entity.Group != null) return;
-            new EntityGroup().TryAddToGroup(entity);
+            if (_battleEventBus == null || _battleOutcome != null) return false;
+            if (_fighters.Any(existing => existing.IsSame(fighter.InstanceId))) return false;
+
+            var freeSpot = _spots.FirstOrDefault(spot => !spot.HasEntityInit());
+            if (freeSpot == null) return false;
+
+            if (alliedWithPlayer && _player != null) _player.Group?.TryAddToGroup(fighter);
+
+            _fighters.Add(fighter);
+            freeSpot.SetEntity(fighter);
+            freeSpot.SetBattleEventBus(_battleEventBus);
+            _timeline.Attach(fighter.CombatEvents);
+            return true;
         }
 
         public bool PrepareBattleArena(List<IFightable> fighters)
@@ -183,27 +206,20 @@
                 return false;
             }
 
-            int enemiesCount = fighters.Count;
+            // Own copy: death/flee bookkeeping must never mutate the caller's participant list —
+            // the context returns EVERYONE (bodies of the dead included) to the world from it.
+            _fighters = [.. fighters];
+            if (_player != null) _fighters.Add(_player);
 
-            for (int i = 0; i < enemiesCount; i++)
+            for (int i = 0; i < fighters.Count; i++)
             {
-                var npc = fighters[i];
-                _fighters.Add(npc);
-                _spots[i].SetEntity(npc);
-            }
-
-            _playersEnemiesCount = enemiesCount;
-
-            _fighters = fighters;
-            if (_player != null)
-                _fighters.Add(_player);
-
-            foreach (var spot in _spots)
-            {
-                if (!spot.HasEntityInit()) continue;
+                var spot = _spots[i];
+                spot.SetEntity(fighters[i]);
                 spot.SetBattleEventBus(_battleEventBus);
             }
 
+            // TODO:
+            // Сейчас на арене создан только спот для игрока. НЕобходимы споты для союзников
             _playerSpot?.SetBattleEventBus(_battleEventBus);
             SetupTargetSelectionController();
             SetupCombatTextPresenter(_battleEventBus);
@@ -213,6 +229,33 @@
             var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
             return true;
+        }
+
+        /// <summary>NPC cast path: straight to Execute — TargetSelectionController is the player's UI path.</summary>
+        public Task CastAbilityAsync(IFightable caster, IAbility ability, IReadOnlyList<IFightable> targets) =>
+            ability.Execute(targets.ToList(), this);
+
+        public async Task BasicAttackAsync(IFightable attacker, IFightable target)
+        {
+            var context = CreateAttackContext(attacker, target);
+            context.RawCriticalChance = attacker.Parameters.CriticalChance;
+            _attackContextScheduler.Schedule(context);
+            await _attackContextScheduler.DrainQueue();
+        }
+
+        /// <summary>
+        /// The fighter leaves the battle alive: out of the fighter list and the enemy count,
+        /// its state restores with everyone else on battle end. Counts toward victory like a death.
+        /// </summary>
+        public Task FleeBattleAsync(IFightable fighter)
+        {
+            if (!_fledIds.Add(fighter.InstanceId)) return Task.CompletedTask;
+
+            // Timeline for the future flee beat/log entry; battle bus for the XP processor.
+            fighter.CombatEvents.Publish(new EntityFledBattleEvent(fighter));
+            _battleEventBus?.Publish(new EntityFledBattleEvent(fighter));
+            CheckPlayerVictory();
+            return Task.CompletedTask;
         }
 
         public async Task<BattleResults> RunBattleAsync()
@@ -260,7 +303,7 @@
                 // doesn't start until the director has shown everything recorded so far.
                 await WaitForPresentationAsync();
 
-                var queue = _queueScheduler.RefillIfEmpty(_fighters);
+                var queue = _queueScheduler.RefillIfEmpty(_fighters.Where(IsPresent).ToList());
                 if (queue.Count > 1)
                     _battleEventBus?.Publish(new BattleQueueDefinedEvent(queue));
             }
@@ -281,7 +324,8 @@
 
         private void SetupBattleDirector(IBattleEventBus battleEventBus)
         {
-            _director?.Setup(_timeline, battleEventBus, CreateVfxPresenter());
+            // FindSpotFor doubles as the melee-approach anchor lookup for attack phrases.
+            _director?.Setup(_timeline, battleEventBus, CreateVfxPresenter(), FindSpotFor);
         }
 
         /// <summary>VFX live in arena space (spot anchors); without a library the director plays without ability VFX.</summary>
@@ -297,6 +341,22 @@
             AddChild(presenter);
             presenter.Setup(FindSpotFor, _visualLibrary);
             return presenter;
+        }
+
+        /// <summary>
+        /// Ally/enemy semantics: same group = allies, everyone outside = enemies.
+        /// A fighter without a group is hostile to everyone and allied only with itself.
+        /// </summary>
+        private static bool AreAllies(IFightable first, IFightable second)
+        {
+            if (first.IsSame(second.InstanceId)) return true;
+            return first.Group != null && ReferenceEquals(first.Group, second.Group);
+        }
+
+        private static void EnsureGroup(IFightable entity)
+        {
+            if (entity.Group != null) return;
+            new EntityGroup().TryAddToGroup(entity);
         }
 
         /// <summary>Every fighter's personal bus feeds the shared timeline; entries arrive in causal order.</summary>
@@ -358,44 +418,36 @@
         // ICombatEnvironment: the primitives the NPC turn planner acts through.
         IBattleField ICombatEnvironment.Field => this;
 
-        /// <summary>NPC cast path: straight to Execute — TargetSelectionController is the player's UI path.</summary>
-        public Task CastAbilityAsync(IFightable caster, IAbility ability, IReadOnlyList<IFightable> targets) =>
-            ability.Execute(targets.ToList(), this);
-
-        public async Task BasicAttackAsync(IFightable attacker, IFightable target)
-        {
-            var context = CreateAttackContext(attacker, target);
-            context.RawCriticalChance = attacker.Parameters.CriticalChance;
-            _attackContextScheduler.Schedule(context);
-            await _attackContextScheduler.DrainQueue();
-        }
-
-        /// <summary>
-        /// The fighter leaves the battle alive: out of the fighter list and the enemy count,
-        /// its state restores with everyone else on battle end. Counts toward victory like a death.
-        /// </summary>
-        public Task FleeBattleAsync(IFightable fighter)
-        {
-            if (!_fledIds.Add(fighter.InstanceId)) return Task.CompletedTask;
-
-            // Timeline for the future flee beat/log entry; battle bus for the XP processor.
-            fighter.CombatEvents.Publish(new EntityFledBattleEvent(fighter));
-            _battleEventBus?.Publish(new EntityFledBattleEvent(fighter));
-            RemoveEnemyFromFight(fighter);
-            return Task.CompletedTask;
-        }
-
         private void OnEntityDead(EntityDiedEvent obj)
         {
             if (obj.Entity is IPlayer) return; // the player's defeat resolves through PlayerDiedEvent
-            RemoveEnemyFromFight(obj.Entity);
+            FreeSpotOf(obj.Entity);
+            CheckPlayerVictory();
         }
 
-        private void RemoveEnemyFromFight(IFightable entity)
+        /// <summary>Death frees the spot for latecomers: the corpse reparents to the arena at the
+        /// same position (still lying on the field, returned to the world by the context at the end).</summary>
+        private void FreeSpotOf(IFightable entity)
         {
-            _playersEnemiesCount--;
-            _fighters.Remove(entity);
-            if (_playersEnemiesCount > 0) return;
+            var spot = _spots.FirstOrDefault(s => s.Entity?.IsSame(entity.InstanceId) == true);
+            if (spot == null || entity is not Node2D corpse) return;
+
+            var worldPosition = corpse.GlobalPosition;
+            spot.RemoveEntityFromSpot();
+            AddChild(corpse);
+            corpse.GlobalPosition = worldPosition;
+            _parkedCorpses[entity.InstanceId] = corpse;
+        }
+
+
+        /// <summary>
+        /// Group-based outcome: the player wins when no enemy of HIS group is standing.
+        /// An ally's death or flight never shrinks the enemy side by accident.
+        /// </summary>
+        private void CheckPlayerVictory()
+        {
+            if (_player == null) return;
+            if (_fighters.Any(fighter => IsPresent(fighter) && !AreAllies(_player, fighter))) return;
 
             // No standing enemies: dead or fled, the player took the field.
             if (_playerTargetTcs is { Task.IsCompleted: false })
@@ -407,7 +459,7 @@
 
         private class BattleOutcome(BattleResults results)
         {
-            public BattleResults Results = results;
+            public readonly BattleResults Results = results;
         }
     }
 }

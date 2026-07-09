@@ -24,7 +24,7 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => throw new System.NotImplementedException();
+        public override ISkill Copy() => new SilentFuryPassive(SilenceSealChance);
 
         public override bool IsStronger(ISkill skill)
         {

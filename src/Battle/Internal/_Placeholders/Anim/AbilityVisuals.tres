@@ -10,6 +10,7 @@ AbilityId = "Ability_Armageddon"
 Delivery = 3
 CastClip = "Ability_Armageddon"
 ImpactClip = "Ability_Armageddon_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_51yah"]
@@ -24,6 +25,7 @@ script = ExtResource("1_cfg")
 AbilityId = "Ability_Berserk_Fury"
 CastClip = "Ability_Berserk_Fury"
 ImpactClip = "Ability_Berserkk_Fury_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_07b7h"]
@@ -54,6 +56,7 @@ script = ExtResource("1_cfg")
 AbilityId = "Ability_Double_Strike"
 CastClip = "Ability_Double_Strike"
 ImpactClip = "Ability_Double_Strike_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_ay3os"]
@@ -70,6 +73,7 @@ script = ExtResource("1_cfg")
 AbilityId = "Ability_Head_Butt"
 CastClip = "Ability_Head_Butt"
 ImpactClip = "Ability_Head_Butt_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_kkt3r"]
@@ -102,6 +106,7 @@ script = ExtResource("1_cfg")
 AbilityId = "Ability_Increasing_Pressure"
 CastClip = "Ability_Increasing_Pressure"
 ImpactClip = "Ability_Increasing_Pressure_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_vn3yq"]
@@ -162,6 +167,7 @@ script = ExtResource("1_cfg")
 AbilityId = "Ability_Series_Of_Attacks"
 CastClip = "Ability_Series_Of_Attacks"
 ImpactClip = "Ability_Series_Of_Attacks_Impact"
+MeleeApproach = true
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [resource]

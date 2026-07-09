@@ -45,6 +45,16 @@
         bool IsFirst { get; }
         bool IsLast { get; }
 
+        /// <summary>Length of the reaction chain behind this attack: 0 = planned attack,
+        /// 1 = reaction to it (counter, chain hit), 2 = reaction to a reaction... The scheduler
+        /// refuses over-deep chains, so mutual reactions can never hang the battle.</summary>
+        int ReactionDepth { get; }
+        bool IsReaction => ReactionDepth > 0;
+
+        /// <summary>The one way to spawn a reaction attack: inherits the scheduler and rng of the
+        /// triggering attack, deepens the chain by one, rolls crit from the reactor's parameter.</summary>
+        IAttackContext CreateReaction(IFightable attacker, IFightable target, float baseDamage);
+
         bool Schedule();
     }
 }

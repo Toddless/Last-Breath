@@ -18,6 +18,9 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="LastBreathTest" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Source\Assets\" />
   </ItemGroup>
 </Project>

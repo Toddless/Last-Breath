@@ -13,7 +13,9 @@
 
         static Tracker()
         {
-            var logPath = ProjectSettings.GlobalizePath("user://log.txt");
+            // ProjectSettings is a native engine call: outside Godot (tests, simulations) it is a fatal
+            // access violation no try/catch can stop — non-Godot hosts MUST set the override first.
+            string logPath = TrackerBootstrap.LogPathOverride ?? ProjectSettings.GlobalizePath("user://log.txt");
             s_logger = new LoggerConfiguration()
                 .WriteTo.File(logPath,
                 outputTemplate: "\n{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}]  {Message:lj}. Source: {Source}, Method: {Method}, Line: {Line} {NewLine}{Exception}  \n CallStack: {CallStack}")

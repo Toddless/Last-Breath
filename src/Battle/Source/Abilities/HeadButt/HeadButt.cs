@@ -2,7 +2,6 @@ namespace Battle.Source.Abilities.HeadButt
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -99,16 +98,15 @@ namespace Battle.Source.Abilities.HeadButt
         {
             var rnd = new Godot.RandomNumberGenerator();
             rnd.Randomize();
-            var cts = new CancellationTokenSource();
 
             foreach (IFightable target in targets)
             {
-                var scheduler = new AttackContextScheduler();
+                var window = new AttackSeriesWindow(this, owner, field);
                 for (int i = 0; i < Attacks; i++)
                 {
                     if (!target.IsAlive) break;
                     float additionalDamage = Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale);
-                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, scheduler)
+                    var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
@@ -118,13 +116,14 @@ namespace Battle.Source.Abilities.HeadButt
                         SourceAbilityId = Id
                     };
 
-                    if (!context.Schedule()) break;
-                    await foreach (var processed in scheduler.RunQueue(cts.Token))
+                    // Every successful owner lunge stuns its target (extra attacks from reactions included).
+                    bool resolved = await window.ResolveAsync(context, async processed =>
                     {
-                        if (processed.Attacker.InstanceId != owner.InstanceId) continue;
-                        if (processed.Result is AttackResults.Succeed) await ApplyStun(owner, processed.Target);
-                        await ApplyImpactRiders(processed.ToImpact(field));
-                    }
+                        if (processed.Attacker.InstanceId == owner.InstanceId && processed.Result is AttackResults.Succeed)
+                            await ApplyStun(owner, processed.Target);
+                        return true;
+                    });
+                    if (!resolved) break;
                 }
             }
         }

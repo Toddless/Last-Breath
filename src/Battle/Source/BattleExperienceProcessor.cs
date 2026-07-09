@@ -18,13 +18,15 @@
         private const float FledExperienceFactor = 0.5f;
         private readonly IGameServiceProvider _gameServiceProvider;
         private readonly IBattleEventBus _battleEventBus;
+        private readonly IFightable _player;
         private readonly List<string> _diedEntities = [];
         private int _totalExp;
 
-        public BattleExperienceProcessor(IBattleEventBus eventBus, IGameServiceProvider provider)
+        public BattleExperienceProcessor(IBattleEventBus eventBus, IGameServiceProvider provider, IFightable player)
         {
             _gameServiceProvider = provider;
             _battleEventBus = eventBus;
+            _player = player;
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDiedEvent);
             _battleEventBus.Subscribe<EntityFledBattleEvent>(OnEntityFledEvent);
         }
@@ -72,7 +74,12 @@
             _diedEntities.Add(entity.InstanceId); // counted once: a fled enemy killed later doesn't double-dip
         }
 
-        private bool CanGetExperience(IFightable entity) => entity is not IPlayer && entity is IFightableNpc && !_diedEntities.Contains(entity.InstanceId);
+        /// <summary>Only the player's ENEMIES are worth experience: a fallen companion is a loss, not a reward.</summary>
+        private bool CanGetExperience(IFightable entity) =>
+            entity is not IPlayer && entity is IFightableNpc && !_diedEntities.Contains(entity.InstanceId) && !IsPlayerAlly(entity);
+
+        private bool IsPlayerAlly(IFightable entity) =>
+            entity.Group != null && ReferenceEquals(entity.Group, _player.Group);
 
         private float CalculateTotalMultiplier(EntityType type, Rarity rarity) => 1f + (NpcTypeToMultiplier(type) + RarityToMultiplier(rarity));
 

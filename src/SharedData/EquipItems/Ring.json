@@ -1,4 +1,4 @@
-{
+﻿{
 	"items": [
 		{
 			"id": "Ring_Of_Dwarfs",
@@ -214,7 +214,7 @@
 				{
 					"id": "Passive_Skill_Servant_Hell",
 					"kind": "Passive",
-					"parameters": {
+					"properties": {
 						"chance": 0.1
 					}
 				}
@@ -229,18 +229,16 @@
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 25 }
+				{ "parameter": "Intelligence", "modifierType": "flat", "value": 25 }
 			],
 			"modifiers": [
-				{ "parameter": "Dexterity", "modifierType": "inc", "value": 0.15 }
+				{ "parameter": "Strength", "modifierType": "inc", "value": 0.15 }
 			],
 			"grants": [
 				{
-					"id": "Passive_Skill_Servant_Hell",
+					"id": "Passive_Skill_No_Critical_Hits",
 					"kind": "Passive",
-					"parameters": {
-						"chance": 0.1
-					}
+					"properties": {}
 				}
 			]
 		},
@@ -278,11 +276,24 @@
 			],
 			"modifiers": [
 				{ "parameter": "Damage", "modifierType": "multi", "value": 0.4 },
-				{ "parameter": "CriticalChance", "modifierType": "multi", "value": 0.4 },
-				{ "parameter": "Health", "modifierType": "inc", "value": 0.07 },
-				{ "parameter": "Mana", "modifierType": "inc", "value": 0.07 }
+				{ "parameter": "CriticalChance", "modifierType": "multi", "value": 0.4 }
 			],
-			"grants": []
+			"grants": [
+				{
+					"id": "Passive_Skill_Critical_Leech",
+					"kind": "Passive",
+					"properties": {
+						"percent": 0.07
+					}
+				},
+				{
+					"id": "Passive_Skill_Critical_Mana_Leech",
+					"kind": "Passive",
+					"properties": {
+						"percent": 0.07
+					}
+				}
+			]
 		}
 	]
 }

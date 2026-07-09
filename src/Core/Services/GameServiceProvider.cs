@@ -73,6 +73,8 @@ namespace Core.Services
             services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(
                 provider => provider.GetRequiredService<NotificationService>());
             services.AddSingleton(_ => CreateRandomizedGenerator());
+            services.AddSingleton<Components.IRandomNumberGenerator>(provider =>
+                new Components.GodotRandomNumberGenerator(provider.GetRequiredService<RandomNumberGenerator>()));
         }
 
         private static RandomNumberGenerator CreateRandomizedGenerator()

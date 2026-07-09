@@ -16,6 +16,7 @@ namespace Core.Data.GameData
         public const string World = "World";
         public const string Player = "Player";
         public const string LootTables = "LootTables";
+        public const string LootConfiguration = "LootConfiguration";
         public const string Items = "Items";
         public const string EquipItems = "EquipItems";
         public const string EquipItemResources = "EquipItemResources";

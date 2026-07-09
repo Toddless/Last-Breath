@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Battle\Battle.csproj" />
     <ProjectReference Include="..\Crafting\Crafting.csproj" />
+    <ProjectReference Include="..\LootGeneration\LootGeneration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

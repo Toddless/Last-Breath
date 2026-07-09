@@ -20,6 +20,7 @@
         {
             ContextParameter.HealingEfficiency => new HealBinding(new HealingBonusContextModifier(() => entry.Value)),
             ContextParameter.BleedDuration => new EffectApplicationBinding(new EffectDurationBonusContextModifier(StatusEffects.Bleed, () => entry.WholeValue)),
+            ContextParameter.BleedDamage => new EffectApplicationBinding(new DotDamageBonusContextModifier(StatusEffects.Bleed, () => entry.Value)),
             ContextParameter.BurningStacks => new EffectApplicationBinding(new BonusEffectStacksContextModifier(StatusEffects.Burning, () => entry.WholeValue)),
             ContextParameter.BurningDamage => new EffectApplicationBinding(new DotDamageBonusContextModifier(StatusEffects.Burning, () => entry.Value)),
             ContextParameter.HealthOnHit => new AttackModifierBinding(new HealthOnHitContextModifier(() => entry.WholeValue)),
