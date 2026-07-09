@@ -4,259 +4,139 @@
 			"id": "Body_Strength_Stoneheart",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 700
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 700, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Strength_Iron_Bastion",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Armor",
-					"modifierType": "inc",
-					"value": 0.3
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 800
-				}
+				{ "parameter": "Armor", "modifierType": "flat", "value": 900, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "inc", "value": 0.35, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Strength_Vital_Core",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 800
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "inc",
-					"value": 0.3
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 900, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "inc", "value": 0.35, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Dexterity_Shadowstep",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Dexterity",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 800
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "increase",
-					"value": 0.5
-				}
+				{ "parameter": "Evade", "modifierType": "flat", "value": 900, "scope": "Local" },
+				{ "parameter": "Evade", "modifierType": "inc", "value": 0.35, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Dexterity_Hunters_Dream",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Dexterity",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 800
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Evade", "modifierType": "flat", "value": 500, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "flat", "value": 400, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Dexterity_Feral_Instinct",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Dexterity",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 400
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 500, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "flat", "value": 400, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Intelligence_Eternal_Reserve",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Intelligence",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 900
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "increase",
-					"value": 0.3
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 900, "scope": "Local" },
+				{ "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Intelligence_Arcane_Bulwark",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Intelligence",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 500
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 500, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 500, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Intelligence_Aegis",
 			"equipmentPart": "Body",
 			"rarity": "Common",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Intelligence",
-			"effectId": "",
+			"tags": [ "Body", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 500
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 500, "scope": "Local" },
+				{ "parameter": "Evade", "modifierType": "flat", "value": 500, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Body_Porcupine",
 			"equipmentPart": "Body",
 			"rarity": "Unique",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
+			"tags": [ "Body", "Equipment" ],
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 350
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 350 },
+				{ "parameter": "Health", "modifierType": "flat", "value": 500 }
 			],
 			"modifiers": []
 		},
@@ -264,25 +144,13 @@
 			"id": "Body_No_Way_Back",
 			"equipmentPart": "Body",
 			"rarity": "Unique",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
+			"tags": [ "Body", "Equipment" ],
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 350
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 350 },
+				{ "parameter": "Health", "modifierType": "flat", "value": 500 }
 			],
 			"modifiers": []
 		},
@@ -290,25 +158,13 @@
 			"id": "Body_All_Evade_To_Armor",
 			"equipmentPart": "Body",
 			"rarity": "Mythic",
-			"tags": [
-				"Body",
-				"Equipment"
-			],
-			"attributeType": "Strength",
+			"tags": [ "Body", "Equipment" ],
 			"effectId": "",
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 350
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 350 },
+				{ "parameter": "Health", "modifierType": "flat", "value": 500 }
 			],
 			"modifiers": []
 		}

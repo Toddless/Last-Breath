@@ -49,7 +49,7 @@
         private void OnItemSelected(int identifier)
         {
             _lastSelectedLabelIdentifier = identifier;
-            EmitSignal(global::Crafting.Source.UIElements.ItemModifierList.SignalName.ItemSelected, _lastSelectedLabelIdentifier, this);
+            EmitSignal(SignalName.ItemSelected, _lastSelectedLabelIdentifier, this);
         }
     }
 }

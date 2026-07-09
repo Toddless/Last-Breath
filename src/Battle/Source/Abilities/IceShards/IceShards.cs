@@ -11,7 +11,6 @@ namespace Battle.Source.Abilities.IceShards
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// Intelligence stance. Fires shards of ice at the target; activation stages are cumulative:

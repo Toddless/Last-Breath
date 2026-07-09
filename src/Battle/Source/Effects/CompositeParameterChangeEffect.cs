@@ -5,9 +5,9 @@ namespace Battle.Source.Effects
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
     using Core.Localization;
-    using Decorators;
 
     /// <summary>One parameter change of a composite effect.</summary>
     public record ParameterChange(EntityParameter Parameter, float Value, OperationType Type, Priority Priority);

@@ -10,6 +10,9 @@ namespace Crafting.Internal
     using Core.Items.Grants;
     using Core.Modifiers;
 
+    /// <summary>Crafting-side <see cref="IItemGameDataFactory"/>: the one place that news up domain objects
+    /// (equip items, weapons, recipes, resources, materials, grants) for <see cref="DataParser"/> during data load.
+    /// Basic non-equip items are out of scope for this project and throw.</summary>
     internal sealed class ItemGameDataFactory : IItemGameDataFactory
     {
         public IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags) =>
@@ -21,10 +24,10 @@ namespace Crafting.Internal
         public IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags) =>
             new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
 
-        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers) => kind switch
+        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
         {
             GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
-            GrantKind.Passive => new PassiveSkillGrant(id, id, static () => PassiveSkillProvider.Instance),
+            GrantKind.Passive => new PassiveSkillGrant(id, id, properties, static () => PassiveSkillProvider.Instance),
             _ => null
         };
 

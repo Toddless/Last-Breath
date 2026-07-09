@@ -68,7 +68,7 @@ namespace Battle.Internal.Player
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
 
-        public string Id { get; }
+        public string Id { get; } = "Entity_Player";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public Texture2D? Icon { get; }
@@ -358,6 +358,7 @@ namespace Battle.Internal.Player
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
+            TurnRecovery.Apply(this);
             CombatEvents.Publish(new TurnEndEvent());
             _battleEventBus?.Publish(new TurnEndEvent());
             _gameEventBus?.Publish(new TurnEndEvent());

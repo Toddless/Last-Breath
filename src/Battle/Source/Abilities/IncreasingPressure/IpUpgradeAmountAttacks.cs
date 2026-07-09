@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     public class IpUpgradeAmountAttacks(string id, string[] tags, int tier, int additionalAttacks)
         : SimpleUpgrade<IncreasingPressure, IncreasingPressure.Parameters>(id, tags, tier,

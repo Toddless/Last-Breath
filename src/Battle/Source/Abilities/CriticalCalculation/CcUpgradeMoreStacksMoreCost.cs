@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// L1: increases the number of buff stacks applied and raises the ability's mana cost.

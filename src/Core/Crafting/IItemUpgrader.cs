@@ -11,7 +11,9 @@
     {
         List<IRequirement> GetRecraftResourceCost(Rarity itemRarity, EquipmentCategory itemCategory);
         List<IRequirement> GetUpgradeResourceCost(Rarity itemRarity, EquipmentCategory itemCategory);
-        IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers);
+        /// <summary>Null when the hash targets nothing rerollable (context lines, stale hashes) —
+        /// a blind reroll would add a modifier without removing one.</summary>
+        IModifierInstance? TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers);
         ItemUpgradeResult TryUpgradeItem(IEquipItem item);
     }
 }

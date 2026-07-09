@@ -9,7 +9,7 @@ namespace Battle.Internal.Npc
     /// Drop one into the world scene next to NpcWorldDirector.
     /// </summary>
     [GlobalClass]
-    public partial class DayNightTint : CanvasModulate
+    internal partial class DayNightTint : CanvasModulate
     {
         /// <summary>How fast the tint chases the phase color (fraction per second).</summary>
         [Export] private float _transitionSpeed = 0.5f;

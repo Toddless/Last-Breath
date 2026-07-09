@@ -5,10 +5,9 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
     using Core.Localization;
-    using Decorators;
-    using Godot;
 
     public abstract class ParameterChangeEffect(
         string id,

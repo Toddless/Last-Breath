@@ -11,6 +11,9 @@ namespace LootGeneration.Internal
     using Godot;
     using Source;
 
+    /// <summary>Loot-side item spawner: copies a cached template from <see cref="IItemDataProvider"/> and, for
+    /// equip items, rolls extra item effects and rarity via <see cref="IItemEffectProvider"/>. The runtime entry
+    /// point <see cref="Source.LootGenerationService"/> calls to turn a rolled table id into a concrete drop.</summary>
     public class ItemCreationService(IItemEffectProvider effectProvider, IItemDataProvider dataProvider, RandomNumberGenerator rnd) : IItemCreationService
     {
         public IItem CreateItem(string id)
@@ -35,11 +38,6 @@ namespace LootGeneration.Internal
             if (equip.Rarity is Rarity.Mythic or Rarity.Unique) return;
 
             // concat all item effects with effects from context
-            var allEffects = effectProvider.GetCopyItemsEffects().Concat(additionalItemEffects).ToList();
-            string equipItemEffect = rnd.Randf() <= equipEffectChance
-                ? allEffects[rnd.RandiRange(0, allEffects.Count)]
-                : string.Empty;
-            equip.SetItemEffect(equipItemEffect);
             equip.Rarity = rarity;
 
             var modifiersPool = dataProvider.GetEquipItemModifierPool(equip.Id);

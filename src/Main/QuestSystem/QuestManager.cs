@@ -2,12 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core.Entity;
     using Godot;
-    using Player = Player;
 
     public partial class QuestManager : Node
     {
-        private Player? _player;
+        private IPlayer? _player;
         private readonly HashSet<Quest> _activeQuests = [];
         private readonly HashSet<Quest> _failedQuests = [];
         private readonly HashSet<Quest> _completedQuests = [];

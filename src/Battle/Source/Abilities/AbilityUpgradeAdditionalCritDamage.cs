@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Ability-scoped critical damage bonus (multicast abilities roll their own crits).</summary>
     public class AbilityUpgradeAdditionalCritDamage(string id, string[] tags, int tier, float amount)

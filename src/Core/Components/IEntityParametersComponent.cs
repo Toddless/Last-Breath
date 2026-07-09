@@ -8,6 +8,8 @@
 
     public interface IEntityParametersComponent
     {
+        // TODO:
+        // Слишком абстрактно. Какой это урон? Оружия? Общий? решить позднее
         float Damage { get; }
         float BlockChance { get; }
         float CriticalChance { get; }

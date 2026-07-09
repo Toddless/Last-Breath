@@ -19,8 +19,6 @@
             ui.SetItemPiece(Localization.Localize(item.EquipmentPiece.ToString()));
             ui.SetItemBaseStats(FormatItemModifiers(item.Implicits).ConvertAll(valueTuple => valueTuple.ModifierText));
             ui.SetItemIcon(item.Icon);
-            ui.SetItemEffectName(Localization.Localize(item.ItemEffect));
-            ui.SetItemEffectDescription(Localization.LocalizeDescription(item.ItemEffect));
             ui.SetItemAdditionalStats(FormatAdditionalModifiers());
         }
 

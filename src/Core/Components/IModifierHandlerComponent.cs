@@ -15,16 +15,22 @@ namespace Core.Components
         void Add(IAttackModifier modifier);
         void Add(IDamageModifier modifier);
         void Add(IHealModifier modifier);
+        void Add(IManaRecoveryModifier modifier);
+        void Add(IEffectApplicationModifier modifier);
         void Add(IAbilityActivationModifier modifier);
 
         void Remove(IAttackModifier modifier);
         void Remove(IDamageModifier modifier);
         void Remove(IHealModifier modifier);
+        void Remove(IManaRecoveryModifier modifier);
+        void Remove(IEffectApplicationModifier modifier);
         void Remove(IAbilityActivationModifier modifier);
 
         void Apply(IAttackContext context);
         void Apply(IDamageContext context);
         void Apply(IHealContext context);
+        void Apply(IManaRecoveryContext context);
+        void Apply(IEffectApplicationContext context);
         void Apply(IAbilityActivationContext context);
     }
 }

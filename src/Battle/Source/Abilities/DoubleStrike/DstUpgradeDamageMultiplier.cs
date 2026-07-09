@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L2 upgrade: both strikes deal a percentage more damage.</summary>
     public class DstUpgradeDamageMultiplier(string id, string[] tags, int tier, float amount)

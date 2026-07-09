@@ -26,7 +26,6 @@ namespace Battle.Internal.Npc
     using Core.Services;
     using Godot;
     using Source;
-    using Source.Npc;
     using GameServiceProvider = Services.GameServiceProvider;
 
     public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant, IRequireServices
@@ -53,7 +52,6 @@ namespace Battle.Internal.Npc
         private IFactionRelationService? _factionRelations;
         private INpcWorldRegistry? _npcRegistry;
         private INpcSkirmishService? _skirmishService;
-        private INpcBuffProvider? _npcBuffProvider;
         private IWorldClock? _worldClock;
         private IWorldBrain? _brain;
         private INpcLifecycle? _lifecycle;
@@ -196,7 +194,6 @@ namespace Battle.Internal.Npc
             _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
             _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            _npcBuffProvider = GameServiceProvider.Instance.GetService<INpcBuffProvider>();
             _npcRegistry?.Register(this);
             _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
         }
@@ -495,6 +492,7 @@ namespace Battle.Internal.Npc
         public void OnTurnEnd()
         {
             Effects.TriggerTurnEnd();
+            TurnRecovery.Apply(this);
             CombatEvents.Publish(new TurnEndEvent());
             _battleEventBus?.Publish(new TurnEndEvent());
             _gameEventBus?.Publish(new TurnEndEvent());

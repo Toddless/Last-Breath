@@ -1,15 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://geser04o26s5"]
+[gd_scene format=3 uid="uid://geser04o26s5"]
 
-[ext_resource type="Script" uid="uid://c1iprptnjunjc" path="res://MainWorld.cs" id="1_4xxmu"]
-[ext_resource type="PackedScene" uid="uid://dgagtrp0u08jt" path="res://Player.tscn" id="2_x0tsy"]
-[ext_resource type="PackedScene" uid="uid://b1n7uuocxrrkv" path="res://Npc/test_npc.tscn" id="3_ngold"]
+[ext_resource type="Script" uid="uid://ceaqsxdscqa37" path="res://MainWorld.cs" id="1_4xxmu"]
+[ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Player/Player.tscn" id="2_x0tsy"]
+[ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="3_ngold"]
 
-[node name="MainWorld" type="Node2D"]
+[node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
-[node name="Player" parent="." instance=ExtResource("2_x0tsy")]
+[node name="Player" parent="." unique_id=33183499 instance=ExtResource("2_x0tsy")]
 
-[node name="TestNpc" parent="." instance=ExtResource("3_ngold")]
+[node name="TestNpc" parent="." unique_id=943438874 instance=ExtResource("3_ngold")]
 position = Vector2(961, 342)
 Id = null
 Tags = null

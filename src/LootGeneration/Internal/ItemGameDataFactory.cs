@@ -10,6 +10,9 @@ namespace LootGeneration.Internal
     using Core.Items.Grants;
     using Core.Modifiers;
 
+    /// <summary>LootGeneration-side <see cref="IItemGameDataFactory"/>: news up the domain objects
+    /// <see cref="DataParser"/> produces (equip items, weapons, resources, materials, grants) for this project's
+    /// data load. Public so the loot bootstrap can register it directly. Basic non-equip items are out of scope.</summary>
     public class ItemGameDataFactory : IItemGameDataFactory
     {
         public IItem CreateItem(string id, Rarity rarity, int maxStackSize, string[] tags) =>
@@ -22,10 +25,10 @@ namespace LootGeneration.Internal
             new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
 
         // LootGeneration has no skill infrastructure yet: passive grants resolve to nothing until a provider appears.
-        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers) => kind switch
+        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
         {
             GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
-            GrantKind.Passive => new PassiveSkillGrant(id, id, static () => null),
+            GrantKind.Passive => new PassiveSkillGrant(id, id, properties, static () => null),
             _ => null
         };
 

@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Sacrifice
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Additive bump of one Sacrifice parameter (charges / rate / sacrificed share / heal share).</summary>
     public class SacUpgradeParameter(string id, string[] tags, int tier, Sacrifice.Parameters parameter, float amount)

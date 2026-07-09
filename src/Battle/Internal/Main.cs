@@ -58,6 +58,11 @@
         {
             if (@event is InputEventKey { Keycode: Key.N, Pressed: true })
                 _uiElementProvider?.ToggleWindow(typeof(MartialArtMasteryWindow));
+            if (@event is InputEventKey { Keycode: Key.R, Pressed: true })
+            {
+                // var item = _provider.GetService<IItemGameDataFactory>().CreateEquipItem("Weapon_Bloodthirsty");
+                // GD.Print($"{item.DisplayName}");
+            }
         }
 
         private static Control? CreateNotificationPopup()

@@ -4,226 +4,127 @@
 			"id": "Gloves_Strength_Stoneheart",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 150
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 400
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 400, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Strength_Iron_Bastion",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 450
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "inc",
-					"value": 0.25
-				}
+				{ "parameter": "Armor", "modifierType": "flat", "value": 450, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Strength_Vital_Core",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 350
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "inc",
-					"value": 0.15
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 400, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "inc", "value": 0.15, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Dexterity_Shadowstep",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 600
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "inc",
-					"value": 0.3
-				}
+				{ "parameter": "Evade", "modifierType": "flat", "value": 900, "scope": "Local" },
+				{ "parameter": "Evade", "modifierType": "inc", "value": 0.35, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Dexterity_Hunters_Dream",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 400
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 200
-				}
+				{ "parameter": "Evade", "modifierType": "flat", "value": 400, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "flat", "value": 200, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Dexterity_Feral_Instinct",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 400
-				},
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 200
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 400, "scope": "Local" },
+				{ "parameter": "Health", "modifierType": "flat", "value": 200, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Intelligence_Eternal_Reserve",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "inc",
-					"value": 0.15
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Barrier", "modifierType": "inc", "value": 0.15, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Intelligence_Arcane_Bulwark",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 300
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 300, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		},
 		{
 			"id": "Gloves_Intelligence_Aegis",
 			"equipmentPart": "Gloves",
 			"rarity": "Common",
-			"tags": [
-				"Gloves",
-				"Equipment"
-			],
-			"effectId": "",
+			"tags": [ "Gloves", "Equipment" ],
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 350
-				}
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Evade", "modifierType": "flat", "value": 300, "scope": "Local" }
 			],
-			"modifiers": []
+			"modifiers": [],
+			"grants": []
 		}
 	]
 }

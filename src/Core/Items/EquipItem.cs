@@ -10,8 +10,12 @@ namespace Core.Items
 
     public class EquipItem : IEquipItem, IAscendable
     {
-        private readonly HashSet<IModifier> _baseModifiers = [];
-        private readonly HashSet<IModifier> _additionalModifiers = [];
+        private readonly HashSet<IModifier> _implicits = [];
+        private readonly HashSet<IModifier> _modifiers = [];
+        private readonly List<ContextModifierEntry> _implicitsContextModifier = [];
+        private readonly List<ContextModifierEntry> _contextModifiers = [];
+        // TODO:
+        // старый список пулов. Не рассчитан на модификаторы контекста и композитные/условные модификаторы
         private readonly List<IModifier> _modifiersPool = [];
         private readonly Dictionary<string, int> _usedResources = [];
         private readonly List<IItemGrant> _grants = [];
@@ -25,11 +29,12 @@ namespace Core.Items
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; }
         public int MaxStackSize => 1;
-
         public Texture2D? Icon
         {
             get
             {
+                // TODO:
+                // сменить на нормальный путь позднее.
                 if (field != null) return field;
                 field = ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Items/{Id}.png");
                 return field;
@@ -39,16 +44,19 @@ namespace Core.Items
         public Rarity Rarity { get; set; } = Rarity.Uncommon;
         public int UpdateLevel { get; set; }
         public int MaxUpdateLevel { get; set; } = 12;
-        public string ItemEffect { get; private set; } = string.Empty;
         public bool IsSealed { get; private set; }
         public string DisplayName => Localization.Localization.Localize(Id);
         public string Description => Localization.Localization.LocalizeDescription(Id);
 
-        public IReadOnlyList<IModifier> Implicits => [.. _baseModifiers];
-        public IReadOnlyList<IModifier> Modifiers => [.. _additionalModifiers];
+        public IReadOnlyList<IModifier> Implicits => [.. _implicits];
+        public IReadOnlyList<IModifier> Modifiers => [.. _modifiers];
+        public IReadOnlyList<ContextModifierEntry> ContextImplicits => _implicitsContextModifier;
+        public IReadOnlyList<ContextModifierEntry> ContextModifiers => _contextModifiers;
         public IReadOnlyList<IItemGrant> Grants => _grants;
         public IReadOnlyCollection<EntityParameter> AffectedParameters =>
-            _baseModifiers.Concat(_additionalModifiers).Select(modifier => modifier.EntityParameter).ToHashSet();
+            _implicits.Concat(_modifiers).Select(modifier => modifier.EntityParameter).ToHashSet();
+        // TODO:
+        // старый список пулов. Не рассчитан на модификаторы контекста и композитные/условные модификаторы
         public IReadOnlyList<IModifier> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= MaxUpdateLevel;
@@ -65,15 +73,18 @@ namespace Core.Items
             EquipmentPiece = source.EquipmentPiece;
             Id = source.Id;
             Tags = [.. source.Tags];
+            // TODO:
+            // иконки загружаются лениво, что мы здесь передаем??
             Icon = source.Icon;
             Rarity = source.Rarity;
             UpdateLevel = source.UpdateLevel;
             MaxUpdateLevel = source.MaxUpdateLevel;
-            ItemEffect = source.ItemEffect;
             UpdateMultiplier = source.UpdateMultiplier;
 
-            SetImplicits(CopyModifiers(source._baseModifiers));
-            SetModifiers(CopyModifiers(source._additionalModifiers));
+            SetImplicits(CopyModifiers(source._implicits));
+            SetModifiers(CopyModifiers(source._modifiers));
+            SetContextImplicits(source._implicitsContextModifier.Select(entry => entry.Copy()));
+            SetContextModifiers(source._contextModifiers.Select(entry => entry.Copy()));
             _grants.AddRange(source._grants.Select(grant => grant.Copy()));
             _modifiersPool.AddRange(source._modifiersPool);
             foreach (var resource in source._usedResources)
@@ -97,33 +108,45 @@ namespace Core.Items
         public void SetImplicits(IEnumerable<IModifier> modifiers)
         {
             if (IsSealed) return;
-            SetModifiers(_baseModifiers, modifiers);
+            SetModifiers(_implicits, modifiers);
         }
 
         public void SetModifiers(IEnumerable<IModifier> modifiers)
         {
             if (IsSealed) return;
-            SetModifiers(_additionalModifiers, modifiers);
+            SetModifiers(_modifiers, modifiers);
         }
 
-        public void SetItemEffect(string effectId)
+        public void SetContextImplicits(IEnumerable<ContextModifierEntry> entries)
         {
             if (IsSealed) return;
-            ItemEffect = effectId;
+            SetContextModifiers(_implicitsContextModifier, entries);
+        }
+
+        public void SetContextModifiers(IEnumerable<ContextModifierEntry> entries)
+        {
+            if (IsSealed) return;
+            SetContextModifiers(_contextModifiers, entries);
         }
 
         public void AddAdditionalModifier(IModifier modifier)
         {
             if (IsSealed) return;
+            if (modifier is CompositeModifier composite)
+            {
+                foreach (var part in ExpandComposite(composite)) AddAdditionalModifier(part);
+                return;
+            }
+
             modifier.Value = modifier.BaseValue * UpdateMultiplier;
-            _additionalModifiers.Add(modifier);
+            _modifiers.Add(modifier);
             _resolvedModifiers = null;
         }
 
         public void RemoveAdditionalModifier(int hash)
         {
             if (IsSealed) return;
-            _additionalModifiers.RemoveWhere(modifier => modifier.GetHashCode() == hash);
+            _modifiers.RemoveWhere(modifier => modifier.GetHashCode() == hash);
             _resolvedModifiers = null;
         }
 
@@ -165,12 +188,14 @@ namespace Core.Items
         {
             _owner = owner;
             foreach (var grant in _grants) grant.Attach(owner);
+            foreach (var entry in AllContextModifiers) entry.Attach(owner);
         }
 
         public void OnUnequip()
         {
             if (_owner == null) return;
             foreach (var grant in _grants) grant.Detach(_owner);
+            foreach (var entry in AllContextModifiers) entry.Detach(_owner);
             _owner = null;
         }
 
@@ -199,8 +224,7 @@ namespace Core.Items
             return Id == other.Id;
         }
 
-
-        protected IEnumerable<IModifier> AllModifiers => _baseModifiers.Concat(_additionalModifiers);
+        protected IEnumerable<IModifier> AllModifiers => _implicits.Concat(_modifiers);
 
         protected virtual EquipItem CreateCopy() => new(this);
 
@@ -216,10 +240,22 @@ namespace Core.Items
                 return copy;
             });
 
+        private IEnumerable<ContextModifierEntry> AllContextModifiers => _implicitsContextModifier.Concat(_contextModifiers);
+
+        private void SetContextModifiers(List<ContextModifierEntry> itemEntries, IEnumerable<ContextModifierEntry> newEntries)
+        {
+            itemEntries.Clear();
+            foreach (var entry in newEntries)
+            {
+                entry.Value = entry.BaseValue * UpdateMultiplier;
+                itemEntries.Add(entry);
+            }
+        }
+
         private void SetModifiers(HashSet<IModifier> itemModifiers, IEnumerable<IModifier> newModifiers)
         {
             itemModifiers.Clear();
-            foreach (var modifier in newModifiers)
+            foreach (var modifier in newModifiers.SelectMany(ExpandIfComposite))
             {
                 modifier.Value = modifier.BaseValue * UpdateMultiplier;
                 itemModifiers.Add(modifier);
@@ -228,10 +264,25 @@ namespace Core.Items
             _resolvedModifiers = null;
         }
 
+        private IEnumerable<IModifier> ExpandIfComposite(IModifier modifier) =>
+            modifier is CompositeModifier composite ? ExpandComposite(composite) : [modifier];
+
+        // Composites live in pools/data only: on the item they become plain per-parameter modifiers,
+        // so scaling, resolution, save and UI stay single-parameter. Fresh instances detach from the shared pool entry.
+        private IEnumerable<IModifier> ExpandComposite(CompositeModifier composite) =>
+            composite.Parts.Select(IModifier (part) =>
+            {
+                var copy = ModifiersCreator.CreateModifierInstance(part.EntityParameter, part.ModifierValueType, part.BaseValue, InstanceId);
+                copy.Scope = part.Scope;
+                return copy;
+            });
+
         private void UpdateModifiersValue()
         {
-            foreach (var modifier in _baseModifiers.Concat(_additionalModifiers))
+            foreach (var modifier in _implicits.Concat(_modifiers))
                 modifier.Value = modifier.BaseValue * UpdateMultiplier;
+            foreach (var entry in AllContextModifiers)
+                entry.Value = entry.BaseValue * UpdateMultiplier;
 
             _resolvedModifiers = null;
         }
@@ -239,7 +290,10 @@ namespace Core.Items
         private Dictionary<EntityParameter, List<IModifierInstance>> BuildResolvedModifiers()
         {
             var resolved = new Dictionary<EntityParameter, List<IModifierInstance>>();
-            foreach (var group in _baseModifiers.Concat(_additionalModifiers).GroupBy(modifier => modifier.EntityParameter))
+            // NOTE:
+            // Здесь мы обрабатываем только простые модификаторы изменяющие параметры Что с контекстными?
+            // NOTE: Композитные модификаторы разбираются ДО резолва
+            foreach (var group in _implicits.Concat(_modifiers).GroupBy(modifier => modifier.EntityParameter))
             {
                 var modifiers = new List<IModifierInstance>();
                 bool localsExternal = IsLocalBucketExternal(group.Key);

@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Armageddon
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
     using HitDelivery;
 
     /// <summary>L3 upgrade: hits every enemy on the field at the price of a longer cooldown.</summary>

@@ -31,10 +31,10 @@ namespace Battle.Source.Abilities
         private const int BaseStage = 1;
 
         /// <summary>Stance-wide base chances per stage; per-ability/per-build shifts come from decorators, not data.</summary>
-        private static readonly Dictionary<int, float> s_baseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.25f };
+        private static readonly Dictionary<int, float> s_baseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.05f };
 
         /// <summary>Stance-wide caps for the final stage chance: stage 2 may become guaranteed, higher stages may not.</summary>
-        private static readonly Dictionary<int, float> s_stageChanceCaps = new() { [2] = 1f, [3] = 0.75f, [4] = 0.4f };
+        private static readonly Dictionary<int, float> s_stageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
 
         private readonly RandomNumberGenerator _rnd = new();
 

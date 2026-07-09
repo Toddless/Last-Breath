@@ -14,7 +14,6 @@
     using Core.Enums;
     using Core.Events.GameEvents;
     using Core.Localization;
-    using Decorators;
     using Godot;
     using Targeting;
 

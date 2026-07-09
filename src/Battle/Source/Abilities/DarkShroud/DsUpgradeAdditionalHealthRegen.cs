@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// L2 upgrade: increases the percentage of max health restored each turn by the shroud.

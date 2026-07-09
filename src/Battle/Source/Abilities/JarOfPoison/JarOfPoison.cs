@@ -11,7 +11,6 @@ namespace Battle.Source.Abilities.JarOfPoison
     using Core.Data;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
     using HitDelivery;
 

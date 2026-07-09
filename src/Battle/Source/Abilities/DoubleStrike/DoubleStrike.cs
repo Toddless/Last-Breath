@@ -13,7 +13,6 @@ namespace Battle.Source.Abilities.DoubleStrike
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
 
     /// <summary>
@@ -196,7 +195,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         private void RestoreMana(IFightable owner)
         {
             if (ManaRestore <= 0) return;
-            owner.CurrentMana += owner.Parameters.MaxMana * ManaRestore;
+            owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = owner.Parameters.MaxMana * ManaRestore });
         }
     }
 }

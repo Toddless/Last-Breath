@@ -81,12 +81,6 @@
         {
             if (equip.Rarity is Rarity.Mythic or Rarity.Unique) return;
 
-            // concat all item effects with effects from context
-            var allEffects = effectProvider.GetCopyItemsEffects().Concat(additionalItemEffects).ToList();
-            string equipItemEffect = rnd.Randf() <= equipEffectChance
-                ? allEffects[rnd.RandiRange(0, allEffects.Count)]
-                : string.Empty;
-            equip.SetItemEffect(equipItemEffect);
             equip.Rarity = rarity;
 
             var modifiersPool = dataProvider.GetEquipItemModifierPool(equip.Id);

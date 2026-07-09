@@ -11,7 +11,7 @@ namespace Battle.Source.Abilities.PoisonExplosion
         : AbilityUpgrade<PoisonExplosion>(id, tags, tier)
     {
         private readonly IActivationRider _modifier =
-            new AbilityDebuffActivationRider(new SealOfOblivion(duration, maxStacks));
+            new AbilityDebuffActivationRider(new OblivionSeal(duration, maxStacks));
 
         public override void ApplyUpgrade(PoisonExplosion ability) => ability.ActivationRiders.TryAdd(_modifier.Id, _modifier);
 

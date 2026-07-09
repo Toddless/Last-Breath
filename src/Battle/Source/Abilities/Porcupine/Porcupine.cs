@@ -10,7 +10,6 @@ namespace Battle.Source.Abilities.Porcupine
     using Core.Components.Module;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
 
     /// <summary>

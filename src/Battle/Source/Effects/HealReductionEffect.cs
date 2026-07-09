@@ -1,10 +1,9 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Abilities.Modifiers;
     using Core.Battle.Abilities;
     using Core.Context;
-    using Core.Enums;
+    using Core.Modifiers.Context;
 
     /// <summary>Debuff: reduces all incoming healing on the target by <c>reduceBy</c> (0..1).</summary>
     public class HealReductionEffect(int duration, int maxStacks, float reduceBy)
@@ -15,7 +14,7 @@ namespace Battle.Source.Effects
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
-            _modifier = new HealReductionModifier(Priority.Weak, reduceBy);
+            _modifier = new HealReductionContextModifier(reduceBy);
             Target?.ModifierHandler.Add(_modifier);
         }
 

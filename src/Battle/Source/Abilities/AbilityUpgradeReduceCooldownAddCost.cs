@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Reduces the ability's cooldown at the price of an increased resource cost.</summary>
     public class AbilityUpgradeReduceCooldownAddCost(string id, string[] tags, int tier, float cooldown, float additionalCost)

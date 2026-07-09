@@ -164,7 +164,7 @@
             float sumAdditions = 0 + value;
             float sumIncreases = 1;
             float sumMultiplicative = 1;
-            foreach (var group in modifiers.GroupBy(m => m.ModifierValueType).OrderBy(g => g.Key))
+            foreach (var group in modifiers.Where(IsModifierActive).GroupBy(m => m.ModifierValueType).OrderBy(g => g.Key))
             {
                 switch (group.Key)
                 {
@@ -182,5 +182,8 @@
 
             return (sumAdditions * sumIncreases) * sumMultiplicative;
         }
+
+        /// <summary>Conditional modifiers stay in the list permanently and are skipped while their condition is off.</summary>
+        private static bool IsModifierActive(IModifier modifier) => modifier is not IConditionalModifier { IsActive: false };
     }
 }

@@ -12,5 +12,6 @@ namespace Core.Data.SaveData
         [JsonProperty("id")] public string Id { get; init; } = string.Empty;
         [JsonProperty("skillId")] public string? SkillId { get; init; }
         [JsonProperty("modifiers")] public List<ModifierSaveData> Modifiers { get; init; } = [];
+        [JsonProperty("properties")] public Dictionary<string, float> Properties { get; init; } = [];
     }
 }

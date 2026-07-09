@@ -60,6 +60,20 @@ namespace Core.Entity
         Task Attack(IAttackContext context);
         Task TakeDamage(IDamageContext context);
         void Heal(IHealContext context);
+
+        /// <summary>The single entry point for every mana gain. Runs the mana-restore pipeline,
+        /// applies the clamped gain and publishes <see cref="Events.GameEvents.ManaRestoredEvent"/>
+        /// with the effective amount. Default implementation is shared by all entities.</summary>
+        void RestoreMana(IManaRecoveryContext context)
+        {
+            ModifierHandler.Apply(context);
+            if (context.Amount <= 0) return;
+            float before = CurrentMana;
+            CurrentMana += context.Amount;
+            float gained = CurrentMana - before; // MaxMana may clamp the gain
+            if (gained <= 0) return;
+            CombatEvents.Publish(new Events.GameEvents.ManaRestoredEvent(this, gained, Data.VitalsSnapshot.From(this)));
+        }
         void OnTurnStart();
         void OnTurnEnd();
     }

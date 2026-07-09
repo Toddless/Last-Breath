@@ -13,10 +13,12 @@
         StatusEffects statusEffect = StatusEffects.None,
         int maxStacks = 999,
         float percentFromDamage = 0.7f)
-        : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect)
+        : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect), IDamageOverTurnEffect
     {
         public float PercentFromBase { get; } = percentFromDamage;
-        public float DamagePerTick { get; private set; }
+
+        /// <summary>Settable so effect-application mutators ("+X% burning damage") can scale the tick.</summary>
+        public float DamagePerTick { get; set; }
 
         public override async Task Apply(EffectApplyingContext context)
         {

@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.ChainLightning
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Additive bump of one Chain Lightning parameter (jumps / falloff — pass a negative amount to soften).</summary>
     public class ClUpgradeParameter(string id, string[] tags, int tier, ChainLightning.Parameters parameter, float amount)

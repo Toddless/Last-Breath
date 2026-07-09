@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// L1 upgrade: increases the shroud's buff duration.

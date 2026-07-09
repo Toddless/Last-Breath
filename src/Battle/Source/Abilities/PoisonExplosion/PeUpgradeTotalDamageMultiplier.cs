@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L1 upgrade: increases the total explosion damage by an additional multiplier.</summary>
     public class PeUpgradeTotalDamageMultiplier(string id, string[] tags, int tier, float multiplier)

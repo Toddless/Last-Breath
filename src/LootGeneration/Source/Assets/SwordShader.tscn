@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://xwwwqostpbcv"]
+
+[ext_resource type="Shader" uid="uid://dg4k6txogmuty" path="res://WeaponEffect.gdshader" id="1_b1x15"]
+[ext_resource type="Texture2D" uid="uid://cpm83p32ibh8g" path="res://Source/Assets/SwordMask.png" id="2_im0to"]
+[ext_resource type="Texture2D" uid="uid://dt3msq3nwu2g0" path="res://Source/Assets/Sword.png" id="3_wguii"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fmhhv"]
+shader = ExtResource("1_b1x15")
+shader_parameter/shine_color = Color(1, 1, 1, 1)
+shader_parameter/shine_strength = 1.2
+shader_parameter/shine_width = 0.45
+shader_parameter/angle = -0.3
+shader_parameter/period = 4.0
+shader_parameter/sweep_fraction = 0.35
+shader_parameter/reverse = true
+shader_parameter/luminance_mask = 1.0
+shader_parameter/edge_mask = ExtResource("2_im0to")
+shader_parameter/use_edge_mask = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5f5v3"]
+atlas = ExtResource("3_wguii")
+
+[node name="Node2D" type="Sprite2D" unique_id=1327898751]
+material = SubResource("ShaderMaterial_fmhhv")
+position = Vector2(129, 197.00002)
+scale = Vector2(0.365, 0.365)
+texture = SubResource("AtlasTexture_5f5v3")

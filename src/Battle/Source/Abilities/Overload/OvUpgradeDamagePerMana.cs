@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Overload
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L2 upgrade: every burned mana point converts into more damage.</summary>
     public class OvUpgradeDamagePerMana(string id, string[] tags, int tier, float amount)

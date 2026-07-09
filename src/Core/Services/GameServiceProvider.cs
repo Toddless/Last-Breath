@@ -61,6 +61,8 @@ namespace Core.Services
             services.AddGameDataParticipant<Localization.IParameterFormatProvider, Localization.ParameterFormatProvider>();
             services.AddSingleton<Localization.ModifierFormatter>();
             services.AddSingleton<Localization.ITextFormatter, Localization.ModifierTextFormatter>();
+            services.AddSingleton<Localization.ContextModifierFormatter>();
+            services.AddSingleton<Localization.ITextFormatter, Localization.ContextModifierTextFormatter>();
             services.AddSingleton<Localization.ILocalizationService, Localization.LocalizationService>();
             services.AddSingleton<Localization.IKeywordProvider, Localization.LocalizationKeywordProvider>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();

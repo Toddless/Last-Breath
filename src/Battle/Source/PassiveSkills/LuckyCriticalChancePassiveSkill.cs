@@ -4,7 +4,6 @@
     using Core.Components.Decorator;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
 
     public class LuckyCriticalChancePassiveSkill() : Skill(id: "Passive_Skill_LuckyCriticalChance")
     {

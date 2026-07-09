@@ -13,6 +13,9 @@ namespace Crafting.Services
     using Core.Modifiers;
     using Godot;
 
+    /// <summary>Crafting's catalog owner: an <see cref="IGameDataParticipant"/> that, on load, feeds each file
+    /// of the catalogs it declares to <see cref="IDataParser"/> and caches the parsed items/pools/costs by id.
+    /// Read side of the crafting item store — hands out independent copies via <see cref="CopyItem"/>.</summary>
     internal class ItemDataProvider(IDataParser dataParser) : IItemDataProvider, IGameDataParticipant
     {
         private readonly Dictionary<string, IItem> _itemData = [];

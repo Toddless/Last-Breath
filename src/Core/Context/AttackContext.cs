@@ -20,7 +20,9 @@
         public float AdditionalDamage { get; set; }
         public float FinalDamage { get; set; }
         public bool IsCritical { get; set; }
+        // Необходимо как-то убедиться, что единожды выставленный чек не будет впоследствии изменен.
         public bool ForceCriticalAttack { get; set; }
+        // NOTE: Модификаторы, делающие атаки неблокируемыми/неизбежными, должны иметь Высокий/Абсолютный приоритет
         public bool IsUnevadable { get; set; }
         public bool IsUnblockable { get; set; }
         public string? SourceAbilityId { get; set; }

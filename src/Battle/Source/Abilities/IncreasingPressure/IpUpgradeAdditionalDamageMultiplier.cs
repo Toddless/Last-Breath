@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities.IncreasingPressure
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     public class IpUpgradeAdditionalDamageMultiplier(string id, string[] tags, int tier, float additionalMultiplier)
         : SimpleUpgrade<IncreasingPressure, IncreasingPressure.Parameters>(id, tags, tier,

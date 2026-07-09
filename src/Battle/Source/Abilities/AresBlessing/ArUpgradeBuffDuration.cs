@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L1 upgrade: the blessing lasts longer.</summary>
     public class ArUpgradeBuffDuration(string id, string[] tags, int tier, float amount)

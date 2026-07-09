@@ -5,7 +5,7 @@ namespace Core.Data.EquipData
 
     public record EquipModifierPoolData
     {
-        [JsonProperty("id")] public string Id { get; init; }
-        [JsonProperty("modifiersPool")] public List<ItemModifier> ModifiersPool { get; init; }
+        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("modifiersPool")] public List<ItemModifier> ModifiersPool { get; init; } = [];
     }
 }

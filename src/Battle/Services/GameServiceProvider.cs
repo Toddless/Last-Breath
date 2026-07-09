@@ -1,11 +1,16 @@
 namespace Battle.Services
 {
+    using Core.Ai.World.Skirmish;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
+    using Core.Save;
+    using Core.Services;
     using Internal.Npc;
+    using Internal.World;
     using Microsoft.Extensions.DependencyInjection;
     using Source;
+    using SaveGameService = Internal.Save.SaveGameService;
 
     /// <summary>Project bootstrap: the shared Core provider + Battle registrations. The only place touching the static root.</summary>
     internal static class GameServiceProvider
@@ -18,8 +23,19 @@ namespace Battle.Services
                 .AddBattleSystemModuleDependencies()
                 .AddGameData("res://Data/", "res://Data/Shared/")
                 // Project-private bindings: only the bootstrap may know Internal classes
-                .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>());
+                .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>()
+                .AddGameDataParticipant<INpcProvider, NpcProvider>()
+                .AddSingleton<INpcPopulationService, NpcPopulationService>()
+                .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
+                .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
+                .AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>()
+                .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
+                .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
+                .AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, GameWorldClock>()
+                .AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
+                .AddSingleton<ISaveGameService, SaveGameService>());
             provider.AddBattleUiElementsFactory();
+
             provider.GetService<IGameDataService>().LoadAll();
             return provider;
         }

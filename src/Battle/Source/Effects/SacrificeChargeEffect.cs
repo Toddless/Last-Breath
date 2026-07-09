@@ -1,10 +1,10 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Abilities.Modifiers;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Events.GameEvents;
+    using Core.Modifiers.Context;
 
     /// <summary>
     /// The Sacrifice charge: the next <c>charges</c> activated abilities deal extra PURE damage equal to
@@ -17,7 +17,7 @@ namespace Battle.Source.Effects
         : Effect(id: "Effect_Sacrifice_Charge", duration: 0, maxStacks: 1)
     {
         private int _chargesLeft = charges;
-        private PureDamageBonusModifier? _modifier;
+        private PureDamageBonusContextModifier? _modifier;
         private string _boostedCastId = string.Empty;
 
         public float BonusPercent => bonusPercent;
@@ -51,7 +51,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return; // recasting Sacrifice refreshes, never consumes
 
-            _modifier = new PureDamageBonusModifier(Target, bonusPercent);
+            _modifier = new PureDamageBonusContextModifier(Target, bonusPercent);
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

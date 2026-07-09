@@ -12,7 +12,6 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
 
     /// <summary>

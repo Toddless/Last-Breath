@@ -14,7 +14,6 @@
     using HeadButt;
     using IncreasingPressure;
     using JarOfPoison;
-    using Modifiers;
     using PoisonCoating;
     using PoisonExplosion;
     using PassiveSkills;
@@ -24,6 +23,7 @@
     using SeriesOfAttacks;
     using ChainLightning;
     using Core.Battle.Abilities;
+    using Core.Modifiers.Context;
     using IceAegis;
     using IceShards;
     using Overload;
@@ -113,13 +113,13 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new LastAttackAlwaysCritModifier()),
+                    new LastAttackAlwaysCritContextModifier()),
             ["Ability_Ip_Upgrade_First_Attack_Crit_Damage"] = data =>
                 new IpUpgradeFirstAttackCritDamage(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new FirstAttackCritModifier(data.UpgradeProperties.GetValueOrDefault("critDamageBonus", 1.3f))),
+                    new FirstAttackCritContextModifier(data.UpgradeProperties.GetValueOrDefault("critDamageBonus", 1.3f))),
             ["Ability_Ip_Upgrade_Attack_Extend_Poison"] = data =>
                 new IpUpgradeExtendPoison(
                     data.Id,
@@ -131,7 +131,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    new UnevadableAttackModifier()),
+                    new UnevadableAttackContextModifier()),
             ["Ability_Ip_Upgrade_Additional_Amount_Attacks"] = data =>
                 new IpUpgradeAmountAttacks(
                     data.Id,

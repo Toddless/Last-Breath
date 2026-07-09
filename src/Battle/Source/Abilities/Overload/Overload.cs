@@ -8,9 +8,9 @@ namespace Battle.Source.Abilities.Overload
     using Core.Components;
     using Core.Components.Decorator;
     using Core.Components.Module;
+    using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Cast plan of the Overload: the volley fields plus the mana-conversion knobs.</summary>
     public class OverloadPlan : CastPlan
@@ -151,7 +151,8 @@ namespace Battle.Source.Abilities.Overload
                 var hit = await DealProjectileDamage(plan, owner, target);
                 plan.Damage = baseDamage;
 
-                if (hit.IsCritical && overload.CritManaRefund > 0) owner.CurrentMana += burned * overload.CritManaRefund;
+                if (hit.IsCritical && overload.CritManaRefund > 0)
+                    owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = burned * overload.CritManaRefund });
                 if (ResetCooldownOnKill && !target.IsAlive) CooldownLeft = 0;
                 foreach (var rider in plan.OnHitRiders)
                     rider(hit);

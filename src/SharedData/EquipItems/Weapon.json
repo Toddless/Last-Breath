@@ -1,3 +1,216 @@
 {
-	
+    "items": [
+        {
+            "id": "Weapon_Simple_Dagger",
+            "equipmentPart": "Weapon",
+            "weaponType": "Dagger",
+            "handedness": "OneHanded",
+            "damage": 160,
+            "critChance": 0.07,
+            "critDamage": 1.8,
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Weapon_Simple_Axe",
+            "equipmentPart": "Weapon",
+            "weaponType": "Sword",
+            "handedness": "OneHanded",
+            "damage": 280,
+            "critChance": 0.05,
+            "critDamage": 1.4,
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [],
+            "modifiers": []
+        },
+        {
+            "id": "Weapon_Simple_Sword",
+            "equipmentPart": "Weapon",
+            "weaponType": "Sword",
+            "handedness": "OneHanded",
+            "damage": 220,
+            "critChance": 0.06,
+            "critDamage": 1.6,
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Weapon_Bloodthirsty",
+            "equipmentPart": "Weapon",
+            "weaponType": "Sword",
+            "handedness": "OneHanded",
+            "damage": 120,
+            "critChance": 0.07,
+            "critDamage": 1.8,
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "bleedDuration",
+                    "modifierType": "flat",
+                    "value": 1
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "critChance",
+                    "modifierType": "inc",
+                    "value": 0.35
+                },
+                {
+                    "parameter": "critDamage",
+                    "modifierType": "flat",
+                    "value": 0.45
+                },
+                {
+                    "parameter": "damage",
+                    "modifierType": "inc",
+                    "value": 0.5
+                },
+                {
+                    "parameter": "healingEfficiency",
+                    "modifierType": "inc",
+                    "value": 0.15
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Bloodthirsty",
+                    "kind": "Passive",
+                    "parameters": {
+                        "stackThreshold": 7,
+                        "healPercent": 0.25
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Weapon_Righteous_Wrath",
+            "equipmentPart": "Weapon",
+            "weaponType": "Axe",
+            "handedness": "TwoHanded",
+            "damage": 280,
+            "critChance": 0.05,
+            "critDamage": 1.4,
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "burningStacks",
+                    "modifierType": "flat",
+                    "value": 1
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "damage",
+                    "modifierType": "inc",
+                    "value": 0.5
+                },
+                {
+                    "parameter": "burningDamage",
+                    "modifierType": "inc",
+                    "value": 0.35
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Righteous_Wrath",
+                    "kind": "Passive",
+                    "parameters": {
+                        "percentFromDamage": 0.35,
+                        "burningDuration": 3,
+                        "stackThreshold": 9,
+                        "incinerationDuration": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Weapon_Silent_Fury",
+            "equipmentPart": "Weapon",
+            "weaponType": "Axe",
+            "handedness": "TwoHanded",
+            "damage": 380,
+            "critChance": 0.05,
+            "critDamage": 1.4,
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "burningStacks",
+                    "modifierType": "flat",
+                    "value": 1
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "damage",
+                    "modifierType": "inc",
+                    "value": 0.5
+                },
+                {
+                    "parameter": "burningDamage",
+                    "modifierType": "inc",
+                    "value": 0.35
+                },
+                {
+                    "parameter": "manaOnHit",
+                    "modifierType": "flat",
+                    "value": 50
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Silent_Fury",
+                    "kind": "Passive",
+                    "parameters": {
+                        "chance": 0.3
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Weapon_All_Cutting",
+            "equipmentPart": "Weapon",
+            "weaponType": "Sword",
+            "handedness": "TwoHanded",
+            "damage": 200,
+            "critChance": 0.06,
+            "critDamage": 1.6,
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 69,
+            "implicits": [],
+            "modifiers": [],
+            "grants": []
+        }
+    ]
 }

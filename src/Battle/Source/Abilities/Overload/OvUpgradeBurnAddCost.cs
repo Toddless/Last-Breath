@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Overload
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L1 upgrade: burns a bigger share of the target's mana at the price of an increased cost.</summary>
     public class OvUpgradeBurnAddCost(string id, string[] tags, int tier, float burnPercent, float additionalCost)

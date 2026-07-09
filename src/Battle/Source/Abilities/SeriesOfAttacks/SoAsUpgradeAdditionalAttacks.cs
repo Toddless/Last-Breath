@@ -1,14 +1,14 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     public class SoAsUpgradeAdditionalAttacks(string id, string[] tags, int tier, int amountAttacks)
         : AbilityUpgrade<SeriesOfAttacks>(id, tags, tier)
     {
-        private const string MinAttacksDecoratorId = "Ability_Parameter_Decorator_SoA_Min_Attacks";
-        private const string MaxAttacksDecoratorId = "Ability_Parameter_Decorator_SoA_Max_Attacks";
+        private const string MinAttacksDecoratorId = "Ability_Parameter_Decorator_SoA_Min_Additional_Attacks";
+        private const string MaxAttacksDecoratorId = "Ability_Parameter_Decorator_SoA_Max_Additional_Attacks";
 
         public override void ApplyUpgrade(SeriesOfAttacks ability)
         {

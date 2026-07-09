@@ -2,10 +2,10 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
     using Core.Events.GameEvents;
     using Core.Modifiers;
-    using Decorators;
 
     /// <summary>
     /// Buff that increases critical damage and additionally raises the bearer's critical chance

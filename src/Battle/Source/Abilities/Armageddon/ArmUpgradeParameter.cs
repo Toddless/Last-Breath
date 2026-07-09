@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.Armageddon
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Additive bump of one Armageddon parameter (stun duration / hp-cost multiplier / missing-hp rate).</summary>
     public class ArmUpgradeParameter(string id, string[] tags, int tier, Armageddon.Parameters parameter, float amount)

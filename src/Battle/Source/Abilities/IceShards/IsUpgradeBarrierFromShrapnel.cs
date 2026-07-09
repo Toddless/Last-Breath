@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.IceShards
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L3 upgrade: restores barrier equal to a fraction of the shrapnel burst damage (raises a zero base parameter).</summary>
     public class IsUpgradeBarrierFromShrapnel(string id, string[] tags, int tier, float leachPercent)

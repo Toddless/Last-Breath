@@ -15,6 +15,11 @@
 
         void AddModifier(IModifierInstance modifier);
         void RemoveModifier(IModifierInstance modifier);
+
+        /// <summary>Forces a recalculation of the parameter without touching the list —
+        /// used when a modifier's effective state changes in place (conditional modifiers).</summary>
+        void RefreshParameter(EntityParameter parameter);
+
         void RemoveModifierBySource(string source);
         void UpdateModifier(IModifierInstance newModifier);
         void UpdateModifiers(IEnumerable<IModifierInstance> modifiers);

@@ -44,8 +44,10 @@
             return requirements.Select(IRequirement (req) => new Requirement(req.Type, req.Id, req.Amount + amount)).ToList();
         }
 
-        public IModifierInstance TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers)
+        public IModifierInstance? TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers)
         {
+            if (item.Modifiers.All(modifier => modifier.GetHashCode() != modifierToReroll)) return null;
+
             (List<WeightedObject<IModifier>> weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
 
             item.RemoveAdditionalModifier(modifierToReroll);

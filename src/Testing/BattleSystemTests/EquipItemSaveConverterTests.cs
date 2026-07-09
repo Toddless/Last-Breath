@@ -1,6 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Core.Data.SaveData;
     using Core.Enums;
     using Core.Items;
     using Core.Items.Grants;
@@ -23,7 +22,6 @@ namespace LastBreathTest.BattleSystemTests
             ]);
             item.SaveModifiersPool([Modifier(EntityParameter.Accuracy, ModifierValueType.Flat, 30f)]);
             item.SaveUsedResources(new Dictionary<string, int> { ["Crafting_Resource_Diamond"] = 3 });
-            item.SetItemEffect("Effect_Thorns");
             item.Upgrade(3); // multiplier 1.3: restored Values must match, not just BaseValues
             item.Rarity = Rarity.Epic;
 
@@ -33,7 +31,6 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(EquipmentPiece.Body, restored.EquipmentPiece);
             Assert.AreEqual(Rarity.Epic, restored.Rarity);
             Assert.AreEqual(3, restored.UpdateLevel);
-            Assert.AreEqual("Effect_Thorns", restored.ItemEffect);
             Assert.AreEqual(3, restored.UsedResources["Crafting_Resource_Diamond"]);
             Assert.AreEqual(1, restored.ModifiersPool.Count);
             Assert.AreEqual(1, restored.Implicits.Count);
@@ -79,11 +76,30 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ContextLinesRoundTripScaledByUpgrade()
+        {
+            var item = new EquipItem(EquipmentPiece.Weapon, "Bloodthirsty", []);
+            item.SetContextImplicits([new ContextModifierEntry(ContextParameter.BleedDuration, ModifierValueType.Flat, 1f)]);
+            item.SetContextModifiers([new ContextModifierEntry(ContextParameter.HealingEfficiency, ModifierValueType.Increase, 0.15f)]);
+            item.Upgrade(12); // multiplier 2.2: whole-number knobs floor the scaled value
+
+            var restored = _converter.FromData(_converter.ToData(item));
+
+            Assert.AreEqual(1, restored.ContextImplicits.Count);
+            var duration = restored.ContextImplicits[0];
+            Assert.AreEqual(ContextParameter.BleedDuration, duration.Parameter);
+            Assert.AreEqual(1f, duration.BaseValue, 0.001f);
+            Assert.AreEqual(2, duration.WholeValue); // 1 * 2.2 floored
+            Assert.AreEqual(1, restored.ContextModifiers.Count);
+            Assert.AreEqual(0.15f * 2.2f, restored.ContextModifiers[0].Value, 0.001f);
+        }
+
+        [TestMethod]
         public void GrantsRoundTripWithTheirKind()
         {
             var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
             item.AddGrant(new ModifierGrant("grant_str", [Modifier(EntityParameter.Strength, ModifierValueType.Flat, 5f)]));
-            item.AddGrant(new PassiveSkillGrant("grant_skill", "Skill_Regeneration", () => null));
+            item.AddGrant(new PassiveSkillGrant("grant_skill", "Skill_Regeneration", new Dictionary<string, float> { ["percent"] = 0.05f }, () => null));
 
             var restored = _converter.FromData(_converter.ToData(item));
 
@@ -93,6 +109,7 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(5f, modifierGrant.Modifiers[0].BaseValue, 0.001f);
             var skillGrant = (PassiveSkillGrant)restored.Grants.First(g => g.Id == "grant_skill");
             Assert.AreEqual("Skill_Regeneration", skillGrant.SkillId);
+            Assert.AreEqual(0.05f, skillGrant.Properties["percent"], 0.001f);
         }
 
         private static SimpleModifier Modifier(EntityParameter parameter, ModifierValueType type, float value) =>

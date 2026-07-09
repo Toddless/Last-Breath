@@ -20,7 +20,7 @@ namespace Core.Localization
             var data = JsonConvert.DeserializeObject<ParameterFormatsData>(file.Json)
                        ?? throw new InvalidOperationException("Failed to deserialize parameter formats");
             foreach (var entry in data.Parameters)
-                _units[DataParse.ParseEnum<EntityParameter>(entry.Parameter)] = DataParse.ParseEnum<ParameterUnit>(entry.Unit);
+                _units[EnumParser.ParseEnum<EntityParameter>(entry.Parameter)] = EnumParser.ParseEnum<ParameterUnit>(entry.Unit);
         }
 
         public ParameterUnit GetUnit(EntityParameter parameter) => _units.GetValueOrDefault(parameter, ParameterUnit.Number);

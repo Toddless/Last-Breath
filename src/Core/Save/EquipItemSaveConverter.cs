@@ -27,9 +27,10 @@ namespace Core.Save
             UpdateLevel = item.UpdateLevel,
             MaxUpdateLevel = item.MaxUpdateLevel,
             IsSealed = item.IsSealed,
-            ItemEffect = item.ItemEffect,
             Implicits = ToModifierData(item.Implicits),
             Modifiers = ToModifierData(item.Modifiers),
+            ContextImplicits = ToContextData(item.ContextImplicits),
+            ContextModifiers = ToContextData(item.ContextModifiers),
             ModifiersPool = ToModifierData(item.ModifiersPool),
             UsedResources = new Dictionary<string, int>(item.UsedResources),
             Grants = item.Grants.Select(ToGrantData).ToList(),
@@ -52,9 +53,10 @@ namespace Core.Save
                     data.Id, data.Tags)
                 : new EquipItem(data.Piece, data.Id, data.Tags);
 
-            item.SetItemEffect(data.ItemEffect);
             item.SetImplicits(data.Implicits.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetModifiers(data.Modifiers.Select(modifier => ToModifier(modifier, item.InstanceId)));
+            item.SetContextImplicits(data.ContextImplicits.Select(ToContextEntry));
+            item.SetContextModifiers(data.ContextModifiers.Select(ToContextEntry));
             item.SaveModifiersPool(data.ModifiersPool.Select(modifier => (IModifier)ToModifier(modifier, item.InstanceId)));
             item.SaveUsedResources(new Dictionary<string, int>(data.UsedResources));
             foreach (var grant in data.Grants)
@@ -91,6 +93,18 @@ namespace Core.Save
         private static IModifierInstance ToModifier(ModifierSaveData data, string source) =>
             new SimpleModifier(data.Parameter, data.ValueType, data.BaseValue, source, data.Weight) { Scope = data.Scope };
 
+        private static List<ContextModifierSaveData> ToContextData(IReadOnlyList<ContextModifierEntry> entries) =>
+            entries.Select(entry => new ContextModifierSaveData
+            {
+                Parameter = entry.Parameter,
+                ValueType = entry.ValueType,
+                BaseValue = entry.BaseValue,
+                Weight = entry.Weight
+            }).ToList();
+
+        private static ContextModifierEntry ToContextEntry(ContextModifierSaveData data) =>
+            new(data.Parameter, data.ValueType, data.BaseValue, data.Weight);
+
         private GrantSaveData ToGrantData(IItemGrant grant) => grant switch
         {
             ModifierGrant modifierGrant => new GrantSaveData
@@ -103,7 +117,8 @@ namespace Core.Save
             {
                 Kind = GrantSaveData.PassiveSkillKind,
                 Id = grant.Id,
-                SkillId = skillGrant.SkillId
+                SkillId = skillGrant.SkillId,
+                Properties = new Dictionary<string, float>(skillGrant.Properties)
             },
             // A silently dropped grant is a corrupted item: fail the capture, the old save survives.
             _ => throw new NotSupportedException($"Grant type {grant.GetType().Name} has no save representation.")
@@ -111,7 +126,7 @@ namespace Core.Save
 
         private IItemGrant FromGrantData(GrantSaveData data, string source) => data.Kind switch
         {
-            GrantSaveData.PassiveSkillKind => new PassiveSkillGrant(data.Id, data.SkillId ?? string.Empty, skillProviderAccessor),
+            GrantSaveData.PassiveSkillKind => new PassiveSkillGrant(data.Id, data.SkillId ?? string.Empty, data.Properties, skillProviderAccessor),
             _ => new ModifierGrant(data.Id, data.Modifiers.Select(modifier => ToModifier(modifier, source)).ToList())
         };
     }

@@ -13,7 +13,6 @@ namespace Battle.Source.Abilities.BerserkFury
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
     using Godot;
 

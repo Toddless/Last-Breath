@@ -2,7 +2,7 @@
 {
     using System;
     using Core.Battle.Abilities;
-    using Decorators;
+    using Core.Components.Decorator;
 
     public class SimpleUpgrade<TAbility, TParameter>(string id, string[] tags, int tier, AbilityParameterDecorator<TParameter> decorator)
         : AbilityUpgrade<TAbility>(id, tags, tier)

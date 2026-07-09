@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Entity;
     using Core.Enums;
     using Core.Events.GameEvents;
@@ -61,6 +62,19 @@
 
         public virtual Task Apply(EffectApplyingContext context)
         {
+            // Caster-side application pipeline: item/passive mutators tune the instance
+            // (duration, DoT tick) before the stacking rules see it. Descendants have already
+            // derived their numbers from the applying context at this point.
+            if (context is { IsBonusStack: false })
+            {
+                var application = new EffectApplicationContext(context.Caster, context.Target, this);
+                context.Caster.ModifierHandler.Apply(application);
+                // Bonus stacks clone the already-mutated instance and skip the pipeline,
+                // so every mutator applies exactly once per stack and cannot recurse.
+                for (int i = 0; i < application.BonusStacks; i++)
+                    _ = Copy().Apply(context with { IsBonusStack = true });
+            }
+
             Context = context;
             Target = context.Target;
             Source = context.Source;
@@ -121,11 +135,7 @@
         /// (usable as {Duration|turn|turns}) and {MaxStacks}; descendants extend the dictionary
         /// with their own values ({Damage}, {Stacks}...) on top of base.DescriptionValues.
         /// </summary>
-        protected virtual Dictionary<string, object?> DescriptionValues => new()
-        {
-            ["Duration"] = Duration,
-            ["MaxStacks"] = MaxStacks,
-        };
+        protected virtual Dictionary<string, object?> DescriptionValues => new() { ["Duration"] = Duration, ["MaxStacks"] = MaxStacks, };
 
         protected virtual string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
 

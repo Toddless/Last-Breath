@@ -11,7 +11,6 @@ namespace Battle.Source.Abilities.ChainLightning
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Godot;
 
     /// <summary>Cast plan of the Chain Lightning: the strike sequence knobs, mutated by stages.</summary>

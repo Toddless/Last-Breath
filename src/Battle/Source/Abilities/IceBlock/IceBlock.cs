@@ -35,6 +35,19 @@ namespace Battle.Source.Abilities.IceBlock
         Costs costType = Costs.Mana)
         : MulticastVolleyAbility(id: "Ability_Ice_Block", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
+        // No upgrades touch these, so plain properties are enough for live description values (no ModuleManager).
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values["StunDuration"] = stunDuration;
+                values["ExtraBlocks"] = extraBlocks;
+                values["ExtraBlockDamagePercent"] = extraBlockDamagePercent;
+                return values;
+            }
+        }
+
         public override IAbility Copy()
         {
             var copy = new IceBlock(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,

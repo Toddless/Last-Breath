@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.IceAegis
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Additive bump of one Ice Aegis parameter (base barrier / per-intelligence scale / duration).</summary>
     public class IaUpgradeParameter(string id, string[] tags, int tier, IceAegis.Parameters parameter, float amount)

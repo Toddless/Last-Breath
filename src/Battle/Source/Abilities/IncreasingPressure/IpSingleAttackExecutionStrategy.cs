@@ -42,11 +42,11 @@
         {
             float increase = 1f;
             float totalDamage = 0f;
+            // Escalation here is unconditional (a single lumped attack can't know per-hit results);
+            // the default strategy instead escalates per resolved hit and stops the series on an evade.
             for (int i = 0; i < ability.Attacks; i++)
             {
-                float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
-                float damage = (owner.Parameters.Damage + additionalDamage) * increase;
-                totalDamage += damage;
+                totalDamage += ability.PerHitDamage(owner, increase);
                 increase += ability.AttackDamageMultiplier;
             }
 

@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// L2 upgrade: increases buff effectiveness while reducing the number of LightStep stacks applied

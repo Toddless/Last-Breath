@@ -1,10 +1,9 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Abilities.Modifiers;
     using Core.Battle.Abilities;
     using Core.Context;
-    using Core.Enums;
+    using Core.Modifiers.Context;
 
     /// <summary>
     /// Buff: the target takes <c>reduce</c> less damage from all incoming hits per stack.
@@ -20,7 +19,7 @@ namespace Battle.Source.Effects
             await base.Apply(context);
             if (!IsApplied) return;
 
-            _modifier = new IncomingDamageReductionModifier(Priority.Weak, reduce);
+            _modifier = new IncomingDamageReductionContextModifier( reduce);
             Target?.ModifierHandler.Add(_modifier);
         }
 

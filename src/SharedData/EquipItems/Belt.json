@@ -1,6 +1,107 @@
 {
 	"items": [
 		{
+			"id": "Belt_of_Strength",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Strength", "modifierType": "flat", "value": 20, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_of_Dexterity",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Dexterity", "modifierType": "flat", "value": 20, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_of_Intelligence",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Intelligence", "modifierType": "flat", "value": 20, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_of_Hunter",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Evade", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 300, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_of_Knight",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Armor", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "BlockChance", "modifierType": "flat", "value": 0.03, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_of_Inquisitor",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
+				{ "parameter": "Mana", "modifierType": "flat", "value": 150, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
+			"id": "Belt_Of_Life",
+			"equipmentPart": "Belt",
+			"maxStackSize": 1,
+			"rarity": "Common",
+			"tags": [],
+			"updateLevel": 0,
+			"maxUpdateLevel": 12,
+			"implicits": [
+				{ "parameter": "Health", "modifierType": "flat", "value": 300, "scope": "Local" }
+			],
+			"modifiers": [],
+			"grants": []
+		},
+		{
 			"id": "Belt",
 			"equipmentPart": "Belt",
 			"rarity": "Common",
@@ -9,133 +110,8 @@
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 600
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 500
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Strength",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Strength",
-					"modifierType": "flat",
-					"value": 20
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Dexterity",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Dexterity",
-					"modifierType": "flat",
-					"value": 20
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Intelligence",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Intelligence",
-					"modifierType": "flat",
-					"value": 20
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Hunter",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "flat",
-					"value": 300
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Knight",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "BlockChance",
-					"modifierType": "flat",
-					"value": 0.03
-				}
-			],
-			"modifiers": []
-		},
-		{
-			"id": "Belt_of_Inquisitor",
-			"equipmentPart": "Belt",
-			"rarity": "Common",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Barrier",
-					"modifierType": "flat",
-					"value": 300
-				},
-				{
-					"parameter": "Mana",
-					"modifierType": "flat",
-					"value": 150
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 600 },
+				{ "parameter": "Armor", "modifierType": "flat", "value": 500 }
 			],
 			"modifiers": []
 		},
@@ -149,16 +125,8 @@
 			"updateLevel": 0,
 			"maxUpdateLevel": 12,
 			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "flat",
-					"value": 500
-				},
-				{
-					"parameter": "Evade",
-					"modifierType": "flat",
-					"value": 800
-				}
+				{ "parameter": "Health", "modifierType": "flat", "value": 500 },
+				{ "parameter": "Evade", "modifierType": "flat", "value": 800 }
 			],
 			"modifiers": []
 		}

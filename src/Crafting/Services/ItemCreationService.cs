@@ -13,6 +13,9 @@
     using Core.Services;
     using Godot;
 
+    /// <summary>Crafting-side item spawner: copies a cached template from <see cref="IItemDataProvider"/> and
+    /// rolls its generated modifiers/effects (mastery- and rarity-driven) into the fresh instance. The runtime
+    /// entry point that turns a data id into a concrete, rolled item for the crafting flow.</summary>
     public class ItemCreationService(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
         : IItemCreationService
     {

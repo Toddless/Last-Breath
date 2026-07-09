@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L2 upgrade: poison stacks applied by the coating get an additional damage multiplier.</summary>
     public class PcUpgradeAdditionalMultiplier(string id, string[] tags, int tier, float multiplier)

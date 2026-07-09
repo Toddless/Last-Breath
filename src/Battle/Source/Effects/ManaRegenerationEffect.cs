@@ -1,6 +1,7 @@
 ﻿namespace Battle.Source.Effects
 {
     using Core.Battle.Abilities;
+    using Core.Context;
     using Core.Enums;
 
     public class ManaRegenerationEffect(
@@ -17,7 +18,7 @@
         {
             if (Target == null) return;
             float regenAmount = Target.Parameters.MaxMana * PercentRegeneration;
-            Target.CurrentMana += regenAmount;
+            Target.RestoreMana(new ManaRecoveryContext(Target, Target) { Amount = regenAmount });
             base.TurnEnd();
         }
 

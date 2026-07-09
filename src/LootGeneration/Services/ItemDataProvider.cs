@@ -13,6 +13,9 @@ namespace LootGeneration.Services
     using Core.Modifiers;
     using Godot;
 
+    /// <summary>LootGeneration's catalog owner: an <see cref="IGameDataParticipant"/> that, on load, feeds each
+    /// file of the catalogs it declares to <see cref="IDataParser"/> and caches the parsed items/pools by id.
+    /// The template store the drop pipeline pulls from — hands out independent copies via <see cref="CopyItem"/>.</summary>
     internal class ItemDataProvider(IDataParser dataParser) : IItemDataProvider, IGameDataParticipant
     {
         private readonly Dictionary<string, IItem> _itemData = [];

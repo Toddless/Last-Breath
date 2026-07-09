@@ -16,6 +16,11 @@ namespace Core.Data
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
+    /// <summary>Turns raw catalog JSON into domain objects — items, recipes, resources, modifier pools,
+    /// upgrade costs. Owns the shared "parameter" namespace resolution (<see cref="Enums.EntityParameter"/>
+    /// vs <see cref="Enums.ContextParameter"/>) and per-entry tolerance (a bad line is reported and dropped,
+    /// not fatal). The concrete objects themselves are built through the injected <see cref="IItemGameDataFactory"/>,
+    /// so each project can supply its own item flavours while sharing this parsing logic.</summary>
     public class DataParser(IItemGameDataFactory factory) : IDataParser
     {
         private static readonly JsonSerializerSettings s_settings = new() { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } };
@@ -42,10 +47,10 @@ namespace Core.Data
                 result.BasicTable.AddRange(lootTable.Tiers);
 
             foreach (var table in data.Fractions)
-                result.FractionTables.TryAdd(DataParse.ParseEnum<Fractions>(table.Key), table.Tiers);
+                result.FractionTables.TryAdd(EnumParser.ParseEnum<Fractions>(table.Key), table.Tiers);
 
             foreach (var lootTable in data.Types)
-                result.EntityTypeTables.TryAdd(DataParse.ParseEnum<EntityType>(lootTable.Key), lootTable.Tiers);
+                result.EntityTypeTables.TryAdd(EnumParser.ParseEnum<EntityType>(lootTable.Key), lootTable.Tiers);
 
             foreach (var lootTable in data.Individual)
                 result.IndividualTables.TryAdd(lootTable.Key, lootTable.Tiers);
@@ -70,10 +75,17 @@ namespace Core.Data
                 var itemModifiers = new List<IModifier>();
                 foreach (var modifier in modifierPool.ModifiersPool)
                 {
+                    if (modifier.Parts.Count > 0)
+                    {
+                        var composite = LoadCompositeModifier(modifierPool.Id, modifier);
+                        if (composite != null) itemModifiers.Add(composite);
+                        continue;
+                    }
+
                     if (!TryParseModifier(modifierPool.Id, modifier.Parameter, modifier.ModifierType, out var parameter, out var type)) continue;
 
                     var itemModifier = factory.CreateModifier(parameter, type, modifier.Value, modifier.Weight);
-                    itemModifier.Scope = DataParse.ParseEnumOrDefault<ModifierScope>(modifier.Scope);
+                    itemModifier.Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope);
                     itemModifiers.Add(itemModifier);
                 }
 
@@ -87,7 +99,7 @@ namespace Core.Data
         {
             var data = JsonConvert.DeserializeObject<ItemDataList>(json, s_settings);
             return (data?.Items ?? [])
-                .Select(item => factory.CreateItem(item.Id, DataParse.ParseEnum<Rarity>(item.Rarity), item.MaxStackSize, item.Tags))
+                .Select(item => factory.CreateItem(item.Id, EnumParser.ParseEnum<Rarity>(item.Rarity), item.MaxStackSize, item.Tags))
                 .ToList();
         }
 
@@ -98,17 +110,18 @@ namespace Core.Data
 
             foreach (var item in data?.Items ?? [])
             {
-                var baseModifiers = LoadModifiers(item.Implicits);
-                var additionalModifiers = LoadModifiers(item.Modifiers);
-                var equipmentType = DataParse.ParseEnum<EquipmentPiece>(item.EquipmentPart);
+                (List<IModifier> implicitModifiers, List<ContextModifierEntry> baseContext) = LoadItemLines(item.Implicits);
+                (List<IModifier> modifiers, List<ContextModifierEntry> additionalContext) = LoadItemLines(item.Modifiers);
+                var equipmentType = EnumParser.ParseEnum<EquipmentPiece>(item.EquipmentPart);
 
                 var newItem = CreateEquipItem(item, equipmentType);
-                newItem.Rarity = DataParse.ParseEnum<Rarity>(item.Rarity);
+                newItem.Rarity = EnumParser.ParseEnum<Rarity>(item.Rarity);
                 newItem.UpdateLevel = item.UpdateLevel;
                 newItem.MaxUpdateLevel = item.MaxUpdateLevel;
-                newItem.SetItemEffect(item.EffectId);
-                newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(baseModifiers, newItem.InstanceId));
-                newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(additionalModifiers, newItem.InstanceId));
+                newItem.SetImplicits(ModifiersCreator.CreateModifierInstances(implicitModifiers, newItem.InstanceId));
+                newItem.SetModifiers(ModifiersCreator.CreateModifierInstances(modifiers, newItem.InstanceId));
+                newItem.SetContextImplicits(baseContext);
+                newItem.SetContextModifiers(additionalContext);
                 LoadGrants(item, newItem);
                 items.Add(newItem);
             }
@@ -122,16 +135,16 @@ namespace Core.Data
             return (data?.CraftingRecipes ?? []).Select(recipeData =>
             {
                 var requirements = recipeData.Requirements
-                    .Select(requirement => factory.CreateRequirement(DataParse.ParseEnum<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
+                    .Select(requirement => factory.CreateRequirement(EnumParser.ParseEnum<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
                     .ToList();
 
                 var recipe = factory.CreateRecipe(
                     recipeData.Id,
                     recipeData.ResultItemId,
                     recipeData.Tags,
-                    DataParse.ParseEnum<Rarity>(recipeData.Rarity),
+                    EnumParser.ParseEnum<Rarity>(recipeData.Rarity),
                     requirements,
-                    DataParse.ParseEnum<ItemType>(recipeData.ItemType),
+                    EnumParser.ParseEnum<ItemType>(recipeData.ItemType),
                     recipeData.IsOpened,
                     recipeData.OptionalResourceCategories);
 
@@ -174,8 +187,8 @@ namespace Core.Data
         {
             foreach (var grantData in itemData.Grants)
             {
-                var kind = DataParse.ParseEnum<GrantKind>(grantData.Kind);
-                var grant = factory.CreateGrant(kind, grantData.Id, LoadModifiers(grantData.Modifiers));
+                var kind = EnumParser.ParseEnum<GrantKind>(grantData.Kind);
+                var grant = factory.CreateGrant(kind, grantData.Id, LoadModifiers(grantData.Modifiers), grantData.Properties);
                 if (grant != null) item.AddGrant(grant);
             }
         }
@@ -185,9 +198,44 @@ namespace Core.Data
             if (equipmentType != EquipmentPiece.Weapon)
                 return factory.CreateEquipItem(equipmentType, item.Id, item.Tags);
 
-            var weaponType = DataParse.ParseEnum<WeaponType>(item.WeaponType);
-            var handedness = DataParse.ParseEnum<Handedness>(item.Handedness);
+            var weaponType = EnumParser.ParseEnum<WeaponType>(item.WeaponType);
+            var handedness = EnumParser.ParseEnum<Handedness>(item.Handedness);
             return factory.CreateWeaponItem(weaponType, handedness, item.Damage, item.CritChance, item.CritDamage, item.Id, item.Tags);
+        }
+
+        /// <summary>Item lines share one "parameter" namespace: a name is resolved as
+        /// <see cref="EntityParameter"/> first, then as <see cref="ContextParameter"/> (pipeline knobs).
+        /// Unknown in both → the entry is reported and dropped, per the usual tolerance rules.</summary>
+        private (List<IModifier> Modifiers, List<ContextModifierEntry> ContextEntries) LoadItemLines(List<ItemModifier> modifiers)
+        {
+            var parameterLines = new List<IModifier>();
+            var contextLines = new List<ContextModifierEntry>();
+            foreach (var m in modifiers)
+            {
+                if (m.Parts.Count > 0)
+                {
+                    var composite = LoadCompositeModifier("item", m);
+                    if (composite != null) parameterLines.Add(composite);
+                    continue;
+                }
+
+                try
+                {
+                    var type = ParseModifierType(m.ModifierType);
+                    if (EnumParser.TryParseEnum<EntityParameter>(m.Parameter, out var parameter))
+                        parameterLines.Add(new Modifier(type, parameter, m.Value) { Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(m.Scope) });
+                    else if (EnumParser.TryParseEnum<ContextParameter>(m.Parameter, out var contextParameter))
+                        contextLines.Add(new ContextModifierEntry(contextParameter, type, m.Value, m.Weight));
+                    else
+                        Tracker.TrackError($"Skipping modifier of 'item': '{m.Parameter}' is neither an EntityParameter nor a ContextParameter");
+                }
+                catch (FormatException e)
+                {
+                    Tracker.TrackError($"Skipping modifier of 'item': {e.Message}");
+                }
+            }
+
+            return (parameterLines, contextLines);
         }
 
         private List<IModifier> LoadModifiers(List<ItemModifier> modifiers)
@@ -195,22 +243,46 @@ namespace Core.Data
             var result = new List<IModifier>();
             foreach (var m in modifiers)
             {
+                if (m.Parts.Count > 0)
+                {
+                    var composite = LoadCompositeModifier("item", m);
+                    if (composite != null) result.Add(composite);
+                    continue;
+                }
+
                 if (!TryParseModifier("item", m.Parameter, m.ModifierType, out var parameter, out var type)) continue;
 
                 result.Add(new Modifier(type, parameter, m.Value)
                 {
-                    Scope = DataParse.ParseEnumOrDefault<ModifierScope>(m.Scope)
+                    Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(m.Scope)
                 });
             }
 
             return result;
         }
 
+        /// <summary>One weighted entry granting all its parts at once. A bad part drops the whole entry
+        /// (a half-granted composite would be misleading), reported per the usual tolerance rules.</summary>
+        private CompositeModifier? LoadCompositeModifier(string context, ItemModifier data)
+        {
+            var parts = new List<IModifierInstance>();
+            foreach (var part in data.Parts)
+            {
+                if (!TryParseModifier(context, part.Parameter, part.ModifierType, out var parameter, out var type)) return null;
+
+                var instance = ModifiersCreator.CreateModifierInstance(parameter, type, part.Value, context);
+                instance.Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(part.Scope);
+                parts.Add(instance);
+            }
+
+            return parts.Count > 0 ? new CompositeModifier(data.Weight, parts, context) : null;
+        }
+
         private List<IUpgradingResource> LoadUpgradeResources(List<UpgradeResourceData> upgradeResourceData) =>
             upgradeResourceData.Select(upgradeResource =>
             {
-                var rarity = DataParse.ParseEnum<Rarity>(upgradeResource.Rarity);
-                var category = DataParse.ParseEnum<EquipmentCategory>(upgradeResource.Category);
+                var rarity = EnumParser.ParseEnum<Rarity>(upgradeResource.Rarity);
+                var category = EnumParser.ParseEnum<EquipmentCategory>(upgradeResource.Category);
                 return factory.CreateUpgradeResource(upgradeResource.Id, upgradeResource.Tags, rarity, category, upgradeResource.MaxStackSize);
             }).ToList();
 
@@ -228,7 +300,7 @@ namespace Core.Data
                 }
 
                 var materialModifiers = LoadMaterialModifiers(craftingData.Id, craftingData.Material.Modifiers);
-                var rarity = DataParse.ParseEnum<Rarity>(craftingData.Rarity);
+                var rarity = EnumParser.ParseEnum<Rarity>(craftingData.Rarity);
                 var material = factory.CreateMaterial(materialModifiers, category);
                 items.Add(factory.CreateCraftingResource(craftingData.Id, craftingData.MaxStackSize, craftingData.Tags, material, rarity));
             }
@@ -241,9 +313,9 @@ namespace Core.Data
             var result = new Dictionary<EquipmentCategory, List<IRequirement>>();
             foreach (var categoryData in categories)
             {
-                var category = DataParse.ParseEnum<EquipmentCategory>(categoryData.Category);
+                var category = EnumParser.ParseEnum<EquipmentCategory>(categoryData.Category);
                 result[category] = categoryData.Requirements
-                    .Select(requirement => factory.CreateRequirement(DataParse.ParseEnum<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
+                    .Select(requirement => factory.CreateRequirement(EnumParser.ParseEnum<RequirementType>(requirement.Type), requirement.Id, requirement.Amount))
                     .ToList();
             }
 
@@ -258,7 +330,7 @@ namespace Core.Data
                 if (!TryParseModifier(context, m.Parameter, m.ModifierType, out var parameter, out var type)) continue;
 
                 var materialModifier = factory.CreateMaterialModifier(parameter, type, m.BaseValue, m.Weight);
-                materialModifier.Scope = DataParse.ParseEnumOrDefault<ModifierScope>(m.Scope);
+                materialModifier.Scope = EnumParser.ParseEnumOrDefault<ModifierScope>(m.Scope);
                 result.Add(materialModifier);
             }
 
@@ -276,7 +348,7 @@ namespace Core.Data
             type = default;
             try
             {
-                parameter = DataParse.ParseEnum<EntityParameter>(parameterValue);
+                parameter = EnumParser.ParseEnum<EntityParameter>(parameterValue);
                 type = ParseModifierType(modifierTypeValue);
                 return true;
             }

@@ -18,7 +18,6 @@
     using Core.Views.UI;
     using Godot;
     using Microsoft.Extensions.DependencyInjection;
-    using Npc;
     using RequestHandlers;
     using UIElements;
 
@@ -29,21 +28,12 @@
             services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
             services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
-            services.AddGameDataParticipant<INpcProvider, NpcProvider>();
-            services.AddSingleton<INpcPopulationService, NpcPopulationService>();
-            services.AddGameDataParticipant<IFactionRelationService, FactionRelationService>();
-            services.AddSingleton<INpcWorldRegistry, NpcWorldRegistry>();
-            services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
-            services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
-            services.AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>();
-            services.AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, World.GameWorldClock>();
-            services.AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, World.PlayerLifecycleConfigProvider>();
 
+            services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
             services.AddSingleton<LoadScope>();
             services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
             services.AddSingleton<ISaveStorage>(_ => new SaveStorage(ProjectSettings.GlobalizePath("user://saves")));
             services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetService<ISkillProvider>));
-            services.AddSingleton<Save.ISaveGameService, Save.SaveGameService>();
             services.AddSingleton<ISaveManager>(sp =>
             {
                 var manager = new SaveManager(sp.GetRequiredService<LoadScope>());
@@ -53,7 +43,7 @@
                 manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
                 manager.Register(new AbilityBookSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<IAbilityProvider>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
-                manager.Register(new Save.PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
+                manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
 
                 // The npcWorld section needs a project-side NPC factory; a project without one
                 // (no world NPCs) simply doesn't write the section.

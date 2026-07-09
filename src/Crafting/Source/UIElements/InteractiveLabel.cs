@@ -36,7 +36,7 @@
             if (@event is not InputEventMouseButton mb) return;
             if (mb is { ButtonIndex: MouseButton.Left, Pressed: true } && Selectable)
             {
-                EmitSignal(global::Crafting.Source.UIElements.InteractiveLabel.SignalName.Selected, Identifier);
+                EmitSignal(SignalName.Selected, Identifier);
                 AcceptEvent();
             }
         }

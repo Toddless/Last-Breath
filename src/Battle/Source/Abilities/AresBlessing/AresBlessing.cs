@@ -10,7 +10,6 @@ namespace Battle.Source.Abilities.AresBlessing
     using Core.Components.Module;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
 
     /// <summary>

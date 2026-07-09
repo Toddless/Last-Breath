@@ -1,9 +1,9 @@
 namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
-    using Abilities.Modifiers;
     using Core.Battle.Abilities;
     using Core.Events.GameEvents;
+    using Core.Modifiers.Context;
 
     /// <summary>
     /// "The next activated ability has no cooldown": puts a cast mutator on the owner and removes
@@ -12,14 +12,14 @@ namespace Battle.Source.Effects
     public class FreeCastEffect(string sourceAbilityId)
         : Effect(id: "Effect_Free_Cast", duration: 0, maxStacks: 1)
     {
-        private NoCooldownActivationModifier? _modifier;
+        private NoCooldownActivationContextModifier? _modifier;
 
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);
             if (!IsApplied || Target == null) return;
 
-            _modifier = new NoCooldownActivationModifier(sourceAbilityId);
+            _modifier = new NoCooldownActivationContextModifier(sourceAbilityId);
             Target.ModifierHandler.Add(_modifier);
             SubscribeUntilRemoved<AbilityActivatedEvent>(Target.CombatEvents, OnAbilityActivated);
         }

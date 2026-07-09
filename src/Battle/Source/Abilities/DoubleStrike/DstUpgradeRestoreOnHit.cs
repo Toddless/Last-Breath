@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>L3 upgrade: a landed first strike restores health, a landed second strike restores mana.</summary>
     public class DstUpgradeRestoreOnHit(string id, string[] tags, int tier, float healthRestore, float manaRestore)

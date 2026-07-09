@@ -11,7 +11,6 @@ namespace Battle.Source.Abilities.IceAegis
     using Core.Components.Module;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
     using Effects;
 
     /// <summary>Cast plan of the Ice Aegis: barrier numbers and the optional stage payloads.</summary>

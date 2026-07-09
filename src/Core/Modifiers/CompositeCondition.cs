@@ -1,8 +1,9 @@
-﻿namespace Core.Modifiers
+namespace Core.Modifiers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Entity;
     using Interfaces;
 
     public class CompositeCondition : ICondition
@@ -19,9 +20,6 @@
         public bool IsMet { get; private set; }
 
         public event Action<bool>? StateChanged;
-        public void Attach(IConditionTarget target) => throw new NotImplementedException();
-
-        public void Detach() => throw new NotImplementedException();
 
         public CompositeCondition(IReadOnlyList<ICondition> conditions, Mode mode)
         {
@@ -31,6 +29,19 @@
                 condition.StateChanged += _ => Evaluate();
             Evaluate();
         }
+
+        public void Attach(IFightable owner)
+        {
+            foreach (ICondition condition in _conditions) condition.Attach(owner);
+            Evaluate();
+        }
+
+        public void Detach()
+        {
+            foreach (ICondition condition in _conditions) condition.Detach();
+        }
+
+        public ICondition Copy() => new CompositeCondition(_conditions.Select(condition => condition.Copy()).ToList(), _mode);
 
         private void Evaluate()
         {

@@ -24,8 +24,7 @@
                 for (int i = 0; i < ability.Attacks; i++)
                 {
                     if (!target.IsAlive) break;
-                    float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
-                    additionalDamage *= increase;
+                    float additionalDamage = ability.BonusDamage(owner) * increase;
                     float damage = owner.Parameters.Damage * increase;
                     var context = new AttackContext(owner, target, damage, rnd, scheduler)
                     {
@@ -48,7 +47,8 @@
                         await ability.ApplyImpactRiders(processed.ToImpact(field));
                     }
 
-                    if (context.Result is AttackResults.Succeed) increase += ability.AttackDamageMultiplier;
+                    if (context.Result is not AttackResults.Succeed) break;
+                    increase += ability.AttackDamageMultiplier;
                 }
             }
         }

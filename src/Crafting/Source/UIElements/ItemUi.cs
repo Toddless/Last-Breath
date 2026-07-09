@@ -46,7 +46,8 @@
 
         public void SetItemBaseStats(List<string> baseStats)
         {
-            for (int i = 0; i < baseStats.Count; i++)
+            // The scene has a fixed set of labels; extra lines (context implicits) must not crash the view.
+            for (int i = 0; i < baseStats.Count && i < _itemBaseStats.Count; i++)
             {
                 _itemBaseStats[i].Text = baseStats[i];
             }
@@ -61,6 +62,6 @@
         public void SetItemAdditionalStats(List<(string ModifierText, int Identifier)> additionalStats) => _additionalStats?.AddModifiersToList(additionalStats);
 
         private void OnModifierItemSelected(int identifier, ItemModifierList source) =>
-            EmitSignal(global::Crafting.Source.UIElements.ItemUi.SignalName.ModifierSelected, identifier, source);
+            EmitSignal(SignalName.ModifierSelected, identifier, source);
     }
 }

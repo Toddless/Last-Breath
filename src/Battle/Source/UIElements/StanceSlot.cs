@@ -11,13 +11,16 @@
         private const string UID = "uid://bke05jg0bjgy1";
 
         private IBattleEventBus? _battleEventBus;
-        private Stance _stance;
+        public Stance Stance { get; private set; }
 
         public override void _Ready() => Toggled += OnToggle;
 
+        // Stance passives at this point already activated, no need to raise OnToggle
+        public void InitializeStance() => ButtonPressed = true;
+
         public void SetBattleEventBus(IBattleEventBus battleEventBus) => _battleEventBus = battleEventBus;
 
-        public void SetStance(Stance stance) => _stance = stance;
+        public void SetStance(Stance stance) => Stance = stance;
 
         public void RemoveBattleEventBus() => _battleEventBus = null;
 
@@ -25,7 +28,7 @@
 
         private void OnToggle(bool toggledOn)
         {
-            if (toggledOn) _battleEventBus?.Publish<PlayerChangesStanceEvent>(new(_stance));
+            if (toggledOn) _battleEventBus?.Publish<PlayerChangesStanceEvent>(new(Stance));
         }
     }
 }

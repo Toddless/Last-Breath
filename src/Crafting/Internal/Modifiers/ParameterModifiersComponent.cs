@@ -55,6 +55,8 @@
         public void RemoveTemporaryModifier(IModifierInstance modifier) => RemoveFromCategory(_temporaryModifiers, modifier);
         public void RemoveBattleModifier(IModifierInstance modifier) => RemoveFromCategory(_battleModifiers, modifier);
 
+        public void RefreshParameter(EntityParameter parameter) => RaiseEvent(parameter);
+
         public void RemoveModifierBySource(string source) => RemoveAllFromCategoryBySource(_permanentModifiers, source);
         public void RemoveTemporaryModifierBySource(object source) => RemoveAllFromCategoryBySource(_temporaryModifiers, source);
         public void RemoveBattleModifierBySource(object source) => RemoveAllFromCategoryBySource(_battleModifiers, source);

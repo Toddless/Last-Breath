@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>
     /// Upgrade that replaces the ability's resource type (e.g. mana → health). CostType is stored as a

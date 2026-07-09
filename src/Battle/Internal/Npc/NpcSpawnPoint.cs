@@ -18,7 +18,7 @@ namespace Battle.Internal.Npc
     /// schedules a replacement; the global cap is enforced by <see cref="INpcPopulationService"/>.
     /// </summary>
     [GlobalClass]
-    public partial class NpcSpawnPoint : Node2D
+    internal partial class NpcSpawnPoint : Node2D
     {
         [Export] private string[] _npcIds = [];
         [Export] private int _maxCount = 3;

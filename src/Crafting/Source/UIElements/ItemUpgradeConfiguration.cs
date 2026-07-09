@@ -15,10 +15,10 @@
             ui.SetItemIcon(item.Icon);
             ui.SetItemPiece(Localization.Localize(item.EquipmentPiece.ToString()));
             ui.SetItemRarity(Localization.Localize(item.Rarity.ToString()));
-            ui.SetItemBaseStats(item.Implicits.Select(Localization.Format).ToList());
-            ui.SetItemAdditionalStats(item.Modifiers.Select(it => (Localization.Format(it), it.GetHashCode())).ToList());
-            ui.SetItemEffectName(Localization.Localize(item.ItemEffect));
-            ui.SetItemEffectDescription(Localization.Localize(item.ItemEffect));
+            ui.SetItemBaseStats(item.Implicits.Select(Localization.Format)
+                .Concat(item.ContextImplicits.Select(Localization.Format)).ToList());
+            ui.SetItemAdditionalStats(item.Modifiers.Select(it => (Localization.Format(it), it.GetHashCode()))
+                .Concat(item.ContextModifiers.Select(entry => (Localization.Format(entry), entry.GetHashCode()))).ToList());
         }
     }
 }

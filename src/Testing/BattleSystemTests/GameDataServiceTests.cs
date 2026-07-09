@@ -173,24 +173,24 @@ namespace LastBreathTest.BattleSystemTests
     }
 
     [TestClass]
-    public class DataParseTests
+    public class EnumParserTests
     {
         private enum Sample { None, First, Second }
 
         [TestMethod]
-        public void ParseEnumIsCaseInsensitive() => Assert.AreEqual(Sample.Second, Core.Data.DataParse.ParseEnum<Sample>("second"));
+        public void ParseEnumIsCaseInsensitive() => Assert.AreEqual(Sample.Second, Core.Data.EnumParser.ParseEnum<Sample>("second"));
 
         [TestMethod]
         public void ParseEnumThrowsOnTypoInsteadOfSilentDefault() =>
-            Assert.ThrowsException<FormatException>(() => Core.Data.DataParse.ParseEnum<Sample>("Secnod"));
+            Assert.ThrowsException<FormatException>(() => Core.Data.EnumParser.ParseEnum<Sample>("Secnod"));
 
         [TestMethod]
         public void ParseEnumOrDefaultTreatsAbsentAsDefaultButParsesPresentStrictly()
         {
-            Assert.AreEqual(Sample.None, Core.Data.DataParse.ParseEnumOrDefault<Sample>(null));
-            Assert.AreEqual(Sample.None, Core.Data.DataParse.ParseEnumOrDefault<Sample>(""));
-            Assert.AreEqual(Sample.First, Core.Data.DataParse.ParseEnumOrDefault<Sample>("first"));
-            Assert.ThrowsException<FormatException>(() => Core.Data.DataParse.ParseEnumOrDefault<Sample>("frist"));
+            Assert.AreEqual(Sample.None, Core.Data.EnumParser.ParseEnumOrDefault<Sample>(null));
+            Assert.AreEqual(Sample.None, Core.Data.EnumParser.ParseEnumOrDefault<Sample>(""));
+            Assert.AreEqual(Sample.First, Core.Data.EnumParser.ParseEnumOrDefault<Sample>("first"));
+            Assert.ThrowsException<FormatException>(() => Core.Data.EnumParser.ParseEnumOrDefault<Sample>("frist"));
         }
     }
 }

@@ -1,22 +1,66 @@
-﻿namespace Battle.Source
+namespace Battle.Source
 {
+    using System;
     using System.Collections.Generic;
+    using Core;
     using Core.Battle.Skills;
+    using PassiveSkills;
 
-    public class PassiveSkillProvider
+    /// <summary>Battle-side skill factory for item grants: maps a skill id to a constructor fed by
+    /// numeric properties from item JSON — balance lives in data, this registry only wires ids to code.
+    /// A missing property refuses the grant loudly instead of constructing a mis-tuned skill.</summary>
+    public class PassiveSkillProvider : ISkillProvider
     {
-        private const string DataPath = "res://Source/Data/";
-        private Dictionary<string, ISkill> _passiveSkills = new();
-
-        public ISkill GetSkill(string id)
+        private static readonly Dictionary<string, Func<SkillProperties, ISkill>> s_factories = new()
         {
-            return _passiveSkills[id];
-        }
+            ["Passive_Skill_Regeneration"] =
+                properties => new RegenerationPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Mana_Regeneration"] =
+                properties => new ManaRegenerationPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Current_Health_Regeneration"] =
+                properties => new CurrentHealthRegenerationPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Mana_To_Barrier"] =
+                properties => new ManaToBarrierPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Critical_Leech"] =
+                properties => new CriticalLeechPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Critical_Mana_Leech"] =
+                properties => new CriticalManaLeechPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_No_Critical_Hits"] = _
+                => new NoCriticalHitsPassiveSkill(),
+            ["Passive_Skill_Mana_On_Attack"] = properties
+                => new ManaOnAttackPassiveSkill(properties.Get("amount")),
+            ["Passive_Skill_Porcupine"] = properties =>
+                new PorcupinePassiveSkill(properties.Get("damagePercent"), properties.Get("armorPercent")),
+            ["Passive_Skill_Bleeding"] = properties
+                => new BleedingPassiveSkill(properties.Get("percentFromDamage"), properties.GetInt("duration"), properties.GetInt("maxStacks")),
+            ["Passive_Skill_Bleed_Detonation"] = properties
+                => new BloodthirstyPassiveSkill(properties.GetInt("stackThreshold"), properties.Get("healPercent")),
+            ["Passive_Skill_Undead_Burning"] = properties
+                => new RighteousWrathPassiveSkill(properties.Get("percentFromDamage"), properties.GetInt("burningDuration"), properties.GetInt("stackThreshold"),
+                    properties.GetInt("incinerationDuration")),
+            ["Passive_Skill_Servant_Hell"] = properties
+                => new ServantHellPassiveSkill(properties.Get("chance")),
+        };
 
+        public ISkill? CreateSkill(string id) => CreateSkill(id, SkillProperties.Empty);
 
-        public void LoadData()
+        public ISkill? CreateSkill(string id, SkillProperties properties)
         {
+            if (!s_factories.TryGetValue(id, out var create))
+            {
+                Tracker.TrackNotFound($"Passive skill factory for '{id}'", this);
+                return null;
+            }
 
+            try
+            {
+                return create(properties);
+            }
+            catch (KeyNotFoundException e)
+            {
+                Tracker.TrackError($"Skill '{id}' not granted: {e.Message}");
+                return null;
+            }
         }
     }
 }

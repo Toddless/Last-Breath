@@ -131,6 +131,8 @@
             _entityBars?.AddChild(bar);
         }
 
+        public void SetPlayerStance(Stance stance) => _stanceButtons?.GetChildren().Cast<StanceSlot>().FirstOrDefault(slot => slot.Stance == stance)?.InitializeStance();
+
         public void SetPlayerInitialValues(float maxHealth, float maxMana, float health, float mana)
         {
             _playerBars?.SetInitialValues(maxMana, mana, maxHealth, health);

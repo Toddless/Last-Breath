@@ -10,7 +10,6 @@
     using Core.Components.Module;
     using Core.Entity;
     using Core.Enums;
-    using Decorators;
 
     public class SeriesOfAttacks(
         string[] tags,

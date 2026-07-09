@@ -22,10 +22,10 @@ namespace LastBreath.Services
             new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
 
         // TODO: Main has no ISkillProvider yet — passive grants resolve to nothing until one is registered.
-        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers) => kind switch
+        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
         {
             GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
-            GrantKind.Passive => new PassiveSkillGrant(id, id, static () => null),
+            GrantKind.Passive => new PassiveSkillGrant(id, id, properties, static () => null),
             _ => null
         };
 

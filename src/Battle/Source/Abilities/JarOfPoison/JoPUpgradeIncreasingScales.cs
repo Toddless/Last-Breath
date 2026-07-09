@@ -1,8 +1,8 @@
 ﻿namespace Battle.Source.Abilities.JarOfPoison
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     public class JoPUpgradeIncreasingScales(string id, string[] tags, int tier, float weaponScale, float spellScale)
         : AbilityUpgrade<JarOfPoison>(id, tags, tier)

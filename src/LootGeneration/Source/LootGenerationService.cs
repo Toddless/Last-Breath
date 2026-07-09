@@ -16,6 +16,9 @@ namespace LootGeneration.Source
     using Core.Services;
     using Godot;
 
+    /// <summary>The drop pipeline: listens for entity deaths, rolls that entity's loot table (cached per id),
+    /// then asks <see cref="IItemCreationService"/> to spawn the resulting items and publishes them on the buses.
+    /// Odds, entity- and rarity-weights all come from the injected <see cref="ILootConfiguration"/>.</summary>
     public class LootGenerationService : ILootGenerationService
     {
         private readonly Dictionary<string, Dictionary<int, List<TableRecord>>> _tableCache = [];

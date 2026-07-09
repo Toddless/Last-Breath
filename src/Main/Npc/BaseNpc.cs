@@ -2,15 +2,17 @@ namespace LastBreath.Npc
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
-    using Attribute;
     using Battle.Source;
     using Components;
     using Core;
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Ai.World.Skirmish;
+    using Core.Ai.World.Time;
+    using Core.Attribute;
     using Core.Battle;
-    using Core.Battle.Abilities;
     using Core.Components;
     using Core.Components.NpcModifiers;
     using Core.Context;
@@ -20,47 +22,47 @@ namespace LastBreath.Npc
     using Core.Enums;
     using Core.Events;
     using Core.Events.GameEvents;
-    using Core.Interfaces;
     using Core.Items;
+    using Core.Modifiers;
+    using Core.Services;
     using Godot;
-    using Services;
-    using Stateless;
-    using DamageContext = DamageContext;
-    using EntityParametersComponent = Core.Components.EntityParametersComponent;
+    using Player;
 
-    public partial class BaseNpc : CharacterBody2D, IFightableNpc
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant
     {
+        /// <summary>Close enough to a movement destination to stop.</summary>
+        private const float ArriveDistance = 5f;
+        /// <summary>How close the player must stand to burn a body.</summary>
+        private const float BurnDistance = 150f;
+        /// <summary>Hostile NPCs this close start an abstract skirmish (NPC-vs-NPC contact distance).</summary>
+        private const float SkirmishEngageDistance = 90f;
+        /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
+        private const float SkirmishScanInterval = 0.5f;
+        private const string UndeadRisingModifierSource = "UndeadRising";
+        private const string UID = "uid://ww6a71b2bbov";
+
+        private bool _hostileToPlayer;
+        private float _skirmishScanCooldown;
+        private float _corpseScanCooldown;
+        private float _moveSpeed;
+        private string _lastMoveAnimation = string.Empty;
+        private float _baseSpeed = 500;
+
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
-
-        private enum State
-        {
-            Idle,
-            Walk,
-            Battle,
-        }
-
-        private enum Trigger
-        {
-            Idle,
-            Walk,
-            Battle,
-        }
-
-        private enum Direction
-        {
-            Up,
-            Down,
-            Left,
-            Right
-        }
-
-        private Direction _direction;
-        private float _baseSpeed = 500;
-        private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
+        private IPlayerAccessor? _playerAccessor;
+        private IFactionRelationService? _factionRelations;
+        private INpcWorldRegistry? _npcRegistry;
+        private INpcSkirmishService? _skirmishService;
+        private IWorldClock? _worldClock;
+        private IWorldBrain? _brain;
+        private INpcLifecycle? _lifecycle;
+        private IReadOnlyList<Vector2>? _patrolRoute;
+        private Vector2? _moveDestination;
         private readonly RandomNumberGenerator _rnd = new();
+        [Export] private AnimationsComponent? _animationsComponent;
 
         [Export] public string Id { get; private set; } = string.Empty;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -70,9 +72,8 @@ namespace LastBreath.Npc
         public string DisplayName { get; } = string.Empty;
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
-        public IAnimationsComponent Animations { get; private set; }
+        public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
-        public ICombatComponent CombatComponent { get; }
         public IAbilityBookComponent AbilityBook { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
@@ -87,16 +88,29 @@ namespace LastBreath.Npc
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
-        public int Level { get; } = 150;
-        public Rarity Rarity { get; } = Rarity.Legendary;
-        public EntityType EntityType { get; } = EntityType.Regular;
-        public Fractions Fraction { get; } = Fractions.Human;
-        public INpcLifecycle? Lifecycle { get; }
-
+        public int Level { get; private set; } = 150;
+        public Rarity Rarity { get; private set; } = Rarity.Legendary;
+        public EntityType EntityType { get; private set; } = EntityType.Regular;
+        public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
         public IBehaviorProfile? Behavior { get; set; }
-        public float RisingBonus { get; }
-        public bool IsRisen { get; }
+
+        /// <summary>Body state for the save system; null until <see cref="ApplyDefinition"/> ran (legacy NPCs).</summary>
+        public INpcLifecycle? Lifecycle => _lifecycle;
+
+        /// <summary>True after this NPC rose as undead — the save system persists risen ones as world deviations.</summary>
+        public bool IsRisen { get; private set; }
+
+        /// <summary>The rising's parameter bonus, kept for the save round-trip.</summary>
+        public float RisingBonus { get; private set; }
+
+        // ---- IWorldAgent (the brain's view of this body) ----
+        public Vector2 HomePosition { get; private set; }
+
+        /// <summary>World-space position; Node2D.Position is parent-local and must not leak into the brain.</summary>
+        Vector2 IWorldAgent.Position => GlobalPosition;
+
+        Vector2 ISkirmishParticipant.Position => GlobalPosition;
 
         public float CurrentHealth
         {
@@ -138,14 +152,11 @@ namespace LastBreath.Npc
         public event Action<float>? CurrentManaChanged;
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
-        public event Action<IFightable>? Dead;
-        public event Action<float, DamageType, bool>? DamageTaken;
-
 
         public override void _Ready()
         {
-            //  Animations.PlayAnimation("Idle");
             _interactionArea?.BodyEntered += OnBodyEnter;
+            _interactionArea?.InputEvent += OnInteractionAreaInput;
 
             _rnd.Randomize();
             Parameters = new EntityParametersComponent();
@@ -157,79 +168,297 @@ namespace LastBreath.Npc
             Strength = new Strength(ParameterModifiers);
             Intelligence = new Intelligence(ParameterModifiers);
             NpcModifiers = new NpcModifiersComponent(this);
-            AbilityBook = new AbilityBookComponent(this, initialStance: GetRandomStance());
-            Effects.EffectAdded += OnEffectAdded;
-            Effects.EffectRemoved += OnEffectRemoved;
+            ModifierHandler = new ModifierHandlerComponent();
+            AbilityBook = new AbilityBookComponent(this);
+            Effects.EffectsChanged += OnEffectsChanged;
             ParameterModifiers.ModifiersChanged += Parameters.OnParameterModifiersChange;
             Parameters.ParameterChanged += OnParameterChanged;
             Parameters.ParameterChanged += Dexterity.OnParameterChanges;
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
-            ConfigureStateMachine();
             SetBaseValuesForParameters();
 
-            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
         }
 
-        public void ApplyDefinition(NpcDefinition definition) => throw new NotImplementedException();
-
-        public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed) => throw new NotImplementedException();
-
-        public void RestoreAsRisen(float parameterBonus) => throw new NotImplementedException();
-
-
         public void InjectServices(IGameServiceProvider provider)
         {
-            _gameEventBus = provider.GetService<IGameEventBus>();
+            _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
+            _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
+            _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
+            _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
+            _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            _npcRegistry?.Register(this);
+            _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
         }
 
-        private Stance GetRandomStance()
+
+        public override void _PhysicsProcess(double delta)
         {
-            var stances = Enum.GetValues<Stance>();
-            return stances[_rnd.RandiRange(0, stances.Length - 1)];
+            if (!IsAlive)
+            {
+                _lifecycle?.Tick((float)delta); // a lying body: only the resurrection timer runs
+                return;
+            }
+
+            _brain?.Tick((float)delta);
+            TryScanForSkirmish((float)delta);
+            TryScanForPlayerCorpse((float)delta);
+            ProcessLocomotion();
         }
 
-        private void ConfigureStateMachine()
+        /// <summary>Humanoid passers-by may burn the player's corpse (the lifecycle rolls the
+        /// chance ONCE per NPC per death — standing next to the body doesn't re-roll).</summary>
+        private void TryScanForPlayerCorpse(float delta)
         {
-            _stateMachine.Configure(State.Idle)
-                // .OnEntry(() => { Animations.PlayAnimation($"Idle"); })
-                .PermitReentry(Trigger.Idle)
-                .Permit(Trigger.Walk, State.Walk)
-                .Permit(Trigger.Battle, State.Battle);
+            _corpseScanCooldown -= delta;
+            if (_corpseScanCooldown > 0) return;
+            _corpseScanCooldown = SkirmishScanInterval;
 
-            _stateMachine.Configure(State.Walk)
-                .PermitReentry(Trigger.Walk)
-                .Permit(Trigger.Idle, State.Idle)
-                .Permit(Trigger.Battle, State.Battle);
+            if (Fraction is not (Fractions.Human or Fractions.Dwarf or Fractions.Elf)) return;
+            if (_playerAccessor?.Player is not Player { IsAlive: false, Lifecycle: { } lifecycle } corpse) return;
+            if (GlobalPosition.DistanceTo(corpse.GlobalPosition) > lifecycle.Config.BurnRadius) return;
 
-            _stateMachine.Configure(State.Battle)
-                .OnEntry(() =>
-                {
-                    //Animations.PlayAnimation("Idle");
-                    CanMove = false;
-                    _lastPosition = Position;
-                })
-                .OnExit(() =>
-                {
-                    CanMove = true;
-                    Position = _lastPosition;
-                })
-                .Permit(Trigger.Idle, State.Idle);
+            lifecycle.TryBurnRoll(InstanceId); // the player reacts to the Burned event itself
         }
+
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
+
+        /// <summary>
+        /// Turns the randomly-initialized NPC into a data-driven one: overrides the rolled base
+        /// parameters, fixes the stance, learns the rolled abilities (Learn auto-equips them)
+        /// and attaches the combat behavior. Call after _Ready has built the components.
+        /// </summary>
+        public void ApplyDefinition(NpcDefinition definition)
+        {
+            Id = definition.NpcId;
+            Level = definition.Level;
+            Rarity = definition.Rarity;
+            EntityType = definition.EntityType;
+            Fraction = definition.Fraction;
+            Behavior = definition.Behavior;
+
+            foreach ((EntityParameter parameter, float value) in definition.Parameters)
+                Parameters.SetBaseValueForParameter(parameter, value);
+
+            AbilityBook.SetStance(definition.Stance);
+            foreach (var ability in definition.Abilities)
+                AbilityBook.Learn(definition.Stance, ability);
+
+            // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
+            NpcModifiers.AddModifiers(definition.Modifiers.ToList());
+
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+
+            AttachWorldBrain(definition.World);
+
+            _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
+            _lifecycle.ResurrectionReady += OnResurrectionReady;
+        }
+
+        /// <summary>Must be set before <see cref="ApplyDefinition"/> — the brain takes the route at construction.</summary>
+        public void SetPatrolRoute(IReadOnlyList<Vector2> points) => _patrolRoute = points;
+
+        /// <summary>The spawn position becomes home: the leash and calm activities anchor to it.</summary>
+        private void AttachWorldBrain(WorldBrainConfig? config)
+        {
+            HomePosition = GlobalPosition;
+            if (config == null) return;
+
+            _hostileToPlayer = config.HostileToPlayer;
+            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), _patrolRoute, _worldClock);
+            CanMove = true;
+        }
+
+        public void MoveTo(Vector2 destination, float speed)
+        {
+            CanMove = true; // symmetric to StopMoving's freeze: a new intent unfreezes the body
+            _moveDestination = destination;
+            _moveSpeed = speed;
+        }
+
+        public void StopMoving()
+        {
+            CanMove = false;
+            _lastPosition = Position;
+            _moveDestination = null;
+            Velocity = Vector2.Zero;
+        }
+
+        /// <summary>
+        /// Vision by distance polling (no physics layers involved). Only enemies are reported —
+        /// the nearest of: the player (personal override or faction standing) and hostile NPCs
+        /// (faction matrix). TODO: line-of-sight raycast when collision layers are defined.
+        /// </summary>
+        public TargetSighting? GetSighting(float visionRadius)
+        {
+            Vector2? nearest = null;
+            float nearestDistance = visionRadius;
+
+            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode)
+                Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
+
+            if (_npcRegistry != null && _factionRelations != null)
+            {
+                foreach (var other in _npcRegistry.All)
+                {
+                    if (!IsSkirmishableEnemy(other)) continue;
+                    Consider(other.Position, ref nearest, ref nearestDistance);
+                }
+            }
+
+            return nearest == null ? null : new TargetSighting(nearest.Value);
+        }
+
+        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's faction standing.</summary>
+        private bool ConsidersPlayerAnEnemy() =>
+            _hostileToPlayer || _factionRelations?.IsHostileToPlayer(Fraction) == true;
+
+        private void Consider(Vector2 candidate, ref Vector2? nearest, ref float nearestDistance)
+        {
+            float distance = GlobalPosition.DistanceTo(candidate);
+            if (distance > nearestDistance) return;
+            nearest = candidate;
+            nearestDistance = distance;
+        }
+
+        /// <summary>An NPC worth chasing/fighting: alive, free and hostile in either direction.</summary>
+        private bool IsSkirmishableEnemy(ISkirmishParticipant other)
+        {
+            if (other.InstanceId == InstanceId || !other.IsAlive || other.IsFighting) return false;
+            return _factionRelations!.IsHostile(Fraction, other.Fraction) ||
+                   _factionRelations.IsHostile(other.Fraction, Fraction);
+        }
+
+        /// <summary>Hostile NPC at contact distance → the abstract skirmish takes both squads over.</summary>
+        private void TryScanForSkirmish(float delta)
+        {
+            if (_brain == null || _skirmishService == null || _npcRegistry == null || _factionRelations == null) return;
+            if (IsFighting) return;
+
+            _skirmishScanCooldown -= delta;
+            if (_skirmishScanCooldown > 0) return;
+            _skirmishScanCooldown = SkirmishScanInterval;
+
+            foreach (var other in _npcRegistry.All)
+            {
+                if (!IsSkirmishableEnemy(other)) continue;
+                if (GlobalPosition.DistanceTo(other.Position) > SkirmishEngageDistance) continue;
+                if (_skirmishService.TryStart(this, other)) return;
+            }
+        }
+
+        /// <summary>
+        /// Straight-line steering with collision sliding — enough for the small open 2D world.
+        /// Seam for later: swap the direction source to NavigationAgent2D once a navmesh exists.
+        /// </summary>
+        private void ProcessLocomotion()
+        {
+            if (_moveDestination == null || !CanMove || IsFighting) return;
+
+            var toDestination = _moveDestination.Value - GlobalPosition;
+            if (toDestination.Length() <= ArriveDistance)
+            {
+                StopMoving();
+                return;
+            }
+
+            Velocity = toDestination.Normalized() * _moveSpeed;
+            MoveAndSlide();
+            UpdateMoveAnimation(Velocity);
+        }
+
+        // TODO: switch to Walk_* clips when they exist; Idle_* keeps the direction readable for now.
+        private void UpdateMoveAnimation(Vector2 velocity)
+        {
+            string clip = Mathf.Abs(velocity.X) >= Mathf.Abs(velocity.Y)
+                ? velocity.X >= 0 ? "Idle_Right" : "Idle_Left"
+                : velocity.Y >= 0
+                    ? "Idle_Down"
+                    : "Idle_Up";
+
+            if (clip == _lastMoveAnimation) return;
+            _lastMoveAnimation = clip;
+            Animations.PlayAnimation(clip);
+        }
+
+        private void OnWorldStimulus(WorldStimulusEvent evnt) => _brain?.OnStimulus(evnt.Stimulus);
 
         public void AddItemToInventory(IItem item)
         {
         }
 
-        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
-
-        public void SetupBattleEventBus(IBattleEventBus bus)
+        public async Task ReceiveAttack(IAttackContext context)
         {
-            _battleEventBus = bus;
-            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
+            try
+            {
+                Calculations.CalculateSucceeded(context);
+                switch (context.Result)
+                {
+                    case AttackResults.Succeed:
+                        Calculations.CalculateInitialAttackDamage(context);
+                        var damageContext = new DamageContext
+                        {
+                            Source = context.Attacker,
+                            Cause = DamageCause.Attack,
+                            IsCrit = context.ForceCriticalAttack || context.IsCritical,
+                            SourceAbilityId = context.SourceAbilityId
+                        };
+                        damageContext.Add(DamageType.Physical, context.FinalDamage);
+                        await TakeDamage(damageContext);
+                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
+                        break;
+                    case AttackResults.Blocked:
+                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
+                        break;
+                    case AttackResults.Evaded:
+                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
+                        break;
+                }
+
+                // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
+                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
+            }
+            catch (Exception e)
+            {
+                GD.Print($"{e.Message}, {e.StackTrace}");
+            }
+        }
+
+        public Task Attack(IAttackContext context)
+        {
+            // BeforeAttack reactions may mutate RawCriticalChance, so the crit roll happens after them
+            CombatEvents.Publish(new BeforeAttackEvent(context));
+            context.IsCritical = context.Rnd.Randf() <= context.RawCriticalChance;
+            return Task.CompletedTask;
+        }
+
+        public Task TakeDamage(IDamageContext context)
+        {
+            ModifierHandler.Apply(context);
+            context.Source.ModifierHandler.Apply(context);
+            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
+            Calculations.CalculateMitigation(context, this);
+
+            float remaining = context.TotalDamage;
+            if (CurrentBarrier > 0)
+            {
+                float absorbed = Mathf.Min(CurrentBarrier, remaining);
+                context.AbsorbedByBarrier = absorbed;
+                CurrentBarrier -= absorbed;
+                remaining -= absorbed;
+            }
+
+            if (remaining > 0) CurrentHealth -= remaining;
+
+            // Combat bus only: the timeline records it and the BattleDirector republishes it
+            // to the battle bus at replay time, so UI reacts when the hit is SHOWN, not resolved.
+            CombatEvents.Publish(new DamageTakenEvent(context, this, VitalsSnapshot.From(this)));
+            return Task.CompletedTask;
         }
 
         public void Heal(IHealContext context)
@@ -238,17 +467,40 @@ namespace LastBreath.Npc
             if (context.Amount <= 0) return;
             if (context.ConvertToDamage)
             {
-                var convertedDamage = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
-                convertedDamage.Add(DamageType.Pure, context.Amount);
-                TakeDamage(convertedDamage);
+                var damageContext = new DamageContext { Source = context.Source, Cause = DamageCause.Passive };
+                damageContext.Add(DamageType.Pure, context.Amount);
+                _ = TakeDamage(damageContext);
                 return;
             }
 
             float amount = context.Amount;
             CurrentHealth += amount; // applied before publishing so the snapshot reflects the post-heal state
-            var healed = new EntityHealedEvent(this, amount, VitalsSnapshot.From(this));
-            CombatEvents.Publish(healed);
-            _battleEventBus?.Publish(healed);
+            CombatEvents.Publish(new EntityHealedEvent(this, amount, VitalsSnapshot.From(this)));
+        }
+
+        public void OnTurnStart()
+        {
+            Effects.TriggerTurnStart();
+            CombatEvents.Publish(new TurnStartEvent(this));
+            _battleEventBus?.Publish(new TurnStartEvent(this));
+            _gameEventBus?.Publish(new TurnStartEvent(this));
+        }
+
+        public void OnTurnEnd()
+        {
+            Effects.TriggerTurnEnd();
+            TurnRecovery.Apply(this);
+            CombatEvents.Publish(new TurnEndEvent());
+            _battleEventBus?.Publish(new TurnEndEvent());
+            _gameEventBus?.Publish(new TurnEndEvent());
+        }
+
+        public float GetDamage() => _rnd.RandfRange(0.9f, 1.1f) * Parameters.Damage;
+
+        public void SetupBattleEventBus(IBattleEventBus bus)
+        {
+            _battleEventBus = bus;
+            _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
         public void ConsumeResource(Costs type, float amount)
@@ -294,114 +546,28 @@ namespace LastBreath.Npc
             return TargetChooser.Choose(targets);
         }
 
-        public async Task ReceiveAttack(IAttackContext context)
-        {
-            try
-            {
-                Calculations.CalculateSucceeded(context);
-                switch (context.Result)
-                {
-                    case AttackResults.Succeed:
-                        Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = new DamageContext
-                        {
-                            Source = context.Attacker,
-                            Cause = DamageCause.Attack,
-                            IsCrit = context.ForceCriticalAttack || context.IsCritical
-                        };
-                        damageContext.Add(DamageType.Physical, context.FinalDamage);
-                        await TakeDamage(damageContext);
-                        context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
-                        break;
-                    case AttackResults.Blocked:
-                        CombatEvents.Publish<AttackBlockedEvent>(new(context));
-                        break;
-                    case AttackResults.Evaded:
-                        CombatEvents.Publish<AttackEvadedEvent>(new(context));
-                        break;
-                }
-
-                context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
-                context.Attacker.ModifierHandler.Apply(context);
-            }
-            catch (Exception e)
-            {
-                GD.Print($"{e.Message}, {e.StackTrace}");
-            }
-        }
-
-        public Task Attack(IAttackContext context)
-        {
-            context.IsCritical = context.Rnd.Randf() <= Parameters.CriticalChance;
-            CombatEvents.Publish(new BeforeAttackEvent(context));
-            return Task.CompletedTask;
-        }
-
-        public void OnTurnEnd()
-        {
-            Effects.TriggerTurnEnd();
-            CombatEvents.Publish(new TurnEndEvent());
-            _battleEventBus?.Publish(new TurnEndEvent());
-            _gameEventBus?.Publish(new TurnEndEvent());
-        }
-
-        public void OnTurnStart()
-        {
-            Effects.TriggerTurnStart();
-            CombatEvents.Publish(new TurnStartEvent(this));
-            _battleEventBus?.Publish(new TurnStartEvent(this));
-            _gameEventBus?.Publish(new TurnStartEvent(this));
-        }
-
-        public Task TakeDamage(IDamageContext context)
-        {
-            ModifierHandler.Apply(context);
-            context.Source.ModifierHandler.Apply(context);
-            CombatEvents.Publish(new BeforeDamageTakenEvent(context));
-            Calculations.CalculateMitigation(context, this);
-
-            float remaining = context.TotalDamage;
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
-
-            if (remaining > 0) CurrentHealth -= remaining;
-
-            var damageTaken = new DamageTakenEvent(context, this, VitalsSnapshot.From(this));
-            CombatEvents.Publish(damageTaken);
-            _battleEventBus?.Publish(damageTaken);
-            return Task.CompletedTask;
-        }
-
         private void OnBodyEnter(Node2D body)
         {
-            if (IsFighting) return;
+            if (IsFighting || !IsAlive) return; // a lying body must not start battles
+            // The player's flag guards the battle-start window: a second NPC touching in the same
+            // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
+            // not a battle target.
+            if (body is not IPlayer player || player.IsFighting || !player.IsAlive) return;
             try
             {
-                switch (body)
+                List<IFightable> fighters = [];
+                if (Group != null)
                 {
-                    case IPlayer player:
-                        {
-                            List<IFightable> fighters = [];
-                            if (Group != null)
-                            {
-                                Group.NotifyAllInGroup(GroupNotification.Attacked);
-                                fighters.AddRange(Group.GetEntitiesInGroup<IFightable>());
-                            }
-                            else
-                                fighters.Add(this);
-
-                            // _stateMachine.Fire(Trigger.Battle);
-                            _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
-                            break;
-                        }
-                    case IFightable fighter:
-                        break;
+                    Group.NotifyAllInGroup(GroupNotification.Attacked);
+                    fighters.AddRange(Group.GetEntitiesInGroup<IFightable>());
                 }
+                else
+                    fighters.Add(this);
+
+                StopMoving();
+                _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
+                // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
+                _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
             }
             catch (Exception e)
             {
@@ -427,18 +593,114 @@ namespace LastBreath.Npc
         private void OnBattleEnd(BattleEndEvent obj)
         {
             Effects.RemoveAllEffects();
-            if (IsAlive) _stateMachine.Fire(Trigger.Idle);
+            CanMove = true;
+            Position = _lastPosition;
+
+            if (IsAlive) _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+            else BecomeBody();
+
             _battleEventBus = null;
         }
 
-        private void OnEffectRemoved(IEffect effect)
+        /// <summary>
+        /// The defeat is not the end: the body stays in the world. Non-undead start the rise
+        /// timer, undead lie dormant; either can be burned by the player (final death).
+        /// NPCs without a data definition have no body rules — free them instead of leaking.
+        /// </summary>
+        private void BecomeBody()
         {
-            _battleEventBus?.Publish<EffectRemovedEvent>(new(effect, this));
+            if (_lifecycle == null)
+            {
+                QueueFree();
+                return;
+            }
+
+            Group?.RemoveFromGroup(this);
+            Group = null;
+            StopMoving();
+            _lifecycle.OnDefeated(Fraction == Fractions.Undead);
+            // TODO:
+            // новая анимация данного состояния.
+            Animations.PlayAnimation("Dead");
         }
 
-        private void OnEffectAdded(IEffect effect)
+        /// <summary>Dies outside a player battle (lost skirmish): the body lifecycle takes over.</summary>
+        public void DefeatInWorld()
         {
-            _battleEventBus?.Publish<EffectAddedEvent>(new(effect, this));
+            CurrentHealth = 0;
+            IsFighting = false;
+            BecomeBody();
+        }
+
+        /// <summary>Burns the lying body — final death; the spawn point spawns a replacement.</summary>
+        public bool TryBurnBody()
+        {
+            if (_lifecycle?.TryBurn() != true) return false;
+            _gameEventBus?.Publish(new NpcFinalDeathEvent(InstanceId, Id, GlobalPosition));
+            QueueFree();
+            return true;
+        }
+
+        /// <summary>Click on a lying body with the player standing next to it — burn it for good.</summary>
+        private void OnInteractionAreaInput(Node viewport, InputEvent @event, long shapeIdx)
+        {
+            if (_lifecycle is not { CanBeBurned: true }) return;
+            if (@event is not InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left }) return;
+            if (!IsPlayerWithin(BurnDistance)) return;
+
+            TryBurnBody();
+        }
+
+        private bool IsPlayerWithin(float distance) =>
+            _playerAccessor?.Player is Node2D playerNode && GlobalPosition.DistanceTo(playerNode.GlobalPosition) <= distance;
+
+        private void OnResurrectionReady(float parameterBonus)
+        {
+            var previousFraction = Fraction;
+            BecomeRisenUndead(parameterBonus);
+            _gameEventBus?.Publish(new NpcFactionChangedEvent(InstanceId, Id, previousFraction, Fractions.Undead, GlobalPosition));
+        }
+
+        /// <summary>Save-load path: rebuilds a lying body. Health drops through the normal property —
+        /// in Battle the game-bus death event has no subscribers; a future loot orchestrator in Main
+        /// must check ILoadScope before reacting to deaths.</summary>
+        public void RestoreAsBody(NpcLifeStage stage, float resurrectDelay, float elapsed)
+        {
+            CurrentHealth = 0;
+            StopMoving();
+            _lifecycle?.RestoreState(stage, resurrectDelay, elapsed);
+            Animations.PlayAnimation("Dead");
+        }
+
+        /// <summary>Save-load path: rebuilds a wild risen undead. No NpcFactionChangedEvent —
+        /// the original spawn point already replaced this NPC before the save.</summary>
+        public void RestoreAsRisen(float parameterBonus) => BecomeRisenUndead(parameterBonus);
+
+        private void BecomeRisenUndead(float parameterBonus)
+        {
+            Fraction = Fractions.Undead;
+            IsRisen = true;
+            RisingBonus = parameterBonus;
+            ApplyRisingBonus(parameterBonus);
+            CurrentHealth = Parameters.MaxHealth;
+            CurrentMana = Parameters.MaxMana;
+            Modulate = new Color(0.65f, 1f, 0.75f); // placeholder undead look until dedicated sprites exist
+            Animations.PlayAnimation("Idle_Down");
+        }
+
+        /// <summary>The longer the body lay, the stronger the rising — Increase modifiers on the core parameters.</summary>
+        private void ApplyRisingBonus(float bonus)
+        {
+            if (bonus <= 0) return;
+
+            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.Damage, EntityParameter.SpellDamage, EntityParameter.Armor];
+            foreach (var parameter in boosted)
+                ParameterModifiers.AddModifier(ModifiersCreator.CreateModifierInstance(parameter, ModifierValueType.Increase, bonus, UndeadRisingModifierSource));
+        }
+
+        private void OnEffectsChanged()
+        {
+            _battleEventBus?.Publish<EffectsChangedEvent>(new(this, Effects.GetEffectViews()));
         }
 
         private void NotifyHealthChanges(float value)
@@ -466,8 +728,7 @@ namespace LastBreath.Npc
         {
             _gameEventBus?.Publish<EntityDiedEvent>(new(this));
             _battleEventBus?.Publish<EntityDiedEvent>(new(this));
-
-            Dead?.Invoke(this);
+            CombatEvents.Publish<EntityDiedEvent>(new(this));
         }
 
         private void SetBaseValuesForParameters()
@@ -482,7 +743,7 @@ namespace LastBreath.Npc
                 {
                     case EntityParameter.Health:
                     case EntityParameter.Barrier:
-                        value = 500;
+                        value = 1000;
                         break;
                     case EntityParameter.Mana:
                         value = 50;
@@ -506,7 +767,7 @@ namespace LastBreath.Npc
                     case EntityParameter.SpellDamage:
                     case EntityParameter.Accuracy:
                     case EntityParameter.Evade:
-                        value = rnd.RandfRange(50, 100);
+                        value = rnd.RandfRange(50, 1000);
                         break;
                 }
 
@@ -518,8 +779,11 @@ namespace LastBreath.Npc
         {
             if (!disposing) return;
 
+            _npcRegistry?.Unregister(this);
+            _gameEventBus?.Unsubscribe<WorldStimulusEvent>(OnWorldStimulus);
             _battleEventBus = null;
             _gameEventBus = null;
+            _brain = null;
         }
     }
 }

@@ -1,9 +1,9 @@
 namespace Battle.Source.UIElements
 {
     using Core.Data;
+    using Core.Save;
     using Core.Views.UI;
     using Godot;
-    using Save;
 
     /// <summary>
     /// Checkpoint save/load screen: 10 slots with metadata (location, mastery level, date),
@@ -72,7 +72,7 @@ namespace Battle.Source.UIElements
             return row;
         }
 
-        private static string DescribeSlot(int slot, Core.Save.SaveMetadata? metadata) =>
+        private static string DescribeSlot(int slot, SaveMetadata? metadata) =>
             metadata == null
                 ? $"{slot}. —"
                 : $"{slot}. {metadata.Location} · {metadata.MasteryLevel} · {metadata.SavedAtUtc.ToLocalTime():dd.MM HH:mm}";

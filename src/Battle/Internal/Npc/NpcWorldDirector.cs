@@ -1,6 +1,6 @@
 namespace Battle.Internal.Npc
 {
-    using Battle.Source.Npc;
+    using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;
     using Core.Events.GameEvents;
@@ -13,7 +13,7 @@ namespace Battle.Internal.Npc
     /// A-Life ticks and skirmish presentation. Pausing the game pauses the world time with it.
     /// </summary>
     [GlobalClass]
-    public partial class NpcWorldDirector : Node
+    internal partial class NpcWorldDirector : Node
     {
         private INpcSkirmishService? _skirmishes;
         private IWorldClock? _clock;

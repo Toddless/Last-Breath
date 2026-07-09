@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Localization
 {
+    using Core.Entity;
     using Godot;
-    using Player = Player;
 
     [GlobalClass]
     public partial class DialogueOption : Resource
@@ -13,7 +13,7 @@
         [Export] public bool AllConditionsMustMet { get; set; } = false;
         [Export] public int MinimumConditionsRequirement { get; set; } = 0;
 
-        public bool CheckConditions(Player player)
+        public bool CheckConditions(IPlayer player)
         {
             // int cnt = Conditions.Where(item => item.IsMet(player.Progress)).Count();
             // return AllConditionsMustMet

@@ -1,7 +1,7 @@
 ﻿namespace Battle.Source.Abilities
 {
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     public class AbilityUpgradeReduceCooldown(string id, string[] tags, int tier, float cooldown)
         : SimpleUpgrade<Ability, AbilityParameter>(id, tags, tier,

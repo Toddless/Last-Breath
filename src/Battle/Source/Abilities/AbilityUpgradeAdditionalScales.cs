@@ -1,8 +1,8 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
+    using Core.Components.Decorator;
     using Core.Enums;
-    using Decorators;
 
     /// <summary>Adds flat bonuses to the ability's weapon and spell damage scales.</summary>
     public class AbilityUpgradeAdditionalScales(string id, string[] tags, int tier, float weaponScale, float spellScale)

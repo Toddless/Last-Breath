@@ -369,6 +369,18 @@ msgstr ""
 msgid "Modifier_Multiplicative"
 msgstr ""
 
+msgid "Context_Modifier_HealingEfficiency"
+msgstr ""
+
+msgid "Context_Modifier_BleedDuration"
+msgstr ""
+
+msgid "Context_Modifier_BurningBonusStacks"
+msgstr ""
+
+msgid "Context_Modifier_BurningDotDamage"
+msgstr ""
+
 msgid "Notification_Game_Saved"
 msgstr ""
 
@@ -662,31 +674,31 @@ msgid "Ability_Poison_Coating"
 msgstr "Ядовитое покрытие"
 
 msgid "Ability_Poison_Coating_Description"
-msgstr "В течение 3 ходов все атаки накладывают стак яда. Каждый стак наносит 75% от нанесённого урона в течение 5 ходов."
+msgstr "В течение {CoatingDuration|turn|turns} все атаки накладывают стак яда. Каждый стак наносит {PoisonMultiplier:%} от нанесённого урона в течение {PoisonDuration|turn|turns}."
 
 msgid "Ability_Poison_Explosion"
 msgstr "Взрыв яда"
 
 msgid "Ability_Poison_Explosion_Description"
-msgstr "Снимает с цели все стаки яда и наносит весь их суммарный урон разом. Казнит цель с 42 или более стаками."
+msgstr "Снимает с цели все стаки яда и наносит весь их суммарный урон разом. Казнит цель с {ExecutionThreshold} или более стаками."
 
 msgid "Ability_Critical_Calculation"
 msgstr "Критический расчёт"
 
 msgid "Ability_Critical_Calculation_Description"
-msgstr "На 3 хода увеличивает шанс критического удара на 45%. Критическая атака продлевает действие бафа на 1 ход."
+msgstr "На {Duration|turn|turns} даёт {Stacks} стаков увеличенного шанса критического удара. Критическая атака продлевает действие бафа на 1 ход."
 
 msgid "Ability_Dark_Shroud"
 msgstr "Тёмный покров"
 
 msgid "Ability_Dark_Shroud_Description"
-msgstr "На 4 хода увеличивает уклонение на 35%. В начале каждого хода восстанавливает 5% здоровья."
+msgstr "На {Duration|turn|turns} накладывает {Stacks} стаков Лёгкого шага (+{LightStepValue:%} уклонения за стак). В начале каждого хода восстанавливает {HealthRegen:%} здоровья."
 
 msgid "Ability_Jar_Of_Poison"
 msgstr "Банка с ядом"
 
 msgid "Ability_Jar_Of_Poison_Description"
-msgstr "Накладывает стак яда, наносящий 50 + (35% + 50%) урона каждый ход в течение 3 ходов."
+msgstr "Накладывает стак яда, наносящий {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона каждый ход в течение {PoisonDuration|turn|turns}."
 
 msgid "Ability_Increasing_Pressure"
 msgstr "Возрастающий натиск"
@@ -698,25 +710,25 @@ msgid "Ability_Series_Of_Attacks"
 msgstr "Серия атак"
 
 msgid "Ability_Series_Of_Attacks_Description"
-msgstr "Серия из 2-5 атак. Атаки наносят дополнительно 30 + (50% + 25%) базового урона. Уклонение цели прерывает серию."
+msgstr "Серия из {MinAttacks}-{MaxAttacks} атак. Атаки наносят дополнительно {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) базового урона. Уклонение цели прерывает серию."
 
 msgid "Ability_Berserk_Fury"
 msgstr "Ярость берсерка"
 
 msgid "Ability_Berserk_Fury_Description"
-msgstr "Совершает последовательные атаки: шанс нанести следующий удар зависит от текущего здоровья — чем оно ниже, тем ниже шанс продолжить серию. Активация накладывает эффект {@Effect_Fury}."
+msgstr "Накладывает {@Effect_Fury} ({FuryDuration|turn|turns}, каждая атака сжигает {FuryHealthPercent:%} текущего здоровья) и совершает последовательные атаки — шанс продолжить серию зависит от текущего здоровья: чем оно ниже, тем ниже шанс."
 
 msgid "Ability_Armageddon"
 msgstr "Армагедон"
 
 msgid "Ability_Armageddon_Description"
-msgstr "Удержание активации накапливает до трёх стадий. Первая стадия поглощает 5% здоровья и наносит 300 + (75% + 75%) базового урона. Вторая поглощает 15% здоровья и наносит 600 + (120% + 120%). Третья поглощает 30% здоровья, наносит 1000 + (180% + 180%) и дополнительно оглушает цель на 2 хода. При нехватке здоровья активируется последняя достигнутая стадия."
+msgstr "Удержание активации накапливает до трёх стадий. Первая стадия поглощает 5% здоровья и наносит 300 + (75% + 75%) базового урона. Вторая поглощает 15% здоровья и наносит 600 + (120% + 120%). Третья поглощает 30% здоровья, наносит 1000 + (180% + 180%) и дополнительно оглушает цель на {StunDuration|turn|turns}. При нехватке здоровья активируется последняя достигнутая стадия."
 
 msgid "Ability_Double_Strike"
 msgstr "Двойной удар"
 
 msgid "Ability_Double_Strike_Description"
-msgstr "Наносит два последовательных удара. Первый наносит 120 + (80% + 65%) базового урона и при попадании снижает броню цели. Второй наносит 60 + (100% + 25%) базового урона и при попадании снижает уклонение цели."
+msgstr "Наносит два последовательных удара. Первый наносит {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) базового урона и при попадании снижает броню цели. Второй наносит {SecondDamage} + ({SecondWeaponScale:%} + {SecondSpellScale:%}) базового урона и при попадании снижает уклонение цели."
 
 msgid "Ability_Head_Butt"
 msgstr "Удар в голову"
@@ -728,49 +740,49 @@ msgid "Ability_Porcupine"
 msgstr "Дикобраз"
 
 msgid "Ability_Porcupine_Description"
-msgstr "На 3 хода возвращает атакующему 25% нанесённого урона + 15% от брони."
+msgstr "На {Duration|turn|turns} возвращает атакующему {DamageReturn:%} нанесённого урона + {ArmorReturn:%} от брони."
 
 msgid "Ability_Ares_Blessing"
 msgstr "Благословение Ареса"
 
 msgid "Ability_Ares_Blessing_Description"
-msgstr "На 3 хода увеличивает здоровье и восстановление здоровья на 30%."
+msgstr "На {Duration|turn|turns} увеличивает максимальное здоровье на {HealthBonus:%} и восстановление здоровья на {RecoveryBonus:%}."
 
 msgid "Ability_Sacrifice"
 msgstr "Жертва"
 
 msgid "Ability_Sacrifice_Description"
-msgstr "Жертвует 15% текущего здоровья. За каждую единицу потерянного здоровья следующая активированная способность получает 1% чистого урона."
+msgstr "Жертвует {SacrificePercent:%} текущего здоровья. За каждые 100 потерянного здоровья следующая активированная способность получает {RatePerHundred:%} чистого урона. Зарядов: {Charges}."
 
 msgid "Ability_Ice_Shards"
 msgstr "Ледяные осколки"
 
 msgid "Ability_Ice_Shards_Description"
-msgstr "Выстреливает тремя осколками льда. Каждый осколок наносит цели 80 + (25% + 90%) урона.\nУровень активации 2: урон осколков увеличивается до 120 + (35% + 120%).\nУровень активации 3: осколки летят во все цели на поле боя.\nУровень активации 4: при критическом ударе осколки распадаются на шрапнель, нанося 50 + (15% + 55%) урона всем противникам."
+msgstr "Выстреливает {Shards} осколками льда. Каждый осколок наносит цели {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона.\nУровень активации 2: урон осколков увеличивается до {SecondStageDamage} + ({SecondStageWeaponDamageScale:%} + {SecondStageSpellDamageScale:%}).\nУровень активации 3: осколки летят во все цели на поле боя.\nУровень активации 4: при критическом ударе осколки распадаются на шрапнель, нанося {ShrapnelDamage} + ({ShrapnelWeaponDamageScale:%} + {ShrapnelSpellDamageScale:%}) урона всем противникам."
 
 msgid "Ability_Ice_Block"
 msgstr "Глыба льда"
 
 msgid "Ability_Ice_Block_Description"
-msgstr "Роняет на цель огромную глыбу льда: 230 + (50% + 130%) урона и оглушение на 1 ход.\nУровень активации 2: оглушение продлевается на 1 ход.\nУровень активации 3: накладывает стак {@Effect_Withering_Curse}.\nУровень активации 4: на цель падают три дополнительных глыбы, каждая наносит 50% урона первоначальной."
+msgstr "Роняет на цель огромную глыбу льда: {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона и оглушение на {StunDuration|turn|turns}.\nУровень активации 2: оглушение продлевается на 1 ход.\nУровень активации 3: накладывает стак {@Effect_Withering_Curse}.\nУровень активации 4: на цель падают {ExtraBlocks} дополнительных глыбы, каждая наносит {ExtraBlockDamagePercent:%} урона первоначальной."
 
 msgid "Ability_Overload"
 msgstr "Перегрузка"
 
 msgid "Ability_Overload_Description"
-msgstr "Сжигает 25% текущей маны цели. Наносит 100 + (15% + 40%) урона + 1.5 урона за каждую единицу сожжённой маны.\nУровень активации 2: множитель 2 за единицу сожжённой маны.\nУровень активации 3: при крите восстанавливает 15% сожжённой маны.\nУровень активации 4: урон становится чистым."
+msgstr "Сжигает {ManaBurnPercent:%} текущей маны цели. Наносит {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) урона + {DamagePerMana} урона за каждую единицу сожжённой маны.\nУровень активации 2: множитель 2 за единицу сожжённой маны.\nУровень активации 3: при крите восстанавливает 15% сожжённой маны.\nУровень активации 4: урон становится чистым."
 
 msgid "Ability_Chain_Lightning"
 msgstr "Цепная молния"
 
 msgid "Ability_Chain_Lightning_Description"
-msgstr "Наносит цели 140 + (25% + 120%) базового урона и перескакивает на случайного противника до двух раз. Каждый прыжок теряет 25% урона.\nУровень активации 2: +1 прыжок.\nУровень активации 3: потеря урона за прыжок снижена на 15%.\nУровень активации 4: последний прыжок наносит удвоенный урон."
+msgstr "Наносит цели {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) базового урона и перескакивает на случайного противника до {Jumps} раз. Каждый прыжок теряет {DamageFalloff:%} урона.\nУровень активации 2: +1 прыжок.\nУровень активации 3: потеря урона за прыжок снижена на 15%.\nУровень активации 4: последний прыжок наносит удвоенный урон."
 
 msgid "Ability_Ice_Aegis"
 msgstr "Ледяная эгида"
 
 msgid "Ability_Ice_Aegis_Description"
-msgstr "Накладывает барьер, равный 300 + 35 за каждую единицу интеллекта, на 3 хода.\nУровень активации 2: дополнительный скейл за единицу интеллекта: +15.\nУровень активации 3: пока действует барьер, атакующие получают стак {@Effect_Clumsiness}.\nУровень активации 4: при разрушении барьера до окончания действия замораживает всех противников на поле боя."
+msgstr "Накладывает барьер, равный {BarrierBase} + {PerIntelligenceScale} за каждую единицу интеллекта, на {Duration|turn|turns}.\nУровень активации 2: дополнительный скейл за единицу интеллекта: +15.\nУровень активации 3: пока действует барьер, атакующие получают стак {@Effect_Clumsiness}.\nУровень активации 4: при разрушении барьера до окончания действия замораживает всех противников на поле боя."
 
 msgid "Effect_Fury_Tooltip"
 msgstr "Сжигает часть здоровья при каждой атаке."
@@ -786,3 +798,970 @@ msgstr "Проклятье увядания"
 
 msgid "Effect_Withering_Curse_Tooltip"
 msgstr "Снижает максимальное здоровье."
+
+# -----------------------
+# Equip items — Amulets
+# -----------------------
+
+msgid "Amulet_Of_Recovery"
+msgstr "Источник восстановления"
+
+msgid "Amulet_Of_Recovery_Description"
+msgstr ""
+
+msgid "Amulet_Stronghold"
+msgstr "Твердыня"
+
+msgid "Amulet_Stronghold_Description"
+msgstr ""
+
+msgid "Amulet_Onyx_Medallion"
+msgstr "Ониксовый медальон"
+
+msgid "Amulet_Onyx_Medallion_Description"
+msgstr ""
+
+msgid "Amulet_Life_Core"
+msgstr "Ядро жизни"
+
+msgid "Amulet_Life_Core_Description"
+msgstr ""
+
+msgid "Amulet_Intelligence"
+msgstr "Средоточие мудрости"
+
+msgid "Amulet_Intelligence_Description"
+msgstr ""
+
+msgid "Amulet_Strength"
+msgstr "Средоточие мощи"
+
+msgid "Amulet_Strength_Description"
+msgstr ""
+
+msgid "Amulet_Dexterity"
+msgstr "Средоточие грации"
+
+msgid "Amulet_Dexterity_Description"
+msgstr ""
+
+msgid "Amulet_Trinity"
+msgstr "Амулет триединства"
+
+msgid "Amulet_Trinity_Description"
+msgstr ""
+
+msgid "Amulet_Dexterity_Intelligence"
+msgstr "Знак следопыта"
+
+msgid "Amulet_Dexterity_Intelligence_Description"
+msgstr ""
+
+msgid "Amulet_Dexterity_Strength"
+msgstr "Талисман ловчего"
+
+msgid "Amulet_Dexterity_Strength_Description"
+msgstr ""
+
+msgid "Amulet_Strength_Intelligence"
+msgstr "Символ веры"
+
+msgid "Amulet_Strength_Intelligence_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Rings
+# -----------------------
+
+msgid "Ring_Of_Dwarfs"
+msgstr "Гномий перстень"
+
+msgid "Ring_Of_Dwarfs_Description"
+msgstr ""
+
+msgid "Ring_Dexterity"
+msgstr "Кольцо ловкости"
+
+msgid "Ring_Dexterity_Description"
+msgstr ""
+
+msgid "Ring_Intelligence"
+msgstr "Кольцо интеллекта"
+
+msgid "Ring_Intelligence_Description"
+msgstr ""
+
+msgid "Ring_Of_Archmage"
+msgstr "Кольцо архимага"
+
+msgid "Ring_Of_Archmage_Description"
+msgstr ""
+
+msgid "Ring_Of_Limitless_Magic"
+msgstr "Кольцо безграничной магии"
+
+msgid "Ring_Of_Limitless_Magic_Description"
+msgstr ""
+
+msgid "Ring_Minor_Barrier"
+msgstr "Малый барьер"
+
+msgid "Ring_Minor_Barrier_Description"
+msgstr ""
+
+msgid "Ring_Archmage_Signet"
+msgstr "Печатка архимага"
+
+msgid "Ring_Archmage_Signet_Description"
+msgstr ""
+
+msgid "Ring_of_Hunter"
+msgstr "Кольцо охотника"
+
+msgid "Ring_of_Hunter_Description"
+msgstr ""
+
+msgid "Ring_of_Assasin"
+msgstr "Кольцо убийцы"
+
+msgid "Ring_of_Assasin_Description"
+msgstr ""
+
+msgid "Ring_of_Trickster"
+msgstr "Кольцо плута"
+
+msgid "Ring_of_Trickster_Description"
+msgstr ""
+
+msgid "Ring_of_Knight"
+msgstr "Кольцо рыцаря"
+
+msgid "Ring_of_Knight_Description"
+msgstr ""
+
+msgid "Ring_Of_Legionnaire"
+msgstr "Кольцо латника"
+
+msgid "Ring_Of_Legionnaire_Description"
+msgstr ""
+
+msgid "Ring_of_Giant"
+msgstr "Кольцо великана"
+
+msgid "Ring_of_Giant_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Belts
+# -----------------------
+
+msgid "Belt_of_Strength"
+msgstr "Кожаный ремень"
+
+msgid "Belt_of_Strength_Description"
+msgstr ""
+
+msgid "Belt_of_Dexterity"
+msgstr "Кушак разведчика"
+
+msgid "Belt_of_Dexterity_Description"
+msgstr ""
+
+msgid "Belt_of_Intelligence"
+msgstr "Тканевый пояс"
+
+msgid "Belt_of_Intelligence_Description"
+msgstr ""
+
+msgid "Belt_of_Hunter"
+msgstr "Пояс охотника"
+
+msgid "Belt_of_Hunter_Description"
+msgstr ""
+
+msgid "Belt_of_Knight"
+msgstr "Пояс рыцаря"
+
+msgid "Belt_of_Knight_Description"
+msgstr ""
+
+msgid "Belt_of_Inquisitor"
+msgstr "Пояс инквизитора"
+
+msgid "Belt_of_Inquisitor_Description"
+msgstr ""
+
+msgid "Belt_Of_Life"
+msgstr "Пояс жизни"
+
+msgid "Belt_Of_Life_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Body armor
+# -----------------------
+
+msgid "Body_Strength_Stoneheart"
+msgstr "Каменное сердце"
+
+msgid "Body_Strength_Stoneheart_Description"
+msgstr ""
+
+msgid "Body_Strength_Iron_Bastion"
+msgstr "Железный бастион"
+
+msgid "Body_Strength_Iron_Bastion_Description"
+msgstr ""
+
+msgid "Body_Strength_Vital_Core"
+msgstr "Основа жизни"
+
+msgid "Body_Strength_Vital_Core_Description"
+msgstr ""
+
+msgid "Body_Dexterity_Shadowstep"
+msgstr "Источник тьмы"
+
+msgid "Body_Dexterity_Shadowstep_Description"
+msgstr ""
+
+msgid "Body_Dexterity_Hunters_Dream"
+msgstr "Мечта охотника"
+
+msgid "Body_Dexterity_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Body_Dexterity_Feral_Instinct"
+msgstr "Животный инстинкт"
+
+msgid "Body_Dexterity_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Body_Intelligence_Eternal_Reserve"
+msgstr "Мантия архимага"
+
+msgid "Body_Intelligence_Eternal_Reserve_Description"
+msgstr ""
+
+msgid "Body_Intelligence_Arcane_Bulwark"
+msgstr "Таинственный бастион"
+
+msgid "Body_Intelligence_Arcane_Bulwark_Description"
+msgstr ""
+
+msgid "Body_Intelligence_Aegis"
+msgstr "Эгида"
+
+msgid "Body_Intelligence_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Helmets
+# -----------------------
+
+msgid "Helmet_Strength_Stoneheart"
+msgstr "Каменное сердце"
+
+msgid "Helmet_Strength_Stoneheart_Description"
+msgstr ""
+
+msgid "Helmet_Strength_Iron_Bastion"
+msgstr "Железный бастион"
+
+msgid "Helmet_Strength_Iron_Bastion_Description"
+msgstr ""
+
+msgid "Helmet_Strength_Vital_Core"
+msgstr "Основа жизни"
+
+msgid "Helmet_Strength_Vital_Core_Description"
+msgstr ""
+
+msgid "Helmet_Dexterity_Shadowstep"
+msgstr "Корона тьмы"
+
+msgid "Helmet_Dexterity_Shadowstep_Description"
+msgstr ""
+
+msgid "Helmet_Dexterity_Hunters_Dream"
+msgstr "Мечта охотника"
+
+msgid "Helmet_Dexterity_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Helmet_Dexterity_Feral_Instinct"
+msgstr "Животный инстинкт"
+
+msgid "Helmet_Dexterity_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Helmet_Intelligence_Eternal_Reserve"
+msgstr "Безграничный резерв"
+
+msgid "Helmet_Intelligence_Eternal_Reserve_Description"
+msgstr ""
+
+msgid "Helmet_Intelligence_Arcane_Bulwark"
+msgstr "Таинственный бастион"
+
+msgid "Helmet_Intelligence_Arcane_Bulwark_Description"
+msgstr ""
+
+msgid "Helmet_Intelligence_Aegis"
+msgstr "Эгида"
+
+msgid "Helmet_Intelligence_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Gloves
+# -----------------------
+
+msgid "Gloves_Strength_Stoneheart"
+msgstr "Каменное сердце"
+
+msgid "Gloves_Strength_Stoneheart_Description"
+msgstr ""
+
+msgid "Gloves_Strength_Iron_Bastion"
+msgstr "Железный бастион"
+
+msgid "Gloves_Strength_Iron_Bastion_Description"
+msgstr ""
+
+msgid "Gloves_Strength_Vital_Core"
+msgstr "Основа жизни"
+
+msgid "Gloves_Strength_Vital_Core_Description"
+msgstr ""
+
+msgid "Gloves_Dexterity_Shadowstep"
+msgstr "Тёмный хват"
+
+msgid "Gloves_Dexterity_Shadowstep_Description"
+msgstr ""
+
+msgid "Gloves_Dexterity_Hunters_Dream"
+msgstr "Мечта охотника"
+
+msgid "Gloves_Dexterity_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Gloves_Dexterity_Feral_Instinct"
+msgstr "Животный инстинкт"
+
+msgid "Gloves_Dexterity_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Gloves_Intelligence_Eternal_Reserve"
+msgstr "Безграничный резерв"
+
+msgid "Gloves_Intelligence_Eternal_Reserve_Description"
+msgstr ""
+
+msgid "Gloves_Intelligence_Arcane_Bulwark"
+msgstr "Таинственный бастион"
+
+msgid "Gloves_Intelligence_Arcane_Bulwark_Description"
+msgstr ""
+
+msgid "Gloves_Intelligence_Aegis"
+msgstr "Эгида"
+
+msgid "Gloves_Intelligence_Aegis_Description"
+msgstr ""
+
+# -----------------------
+# Equip items — Boots
+# -----------------------
+
+msgid "Boots_Strength_Stoneheart"
+msgstr "Каменная поступь"
+
+msgid "Boots_Strength_Stoneheart_Description"
+msgstr ""
+
+msgid "Boots_Strength_Iron_Bastion"
+msgstr "Железное наступление"
+
+msgid "Boots_Strength_Iron_Bastion_Description"
+msgstr ""
+
+msgid "Boots_Strength_Vital_Core"
+msgstr "Основа жизни"
+
+msgid "Boots_Strength_Vital_Core_Description"
+msgstr ""
+
+msgid "Boots_Dexterity_Shadowstep"
+msgstr "Тёмный шаг"
+
+msgid "Boots_Dexterity_Shadowstep_Description"
+msgstr ""
+
+msgid "Boots_Dexterity_Hunters_Dream"
+msgstr "Мечта охотника"
+
+msgid "Boots_Dexterity_Hunters_Dream_Description"
+msgstr ""
+
+msgid "Boots_Dexterity_Feral_Instinct"
+msgstr "Животный инстинкт"
+
+msgid "Boots_Dexterity_Feral_Instinct_Description"
+msgstr ""
+
+msgid "Boots_Intelligence_Eternal_Reserve"
+msgstr "Безграничный резерв"
+
+msgid "Boots_Intelligence_Eternal_Reserve_Description"
+msgstr ""
+
+msgid "Boots_Intelligence_Arcane_Bulwark"
+msgstr "Таинственный бастион"
+
+msgid "Boots_Intelligence_Arcane_Bulwark_Description"
+msgstr ""
+
+msgid "Boots_Intelligence_Aegis"
+msgstr "Эгида"
+
+msgid "Boots_Intelligence_Aegis_Description"
+msgstr ""
+
+# ------------------------------
+# Keyword reference cards (for ability upgrades)
+# ------------------------------
+
+msgid "Effect_Fragility"
+msgstr "Хрупкость"
+
+msgid "Effect_Fragility_Tooltip"
+msgstr "Увеличивает получаемый критический урон."
+
+msgid "Effect_Mana_Flow"
+msgstr "Поток маны"
+
+msgid "Effect_Mana_Flow_Tooltip"
+msgstr "Восстанавливает процент максимальной маны каждый ход."
+
+# ------------------------------
+# Ability upgrades — Intelligence stance
+# ------------------------------
+
+msgid "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost_Description"
+msgstr "Перезарядка {cooldown}, но стоимость +{additionalCost}."
+
+msgid "Ability_Is_Upgrade_Additional_Scales_Description"
+msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона."
+
+msgid "Ability_Is_Upgrade_Reduce_Cost_Description"
+msgstr "Стоимость {cost}."
+
+msgid "Ability_Is_Upgrade_Additional_Crit_Damage_Description"
+msgstr "+{amount:%} критического урона."
+
+msgid "Ability_Is_Upgrade_Additional_Crit_Chance_Description"
+msgstr "+{amount:%} шанса крита."
+
+msgid "Ability_Is_Upgrade_Barrier_From_Shrapnel_Description"
+msgstr "Восстанавливает {leachPercent:%} барьера от урона шрапнелью."
+
+msgid "Ability_Is_Upgrade_Apply_Fragility_Description"
+msgstr "Накладывает {@Effect_Fragility} ({duration|turn|turns}, до {maxStacks|stack|stacks}, +{critDamageAmp:%} получаемого крит-урона)."
+
+msgid "Ability_Ov_Upgrade_Reduce_Cooldown_Description"
+msgstr "Перезарядка {cooldown}."
+
+msgid "Ability_Ov_Upgrade_Burn_Add_Cost_Description"
+msgstr "Сжигает {burnPercent:%} маны, стоимость +{additionalCost}."
+
+msgid "Ability_Ov_Upgrade_Additional_Scales_Description"
+msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона."
+
+msgid "Ability_Ov_Upgrade_Damage_Per_Mana_Description"
+msgstr "+{amount} урона за сожжённую ману."
+
+msgid "Ability_Ov_Upgrade_Additional_Crit_Chance_Description"
+msgstr "+{amount:%} шанса крита."
+
+msgid "Ability_Ov_Upgrade_Mana_Flow_Description"
+msgstr "Накладывает {@Effect_Mana_Flow} ({regenAmount:%} восстановления на {duration|turn|turns})."
+
+msgid "Ability_Ov_Upgrade_Kill_Resets_Cooldown_Description"
+msgstr "Убийство цели сбрасывает перезарядку."
+
+msgid "Ability_Cl_Upgrade_Reduce_Cooldown_Description"
+msgstr "Перезарядка {cooldown}."
+
+msgid "Ability_Cl_Upgrade_Scales_Add_Cost_Description"
+msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам урона, стоимость +{additionalCost}."
+
+msgid "Ability_Cl_Upgrade_Reduce_Cost_Description"
+msgstr "Стоимость {cost}."
+
+msgid "Ability_Cl_Upgrade_Additional_Jump_Description"
+msgstr "Добавляет {amount} дополнительный прыжок."
+
+msgid "Ability_Cl_Upgrade_Reduce_Falloff_Description"
+msgstr "−{amount:%} потери урона за прыжок."
+
+msgid "Ability_Cl_Upgrade_Ignore_Resistances_Description"
+msgstr "Молнии игнорируют сопротивления."
+
+msgid "Ability_Ia_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Ia_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Ia_Upgrade_Additional_Barrier_Description"
+msgstr "+{amount} базового барьера."
+
+msgid "Ability_Ia_Upgrade_Additional_Scale_Description"
+msgstr "+{amount} барьера за единицу интеллекта."
+
+msgid "Ability_Ia_Upgrade_Additional_Duration_Description"
+msgstr "+{amount|turn|turns} к длительности."
+
+# ------------------------------
+# Keyword reference cards (dexterity effects)
+# ------------------------------
+
+msgid "Effect_Blind"
+msgstr "Слепота"
+
+msgid "Effect_Blind_Tooltip"
+msgstr "Снижает точность цели."
+
+msgid "Effect_Weakness"
+msgstr "Бессилие"
+
+msgid "Effect_Weakness_Tooltip"
+msgstr "Снижает урон цели."
+
+msgid "Effect_Enhance_Defense"
+msgstr "Усиленная защита"
+
+msgid "Effect_Enhance_Defense_Tooltip"
+msgstr "Увеличивает защитные параметры владельца."
+
+msgid "Effect_Lucky_Crit_Chance"
+msgstr "Удачливый крит"
+
+msgid "Effect_Lucky_Crit_Chance_Tooltip"
+msgstr "Критический удар прокается дважды, берётся лучший результат."
+
+msgid "Effect_Seal_Of_Oblivion"
+msgstr "Печать забвения"
+
+msgid "Effect_Seal_Of_Oblivion_Tooltip"
+msgstr "Запечатанную цель нельзя лечить."
+
+# ------------------------------
+# Ability upgrades — Dexterity stance
+# ------------------------------
+
+msgid "Ability_SoA_Upgrade_Poison_On_Hit_Description"
+msgstr "Атаки накладывают стак яда на {poisonDuration|turn|turns}."
+
+msgid "Ability_SoA_Upgrade_Apply_Buff_Critical_Chance_Description"
+msgstr "После {amountAttacks} успешных атак — +{criticalChance:%} шанса крита на {duration|turn|turns} (до {maxStacks|stack|stacks})."
+
+msgid "Ability_SoA_Upgrade_Apply_Buff_Critical_Damage_Description"
+msgstr "После {amountAttacks} успешных атак — +{criticalDamage:%} критического урона на {duration|turn|turns} (до {maxStacks|stack|stacks})."
+
+msgid "Ability_SoA_Upgrade_Additional_Max_Attacks_Description"
+msgstr "+{maxAdditionalAttacks} к максимуму атак."
+
+msgid "Ability_SoA_Upgrade_More_Attack_Damage_Description"
+msgstr "+{damageMultiplier:%} урона атак."
+
+msgid "Ability_SoA_Upgrade_Attacks_Cannot_Be_Evaded_Description"
+msgstr "Серия больше не прерывается уклонением."
+
+msgid "Ability_SoA_Upgrade_Additional_Attacks_Description"
+msgstr "+{amountAttacks} атака."
+
+msgid "Ability_SoA_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_SoA_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Ip_Upgrade_Single_Empowered_Attack_Description"
+msgstr "Заменяет серию одним усиленным ударом."
+
+msgid "Ability_Ip_Upgrade_Attack_Random_Target_Description"
+msgstr "Атаки бьют случайную цель ({splashDamage:%} сплеша)."
+
+msgid "Ability_Ip_Upgrade_Last_Attack_Always_Crit_Description"
+msgstr "Последняя атака всегда критическая."
+
+msgid "Ability_Ip_Upgrade_First_Attack_Crit_Damage_Description"
+msgstr "Первая атака наносит +{critDamageBonus:%} критического урона."
+
+msgid "Ability_Ip_Upgrade_Attack_Extend_Poison_Description"
+msgstr "Успешная атака продлевает яд на {poisonDuration|turn|turns}."
+
+msgid "Ability_Ip_Upgrade_Unevadable_Description"
+msgstr "Серия больше не прерывается уклонением."
+
+msgid "Ability_Ip_Upgrade_Additional_Amount_Attacks_Description"
+msgstr "+{amountAttacks} атаки."
+
+msgid "Ability_Ip_Upgrade_Additional_Damage_Multiplier_Description"
+msgstr "+{damageMultiplier:%} усиления за успешный удар."
+
+msgid "Ability_Ip_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_JoP_Upgrade_Bouncing_Description"
+msgstr "Банка прыгает между целями {bounces} раз."
+
+msgid "Ability_JoP_Upgrade_Transfer_Poison_On_Death_Description"
+msgstr "При смерти цели яд переносится на другого врага."
+
+msgid "Ability_JoP_Upgrade_All_Targets_Description"
+msgstr "Накладывает яд на всех врагов."
+
+msgid "Ability_JoP_Upgrade_Clumsiness_Description"
+msgstr "Накладывает стак {@Effect_Clumsiness} (−{evadeReduce:%} уклонения, до {maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Ability_JoP_Upgrade_Apply_Blind_Description"
+msgstr "Накладывает стак {@Effect_Blind} (−{accuracyReduce:%} точности, до {maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Ability_JoP_Upgrade_Apply_Weakness_Description"
+msgstr "Накладывает стак {@Effect_Weakness} (−{damageReduce:%} урона, до {maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Ability_JoP_Upgrade_Increasing_Scales_Description"
+msgstr "Скейлы яда → {weaponDamageScale:%} / {spellDamageScale:%}."
+
+msgid "Ability_JoP_Upgrade_Poison_Duration_Description"
+msgstr "+{poisonDuration|turn|turns} длительности яда."
+
+msgid "Ability_JoP_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Ds_Upgrade_Additional_Attack_Chance_Description"
+msgstr "+{amount:%} шанса дополнительной атаки."
+
+msgid "Ability_Ds_Upgrade_Additional_Accuracy_Description"
+msgstr "+{amount:%} точности."
+
+msgid "Ability_Ds_Upgrade_Immortality_Description"
+msgstr "Даёт Бессмертие на {duration|turn|turns} (аналог Эгиды жизни)."
+
+msgid "Ability_Ds_Upgrade_Mana_Regen_Description"
+msgstr "+{regenAmount:%} восстановления маны."
+
+msgid "Ability_Ds_Upgrade_Additional_Health_Regen_Description"
+msgstr "+{additionalRegen:%} регена здоровья."
+
+msgid "Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks_Description"
+msgstr "+{additionalEffectiveness:%} эффективности, но −{amountStacks|stack|stacks}."
+
+msgid "Ability_Ds_Upgrade_Increased_Buff_Duration_Description"
+msgstr "+{duration|turn|turns} длительности бафа."
+
+msgid "Ability_Ds_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Ds_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Cc_Upgrade_Additional_Attack_Chance_Description"
+msgstr "Даёт шанс дополнительной атаки вместо шанса крита."
+
+msgid "Ability_Cc_Upgrade_Additional_Crit_Chance_Description"
+msgstr "+{criticalChance:%} шанса крита."
+
+msgid "Ability_Cc_Upgrade_Lucky_Crit_Description"
+msgstr "Даёт {@Effect_Lucky_Crit_Chance} на {duration|turn|turns}."
+
+msgid "Ability_Cc_Upgrade_Additional_Crit_Multiplier_Description"
+msgstr "+{multiplier:%} крит-урона, растущего за каждый крит ({duration|turn|turns})."
+
+msgid "Ability_Cc_Upgrade_Leach_On_Crit_Description"
+msgstr "Критические удары лечат на {amount:%} нанесённого урона."
+
+msgid "Ability_Cc_Upgrade_Apply_Enhanced_Defence_Description"
+msgstr "Накладывает {@Effect_Enhance_Defense} ({duration|turn|turns}, до {stacks|stack|stacks}, {value:%})."
+
+msgid "Ability_Cc_Upgrade_More_Stacks_More_Cost_Description"
+msgstr "+{stacks|stack|stacks}, +{cost} к стоимости."
+
+msgid "Ability_Cc_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Cc_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion_Description"
+msgstr "Накладывает {@Effect_Seal_Of_Oblivion} на {duration|turn|turns}."
+
+msgid "Ability_Pe_Upgrade_Execute_Bosses_Description"
+msgstr "Может казнить боссов (×{stacksMultiplier} к порогу стаков)."
+
+msgid "Ability_Pe_Upgrade_Spread_Poison_Description"
+msgstr "Распространяет яд на всех врагов."
+
+msgid "Ability_Pe_Upgrade_Poison_Not_Removed_Description"
+msgstr "Наносит урон, не снимая яд."
+
+msgid "Ability_Pe_Upgrade_Reduce_Execution_Trahsold_Description"
+msgstr "−{amount} к порогу казни."
+
+msgid "Ability_Pe_Upgrade_Transfer_Poison_On_Death_Description"
+msgstr "При смерти цели яд переносится на другого врага."
+
+msgid "Ability_Pe_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Pe_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке, но +{additionalCost} к стоимости."
+
+msgid "Ability_Pe_Upgrade_Total_Damage_Multiplier_Description"
+msgstr "+{multiplier:%} итогового урона."
+
+msgid "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal_Description"
+msgstr "Атаки накладывают −{reduceBy:%} получаемого лечения ({maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Ability_Pc_Upgrade_Attacks_Reduce_Armor_Description"
+msgstr "Атаки накладывают −{reduceArmorBy:%} брони (до {maxStacks|stack|stacks}, {duration|turn|turns})."
+
+msgid "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy_Description"
+msgstr "Накладывает стак яда за каждого врага на поле боя."
+
+msgid "Ability_Pc_Upgrade_Increase_Poison_On_Target_Description"
+msgstr "+{poisonDuration|turn|turns} длительности яда на цели."
+
+msgid "Ability_Pc_Upgrade_Additional_Poison_Stack_Duration_Description"
+msgstr "+{additionalDuration|turn|turns} длительности накладываемого стака."
+
+msgid "Ability_Pc_Upgrade_Additional_Multiplier_Description"
+msgstr "+{multiplier:%} множителя яда."
+
+msgid "Ability_Pc_Upgrade_Increase_Duration_Description"
+msgstr "+{duration|turn|turns} длительности бафа."
+
+msgid "Ability_Pc_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Pc_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+# ------------------------------
+# Ability upgrades — Strength stance
+# ------------------------------
+
+msgid "Ability_Arm_Upgrade_Missing_Hp_Damage_Description"
+msgstr "+{rate} урона за каждую единицу отсутствующего здоровья."
+
+msgid "Ability_Arm_Upgrade_Shatter_Armor_Description"
+msgstr "Уничтожает броню цели на {duration|turn|turns}."
+
+msgid "Ability_Arm_Upgrade_All_Targets_Description"
+msgstr "Бьёт по всем врагам, но +{additionalCooldown} к перезарядке."
+
+msgid "Ability_Arm_Upgrade_Reduce_Hp_Cost_Description"
+msgstr "−{amount:%} HP-стоимости всех стадий."
+
+msgid "Ability_Arm_Upgrade_Stage1_Damage_Description"
+msgstr "Стадия 1 → {damage} + ({weaponScale:%} + {spellScale:%})."
+
+msgid "Ability_Arm_Upgrade_Stage3_Burning_Description"
+msgstr "Стадия 3 накладывает {stacks} {stacks|stack|stacks} горения (×{damageMultiplier}, {duration|turn|turns})."
+
+msgid "Ability_Arm_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Arm_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Arm_Upgrade_Extend_Stun_Description"
+msgstr "+{duration|turn|turns} оглушения."
+
+msgid "Ability_Porc_Upgrade_Echo_Description"
+msgstr "{delayedPercent:%} входящего урона откладывается на {turns|turn|turns}."
+
+msgid "Ability_Porc_Upgrade_Incoming_Reduction_Description"
+msgstr "Весь входящий урон −{reduce:%}."
+
+msgid "Ability_Porc_Upgrade_Crit_Mitigation_Description"
+msgstr "−{amount:%} получаемого крит-урона."
+
+msgid "Ability_Porc_Upgrade_Heal_On_Hit_Description"
+msgstr "Лечит на {amount:%} при получении удара."
+
+msgid "Ability_Porc_Upgrade_More_Armor_Return_Description"
+msgstr "+{amount:%} возврата от брони."
+
+msgid "Ability_Porc_Upgrade_More_Damage_Return_Description"
+msgstr "+{amount:%} возврата урона."
+
+msgid "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost_Description"
+msgstr "−{cooldown} к перезарядке, но +{additionalCost} к стоимости."
+
+msgid "Ability_Porc_Upgrade_Cooldown_Chance_Description"
+msgstr "{chance:%} шанс снизить перезарядку при получении удара."
+
+msgid "Ability_Porc_Upgrade_Armor_Buff_Description"
+msgstr "+{amount:%} брони."
+
+msgid "Ability_Sac_Upgrade_Heal_From_Damage_Description"
+msgstr "Лечит на {amount:%} урона следующей способности."
+
+msgid "Ability_Sac_Upgrade_Incoming_Reduction_Description"
+msgstr "−{reduce:%} входящего урона на {duration|turn|turns}."
+
+msgid "Ability_Sac_Upgrade_Free_Cast_Description"
+msgstr "Следующая способность без перезарядки."
+
+msgid "Ability_Sac_Upgrade_Additional_Rate_Description"
+msgstr "+{amount:%} бонуса за 100 пожертвованного HP."
+
+msgid "Ability_Sac_Upgrade_More_Sacrifice_Description"
+msgstr "+{amount:%} жертвуемого HP."
+
+msgid "Ability_Sac_Upgrade_Cost_Type_Health_Description"
+msgstr "Стоимость оплачивается здоровьем вместо маны."
+
+msgid "Ability_Sac_Upgrade_Additional_Charge_Description"
+msgstr "+{amount} заряд."
+
+msgid "Ability_Sac_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Sac_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Bf_Upgrade_Burning_Fury_Description"
+msgstr "{@Effect_Fury} → {@Effect_Burning_Fury}: сожжённое HP также наносит урон ({burningDuration|turn|turns}, до {burningMaxStacks|stack|stacks})."
+
+msgid "Ability_Bf_Upgrade_Primal_Fury_Description"
+msgstr "{@Effect_Fury} → Первобытная ярость (×{damageMultiplier} урона)."
+
+msgid "Ability_Bf_Upgrade_Healing_Fury_Description"
+msgstr "{@Effect_Fury} → {@Effect_Healing_Fury}: лечит на {healAmount:%} сожжённого HP."
+
+msgid "Ability_Bf_Upgrade_Cost_Type_Health_Description"
+msgstr "Стоимость оплачивается здоровьем вместо маны."
+
+msgid "Ability_Bf_Upgrade_More_Burn_Description"
+msgstr "Атаки сжигают на {amount:%} больше HP."
+
+msgid "Ability_Bf_Upgrade_Less_Burn_Description"
+msgstr "Атаки сжигают на {amount:%} меньше HP."
+
+msgid "Ability_Bf_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Bf_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Bf_Upgrade_Fury_Duration_Description"
+msgstr "+{duration|turn|turns} длительности Ярости."
+
+msgid "Ability_Ar_Upgrade_Incoming_Reduction_Description"
+msgstr "−{reduce:%} входящего урона на время бафа."
+
+msgid "Ability_Ar_Upgrade_Turn_End_Heal_Description"
+msgstr "Восстанавливает {regenAmount:%} здоровья в конце хода."
+
+msgid "Ability_Ar_Upgrade_Damage_Buff_Description"
+msgstr "+{amount:%} наносимого урона."
+
+msgid "Ability_Ar_Upgrade_Recovery_Bonus_Description"
+msgstr "+{recoveryBonus:%} восстановления здоровья."
+
+msgid "Ability_Ar_Upgrade_Health_Bonus_Description"
+msgstr "+{healthBonus:%} максимального здоровья."
+
+msgid "Ability_Ar_Upgrade_Both_Bonuses_Description"
+msgstr "+{healthBonus:%} максимального здоровья и +{recoveryBonus:%} восстановления."
+
+msgid "Ability_Ar_Upgrade_Buff_Duration_Description"
+msgstr "+{duration|turn|turns} длительности бафа."
+
+msgid "Ability_Ar_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Ar_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Dst_Upgrade_Both_Hits_Buff_Description"
+msgstr "Обе атаки дают +{amount:%} урона на {duration|turn|turns}."
+
+msgid "Ability_Dst_Upgrade_Restore_On_Hit_Description"
+msgstr "Первый удар восстанавливает {healthRestore:%} HP, второй — {manaRestore:%} маны."
+
+msgid "Ability_Dst_Upgrade_Accuracy_Description"
+msgstr "+{amount:%} точности."
+
+msgid "Ability_Dst_Upgrade_Damage_Multiplier_Description"
+msgstr "+{amount:%} урона обеих атак."
+
+msgid "Ability_Dst_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Dst_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+msgid "Ability_Hb_Upgrade_Additional_Lunges_Description"
+msgstr "+{amount|lunge|lunges}."
+
+msgid "Ability_Hb_Upgrade_Additional_Scales_Description"
+msgstr "+{weaponDamageScale:%} / +{spellDamageScale:%} к скейлам."
+
+msgid "Ability_Hb_Upgrade_Extend_Stun_Add_Cost_Description"
+msgstr "+{stunDuration|turn|turns} оглушения, +{additionalCost} к стоимости."
+
+msgid "Ability_Hb_Upgrade_Armor_Debuff_Description"
+msgstr "Накладывает −{reduceArmorBy:%} брони ({duration|turn|turns}, до {maxStacks|stack|stacks})."
+
+msgid "Ability_Hb_Upgrade_Reduce_Cost_Description"
+msgstr "−{cost} к стоимости."
+
+msgid "Ability_Hb_Upgrade_Reduce_Cooldown_Description"
+msgstr "−{cooldown} к перезарядке."
+
+# ------------------------------
+# Passive skills
+# ------------------------------
+
+msgid "Passive_Skill_Execute"
+msgstr "Казнь"
+
+msgid "Passive_Skill_Execute_Description"
+msgstr "Мгновенно убивает цель с 25% здоровья или ниже."
+
+msgid "Passive_Skill_Porcupine"
+msgstr "Дикобраз"
+
+msgid "Passive_Skill_Porcupine_Description"
+msgstr "Возвращает 25% нанесённого урона и 15% брони атакующему."
+
+msgid "Passive_Skill_Servant_Hell"
+msgstr "Слуга Хель"
+
+msgid "Passive_Skill_Servant_Hell_Description"
+msgstr "Атака имеет 10% шанс отправить цель прямиком в Недра."
+
+msgid "Passive_Skill_Echo"
+msgstr "Переливание"
+
+msgid "Passive_Skill_Echo_Description"
+msgstr "30% полученного урона наносится через 3 хода."
+
+msgid "Passive_Skill_Soul_Devouring"
+msgstr "Поглощение духа"
+
+msgid "Passive_Skill_Soul_Devouring_Description"
+msgstr "Восстанавливает 3% барьера за каждую активированную способность."
+
+msgid "Passive_Skill_Mana_Burn"
+msgstr "Сожжение маны"
+
+msgid "Passive_Skill_Mana_Burn_Description"
+msgstr "С каждой атакой сжигает 5% текущей маны цели."
