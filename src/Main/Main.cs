@@ -11,7 +11,8 @@
     using Core.Services;
     using Core.Views.UI;
     using Godot;
-    using UI.Layers;
+    using Services;
+    using UI;
     using GameServiceProvider = Services.GameServiceProvider;
 
     public partial class Main : Node2D
@@ -21,7 +22,7 @@
         private IUiElementsManager? _uiElementProvider;
         private IGameEventBus? _gameEventBus;
         [Export] private MainWorld? _mainWorld;
-        [Export] private UiLayersManager? _layerManager;
+        [Export] private UiLayerManager? _layerManager;
 
         public override void _Ready()
         {
@@ -42,6 +43,7 @@
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
+            _uiElementProvider.ChangeHud(typeof(PlayerHud));
         }
 
         public override void _ExitTree()
@@ -59,11 +61,6 @@
         {
             if (@event is InputEventKey { Keycode: Key.N, Pressed: true })
                 _uiElementProvider?.ToggleWindow(typeof(MartialArtMasteryWindow));
-            if (@event is InputEventKey { Keycode: Key.R, Pressed: true })
-            {
-                // var item = _provider.GetService<IItemGameDataFactory>().CreateEquipItem("Weapon_Bloodthirsty");
-                // GD.Print($"{item.DisplayName}");
-            }
         }
 
         private static Control? CreateNotificationPopup()

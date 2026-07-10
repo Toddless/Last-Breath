@@ -15,6 +15,9 @@ namespace Core.Data.GameData
         public const string ReputationDeeds = "ReputationDeeds";
         public const string ReputationPerks = "ReputationPerks";
         public const string Raids = "Raids";
+        public const string Influence = "Influence";
+        public const string Quests = "Quests";
+        public const string Dialogues = "Dialogues";
         public const string Formatting = "Formatting";
         public const string World = "World";
         public const string Player = "Player";

@@ -67,7 +67,7 @@ namespace LastBreath.Npc
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
-        [Export] public string Id { get; private set; } = string.Empty;
+        [Export] public string Id { get; private set; } = "Npc_Bandit_Veteran";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         [Export] public string[] Tags { get; private set; } = [];
         public Texture2D? Icon { get; } = null;
@@ -92,7 +92,7 @@ namespace LastBreath.Npc
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
         public int Level { get; private set; } = 150;
-        public Rarity Rarity { get; private set; } = Rarity.Legendary;
+        public Rarity Rarity { get; private set; } = Rarity.Epic;
         public EntityType EntityType { get; private set; } = EntityType.Regular;
         public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }

@@ -3,8 +3,10 @@ namespace Battle.Source.RequestHandlers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Core;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Constants;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
     using Core.Services;
@@ -38,7 +40,18 @@ namespace Battle.Source.RequestHandlers
         {
             int unlockLevel = abilityProvider.GetMasteryLevel(abilityId);
             var state = mastery.CurrentLevel >= unlockLevel ? AbilityState.Available : AbilityState.Locked;
-            return new AbilitySlotView(abilityId,  ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Icons/{abilityId}.png"), state, unlockLevel);
+            return new AbilitySlotView(abilityId, LoadIcon(abilityId), state, unlockLevel);
+        }
+
+        /// <summary>A missing icon is a report and an empty slot image, not an engine error.</summary>
+        private static Texture2D? LoadIcon(string abilityId)
+        {
+            string path = AssetPaths.AbilityIcon(abilityId);
+            if (ResourceLoader.Exists(path)) return ResourceLoader.Load<Texture2D>(path);
+
+            Tracker.TrackNotFound($"Ability icon not found: {path}");
+            GD.Print($"Ability icon not found: {path}");
+            return null;
         }
     }
 }

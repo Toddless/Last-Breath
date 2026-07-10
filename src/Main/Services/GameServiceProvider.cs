@@ -11,7 +11,14 @@ namespace LastBreath.Services
     using Core.Events;
     using Core.Interfaces;
     using Core.Inventory;
+    using Core.Narrative.Actions;
+    using Core.Narrative.Conditions;
+    using Core.Narrative.Dialogues;
+    using Core.Narrative.Facts;
+    using Core.Narrative.Influence;
+    using Core.Narrative.Quests;
     using Core.Reputation;
+    using Core.Save.Participants;
     using Core.Services;
     using Core.Views.UI;
     using Core.Save;
@@ -20,8 +27,10 @@ namespace LastBreath.Services
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
     using Npc;
-    using UI.View;
     using World;
+    using DialogueWindow = UI.DialogueWindow;
+    using PlayerHud = UI.PlayerHud;
+    using QuestJournalWindow = UI.QuestJournalWindow;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
     public static class GameServiceProvider
@@ -31,9 +40,14 @@ namespace LastBreath.Services
         private static IGameServiceProvider CreateProvider()
         {
             var provider = Core.Services.GameServiceProvider.Initialize(RegisterProjectServices);
-            RegisterUiFactories(provider);
             provider.GetService<IGameDataService>().LoadAll();
             provider.GetService<ReputationBroadcaster>(); // eager: nobody injects it, it lives on bus subscriptions
+            provider.GetService<KillFactTracker>(); // eager: same, bus subscriptions only
+            provider.GetService<LocationFactTracker>();
+            provider.GetService<IQuestLogService>(); // eager: lives on facts/inventory/clock subscriptions
+            provider.GetService<QuestNotificationBroadcaster>();
+            RegisterUiFactories(provider);
+            RegisterNarrativeSaveSections(provider);
             return provider;
         }
 
@@ -71,6 +85,66 @@ namespace LastBreath.Services
             services.AddCraftingSystemModuleDependencies();
             services.AddBattleSystemModuleDependencies();
             services.AddLootGenerationServices();
+            RegisterNarrativeServices(services);
+        }
+
+        /// <summary>Narrative foundation: world facts + the condition/action vocabulary shared by
+        /// the dialogue and quest systems, and the Influence mastery both feed on.</summary>
+        private static void RegisterNarrativeServices(IServiceCollection services)
+        {
+            services.AddSingleton<IWorldFactsService, WorldFactsService>();
+            services.AddSingleton<KillFactTracker>();
+            services.AddSingleton<LocationFactTracker>();
+            services.AddGameDataParticipant<IInfluenceMastery, InfluenceMastery>();
+            services.AddGameDataParticipant<IQuestProvider, QuestProvider>();
+            services.AddSingleton<IQuestLogService, QuestLogService>();
+            services.AddSingleton<QuestNotificationBroadcaster>();
+            services.AddGameDataParticipant<IDialogueProvider, DialogueProvider>();
+            services.AddSingleton<IDialogueService, DialogueService>();
+            services.AddTransient<IMessageHandler<OpenDialogueMessage>, OpenDialogueMessageHandler>();
+
+            services.AddSingleton<INarrativeConditionParser, NarrativeConditionParser>();
+            services.AddSingleton<INarrativeConditionFactory, HasItemConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, FactConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, FactionStandingConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, NpcRelationConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, AttributeConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, InfluenceConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, AllOfConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, AnyOfConditionFactory>();
+            services.AddSingleton<INarrativeConditionFactory, NotConditionFactory>();
+
+            // Quest vocabulary: Func-injected — the data loaders own the parsers, a direct
+            // IQuestLogService/IQuestProvider dependency here would close a DI cycle.
+            services.AddSingleton<INarrativeConditionFactory>(sp => new QuestStatusConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new CanAcceptQuestConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new CanTurnInQuestConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new QuestOfferRollConditionFactory(
+                sp.GetRequiredService<IWorldFactsService>(),
+                sp.GetRequiredService<IInfluenceMastery>(),
+                sp.GetRequiredService<IWorldClock>(),
+                sp.GetRequiredService<Godot.RandomNumberGenerator>(),
+                () => sp.GetRequiredService<IQuestProvider>()));
+
+            services.AddSingleton<INarrativeActionParser, NarrativeActionParser>();
+            services.AddSingleton<INarrativeActionFactory, SetFactActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, GiveItemActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, TakeItemActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, PublishDeedActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, AddReputationActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, AddInfluenceExpActionFactory>();
+            foreach (var kind in System.Enum.GetValues<QuestActionKind>())
+                services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(() => sp.GetRequiredService<IQuestLogService>(), kind));
+        }
+
+        /// <summary>The Battle module owns the ISaveManager factory; Main-only sections are
+        /// registered on top of it here instead of editing the shared module.</summary>
+        private static void RegisterNarrativeSaveSections(IGameServiceProvider provider)
+        {
+            var saveManager = provider.GetService<ISaveManager>();
+            saveManager.Register(new WorldFactsSaveParticipant(provider.GetService<IWorldFactsService>()));
+            saveManager.Register(new InfluenceMasterySaveParticipant(provider.GetService<IInfluenceMastery>()));
+            saveManager.Register(new QuestLogSaveParticipant(provider.GetService<IQuestLogService>()));
         }
 
         private static void RegisterUiFactories(IGameServiceProvider provider)
@@ -78,6 +152,8 @@ namespace LastBreath.Services
             var uiElements = provider.GetService<IUiElementsManager>();
             uiElements.RegisterHudFactory(typeof(PlayerHud), () => PlayerHud.Initialize().Instantiate<PlayerHud>());
             uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>());
+            uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>());
+            uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
         }

@@ -1,0 +1,240 @@
+{
+  "dialogues": [
+    {
+      "npcId": "Npc_Bandit_Veteran",
+      "entryRules": [
+        {
+          "priority": 30,
+          "conditions": [
+            {
+              "type": "QuestStatus",
+              "questId": "Quest_Field_Of_Bones",
+              "status": "ReadyToTurnIn"
+            }
+          ],
+          "node": "HaveIt"
+        },
+        {
+          "priority": 20,
+          "conditions": [
+            {
+              "type": "QuestStatus",
+              "questId": "Quest_Field_Of_Bones",
+              "status": "Active"
+            }
+          ],
+          "node": "Working"
+        },
+        {
+          "priority": 0,
+          "conditions": [],
+          "node": "Greeting"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Greeting_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "AskWork",
+              "key": "Dlg_Veteran_Opt_AskWork",
+              "visibleConditions": [
+                {
+                  "type": "CanAcceptQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                },
+                {
+                  "type": "QuestOfferRoll",
+                  "questId": "Quest_Field_Of_Bones",
+                  "cooldownHours": 12
+                }
+              ],
+              "next": "Offer"
+            },
+            {
+              "id": "Flatter",
+              "key": "Dlg_Veteran_Opt_Flatter",
+              "oncePerGame": true,
+              "speechCheck": {
+                "difficulty": 2,
+                "failNext": "FlatterBad"
+              },
+              "actions": [
+                {
+                  "type": "Deed",
+                  "deedId": "Deed_Flattery"
+                }
+              ],
+              "next": "FlatterGood"
+            },
+            {
+              "id": "Leave",
+              "key": "Dlg_Opt_Leave"
+            }
+          ]
+        },
+        {
+          "id": "Offer",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Offer_1"
+            },
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Offer_2"
+            }
+          ],
+          "options": [
+            {
+              "id": "Accept",
+              "key": "Dlg_Veteran_Opt_Accept",
+              "actions": [
+                {
+                  "type": "AcceptQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                }
+              ],
+              "next": "Accepted"
+            },
+            {
+              "id": "Refuse",
+              "key": "Dlg_Veteran_Opt_Refuse",
+              "actions": [
+                {
+                  "type": "DeclineQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Accepted",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Accepted_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "Leave",
+              "key": "Dlg_Opt_Leave"
+            }
+          ]
+        },
+        {
+          "id": "Working",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Working_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "GiveUp",
+              "key": "Dlg_Veteran_Opt_GiveUp",
+              "actions": [
+                {
+                  "type": "AbandonQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                }
+              ]
+            },
+            {
+              "id": "Leave",
+              "key": "Dlg_Opt_Leave"
+            }
+          ]
+        },
+        {
+          "id": "HaveIt",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_HaveIt_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "TurnIn",
+              "key": "Dlg_Veteran_Opt_TurnIn",
+              "enabledConditions": [
+                {
+                  "type": "CanTurnInQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                }
+              ],
+              "actions": [
+                {
+                  "type": "TurnInQuest",
+                  "questId": "Quest_Field_Of_Bones"
+                }
+              ],
+              "next": "Thanks"
+            },
+            {
+              "id": "Leave",
+              "key": "Dlg_Opt_Leave"
+            }
+          ]
+        },
+        {
+          "id": "Thanks",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_Thanks_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "Leave",
+              "key": "Dlg_Opt_Leave"
+            }
+          ]
+        },
+        {
+          "id": "FlatterGood",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_FlatterGood_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "Back",
+              "key": "Dlg_Opt_Back",
+              "next": "Greeting"
+            }
+          ]
+        },
+        {
+          "id": "FlatterBad",
+          "lines": [
+            {
+              "speaker": "Npc",
+              "key": "Dlg_Veteran_FlatterBad_1"
+            }
+          ],
+          "options": [
+            {
+              "id": "Back",
+              "key": "Dlg_Opt_Back",
+              "next": "Greeting"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

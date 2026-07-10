@@ -15,6 +15,10 @@ namespace Core.Save
         /// <summary>Inventory + equipment: the parameter modifier sources.</summary>
         public const int Items = 20;
 
+        /// <summary>Quest log: after Items so restored states sit on the settled inventory
+        /// (objectives are re-derived from facts + inventory, never stored).</summary>
+        public const int Quests = 25;
+
         /// <summary>Ability book, learned abilities and chosen upgrades.</summary>
         public const int Abilities = 30;
 

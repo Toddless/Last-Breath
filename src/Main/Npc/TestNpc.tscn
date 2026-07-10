@@ -1,17 +1,15 @@
 [gd_scene format=3 uid="uid://ww6a71b2bbov"]
 
 [ext_resource type="Script" uid="uid://bcfijnhl37sto" path="res://Npc/BaseNpc.cs" id="1_xnmur"]
-[ext_resource type="Script" uid="uid://de0bqb3cqjole" path="res://DamageContext.cs" id="2_om8jy"]
 [ext_resource type="Texture2D" uid="uid://btiak56njxsg0" path="res://Npc/Left - Attacking.png" id="3_lhems"]
 [ext_resource type="Texture2D" uid="uid://cg7qt0wm5f7cm" path="res://Npc/Dying.png" id="3_njduj"]
+[ext_resource type="Script" uid="uid://b83aev78cw2jb" path="res://Components/AnimationsComponent.cs" id="3_r5eee"]
 [ext_resource type="Texture2D" uid="uid://dtf435irsh00h" path="res://Npc/Front - Idle.png" id="3_vpjn1"]
 [ext_resource type="Texture2D" uid="uid://d2m17h7rabqox" path="res://Npc/Back - Idle.png" id="4_c26fi"]
 [ext_resource type="Texture2D" uid="uid://bk7b387n62dh" path="res://Npc/Left - Idle.png" id="4_n34kv"]
 [ext_resource type="Texture2D" uid="uid://rpt1oxcxaifq" path="res://Npc/Left - Hurt.png" id="4_og1c3"]
 [ext_resource type="Texture2D" uid="uid://dtcqxb7rqpu70" path="res://Npc/Right - Idle.png" id="5_lhems"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
-radius = 32.0
+[ext_resource type="Script" uid="uid://bqc3et70qq3ua" path="res://Npc/DialogueActor.cs" id="10_r5eee"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8osjy"]
 radius = 35.0
@@ -713,17 +711,19 @@ animations = [{
 "speed": 24.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
+radius = 32.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5f5v3"]
+radius = 77.64
+
 [node name="TestNpc" type="CharacterBody2D" unique_id=283522954 node_paths=PackedStringArray("_interactionArea", "_animationsComponent")]
 script = ExtResource("1_xnmur")
 _interactionArea = NodePath("Area2D")
 _animationsComponent = NodePath("AnimationsComponent")
-Id = "Test_Npc"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=177793197]
-shape = SubResource("CircleShape2D_fx85w")
 
 [node name="AnimationsComponent" type="Node" parent="." unique_id=236084216 node_paths=PackedStringArray("_animatedSprite2D")]
-script = ExtResource("2_om8jy")
+script = ExtResource("3_r5eee")
 _animatedSprite2D = NodePath("../AnimatedSprite2D")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1573985267]
@@ -734,4 +734,17 @@ shape = SubResource("CapsuleShape2D_8osjy")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=331296717]
 scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_fx85w")
-animation = &"Dead"
+animation = &"Idle_Down"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=177793197]
+position = Vector2(0, 25)
+shape = SubResource("CircleShape2D_fx85w")
+
+[node name="DialogueActor" type="Area2D" parent="." unique_id=1792907842]
+script = ExtResource("10_r5eee")
+_npcId = "Npc_Bandit_Veteran"
+metadata/_custom_type_script = "uid://bqc3et70qq3ua"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DialogueActor" unique_id=92195266]
+position = Vector2(0, 15)
+shape = SubResource("CircleShape2D_5f5v3")

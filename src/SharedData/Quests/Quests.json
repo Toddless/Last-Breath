@@ -1,0 +1,48 @@
+{
+  "quests": [
+    {
+      "id": "Quest_Field_Of_Bones",
+      "giverNpcId": "Npc_Bandit_Veteran",
+      "faction": "Human",
+      "tier": 1,
+      "turnInNpcIds": [ "Npc_Bandit_Veteran" ],
+      "declinePolicy": "Cooldown",
+      "declineCooldownHours": 24,
+      "timeLimitHours": 0,
+      "acceptConditions": [],
+      "stages": [
+        {
+          "id": "FindBattlefield",
+          "objectives": [
+            {
+              "id": "Battlefield",
+              "condition": { "type": "Fact", "key": "Location_Discovered:Old_Battlefield" }
+            }
+          ]
+        },
+        {
+          "id": "GatherProof",
+          "objectives": [
+            {
+              "id": "Proof",
+              "condition": { "type": "HasItem", "itemId": "Coal", "amount": 3 }
+            },
+            {
+              "id": "Revenants",
+              "counter": { "key": "Kill_Count:Npc_Grave_Revenant", "amount": 2, "retroactive": true },
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "influenceExp": 40,
+        "items": [],
+        "actions": [
+          { "type": "TakeItem", "itemId": "Coal", "amount": 3 },
+          { "type": "AddReputation", "faction": "Human", "delta": 150, "reason": "Quest_Field_Of_Bones" }
+        ]
+      }
+    }
+  ]
+}

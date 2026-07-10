@@ -4,7 +4,7 @@
 
     public interface IPlayer : IFightable
     {
-        string Name { get; }
+        string PlayerName { get; }
         IEquipmentComponent EquipmentComponent { get; }
     }
 }

@@ -15,14 +15,14 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Last Breath"
-run/main_scene="uid://bd5wylwyowomd"
+run/main_scene="uid://cvru2meygw8jj"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 run/max_fps=144
 config/icon="res://icon.svg"
 
-[audio]
+[autoload]
 
-buses/default_bus_layout="uid://blfs8ca5iilus"
+DebugConsole="*res://Helpers/DebugConsole.cs"
 
 [display]
 

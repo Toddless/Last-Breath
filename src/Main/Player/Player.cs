@@ -95,7 +95,7 @@ namespace LastBreath.Player
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
-        public string Name { get; private set; } = string.Empty;
+        public string PlayerName { get; private set; } = string.Empty;
 
         public float CurrentHealth
         {

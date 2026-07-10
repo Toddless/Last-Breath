@@ -33,9 +33,11 @@ namespace Battle.Services
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
                 .AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, GameWorldClock>()
                 .AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
-                 .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
-                 .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
-                 .AddSingleton<ReputationBroadcaster>()
+                .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
+                .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
+                .AddSingleton<ReputationBroadcaster>()
+                .AddSingleton<IWitnessQuery, WorldWitnessQuery>()
+                .AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>()
                 .AddSingleton<ISaveGameService, SaveGameService>());
             provider.AddBattleUiElementsFactory();
 

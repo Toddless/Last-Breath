@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bcyue1uk1ek5e" path="res://Main.cs" id="1_r0du0"]
 [ext_resource type="PackedScene" uid="uid://geser04o26s5" path="res://MainWorld.tscn" id="2_cm0pq"]
-[ext_resource type="Script" uid="uid://ll4ctt5bd881" path="res://UI/Layers/UiLayersManager.cs" id="3_fos0i"]
+[ext_resource type="Script" uid="uid://ll4ctt5bd881" path="res://UI/Layers/UiLayerManager.cs" id="3_r0du0"]
 
 [node name="Main" type="Node2D" unique_id=2100645649 node_paths=PackedStringArray("_mainWorld", "_layerManager")]
 script = ExtResource("1_r0du0")
@@ -11,16 +11,43 @@ _layerManager = NodePath("UiLayerManager")
 
 [node name="MainWorld" parent="." unique_id=1079202584 instance=ExtResource("2_cm0pq")]
 
-[node name="UiLayerManager" type="Node" parent="." unique_id=244585082 node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_overlayLayer")]
-script = ExtResource("3_fos0i")
-_mainLayer = NodePath("MainLayer")
-_windowLayer = NodePath("WindowLayer")
-_overlayLayer = NodePath("TooltipLayer")
+[node name="UiLayerManager" type="Node" parent="." unique_id=244585082 node_paths=PackedStringArray("_mainLayer", "_windowLayer", "_overlayLayer", "_topCenterRegion", "_topRightRegion", "_bottomRightRegion")]
+script = ExtResource("3_r0du0")
+_mainLayer = NodePath("Hud")
+_windowLayer = NodePath("Window")
+_overlayLayer = NodePath("Overlay")
+_topCenterRegion = NodePath("Overlay/LocationDiscovered")
+_topRightRegion = NodePath("Overlay/TopRight")
+_bottomRightRegion = NodePath("Overlay/Notifications")
 
-[node name="MainLayer" type="CanvasLayer" parent="UiLayerManager" unique_id=38363312]
+[node name="Hud" type="CanvasLayer" parent="UiLayerManager" unique_id=38363312]
 
-[node name="WindowLayer" type="CanvasLayer" parent="UiLayerManager" unique_id=1703210409]
+[node name="Window" type="CanvasLayer" parent="UiLayerManager" unique_id=1703210409]
 
-[node name="TooltipLayer" type="CanvasLayer" parent="UiLayerManager" unique_id=1549758015]
+[node name="Overlay" type="CanvasLayer" parent="UiLayerManager" unique_id=1549758015]
+
+[node name="Notifications" type="VBoxContainer" parent="UiLayerManager/Overlay" unique_id=56555433]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="LocationDiscovered" type="VBoxContainer" parent="UiLayerManager/Overlay" unique_id=137503335]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="TopRight" type="VBoxContainer" parent="UiLayerManager/Overlay" unique_id=222515263]
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="NotificationLayer" type="CanvasLayer" parent="UiLayerManager" unique_id=949135983]

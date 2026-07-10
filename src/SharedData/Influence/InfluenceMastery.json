@@ -1,0 +1,20 @@
+{
+  "maxLevel": 50,
+  "baseExp": 50,
+  "expFactor": 1.8,
+  "speechCheckExp": 5,
+  "firstTalkExp": 2,
+  "speechCheck": {
+    "baseChance": 0.5,
+    "chancePerLevel": 0.05,
+    "min": 0.05,
+    "max": 0.95
+  },
+  "questOffer": {
+    "baseChance": 0.4,
+    "chancePerLevel": 0.04,
+    "levelsPerTier": 10,
+    "min": 0.05,
+    "max": 1.0
+  }
+}

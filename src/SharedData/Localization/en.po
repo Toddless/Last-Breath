@@ -423,6 +423,135 @@ msgstr "Game saved"
 msgid "Notification_Martial_Art_Mastery_Level_Up"
 msgstr "Martial Art mastery level up!"
 
+msgid "Notification_Influence_Mastery_Level_Up"
+msgstr "Influence mastery level up!"
+
+msgid "Mastery_Influence"
+msgstr "Influence"
+
+msgid "Mastery_Influence_Description"
+msgstr "How skillfully you wield words and standing: speech checks, and whether folk trust you with their troubles at all."
+
+msgid "UI_Quest_Accepted"
+msgstr "Quest accepted: {Quest}"
+
+msgid "UI_Quest_Updated"
+msgstr "Quest updated: {Quest}"
+
+msgid "UI_Quest_Ready"
+msgstr "Ready to turn in: {Quest}"
+
+msgid "UI_Quest_Completed"
+msgstr "Quest completed: {Quest}"
+
+msgid "UI_Quest_Failed"
+msgstr "Quest failed: {Quest}"
+
+msgid "UI_Quest_Ghost_Hint"
+msgstr "A cold whisper urges you to hurry... ({Quest})"
+
+msgid "Quest_Field_Of_Bones"
+msgstr "Field of Bones"
+
+msgid "Quest_Field_Of_Bones_Description"
+msgstr "A veteran wants proof of what really happened on the old battlefield. Find the place, gather what the dead left behind."
+
+msgid "UI_Dialogue_You"
+msgstr "You"
+
+msgid "UI_Journal_Empty"
+msgstr "No quests yet. The world won't come asking — go talk to people."
+
+msgid "UI_Journal_Abandon"
+msgstr "Abandon quest"
+
+msgid "UI_Journal_Optional"
+msgstr "optional"
+
+msgid "UI_Quest_Status_Active"
+msgstr "In progress"
+
+msgid "UI_Quest_Status_ReadyToTurnIn"
+msgstr "Ready to turn in"
+
+msgid "UI_Quest_Status_Completed"
+msgstr "Completed"
+
+msgid "UI_Quest_Status_Failed"
+msgstr "Failed"
+
+msgid "UI_Quest_Status_Declined"
+msgstr "Declined"
+
+msgid "Quest_Field_Of_Bones_Stage_FindBattlefield"
+msgstr "Find the old battlefield"
+
+msgid "Quest_Field_Of_Bones_Obj_Battlefield"
+msgstr "Discover the old battlefield"
+
+msgid "Quest_Field_Of_Bones_Stage_GatherProof"
+msgstr "Gather proof from the burned ground"
+
+msgid "Quest_Field_Of_Bones_Obj_Proof"
+msgstr "Collect coal"
+
+msgid "Quest_Field_Of_Bones_Obj_Revenants"
+msgstr "Put down grave revenants"
+
+msgid "Dlg_Opt_Leave"
+msgstr "Leave."
+
+msgid "Dlg_Opt_Back"
+msgstr "About something else..."
+
+msgid "Npc_Bandit_Veteran"
+msgstr "Veteran"
+
+msgid "Dlg_Veteran_Greeting_1"
+msgstr "What do you want? Speak quickly."
+
+msgid "Dlg_Veteran_Opt_AskWork"
+msgstr "Got any work for me?"
+
+msgid "Dlg_Veteran_Opt_Flatter"
+msgstr "[Flatter] Those scars... you must have seen a hundred battles."
+
+msgid "Dlg_Veteran_FlatterGood_1"
+msgstr "Heh. A hundred and six. You've got a good eye, stranger."
+
+msgid "Dlg_Veteran_FlatterBad_1"
+msgstr "Save the honey for someone who can't smell it. Out with it."
+
+msgid "Dlg_Veteran_Offer_1"
+msgstr "There is an old battlefield somewhere in these lands. Nobody who went looking came back to tell where."
+
+msgid "Dlg_Veteran_Offer_2"
+msgstr "Find it, bring me three lumps of coal from the burned ground. Then we talk payment."
+
+msgid "Dlg_Veteran_Opt_Accept"
+msgstr "I'll find it."
+
+msgid "Dlg_Veteran_Opt_Refuse"
+msgstr "Not interested."
+
+msgid "Dlg_Veteran_Accepted_1"
+msgstr "Don't die out there. Or do — just not before you find the place."
+
+msgid "Dlg_Veteran_Working_1"
+msgstr "You're still here? The battlefield won't find itself."
+
+msgid "Dlg_Veteran_Opt_GiveUp"
+msgstr "I'm done with this errand of yours."
+
+msgid "Dlg_Veteran_HaveIt_1"
+msgstr "That look on your face... you found it, didn't you?"
+
+msgid "Dlg_Veteran_Opt_TurnIn"
+msgstr "Here's your coal from the burned ground."
+
+msgid "Dlg_Veteran_Thanks_1"
+msgstr "So it's true then. Take this — and forget you ever told me."
+
 
 # ------------------------------
 # Plural words (used by templates as {Name|singular|plural})
