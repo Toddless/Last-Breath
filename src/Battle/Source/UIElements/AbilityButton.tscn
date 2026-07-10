@@ -1,63 +1,59 @@
 [gd_scene format=3 uid="uid://bcq7vkx5c2o4"]
 
 [ext_resource type="Script" uid="uid://cofhduqd3oiv0" path="res://Source/UIElements/AbilityButton.cs" id="1_qwsp7"]
+[ext_resource type="Texture2D" uid="uid://b5r10d060ur0s" path="res://Internal/_Placeholders/Art/UI/UI_AbilityButton_Background.png" id="2_htaoy"]
+[ext_resource type="Texture2D" uid="uid://cr787sauttt8p" path="res://Internal/_Placeholders/Art/UI/UI_AbilityButton_Frame.png" id="3_gb2iu"]
+[ext_resource type="Texture2D" uid="uid://deao44bjma6ab" path="res://Internal/_Placeholders/Icons/Ability_Chain_Lightning.png" id="4_gb2iu"]
 
-[node name="AbilityButton" type="Control" unique_id=1565065276 node_paths=PackedStringArray("_background", "_icon", "_frame", "_number", "_cooldownLabel")]
+[node name="AbilityButton" type="MarginContainer" unique_id=215584642 node_paths=PackedStringArray("_background", "_icon", "_frame", "_number", "_cooldownLabel")]
 custom_minimum_size = Vector2(75, 75)
-layout_mode = 3
-anchors_preset = 0
+offset_right = 75.0
+offset_bottom = 75.0
 script = ExtResource("1_qwsp7")
 _background = NodePath("Background")
-_icon = NodePath("Icon")
-_frame = NodePath("Frame")
+_icon = NodePath("MarginContainer/Icon")
+_frame = NodePath("Background/Frame")
 _number = NodePath("Number")
 _cooldownLabel = NodePath("Cooldown")
 
 [node name="Background" type="TextureRect" parent="." unique_id=219232674]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+texture = ExtResource("2_htaoy")
+expand_mode = 1
+stretch_mode = 4
 
-[node name="Icon" type="TextureRect" parent="." unique_id=1764325252]
+[node name="Frame" type="TextureRect" parent="Background" unique_id=2044993500]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(1.5, 1.5)
+pivot_offset = Vector2(36, 36)
+texture = ExtResource("3_gb2iu")
 expand_mode = 1
 
-[node name="Frame" type="TextureRect" parent="." unique_id=2044993500]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=740706474]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Icon" type="TextureRect" parent="MarginContainer" unique_id=1764325252]
+layout_mode = 2
+texture = ExtResource("4_gb2iu")
+expand_mode = 1
 
 [node name="Number" type="Label" parent="." unique_id=1120811465]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -23.0
-grow_horizontal = 0
-grow_vertical = 0
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
 
 [node name="Cooldown" type="Label" parent="." unique_id=1120811466]
 visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 vertical_alignment = 1

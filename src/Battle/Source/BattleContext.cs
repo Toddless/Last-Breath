@@ -35,6 +35,7 @@
             _battleArena = BattleArena.Initialize().Instantiate<BattleArena>();
             _localBus = new BattleEventBus();
             _battleArena.SetupEventBus(_localBus);
+            _battleArena.InjectServices(provider);
             _battleExperienceProcessor = new BattleExperienceProcessor(_localBus, provider, player);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);
@@ -52,12 +53,13 @@
             {
                 _battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
                 await _battleHud.SetupEventBus(_localBus);
-                _battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana);
+                _battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana,
+                    _player.Parameters.MaxBarrier, _player.CurrentBarrier);
                 _battleHud.SetPlayerStance(_player.AbilityBook.CurrentStance);
                 _battleHud.SetAbilityBook(_player.AbilityBook);
                 foreach (IFightable entity in _entities)
                     _battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth,
-                        entity.CurrentMana);
+                        entity.CurrentMana, entity.Parameters.MaxBarrier, entity.CurrentBarrier);
 
                 _battleArena.SetPlayer(_player);
                 if (!_battleArena.PrepareBattleArena(_entities)) return results;
@@ -97,7 +99,8 @@
                 node.GetParent()?.RemoveChild(node); // the spot already claimed the node via deferred AddChild
 
             _entities.Add(fighter); // the return-to-world list must include the latecomer
-            _battleHud?.CreateEntityBarsWithInitialValues(fighter.InstanceId, fighter.Parameters.MaxHealth, fighter.Parameters.MaxMana, fighter.CurrentHealth, fighter.CurrentMana);
+            _battleHud?.CreateEntityBarsWithInitialValues(fighter.InstanceId, fighter.Parameters.MaxHealth, fighter.Parameters.MaxMana, fighter.CurrentHealth,
+                fighter.CurrentMana, fighter.Parameters.MaxBarrier, fighter.CurrentBarrier);
             return true;
         }
 

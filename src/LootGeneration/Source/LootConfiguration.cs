@@ -10,6 +10,7 @@ namespace LootGeneration.Source
         float levelCoefficient,
         float equipItemEffectChance,
         float baseItemModifierMultiplier,
+        int maxItemsPerKill,
         Dictionary<EntityType, float> baseBudget,
         Dictionary<Rarity, float> rarityMultipliers) : ILootConfiguration
     {
@@ -19,6 +20,7 @@ namespace LootGeneration.Source
         public float LvlCoefficient { get; } = levelCoefficient;
         public float EquipItemEffectChance { get; } = equipItemEffectChance;
         public float ItemModifierMultiplier { get; } = baseItemModifierMultiplier;
+        public int MaxItemsPerKill { get; } = maxItemsPerKill;
 
         public Dictionary<EntityType, float> BaseBudget { get; } = baseBudget;
 

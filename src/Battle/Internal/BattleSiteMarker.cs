@@ -25,8 +25,10 @@ namespace Battle.Internal
             var area = new Area2D { CollisionMask = uint.MaxValue };
             var shape = new CollisionShape2D { Shape = new CircleShape2D { Radius = ContactRadius } };
             area.AddChild(shape);
-            AddChild(area);
             area.BodyEntered += OnBodyEntered;
+            // Battle start happens inside a physics callback (BodyEntered): adding a collision
+            // object to the tree mid-flush is forbidden — "can't change state while flushing queries".
+            CallDeferred(Node.MethodName.AddChild, area);
         }
 
         public override void _Process(double delta)

@@ -11,6 +11,10 @@ namespace LootGeneration.Source
         float LvlCoefficient { get; }
         float EquipItemEffectChance { get; }
         float ItemModifierMultiplier { get; }
+
+        /// <summary>Hard cap on rolled (non-guaranteed) items per kill; values &lt;= 0 mean no cap.
+        /// Leftover budget converts into tier upgrades of already-chosen items.</summary>
+        int MaxItemsPerKill { get; }
         Dictionary<EntityType, float> BaseBudget { get; }
         Dictionary<Rarity, float> RarityMultipliers { get; }
     }

@@ -1,7 +1,6 @@
-namespace LastBreath.Npc
+namespace Core.Ai.World.Skirmish
 {
     using System.Collections.Generic;
-    using Core.Ai.World.Skirmish;
 
     /// <summary>NPCs register on ready and unregister on dispose; senses scan the list by distance.</summary>
     public class NpcWorldRegistry : INpcWorldRegistry

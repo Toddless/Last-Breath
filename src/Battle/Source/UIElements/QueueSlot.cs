@@ -3,6 +3,7 @@
     using Core.Views.UI;
     using Godot;
 
+    // TODO: не используется нигде (очередь ходов в BattleHud рисуется серыми Label'ами; у бойцов нет иконок) — кандидат на удаление вместе со сценой.
     [GlobalClass]
     [Tool]
     public partial class QueueSlot : Control, IInitializable

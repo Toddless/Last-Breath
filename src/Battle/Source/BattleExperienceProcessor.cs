@@ -42,6 +42,7 @@
             {
                 BattleResults.PlayerLost => Mathf.RoundToInt(_totalExp * 0.3f),
                 BattleResults.BattleAbandoned => 0,
+                BattleResults.PlayerFled => 0, // fled — earned nothing
                 _ => _totalExp
             };
 

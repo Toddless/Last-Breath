@@ -24,5 +24,10 @@ namespace Battle.Internal.Npc
             npc.ApplyDefinition(definition);
             return npc;
         }
+
+        public void Despawn(IFightableNpc npc)
+        {
+            if (npc is Node node) node.QueueFree();
+        }
     }
 }

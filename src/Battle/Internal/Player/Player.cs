@@ -557,7 +557,7 @@ namespace Battle.Internal.Player
             EntityParameter.AdditionalHitChance => 0.6f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 1f,
-            EntityParameter.Damage or EntityParameter.SpellDamage => 300,
+            EntityParameter.Damage or EntityParameter.SpellDamage => 3000,
             _ => 0f
         };
 

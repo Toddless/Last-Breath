@@ -30,7 +30,13 @@ namespace Battle.Source.UIElements
             bus.Subscribe<AttackBlockedEvent>(OnAttackBlocked);
             bus.Subscribe<EffectAppliedEvent>(OnEffectApplied);
             bus.Subscribe<TurnSkippedEvent>(OnTurnSkipped);
+            bus.Subscribe<PlayerFleeResolvedEvent>(OnFleeResolved);
         }
+
+        private void OnFleeResolved(PlayerFleeResolvedEvent evt) =>
+            Emit(BattleLogCategory.System, TextPalette.Colorize(
+                Localization.Localize(evt.Succeeded ? "Log_Flee_Success" : "Log_Flee_Failed"),
+                evt.Succeeded ? TextPalette.System : TextPalette.Muted));
 
         private void OnTurnStart(TurnStartEvent evt) =>
             Emit(BattleLogCategory.System, TextPalette.Colorize(

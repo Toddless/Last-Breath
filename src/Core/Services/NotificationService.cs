@@ -49,11 +49,12 @@ namespace Core.Services
             if (_layers == null || _popupFactory == null) return Task.CompletedTask;
 
             var region = s_regions.GetValueOrDefault(message.Category, OverlayRegion.BottomRight);
-            if (_queue.TryTake(message.Id, region)) Show(message.Id, region);
+            var notification = new NotificationContent(message.Id, message.Values);
+            if (_queue.TryTake(notification, region)) Show(notification, region);
             return Task.CompletedTask;
         }
 
-        private void Show(string notificationId, OverlayRegion region)
+        private void Show(NotificationContent content, OverlayRegion region)
         {
             // The layer node dies with the scene; a queued follow-up must not talk to a corpse
             if (_layers is GodotObject layerNode && !GodotObject.IsInstanceValid(layerNode)) return;
@@ -65,14 +66,14 @@ namespace Core.Services
                 return;
             }
 
-            notification.SetNotification(notificationId, region);
+            notification.SetNotification(content, region);
             popup.TreeExiting += () => ShowNext(region);
             _layers?.ShowOverlay(notification);
         }
 
         private void ShowNext(OverlayRegion region)
         {
-            string? next = _queue.Release(region);
+            NotificationContent? next = _queue.Release(region);
             if (next != null) Show(next, region);
         }
     }

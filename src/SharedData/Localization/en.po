@@ -350,6 +350,12 @@ msgstr "{value} more {parameter}"
 msgid "UI_Save"
 msgstr "Save"
 
+msgid "UI_End_Turn"
+msgstr "End Turn"
+
+msgid "UI_Flee"
+msgstr "Flee"
+
 msgid "UI_Load"
 msgstr "Load"
 
@@ -443,6 +449,12 @@ msgstr[1] "lunges"
 
 msgid "Log_Turn"
 msgstr "Turn: {Name}"
+
+msgid "Log_Flee_Success"
+msgstr "You slipped away from the battle."
+
+msgid "Log_Flee_Failed"
+msgstr "Escape failed — the turn is lost."
 
 msgid "Log_AbilityUsed"
 msgstr "{Caster} uses {Ability}"
@@ -1793,3 +1805,58 @@ msgstr "Fishing Mastery"
 
 msgid "Passive_Skill_Battle_Mastery"
 msgstr "Battle Mastery"
+
+# ------------------------------
+# Factions & reputation
+# ------------------------------
+
+msgid "Fraction_Elf"
+msgstr "Elves"
+
+msgid "Fraction_Dwarf"
+msgstr "Dwarves"
+
+msgid "Fraction_Human"
+msgstr "Humans"
+
+msgid "Fraction_Undead"
+msgstr "Undead"
+
+msgid "Fraction_Demon"
+msgstr "Demons"
+
+msgid "Fraction_Animal"
+msgstr "Beasts"
+
+msgid "Fraction_MysticalCreature"
+msgstr "Mystical Creatures"
+
+msgid "RelationLevel_Hatred"
+msgstr "Hatred"
+
+msgid "RelationLevel_Hostility"
+msgstr "Hostility"
+
+msgid "RelationLevel_Dislike"
+msgstr "Dislike"
+
+msgid "RelationLevel_Neutral"
+msgstr "Neutral"
+
+msgid "RelationLevel_Friendly"
+msgstr "Friendly"
+
+msgid "RelationLevel_Respect"
+msgstr "Respect"
+
+msgid "RelationLevel_Alliance"
+msgstr "Alliance"
+
+msgid "UI_Reputation_Changed"
+msgstr "{Faction}: {Delta} reputation"
+
+msgid "UI_Standing_Changed"
+msgstr "{Faction} now regard you with {Level}"
+
+msgid "UI_Raid_Started"
+msgstr "Raid! The {Faction} are coming for you"

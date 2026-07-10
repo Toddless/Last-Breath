@@ -411,6 +411,18 @@ msgstr ""
 msgid "Effect_Incineration_Description"
 msgstr ""
 
+msgid "UI_End_Turn"
+msgstr ""
+
+msgid "UI_Flee"
+msgstr ""
+
+msgid "Log_Flee_Success"
+msgstr ""
+
+msgid "Log_Flee_Failed"
+msgstr ""
+
 msgid "Notification_Game_Saved"
 msgstr ""
 
@@ -1795,3 +1807,58 @@ msgstr "Сожжение маны"
 
 msgid "Passive_Skill_Mana_Burn_Description"
 msgstr "С каждой атакой сжигает 5% текущей маны цели."
+
+# ------------------------------
+# Factions & reputation
+# ------------------------------
+
+msgid "Fraction_Elf"
+msgstr "Эльфы"
+
+msgid "Fraction_Dwarf"
+msgstr "Гномы"
+
+msgid "Fraction_Human"
+msgstr "Люди"
+
+msgid "Fraction_Undead"
+msgstr "Нежить"
+
+msgid "Fraction_Demon"
+msgstr "Демоны"
+
+msgid "Fraction_Animal"
+msgstr "Звери"
+
+msgid "Fraction_MysticalCreature"
+msgstr "Мистические существа"
+
+msgid "RelationLevel_Hatred"
+msgstr "Ненависть"
+
+msgid "RelationLevel_Hostility"
+msgstr "Вражда"
+
+msgid "RelationLevel_Dislike"
+msgstr "Неприязнь"
+
+msgid "RelationLevel_Neutral"
+msgstr "Нейтралитет"
+
+msgid "RelationLevel_Friendly"
+msgstr "Дружелюбие"
+
+msgid "RelationLevel_Respect"
+msgstr "Уважение"
+
+msgid "RelationLevel_Alliance"
+msgstr "Союзничество"
+
+msgid "UI_Reputation_Changed"
+msgstr "{Faction}: {Delta} к репутации"
+
+msgid "UI_Standing_Changed"
+msgstr "{Faction}: новое отношение — {Level}"
+
+msgid "UI_Raid_Started"
+msgstr "Рейд! {Faction} идут за вами"

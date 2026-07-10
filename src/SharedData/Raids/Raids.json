@@ -1,0 +1,11 @@
+{
+    "initialDelaySeconds": 180,
+    "checkIntervalSeconds": 30,
+    "chance": 0.35,
+    "cooldownSeconds": 900,
+    "durationSeconds": 240,
+    "squadSizeMin": 2,
+    "squadSizeMax": 4,
+    "moveSpeed": 220,
+    "spawnJitter": 120
+}

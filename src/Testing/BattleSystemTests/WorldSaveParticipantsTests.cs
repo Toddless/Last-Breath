@@ -4,9 +4,10 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Ai.World;
     using Core.Ai.World.Time;
     using Core.Components;
-    using Core.Data.FactionData;
     using Core.Enums;
+    using Core.Reputation;
     using Core.Save.Participants;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class WorldSaveParticipantsTests
@@ -40,19 +41,35 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void FactionRelationsRoundTripPlayerStanding()
+        public void FactionRelationsRoundTripPointsAndHysteresisState()
         {
-            var source = new FactionRelationService(new FactionRelationsData());
-            source.SetPlayerRelation(Fractions.Undead, RelationLevel.Hatred);
-            source.SetPlayerRelation(Fractions.Elf, RelationLevel.Dislike);
+            var source = new FactionRelationService(FactionTestData.Create());
+            source.AddReputation(Fractions.Elf, 1100, "Deed"); // Friendly
+            source.AddReputation(Fractions.Elf, -120, "Deed"); // 980 — Friendly held only by hysteresis
+            source.SetPlayerRelation(Fractions.Dwarf, RelationLevel.Dislike);
             var captured = new FactionRelationsSaveParticipant(source).Capture();
 
-            var target = new FactionRelationService(new FactionRelationsData());
-            new FactionRelationsSaveParticipant(target).Restore(captured, 1);
+            var target = new FactionRelationService(FactionTestData.Create());
+            new FactionRelationsSaveParticipant(target).Restore(captured, 2);
+
+            Assert.AreEqual(980, target.GetReputation(Fractions.Elf));
+            Assert.AreEqual(RelationLevel.Friendly, target.GetPlayerRelation(Fractions.Elf)); // stateless resolve would say Neutral
+            Assert.AreEqual(RelationLevel.Dislike, target.GetPlayerRelation(Fractions.Dwarf));
+            Assert.AreEqual(-1000, target.GetReputation(Fractions.Undead)); // untouched default survives
+        }
+
+        [TestMethod]
+        public void FactionRelationsMigrateV1LevelsToBandMidpoints()
+        {
+            var target = new FactionRelationService(FactionTestData.Create());
+            var legacy = JToken.Parse("""{"playerRelations":{"Undead":"Hatred","Elf":"Dislike","Ghost":"Hatred"}}""");
+
+            new FactionRelationsSaveParticipant(target).Restore(legacy, 1);
 
             Assert.AreEqual(RelationLevel.Hatred, target.GetPlayerRelation(Fractions.Undead));
+            Assert.AreEqual((-6000 + -2000) / 2, target.GetReputation(Fractions.Undead));
             Assert.AreEqual(RelationLevel.Dislike, target.GetPlayerRelation(Fractions.Elf));
-            Assert.AreEqual(RelationLevel.Neutral, target.GetPlayerRelation(Fractions.Human));
+            Assert.AreEqual((-800 + -200) / 2, target.GetReputation(Fractions.Elf));
         }
 
         [TestMethod]

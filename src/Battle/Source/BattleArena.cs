@@ -34,6 +34,7 @@
         private TaskCompletionSource<IFightable?>? _playerTargetTcs;
         private TargetSelectionController? _selectionController;
         private IBattleEventBus? _battleEventBus;
+        private IGameEventBus? _gameEventBus;
         private List<IFightable> _fighters = [];
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
@@ -65,6 +66,7 @@
         public override void _ExitTree()
         {
             _battleEventBus = null;
+            _gameEventBus = null;
             _timeline.DetachAll();
             foreach (EntitySpot entitySpot in _spots)
                 entitySpot.RemoveBattleEventBus();
@@ -72,6 +74,7 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
+            _gameEventBus = provider.GetService<IGameEventBus>();
         }
 
         public void SetupEventBus(IBattleEventBus battleEventBus)
@@ -81,6 +84,34 @@
             _battleEventBus.Subscribe<EntityDiedEvent>(OnEntityDead);
             _battleEventBus.Subscribe<AttackTargetSelectedEvent>(OnAttackTargetSelected);
             _battleEventBus.Subscribe<AbilityActivationEvent>(OnAbilityActivation);
+            _battleEventBus.Subscribe<PlayerEndTurnRequestedEvent>(OnPlayerEndTurnRequested);
+            _battleEventBus.Subscribe<PlayerFleeAttemptEvent>(OnPlayerFleeAttempt);
+        }
+
+        /// <summary>Same input window as the attack click: the player's turn, nothing animating.</summary>
+        private bool CanResolvePlayerAction() =>
+            _currentFighter is IPlayer
+            && _director?.IsPlaying != true
+            && _playerTargetTcs is { Task.IsCompleted: false };
+
+        private void OnPlayerEndTurnRequested(PlayerEndTurnRequestedEvent evnt)
+        {
+            if (!CanResolvePlayerAction()) return;
+            _playerTargetTcs!.SetResult(null); // no target — the turn ends without an attack
+        }
+
+        private void OnPlayerFleeAttempt(PlayerFleeAttemptEvent evnt)
+        {
+            if (!CanResolvePlayerAction() || _player == null) return;
+
+            float chance = EscapeChanceCalculator.For(
+                _fighters.Where(fighter => IsPresent(fighter) && !AreAllies(_player, fighter)).OfType<IFightableNpc>());
+            bool succeeded = _rnd.Randf() <= chance;
+            _battleEventBus?.Publish(new PlayerFleeResolvedEvent(succeeded, chance));
+
+            if (succeeded) EndBattle(new BattleOutcome(BattleResults.PlayerFled));
+            // Success or failure, the turn is spent; on success the loop exits by the outcome.
+            _playerTargetTcs!.SetResult(null);
         }
 
         private async void OnAbilityActivation(AbilityActivationEvent obj)
@@ -251,9 +282,11 @@
         {
             if (!_fledIds.Add(fighter.InstanceId)) return Task.CompletedTask;
 
-            // Timeline for the future flee beat/log entry; battle bus for the XP processor.
+            // Timeline for the future flee beat/log entry; battle bus for the XP processor;
+            // game bus for world-level listeners (a fleeing survivor is a guaranteed witness).
             fighter.CombatEvents.Publish(new EntityFledBattleEvent(fighter));
             _battleEventBus?.Publish(new EntityFledBattleEvent(fighter));
+            _gameEventBus?.Publish(new EntityFledBattleEvent(fighter));
             CheckPlayerVictory();
             return Task.CompletedTask;
         }

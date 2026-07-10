@@ -28,7 +28,7 @@ namespace Battle.Internal.Npc
     using Source;
     using GameServiceProvider = Services.GameServiceProvider;
 
-    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant, IRequireServices
+    public partial class BaseNpc : CharacterBody2D, IFightableNpc, IWorldAgent, ISkirmishParticipant
     {
         /// <summary>Close enough to a movement destination to stop.</summary>
         private const float ArriveDistance = 5f;
@@ -194,8 +194,8 @@ namespace Battle.Internal.Npc
             _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
             _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
-            _npcRegistry?.Register(this);
-            _gameEventBus?.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
+            _npcRegistry.Register(this);
+            _gameEventBus.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
         }
 
 

@@ -63,6 +63,7 @@ namespace LastBreath.Player
         private IBattleEventBus? _battleEventBus;
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
+        private IFightable? _lastDamageSource;
 
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
@@ -255,7 +256,11 @@ namespace LastBreath.Player
 
         public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
-        public void Kill() => NotifyShouldDie();
+        public void Kill()
+        {
+            _lastDamageSource = null; // debug/tool death — nobody gets the credit
+            NotifyShouldDie();
+        }
 
         public async Task ReceiveAttack(IAttackContext context)
         {
@@ -304,6 +309,7 @@ namespace LastBreath.Player
 
         public Task TakeDamage(IDamageContext context)
         {
+            _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
             // Apply modifiers like "Reduce all damage taken"
             ModifierHandler.Apply(context);
             // apply attackers modifiers like "increase all damage dealt"
@@ -497,9 +503,9 @@ namespace LastBreath.Player
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
-            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
-            CombatEvents.Publish<EntityDiedEvent>(new(this));
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            CombatEvents.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
             // The arena deliberately ignores the player's EntityDiedEvent: PlayerDiedEvent is
             // the battle-ending signal (PlayerLost). Without it the battle loop never exits.
             _gameEventBus?.Publish<PlayerDiedEvent>(new(this));

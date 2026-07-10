@@ -2,6 +2,7 @@ namespace Battle.Source.UIElements
 {
     using System.Threading.Tasks;
     using Core.Localization;
+    using Core.Services;
     using Core.Views.UI;
     using Godot;
 
@@ -32,9 +33,11 @@ namespace Battle.Source.UIElements
         public OverlayRegion Region { get; private set; }
 
         /// <summary>Localizes and stores the text; display starts in _Ready, once the node is in the tree.</summary>
-        public void SetNotification(string notificationId, OverlayRegion region)
+        public void SetNotification(NotificationContent content, OverlayRegion region)
         {
-            _text = Localization.Localize(notificationId);
+            _text = content.Values == null
+                ? Localization.Localize(content.Id)
+                : Localization.Render(content.Id, content.Values);
             Region = region;
         }
 

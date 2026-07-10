@@ -76,6 +76,7 @@ namespace Core.Data
                 data.LevelCoefficient,
                 data.EquipItemEffectChance,
                 data.ItemModifierMultiplier,
+                data.MaxItemsPerKill,
                 data.BaseBudget.ToDictionary(kvp => EnumParser.ParseEnum<EntityType>(kvp.Key), kvp => kvp.Value),
                 data.RarityMultipliers.ToDictionary(kvp => EnumParser.ParseEnum<Rarity>(kvp.Key), kvp => kvp.Value));
         }

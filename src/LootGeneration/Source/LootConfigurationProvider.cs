@@ -20,6 +20,7 @@ namespace LootGeneration.Source
         public float LvlCoefficient => Configuration.LvlCoefficient;
         public float EquipItemEffectChance => Configuration.EquipItemEffectChance;
         public float ItemModifierMultiplier => Configuration.ItemModifierMultiplier;
+        public int MaxItemsPerKill => Configuration.MaxItemsPerKill;
         public Dictionary<EntityType, float> BaseBudget => Configuration.BaseBudget;
         public Dictionary<Rarity, float> RarityMultipliers => Configuration.RarityMultipliers;
 
@@ -36,6 +37,7 @@ namespace LootGeneration.Source
                 parsed.LevelCoefficient,
                 parsed.EquipItemEffectChance,
                 parsed.ItemModifierMultiplier,
+                parsed.MaxItemsPerKill,
                 parsed.BaseBudget,
                 parsed.RarityMultipliers);
         }

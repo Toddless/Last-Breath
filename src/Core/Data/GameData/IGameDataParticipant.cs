@@ -9,9 +9,9 @@ namespace Core.Data.GameData
     /// </summary>
     public interface IGameDataParticipant
     {
-        IReadOnlyList<string> Catalogs { get; }
+        public IReadOnlyList<string> Catalogs { get; }
 
         /// <summary>Parses one file of one of the declared catalogs. Throw on bad data — the service reports and skips the file.</summary>
-        void Apply(string catalog, GameDataFile file);
+        public void Apply(string catalog, GameDataFile file);
     }
 }

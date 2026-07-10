@@ -2,9 +2,12 @@ namespace LastBreath.Npc
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Battle.Source;
+    using Core.Ai.World.Raids;
     using Core.Data;
     using Core.Entity;
+    using Core.Enums;
     using Core.Events;
     using Core.Events.GameEvents;
     using Core.Services;
@@ -17,7 +20,7 @@ namespace LastBreath.Npc
     /// schedules a replacement; the global cap is enforced by <see cref="INpcPopulationService"/>.
     /// </summary>
     [GlobalClass]
-    public partial class NpcSpawnPoint : Node2D
+    public partial class NpcSpawnPoint : Node2D, IRaidSpawnSite
     {
         [Export] private string[] _npcIds = [];
         [Export] private int _maxCount = 3;
@@ -32,9 +35,18 @@ namespace LastBreath.Npc
         private INpcProvider? _provider;
         private IGameEventBus? _gameEventBus;
         private INpcPopulationService? _population;
+        private IRaidSpawnRegistry? _raidRegistry;
+        private Fractions? _fraction;
         private EntityGroup? _group;
         private int _pendingRespawns;
         private float _respawnTimer;
+
+        /// <summary>Faction of the first known id — a point houses one faction; null until the data loads.</summary>
+        public Fractions? Fraction => _fraction ??= ResolveFraction();
+
+        public IReadOnlyList<string> NpcIds => _npcIds;
+
+        Vector2 IRaidSpawnSite.Position => GlobalPosition;
 
         public override void _Ready()
         {
@@ -43,6 +55,8 @@ namespace LastBreath.Npc
             _provider = _gameServiceProvider.GetService<INpcProvider>();
             _gameEventBus = _gameServiceProvider.GetService<IGameEventBus>();
             _population = _gameServiceProvider.GetService<INpcPopulationService>();
+            _raidRegistry = _gameServiceProvider.GetService<IRaidSpawnRegistry>();
+            _raidRegistry?.Register(this);
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
             _gameEventBus?.Subscribe<NpcFactionChangedEvent>(OnFactionChanged);
 
@@ -52,6 +66,7 @@ namespace LastBreath.Npc
 
         public override void _ExitTree()
         {
+            _raidRegistry?.Unregister(this);
             _gameEventBus?.Unsubscribe<NpcFinalDeathEvent>(OnFinalDeath);
             _gameEventBus?.Unsubscribe<NpcFactionChangedEvent>(OnFactionChanged);
         }
@@ -125,6 +140,15 @@ namespace LastBreath.Npc
             if (!_ownedInstanceIds.Remove(instanceId)) return;
             if (_pendingRespawns == 0) _respawnTimer = _respawnDelaySeconds;
             _pendingRespawns++;
+        }
+
+        private Fractions? ResolveFraction()
+        {
+            if (_provider == null) return null;
+
+            foreach (string npcId in _npcIds.Where(id => _provider.KnownNpcIds.Contains(id)))
+                return _provider.CreateDefinition(npcId).Fraction;
+            return null;
         }
     }
 }

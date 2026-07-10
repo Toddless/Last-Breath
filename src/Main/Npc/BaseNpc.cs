@@ -24,6 +24,7 @@ namespace LastBreath.Npc
     using Core.Events.GameEvents;
     using Core.Items;
     using Core.Modifiers;
+    using Core.Reputation;
     using Core.Services;
     using Godot;
     using Player;
@@ -54,6 +55,7 @@ namespace LastBreath.Npc
         private IBattleEventBus? _battleEventBus;
         private IPlayerAccessor? _playerAccessor;
         private IFactionRelationService? _factionRelations;
+        private IPersonalReputationService? _personalReputation;
         private INpcWorldRegistry? _npcRegistry;
         private INpcSkirmishService? _skirmishService;
         private IWorldClock? _worldClock;
@@ -61,6 +63,7 @@ namespace LastBreath.Npc
         private INpcLifecycle? _lifecycle;
         private IReadOnlyList<Vector2>? _patrolRoute;
         private Vector2? _moveDestination;
+        private IFightable? _lastDamageSource;
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
@@ -188,6 +191,7 @@ namespace LastBreath.Npc
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _playerAccessor = GameServiceProvider.Instance.GetService<IPlayerAccessor>();
             _factionRelations = GameServiceProvider.Instance.GetService<IFactionRelationService>();
+            _personalReputation = GameServiceProvider.Instance.GetService<IPersonalReputationService>();
             _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
             _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
@@ -314,9 +318,14 @@ namespace LastBreath.Npc
             return nearest == null ? null : new TargetSighting(nearest.Value);
         }
 
-        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's faction standing.</summary>
-        private bool ConsidersPlayerAnEnemy() =>
-            _hostileToPlayer || _factionRelations?.IsHostileToPlayer(Fraction) == true;
+        /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's
+        /// faction standing shifted by THIS NPC's personal opinion (a rescued dwarf won't attack).</summary>
+        private bool ConsidersPlayerAnEnemy()
+        {
+            if (_hostileToPlayer) return true;
+            if (_personalReputation != null) return _personalReputation.IsHostileToPlayer(InstanceId, Fraction);
+            return _factionRelations?.IsHostileToPlayer(Fraction) == true;
+        }
 
         private void Consider(Vector2 candidate, ref Vector2? nearest, ref float nearestDistance)
         {
@@ -439,6 +448,7 @@ namespace LastBreath.Npc
 
         public Task TakeDamage(IDamageContext context)
         {
+            _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
             ModifierHandler.Apply(context);
             context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
@@ -537,7 +547,11 @@ namespace LastBreath.Npc
             return true;
         }
 
-        public void Kill() => NotifyShouldDie();
+        public void Kill()
+        {
+            _lastDamageSource = null; // debug/tool death — nobody gets the credit
+            NotifyShouldDie();
+        }
 
         public IFightable ChoseTarget(List<IFightable> targets)
         {
@@ -627,6 +641,8 @@ namespace LastBreath.Npc
         /// <summary>Dies outside a player battle (lost skirmish): the body lifecycle takes over.</summary>
         public void DefeatInWorld()
         {
+            // A stale source from an old player battle must not frame the player for a lost skirmish.
+            _lastDamageSource = null;
             CurrentHealth = 0;
             IsFighting = false;
             BecomeBody();
@@ -726,9 +742,9 @@ namespace LastBreath.Npc
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
-            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
-            CombatEvents.Publish<EntityDiedEvent>(new(this));
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            CombatEvents.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
         }
 
         private void SetBaseValuesForParameters()

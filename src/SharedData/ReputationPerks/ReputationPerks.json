@@ -1,0 +1,46 @@
+{
+    "levels": [
+        {
+            "level": "Hatred",
+            "perks": [
+                { "id": "Perk_Settlements_Closed", "value": 1 }
+            ]
+        },
+        {
+            "level": "Hostility",
+            "perks": [
+                { "id": "Perk_Price_Change", "value": 0.5 }
+            ]
+        },
+        {
+            "level": "Dislike",
+            "perks": [
+                { "id": "Perk_Price_Change", "value": 0.3 },
+                { "id": "Perk_Reward_Change", "value": -0.3 },
+                { "id": "Perk_Entrance_Fee", "value": 1 }
+            ]
+        },
+        {
+            "level": "Friendly",
+            "perks": [
+                { "id": "Perk_Price_Change", "value": -0.15 },
+                { "id": "Perk_Reward_Change", "value": 0.15 }
+            ]
+        },
+        {
+            "level": "Respect",
+            "perks": [
+                { "id": "Perk_Price_Change", "value": -0.3 },
+                { "id": "Perk_Reward_Change", "value": 0.3 }
+            ]
+        },
+        {
+            "level": "Alliance",
+            "perks": [
+                { "id": "Perk_Price_Change", "value": -0.5 },
+                { "id": "Perk_Reward_Change", "value": 0.5 },
+                { "id": "Perk_Mythic_Gear_Access", "value": 1 }
+            ]
+        }
+    ]
+}

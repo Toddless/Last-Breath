@@ -7,10 +7,6 @@
                     "tier": 0,
                     "items": [
                         {
-                            "id": "Ring_Hell_Servant",
-                            "price": 330
-                        },
-                        {
                             "id": "Helmet_Dexterity_Hunters_Dream",
                             "price": 452
                         },
@@ -31,10 +27,6 @@
                             "price": 352
                         },
                         {
-                            "id": "Ring_of_Creators",
-                            "price": 354
-                        },
-                        {
                             "id": "Helmet_Intelligence_Aegis",
                             "price": 484
                         },
@@ -49,10 +41,6 @@
                         {
                             "id": "Boots_Intelligence_Aegis",
                             "price": 565
-                        },
-                        {
-                            "id": "Amulet_Eternal_Ravage",
-                            "price": 335
                         },
                         {
                             "id": "Helmet_Strength_Vital_Core",
@@ -71,14 +59,6 @@
                             "price": 450
                         },
                         {
-                            "id": "Amulet_Of_Dexterity",
-                            "price": 253
-                        },
-                        {
-                            "id": "Amulet_Goliath_Sign",
-                            "price": 555
-                        },
-                        {
                             "id": "Helmet_Intelligence_Eternal_Reserve",
                             "price": 355
                         },
@@ -95,8 +75,32 @@
                             "price": 451
                         },
                         {
-                            "id": "Ring_Dexterity_Additional_Hit_Chance",
-                            "price": 451
+                            "id": "Ring_Hell_Servant",
+                            "price": 426
+                        },
+                        {
+                            "id": "Ring_of_Creators",
+                            "price": 613
+                        },
+                        {
+                            "id": "Amulet_Goliath_Sign",
+                            "price": 498
+                        },
+                        {
+                            "id": "Body_Porcupine",
+                            "price": 436
+                        },
+                        {
+                            "id": "Ring_Of_Fire_Demon",
+                            "price": 474
+                        },
+                        {
+                            "id": "Body_All_Evade_To_Armor",
+                            "price": 596
+                        },
+                        {
+                            "id": "Body_No_Way_Back",
+                            "price": 450
                         }
                     ]
                 },
@@ -124,14 +128,6 @@
                             "price": 175
                         },
                         {
-                            "id": "Body_Porcupine",
-                            "price": 180
-                        },
-                        {
-                            "id": "Ring_Of_Fire_Demon",
-                            "price": 165
-                        },
-                        {
                             "id": "Boots_Strength_Iron_Bastion",
                             "price": 150
                         },
@@ -146,10 +142,6 @@
                         {
                             "id": "Helmet_Strength_Iron_Bastion",
                             "price": 175
-                        },
-                        {
-                            "id": "Ring_Dexterity_Critical_Chance",
-                            "price": 195
                         },
                         {
                             "id": "Boots_Strength_Stoneheart",
@@ -186,10 +178,6 @@
                         {
                             "id": "Gloves_Dexterity_Shadowstep",
                             "price": 151
-                        },
-                        {
-                            "id": "Ring_Intelligence_Multicast",
-                            "price": 105
                         },
                         {
                             "id": "Amulet_Stronghold",
@@ -229,18 +217,6 @@
                             "price": 25
                         },
                         {
-                            "id": "Amulet_Of_Wisdom",
-                            "price": 65
-                        },
-                        {
-                            "id": "Ring_Strength_Block_Chance",
-                            "price": 32
-                        },
-                        {
-                            "id": "Body_All_Evade_To_Armor",
-                            "price": 50
-                        },
-                        {
                             "id": "Helmet_Dexterity_Feral_Instinct",
                             "price": 35
                         },
@@ -251,18 +227,6 @@
                         {
                             "id": "Gloves_Dexterity_Feral_Instinct",
                             "price": 35
-                        },
-                        {
-                            "id": "Body_Dexterity_Feral_Instinct",
-                            "price": 35
-                        },
-                        {
-                            "id": "Amulet_Of_Power",
-                            "price": 80
-                        },
-                        {
-                            "id": "Ring_Strength",
-                            "price": 45
                         },
                         {
                             "id": "Ring_Dexterity",
@@ -326,14 +290,6 @@
                             "price": 10
                         },
                         {
-                            "id": "Ring_Dexterity_Accuracy",
-                            "price": 10
-                        },
-                        {
-                            "id": "Body_No_Way_Back",
-                            "price": 10
-                        },
-                        {
                             "id": "Helmet_Intelligence_Arcane_Bulwark",
                             "price": 15
                         },
@@ -348,10 +304,6 @@
                         {
                             "id": "Boots_Intelligence_Arcane_Bulwark",
                             "price": 10
-                        },
-                        {
-                            "id": "Amulet_Of_Defence",
-                            "price": 10
                         }
                     ]
                 }
@@ -364,7 +316,16 @@
             "tiers": [
                 {
                     "tier": 0,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Ring_of_Hunter",
+                            "price": 290
+                        },
+                        {
+                            "id": "Ring_Of_Legionnaire",
+                            "price": 423
+                        }
+                    ]
                 },
                 {
                     "tier": 1,
@@ -376,7 +337,16 @@
                 },
                 {
                     "tier": 3,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Essence_Critical_Chance",
+                            "price": 13
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Health",
+                            "price": 4
+                        }
+                    ]
                 }
             ]
         },
@@ -385,15 +355,34 @@
             "tiers": [
                 {
                     "tier": 0,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Recipe_Body_Intelligence_Aegis",
+                            "price": 636
+                        },
+                        {
+                            "id": "Belt_Mana_Flow",
+                            "price": 445
+                        }
+                    ]
                 },
                 {
                     "tier": 1,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Weapon_Simple_Axe",
+                            "price": 133
+                        }
+                    ]
                 },
                 {
                     "tier": 2,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Belt_Of_Life",
+                            "price": 76
+                        }
+                    ]
                 },
                 {
                     "tier": 3,
@@ -407,25 +396,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Body_Ice_Mage",
+                            "price": 472
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Strength_Intelligence",
+                            "price": 193
+                        }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Dexterity",
+                            "price": 13
+                        },
+                        {
+                            "id": "Belt_of_Strength",
+                            "price": 13
+                        }
                     ]
                 }
             ]
@@ -436,25 +436,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_of_Knight",
+                            "price": 585
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_Minor_Barrier",
+                            "price": 133
+                        },
+                        {
+                            "id": "Weapon_Simple_Sword",
+                            "price": 148
+                        }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Crafting_Resource_Essence_Evade",
+                            "price": 14
+                        }
                     ]
                 }
             ]
@@ -465,25 +476,37 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Weapon_Righteous_Wrath",
+                            "price": 545
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_of_Assasin",
+                            "price": 160
+                        }
                     ]
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Trinity",
+                            "price": 65
+                        }
                     ]
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt_of_Dexterity",
+                            "price": 11
+                        }
                     ]
                 }
             ]
@@ -494,25 +517,35 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Recipe_Body_Strength_Iron_Bastion",
+                            "price": 437
+                        },
+                        {
+                            "id": "Ring_Submittion_Mark",
+                            "price": 529
+                        }
                     ]
                 },
                 {
                     "tier": 1,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt_of_Intelligence",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Armor",
+                            "price": 11
+                        }
                     ]
                 }
             ]
@@ -523,25 +556,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_Of_Limitless_Magic",
+                            "price": 263
+                        },
+                        {
+                            "id": "Weapon_All_Cutting",
+                            "price": 458
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt_of_Hunter",
+                            "price": 208
+                        }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Strength",
+                            "price": 7
+                        }
                     ]
                 }
             ]
@@ -554,25 +598,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Weapon_Bloodthirsty",
+                            "price": 576
+                        },
+                        {
+                            "id": "Weapon_Silent_Fury",
+                            "price": 442
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Upgrade_Resource_Blacksmith_Rune",
+                            "price": 165
+                        }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Upgrade_Resource_Jeweler_Rune",
+                            "price": 8
+                        }
                     ]
                 }
             ]
@@ -583,26 +638,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Body_Power",
+                            "price": 539
+                        },
+                        {
+                            "id": "Belt_Life_Flow",
+                            "price": 496
+                        }
                     ]
                 },
                 {
                     "tier": 1,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_Of_Dwarfs",
+                            "price": 60
+                        },
+                        {
+                            "id": "Ring_of_Trickster",
+                            "price": 48
+                        }
                     ]
                 },
                 {
                     "tier": 3,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 }
             ]
         },
@@ -612,26 +677,36 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt_of_Inquisitor",
+                            "price": 529
+                        },
+                        {
+                            "id": "Belt_Ether_Flow",
+                            "price": 510
+                        }
                     ]
                 },
                 {
                     "tier": 1,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Recipe_Ring_Of_Fire_Demon",
+                            "price": 65
+                        },
+                        {
+                            "id": "Ring_of_Giant",
+                            "price": 38
+                        }
                     ]
                 },
                 {
                     "tier": 3,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 }
             ]
         },
@@ -640,26 +715,37 @@
             "tiers": [
                 {
                     "tier": 0,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt_of_Knight",
+                            "price": 161
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Damage",
+                            "price": 129
+                        }
                     ]
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_Of_Archmage",
+                            "price": 42
+                        }
                     ]
                 },
                 {
                     "tier": 3,
                     "items": [
-                        {}
+                        {
+                            "id": "Ring_Archmage_Signet",
+                            "price": 15
+                        }
                     ]
                 }
             ]
@@ -670,26 +756,37 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Creators_Nature",
+                            "price": 568
+                        },
+                        {
+                            "id": "Creators_Cloak",
+                            "price": 646
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Crafting_Resource_Essence_Barrier",
+                            "price": 184
+                        }
                     ]
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Belt",
+                            "price": 43
+                        }
                     ]
                 },
                 {
                     "tier": 3,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 }
             ]
         },
@@ -699,26 +796,33 @@
                 {
                     "tier": 0,
                     "items": [
-                        {}
+                        {
+                            "id": "Amulet_Intelligence",
+                            "price": 266
+                        }
                     ]
                 },
                 {
                     "tier": 1,
                     "items": [
-                        {}
+                        {
+                            "id": "Upgrade_Resource_Weapon_Rune",
+                            "price": 99
+                        }
                     ]
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {}
+                        {
+                            "id": "Weapon_Simple_Dagger",
+                            "price": 51
+                        }
                     ]
                 },
                 {
                     "tier": 3,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 }
             ]
         }
@@ -729,27 +833,19 @@
             "tiers": [
                 {
                     "tier": 0,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 1,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
-                    "items": [
-                        {}
-                    ]
+                    "items": []
                 }
             ]
         }

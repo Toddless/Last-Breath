@@ -13,6 +13,10 @@
         /// <summary>
         /// Player will get nothing.
         /// </summary>
-        BattleAbandoned
+        BattleAbandoned,
+        /// <summary>
+        /// Player escaped alive but earned nothing.
+        /// </summary>
+        PlayerFled
     }
 }

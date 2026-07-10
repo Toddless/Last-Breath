@@ -3,6 +3,9 @@ namespace Core.Services
     using System.Collections.Generic;
     using Views.UI;
 
+    /// <summary>A queued notification: the localization key plus optional template values.</summary>
+    public record NotificationContent(string Id, IReadOnlyDictionary<string, object?>? Values = null);
+
     /// <summary>
     /// Per-region throttle for notifications: at most N visible at once, the rest wait in FIFO
     /// order. Regions are independent — a location announcement never waits for the system feed.
@@ -10,16 +13,16 @@ namespace Core.Services
     /// </summary>
     public class NotificationQueue(int maxVisiblePerRegion)
     {
-        private readonly Dictionary<OverlayRegion, Queue<string>> _waiting = [];
+        private readonly Dictionary<OverlayRegion, Queue<NotificationContent>> _waiting = [];
         private readonly Dictionary<OverlayRegion, int> _visible = [];
 
         /// <summary>True — a slot was taken, show the notification now; false — parked in the queue.</summary>
-        public bool TryTake(string notificationId, OverlayRegion region)
+        public bool TryTake(NotificationContent notification, OverlayRegion region)
         {
             int visible = _visible.GetValueOrDefault(region);
             if (visible >= maxVisiblePerRegion)
             {
-                Waiting(region).Enqueue(notificationId);
+                Waiting(region).Enqueue(notification);
                 return false;
             }
 
@@ -27,8 +30,8 @@ namespace Core.Services
             return true;
         }
 
-        /// <summary>A visible notification died; returns the next queued id (its slot is re-taken) or null.</summary>
-        public string? Release(OverlayRegion region)
+        /// <summary>A visible notification died; returns the next queued one (its slot is re-taken) or null.</summary>
+        public NotificationContent? Release(OverlayRegion region)
         {
             int visible = _visible.GetValueOrDefault(region);
             if (visible > 0) _visible[region] = visible - 1;
@@ -47,10 +50,10 @@ namespace Core.Services
             _visible.Clear();
         }
 
-        private Queue<string> Waiting(OverlayRegion region)
+        private Queue<NotificationContent> Waiting(OverlayRegion region)
         {
             if (!_waiting.TryGetValue(region, out var queue))
-                _waiting[region] = queue = new Queue<string>();
+                _waiting[region] = queue = new Queue<NotificationContent>();
             return queue;
         }
     }

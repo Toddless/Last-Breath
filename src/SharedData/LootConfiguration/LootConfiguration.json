@@ -5,6 +5,7 @@
     "levelCoefficient": 0.35,
     "equipItemEffectChance": 0.15,
     "itemModifierMultiplier": 0.10,
+    "maxItemsPerKill": 25,
     "baseBudget": {
         "Regular": 5,
         "Special": 10,

@@ -4,11 +4,13 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Data.GameData;
+    using Entity;
     using Events;
     using Godot;
     using Interfaces;
     using MessageBus;
     using Microsoft.Extensions.DependencyInjection;
+    using Reputation;
     using Views.UI;
 
     /// <summary>

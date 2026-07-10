@@ -39,6 +39,11 @@
                 var manager = new SaveManager(sp.GetRequiredService<LoadScope>());
                 manager.Register(new WorldClockSaveParticipant(sp.GetRequiredService<Core.Ai.World.Time.IWorldClock>()));
                 manager.Register(new FactionRelationsSaveParticipant(sp.GetRequiredService<IFactionRelationService>()));
+                // Optional like the npcWorld section: a project without the personal layer doesn't write it.
+                if (sp.GetService<Core.Reputation.IPersonalReputationService>() is { } personalReputation)
+                    manager.Register(new PersonalReputationSaveParticipant(personalReputation));
+                if (sp.GetService<Core.Ai.World.Raids.IRaidService>() is { } raidService)
+                    manager.Register(new RaidsSaveParticipant(raidService));
                 manager.Register(new MasterySaveParticipant(sp.GetRequiredService<IMartialArtMastery>()));
                 manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
                 manager.Register(new AbilityBookSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<IAbilityProvider>()));

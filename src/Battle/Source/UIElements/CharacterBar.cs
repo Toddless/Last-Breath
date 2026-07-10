@@ -11,10 +11,13 @@
     public partial class CharacterBar : Control, IInitializable
     {
         private const string UID = "uid://cv5svhrugien6";
+        private static readonly Color s_deadTint = new(0.45f, 0.45f, 0.45f, 0.8f);
         private Tween? _tween;
+        private ProgressBar? _barrierBar;
         [Export] private Control? MainContainer { get; set; }
         [Export] private TextureProgressBar? ManaBar { get; set; }
         [Export] private TextureProgressBar? HealthBar { get; set; }
+        [Export] private TextureProgressBar? BarrierBar { get; set; }
         [Export] private TextureRect? Icon { get; set; }
         [Export] private TextureRect? MainTexture { get; set; }
         [Export] private GridContainer? CharacterEffects { get; set; }
@@ -36,12 +39,25 @@
         public void UpdateMaxHealth(float value) => HealthBar?.MaxValue = value;
         public void UpdateMaxMana(float value) => ManaBar?.MaxValue = value;
 
+        /// <summary>PoE-style: the barrier is a translucent overlay ON TOP of the health bar,
+        /// scaled to its own maximum. Hidden while the entity carries no barrier.</summary>
+        public void UpdateBarrier(float value, float maxValue)
+        {
+            BarrierBar?.MaxValue = Mathf.Max(maxValue, 1f);
+            BarrierBar?.Value = value;
+            BarrierBar?.Visible = value > 0f;
+        }
+
+        /// <summary>Grey out the fallen: the bar stays in the list, but the living roster must read at a glance.</summary>
+        public void SetDead() => Modulate = s_deadTint;
+
         /// <summary>Reconciles the effect icons with the aggregated snapshot: one slot per effect id.</summary>
         public void SetEffects(IReadOnlyList<EffectView> effects)
         {
             var slotsById = new Dictionary<string, EffectSlot>();
             foreach (var slot in GetEffectSlots())
-                if (!string.IsNullOrEmpty(slot.EffectId)) slotsById[slot.EffectId] = slot;
+                if (!string.IsNullOrEmpty(slot.EffectId))
+                    slotsById[slot.EffectId] = slot;
 
             foreach (var view in effects)
             {
@@ -59,7 +75,8 @@
 
             var activeIds = effects.Select(view => view.Id).ToHashSet();
             foreach (var (id, slot) in slotsById)
-                if (!activeIds.Contains(id)) slot.RemoveEffect();
+                if (!activeIds.Contains(id))
+                    slot.RemoveEffect();
         }
 
         public void ClearEffects()
@@ -68,12 +85,15 @@
                 child?.RemoveEffect();
         }
 
-        public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, Texture2D? icon = null)
+        public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, float maxBarrier = 0f, float currentBarrier = 0f, Texture2D? icon = null)
         {
             ManaBar?.MaxValue = maxMana;
             ManaBar?.Value = currentMana;
             HealthBar?.MaxValue = maxHealth;
             HealthBar?.Value = currentHealth;
+            // The scene's defaults must never leak: a bar created mid-battle (a latecomer) may not
+            // receive a vitals snapshot for a whole round.
+            UpdateBarrier(currentBarrier, maxBarrier);
             if (icon != null) Icon?.Texture = icon;
             //_tween = CreateTween();
         }
@@ -95,6 +115,7 @@
             MainTexture?.FlipH = FlipH;
             ManaBar?.FillMode = FlipH ? 1 : 0;
             HealthBar?.FillMode = FlipH ? 1 : 0;
+            BarrierBar?.FillMode = FlipH ? 1 : 0;
         }
     }
 }

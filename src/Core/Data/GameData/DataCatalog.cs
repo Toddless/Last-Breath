@@ -12,6 +12,9 @@ namespace Core.Data.GameData
         public const string NpcBuffs = "NpcBuffs";
         public const string NpcModifiers = "NpcModifiers";
         public const string Factions = "Factions";
+        public const string ReputationDeeds = "ReputationDeeds";
+        public const string ReputationPerks = "ReputationPerks";
+        public const string Raids = "Raids";
         public const string Formatting = "Formatting";
         public const string World = "World";
         public const string Player = "Player";

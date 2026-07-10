@@ -50,5 +50,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="LootSimulation\Reports\" />
+  </ItemGroup>
+
 
 </Project>

@@ -77,6 +77,10 @@ namespace Battle.Source.UIElements
                 OnActivationPressed();
         }
 
+        // TODO:
+        // Иконка способности перекрывает фрейм слота
+
+
         public override void _Ready()
         {
             MouseEntered += OnMouseEnter;
@@ -99,15 +103,6 @@ namespace Battle.Source.UIElements
             _chargeStage = stage;
             ShowChargeStage();
         }
-
-        // public override GodotObject? _MakeCustomTooltip(string forText)
-        // {
-        //     if (_ability == null) return null;
-        //
-        //     var abilityDescription = AbilityDescription.Initialize().Instantiate<AbilityDescription>();
-        //     abilityDescription.SetupFullAbilityDescription(_ability);
-        //     return abilityDescription;
-        // }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

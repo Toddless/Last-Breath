@@ -19,6 +19,7 @@ namespace Core.Save
         private readonly IMartialArtMastery _mastery;
         private readonly INpcPopulationService _population;
         private readonly IGameMessageBus _messageBus;
+        private readonly Ai.World.Raids.IRaidService? _raids;
         private SaveFile? _pendingLoad;
 
         public SaveGameService(
@@ -27,7 +28,8 @@ namespace Core.Save
             IPlayerAccessor playerAccessor,
             IMartialArtMastery mastery,
             INpcPopulationService population,
-            IGameMessageBus messageBus)
+            IGameMessageBus messageBus,
+            Ai.World.Raids.IRaidService? raids = null)
         {
             _manager = manager;
             _storage = storage;
@@ -35,13 +37,14 @@ namespace Core.Save
             _mastery = mastery;
             _population = population;
             _messageBus = messageBus;
+            _raids = raids;
             _manager.SectionRestoreFailed += OnSectionRestoreFailed;
         }
 
         public int SlotCount => Slots;
 
-        /// <summary>No saving in battle or while lying dead (checkpoints are unreachable in both — this is the backstop).</summary>
-        public bool CanSave => _playerAccessor.Player is { IsFighting: false, IsAlive: true };
+        /// <summary>No saving in battle, while lying dead, or under an active raid (checkpoints are unreachable in all — this is the backstop).</summary>
+        public bool CanSave => _playerAccessor.Player is { IsFighting: false, IsAlive: true } && _raids?.IsRaidActive != true;
         public bool HasPendingLoad => _pendingLoad != null;
 
         public bool HasSave(int slot) => _storage.Exists(slot);

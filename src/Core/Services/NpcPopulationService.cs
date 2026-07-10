@@ -1,9 +1,8 @@
-namespace Battle.Internal.Npc
+namespace Core.Services
 {
     using System;
-    using Core.Events;
-    using Core.Events.GameEvents;
-    using Core.Services;
+    using Events;
+    using Events.GameEvents;
 
     /// <summary>
     /// Counts every spawn-point NPC alive in the world. A reservation survives faction changes
@@ -33,6 +32,14 @@ namespace Battle.Internal.Npc
                 if (CurrentCount >= GlobalLimit) return false;
                 CurrentCount++;
                 return true;
+            }
+        }
+
+        public void ReserveOutsideLimit()
+        {
+            lock (_sync)
+            {
+                CurrentCount++;
             }
         }
 

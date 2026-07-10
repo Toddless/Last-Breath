@@ -20,7 +20,7 @@ namespace Core.Components.NpcModifiers
                         .Cast<INpcModifier>().ToList(),
                 ["tierUpgrade"] = data =>
                     data.OfType<TierUpgradeData>()
-                        .Select(upgrade => new TierUpgradeModifier(upgrade.Id, upgrade.Weight, upgrade.Difficulty, upgrade.IsUnique, upgrade.NpcBuffId, upgrade.UpgradeMultiplier,
+                        .Select(upgrade => new TierUpgradeModifier(upgrade.Id, upgrade.Weight, upgrade.Difficulty, upgrade.IsUnique, upgrade.NpcBuffId, upgrade.TierUpgradeChance,
                             upgrade.UpgradeBy))
                         .Cast<INpcModifier>().ToList(),
                 ["guaranteedItems"] = data =>

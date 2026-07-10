@@ -10,6 +10,7 @@ namespace Core.Data.LootTable
         float LevelCoefficient,
         float EquipItemEffectChance,
         float ItemModifierMultiplier,
+        int MaxItemsPerKill,
         Dictionary<EntityType, float> BaseBudget,
         Dictionary<Rarity, float> RarityMultipliers);
 }

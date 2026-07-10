@@ -4,6 +4,7 @@ namespace Battle.Services
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
+    using Core.Reputation;
     using Core.Save;
     using Core.Services;
     using Internal.Npc;
@@ -26,13 +27,15 @@ namespace Battle.Services
                 .AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>()
                 .AddGameDataParticipant<INpcProvider, NpcProvider>()
                 .AddSingleton<INpcPopulationService, NpcPopulationService>()
-                .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
                 .AddSingleton<INpcWorldRegistry, NpcWorldRegistry>()
                 .AddGameDataParticipant<INpcBuffProvider, NpcBuffProvider>()
                 .AddSingleton<INpcSkirmishService, NpcSkirmishService>()
                 .AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>()
                 .AddGameDataParticipant<Core.Ai.World.Time.IWorldClock, GameWorldClock>()
                 .AddGameDataParticipant<Core.Ai.World.IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>()
+                 .AddGameDataParticipant<IFactionRelationService, FactionRelationService>()
+                 .AddGameDataParticipant<IReputationDeedProcessor, ReputationDeedProcessor>()
+                 .AddSingleton<ReputationBroadcaster>()
                 .AddSingleton<ISaveGameService, SaveGameService>());
             provider.AddBattleUiElementsFactory();
 

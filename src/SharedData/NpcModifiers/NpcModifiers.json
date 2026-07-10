@@ -76,7 +76,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Crafting_Resource",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Crafting_Resource",
                     "weight": 50,
-                    "difficulty": 0.1,
+                    "difficulty": 0.4,
                     "items": [
                         "Crafting_Resource_Cooper_Ore",
                         "Crafting_Resource_Deer_Leather",
@@ -89,7 +89,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Crafting_Upgrade",
                     "weight": 25,
-                    "difficulty": 0.3,
+                    "difficulty": 0.5,
                     "items": [
                         "Upgrade_Resource_Weapon_Rune",
                         "Upgrade_Resource_Jeweler_Rune",
@@ -101,7 +101,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Equip",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Equip",
                     "weight": 15,
-                    "difficulty": 0.4,
+                    "difficulty": 0.6,
                     "items": [
                         "Body_Strength_Stoneheart",
                         "Gloves_Strength_Stoneheart",
@@ -113,7 +113,7 @@
                     "id": "Npc_Modifier_Guaranteed_Items_Essence",
                     "npcBuffId": "Npc_Buff_Guaranteed_Items_Essence",
                     "weight": 5,
-                    "difficulty": 0.6,
+                    "difficulty": 0.7,
                     "items": [
                         "Crafting_Resource_Essence_Barrier",
                         "Crafting_Resource_Essence_Evade",

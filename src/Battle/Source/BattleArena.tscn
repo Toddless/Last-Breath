@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://bh87hiqb74wbh" path="res://Internal/_Placeholders/Anim/AbilityVisuals.tres" id="4_visuals"]
 
 [node name="BattleArena" type="Node2D" unique_id=1123925940 node_paths=PackedStringArray("_spots", "_playerSpot", "_director")]
+z_index = 2
 script = ExtResource("1_ggikp")
 _spots = [NodePath("FirstSpot"), NodePath("SecondSpot"), NodePath("ThirdSpot"), NodePath("FourthSpot"), NodePath("FifthSpot")]
 _playerSpot = NodePath("PlayerSpot")

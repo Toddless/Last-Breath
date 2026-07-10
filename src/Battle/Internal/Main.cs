@@ -55,9 +55,13 @@
             _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
         }
 
-        /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.</summary>
+        /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.
+        /// Deferred: the request comes from a physics callback, and joining reparents a physics
+        /// body (world → spot) — doing that mid-flush silently fails and strands the node in the world.</summary>
         private void OnBattleJoinRequest(BattleJoinRequestEvent evnt) =>
-            _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer);
+            // Statement lambda on purpose: an expression lambda would return bool? and Callable
+            // has no Variant conversion for Nullable — crashes at invoke time.
+            Callable.From(() => { _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer); }).CallDeferred();
 
         private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
             _uiElementProvider?.OpenWindow(typeof(GameOverWindow));

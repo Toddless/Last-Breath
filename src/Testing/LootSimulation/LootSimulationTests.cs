@@ -125,6 +125,29 @@ namespace LastBreathTest.LootSimulation
         }
 
         [TestMethod]
+        public async Task RolledItemCountRespectsConfiguredCap()
+        {
+            var archetype = new NpcArchetype("Test_Cap", EntityType.Archon, Rarity.Mythic, 150, Fractions.Demon)
+            {
+                ModifierIds =
+                [
+                    "Npc_Modifier_Scale_Double_Health",
+                    "Npc_Modifier_Scale_Double_Damage",
+                    "Npc_Modifier_Scale_Double_Defence",
+                ],
+            };
+            var result = await s_simulator.RunAsync(archetype, kills: 100);
+
+            int cap = s_pipeline.Configuration.MaxItemsPerKill;
+            Assert.IsTrue(cap > 0, "MaxItemsPerKill is not configured.");
+            foreach (var kill in result.KillRecords)
+            {
+                int rolled = kill.Drops.Where(drop => !drop.IsGuaranteed).Sum(drop => drop.Stack);
+                Assert.IsTrue(rolled <= cap, $"Rolled {rolled} items, cap is {cap}.");
+            }
+        }
+
+        [TestMethod]
         public async Task TierUpgradeModifierRaisesTopTierShare()
         {
             var baseResult = await s_simulator.RunAsync(ScenarioCatalog.RichBaseline with { Name = "Test_TierBase" }, kills: 500);
@@ -136,6 +159,10 @@ namespace LastBreathTest.LootSimulation
             float upgradedShare = TopTierShare(upgraded);
             Assert.IsTrue(upgradedShare > baseShare,
                 $"Tier upgrade modifier did not raise the tier-0 share: {baseShare} -> {upgradedShare}.");
+            // The modifier procs on 20% of the purchases (tierUpgradeChance 0.2 in data): the share must
+            // sit near that, not be a budget side-effect. Guards the once-dead JSON mapping.
+            Assert.IsTrue(upgradedShare > 0.12f,
+                $"Tier-0 share {upgradedShare:P1} is far below the 20% upgrade chance — the modifier looks dead again.");
         }
 
         private static float TopTierShare(ScenarioResult result)

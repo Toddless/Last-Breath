@@ -77,6 +77,7 @@ namespace Battle.Source.UIElements
                     new GetAbilityUpgradeViewRequest(abilityId));
 
                 if (_uiElementsManager.OpenWindow(typeof(AbilityUpgradeWindow)) is not AbilityUpgradeWindow window) return;
+
                 window.Show(view);
             }
             catch (Exception e)

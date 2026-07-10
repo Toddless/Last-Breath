@@ -1,0 +1,13 @@
+{
+    "witnessRadius": 600,
+    "deeds": [
+        {
+            "id": "Deed_Kill_Npc",
+            "reputation": -120,
+            "noPenaltyAtOrBelow": "Hostility",
+            "hostileToTargetBonus": 10,
+            "requiresWitness": true,
+            "repeatDecay": 0.9
+        }
+    ]
+}

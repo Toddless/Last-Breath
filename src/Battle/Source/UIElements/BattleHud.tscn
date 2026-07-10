@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Source/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
 [ext_resource type="PackedScene" uid="uid://cpnxcv1yd5d7g" path="res://Source/UIElements/BattleLog.tscn" id="3_blog"]
 
-[node name="BattleHud" type="Control" unique_id=745766495 node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_entityBars", "_abilitySlots", "_battleLog")]
+[node name="BattleHud" type="Control" unique_id=745766495 node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_battleLog", "_entityBars", "_abilitySlots", "_queueContainer")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,9 +16,10 @@ script = ExtResource("1_qll2p")
 _buttonsContainer = NodePath("VBoxContainer")
 _playerBars = NodePath("CharacterHealthBar")
 _stanceButtons = NodePath("VBoxContainer/StanceSlots")
+_battleLog = NodePath("BattleLog")
 _entityBars = NodePath("HBoxContainer")
 _abilitySlots = NodePath("VBoxContainer/AbilitySlots")
-_battleLog = NodePath("BattleLog")
+_queueContainer = NodePath("Queue")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=284745788]
 layout_mode = 1
@@ -60,3 +61,13 @@ offset_left = -470.0
 offset_top = -290.0
 offset_right = -10.0
 offset_bottom = -10.0
+
+[node name="Queue" type="HBoxContainer" parent="." unique_id=1718805809]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2

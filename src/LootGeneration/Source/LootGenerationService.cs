@@ -85,6 +85,8 @@ namespace LootGeneration.Source
             return lootTable;
         }
 
+        private const int MaxWastedRolls = 100;
+
         private List<string> SpendBudget(
             float budget,
             int[] tierPrices,
@@ -93,12 +95,18 @@ namespace LootGeneration.Source
             Dictionary<int, List<TableRecord>> modifiedTable)
         {
             Dictionary<int, int> tiersAmount = Enumerable.Range(0, tierPrices.Length).ToDictionary(tier => tier, _ => 0);
-            List<string> chosenItemsIds = [];
+            List<(TableRecord Record, int Tier)> chosen = [];
+
+            // Tier affordability follows the ACTUAL cheapest item in the table, not the configured
+            // band price: a tier whose items start at 250 must be buyable with a 300 budget.
+            var minPriceByTier = BuildMinPriceByTier(modifiedTable);
+            float cheapestPrice = minPriceByTier.Count > 0 ? minPriceByTier.Values.Min() : float.MaxValue;
+            int maxItems = _configuration.MaxItemsPerKill > 0 ? _configuration.MaxItemsPerKill : int.MaxValue;
+
             // A roll can fail without spending budget (empty tier, no affordable item) — cap those so a
             // sparse loot table can never spin this loop forever.
             int wastedRolls = 0;
-            const int MaxWastedRolls = 100;
-            while (budget > tierPrices[^1])
+            while (budget >= cheapestPrice && chosen.Count < maxItems)
             {
                 if (wastedRolls >= MaxWastedRolls)
                 {
@@ -107,39 +115,94 @@ namespace LootGeneration.Source
                 }
 
                 int chosenTier = MakeRoll(actualTierChances);
-                chosenTier = tryUpgradeTier(chosenTier, _rnd.RandFloat());
-
                 if (chosenTier < 0 || chosenTier >= tierPrices.Length)
                 {
                     wastedRolls++;
                     continue;
                 }
 
-                if (tierPrices[chosenTier] > budget) chosenTier = FindFirstSuitableTier(budget);
-                if (!modifiedTable.TryGetValue(chosenTier, out var tableRecords) || tableRecords.Count == 0)
+                if (minPriceByTier.GetValueOrDefault(chosenTier, float.MaxValue) > budget)
+                    chosenTier = FindClosestAffordableTier(chosenTier, budget, minPriceByTier, tierPrices.Length);
+                if (chosenTier < 0)
                 {
                     wastedRolls++;
                     continue;
                 }
 
-                int randomNumber = _rnd.RandIntRange(0, tableRecords.Count - 1);
-                var randomItem = tableRecords[randomNumber];
-
-                if (randomItem.Price > budget) randomItem = FindFirstSuitableItem(tableRecords, budget);
-                if (randomItem == null || string.IsNullOrWhiteSpace(randomItem.Id))
+                var tableRecords = modifiedTable[chosenTier];
+                var randomItem = tableRecords[_rnd.RandIntRange(0, tableRecords.Count - 1)];
+                if (randomItem.Price > budget || string.IsNullOrWhiteSpace(randomItem.Id)) randomItem = PickRandomAffordableItem(tableRecords, budget);
+                if (randomItem == null)
                 {
                     wastedRolls++;
                     continue;
+                }
+
+                budget -= randomItem.Price;
+
+                // Tier upgrade is a free quality swap AFTER the purchase: the roll already paid the
+                // original tier's price — the rest was paid by the modifier's difficulty. Gating the
+                // upgrade by budget would silently void the modifier on every mid-budget NPC.
+                int upgradedTier = tryUpgradeTier(chosenTier, _rnd.RandFloat());
+                if (upgradedTier >= 0 && upgradedTier < chosenTier && modifiedTable.TryGetValue(upgradedTier, out var upgradedRecords))
+                {
+                    var upgradedItem = PickRandomAffordableItem(upgradedRecords, float.MaxValue);
+                    if (upgradedItem != null)
+                    {
+                        randomItem = upgradedItem;
+                        chosenTier = upgradedTier;
+                    }
                 }
 
                 tiersAmount[chosenTier]++;
-                budget -= randomItem.Price;
-                chosenItemsIds.Add(randomItem.Id);
+                chosen.Add((randomItem, chosenTier));
             }
+
+            ConvertLeftoverBudgetToQuality(budget, maxItems, chosen, tiersAmount, modifiedTable);
 
             _gameEventBus.Publish<ItemTierChosenEvent>(new(tiersAmount));
 
-            return chosenItemsIds;
+            return chosen.Select(entry => entry.Record.Id).ToList();
+        }
+
+        /// <summary>The item cap must not flatten the reward curve: when the cap stopped the spending,
+        /// the leftover budget repeatedly swaps the cheapest chosen item for a better-tier one.</summary>
+        private void ConvertLeftoverBudgetToQuality(
+            float budget,
+            int maxItems,
+            List<(TableRecord Record, int Tier)> chosen,
+            Dictionary<int, int> tiersAmount,
+            Dictionary<int, List<TableRecord>> modifiedTable)
+        {
+            if (chosen.Count < maxItems || chosen.Count == 0) return;
+
+            int guard = 0;
+            while (budget > 0 && guard++ < MaxWastedRolls)
+            {
+                int cheapestIndex = 0;
+                for (int i = 1; i < chosen.Count; i++)
+                    if (chosen[i].Record.Price < chosen[cheapestIndex].Record.Price)
+                        cheapestIndex = i;
+
+                (TableRecord cheapest, int cheapestTier) = chosen[cheapestIndex];
+
+                List<(TableRecord Record, int Tier)> candidates = [];
+                for (int betterTier = cheapestTier - 1; betterTier >= 0; betterTier--)
+                {
+                    if (!modifiedTable.TryGetValue(betterTier, out var records)) continue;
+                    candidates.AddRange(records
+                        .Where(record => !string.IsNullOrWhiteSpace(record.Id) && record.Price > cheapest.Price && record.Price - cheapest.Price <= budget)
+                        .Select(record => (record, betterTier)));
+                }
+
+                if (candidates.Count == 0) return;
+
+                var (replacement, replacementTier) = candidates[_rnd.RandIntRange(0, candidates.Count - 1)];
+                budget -= replacement.Price - cheapest.Price;
+                tiersAmount[cheapestTier]--;
+                tiersAmount[replacementTier]++;
+                chosen[cheapestIndex] = (replacement, replacementTier);
+            }
         }
 
         private List<ItemStack> GenerateChosenItems(float[] actualRarityChances, IModifierApplyingContext context, List<string> chosenItemsIds)
@@ -196,18 +259,29 @@ namespace LootGeneration.Source
             return chances.Length - 1;
         }
 
-        private int FindFirstSuitableTier(float budget)
-        {
-            int[] tierPrices = _configuration.TierPrices;
-            for (int i = 0; i < tierPrices.Length; i++)
-                if (tierPrices[i] <= budget)
-                    return i;
+        private static Dictionary<int, float> BuildMinPriceByTier(Dictionary<int, List<TableRecord>> table) =>
+            table.Where(kvp => kvp.Value.Any(record => !string.IsNullOrWhiteSpace(record.Id)))
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Where(record => !string.IsNullOrWhiteSpace(record.Id)).Min(record => record.Price));
 
-            return tierPrices.Length - 1;
+        /// <summary>Falls to the nearest WORSE tier the budget can still afford; -1 when none can.</summary>
+        private static int FindClosestAffordableTier(int fromTier, float budget, Dictionary<int, float> minPriceByTier, int tierCount)
+        {
+            for (int tier = fromTier + 1; tier < tierCount; tier++)
+                if (minPriceByTier.GetValueOrDefault(tier, float.MaxValue) <= budget)
+                    return tier;
+
+            return -1;
         }
 
-        private TableRecord? FindFirstSuitableItem(List<TableRecord> tableRecords, float budget) =>
-            tableRecords.Where(x => x.Price <= budget).MaxBy(x => x.Price);
+        // A uniform pick among the affordable records: a deterministic "best affordable" fallback would
+        // funnel most small-budget kills into the single most expensive item of the tier.
+        private TableRecord? PickRandomAffordableItem(List<TableRecord> tableRecords, float budget)
+        {
+            var affordable = tableRecords.Where(record => !string.IsNullOrWhiteSpace(record.Id) && record.Price <= budget).ToList();
+            return affordable.Count == 0 ? null : affordable[_rnd.RandIntRange(0, affordable.Count - 1)];
+        }
 
         private void OnBattleEnds(BattleEndEvent obj)
         {
