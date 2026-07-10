@@ -92,7 +92,7 @@ namespace LootGeneration.Source
             Func<int, float, int> tryUpgradeTier,
             Dictionary<int, List<TableRecord>> modifiedTable)
         {
-            Dictionary<int, int> tiersAmount = new() { [0] = 0, [1] = 0, [2] = 0, [3] = 0 };
+            Dictionary<int, int> tiersAmount = Enumerable.Range(0, tierPrices.Length).ToDictionary(tier => tier, _ => 0);
             List<string> chosenItemsIds = [];
             // A roll can fail without spending budget (empty tier, no affordable item) — cap those so a
             // sparse loot table can never spin this loop forever.
@@ -200,7 +200,7 @@ namespace LootGeneration.Source
         {
             int[] tierPrices = _configuration.TierPrices;
             for (int i = 0; i < tierPrices.Length; i++)
-                if (tierPrices[i] < budget)
+                if (tierPrices[i] <= budget)
                     return i;
 
             return tierPrices.Length - 1;
@@ -215,11 +215,12 @@ namespace LootGeneration.Source
             _diedEntities.Clear();
         }
 
-        private float[] CopyBaseChances(float[] baseChancesToCopy)
+        // Copies tier AND rarity chance arrays — size must follow the source, not the tier config.
+        private static float[] CopyBaseChances(float[] baseChancesToCopy)
         {
-            float[] tierChances = new float[_configuration.BaseTierChances.Length];
-            baseChancesToCopy.CopyTo(tierChances, 0);
-            return tierChances;
+            float[] chances = new float[baseChancesToCopy.Length];
+            baseChancesToCopy.CopyTo(chances, 0);
+            return chances;
         }
 
         private IModifierApplyingContext CreateModifierApplyingContext(IFightableNpc npc)

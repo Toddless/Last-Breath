@@ -27,7 +27,7 @@
                             "price": 405
                         },
                         {
-                            "id": "Amulet_Mana_Health",
+                            "id": "Amulet_Onyx_Medallion",
                             "price": 352
                         },
                         {
@@ -190,6 +190,10 @@
                         {
                             "id": "Ring_Intelligence_Multicast",
                             "price": 105
+                        },
+                        {
+                            "id": "Amulet_Stronghold",
+                            "price": 90
                         }
                     ]
                 },
@@ -267,6 +271,10 @@
                         {
                             "id": "Ring_Intelligence",
                             "price": 40
+                        },
+                        {
+                            "id": "Amulet_Life_Core",
+                            "price": 35
                         }
                     ]
                 },
@@ -279,7 +287,7 @@
                         },
                         {
                             "id": "Crafting_Resource_Gold_Ore",
-                            "price":3
+                            "price": 3
                         },
                         {
                             "id": "Crafting_Resource_Iron_Ore",
@@ -319,7 +327,7 @@
                         },
                         {
                             "id": "Ring_Dexterity_Accuracy",
-                            "price":10
+                            "price": 10
                         },
                         {
                             "id": "Body_No_Way_Back",
