@@ -12,6 +12,8 @@
 
     public class Inventory : IInventory
     {
+        private const int BagSlots = 220;
+
         private readonly Dictionary<string, IItem> _itemInstances = [];
         private readonly IGameMessageBus _uiMessageBus;
         protected List<IInventorySlot> Slots { get; } = [];
@@ -19,7 +21,7 @@
         public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
         public event Action<string, string, int, int>? InventoryFull;
         public event Action<string>? NotEnoughItems;
-        public int InventoryCapacity { get; }
+        public int InventoryCapacity => BagSlots;
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
@@ -28,27 +30,47 @@
             _uiMessageBus = messageBus;
         }
 
-        public void Initialize(int amount, GridContainer? container)
+        /// <summary>
+        /// Shows the bag inside a window's grid. The SERVICE owns the slot nodes for the whole
+        /// session (the items live in them); windows only borrow the view — detach before dying.
+        /// </summary>
+        public void AttachSlots(GridContainer container)
         {
-            if (container != null)
+            EnsureSlots();
+            foreach (var slot in Slots)
+                if (slot is Node node && node.GetParent() == null)
+                    container.AddChild(node);
+        }
+
+        /// <summary>Fresh-instance windows die on close; the slots must not die with them.</summary>
+        public void DetachSlots()
+        {
+            foreach (var slot in Slots)
+                if (slot is Node node)
+                    node.GetParent()?.RemoveChild(node);
+        }
+
+        private void EnsureSlots()
+        {
+            if (Slots.Count > 0) return;
+
+            for (int i = 0; i < BagSlots; i++)
             {
-                for (int i = 0; i < amount; i++)
-                {
-                    InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
-                    inventorySlot.ItemDeleted += OnDeleteRequested;
-                    inventorySlot.GetItemInstance = (GetItem<IItem>);
-                    inventorySlot.GetItemIcon = GetItemIcon;
-                    inventorySlot.ItemInteraction += OnItemInteraction;
-                    inventorySlot.SetUIElementProvider(_uiMessageBus);
-                    container.AddChild(inventorySlot);
-                    Slots.Add(inventorySlot);
-                }
+                InventorySlot inventorySlot = InventorySlot.Initialize().Instantiate<InventorySlot>();
+                inventorySlot.ItemDeleted += OnDeleteRequested;
+                inventorySlot.GetItemInstance = (GetItem<IItem>);
+                inventorySlot.GetItemIcon = GetItemIcon;
+                inventorySlot.ItemInteraction += OnItemInteraction;
+                inventorySlot.SetUIElementProvider(_uiMessageBus);
+                Slots.Add(inventorySlot);
             }
         }
 
         private void OnItemInteraction(IInventorySlot slot, MouseInteractions interactions)
         {
-
+            if (slot.CurrentItem == null) return;
+            var item = GetItem<IItem>(slot.CurrentItem.InstanceId);
+            if (item != null) ItemInteraction?.Invoke(item, interactions);
         }
 
         public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
@@ -86,7 +108,11 @@
             return true;
         }
 
-        public int GetAvailableCapacity() => throw new NotImplementedException();
+        public int GetAvailableCapacity()
+        {
+            EnsureSlots();
+            return Slots.Count(x => x.CurrentItem == null);
+        }
 
         /// <summary>
         /// Use to return item instance in inventory.
@@ -173,6 +199,7 @@
 
         private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
         {
+            EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
             var remaining = amount;
             var slotsWithSameItem = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId && x.CurrentItem?.ItemId == itemId);
             foreach (var slot in slotsWithSameItem)

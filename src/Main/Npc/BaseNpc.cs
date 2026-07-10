@@ -33,12 +33,16 @@ namespace LastBreath.Npc
     {
         /// <summary>Close enough to a movement destination to stop.</summary>
         private const float ArriveDistance = 5f;
+
         /// <summary>How close the player must stand to burn a body.</summary>
         private const float BurnDistance = 150f;
+
         /// <summary>Hostile NPCs this close start an abstract skirmish (NPC-vs-NPC contact distance).</summary>
         private const float SkirmishEngageDistance = 90f;
+
         /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
         private const float SkirmishScanInterval = 0.5f;
+
         private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
 
@@ -68,8 +72,11 @@ namespace LastBreath.Npc
         [Export] private AnimationsComponent? _animationsComponent;
 
         [Export] public string Id { get; private set; } = "Npc_Bandit_Veteran";
-        public string InstanceId { get; } = Guid.NewGuid().ToString();
         [Export] public string[] Tags { get; private set; } = [];
+        public Rarity Rarity { get; private set; } = Rarity.Epic;
+        public EntityType EntityType { get; private set; } = EntityType.Regular;
+        [Export] public Fractions Fraction { get; private set; } = Fractions.Human;
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; } = null;
         public string Description { get; } = string.Empty;
         public string DisplayName { get; } = string.Empty;
@@ -92,9 +99,6 @@ namespace LastBreath.Npc
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
         public int Level { get; private set; } = 150;
-        public Rarity Rarity { get; private set; } = Rarity.Epic;
-        public EntityType EntityType { get; private set; } = EntityType.Regular;
-        public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
         public IBehaviorProfile? Behavior { get; set; }
 

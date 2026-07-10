@@ -19,15 +19,13 @@
         IItemDataProvider dataProvider,
         ICraftingMastery craftingMastery) : IItemCreationService
     {
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance)
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
             var item = dataProvider.CopyItem(id);
-            if (item is IEquipItem equipItem) HandleEquipItemGeneration(equipItem, additionalItemEffects, rarity, equipEffectChance);
+            if (item is IEquipItem equipItem) HandleEquipItemGeneration(equipItem, additionalItemEffects, rarity, equipEffectChance, modifierMultiplier);
 
             return item;
         }
-
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) => throw new NotImplementedException();
 
         public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers)
         {
@@ -77,7 +75,7 @@
             }
         }
 
-        private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance)
+        private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
             if (equip.Rarity is Rarity.Mythic or Rarity.Unique) return;
 
@@ -93,7 +91,21 @@
                 rarity.ConvertRarityToItemModifierAmount(),
                 rnd);
 
-            equip.SetModifiers(chosenMods);
+            equip.SetModifiers(chosenMods.SelectMany(mod => CreateScaledInstances(mod, modifierMultiplier, equip.InstanceId)));
+        }
+
+        // Flat/Increase/Multiplicative values all store the bonus delta (Calculations.CalculateModifiers sums
+        // each bucket onto 1), so one linear scale is valid for every type. Pool entries are shared between
+        // items — scale fresh instances, never the originals.
+        private static IEnumerable<IModifier> CreateScaledInstances(IModifier modifier, float multiplier, string instanceId)
+        {
+            IEnumerable<IModifier> parts = modifier is CompositeModifier composite ? composite.Parts : [modifier];
+            return parts.Select(IModifier (part) =>
+            {
+                var copy = ModifiersCreator.CreateModifierInstance(part.EntityParameter, part.ModifierValueType, part.BaseValue * multiplier, instanceId);
+                copy.Scope = part.Scope;
+                return copy;
+            });
         }
 
         private float ApplyPlayerMultiplier(float baseValue, ModifierValueType valueType)

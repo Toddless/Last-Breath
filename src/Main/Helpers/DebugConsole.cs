@@ -82,7 +82,9 @@ namespace LastBreath.Helpers
                 case "quest": ExecuteQuest(args); break;
                 case "fact": ExecuteFact(args); break;
                 case "influence": ExecuteInfluence(args); break;
+                case "martial": ExecuteMartial(args); break;
                 case "rep": ExecuteReputation(args); break;
+                case "item": ExecuteItem(args); break;
                 default: Print("Unknown command, try: help"); break;
             }
         }
@@ -165,6 +167,28 @@ namespace LastBreath.Helpers
             Print($"Influence: level {mastery.CurrentLevel}/{mastery.MaximumLevel}, exp {mastery.CurrentExperience}, to next {mastery.ExpToNextLevelRemain()}");
         }
 
+        private void ExecuteMartial(string[] args)
+        {
+            var mastery = Service<Core.Battle.IMartialArtMastery>();
+            if (args.Length > 2 && args[1].ToLowerInvariant() == "exp" && int.TryParse(args[2], out int exp))
+                mastery.AddExperience(exp);
+            Print($"Martial Art: level {mastery.CurrentLevel}/{mastery.MaximumLevel}, exp {mastery.CurrentExperience}, to next {mastery.ExpToNextLevelRemain()}");
+        }
+
+        private void ExecuteItem(string[] args)
+        {
+            if (args.Length < 3 || args[1].ToLowerInvariant() != "add")
+            {
+                Print("item add <itemId> [amount]");
+                return;
+            }
+
+            int amount = args.Length > 3 && int.TryParse(args[3], out int parsed) ? parsed : 1;
+            var inventory = Service<Core.Inventory.IInventory>();
+            inventory.TryAddItem(Service<IItemDataProvider>().CopyItem(args[2]), amount);
+            Print($"{args[2]}: now {inventory.GetTotalItemAmount(args[2])}");
+        }
+
         private void ExecuteReputation(string[] args)
         {
             var relations = Service<IFactionRelationService>();
@@ -182,7 +206,7 @@ namespace LastBreath.Helpers
         {
             Print("quest list | quest <accept|decline|abandon|fail|turnin> <questId>");
             Print("fact set <key> [amount] | fact dump [prefix]");
-            Print("influence [exp <n>]");
+            Print("influence [exp <n>] | martial [exp <n>] | item add <itemId> [amount]");
             Print("rep add <faction> <delta>");
         }
 

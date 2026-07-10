@@ -34,7 +34,7 @@
             get
             {
                 if (field != null) return field;
-                field = ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Effects/{Id}.png");
+                field = ResourceLoader.Load<Texture2D>($"res://Data/Shared/Assets/Effects/{Id}.png");
                 return field;
             }
         }

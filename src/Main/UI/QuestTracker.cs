@@ -90,8 +90,8 @@ namespace LastBreath.UI
                 BbcodeEnabled = true,
                 FitContent = true,
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                FocusMode = Control.FocusModeEnum.None,
-                MouseFilter = Control.MouseFilterEnum.Ignore,
+                FocusMode = FocusModeEnum.None,
+                MouseFilter = MouseFilterEnum.Ignore,
             };
             label.AppendText(bbcode);
             AddChild(label);

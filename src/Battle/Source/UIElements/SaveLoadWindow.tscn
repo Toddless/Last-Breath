@@ -35,6 +35,7 @@ layout_mode = 2
 [node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=529823651]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
 text = "Save / Load"
 
 [node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header" unique_id=1639485952]

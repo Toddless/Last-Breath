@@ -10,9 +10,15 @@ font_size = 20
 font_size = 12
 
 [node name="AbilityUpgradeWindow" type="MarginContainer" unique_id=1479837103 node_paths=PackedStringArray("_abilityUpgrades", "_abilityName", "_cost", "_cooldown", "_abilityIcon", "_abilityDescription", "_close")]
-anchors_preset = 9
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 500.0
+offset_left = -510.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("1_iw8cd")
 _abilityUpgrades = NodePath("MainContainer/ScrollContainer/Upgrades/AbilityUpgrades")

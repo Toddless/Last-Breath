@@ -459,6 +459,21 @@ msgstr "A veteran wants proof of what really happened on the old battlefield. Fi
 msgid "UI_Dialogue_You"
 msgstr "You"
 
+msgid "UI_Char_Vitals"
+msgstr "Vitals"
+
+msgid "UI_Char_Attributes"
+msgstr "Attributes"
+
+msgid "UI_Char_Offense"
+msgstr "Offense"
+
+msgid "UI_Char_Defense"
+msgstr "Defense"
+
+msgid "UI_Char_Misc"
+msgstr "Miscellaneous"
+
 msgid "UI_Journal_Empty"
 msgstr "No quests yet. The world won't come asking — go talk to people."
 

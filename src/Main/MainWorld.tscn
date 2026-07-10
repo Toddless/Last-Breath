@@ -3,6 +3,10 @@
 [ext_resource type="Script" uid="uid://ceaqsxdscqa37" path="res://MainWorld.cs" id="1_4xxmu"]
 [ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Player/Player.tscn" id="2_x0tsy"]
 [ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="3_ngold"]
+[ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://Npc/NpcSpawnPoint.cs" id="4_x0tsy"]
+[ext_resource type="Script" uid="uid://b6tdsalfvh1ay" path="res://World/NpcWorldDirector.cs" id="5_ngold"]
+[ext_resource type="Script" uid="uid://o4isflqmdcvu" path="res://World/SaveDirector.cs" id="6_x4wt1"]
+[ext_resource type="Script" uid="uid://bvkmjwos0jl80" path="res://World/DayNightTint.cs" id="7_y0rla"]
 
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
@@ -11,5 +15,22 @@ script = ExtResource("1_4xxmu")
 
 [node name="TestNpc" parent="." unique_id=943438874 instance=ExtResource("3_ngold")]
 position = Vector2(961, 342)
-Id = null
-Tags = null
+
+[node name="Assasins" type="Node2D" parent="." unique_id=1587915089]
+position = Vector2(1406, 665)
+script = ExtResource("4_x0tsy")
+_npcIds = PackedStringArray("Npc_Skeleton_Mage")
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="NpcWorldDirector" type="Node" parent="." unique_id=1348952950]
+script = ExtResource("5_ngold")
+metadata/_custom_type_script = "uid://b6tdsalfvh1ay"
+
+[node name="SaveDirector" type="Node" parent="." unique_id=1422095378]
+script = ExtResource("6_x4wt1")
+metadata/_custom_type_script = "uid://o4isflqmdcvu"
+
+[node name="DayNightTint" type="CanvasModulate" parent="." unique_id=1148565666]
+script = ExtResource("7_y0rla")
+_transitionSpeed = 0.1
+metadata/_custom_type_script = "uid://bvkmjwos0jl80"

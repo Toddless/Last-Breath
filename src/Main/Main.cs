@@ -11,6 +11,7 @@
     using Core.Services;
     using Core.Views.UI;
     using Godot;
+    using LootGeneration.Source;
     using Services;
     using UI;
     using GameServiceProvider = Services.GameServiceProvider;
@@ -38,8 +39,8 @@
 
             // Resolve once so it subscribes to mastery/player changes and auto-learns unlocked abilities.
             _provider.GetService<IAbilityUnlockService>();
-            var mastery = _provider.GetService<IMartialArtMastery>();
-            mastery.AddExperience(500000);
+            // Spoils of battle land on this world's floor (cleared on exit — the node dies with the scene).
+            _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(_mainWorld);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
@@ -52,6 +53,7 @@
             // keep calling handlers on a freed node.
             _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
+            _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(null);
         }
 
         private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
@@ -90,6 +92,7 @@
             {
                 // Dispose must survive a crashed battle: it returns the fighters to the world
                 // and frees the arena — otherwise the NPCs vanish with the leaked arena node.
+                _uiElementProvider?.ChangeHud(typeof(PlayerHud));
                 context?.Dispose();
             }
         }

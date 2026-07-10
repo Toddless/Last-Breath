@@ -6,6 +6,55 @@ Godot 4.7 C# (.NET 9, LangVersion preview: primary constructors, `field`). По�
 ## Правила работы и формулы
 Перенесены в `CLAUDE.md` (авто-подгружается всегда). Там: код-стайл, работа с файлами, формулы урона/крита, описание систем.
 
+## Нарратив: диалоги + квесты + Влияние (2026-07-10/11, СДЕЛАНО, протестировано в Godot)
+Старые Main/QuestSystem, Main/Reputation (классовые), Dialogue* на Godot Resources — СНЕСЕНЫ. Новая система целиком data-driven, чистое ядро в `Core/Narrative`, работает Main+Core.
+
+**Ключевая идея — «мир помнит, квест спрашивает»:** `WorldFactsService` (флаги+счётчики, `FactKeys`) пишется трекерами всегда (KillFactTracker — убийства игрока по id определения и фракции; LocationFactTracker — `LocationMarker` Area2D в мире → `LocationDiscoveredEvent`). Цели квестов = предикаты над фактами/инвентарём → ретроактивность бесплатно: предмет/локация, найденные ДО квеста, закрывают фазу в момент принятия.
+
+**Единый словарь условий/действий** (`Core/Narrative/{Conditions,Actions}`, реестры фабрик через DI, парсеры отдают null на битой записи + Tracker; композиты fail-closed): условия HasItem/Fact/FactionStanding/NpcRelation (эффективное отношение)/Attribute (жёсткий порог)/Influence/AllOf/AnyOf/Not + квестовые QuestStatus/CanAcceptQuest/CanTurnInQuest/QuestOfferRoll; действия SetFact/GiveItem/TakeItem/Deed (реляционные эффекты диалога → deed-пайплайн репутации: личная репутация, decay, тосты бесплатно)/AddReputation (награды, мимо decay)/AddInfluenceExp + AcceptQuest/DeclineQuest/TurnInQuest/AbandonQuest. Квестовые фабрики регистрируются с `Func<IQuestLogService>` — разрыв DI-цикла через парсеры. Один словарь обслуживает доступность квестов, цели и опции диалогов.
+
+**Квесты** (`Core/Narrative/Quests`, каталог `SharedData/Quests`, парс строгий — битая запись роняет весь квест): фазы → цели (condition XOR counter{key, amount, retroactive} — счётчик с базлайном «stageIndex:factKey» для «убей 10 НОВЫХ»); статусы Active/ReadyToTurnIn/Completed/Failed/Declined (сдача ТОЛЬКО действием — «пришёл уже с предметом» = мгновенно ReadyToTurnIn); `declinePolicy: Fail|CanReturn|Cooldown(hours)`, `repeatable`, `timeLimitHours` (WorldClock); реэвалюация по FactChanged/ItemAmountChanges/HourPassed с dirty-циклом (реентрантные actions безопасны). **Политика смерти квестовых NPC (А+Б):** пул кандидатов сдачи по миру-реестру с фильтром фракции (восставший нежитью выбывает); остался 1 живой → «призрачный намёк» (тост, once); пул пуст → автопровал. Сейв-секция `quests` (RestoreOrder.Quests=25), квест из сейва без определения — лог+дроп. Тосты — `QuestNotificationBroadcaster` (UI_Quest_*).
+
+**Диалоги** (`Core/Narrative/Dialogues`, каталог `SharedData/Dialogues`, диалог на id ОПРЕДЕЛЕНИЯ NPC): entry rules по приоритету (приветствие следует за состоянием мира), у опций Visible/Enabled условия (недоступное показывается серым), once per conversation/game, спич-чеки — НЕВИДИМЫЙ ролл `GetSpeechCheckChance(difficulty)` с failNext-веткой и exp once-per-option; атрибутные проверки — пороги без ролла. Факт `Npc_Talked` + exp за первый разговор. **Мир не ждёт**: BattleInitializedEvent рвёт диалог (каждый выбор атомарен, откатов нет). Нода без видимых опций → авто-End (антисофтлок). `DialogueService` — синглтон-раннер; `DialogueWindow` — тупой презентер (лог-история накапливается, кнопки пересобираются); вход — `DialogueActor` (Area2D ребёнком NPC; заполненный `_npcId`-экспорт = авторский оверрайд, иначе id родителя; мёртвый/дерущийся молчит) → `OpenDialogueMessage` → хендлер. Отказ Start пишется в Tracker + консоль.
+
+**Influence (Мастерство влияния)** (`Core/Narrative/Influence`, конфиг `SharedData/Influence/InfluenceMastery.json`, каталог Influence): IMastery-клон Martial/Crafting, кривые из JSON. `GetSpeechCheckChance(difficulty)` и `GetQuestOfferChance(tier)` — шанс, что NPC вообще предложит квест; ролл оффера кэшируется в фактах (`Quest_Offer_Until/Passed`) до конца кулдауна, переживает сейв. Опыт: сдача квестов (главный), спич-чеки, первые разговоры. Сейв-секция `influenceMastery`. Оба рычага (умение+репутация) сходятся через параметр `bonus` — перки репутации подключаются туда (пока не подключены).
+
+Конвенции локализации: имя квеста = его id (`Quest_*`), `<Id>_Description`, `<Id>_Stage_<StageId>`, `<Id>_Obj_<ObjId>`; реплики — явные ключи в JSON (`Dlg_*`). Сейв-секции Main-only регистрируются в `RegisterNarrativeSaveSections` (Main GameServiceProvider) через публичный `ISaveManager.Register` — Battle-модуль не тронут. Тесты: `NarrativeDataParseTests` гоняет РЕАЛЬНЫЕ json через реальные парсеры + живой Start (без Godot; RNG нельзя создать вне движка — ролл прекэшируется в фактах).
+
+**Пример-цепочка**: Quest_Field_Of_Bones + диалог Npc_Bandit_Veteran (оффер за роллом, лесть со спич-чеком и Deed_Flattery, сдача с блокировкой при полном инвентаре) — рабочий шаблон для новых квестов, код не нужен.
+
+**Дебаг-консоль** (`Main/Helpers/DebugConsole.cs`, автолоад, F12, только debug-билды): `quest list/accept/decline/abandon/fail/turnin`, `fact set/dump`, `influence exp`, `martial exp`, `rep add`, `item add`.
+
+**UI квестов**: QuestJournalWindow (список по статусам + цели с прогрессом + Abandon), QuestTracker (компакт на HUD, юзер инстансит в PlayerHUD-сцену), вкладка Reputation в CharacterWindow.
+
+## Сшивка игрового цикла: лут (2026-07-10, сделано; лут на земле — awaiting Godot-теста)
+`LootOrchestrator` был написан, но не подключён (никто не резолвил → подписки не создавались, пол не задан, `PickUpItem` пустой). Доведено: лут копится ТОЛЬКО в окне боя игрока (скирмиши мира и рестор сейва не дают добычу — ILoadScope/battle-гейты), проигранный бой чистит кэш; подбор = клик по `ItemOnGround` (событие PickedUp → оркестратор: радиус 350, TryAddItem, QueueFree); опциональные зависимости через `GetServices<T>().FirstOrDefault()` — песочница LootGeneration без IInventory не ломается. Main.Ready задаёт пол (`SetFloorToSpawnItems(_mainWorld)`, null в ExitTree). Дебаг-хак `AddExperience(500000)` снят. **Найден вероятный корень «лут не выпал в сумку»: у сервиса Inventory было 0 слотов** (см. секцию UI). Известное: предметы на земле НЕ сейвятся.
+
+## UI-тема и базовые окна (2026-07-10/11, сделано; Godot-тест частично)
+Прототип-минимализм (референс D2/PoE), full-hd + canvas_items, мышь+клава. **`SharedData/Assets/UI/Theme.tres`** — StyleBoxFlat-тема (панель/кнопки/табы/списки/поля/бары, острые углы, бронза-пергамент-золото), подключена ГЛОБАЛЬНО `gui/theme/custom` в Main и Battle — красит всё; вариации `TitleLabel/HeaderLabel/DimLabel/HpBar/ManaBar` (ставить `theme_type_variation`). Переверстаны: MainMenu, PauseMenu (dim+центр), PlayerHUD (живые HP/мана от Player*ChangesEvent + Parameters.MaxHealth/MaxMana — раньше бар не обновлял никто; часы Day/HH:MM/фаза от IWorldClock), CharacterWindow (ВСЕ EntityParameters секциями, проценты через IParameterFormatProvider, ключи имён = имена enum в .po; + вкладка репутации), MartialArtMasteryWindow (панель слева 1390px, живые уровень/exp — экспорты были не привязаны; зазоры StanceTree ужаты; **AbilityUpgradeWindow передокирован ВПРАВО** — не перекрывает деревья), InventoryWindow (справа 980px: колонка экипировки + сумка).
+
+**Инвентарь — важная починка**: `Inventory.Initialize` никто не звал → 0 слотов, добавления уходили в никуда, `GetAvailableCapacity` кидал NotImplementedException. Теперь **слоты-ноды принадлежат сервису пожизненно** (лениво 220), окно одалживает их (`AttachSlots`/`DetachSlots`) — fresh-instance окон больше не убивает сумку. Экипировка: ПКМ по IEquipItem в сумке = надеть (TryEquip, вытесненное назад в сумку), × на строке = снять. Дебаг-сид «100 каждого ресурса при каждом открытии» удалён (замена — `item add`).
+
+## Нарратив/лут/UI — что дальше и как улучшить
+**Сделать (по убыванию важности):**
+- Прогнать лут в Godot после починки слотов (гипотеза: предметы падали, но сумка их теряла).
+- **Session reset**: повторная «Новая игра» за один запуск процесса наследует статические синглтоны (факты, квесты, инвентарь, репутация, мастерства). Нужен общий механизм сброса сессии (аналог RestoreState с пустыми данными по всем участникам).
+- **IQuestItem : IItem** — дизайн принят (защита от продажи/разборки/крафта одной проверкой типа), тип НЕ создан.
+- Кнопки инвентаря Sort/Destroy/Stats — экспорты живы, логика не подключена (и раньше не была).
+- Предметы на земле в сейв (секция ground-items) — или осознанно оставить «не подобрал — потерял».
+- ru.po: новые ключи не добавлены (конвенция — en с текстом, ru по мере надобности); имена EquipmentPiece и «Day» в HUD — литералы.
+- Отображение уровня Влияния в UI (сейчас только консоль) — строка в CharacterWindow напрашивается.
+
+**Улучшения систем (заложены точки подключения):**
+- Перки репутации → потребители: `ReputationPerkProvider` ждёт; параметр `bonus` в GetSpeechCheckChance/GetQuestOfferChance уже есть (перк-иды типа SpeechCheckBonus/QuestRewardBonus).
+- Спич-чек: модификатор шанса от эффективного отношения NPC (личная симпатия помогает уговорить) — параметр есть, подстановка не сделана.
+- Торговля из диалога: действие StartTrade + окно торговца + цены от RelationLevel (комментарии в enum это уже обещают).
+- Зоны-триггеры автозапуска диалога/квеста (первый вход в деревню) — те же entry rules, паблиш OpenDialogueMessage из Area2D.
+- Кандидаты сдачи: edge с респавном generic-NPC (провал при 0 в пуле, а спавн-точка потом родит замену) — если квестодатели станут респавнящимися, пересмотреть.
+- Диалоги: typewriter/скорость (сейчас мгновенный текст с прокруткой-историей), возврат к предыдущей ноде делается данными (`next` на ноду) — хелпера «back» нет.
+- Журнал: подтверждение Abandon, фильтры/сортировка, счётчик повторяемых прохождений.
+- Инвентарь: drag-and-drop сумка↔экипировка (сейчас ПКМ/кнопка), тултипы на строках экипировки.
+
 ## Модификаторы предметов: 
 Полный путь данные→бой работает. Три вида строк предмета:
 - **Парам-модификаторы** — `implicits`/`modifiers` в JSON, `"parameter"` = член `EntityParameter` (регистронезависимо), pull-модель через `GetResolvedModifiers`, скоупы local/global, композиты через `parts` (одна запись = все части).

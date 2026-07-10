@@ -30,6 +30,10 @@ window/stretch/mode="canvas_items"
 
 project/assembly_name="Battle"
 
+[gui]
+
+theme/custom="res://Data/Shared/Assets/UI/Theme.tres"
+
 [input]
 
 ui_left={

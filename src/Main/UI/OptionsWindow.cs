@@ -7,7 +7,7 @@
     using Core.Interfaces;
     using Core.Views.UI;
     using Godot;
-    using LastBreath.Helpers;
+    using Helpers;
 
     public partial class OptionsWindow : Control, IWindow
     {

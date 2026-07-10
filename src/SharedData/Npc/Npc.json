@@ -91,8 +91,8 @@
             "levelScaling": 0.04,
             "abilityCount": 2,
             "baseParameters": {
-                "Health": 700,
-                "Barrier": 400,
+                "Health": 200,
+                "Barrier": 100,
                 "Mana": 500,
                 "Strength": 1,
                 "Dexterity": 2,

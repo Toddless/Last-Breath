@@ -1,5 +1,6 @@
 namespace LootGeneration.Source
 {
+    using System;
     using System.Threading.Tasks;
     using Core.Crafting;
     using Core.Enums;
@@ -30,6 +31,9 @@ namespace LootGeneration.Source
 
         public int Quantity { get; set; } = 1;
         public IItem? Item { get; private set; }
+
+        /// <summary>A pickup attempt (click on the item): the orchestrator decides reach and inventory.</summary>
+        public event Action<ItemOnGround>? PickedUp;
 
         public override void _Ready()
         {
@@ -107,6 +111,8 @@ namespace LootGeneration.Source
 
         private void PickUpItem()
         {
+            if (!MouseInside || Item == null) return;
+            PickedUp?.Invoke(this);
         }
 
         private void RemoveAllInfo()
@@ -121,6 +127,7 @@ namespace LootGeneration.Source
 
         private void OnMouseExit()
         {
+            MouseInside = false;
             if (Item == null || _itemName == null) return;
             var tween = CreateTween();
             tween.TweenProperty(_itemName, "scale", Vector2.Zero, AnimationDuration);
@@ -128,6 +135,7 @@ namespace LootGeneration.Source
 
         private void OnMouseEnter()
         {
+            MouseInside = true;
             if (Item == null) return;
             if (_itemName == null)
             {
