@@ -15,7 +15,7 @@ namespace Core.Narrative.Quests
     using MessageBus;
     using Save;
 
-    public class QuestLogService : IQuestLogService
+    public class QuestLogService : IQuestLogService, Session.ISessionResettable
     {
         private const int MinutesPerHour = 60;
         private const int MinutesPerDay = 1440;
@@ -174,6 +174,9 @@ namespace Core.Narrative.Quests
                 return (Math.Clamp(CounterValue(state, counter), 0, counter.Amount), counter.Amount);
             return (objective.Condition!.IsMet(NarrativeContext.Empty) ? 1 : 0, 1);
         }
+
+        /// <summary>Silent wipe: no per-quest status events — the fresh journal simply starts empty.</summary>
+        public void ResetSession() => _states.Clear();
 
         public void RestoreState(IEnumerable<QuestState> states)
         {

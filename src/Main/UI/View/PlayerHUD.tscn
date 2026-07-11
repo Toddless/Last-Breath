@@ -16,14 +16,14 @@ _characterBtn = NodePath("Margin/Buttons/Character")
 _inventoryBtn = NodePath("Margin/Buttons/Inventory")
 _questsBtn = NodePath("Margin/Buttons/Quests")
 _craftingBtn = NodePath("Margin/Buttons/Crafting")
-_health = NodePath("Margin/Vitals/Health")
-_mana = NodePath("Margin/Vitals/Mana")
-_barrier = NodePath("Margin/Vitals/Barrier")
-_healthText = NodePath("Margin/Vitals/Health/HealthText")
-_manaText = NodePath("Margin/Vitals/Mana/ManaText")
-_barrierText = NodePath("Margin/Vitals/Barrier/BarrierText")
-_clock = NodePath("Margin/Clock")
-_playerEffects = NodePath("Margin/Vitals/Effects")
+_health = NodePath("Margin/VBoxContainer/Vitals/Health")
+_mana = NodePath("Margin/VBoxContainer/Vitals/Mana")
+_barrier = NodePath("Margin/VBoxContainer/Vitals/Barrier")
+_healthText = NodePath("Margin/VBoxContainer/Vitals/Health/HealthText")
+_manaText = NodePath("Margin/VBoxContainer/Vitals/Mana/ManaText")
+_barrierText = NodePath("Margin/VBoxContainer/Vitals/Barrier/BarrierText")
+_clock = NodePath("Margin/VBoxContainer/Clock")
+_playerEffects = NodePath("Margin/VBoxContainer/Vitals/Effects")
 
 [node name="QuestTracker" parent="." unique_id=941207267 instance=ExtResource("2_l0x06")]
 layout_mode = 1
@@ -52,20 +52,23 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="Vitals" type="VBoxContainer" parent="Margin" unique_id=197663918]
+[node name="VBoxContainer" type="VBoxContainer" parent="Margin" unique_id=1647945758]
+layout_mode = 2
+
+[node name="Vitals" type="VBoxContainer" parent="Margin/VBoxContainer" unique_id=197663918]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="Barrier" type="ProgressBar" parent="Margin/Vitals" unique_id=2088016793]
+[node name="Barrier" type="ProgressBar" parent="Margin/VBoxContainer/Vitals" unique_id=2088016793]
 custom_minimum_size = Vector2(300, 15)
 layout_mode = 2
 theme_type_variation = &"BarrierBar"
 show_percentage = false
 
-[node name="BarrierText" type="Label" parent="Margin/Vitals/Barrier" unique_id=1088581129]
+[node name="BarrierText" type="Label" parent="Margin/VBoxContainer/Vitals/Barrier" unique_id=1088581129]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -76,13 +79,13 @@ theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Health" type="ProgressBar" parent="Margin/Vitals" unique_id=155102817]
+[node name="Health" type="ProgressBar" parent="Margin/VBoxContainer/Vitals" unique_id=155102817]
 custom_minimum_size = Vector2(300, 26)
 layout_mode = 2
 theme_type_variation = &"HpBar"
 show_percentage = false
 
-[node name="HealthText" type="Label" parent="Margin/Vitals/Health" unique_id=561391717]
+[node name="HealthText" type="Label" parent="Margin/VBoxContainer/Vitals/Health" unique_id=561391717]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -93,13 +96,13 @@ theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Mana" type="ProgressBar" parent="Margin/Vitals" unique_id=583137024]
+[node name="Mana" type="ProgressBar" parent="Margin/VBoxContainer/Vitals" unique_id=583137024]
 custom_minimum_size = Vector2(300, 20)
 layout_mode = 2
 theme_type_variation = &"ManaBar"
 show_percentage = false
 
-[node name="ManaText" type="Label" parent="Margin/Vitals/Mana" unique_id=1993968879]
+[node name="ManaText" type="Label" parent="Margin/VBoxContainer/Vitals/Mana" unique_id=1993968879]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -110,18 +113,19 @@ theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Effects" type="GridContainer" parent="Margin/Vitals" unique_id=2124316385]
+[node name="Effects" type="GridContainer" parent="Margin/VBoxContainer/Vitals" unique_id=2124316385]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/h_separation = 1
 columns = 11
 
-[node name="Clock" type="Label" parent="Margin" unique_id=805301505]
+[node name="Clock" type="Label" parent="Margin/VBoxContainer" unique_id=805301505]
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_type_variation = &"DimLabel"
+text = "Clock"
 
 [node name="Buttons" type="HBoxContainer" parent="Margin" unique_id=1522956462]
 layout_mode = 2

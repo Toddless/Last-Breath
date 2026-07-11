@@ -5,7 +5,7 @@ namespace Core.Data.NpcData
 
     /// <summary>
     /// Per-EntityType spawn defaults agreed with design. Enum members are the source of truth,
-    /// display names map as: Regular=Обычный, Special=Редкий, Elit=Элитный, Unique=Специальный.
+    /// display names map as: Regular=Common, Special=Rare, Elit=Elit, Unique=Unique.
     /// Boss and Archon are hand-authored, never rolled by spawners.
     /// </summary>
     public static class NpcTypeDefaults

@@ -33,6 +33,16 @@ namespace Core.Data.NpcData
 
         /// <summary>Post-defeat rules override. Null = design defaults (rise in 1–10 minutes).</summary>
         [JsonProperty("lifecycle")] public NpcLifecycleData? Lifecycle { get; init; }
+
+        /// <summary>Species capabilities (talking, later trading). Null = can do none of it.</summary>
+        [JsonProperty("interaction")] public NpcInteractionData? Interaction { get; init; }
+    }
+
+    /// <summary>The "interaction" section: what the SPECIES is capable of. Hostility is state
+    /// (reputation), never declared here — a hostile veteran may talk, a friendly wolf never will.</summary>
+    public record NpcInteractionData
+    {
+        [JsonProperty("canTalk")] public bool CanTalk { get; init; }
     }
 
     /// <summary>The "lifecycle" section — maps 1:1 to Core.Ai.World.NpcLifecycleConfig.</summary>

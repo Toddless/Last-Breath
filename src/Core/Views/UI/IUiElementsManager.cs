@@ -16,11 +16,13 @@ namespace Core.Views.UI
 
         IHud ChangeHud(Type hudType);
 
-        /// <summary>Hotkey semantics: opens the window, or closes it when it is already open.</summary>
-        IWindow ToggleWindow(Type windowType);
+        /// <summary>Hotkey semantics: opens the window, or closes it when it is already open.
+        /// Null when the window is not allowed in the current <see cref="UiContext"/> (silent no-op).</summary>
+        IWindow? ToggleWindow(Type windowType);
 
-        /// <summary>Returns the already open window if there is one, otherwise opens a fresh one. Never closes.</summary>
-        IWindow OpenWindow(Type windowType);
+        /// <summary>Returns the already open window if there is one, otherwise opens a fresh one. Never closes.
+        /// Null when the window is not allowed in the current <see cref="UiContext"/> (silent no-op).</summary>
+        IWindow? OpenWindow(Type windowType);
 
         /// <summary>
         /// Always a fresh instance; the previous popup of the SAME type is closed first,
@@ -37,7 +39,11 @@ namespace Core.Views.UI
         bool HandleEscape();
 
         bool RegisterHudFactory(Type hudType, Func<IHud> factory);
-        bool RegisterWindowFactory(Type windowType, Func<IWindow> factory);
+
+        /// <summary>The window is openable only in <paramref name="allowedIn"/> contexts; a context
+        /// switch closes it automatically when it becomes disallowed. Default: available everywhere.</summary>
+        bool RegisterWindowFactory(Type windowType, Func<IWindow> factory, UiContext allowedIn = UiContext.All);
+
         bool RegisterPopupFactory(Type popupType, Func<IPopup> factory);
     }
 }

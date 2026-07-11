@@ -30,5 +30,8 @@ namespace Core.Data.NpcData
 
         /// <summary>Post-defeat rules (resurrection/burning). Always present — defaults if not authored.</summary>
         public required Ai.World.NpcLifecycleConfig Lifecycle { get; init; }
+
+        /// <summary>Species capability, not state: whether this kind of NPC converses at all.</summary>
+        public bool CanTalk { get; init; }
     }
 }

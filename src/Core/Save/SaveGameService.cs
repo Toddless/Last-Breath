@@ -8,7 +8,7 @@ namespace Core.Save
     using Services;
     using Godot;
 
-    public class SaveGameService : ISaveGameService
+    public class SaveGameService : ISaveGameService, Session.ISessionResettable
     {
         private const int Slots = 10;
         private const string SavedNotificationId = "Notification_Game_Saved";
@@ -80,6 +80,9 @@ namespace Core.Save
             playerNode.GetTree().CallDeferred(SceneTree.MethodName.ReloadCurrentScene);
             return true;
         }
+
+        /// <summary>A pending load must not leak into a freshly started game.</summary>
+        public void ResetSession() => _pendingLoad = null;
 
         public void ApplyPendingLoad()
         {

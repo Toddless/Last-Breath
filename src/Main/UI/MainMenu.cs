@@ -26,7 +26,16 @@
             _loadGameButton?.Pressed += LoadGamePressed;
             _optionsButton?.Pressed += OptionsButtonPressed;
             _quitButton?.Pressed += () => GetTree().Quit();
-            _newGameButton?.Pressed += () => GetTree().ChangeSceneToPacked(Main.Initialize());
+            _newGameButton?.Pressed += StartNewGame;
+        }
+
+        /// <summary>The service singletons outlive scene changes — a second "New game" in one
+        /// process must not inherit the previous session's facts/quests/inventory/reputation.</summary>
+        private void StartNewGame()
+        {
+            _provider.GetService<Core.Session.ISessionResetService>().ResetSession();
+            Engine.TimeScale = 1; // the death fast-forward must not leak through the menu
+            GetTree().ChangeSceneToPacked(Main.Initialize());
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

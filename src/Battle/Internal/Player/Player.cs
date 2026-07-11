@@ -59,6 +59,7 @@ namespace Battle.Internal.Player
         private float _baseSpeed = 500;
         [Export] private AnimationsComponent? _animationsComponent;
         [Export] private Area2D? _interactionArea;
+        [Export] private Camera2D? _camera;
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
@@ -142,11 +143,30 @@ namespace Battle.Internal.Player
         public event Action<float>? CurrentBarrierChanged;
         public event Action<float>? CurrentHealthChanged;
 
+        /// <summary>The battle flow reparents the player (world ↔ arena spot). Into battle the arena's
+        /// own camera frames the field; back in the world the player re-takes the view, snapped to the
+        /// new position instead of smoothing across half the map.</summary>
+        public override void _Notification(int what)
+        {
+            if (what == (int)NotificationParented)
+                Callable.From(OnReparented).CallDeferred();
+        }
+
+        private void OnReparented()
+        {
+            // Parented also fires during scene instantiation, before the camera enters the tree —
+            // that first shot is _Ready's job (MakeCurrent there), not a real reparent.
+            if (_camera == null || IsFighting || !_camera.IsInsideTree() || !_camera.Enabled) return;
+            _camera.MakeCurrent();
+            _camera.ResetSmoothing();
+        }
+
         public override void _Ready()
         {
             if (_interactionArea != null) _interactionArea.BodyEntered += OnBodyEnter;
 
             _rnd.Randomize();
+            if (_camera is { Enabled: true }) _camera.MakeCurrent();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
@@ -500,6 +520,7 @@ namespace Battle.Internal.Player
             CurrentHealth = Parameters.MaxHealth * config.ReviveHealthPercent;
             CurrentMana = Parameters.MaxMana * config.ReviveManaPercent;
             _stateMachine.Fire(Trigger.Revive);
+            _gameEventBus?.Publish(new PlayerRevivedEvent());
         }
 
         private void OnCorpseBurned()

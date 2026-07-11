@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://b3e1nusmv0gds"]
+[gd_scene format=3 uid="uid://cqgv66clgv0uv"]
 
-[ext_resource type="Script" uid="uid://bgrx4b6urnx6t" path="res://Source/UIElements/NotificationPopup.cs" id="1_3bwvw"]
+[ext_resource type="Script" uid="uid://bgrx4b6urnx6t" path="res://UI/NotificationPopup.cs" id="1_3bwvw"]
 
 [node name="NotificationPopup" type="MarginContainer" unique_id=1002943596 node_paths=PackedStringArray("_close", "_label")]
 offset_right = 250.0

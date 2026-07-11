@@ -24,8 +24,10 @@
         private Dictionary<string, CharacterBar> _characterBars = [];
         private readonly Dictionary<string, Label> _queueLabels = [];
         private AbilityButton[] _abilitySlotsInstances = new AbilityButton[BattleConstants.AbilitySlotsPerStance];
+        private static readonly float[] s_playbackSpeeds = [1f, 2f, 3f];
         private IAbilityBookComponent? _abilityBook;
-        private Button? _endTurnButton, _fleeButton;
+        private Button? _endTurnButton, _fleeButton, _speedButton;
+        private int _speedIndex;
         private bool _isPlayerTurn, _isPresenting, _isSelectingTargets;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
@@ -45,6 +47,7 @@
                     slot.SetNumber(i + 1);
                     _abilitySlots?.AddChild(slot);
                     _abilitySlotsInstances[i] = slot;
+                    HoverTooltip.Attach(slot, () => ShowAbilityTooltip(slot));
                 }
 
                 var buttonGroup = new ButtonGroup { AllowUnpress = false };
@@ -55,6 +58,7 @@
                     slot.SetStance((Stance)i);
                     slot.ButtonGroup = buttonGroup;
                     _stanceButtons?.AddChild(slot);
+                    HoverTooltip.Attach(slot, () => ShowStanceTooltip(slot.Stance));
                 }
 
                 CreateTurnButtons();
@@ -78,6 +82,47 @@
             _fleeButton.Pressed += () => _battleEventBus?.Publish(new PlayerFleeAttemptEvent());
             _fleeButton.FocusMode = FocusModeEnum.None;
             _buttonsContainer?.AddChild(_fleeButton);
+
+            _speedButton = new Button { Text = SpeedLabel(s_playbackSpeeds[_speedIndex]) };
+            _speedButton.Pressed += CyclePlaybackSpeed;
+            _speedButton.FocusMode = FocusModeEnum.None;
+            _buttonsContainer?.AddChild(_speedButton);
+        }
+
+        private void CyclePlaybackSpeed()
+        {
+            _speedIndex = (_speedIndex + 1) % s_playbackSpeeds.Length;
+            float speed = s_playbackSpeeds[_speedIndex];
+            if (_speedButton != null) _speedButton.Text = SpeedLabel(speed);
+            _battleEventBus?.Publish(new PlaybackSpeedChangedEvent(speed));
+        }
+
+        private static string SpeedLabel(float speed) => $"×{speed:0}";
+
+        private IPopup? ShowAbilityTooltip(AbilityButton slot)
+        {
+            if (slot.CurrentAbility is not { } ability) return null;
+            var popup = _uiElementProvider?.ShowPopup(typeof(TextTooltipPopup)) as TextTooltipPopup;
+            popup?.Show(ability.DisplayName, AbilityInfoLine(ability), ability.Description);
+            return popup;
+        }
+
+        private static string AbilityInfoLine(Core.Battle.Abilities.IAbility ability)
+        {
+            string cost = $"{ability.CostValue} {ability.CostType}";
+            return ability.Cooldown > 0
+                ? $"{cost} · {Core.Localization.Localization.Localize("UI_Cooldown")} {ability.Cooldown:0.#}"
+                : cost;
+        }
+
+        private IPopup? ShowStanceTooltip(Stance stance)
+        {
+            var popup = _uiElementProvider?.ShowPopup(typeof(TextTooltipPopup)) as TextTooltipPopup;
+            popup?.Show(
+                Core.Localization.Localization.Localize($"Stance_{stance}"),
+                null,
+                Core.Localization.Localization.Localize($"Stance_{stance}_Description"));
+            return popup;
         }
 
         public override void _ExitTree()

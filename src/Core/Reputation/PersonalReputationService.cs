@@ -15,7 +15,7 @@ namespace Core.Reputation
     /// personalReputation section of FactionRelations.json (a second participant on the same
     /// catalog). Cleanup is event-driven: a burned body or a body risen as undead forgets.
     /// </summary>
-    public class PersonalReputationService : IPersonalReputationService, IGameDataParticipant
+    public class PersonalReputationService : IPersonalReputationService, IGameDataParticipant, Session.ISessionResettable
     {
         private readonly Dictionary<string, int> _points = [];
         private readonly IFactionRelationService _factions;
@@ -63,5 +63,7 @@ namespace Core.Reputation
             GetEffectiveRelation(instanceId, faction) <= RelationLevel.Hostility;
 
         public void Forget(string instanceId) => _points.Remove(instanceId);
+
+        public void ResetSession() => _points.Clear();
     }
 }

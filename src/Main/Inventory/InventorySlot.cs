@@ -1,127 +1,60 @@
-﻿namespace LastBreath.Inventory
+namespace LastBreath.Inventory
 {
     using System;
     using Core.Enums;
-    using Core.Events;
     using Core.Inventory;
     using Core.Items;
-    using Core.MessageBus;
+    using Core.Localization;
     using Godot;
 
     public partial class InventorySlot : Slot, IInventorySlot
     {
         private const string UID = "uid://bqlqfsqoepfhs";
 
-        private bool _isMouseInside, _rmbWasPressed, _detailsShowing;
         [Export] protected Label? QuantityLabel;
 
-        private IGameMessageBus? _gameMessageBus;
         public Func<string, IItem?>? GetItemInstance;
         public event Action<IInventorySlot, MouseInteractions>? ItemInteraction;
+        public event Action<EquipmentPiece, IInventorySlot>? EquipmentDropped;
 
-        public override void _Ready()
-        {
-            MouseExited += OnMouseExit;
-            MouseEntered += OnMouseEnter;
-        }
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public override void _GuiInput(InputEvent @event)
         {
-            if (@event is InputEventMouseButton mb)
-            {
-                if (CurrentItem == null) return;
-                if (mb.Pressed)
-                {
-                    if (mb.AltPressed)
-                    {
-                        switch (true)
-                        {
-                            case var _ when mb.ButtonIndex == MouseButton.Left:
-                                RaiseEvent(MouseInteractions.AltRMB);
-                                break;
-                            case var _ when mb.ButtonIndex == MouseButton.Right:
-                                RaiseEvent(MouseInteractions.AltRMB);
-                                break;
-                        }
-                    }
+            if (@event is not InputEventMouseButton { Pressed: true } mb || CurrentItem == null) return;
 
-                    if (mb.CtrlPressed)
-                    {
-                        switch (true)
-                        {
-                            case var _ when mb.ButtonIndex == MouseButton.Left:
-                                RaiseEvent(MouseInteractions.CtrLMB);
-                                break;
-                            case var _ when mb.ButtonIndex == MouseButton.Right:
-                                RaiseEvent(MouseInteractions.CtrRMB);
-                                break;
-                        }
-                    }
-                    if (mb.ButtonIndex == MouseButton.Right)
-                        ShowButtonsTooltip();
-
-                    AcceptEvent();
-                }
-            }
+            var interaction = ToInteraction(mb);
+            if (interaction == MouseInteractions.None) return;
+            ItemInteraction?.Invoke(this, interaction);
+            AcceptEvent();
         }
-
-        public override void _Input(InputEvent @event)
-        {
-            if (_rmbWasPressed && @event.IsActionPressed("ui_cancel"))
-            {
-                Clear();
-                GetViewport().SetInputAsHandled();
-            }
-        }
-
-        public void SetUIElementProvider(IGameMessageBus mediator)
-        {
-            _gameMessageBus = mediator;
-        }
-
-        private void Clear()
-        {
-            _rmbWasPressed = false;
-            _detailsShowing = false;
-        }
-
-        private void RaiseEvent(MouseInteractions interaction) => ItemInteraction?.Invoke(this, interaction);
-
-        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         protected override void RefreshUI()
         {
             base.RefreshUI();
             if (QuantityLabel != null) QuantityLabel.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
+            UpdateRarityFrame();
         }
 
-        private async void OnMouseEnter()
+        protected override void OnEquipmentDropped(EquipmentPiece piece) => EquipmentDropped?.Invoke(piece, this);
+
+        /// <summary>The slot frame is tinted by the item's rarity; an empty slot stays neutral.</summary>
+        private void UpdateRarityFrame()
         {
-            _isMouseInside = true;
-
-            await ToSignal(GetTree().CreateTimer(0.4), SceneTreeTimer.SignalName.Timeout);
-
-            if (_isMouseInside && CurrentItem != null)
-            {
-                _gameMessageBus?.PublishMessageAsync(new ShowInventoryItemMessage(CurrentItem, this));
-                _detailsShowing = true;
-            }
+            if (Frame == null) return;
+            var item = CurrentItem == null ? null : GetItemInstance?.Invoke(CurrentItem.InstanceId);
+            Frame.Modulate = item == null ? Colors.White : Color.FromHtml(TextPalette.RarityColor(item.Rarity));
         }
 
-        private void OnMouseExit()
+        private static MouseInteractions ToInteraction(InputEventMouseButton mb) => mb switch
         {
-            _isMouseInside = false;
-            if (_rmbWasPressed) return;
-            _detailsShowing = false;
-            _gameMessageBus?.PublishMessageAsync(new ClearUiElementsMessage(this));
-        }
-
-        private void ShowButtonsTooltip()
-        {
-            _rmbWasPressed = true;
-            if (!_detailsShowing)
-                _gameMessageBus?.PublishMessageAsync(new ShowInventoryItemMessage(CurrentItem!, this));
-            _gameMessageBus?.PublishMessageAsync(new ShowInventorySlotButtonsTooltipMessage(this, CurrentItem!.InstanceId));
-        }
+            { ButtonIndex: MouseButton.Left, AltPressed: true } => MouseInteractions.AltLMB,
+            { ButtonIndex: MouseButton.Right, AltPressed: true } => MouseInteractions.AltRMB,
+            { ButtonIndex: MouseButton.Left, CtrlPressed: true } => MouseInteractions.CtrLMB,
+            { ButtonIndex: MouseButton.Right, CtrlPressed: true } => MouseInteractions.CtrRMB,
+            { ButtonIndex: MouseButton.Right } => MouseInteractions.RightClick,
+            { ButtonIndex: MouseButton.Left } => MouseInteractions.LeftClick,
+            _ => MouseInteractions.None,
+        };
     }
 }

@@ -47,6 +47,9 @@ namespace Battle.Source.UIElements
         private bool _inputEnabled;
         private IAbility? _ability;
         private Key _slotNumber;
+
+        /// <summary>Read access for the HUD's hover tooltip.</summary>
+        public IAbility? CurrentAbility => _ability;
         private string _selectionId = string.Empty;
         private IBattleEventBus? _battleEventBus;
         [Export] private TextureRect? _background, _icon, _frame;

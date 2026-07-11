@@ -7,7 +7,7 @@
     using Core.MessageBus;
     using Godot;
 
-    public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery
+    public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery, Core.Session.ISessionResettable
     {
         private const float ExpFactor = 1.8f;
         private const int BaseExp = 50;
@@ -74,6 +74,13 @@
         {
             CurrentLevel = Mathf.Clamp(baseLevel, 1, MaxLevel);
             CurrentExperience = Mathf.Max(0, experience);
+        }
+
+        /// <summary>Unlike RestoreState, the bonus levels zero too: the fresh session has no equipment granting them.</summary>
+        public void ResetSession()
+        {
+            BonusLevel = 0;
+            RestoreState(1, 0);
         }
 
         public void AddBonusLevel() => BonusLevel++;

@@ -36,7 +36,21 @@ namespace Core.Localization
             [DamageType.Bleed] = "#e05555",
         };
 
+        private static readonly Dictionary<Rarity, string> s_rarityColors = new()
+        {
+            [Rarity.Common] = "#d0d0d0",
+            [Rarity.Uncommon] = "#7ccb64",
+            [Rarity.Rare] = "#6ec6ff",
+            [Rarity.Epic] = "#c9a0e8",
+            [Rarity.Legendary] = "#ffd75e",
+            [Rarity.Unique] = "#ff9d45",
+            [Rarity.Mythic] = "#e05555",
+        };
+
         public static string DamageColor(DamageType type) => s_damageColors.GetValueOrDefault(type, "#ffffff");
+
+        /// <summary>Item rarity accent: tooltip titles, slot frames and anything else that color-codes rarity.</summary>
+        public static string RarityColor(Rarity rarity) => s_rarityColors.GetValueOrDefault(rarity, "#ffffff");
 
         public static string ColorizeNumber(string text) => Colorize(text, Number);
 

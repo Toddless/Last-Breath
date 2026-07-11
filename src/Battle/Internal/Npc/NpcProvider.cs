@@ -80,6 +80,7 @@ namespace Battle.Internal.Npc
                 Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect)),
                 World = BuildWorldConfig(data.World),
                 Lifecycle = BuildLifecycleConfig(data.Lifecycle),
+                CanTalk = data.Interaction?.CanTalk ?? false,
             };
         }
 

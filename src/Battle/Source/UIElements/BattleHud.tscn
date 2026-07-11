@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://6d0sr4hy4gg2"]
 
-[ext_resource type="Script" uid="uid://cdpdw7f753nlg" path="res://Source/UIElements/BattleHud.cs" id="1_qll2p"]
-[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Source/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
-[ext_resource type="PackedScene" uid="uid://cpnxcv1yd5d7g" path="res://Source/UIElements/BattleLog.tscn" id="3_blog"]
+[ext_resource type="Script" uid="uid://cdpdw7f753nlg" path="res://Addons/Battle/UIElements/BattleHud.cs" id="1_qll2p"]
+[ext_resource type="PackedScene" uid="uid://cv5svhrugien6" path="res://Addons/Battle/UIElements/CharacterHealthBar.tscn" id="2_5gjf2"]
+[ext_resource type="PackedScene" uid="uid://cpnxcv1yd5d7g" path="res://Addons/Battle/UIElements/BattleLog.tscn" id="3_blog"]
 
 [node name="BattleHud" type="Control" unique_id=745766495 node_paths=PackedStringArray("_buttonsContainer", "_playerBars", "_stanceButtons", "_battleLog", "_entityBars", "_abilitySlots", "_queueContainer")]
 layout_mode = 3
@@ -57,10 +57,12 @@ grow_horizontal = 0
 
 [node name="BattleLog" parent="." unique_id=653788986 instance=ExtResource("3_blog")]
 layout_mode = 1
-offset_left = -470.0
-offset_top = -290.0
-offset_right = -10.0
-offset_bottom = -10.0
+anchors_preset = 2
+anchor_left = 0.0
+anchor_right = 0.0
+offset_top = -280.0
+offset_right = 523.0
+grow_horizontal = 1
 
 [node name="Queue" type="HBoxContainer" parent="." unique_id=1718805809]
 layout_mode = 1

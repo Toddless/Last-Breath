@@ -7,7 +7,7 @@ namespace Core.Ai.World.Time
     /// A tick spanning several game hours fires each event once with the final value —
     /// consumers read the current state, they don't replay the skipped hours.
     /// </summary>
-    public class WorldClock : IWorldClock
+    public class WorldClock : IWorldClock, Session.ISessionResettable
     {
         private const double GameDaySeconds = 24 * 3600;
 
@@ -58,6 +58,9 @@ namespace Core.Ai.World.Time
             if (Hour != previousHour) HourPassed?.Invoke(Hour);
             if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);
         }
+
+        /// <summary>Silent rewind to the configured start; the fresh world reads the state in its own _Ready.</summary>
+        public void ResetSession() => ResetToStart();
 
         /// <summary>Applies a freshly loaded config and rewinds to its start time (startup only).</summary>
         public void Configure(WorldClockConfig config)

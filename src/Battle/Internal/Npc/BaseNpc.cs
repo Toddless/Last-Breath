@@ -110,6 +110,9 @@ namespace Battle.Internal.Npc
         /// <summary>True after this NPC rose as undead — the save system persists risen ones as world deviations.</summary>
         public bool IsRisen { get; private set; }
 
+        /// <summary>Species capability from the definition (interaction.canTalk); hostility never changes it.</summary>
+        public bool CanTalk { get; private set; }
+
         /// <summary>The rising's parameter bonus, kept for the save round-trip.</summary>
         public float RisingBonus { get; private set; }
 
@@ -254,6 +257,7 @@ namespace Battle.Internal.Npc
             EntityType = definition.EntityType;
             Fraction = definition.Fraction;
             Behavior = definition.Behavior;
+            CanTalk = definition.CanTalk;
 
             foreach ((EntityParameter parameter, float value) in definition.Parameters)
                 Parameters.SetBaseValueForParameter(parameter, value);

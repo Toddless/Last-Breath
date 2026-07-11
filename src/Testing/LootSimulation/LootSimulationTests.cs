@@ -1,9 +1,9 @@
-namespace LastBreathTest.LootSimulation
+﻿namespace LastBreathTest.LootSimulation
 {
     using Core.Enums;
     using Core.Modifiers;
 
-    /// <summary>Fast, seeded invariants of the drop pipeline — the economy's regression net.
+    /// <summary>Fast, seeded invariants of the drop pipeline â€” the economy's regression net.
     /// Run only these with: dotnet test --filter "TestCategory!=Simulation"</summary>
     [TestClass]
     public class LootSimulationTests
@@ -40,7 +40,7 @@ namespace LastBreathTest.LootSimulation
             };
             var result = await s_simulator.RunAsync(archetype, kills: 200);
 
-            // Mythic/Unique templates keep their data rarity by design — the floor applies to rolled equips.
+            // Mythic/Unique templates keep their data rarity by design â€” the floor applies to rolled equips.
             var rolledEquips = result.KillRecords
                 .SelectMany(kill => kill.Drops)
                 .Where(drop => drop is { IsEquip: true, Rarity: <= Rarity.Common });
@@ -53,7 +53,7 @@ namespace LastBreathTest.LootSimulation
         {
             string[] expected =
             [
-                "Crafting_Resource_Cooper_Ore",
+                "Crafting_Resource_Copper_Ore",
                 "Crafting_Resource_Deer_Leather",
                 "Crafting_Resource_Diamond_Gem",
                 "Crafting_Resource_Linen_Fabric",
@@ -111,7 +111,7 @@ namespace LastBreathTest.LootSimulation
         private static IEnumerable<IModifier> ExpandLeaves(IModifier modifier) =>
             modifier is CompositeModifier composite ? composite.Parts : [modifier];
 
-        /// <summary>Loot tables reference ids that have no item data yet — those cannot be rolled.</summary>
+        /// <summary>Loot tables reference ids that have no item data yet â€” those cannot be rolled.</summary>
         private static Core.Items.IItem? TryCopy(string id)
         {
             try
@@ -162,7 +162,7 @@ namespace LastBreathTest.LootSimulation
             // The modifier procs on 20% of the purchases (tierUpgradeChance 0.2 in data): the share must
             // sit near that, not be a budget side-effect. Guards the once-dead JSON mapping.
             Assert.IsTrue(upgradedShare > 0.12f,
-                $"Tier-0 share {upgradedShare:P1} is far below the 20% upgrade chance — the modifier looks dead again.");
+                $"Tier-0 share {upgradedShare:P1} is far below the 20% upgrade chance â€” the modifier looks dead again.");
         }
 
         private static float TopTierShare(ScenarioResult result)

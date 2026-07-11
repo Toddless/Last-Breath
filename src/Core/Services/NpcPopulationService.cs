@@ -9,7 +9,7 @@ namespace Core.Services
     /// (the risen undead still walks the map) and frees itself on the final death event —
     /// wild risen NPCs release their slot without any spawn point owning them.
     /// </summary>
-    public class NpcPopulationService : INpcPopulationService, IDisposable
+    public class NpcPopulationService : INpcPopulationService, IDisposable, Session.ISessionResettable
     {
         private const int DefaultGlobalLimit = 20;
 
@@ -50,6 +50,9 @@ namespace Core.Services
                 CurrentCount = 0;
             }
         }
+
+        /// <summary>The old scene's NPC nodes die without final-death events; the counter must not survive them.</summary>
+        public void ResetSession() => Reset();
 
         public void Dispose() => _gameEventBus.Unsubscribe<NpcFinalDeathEvent>(OnFinalDeath);
 

@@ -66,6 +66,7 @@ namespace Core.Services
             services.AddSingleton<ILocalizationService, LocalizationService>();
             services.AddSingleton<IKeywordProvider, LocalizationKeywordProvider>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();
+            services.AddSingleton<IUiContextService, UiContextService>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
             services.AddSingleton< NotificationService>();

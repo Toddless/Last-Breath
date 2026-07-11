@@ -14,6 +14,7 @@
     using Core.Save;
     using Core.Save.Participants;
     using Core.Services;
+    using Core.Session;
     using Core.Views;
     using Core.Views.UI;
     using Godot;
@@ -63,6 +64,34 @@
                 return manager;
             });
 
+            services.AddSingleton<ISessionResetService>(sp =>
+            {
+                var session = new SessionResetService(sp.GetRequiredService<LoadScope>());
+                // Registration order = reset order; every entry is optional — a sandbox project
+                // without the service simply skips it.
+                Add<ISaveGameService>(); // a pending load must not leak into the new game
+                Add<Core.Narrative.Quests.IQuestLogService>(); // before the facts they evaluate against
+                Add<Core.Narrative.Facts.IWorldFactsService>();
+                Add<Core.Narrative.Influence.IInfluenceMastery>();
+                Add<IMartialArtMastery>();
+                Add<Core.Crafting.ICraftingMastery>();
+                Add<Core.Inventory.IInventory>();
+                Add<IFactionRelationService>();
+                Add<Core.Reputation.IPersonalReputationService>();
+                Add<Core.Reputation.IReputationDeedProcessor>();
+                Add<Core.Ai.World.Raids.IRaidService>();
+                Add<Core.Ai.World.Time.IWorldClock>();
+                Add<INpcPopulationService>();
+                Add<Core.Views.UI.IUiContextService>();
+                return session;
+
+                void Add<T>()
+                    where T : class
+                {
+                    if (sp.GetService<T>() is ISessionResettable resettable) session.Register(resettable);
+                }
+            });
+
             services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
             services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();
             services.AddTransient<IRequestHandler<ApplyAbilityUpgradeRequest, AbilityUpgradeView>, ApplyAbilityUpgradeRequestHandler>();
@@ -73,8 +102,10 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
-            uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
-            uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>());
+            // Not read-only (upgrades apply from here) — so not available mid-battle (design, Todd 2026-07-11).
+            uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>(), UiContext.World);
+            uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>(), UiContext.World);
+            uiElementManager.RegisterPopupFactory(typeof(TextTooltipPopup), () => TextTooltipPopup.Initialize().Instantiate<TextTooltipPopup>());
         }
     }
 }

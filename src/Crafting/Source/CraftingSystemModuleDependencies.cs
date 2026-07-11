@@ -45,7 +45,7 @@
         public static void AddCraftingWindowFactories(this IGameServiceProvider provider)
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
-            uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>());
+            uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>(), UiContext.World);
         }
     }
 }

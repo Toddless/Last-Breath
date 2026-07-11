@@ -46,6 +46,11 @@
         // арене нужен фейковый директор, иначе цикл ходов крутится вечно.
         [Export] private BattleDirector? _director;
         [Export] private AbilityVisualLibrary? _visualLibrary;
+
+        // The arena's own view: frames the whole battlefield for the duration of the battle
+        // (the player's follow-camera would keep the field half off-screen). The player re-takes
+        // the view when he is returned to the world (Player.OnReparented).
+        [Export] private Camera2D? _camera;
         private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
@@ -57,9 +62,6 @@
         // mutual enemies: a skeleton's chain lightning legally "executed" its own kin (read as
         // a self-kill). Solo NPCs of one faction share a battle-scoped group instead.
         private readonly System.Collections.Generic.Dictionary<Fractions, EntityGroup> _fractionGroups = [];
-
-        /// <summary>The ordered record of the current battle; the presentation layer replays it.</summary>
-        public IBattleTimeline Timeline => _timeline;
 
         public override void _Ready()
         {
@@ -277,6 +279,7 @@
             // TODO:
             // Сейчас на арене создан только спот для игрока. НЕобходимы споты для союзников
             _playerSpot?.SetBattleEventBus(_battleEventBus);
+            if (_camera is { Enabled: true } && _camera.IsInsideTree()) _camera.MakeCurrent();
             SetupTargetSelectionController();
             SetupCombatTextPresenter(_battleEventBus);
             StartTimelineRecording();

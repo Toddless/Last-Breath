@@ -7,15 +7,16 @@
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
-    using Core.MessageBus;
+    using Core.Views.UI;
     using Godot;
+    using UI;
 
-    public class Inventory : IInventory
+    public class Inventory : IInventory, Core.Session.ISessionResettable
     {
         private const int BagSlots = 220;
 
         private readonly Dictionary<string, IItem> _itemInstances = [];
-        private readonly IGameMessageBus _uiMessageBus;
+        private readonly IUiElementsManager _uiElements;
         protected List<IInventorySlot> Slots { get; } = [];
 
         public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
@@ -25,9 +26,12 @@
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
-        public Inventory(IGameMessageBus messageBus)
+        /// <summary>An equipped piece was dragged into a bag slot; the window resolves the unequip.</summary>
+        public event Action<EquipmentPiece, IInventorySlot>? EquipmentDroppedIntoBag;
+
+        public Inventory(IUiElementsManager uiElements)
         {
-            _uiMessageBus = messageBus;
+            _uiElements = uiElements;
         }
 
         /// <summary>
@@ -61,9 +65,21 @@
                 inventorySlot.GetItemInstance = (GetItem<IItem>);
                 inventorySlot.GetItemIcon = GetItemIcon;
                 inventorySlot.ItemInteraction += OnItemInteraction;
-                inventorySlot.SetUIElementProvider(_uiMessageBus);
+                inventorySlot.EquipmentDropped += (piece, slot) => EquipmentDroppedIntoBag?.Invoke(piece, slot);
+                HoverTooltip.Attach(inventorySlot, () => ShowItemTooltip(inventorySlot));
                 Slots.Add(inventorySlot);
             }
+        }
+
+        private IPopup? ShowItemTooltip(IInventorySlot slot)
+        {
+            if (slot.CurrentItem == null) return null;
+            var item = GetItem<IItem>(slot.CurrentItem.InstanceId);
+            if (item == null) return null;
+
+            var popup = _uiElements.ShowPopup(typeof(ItemTooltipPopup)) as ItemTooltipPopup;
+            popup?.ShowItem(item);
+            return popup;
         }
 
         private void OnItemInteraction(IInventorySlot slot, MouseInteractions interactions)
@@ -75,7 +91,7 @@
 
         public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
         public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
-        T? IInventory.GetItem<T>(string instanceId) where T : class => throw new NotImplementedException();
+        T? IInventory.GetItem<T>(string instanceId) where T : class => _itemInstances.GetValueOrDefault(instanceId) as T;
 
         public T? GetItem<T>(string instanceId)
             where T : IItem => (T?)_itemInstances.GetValueOrDefault(instanceId);
@@ -112,6 +128,51 @@
         {
             EnsureSlots();
             return Slots.Count(x => x.CurrentItem == null);
+        }
+
+        /// <summary>Repacks the bag: stacks merged, best rarity first, then by name.</summary>
+        public void SortBag()
+        {
+            EnsureSlots();
+            // Instances resolve BEFORE the clear: a stack whose instance went missing is skipped
+            // instead of losing the whole re-fill to an exception over an empty bag.
+            var stacks = Slots
+                .Where(slot => slot.CurrentItem != null)
+                .Select(slot => (Item: _itemInstances.GetValueOrDefault(slot.CurrentItem!.InstanceId), slot.Quantity))
+                .Where(x => x.Item != null)
+                .ToList();
+
+            foreach (var slot in Slots)
+                slot.ClearSlot();
+
+            // Stackables merge by item id (each pickup is its own instance); per-roll items keep instance identity.
+            var ordered = stacks
+                .GroupBy(x => x.Item!.MaxStackSize > 1 ? x.Item.Id : x.Item.InstanceId)
+                .Select(group => (Item: group.First().Item!, Amount: group.Sum(x => x.Quantity)))
+                .OrderBy(x => RarityRank(x.Item.Rarity))
+                .ThenBy(x => x.Item.DisplayName, StringComparer.Ordinal);
+
+            foreach (var (item, amount) in ordered)
+                FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
+        }
+
+        /// <summary>Display order: best first — the enum itself puts Unique/Mythic at 10/11.</summary>
+        private static int RarityRank(Rarity rarity) => rarity switch
+        {
+            Rarity.Mythic => 0,
+            Rarity.Unique => 1,
+            _ => (int)rarity + 2,
+        };
+
+        /// <summary>Adds an item into the specific slot the player dropped it on; an occupied slot falls back to the usual placement.</summary>
+        public bool TryAddItemAt(IItem item, IInventorySlot slot)
+        {
+            if (slot.CurrentItem != null) return TryAddItem(item);
+
+            _itemInstances[item.InstanceId] = item;
+            slot.SetItem(new(item.Id, item.InstanceId, item.MaxStackSize));
+            ItemAmountChanges?.Invoke(item.Id, GetTotalItemAmount(item.Id));
+            return true;
         }
 
         /// <summary>
@@ -180,6 +241,9 @@
             _itemInstances.Clear();
         }
 
+        /// <summary>The slot nodes are service-owned for the whole process — a new session empties them, not replaces them.</summary>
+        public void ResetSession() => Clear();
+
         protected void OnDeleteRequested(string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) return;
@@ -201,11 +265,14 @@
         {
             EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
             var remaining = amount;
-            var slotsWithSameItem = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId && x.CurrentItem?.ItemId == itemId);
+            // Top-up matches by item id, not instance: every pickup of a resource is a fresh
+            // instance, matching by instance would fragment the bag into per-pickup stacks.
+            // Per-roll items (equip) are safe — their stack size of 1 never merges.
+            var slotsWithSameItem = Slots.Where(x => x.CurrentItem?.ItemId == itemId);
             foreach (var slot in slotsWithSameItem)
             {
                 if (remaining <= 0) break;
-                slot.TryAddStacks(amount, out int left);
+                slot.TryAddStacks(remaining, out int left);
                 remaining = left;
             }
 

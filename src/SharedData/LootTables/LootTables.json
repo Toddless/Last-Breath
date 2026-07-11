@@ -246,7 +246,7 @@
                     "tier": 3,
                     "items": [
                         {
-                            "id": "Crafting_Resource_Cooper_Ore",
+                            "id": "Crafting_Resource_Copper_Ore",
                             "price": 3
                         },
                         {
@@ -345,6 +345,22 @@
                         {
                             "id": "Crafting_Resource_Essence_Health",
                             "price": 4
+                        },
+                        {
+                            "id": "Crafting_Resource_Pine_Wood",
+                            "price": 4
+                        },
+                        {
+                            "id": "Crafting_Resource_Copper_Ore",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Deer_Leather",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Oak_Wood",
+                            "price": 12
                         }
                     ]
                 }
@@ -386,7 +402,16 @@
                 },
                 {
                     "tier": 3,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Essence_Barrier",
+                            "price": 11
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Damage",
+                            "price": 13
+                        }
+                    ]
                 }
             ]
         },
@@ -408,12 +433,25 @@
                         {
                             "id": "Amulet_Strength_Intelligence",
                             "price": 193
+                        },
+                        {
+                            "id": "Crafting_Resource_Ironwood",
+                            "price": 260
                         }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Yew_Wood",
+                            "price": 90
+                        },
+                        {
+                            "id": "Crafting_Resource_Amethyst_Gem",
+                            "price": 120
+                        }
+                    ]
                 },
                 {
                     "tier": 3,
@@ -425,6 +463,22 @@
                         {
                             "id": "Belt_of_Strength",
                             "price": 13
+                        },
+                        {
+                            "id": "Crafting_Resource_Pine_Wood",
+                            "price": 4
+                        },
+                        {
+                            "id": "Crafting_Resource_Oak_Wood",
+                            "price": 12
+                        },
+                        {
+                            "id": "Crafting_Resource_Linen_Fabric",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Silk_Fabric",
+                            "price": 3
                         }
                     ]
                 }
@@ -439,6 +493,10 @@
                         {
                             "id": "Ring_of_Knight",
                             "price": 585
+                        },
+                        {
+                            "id": "Crafting_Resource_Adamantite_Ore",
+                            "price": 480
                         }
                     ]
                 },
@@ -452,12 +510,25 @@
                         {
                             "id": "Weapon_Simple_Sword",
                             "price": 148
+                        },
+                        {
+                            "id": "Crafting_Resource_Topaz_Gem",
+                            "price": 280
                         }
                     ]
                 },
                 {
                     "tier": 2,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Mithril_Ore",
+                            "price": 110
+                        },
+                        {
+                            "id": "Crafting_Resource_Sapphire_Gem",
+                            "price": 120
+                        }
+                    ]
                 },
                 {
                     "tier": 3,
@@ -465,6 +536,22 @@
                         {
                             "id": "Crafting_Resource_Essence_Evade",
                             "price": 14
+                        },
+                        {
+                            "id": "Crafting_Resource_Copper_Ore",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Iron_Ore",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Silver_Ore",
+                            "price": 15
+                        },
+                        {
+                            "id": "Crafting_Resource_Gold_Ore",
+                            "price": 3
                         }
                     ]
                 }
@@ -506,6 +593,14 @@
                         {
                             "id": "Belt_of_Dexterity",
                             "price": 11
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Damage",
+                            "price": 13
+                        },
+                        {
+                            "id": "Crafting_Resource_Essence_Critical_Chance",
+                            "price": 13
                         }
                     ]
                 }
@@ -524,16 +619,34 @@
                         {
                             "id": "Ring_Submittion_Mark",
                             "price": 529
+                        },
+                        {
+                            "id": "Crafting_Resource_Ancient_Fang",
+                            "price": 460
                         }
                     ]
                 },
                 {
                     "tier": 1,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Direwolf_Leather",
+                            "price": 270
+                        }
+                    ]
                 },
                 {
                     "tier": 2,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Crafting_Resource_Bear_Leather",
+                            "price": 95
+                        },
+                        {
+                            "id": "Crafting_Resource_Bear_Claw",
+                            "price": 100
+                        }
+                    ]
                 },
                 {
                     "tier": 3,
@@ -545,6 +658,26 @@
                         {
                             "id": "Crafting_Resource_Essence_Armor",
                             "price": 11
+                        },
+                        {
+                            "id": "Crafting_Resource_Wolf_Leather",
+                            "price": 4
+                        },
+                        {
+                            "id": "Crafting_Resource_Wolf_Fang",
+                            "price": 5
+                        },
+                        {
+                            "id": "Crafting_Resource_Deer_Leather",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Wild_Boar_Leather",
+                            "price": 3
+                        },
+                        {
+                            "id": "Crafting_Resource_Boar_Tusk",
+                            "price": 14
                         }
                     ]
                 }

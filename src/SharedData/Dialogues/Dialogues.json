@@ -235,6 +235,128 @@
           ]
         }
       ]
+    },
+    {
+      "npcId": "Npc_Villager",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Villager_Greeting_1" }
+          ],
+          "options": [
+            { "id": "AskVillage", "key": "Dlg_Villager_Opt_AskVillage", "oncePerConversation": true, "next": "AboutVillage" },
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        },
+        {
+          "id": "AboutVillage",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Villager_AboutVillage_1" }
+          ],
+          "options": [
+            { "id": "Back", "key": "Dlg_Opt_Back", "next": "Greeting" }
+          ]
+        }
+      ]
+    },
+    {
+      "npcId": "Npc_Hunter",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Hunter_Greeting_1" }
+          ],
+          "options": [
+            { "id": "AskPrey", "key": "Dlg_Hunter_Opt_AskPrey", "oncePerConversation": true, "next": "AboutPrey" },
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        },
+        {
+          "id": "AboutPrey",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Hunter_AboutPrey_1" }
+          ],
+          "options": [
+            { "id": "Back", "key": "Dlg_Opt_Back", "next": "Greeting" }
+          ]
+        }
+      ]
+    },
+    {
+      "npcId": "Npc_Elf_Ranger",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Elf_Ranger_Greeting_1" }
+          ],
+          "options": [
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        }
+      ]
+    },
+    {
+      "npcId": "Npc_Elf_Mage",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Elf_Mage_Greeting_1" }
+          ],
+          "options": [
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        }
+      ]
+    },
+    {
+      "npcId": "Npc_Dwarf_Warrior",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Dwarf_Warrior_Greeting_1" }
+          ],
+          "options": [
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        }
+      ]
+    },
+    {
+      "npcId": "Npc_Dwarf_Crossbowman",
+      "entryRules": [
+        { "priority": 0, "conditions": [], "node": "Greeting" }
+      ],
+      "nodes": [
+        {
+          "id": "Greeting",
+          "lines": [
+            { "speaker": "Npc", "key": "Dlg_Dwarf_Crossbowman_Greeting_1" }
+          ],
+          "options": [
+            { "id": "Leave", "key": "Dlg_Opt_Leave" }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -15,10 +15,13 @@ namespace Core.Services
         private readonly Dictionary<Type, Func<IHud>> _hudFactories = [];
         private readonly Dictionary<Type, Func<IWindow>> _windowFactories = [];
         private readonly Dictionary<Type, Func<IPopup>> _popupFactories = [];
+        private readonly Dictionary<Type, UiContext> _windowContexts = [];
         private readonly Dictionary<Type, IWindow> _openWindows = [];
         private readonly Dictionary<Type, IPopup> _openPopups = [];
         private ILayerManager? _layers;
         private IHud? _currentHud;
+        private IUiContextService? _context;
+        private bool _contextResolved;
 
         public void Subscribe(ILayerManager? layers) => _layers = layers;
 
@@ -31,7 +34,7 @@ namespace Core.Services
             return hud;
         }
 
-        public IWindow ToggleWindow(Type windowType)
+        public IWindow? ToggleWindow(Type windowType)
         {
             if (!TryGetOpenWindow(windowType, out var openWindow)) return OpenFreshWindow(windowType);
 
@@ -39,7 +42,7 @@ namespace Core.Services
             return openWindow;
         }
 
-        public IWindow OpenWindow(Type windowType) =>
+        public IWindow? OpenWindow(Type windowType) =>
             TryGetOpenWindow(windowType, out var openWindow) ? openWindow : OpenFreshWindow(windowType);
 
         public IPopup ShowPopup(Type popupType)
@@ -67,16 +70,51 @@ namespace Core.Services
 
         public bool RegisterHudFactory(Type hudType, Func<IHud> factory) => _hudFactories.TryAdd(hudType, factory);
 
-        public bool RegisterWindowFactory(Type windowType, Func<IWindow> factory) => _windowFactories.TryAdd(windowType, factory);
+        public bool RegisterWindowFactory(Type windowType, Func<IWindow> factory, UiContext allowedIn = UiContext.All)
+        {
+            EnsureContextService(); // registration happens at bootstrap — the context tracker must live from the start
+            if (!_windowFactories.TryAdd(windowType, factory)) return false;
+            _windowContexts[windowType] = allowedIn;
+            return true;
+        }
 
         public bool RegisterPopupFactory(Type popupType, Func<IPopup> factory) => _popupFactories.TryAdd(popupType, factory);
 
-        private IWindow OpenFreshWindow(Type windowType)
+        private IWindow? OpenFreshWindow(Type windowType)
         {
+            if (!IsAllowedNow(windowType)) return null; // silent by design (Todd)
+
             var window = CreateElement(_windowFactories, windowType);
             _openWindows[windowType] = window;
             _layers?.ShowWindow(window);
             return window;
+        }
+
+        private bool IsAllowedNow(Type windowType)
+        {
+            EnsureContextService();
+            if (_context == null) return true; // a project without the context tracker gates nothing
+            return (_windowContexts.GetValueOrDefault(windowType, UiContext.All) & _context.Current) != 0;
+        }
+
+        /// <summary>Resolved lazily — the manager is constructed while the container is still being built.</summary>
+        private void EnsureContextService()
+        {
+            if (_contextResolved) return;
+            _contextResolved = true;
+            _context = provider.GetServices<IUiContextService>().FirstOrDefault();
+            if (_context != null) _context.ContextChanged += CloseDisallowedWindows;
+        }
+
+        /// <summary>A context switch (battle starts, dialogue opens...) slams the windows that don't belong in it.</summary>
+        private void CloseDisallowedWindows(UiContext context)
+        {
+            foreach ((Type type, IWindow window) in _openWindows.ToList())
+            {
+                if (!TryGetOpenWindow(type, out _)) continue;
+                if ((_windowContexts.GetValueOrDefault(type, UiContext.All) & context) != 0) continue;
+                CloseWindow(type, window);
+            }
         }
 
         private bool CloseOverlayLayer()
@@ -142,7 +180,9 @@ namespace Core.Services
         private bool TryGetOpenWindow(Type windowType, out IWindow window)
         {
             if (!_openWindows.TryGetValue(windowType, out window!)) return false;
-            if (window is Node node && GodotObject.IsInstanceValid(node)) return true;
+            // The disposed-instance check only applies to nodes (non-node windows exist in tests).
+            if (window is not Node node) return true;
+            if (GodotObject.IsInstanceValid(node)) return true;
 
             _openWindows.Remove(windowType);
             return false;

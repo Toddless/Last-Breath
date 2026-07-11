@@ -70,12 +70,28 @@
         private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
             _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
 
+        // Window hotkeys route through InputMap actions (Core.Constants.Settings names them) —
+        // availability per game situation is the UiContext map's job, not checks here.
+        private static readonly System.Collections.Generic.Dictionary<string, Type> s_windowHotkeys = new()
+        {
+            [Core.Constants.Settings.Inventory] = typeof(Inventory.InventoryWindow),
+            [Core.Constants.Settings.Quests] = typeof(QuestJournalWindow),
+            [Core.Constants.Settings.Character] = typeof(CharacterWindow),
+            [Core.Constants.Settings.Mastery] = typeof(MartialArtMasteryWindow),
+        };
+
         public override void _Input(InputEvent @event)
         {
-            // TODO:
-            // Обработка инпута (горячие клавиши окон). Выносим из мейна? Или оствляем здесь?
-            if (@event is InputEventKey { Keycode: Key.N, Pressed: true })
-                _uiElementProvider?.ToggleWindow(typeof(MartialArtMasteryWindow));
+            // Typing is not a hotkey: a focused text field (debug console, future chat) owns the keys.
+            if (GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit) return;
+
+            foreach ((string action, var window) in s_windowHotkeys)
+            {
+                if (!@event.IsActionPressed(action)) continue;
+                _uiElementProvider?.ToggleWindow(window);
+                GetViewport().SetInputAsHandled();
+                return;
+            }
         }
 
         private static Control? CreateNotificationPopup()

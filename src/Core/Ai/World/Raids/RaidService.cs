@@ -23,7 +23,7 @@ namespace Core.Ai.World.Raids
     /// Survivors leave after the timeout via the final-death channel (population and personal
     /// memory release like for any burned body).
     /// </summary>
-    public class RaidService : IRaidService, IGameDataParticipant
+    public class RaidService : IRaidService, IGameDataParticipant, Session.ISessionResettable
     {
         private const string RaidNotificationId = "UI_Raid_Started";
 
@@ -77,6 +77,15 @@ namespace Core.Ai.World.Raids
             _config = JsonConvert.DeserializeObject<RaidsData>(file.Json)
                       ?? throw new InvalidOperationException("Failed to deserialize raids config");
             CooldownRemaining = _config.InitialDelaySeconds; // a save restore overwrites this later
+        }
+
+        /// <summary>Silent reset: raider nodes die with the old scene — no despawn/final-death traffic here.</summary>
+        public void ResetSession()
+        {
+            _raiders.Clear();
+            _timeLeft = 0;
+            _checkTimer = 0;
+            CooldownRemaining = _config.InitialDelaySeconds;
         }
 
         public void Tick(float delta)

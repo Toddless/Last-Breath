@@ -3,7 +3,7 @@ namespace Core.Narrative.Facts
     using System;
     using System.Collections.Generic;
 
-    public class WorldFactsService : IWorldFactsService
+    public class WorldFactsService : IWorldFactsService, Session.ISessionResettable
     {
         private readonly Dictionary<string, int> _facts = [];
 
@@ -32,6 +32,9 @@ namespace Core.Narrative.Facts
             if (GetCount(key) == value) return;
             Write(key, value);
         }
+
+        /// <summary>Silent wipe — no per-fact FactChanged storm on a session reset.</summary>
+        public void ResetSession() => _facts.Clear();
 
         public void RestoreState(IReadOnlyDictionary<string, int> facts)
         {

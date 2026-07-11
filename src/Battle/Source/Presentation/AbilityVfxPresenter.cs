@@ -18,6 +18,9 @@ namespace Battle.Source.Presentation
         private Func<string, Node2D?>? _findSpot;
         private AbilityVisualLibrary? _library;
 
+        /// <summary>Playback speed multiplier; the director keeps it in sync with its own pacing.</summary>
+        public float SpeedScale { get; set; } = 1f;
+
         public void Setup(Func<string, Node2D?> findSpot, AbilityVisualLibrary library)
         {
             _findSpot = findSpot;
@@ -40,7 +43,7 @@ namespace Battle.Source.Presentation
             sprite.GlobalPosition = from.GlobalPosition;
             sprite.Rotation = (to.GlobalPosition - from.GlobalPosition).Angle();
 
-            float duration = from.GlobalPosition.DistanceTo(to.GlobalPosition) / Mathf.Max(1f, config.TravelSpeed);
+            float duration = from.GlobalPosition.DistanceTo(to.GlobalPosition) / Mathf.Max(1f, config.TravelSpeed) / SpeedScale;
             var tween = CreateTween();
             tween.TweenProperty(sprite, "global_position", to.GlobalPosition, duration);
             await ToSignal(tween, Tween.SignalName.Finished);
@@ -79,7 +82,7 @@ namespace Battle.Source.Presentation
 
         private AnimatedSprite2D SpawnSprite(SpriteFrames frames, string clip, float scale)
         {
-            var sprite = new AnimatedSprite2D { SpriteFrames = frames, Scale = Vector2.One * scale };
+            var sprite = new AnimatedSprite2D { SpriteFrames = frames, Scale = Vector2.One * scale, SpeedScale = SpeedScale };
             AddChild(sprite);
             sprite.Play(clip);
             return sprite;
@@ -89,7 +92,7 @@ namespace Battle.Source.Presentation
         {
             // Any looping mode (linear/ping-pong) never emits animation_finished — wait a fixed time instead.
             if (frames.GetAnimationLoopMode(clip) is not SpriteFrames.LoopMode.None)
-                await ToSignal(GetTree().CreateTimer(LoopedClipSeconds), SceneTreeTimer.SignalName.Timeout);
+                await ToSignal(GetTree().CreateTimer(LoopedClipSeconds / SpeedScale), SceneTreeTimer.SignalName.Timeout);
             else
                 await ToSignal(sprite, AnimatedSprite2D.SignalName.AnimationFinished);
         }

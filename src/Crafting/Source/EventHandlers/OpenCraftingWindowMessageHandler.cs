@@ -21,7 +21,8 @@ namespace Crafting.Source.EventHandlers
                 return Task.CompletedTask;
             }
 
-            var window = (CraftingWindow)uiElementsManager.OpenWindow(typeof(CraftingWindow));
+            // Null = crafting is not available in the current context (battle etc.) — silent no-op.
+            if (uiElementsManager.OpenWindow(typeof(CraftingWindow)) is not CraftingWindow window) return Task.CompletedTask;
             var item = inventory.GetItem<IEquipItem>(message.Id);
             if (item != null && message.CraftingMode is CraftingMode.Upgrade or CraftingMode.Recraft or CraftingMode.Ascend)
                 window.SetItem(item, message.CraftingMode);

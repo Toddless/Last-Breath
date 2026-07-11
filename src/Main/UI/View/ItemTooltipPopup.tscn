@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://di3yh40oyvjhe"]
+
+[ext_resource type="Script" uid="uid://dxk3i5x34sfio" path="res://UI/ItemTooltipPopup.cs" id="1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 20
+
+[node name="ItemTooltipPopup" type="Control" unique_id=693653492 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+_panel = NodePath("Panel")
+_title = NodePath("Panel/Margin/Layout/Title")
+_subtitle = NodePath("Panel/Margin/Layout/Subtitle")
+_lines = NodePath("Panel/Margin/Layout/Lines")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=585764383]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1202636499]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin" unique_id=451112163]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Panel/Margin/Layout" unique_id=1784585446]
+layout_mode = 2
+text = "Item"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="Subtitle" type="Label" parent="Panel/Margin/Layout" unique_id=1539792530]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Rarity"
+
+[node name="Lines" type="VBoxContainer" parent="Panel/Margin/Layout" unique_id=963341082]
+layout_mode = 2
+theme_override_constants/separation = 2

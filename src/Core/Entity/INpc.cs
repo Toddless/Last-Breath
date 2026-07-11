@@ -13,6 +13,10 @@
         Fractions Fraction { get; }
         INpcLifecycle? Lifecycle { get; }
 
+        /// <summary>Species capability, not state: a wolf never talks no matter the reputation,
+        /// a hostile veteran still may (what he says is the dialogue entry rules' business).</summary>
+        bool CanTalk => false;
+
         Vector2 Position { get; set; }
 
         /// <summary>

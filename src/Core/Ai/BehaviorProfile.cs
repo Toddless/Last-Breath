@@ -39,6 +39,6 @@ namespace Core.Ai
         public required IReadOnlyDictionary<string, AbilityBehavior> Abilities { get; init; }
 
         public AbilityBehavior? GetBehaviorFor(string abilityId) =>
-            Abilities.TryGetValue(abilityId, out var behavior) ? behavior : null;
+            Abilities.GetValueOrDefault(abilityId);
     }
 }

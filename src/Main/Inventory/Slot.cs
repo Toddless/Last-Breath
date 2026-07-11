@@ -2,6 +2,7 @@
 {
     using System;
     using Core;
+    using Core.Enums;
     using Core.Items;
     using Godot;
     using Godot.Collections;
@@ -48,6 +49,7 @@
             var payload = new Dictionary
             {
                 ["Item"] = CurrentItem.ItemId,
+                ["Instance"] = CurrentItem.InstanceId,
                 ["Quantity"] = Quantity,
                 ["MaxStackSize"] = CurrentItem.MaxStackSize,
                 ["Source"] = GetPath()
@@ -69,12 +71,20 @@
 
         public override bool _CanDropData(Vector2 atPosition, Variant data)
         {
-            return data.VariantType == Variant.Type.Dictionary && data.AsGodotDictionary().ContainsKey("Item");
+            if (data.VariantType != Variant.Type.Dictionary) return false;
+            var payload = data.AsGodotDictionary();
+            return payload.ContainsKey("Item") || payload.ContainsKey("EquipmentPiece");
         }
 
         public override void _DropData(Vector2 atPosition, Variant data)
         {
             var payload = data.AsGodotDictionary();
+            if (payload.ContainsKey("EquipmentPiece"))
+            {
+                OnEquipmentDropped((EquipmentPiece)payload["EquipmentPiece"].AsInt32());
+                return;
+            }
+
             var itemId = payload["Item"].AsString();
             var sourcePath = payload["Source"].AsNodePath();
             var stackSize = payload["MaxStackSize"].AsInt32();
@@ -98,6 +108,11 @@
 
                 SwapItems(source, this);
             }
+        }
+
+        /// <summary>An equipped piece was dragged into this slot; the bag slot raises it up to the window.</summary>
+        protected virtual void OnEquipmentDropped(EquipmentPiece piece)
+        {
         }
 
         public virtual void ClearSlot(bool itemDeleted = false)

@@ -150,14 +150,17 @@ namespace LastBreath.Services
         {
             var uiElements = provider.GetService<IUiElementsManager>();
             uiElements.RegisterHudFactory(typeof(PlayerHud), () => PlayerHud.Initialize().Instantiate<PlayerHud>());
-            uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>());
-            uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>());
-            uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>());
-            uiElements.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>());
-            uiElements.RegisterWindowFactory(typeof(CharacterWindow), () => CharacterWindow.Initialize().Instantiate<CharacterWindow>());
+            // The availability map (design, Todd 2026-07-11): battle allows only the read-only
+            // CharacterWindow; a dialogue allows nothing else; a forbidden open is a silent no-op.
+            uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>(), UiContext.World);
+            uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>(), UiContext.World | UiContext.Dialogue);
+            uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>(), UiContext.World);
+            uiElements.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>(), UiContext.World | UiContext.GameOver);
+            uiElements.RegisterWindowFactory(typeof(CharacterWindow), () => CharacterWindow.Initialize().Instantiate<CharacterWindow>(), UiContext.World | UiContext.Battle);
             uiElements.RegisterWindowFactory(typeof(OptionsWindow), () => OptionsWindow.Initialize().Instantiate<OptionsWindow>());
             uiElements.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
             uiElements.RegisterPopupFactory(typeof(IKeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
+            uiElements.RegisterPopupFactory(typeof(ItemTooltipPopup), () => ItemTooltipPopup.Initialize().Instantiate<ItemTooltipPopup>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
         }

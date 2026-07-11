@@ -21,7 +21,7 @@ namespace Core.Reputation
     /// the no-penalty floor (already-hostile targets are fair game), the hostile-to-target
     /// bonus through the static matrix, and a session-scoped repeat decay against farming.
     /// </summary>
-    public class ReputationDeedProcessor : IGameDataParticipant, IReputationDeedProcessor
+    public class ReputationDeedProcessor : IGameDataParticipant, IReputationDeedProcessor, Session.ISessionResettable
     {
         private record Deed(ReputationDeedEntry Entry, RelationLevel? NoPenaltyFloor);
 
@@ -58,6 +58,9 @@ namespace Core.Reputation
                 _deeds[deed.Id] = new Deed(deed,
                     deed.NoPenaltyAtOrBelow == null ? null : EnumParser.ParseEnum<RelationLevel>(deed.NoPenaltyAtOrBelow));
         }
+
+        /// <summary>The repeat-decay counters are session-scoped by design; a new session farms from scratch.</summary>
+        public void ResetSession() => _repeats.Clear();
 
         private void OnEntityDied(EntityDiedEvent evnt)
         {

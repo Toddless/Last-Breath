@@ -37,6 +37,10 @@ namespace LastBreath.Npc
 
             // A lying body or a fighter mid-battle doesn't talk.
             if (GetParent() is ISkirmishParticipant { IsAlive: false } or ISkirmishParticipant { IsFighting: true }) return;
+            // Species capability (interaction.canTalk in Npc.json): a wolf never converses no matter
+            // the reputation. Checked at click time — the definition applies after _Ready.
+            // A standalone actor (no INpc parent) is an authored static talker and always may.
+            if (GetParent() is INpc { CanTalk: false }) return;
             // A filled export is the author's override (a spawned parent may carry ANY definition);
             // the parent identity is the fallback, but its instance/faction stay authoritative.
             var parent = GetParent() as INpc;

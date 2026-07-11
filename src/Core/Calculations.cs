@@ -157,7 +157,12 @@
 
         private static bool ChanceSuccessful(float chance, float randomNumber) => randomNumber <= chance;
 
-        private static float CalculateEvasionChance(float evasion, float accuracy) => 1f / (1f + MathF.Exp(-(evasion - accuracy) / EvasionScalingFactor));
+        /// <summary>Armor-style curve: accuracy at or above evasion guarantees a hit; only the excess of evasion over accuracy grants evade chance.</summary>
+        private static float CalculateEvasionChance(float evasion, float accuracy)
+        {
+            float advantage = Math.Max(0, evasion - accuracy);
+            return advantage / (advantage + EvasionScalingFactor);
+        }
 
         private static float CalculateModifiers(IEnumerable<IModifier> modifiers, float value = 0)
         {

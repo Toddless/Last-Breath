@@ -10,7 +10,7 @@
     using Core.MessageBus;
     using Godot;
 
-    public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery
+    public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery, Core.Session.ISessionResettable
     {
         // TODO: Remove from here
         // ________________________________________________________
@@ -100,6 +100,14 @@
         public void AddBonusLevel() => BonusLevel++;
 
         public void RemoveBonusLevel() => BonusLevel--;
+
+        /// <summary>Back to the fresh-process values (this mastery starts at base level 0); bonus levels zero with the lost equipment.</summary>
+        public void ResetSession()
+        {
+            BonusLevel = 0;
+            CurrentLevel = 0;
+            CurrentExperience = 0;
+        }
         // TODO: Мастери должно влиять так же на шансы получить более редкий модификатор при рекрафте
         // Позднее возможно так же добавить шансы на получение более редких способностей
         // Сюда же шансы на апгрейд предметов

@@ -14,7 +14,7 @@ namespace Core.Narrative.Influence
     /// InfluenceMastery.json instead of code. Exp sources: quest turn-ins (main), passed speech
     /// checks and first conversations (small) — wired by the quest/dialogue systems via AddExperience.
     /// </summary>
-    public class InfluenceMastery(IGameMessageBus bus) : IInfluenceMastery, IGameDataParticipant
+    public class InfluenceMastery(IGameMessageBus bus) : IInfluenceMastery, IGameDataParticipant, Session.ISessionResettable
     {
         private InfluenceMasteryData _config = new();
 
@@ -102,6 +102,13 @@ namespace Core.Narrative.Influence
         {
             CurrentLevel = Mathf.Clamp(baseLevel, 1, MaximumLevel);
             CurrentExperience = Mathf.Max(0, experience);
+        }
+
+        /// <summary>Unlike RestoreState, the bonus levels zero too: the fresh session has no equipment granting them.</summary>
+        public void ResetSession()
+        {
+            BonusLevel = 0;
+            RestoreState(1, 0);
         }
 
         public void AddBonusLevel() => BonusLevel++;

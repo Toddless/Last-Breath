@@ -17,10 +17,11 @@ namespace Core.Reputation
     /// points beat a boundary by the hysteresis buffer; factions flagged without reputation ignore
     /// point changes entirely.
     /// </summary>
-    public class FactionRelationService : IFactionRelationService, IGameDataParticipant
+    public class FactionRelationService : IFactionRelationService, IGameDataParticipant, Session.ISessionResettable
     {
         private readonly Dictionary<(Fractions From, Fractions To), RelationLevel> _relations = [];
         private readonly Dictionary<Fractions, int> _reputation = [];
+        private readonly Dictionary<Fractions, int> _defaults = [];
         private readonly Dictionary<Fractions, RelationLevel> _levels = [];
         private readonly Dictionary<Fractions, FactionTraitsEntry> _traits = [];
         private (RelationLevel Level, int From)[] _thresholds = [];
@@ -102,8 +103,20 @@ namespace Core.Reputation
             foreach (var entry in data.Factions)
                 _traits[EnumParser.ParseEnum<Fractions>(entry.Fraction)] = entry;
 
+            _defaults.Clear();
             foreach (var entry in data.PlayerDefaults)
-                _reputation[EnumParser.ParseEnum<Fractions>(entry.Fraction)] = Math.Clamp(entry.Points, _min, _max);
+                _defaults[EnumParser.ParseEnum<Fractions>(entry.Fraction)] = Math.Clamp(entry.Points, _min, _max);
+            foreach ((var faction, int points) in _defaults)
+                _reputation[faction] = points;
+        }
+
+        /// <summary>Silent return of the player's standing to the data defaults; the static NPC matrix never changes.</summary>
+        public void ResetSession()
+        {
+            _reputation.Clear();
+            _levels.Clear();
+            foreach ((var faction, int points) in _defaults)
+                _reputation[faction] = points;
         }
 
         /// <summary>Clamps and stores the points; publishes and returns true only when they actually moved.</summary>

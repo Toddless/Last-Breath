@@ -31,10 +31,17 @@ namespace Battle.Source.Presentation
         private const float MeleeGap = 120f;
         private const float ApproachSeconds = 0.25f;
         private const float ReturnSeconds = 0.20f;
+        // How far into the swing clip the hit lands: the target's reaction overlaps the strike
+        // point instead of waiting for the full swing to finish.
+        private const float SwingImpactFraction = 0.6f;
         private const string AttackAnimation = "Fight_Attack";
         private const string HurtAnimation = "Fight_Hurt";
         private const string DeadAnimation = "Dead";
         private const string StunnedAnimation = "Stunned";
+        // Auto-boost: a backed-up queue (big multi-sided fights) plays faster on top of the
+        // player-chosen speed and drains back to normal pace as the queue empties.
+        private const int AutoBoostQueueLength = 8;
+        private const float MaxAutoBoost = 2f;
 
         private readonly Queue<TimelineEntry> _pending = new();
         private readonly HashSet<string> _shownDead = [];
@@ -44,6 +51,9 @@ namespace Battle.Source.Presentation
         private AbilityVfxPresenter? _vfx;
         private Func<string, Node2D?>? _findSpot;
         private Task _playback = Task.CompletedTask;
+        private float _baseSpeed = 1f;
+
+        private float CurrentSpeed => _baseSpeed * Mathf.Clamp(_pending.Count / (float)AutoBoostQueueLength, 1f, MaxAutoBoost);
 
         public bool IsPlaying => !_playback.IsCompleted;
 
@@ -51,6 +61,7 @@ namespace Battle.Source.Presentation
         {
             _beatHandlers = CreateBeatHandlers();
             _battleEventBus = battleEventBus;
+            _battleEventBus.Subscribe<PlaybackSpeedChangedEvent>(OnPlaybackSpeedChanged);
             _vfx = vfx;
             _findSpot = findSpot;
             _shownDead.Clear();
@@ -62,6 +73,7 @@ namespace Battle.Source.Presentation
         {
             if (_timeline != null) _timeline.EntryRecorded -= OnEntryRecorded;
             _timeline = null;
+            _battleEventBus?.Unsubscribe<PlaybackSpeedChangedEvent>(OnPlaybackSpeedChanged);
             _battleEventBus = null;
             _pending.Clear();
             _shownDead.Clear();
@@ -71,6 +83,8 @@ namespace Battle.Source.Presentation
         public Task WaitUntilIdleAsync() => _playback;
 
         public override void _ExitTree() => Teardown();
+
+        private void OnPlaybackSpeedChanged(PlaybackSpeedChangedEvent evnt) => _baseSpeed = Mathf.Max(evnt.Speed, 0.1f);
 
         private void OnEntryRecorded(TimelineEntry entry)
         {
@@ -96,8 +110,9 @@ namespace Battle.Source.Presentation
 
                 while (_pending.Count > 0 && IsInsideTree())
                 {
+                    if (_vfx != null) _vfx.SpeedScale = CurrentSpeed;
                     if (TryCollectCastChord(out var cast, out var chord)) await PlayCastChord(cast, chord);
-                    else if (TryCollectAttackPhrase(out var attack, out var resolution)) await PlayAttackPhrase(attack, resolution);
+                    else if (TryCollectMeleeExchange(out var opener, out var steps)) await PlayMeleeExchange(opener, steps);
                     else await PlayBeat(_pending.Dequeue());
                 }
             }
@@ -164,22 +179,63 @@ namespace Battle.Source.Presentation
             await handler(evnt);
         }
 
-        /// <summary>
-        /// One attack as a single visual phrase: the swing and its resolution (hurt/evade/block) play
-        /// at melee range. Attack resolution writes the entries strictly in order, so the resolution
-        /// is always the entry right after its BeforeAttackEvent.
-        /// </summary>
-        private bool TryCollectAttackPhrase(out BeforeAttackEvent attack, out object? resolution)
-        {
-            attack = null!;
-            resolution = null;
-            if (_pending.Peek().Event is not BeforeAttackEvent head) return false;
+        /// <summary>One step of a melee exchange: an attack with its resolution (hurt/evade/block),
+        /// or an instant rider event (heal/effect) that fired between the blows and replays in order.</summary>
+        private readonly record struct ExchangeStep(BeforeAttackEvent? Attack, object? Resolution, object? Instant);
 
-            _pending.Dequeue();
-            attack = head;
-            if (_pending.Count > 0 && IsResolutionOf(head, _pending.Peek().Event))
-                resolution = _pending.Dequeue().Event;
+        /// <summary>
+        /// A melee exchange is the run of consecutive basic attacks between the same two fighters —
+        /// the planned attack plus its extra attacks and counterattacks: one approach by the opener,
+        /// every blow lands at melee range, one return at the end. Without the batching every
+        /// reaction made its own lunge across the arena to the opponent's (empty) spot.
+        /// Attack resolution writes the entries strictly in order, so the resolution is always
+        /// the entry right after its BeforeAttackEvent.
+        /// </summary>
+        private bool TryCollectMeleeExchange(out BeforeAttackEvent opener, out List<ExchangeStep> steps)
+        {
+            opener = null!;
+            steps = [];
+            if (_pending.Peek().Event is not BeforeAttackEvent head) return false;
+            opener = head;
+
+            while (_pending.Count > 0)
+            {
+                object evnt = _pending.Peek().Event;
+                if (evnt is BeforeAttackEvent attack && IsSamePair(opener, attack))
+                {
+                    _pending.Dequeue();
+                    object? resolution = null;
+                    if (_pending.Count > 0 && IsResolutionOf(attack, _pending.Peek().Event))
+                        resolution = _pending.Dequeue().Event;
+                    steps.Add(new ExchangeStep(attack, resolution, null));
+                }
+                else if (evnt is EntityHealedEvent or EffectAppliedEvent && NextAttackContinuesExchange(opener))
+                    steps.Add(new ExchangeStep(null, null, _pending.Dequeue().Event));
+                else break;
+            }
+
             return true;
+        }
+
+        private static bool IsSamePair(BeforeAttackEvent first, BeforeAttackEvent next) =>
+            (next.Context.Attacker.IsSame(first.Context.Attacker.InstanceId) && next.Context.Target.IsSame(first.Context.Target.InstanceId))
+            || (next.Context.Attacker.IsSame(first.Context.Target.InstanceId) && next.Context.Target.IsSame(first.Context.Attacker.InstanceId));
+
+        /// <summary>Instant rider events (on-hit heals/effects) sit between the blows of one exchange;
+        /// they join the phrase only when another attack of the same pair follows them.</summary>
+        private bool NextAttackContinuesExchange(BeforeAttackEvent opener)
+        {
+            foreach (var entry in _pending)
+            {
+                switch (entry.Event)
+                {
+                    case EntityHealedEvent or EffectAppliedEvent: continue;
+                    case BeforeAttackEvent attack: return IsSamePair(opener, attack);
+                    default: return false;
+                }
+            }
+
+            return false;
         }
 
         private static bool IsResolutionOf(BeforeAttackEvent attack, object evnt) => evnt switch
@@ -190,21 +246,38 @@ namespace Battle.Source.Presentation
             _ => false
         };
 
-        private async Task PlayAttackPhrase(BeforeAttackEvent attack, object? resolution)
+        private async Task PlayMeleeExchange(BeforeAttackEvent opener, List<ExchangeStep> steps)
         {
             try
             {
-                bool showAttacker = !IsShownDead(attack.Context.Attacker);
-                if (showAttacker) await MoveToMeleeRangeAsync(attack.Context.Attacker, attack.Context.Target);
-                if (showAttacker) await PlayAttack(attack);
-                if (resolution != null) await PlayEvent(resolution);
-                if (showAttacker) await ReturnToSpotAsync(attack.Context.Attacker);
+                var mover = opener.Context.Attacker;
+                if (!IsShownDead(mover)) await MoveToMeleeRangeAsync(mover, opener.Context.Target);
+                foreach (var step in steps)
+                {
+                    if (step.Instant != null) await PlayEvent(step.Instant);
+                    else await PlayExchangeBlow(step.Attack!, step.Resolution);
+                }
+
+                // Re-checked after the blows: a counterattack may have killed the opener mid-exchange.
+                if (!IsShownDead(mover)) await ReturnToSpotAsync(mover);
                 await WaitAsync(DelayBetweenBeats);
             }
             catch (Exception e)
             {
-                Tracker.TrackException("Attack phrase playback failed", e, this);
+                Tracker.TrackException("Melee exchange playback failed", e, this);
             }
+        }
+
+        /// <summary>The swing and its outcome overlap: the resolution shows at the strike point of the
+        /// clip, and the next blow starts only after the swing has fully played out.</summary>
+        private async Task PlayExchangeBlow(BeforeAttackEvent attack, object? resolution)
+        {
+            bool showAttacker = !IsShownDead(attack.Context.Attacker);
+            Task swing = showAttacker ? PlayAttack(attack) : Task.CompletedTask;
+            if (showAttacker) await WaitAsync(attack.Context.Attacker.Animations.GetClipSeconds(AttackAnimation) * SwingImpactFraction);
+            if (resolution != null) await PlayEvent(resolution);
+            await swing;
+            await WaitAsync(DelayBetweenBeats);
         }
 
         /// <summary>Runs the attacker's node from its spot to arm's reach of the target's spot.
@@ -219,7 +292,9 @@ namespace Battle.Source.Presentation
             var direction = (attackerSpot.GlobalPosition - targetSpot.GlobalPosition).Normalized();
             var anchor = targetSpot.GlobalPosition + (direction * MeleeGap);
             var tween = node.CreateTween();
-            tween.TweenProperty(node, "global_position", anchor, ApproachSeconds);
+            // A lunge: bursts forward and decelerates into the strike.
+            tween.TweenProperty(node, "global_position", anchor, ApproachSeconds / CurrentSpeed)
+                .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
             await ToSignal(tween, Tween.SignalName.Finished);
         }
 
@@ -228,7 +303,8 @@ namespace Battle.Source.Presentation
         {
             if (attacker is not Node2D node || node.Position == Vector2.Zero) return;
             var tween = node.CreateTween();
-            tween.TweenProperty(node, "position", Vector2.Zero, ReturnSeconds);
+            tween.TweenProperty(node, "position", Vector2.Zero, ReturnSeconds / CurrentSpeed)
+                .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.InOut);
             await ToSignal(tween, Tween.SignalName.Finished);
         }
 
@@ -260,15 +336,15 @@ namespace Battle.Source.Presentation
             return Task.CompletedTask;
         }
 
-        private static Task PlayAttack(BeforeAttackEvent evnt) =>
-            evnt.Context.Attacker.Animations.PlayAnimationAsync(AttackAnimation);
+        private Task PlayAttack(BeforeAttackEvent evnt) =>
+            evnt.Context.Attacker.Animations.PlayAnimationAsync(AttackAnimation, CurrentSpeed);
 
         private async Task PlayDamageTaken(DamageTakenEvent evnt)
         {
             Republish(evnt);
             // Attacks of an ability (SourceAbilityId stamped) show the ability's impact clip with the hurt.
             Task impact = PlayAttackImpact(evnt);
-            await evnt.Target.Animations.PlayAnimationAsync(HurtAnimation);
+            await evnt.Target.Animations.PlayAnimationAsync(HurtAnimation, CurrentSpeed);
             await impact;
             if (evnt.Vitals.IsDead) ShowDeath(evnt.Target);
         }
@@ -317,7 +393,7 @@ namespace Battle.Source.Presentation
         private async Task PlayTurnSkipped(TurnSkippedEvent evnt)
         {
             Republish(evnt);
-            await evnt.Fighter.Animations.PlayAnimationAsync(StunnedAnimation);
+            await evnt.Fighter.Animations.PlayAnimationAsync(StunnedAnimation, CurrentSpeed);
         }
 
         /// <summary>
@@ -336,7 +412,7 @@ namespace Battle.Source.Presentation
                 var visual = _vfx?.GetConfig(cast.Ability.Id);
                 // The caster's pose and the ability's activation VFX play together.
                 Task castVfx = visual != null && _vfx != null ? _vfx.PlayCastAsync(visual, cast.Caster.InstanceId) : Task.CompletedTask;
-                await cast.Caster.Animations.PlayAnimationAsync(cast.Ability.Id);
+                await cast.Caster.Animations.PlayAnimationAsync(cast.Ability.Id, CurrentSpeed);
                 await castVfx;
 
                 var hits = chord.OfType<DamageTakenEvent>().Where(hit => !IsShownDead(hit.Target)).ToList();
@@ -386,7 +462,7 @@ namespace Battle.Source.Presentation
                 await _vfx.PlayTravelAsync(visual, casterInstanceId, target.InstanceId);
 
             Task impact = visual != null && _vfx != null ? _vfx.PlayImpactAsync(visual, target.InstanceId) : Task.CompletedTask;
-            var hurt = target.Animations.PlayAnimationAsync(HurtAnimation);
+            var hurt = target.Animations.PlayAnimationAsync(HurtAnimation, CurrentSpeed);
             foreach (var hit in hits)
             {
                 Republish(hit);
@@ -452,7 +528,7 @@ namespace Battle.Source.Presentation
             {
                 await _vfx!.PlayTravelAsync(visual, from, hit.Target.InstanceId);
                 Task impact = _vfx.PlayImpactAsync(visual, hit.Target.InstanceId);
-                var hurt = hit.Target.Animations.PlayAnimationAsync(HurtAnimation);
+                var hurt = hit.Target.Animations.PlayAnimationAsync(HurtAnimation, CurrentSpeed);
                 Republish(hit);
                 await hurt;
                 await impact;
@@ -480,8 +556,9 @@ namespace Battle.Source.Presentation
 
         private async Task WaitAsync(float seconds)
         {
-            if (seconds <= 0 || !IsInsideTree()) return;
-            await ToSignal(GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
+            float scaled = seconds / CurrentSpeed;
+            if (scaled <= 0 || !IsInsideTree()) return;
+            await ToSignal(GetTree().CreateTimer(scaled), SceneTreeTimer.SignalName.Timeout);
         }
     }
 }

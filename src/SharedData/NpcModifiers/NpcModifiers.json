@@ -1,4 +1,4 @@
-{
+﻿{
     "mods": [
         {
             "key": "scale",
@@ -78,7 +78,7 @@
                     "weight": 50,
                     "difficulty": 0.4,
                     "items": [
-                        "Crafting_Resource_Cooper_Ore",
+                        "Crafting_Resource_Copper_Ore",
                         "Crafting_Resource_Deer_Leather",
                         "Crafting_Resource_Diamond_Gem",
                         "Crafting_Resource_Linen_Fabric"

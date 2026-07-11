@@ -69,6 +69,40 @@
             ]
         },
         {
+            "id": "Category_Wood",
+            "modifiers": [
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "flat",
+                    "baseValue": 250,
+                    "weight": 200
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "inc",
+                    "baseValue": 0.1,
+                    "weight": 150
+                }
+            ]
+        },
+        {
+            "id": "Category_Bone",
+            "modifiers": [
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "baseValue": 0.03,
+                    "weight": 200
+                },
+                {
+                    "parameter": "CriticalDamage",
+                    "modifierType": "flat",
+                    "baseValue": 0.2,
+                    "weight": 150
+                }
+            ]
+        },
+        {
             "id": "Category_Essence",
             "modifiers": []
         }
@@ -149,9 +183,9 @@
     ],
     "craftingResources": [
         {
-            "id": "Crafting_Resource_Cooper_Ore",
+            "id": "Crafting_Resource_Copper_Ore",
             "material": {
-                "id": "Material_Cooper_Ore",
+                "id": "Material_Copper_Ore",
                 "categoryId": "Category_Metal",
                 "modifiers": [
                     {
@@ -179,7 +213,7 @@
                 "Crafting",
                 "Resource",
                 "Metal",
-                "Cooper"
+                "Copper"
             ],
             "rarity": "Uncommon"
         },
@@ -335,8 +369,8 @@
             "tags": [
                 "Crafting",
                 "Resource",
-                "Leather",
-                "WildBoar"
+                "Gem",
+                "Diamond"
             ],
             "rarity": "Uncommon"
         },
@@ -665,6 +699,589 @@
                 "Barrier"
             ],
             "rarity": "Uncommon"
+        },
+        {
+            "id": "Crafting_Resource_Silver_Ore",
+            "material": {
+                "id": "Material_Silver_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "flat",
+                        "baseValue": 250,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "inc",
+                        "baseValue": 0.15,
+                        "weight": 75
+                    },
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "flat",
+                        "baseValue": 60,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Silver"
+            ],
+            "rarity": "Uncommon"
+        },
+        {
+            "id": "Crafting_Resource_Mithril_Ore",
+            "material": {
+                "id": "Material_Mithril_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 450,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "flat",
+                        "baseValue": 200,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Mithril"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Adamantite_Ore",
+            "material": {
+                "id": "Material_Adamantite_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 800,
+                        "weight": 60
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "multi",
+                        "baseValue": 1.2,
+                        "weight": 40
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "baseValue": 400,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Metal",
+                "Adamantite"
+            ],
+            "rarity": "Legendary"
+        },
+        {
+            "id": "Crafting_Resource_Sapphire_Gem",
+            "material": {
+                "id": "Material_Sapphire",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "Mana",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "Mana",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "ManaRecovery",
+                        "modifierType": "flat",
+                        "baseValue": 100,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "ManaRecovery",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Gem",
+                "Sapphire"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Amethyst_Gem",
+            "material": {
+                "id": "Material_Amethyst",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 50
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Gem",
+                "Amethyst"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Topaz_Gem",
+            "material": {
+                "id": "Material_Topaz",
+                "categoryId": "Category_Gem",
+                "modifiers": [
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "multi",
+                        "baseValue": 1.25,
+                        "weight": 55
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "inc",
+                        "baseValue": 0.25,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.04,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "AdditionalHitChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.03,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Gem",
+                "Topaz"
+            ],
+            "rarity": "Epic"
+        },
+        {
+            "id": "Crafting_Resource_Pine_Wood",
+            "material": {
+                "id": "Material_Pine",
+                "categoryId": "Category_Wood",
+                "modifiers": [
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "flat",
+                        "baseValue": 150,
+                        "weight": 120
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "inc",
+                        "baseValue": 0.1,
+                        "weight": 80
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Wood",
+                "Pine"
+            ],
+            "rarity": "Common"
+        },
+        {
+            "id": "Crafting_Resource_Oak_Wood",
+            "material": {
+                "id": "Material_Oak",
+                "categoryId": "Category_Wood",
+                "modifiers": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "baseValue": 300,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 200,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "inc",
+                        "baseValue": 0.1,
+                        "weight": 60
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Wood",
+                "Oak"
+            ],
+            "rarity": "Uncommon"
+        },
+        {
+            "id": "Crafting_Resource_Yew_Wood",
+            "material": {
+                "id": "Material_Yew",
+                "categoryId": "Category_Wood",
+                "modifiers": [
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "flat",
+                        "baseValue": 350,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.03,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Wood",
+                "Yew"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Ironwood",
+            "material": {
+                "id": "Material_Ironwood",
+                "categoryId": "Category_Wood",
+                "modifiers": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 500,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 60
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "multi",
+                        "baseValue": 1.15,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Wood",
+                "Ironwood"
+            ],
+            "rarity": "Epic"
+        },
+        {
+            "id": "Crafting_Resource_Wolf_Leather",
+            "material": {
+                "id": "Material_Wolf_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "flat",
+                        "baseValue": 150,
+                        "weight": 120
+                    },
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "inc",
+                        "baseValue": 0.1,
+                        "weight": 80
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "Wolf"
+            ],
+            "rarity": "Common"
+        },
+        {
+            "id": "Crafting_Resource_Bear_Leather",
+            "material": {
+                "id": "Material_Bear_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "baseValue": 450,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "baseValue": 250,
+                        "weight": 70
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 60
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "Bear"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Direwolf_Leather",
+            "material": {
+                "id": "Material_Direwolf_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "flat",
+                        "baseValue": 400,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "multi",
+                        "baseValue": 1.2,
+                        "weight": 40
+                    },
+                    {
+                        "parameter": "MoveSpeed",
+                        "modifierType": "flat",
+                        "baseValue": 20,
+                        "weight": 60
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Leather",
+                "Direwolf"
+            ],
+            "rarity": "Epic"
+        },
+        {
+            "id": "Crafting_Resource_Wolf_Fang",
+            "material": {
+                "id": "Material_Wolf_Fang",
+                "categoryId": "Category_Bone",
+                "modifiers": [
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.02,
+                        "weight": 120
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "flat",
+                        "baseValue": 100,
+                        "weight": 60
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Bone",
+                "Wolf"
+            ],
+            "rarity": "Common"
+        },
+        {
+            "id": "Crafting_Resource_Boar_Tusk",
+            "material": {
+                "id": "Material_Boar_Tusk",
+                "categoryId": "Category_Bone",
+                "modifiers": [
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "flat",
+                        "baseValue": 60,
+                        "weight": 100
+                    },
+                    {
+                        "parameter": "CriticalDamage",
+                        "modifierType": "flat",
+                        "baseValue": 0.15,
+                        "weight": 60
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Bone",
+                "Boar"
+            ],
+            "rarity": "Uncommon"
+        },
+        {
+            "id": "Crafting_Resource_Bear_Claw",
+            "material": {
+                "id": "Material_Bear_Claw",
+                "categoryId": "Category_Bone",
+                "modifiers": [
+                    {
+                        "parameter": "CriticalDamage",
+                        "modifierType": "flat",
+                        "baseValue": 0.25,
+                        "weight": 80
+                    },
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "inc",
+                        "baseValue": 0.2,
+                        "weight": 70
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.03,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Bone",
+                "Bear"
+            ],
+            "rarity": "Rare"
+        },
+        {
+            "id": "Crafting_Resource_Ancient_Fang",
+            "material": {
+                "id": "Material_Ancient_Fang",
+                "categoryId": "Category_Bone",
+                "modifiers": [
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "baseValue": 0.05,
+                        "weight": 60
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "inc",
+                        "baseValue": 0.3,
+                        "weight": 50
+                    },
+                    {
+                        "parameter": "CriticalDamage",
+                        "modifierType": "flat",
+                        "baseValue": 0.4,
+                        "weight": 40
+                    }
+                ]
+            },
+            "maxStackSize": 999,
+            "tags": [
+                "Crafting",
+                "Resource",
+                "Bone",
+                "Ancient"
+            ],
+            "rarity": "Legendary"
         }
     ]
 }

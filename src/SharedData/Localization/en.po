@@ -99,8 +99,8 @@ msgstr "Iron Ore"
 msgid "Crafting_Resource_Gold_Ore"
 msgstr "Gold Ore"
 
-msgid "Crafting_Resource_Cooper_Ore"
-msgstr "Cooper Ore"
+msgid "Crafting_Resource_Copper_Ore"
+msgstr "Copper Ore"
 
 msgid "Crafting_Resource_Silk_Fabric"
 msgstr "Silk"
@@ -356,6 +356,27 @@ msgstr "End Turn"
 msgid "UI_Flee"
 msgstr "Flee"
 
+msgid "UI_Cooldown"
+msgstr "Cooldown"
+
+msgid "Stance_Dexterity"
+msgstr "Dexterity Stance"
+
+msgid "Stance_Dexterity_Description"
+msgstr "Fast and precise: attack series, poisons and evasion. Abilities of this stance scale with Dexterity."
+
+msgid "Stance_Strength"
+msgstr "Strength Stance"
+
+msgid "Stance_Strength_Description"
+msgstr "Brutal and enduring: heavy blows, self-buffs and retaliation. Abilities of this stance scale with Strength."
+
+msgid "Stance_Intelligence"
+msgstr "Intelligence Stance"
+
+msgid "Stance_Intelligence_Description"
+msgstr "Elemental mastery: multicast spells, barriers and control. Abilities of this stance scale with Intelligence."
+
 msgid "UI_Load"
 msgstr "Load"
 
@@ -496,7 +517,7 @@ msgid "UI_Craft_Ascend"
 msgstr "Ascend"
 
 msgid "UI_Journal_Empty"
-msgstr "No quests yet. The world won't come asking — go talk to people."
+msgstr "No quests yet. The world won't come asking â€” go talk to people."
 
 msgid "UI_Journal_Abandon"
 msgstr "Abandon quest"
@@ -571,7 +592,7 @@ msgid "Dlg_Veteran_Opt_Refuse"
 msgstr "Not interested."
 
 msgid "Dlg_Veteran_Accepted_1"
-msgstr "Don't die out there. Or do — just not before you find the place."
+msgstr "Don't die out there. Or do â€” just not before you find the place."
 
 msgid "Dlg_Veteran_Working_1"
 msgstr "You're still here? The battlefield won't find itself."
@@ -586,7 +607,7 @@ msgid "Dlg_Veteran_Opt_TurnIn"
 msgstr "Here's your coal from the burned ground."
 
 msgid "Dlg_Veteran_Thanks_1"
-msgstr "So it's true then. Take this — and forget you ever told me."
+msgstr "So it's true then. Take this â€” and forget you ever told me."
 
 
 # ------------------------------
@@ -619,7 +640,7 @@ msgid "Log_Flee_Success"
 msgstr "You slipped away from the battle."
 
 msgid "Log_Flee_Failed"
-msgstr "Escape failed — the turn is lost."
+msgstr "Escape failed â€” the turn is lost."
 
 msgid "Log_AbilityUsed"
 msgstr "{Caster} uses {Ability}"
@@ -694,7 +715,7 @@ msgid "Effect_Ares_Blessing_Description"
 msgstr "Grants {Changes} for {Duration|turn|turns}."
 
 # ------------------------------
-# Parameters (EntityParameter enum — держать в синхроне)
+# Parameters (EntityParameter enum â€” Ð´ÐµÑ€Ð¶Ð°Ñ‚ÑŒ Ð² ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ðµ)
 # ------------------------------
 
 msgid "Damage"
@@ -799,7 +820,7 @@ msgstr "Selfcast"
 
 
 # ------------------------------
-# Ability names & descriptions (2026-07-07, тексты Todd)
+# Ability names & descriptions (2026-07-07, Ñ‚ÐµÐºÑÑ‚Ñ‹ Todd)
 # ------------------------------
 
 msgid "Ability_Berserk_Fury"
@@ -866,7 +887,7 @@ msgid "Ability_Series_Of_Attacks_Description"
 msgstr "A series of {MinAttacks}-{MaxAttacks} attacks. Each attack deals an additional {Damage} + ({WeaponDamageScale:%} + {SpellDamageScale:%}) base damage. An evade interrupts the series."
 
 msgid "Ability_Berserk_Fury_Description"
-msgstr "Applies {@Effect_Fury} ({FuryDuration|turn|turns}, each attack burns {FuryHealthPercent:%} of current health) and performs consecutive attacks — the chance to continue the series depends on current health: the lower it is, the lower the chance."
+msgstr "Applies {@Effect_Fury} ({FuryDuration|turn|turns}, each attack burns {FuryHealthPercent:%} of current health) and performs consecutive attacks â€” the chance to continue the series depends on current health: the lower it is, the lower the chance."
 
 msgid "Ability_Armageddon"
 msgstr "Armageddon"
@@ -948,7 +969,7 @@ msgid "Effect_Withering_Curse_Tooltip"
 msgstr "Reduces maximum health."
 
 # -----------------------
-# Equip items — Amulets
+# Equip items â€” Amulets
 # -----------------------
 
 msgid "Amulet_Of_Recovery"
@@ -1018,7 +1039,7 @@ msgid "Amulet_Strength_Intelligence_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Rings
+# Equip items â€” Rings
 # -----------------------
 
 msgid "Ring_Of_Dwarfs"
@@ -1100,7 +1121,7 @@ msgid "Ring_of_Giant_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Belts
+# Equip items â€” Belts
 # -----------------------
 
 msgid "Belt_of_Strength"
@@ -1161,7 +1182,7 @@ msgid "Belt_Of_Life_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Body armor
+# Equip items â€” Body armor
 # -----------------------
 
 msgid "Body_Strength_Stoneheart"
@@ -1219,7 +1240,7 @@ msgid "Body_Intelligence_Aegis_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Helmets
+# Equip items â€” Helmets
 # -----------------------
 
 msgid "Helmet_Strength_Stoneheart"
@@ -1277,7 +1298,7 @@ msgid "Helmet_Intelligence_Aegis_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Gloves
+# Equip items â€” Gloves
 # -----------------------
 
 msgid "Gloves_Strength_Stoneheart"
@@ -1335,7 +1356,7 @@ msgid "Gloves_Intelligence_Aegis_Description"
 msgstr ""
 
 # -----------------------
-# Equip items — Boots
+# Equip items â€” Boots
 # -----------------------
 
 msgid "Boots_Strength_Stoneheart"
@@ -1409,7 +1430,7 @@ msgid "Effect_Mana_Flow_Tooltip"
 msgstr "Restores a percentage of maximum mana each turn."
 
 # ------------------------------
-# Ability upgrades — Intelligence stance
+# Ability upgrades â€” Intelligence stance
 # ------------------------------
 
 msgid "Ability_Is_Upgrade_Reduce_Cooldown_Add_Cost_Description"
@@ -1467,16 +1488,16 @@ msgid "Ability_Cl_Upgrade_Additional_Jump_Description"
 msgstr "Adds {amount} extra jump."
 
 msgid "Ability_Cl_Upgrade_Reduce_Falloff_Description"
-msgstr "−{amount:%} damage falloff per jump."
+msgstr "âˆ’{amount:%} damage falloff per jump."
 
 msgid "Ability_Cl_Upgrade_Ignore_Resistances_Description"
 msgstr "Lightning ignores resistances."
 
 msgid "Ability_Ia_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Ia_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Ia_Upgrade_Additional_Barrier_Description"
 msgstr "+{amount} base barrier."
@@ -1522,7 +1543,7 @@ msgid "Effect_Seal_Of_Oblivion_Tooltip"
 msgstr "The sealed target cannot be healed."
 
 # ------------------------------
-# Ability upgrades — Dexterity stance
+# Ability upgrades â€” Dexterity stance
 # ------------------------------
 
 msgid "Ability_SoA_Upgrade_Poison_On_Hit_Description"
@@ -1547,10 +1568,10 @@ msgid "Ability_SoA_Upgrade_Additional_Attacks_Description"
 msgstr "+{amountAttacks} attack."
 
 msgid "Ability_SoA_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_SoA_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Ip_Upgrade_Single_Empowered_Attack_Description"
 msgstr "Replaces the series with a single empowered strike."
@@ -1577,7 +1598,7 @@ msgid "Ability_Ip_Upgrade_Additional_Damage_Multiplier_Description"
 msgstr "+{damageMultiplier:%} empowerment per successful hit."
 
 msgid "Ability_Ip_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_JoP_Upgrade_Bouncing_Description"
 msgstr "The jar bounces between targets {bounces} times."
@@ -1589,13 +1610,13 @@ msgid "Ability_JoP_Upgrade_All_Targets_Description"
 msgstr "Applies poison to every enemy."
 
 msgid "Ability_JoP_Upgrade_Clumsiness_Description"
-msgstr "Applies a stack of {@Effect_Clumsiness} (−{evadeReduce:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Clumsiness} (âˆ’{evadeReduce:%} evade, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Ability_JoP_Upgrade_Apply_Blind_Description"
-msgstr "Applies a stack of {@Effect_Blind} (−{accuracyReduce:%} accuracy, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Blind} (âˆ’{accuracyReduce:%} accuracy, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Ability_JoP_Upgrade_Apply_Weakness_Description"
-msgstr "Applies a stack of {@Effect_Weakness} (−{damageReduce:%} damage, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Applies a stack of {@Effect_Weakness} (âˆ’{damageReduce:%} damage, up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Ability_JoP_Upgrade_Increasing_Scales_Description"
 msgstr "Poison scaling becomes {weaponDamageScale:%} / {spellDamageScale:%}."
@@ -1604,7 +1625,7 @@ msgid "Ability_JoP_Upgrade_Poison_Duration_Description"
 msgstr "+{poisonDuration|turn|turns} poison duration."
 
 msgid "Ability_JoP_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Ds_Upgrade_Additional_Attack_Chance_Description"
 msgstr "+{amount:%} additional attack chance."
@@ -1622,16 +1643,16 @@ msgid "Ability_Ds_Upgrade_Additional_Health_Regen_Description"
 msgstr "+{additionalRegen:%} health regeneration."
 
 msgid "Ability_Ds_Upgrade_Add_Effectiveness_Reduce_Stacks_Description"
-msgstr "+{additionalEffectiveness:%} effectiveness, but −{amountStacks|stack|stacks}."
+msgstr "+{additionalEffectiveness:%} effectiveness, but âˆ’{amountStacks|stack|stacks}."
 
 msgid "Ability_Ds_Upgrade_Increased_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
 
 msgid "Ability_Ds_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Ds_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Cc_Upgrade_Additional_Attack_Chance_Description"
 msgstr "Grants additional attack chance instead of critical chance."
@@ -1655,16 +1676,16 @@ msgid "Ability_Cc_Upgrade_More_Stacks_More_Cost_Description"
 msgstr "+{stacks|stack|stacks}, +{cost} cost."
 
 msgid "Ability_Cc_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Cc_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Pe_Upgrade_Apply_Seal_Of_Oblivion_Description"
 msgstr "Applies {@Effect_Seal_Of_Oblivion} for {duration|turn|turns}."
 
 msgid "Ability_Pe_Upgrade_Execute_Bosses_Description"
-msgstr "Can execute bosses (×{stacksMultiplier} stack threshold)."
+msgstr "Can execute bosses (Ã—{stacksMultiplier} stack threshold)."
 
 msgid "Ability_Pe_Upgrade_Spread_Poison_Description"
 msgstr "Spreads the poison to every enemy."
@@ -1673,25 +1694,25 @@ msgid "Ability_Pe_Upgrade_Poison_Not_Removed_Description"
 msgstr "Deals the damage without removing the poison."
 
 msgid "Ability_Pe_Upgrade_Reduce_Execution_Trahsold_Description"
-msgstr "−{amount} to the execution threshold."
+msgstr "âˆ’{amount} to the execution threshold."
 
 msgid "Ability_Pe_Upgrade_Transfer_Poison_On_Death_Description"
 msgstr "On the target's death, the poison transfers to another enemy."
 
 msgid "Ability_Pe_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Pe_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown, but +{additionalCost} cost."
+msgstr "âˆ’{cooldown} cooldown, but +{additionalCost} cost."
 
 msgid "Ability_Pe_Upgrade_Total_Damage_Multiplier_Description"
 msgstr "+{multiplier:%} total damage."
 
 msgid "Ability_Pc_Upgrade_Attacks_Reduce_Incoming_Heal_Description"
-msgstr "Attacks apply −{reduceBy:%} incoming healing ({maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Attacks apply âˆ’{reduceBy:%} incoming healing ({maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Ability_Pc_Upgrade_Attacks_Reduce_Armor_Description"
-msgstr "Attacks apply −{reduceArmorBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
+msgstr "Attacks apply âˆ’{reduceArmorBy:%} armor (up to {maxStacks|stack|stacks}, {duration|turn|turns})."
 
 msgid "Ability_Pc_Upgrade_Apply_Stack_For_Each_Enemy_Description"
 msgstr "Applies a poison stack for each enemy on the battlefield."
@@ -1709,13 +1730,13 @@ msgid "Ability_Pc_Upgrade_Increase_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
 
 msgid "Ability_Pc_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Pc_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 # ------------------------------
-# Ability upgrades — Strength stance
+# Ability upgrades â€” Strength stance
 # ------------------------------
 
 msgid "Ability_Arm_Upgrade_Missing_Hp_Damage_Description"
@@ -1728,19 +1749,19 @@ msgid "Ability_Arm_Upgrade_All_Targets_Description"
 msgstr "Strikes every enemy, but +{additionalCooldown} cooldown."
 
 msgid "Ability_Arm_Upgrade_Reduce_Hp_Cost_Description"
-msgstr "−{amount:%} health cost of every stage."
+msgstr "âˆ’{amount:%} health cost of every stage."
 
 msgid "Ability_Arm_Upgrade_Stage1_Damage_Description"
 msgstr "Stage 1 becomes {damage} + ({weaponScale:%} + {spellScale:%})."
 
 msgid "Ability_Arm_Upgrade_Stage3_Burning_Description"
-msgstr "Stage 3 applies {stacks} burning {stacks|stack|stacks} (×{damageMultiplier}, {duration|turn|turns})."
+msgstr "Stage 3 applies {stacks} burning {stacks|stack|stacks} (Ã—{damageMultiplier}, {duration|turn|turns})."
 
 msgid "Ability_Arm_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Arm_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Arm_Upgrade_Extend_Stun_Description"
 msgstr "+{duration|turn|turns} stun."
@@ -1749,10 +1770,10 @@ msgid "Ability_Porc_Upgrade_Echo_Description"
 msgstr "{delayedPercent:%} of incoming damage is delayed for {turns|turn|turns}."
 
 msgid "Ability_Porc_Upgrade_Incoming_Reduction_Description"
-msgstr "All incoming damage −{reduce:%}."
+msgstr "All incoming damage âˆ’{reduce:%}."
 
 msgid "Ability_Porc_Upgrade_Crit_Mitigation_Description"
-msgstr "−{amount:%} critical damage taken."
+msgstr "âˆ’{amount:%} critical damage taken."
 
 msgid "Ability_Porc_Upgrade_Heal_On_Hit_Description"
 msgstr "Heals for {amount:%} when hit."
@@ -1764,7 +1785,7 @@ msgid "Ability_Porc_Upgrade_More_Damage_Return_Description"
 msgstr "+{amount:%} damage return."
 
 msgid "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost_Description"
-msgstr "−{cooldown} cooldown, but +{additionalCost} cost."
+msgstr "âˆ’{cooldown} cooldown, but +{additionalCost} cost."
 
 msgid "Ability_Porc_Upgrade_Cooldown_Chance_Description"
 msgstr "{chance:%} chance to reduce the cooldown when hit."
@@ -1776,7 +1797,7 @@ msgid "Ability_Sac_Upgrade_Heal_From_Damage_Description"
 msgstr "Heals for {amount:%} of the next ability's damage."
 
 msgid "Ability_Sac_Upgrade_Incoming_Reduction_Description"
-msgstr "−{reduce:%} incoming damage for {duration|turn|turns}."
+msgstr "âˆ’{reduce:%} incoming damage for {duration|turn|turns}."
 
 msgid "Ability_Sac_Upgrade_Free_Cast_Description"
 msgstr "The next ability is cast without a cooldown."
@@ -1794,16 +1815,16 @@ msgid "Ability_Sac_Upgrade_Additional_Charge_Description"
 msgstr "+{amount} charge."
 
 msgid "Ability_Sac_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Sac_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Bf_Upgrade_Burning_Fury_Description"
 msgstr "{@Effect_Fury} becomes {@Effect_Burning_Fury}: the burned health also deals damage ({burningDuration|turn|turns}, up to {burningMaxStacks|stack|stacks})."
 
 msgid "Ability_Bf_Upgrade_Primal_Fury_Description"
-msgstr "{@Effect_Fury} becomes Primal Fury (×{damageMultiplier} damage)."
+msgstr "{@Effect_Fury} becomes Primal Fury (Ã—{damageMultiplier} damage)."
 
 msgid "Ability_Bf_Upgrade_Healing_Fury_Description"
 msgstr "{@Effect_Fury} becomes {@Effect_Healing_Fury}: heals for {healAmount:%} of the burned health."
@@ -1818,16 +1839,16 @@ msgid "Ability_Bf_Upgrade_Less_Burn_Description"
 msgstr "Attacks burn {amount:%} less health."
 
 msgid "Ability_Bf_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Bf_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Bf_Upgrade_Fury_Duration_Description"
 msgstr "+{duration|turn|turns} Fury duration."
 
 msgid "Ability_Ar_Upgrade_Incoming_Reduction_Description"
-msgstr "−{reduce:%} incoming damage while the buff lasts."
+msgstr "âˆ’{reduce:%} incoming damage while the buff lasts."
 
 msgid "Ability_Ar_Upgrade_Turn_End_Heal_Description"
 msgstr "Restores {regenAmount:%} health at the end of the turn."
@@ -1848,10 +1869,10 @@ msgid "Ability_Ar_Upgrade_Buff_Duration_Description"
 msgstr "+{duration|turn|turns} buff duration."
 
 msgid "Ability_Ar_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Ar_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Dst_Upgrade_Both_Hits_Buff_Description"
 msgstr "Both attacks grant +{amount:%} damage for {duration|turn|turns}."
@@ -1866,10 +1887,10 @@ msgid "Ability_Dst_Upgrade_Damage_Multiplier_Description"
 msgstr "+{amount:%} damage of both attacks."
 
 msgid "Ability_Dst_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Dst_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 msgid "Ability_Hb_Upgrade_Additional_Lunges_Description"
 msgstr "+{amount|lunge|lunges}."
@@ -1881,13 +1902,13 @@ msgid "Ability_Hb_Upgrade_Extend_Stun_Add_Cost_Description"
 msgstr "+{stunDuration|turn|turns} stun, +{additionalCost} cost."
 
 msgid "Ability_Hb_Upgrade_Armor_Debuff_Description"
-msgstr "Applies −{reduceArmorBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
+msgstr "Applies âˆ’{reduceArmorBy:%} armor ({duration|turn|turns}, up to {maxStacks|stack|stacks})."
 
 msgid "Ability_Hb_Upgrade_Reduce_Cost_Description"
-msgstr "−{cost} cost."
+msgstr "âˆ’{cost} cost."
 
 msgid "Ability_Hb_Upgrade_Reduce_Cooldown_Description"
-msgstr "−{cooldown} cooldown."
+msgstr "âˆ’{cooldown} cooldown."
 
 # ------------------------------
 # Passive skills
@@ -2028,3 +2049,129 @@ msgstr "Raid! The {Faction} are coming for you"
 
 msgid "Player"
 msgstr "Player"
+
+msgid "Crafting_Resource_Silver_Ore"
+msgstr "Silver Ore"
+
+msgid "Crafting_Resource_Mithril_Ore"
+msgstr "Mithril Ore"
+
+msgid "Crafting_Resource_Adamantite_Ore"
+msgstr "Adamantite Ore"
+
+msgid "Crafting_Resource_Sapphire_Gem"
+msgstr "Sapphire"
+
+msgid "Crafting_Resource_Amethyst_Gem"
+msgstr "Amethyst"
+
+msgid "Crafting_Resource_Topaz_Gem"
+msgstr "Topaz"
+
+msgid "Crafting_Resource_Pine_Wood"
+msgstr "Pine Wood"
+
+msgid "Crafting_Resource_Oak_Wood"
+msgstr "Oak Wood"
+
+msgid "Crafting_Resource_Yew_Wood"
+msgstr "Yew Wood"
+
+msgid "Crafting_Resource_Ironwood"
+msgstr "Ironwood"
+
+msgid "Crafting_Resource_Wolf_Leather"
+msgstr "Wolf Pelt"
+
+msgid "Crafting_Resource_Bear_Leather"
+msgstr "Bear Hide"
+
+msgid "Crafting_Resource_Direwolf_Leather"
+msgstr "Direwolf Pelt"
+
+msgid "Crafting_Resource_Wolf_Fang"
+msgstr "Wolf Fang"
+
+msgid "Crafting_Resource_Boar_Tusk"
+msgstr "Boar Tusk"
+
+msgid "Crafting_Resource_Bear_Claw"
+msgstr "Bear Claw"
+
+msgid "Crafting_Resource_Ancient_Fang"
+msgstr "Ancient Fang"
+
+msgid "Npc_Wolf"
+msgstr "Wolf"
+
+msgid "Npc_Boar"
+msgstr "Wild Boar"
+
+msgid "Npc_Deer"
+msgstr "Deer"
+
+msgid "Npc_Bear"
+msgstr "Bear"
+
+msgid "Npc_Direwolf"
+msgstr "Direwolf"
+
+msgid "Npc_Villager"
+msgstr "Villager"
+
+msgid "Npc_Hunter"
+msgstr "Hunter"
+
+msgid "Npc_Skeleton_Warrior"
+msgstr "Skeleton Warrior"
+
+msgid "Npc_Ghoul"
+msgstr "Ghoul"
+
+msgid "Npc_Elf_Ranger"
+msgstr "Elf Ranger"
+
+msgid "Npc_Elf_Mage"
+msgstr "Elf Mage"
+
+msgid "Npc_Dwarf_Warrior"
+msgstr "Dwarf Warrior"
+
+msgid "Npc_Dwarf_Crossbowman"
+msgstr "Dwarf Crossbowman"
+
+msgid "Npc_Imp"
+msgstr "Imp"
+
+msgid "Npc_Demon_Brute"
+msgstr "Demon Brute"
+
+msgid "Dlg_Villager_Greeting_1"
+msgstr "Haven't seen you around before, stranger. Keep your hands where I can see them — times are rough."
+
+msgid "Dlg_Villager_Opt_AskVillage"
+msgstr "Tell me about this place."
+
+msgid "Dlg_Villager_AboutVillage_1"
+msgstr "Just a village like any other. We plow, we pray, and we burn the dead before they get back up."
+
+msgid "Dlg_Hunter_Greeting_1"
+msgstr "Quiet now. You'll scare off the game stomping around like that."
+
+msgid "Dlg_Hunter_Opt_AskPrey"
+msgstr "What are you hunting?"
+
+msgid "Dlg_Hunter_AboutPrey_1"
+msgstr "Wolves have grown bold lately, and something bigger prowls the woods at night. If you find a den — steer clear of it."
+
+msgid "Dlg_Elf_Ranger_Greeting_1"
+msgstr "These woods are under our watch, traveler. Walk the path and touch nothing that grows."
+
+msgid "Dlg_Elf_Mage_Greeting_1"
+msgstr "Curious... the weave bends strangely around you. Move along, before I start asking questions."
+
+msgid "Dlg_Dwarf_Warrior_Greeting_1"
+msgstr "Out of the way, longlegs. Unless you carry ale or ore to trade, we have nothing to talk about."
+
+msgid "Dlg_Dwarf_Crossbowman_Greeting_1"
+msgstr "That's far enough. State your business or keep walking."
