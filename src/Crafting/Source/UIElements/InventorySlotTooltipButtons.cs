@@ -51,7 +51,7 @@
 
         private void OnUpdatePressed()
         {
-            _mediator?.PublishMessageAsync(new OpenCraftingWindowMessage(_itemInstance, true));
+            _mediator?.PublishMessageAsync(new OpenCraftingWindowMessage(_itemInstance, true, Core.Enums.CraftingMode.Upgrade));
             Close?.Invoke();
         }
 

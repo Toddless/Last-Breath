@@ -474,6 +474,27 @@ msgstr "Defense"
 msgid "UI_Char_Misc"
 msgstr "Miscellaneous"
 
+msgid "UI_Craft_PickRecipe"
+msgstr "Pick a recipe"
+
+msgid "UI_Craft_Choose"
+msgstr "Choose"
+
+msgid "UI_Craft_Additives"
+msgstr "Additives"
+
+msgid "UI_Craft_Create"
+msgstr "Craft"
+
+msgid "UI_Craft_Upgrade"
+msgstr "Upgrade"
+
+msgid "UI_Craft_Reroll"
+msgstr "Reroll modifier"
+
+msgid "UI_Craft_Ascend"
+msgstr "Ascend"
+
 msgid "UI_Journal_Empty"
 msgstr "No quests yet. The world won't come asking — go talk to people."
 
@@ -2004,3 +2025,6 @@ msgstr "{Faction} now regard you with {Level}"
 
 msgid "UI_Raid_Started"
 msgstr "Raid! The {Faction} are coming for you"
+
+msgid "Player"
+msgstr "Player"

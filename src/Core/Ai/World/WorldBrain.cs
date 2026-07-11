@@ -40,6 +40,9 @@ namespace Core.Ai.World
         public IWorldAgent Agent { get; }
         public WorldBrainConfig Config { get; }
         public IRandomNumberGenerator Rnd { get; }
+        // TODO:
+        // По необходимости расширить стейт машину.
+        // Ввести иерархию (Если нпс добывает ресурс и в этот появляется противник, нпс переключает внимание на битву. ПОсле битвы нпс возвращается к добыче ресурсов, если он выживает)
         public AlertnessState State => _fsm.State;
 
         public WorldBrain(IWorldAgent agent, WorldBrainConfig config, IRandomNumberGenerator rnd,

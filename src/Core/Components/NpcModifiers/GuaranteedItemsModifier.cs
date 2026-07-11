@@ -3,7 +3,6 @@ namespace Core.Components.NpcModifiers
     using System.Collections.Generic;
     using Context;
     using Entity;
-    using Interfaces;
 
     public class GuaranteedItemsModifier(
         string id,

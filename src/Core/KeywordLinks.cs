@@ -1,7 +1,7 @@
-namespace Battle.Source.UIElements
+namespace Core
 {
-    using Core.Localization;
-    using Core.Views.UI;
+    using Localization;
+    using Views.UI;
     using Godot;
 
     /// <summary>
@@ -15,17 +15,16 @@ namespace Battle.Source.UIElements
         {
             if (label == null) return;
             label.BbcodeEnabled = true;
-            label.MetaClicked += meta => Open(meta.ToString() ?? string.Empty, label);
+            label.MetaClicked += meta => Open(meta.ToString(), label);
         }
 
         private static void Open(string key, Control source)
         {
             if (key.Length == 0) return;
-            var services = Core.Services.GameServiceProvider.Instance;
+            var services = Services.GameServiceProvider.Instance;
             if (!services.GetService<IKeywordProvider>().TryGetTooltip(key, out var view)) return;
 
-            if (services.GetService<IUiElementsManager>().ShowPopup(typeof(KeywordTooltipPopup)) is KeywordTooltipPopup popup)
-                popup.ShowKeyword(view, source.GetGlobalMousePosition());
+            services.GetService<IUiElementsManager>().ShowKeyword(view, source.GetGlobalMousePosition());
         }
     }
 }

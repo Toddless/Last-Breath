@@ -16,7 +16,13 @@ namespace LastBreath.World
 
         private IWorldClock? _clock;
 
-        public override void _Ready() => _clock = GameServiceProvider.Instance.GetService<IWorldClock>();
+        public override void _Ready()
+        {
+            _clock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            // Snap, don't lerp, into the CURRENT phase: a scene reload recreates this node with
+            // the default white Color — easing from it flashed a night world into daylight.
+            if (_clock != null) Color = PhaseColor(_clock.Phase);
+        }
 
         public override void _Process(double delta)
         {

@@ -14,7 +14,6 @@ namespace LootGeneration.Internal
     using Core.Enums;
     using Core.Events;
     using Core.Events.GameEvents;
-    using Core.Interfaces;
     using Core.Items;
     using Core.Views.UI;
     using Godot;

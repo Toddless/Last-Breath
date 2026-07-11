@@ -21,12 +21,12 @@ namespace Core.Views.UI
     /// </summary>
     public interface IPopup : IInitializable
     {
-        PopupLifetime Lifetime { get; }
+        public PopupLifetime Lifetime { get; }
 
         /// <summary>The element's placement intent; the layer decides the actual geometry.</summary>
-        OverlayRegion Region { get; }
+        public OverlayRegion Region { get; }
 
         /// <summary>Closing means dying: implementations QueueFree themselves.</summary>
-        void Close();
+        public void Close();
     }
 }

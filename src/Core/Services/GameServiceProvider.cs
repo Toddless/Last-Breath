@@ -4,13 +4,11 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Data.GameData;
-    using Entity;
     using Events;
     using Godot;
-    using Interfaces;
+    using Localization;
     using MessageBus;
     using Microsoft.Extensions.DependencyInjection;
-    using Reputation;
     using Views.UI;
 
     /// <summary>
@@ -59,21 +57,20 @@ namespace Core.Services
             services.AddSingleton<IGameServiceProvider>(this);
             services.AddSingleton<IGameEventBus, GameEventBus>();
             services.AddSingleton<IGameMessageBus, GameMessageBus>();
-            services.AddSingleton<Localization.ILocalizationProvider, Localization.GodotLocalizationProvider>();
-            services.AddGameDataParticipant<Localization.IParameterFormatProvider, Localization.ParameterFormatProvider>();
-            services.AddSingleton<Localization.ModifierFormatter>();
-            services.AddSingleton<Localization.ITextFormatter, Localization.ModifierTextFormatter>();
-            services.AddSingleton<Localization.ContextModifierFormatter>();
-            services.AddSingleton<Localization.ITextFormatter, Localization.ContextModifierTextFormatter>();
-            services.AddSingleton<Localization.ILocalizationService, Localization.LocalizationService>();
-            services.AddSingleton<Localization.IKeywordProvider, Localization.LocalizationKeywordProvider>();
+            services.AddSingleton<ILocalizationProvider, GodotLocalizationProvider>();
+            services.AddGameDataParticipant<IParameterFormatProvider, ParameterFormatProvider>();
+            services.AddSingleton<ModifierFormatter>();
+            services.AddSingleton<ITextFormatter, ModifierTextFormatter>();
+            services.AddSingleton<ContextModifierFormatter>();
+            services.AddSingleton<ITextFormatter, ContextModifierTextFormatter>();
+            services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton<IKeywordProvider, LocalizationKeywordProvider>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();
             services.AddSingleton<IUIWindowPositionStorage, UiWindowPositionStorage>();
             services.AddSingleton<IPlayerAccessor, PlayerAccessor>();
-            services.AddSingleton<NotificationService>();
+            services.AddSingleton< NotificationService>();
             // The same instance handles the messages: Setup is called on the singleton by the bootstrap
-            services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(
-                provider => provider.GetRequiredService<NotificationService>());
+            services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(provider => provider.GetRequiredService<NotificationService>());
             services.AddSingleton(_ => CreateRandomizedGenerator());
             services.AddSingleton<Components.IRandomNumberGenerator>(provider =>
                 new Components.GodotRandomNumberGenerator(provider.GetRequiredService<RandomNumberGenerator>()));

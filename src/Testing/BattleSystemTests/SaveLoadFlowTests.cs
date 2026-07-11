@@ -1,12 +1,10 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Battle.Internal.Npc;
     using Core.Battle.Abilities;
     using Core.Components;
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Interfaces;
     using Core.Save.Participants;
     using Core.Services;
     using Moq;

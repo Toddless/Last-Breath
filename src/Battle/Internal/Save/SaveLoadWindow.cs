@@ -1,4 +1,4 @@
-namespace Battle.Source.UIElements
+namespace Battle.Internal.Save
 {
     using Core.Data;
     using Core.Save;
@@ -11,7 +11,7 @@ namespace Battle.Source.UIElements
     /// hosts the frame — restyle freely later.
     /// </summary>
     [GlobalClass]
-    public partial class SaveLoadWindow : Control, IWindow
+    internal partial class SaveLoadWindow : Control, IWindow
     {
         private const string ScenePath = "uid://cua8akmbr326r";
 

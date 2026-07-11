@@ -5,7 +5,6 @@
     using Core;
     using Entity;
     using Enums;
-    using Interfaces;
     using Godot;
 
     public record DamageContext : IDamageContext

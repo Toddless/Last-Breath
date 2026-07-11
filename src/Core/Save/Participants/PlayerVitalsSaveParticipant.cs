@@ -2,7 +2,6 @@ namespace Core.Save.Participants
 {
     using System;
     using Data.SaveData;
-    using Interfaces;
     using Newtonsoft.Json.Linq;
     using Services;
 

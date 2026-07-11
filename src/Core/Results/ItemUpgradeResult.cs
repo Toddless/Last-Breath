@@ -4,6 +4,9 @@
     {
         Success = 0,
         Failure,
-        ReachedMaxLevel
+        ReachedMaxLevel,
+
+        /// <summary>Rejected before the roll: the inventory doesn't cover the cost. Nothing was consumed.</summary>
+        NotEnoughResources
     }
 }

@@ -77,6 +77,7 @@ namespace LootGeneration.Services
         // LootGeneration never upgrades or recrafts items — costs live in the crafting-side data.
         public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => [];
         public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => [];
+        public IReadOnlyList<IRequirement> GetAscendCost(EquipmentCategory category) => [];
 
         public string GetRecipeResultItemId(string recipeId)
         {

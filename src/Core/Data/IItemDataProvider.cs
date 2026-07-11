@@ -24,5 +24,6 @@
         List<IModifier> GetEquipItemBaseModifierPool(string id);
         IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category);
         IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category);
+        IReadOnlyList<IRequirement> GetAscendCost(EquipmentCategory category);
     }
 }

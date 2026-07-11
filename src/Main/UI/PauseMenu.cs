@@ -2,8 +2,6 @@
 {
     using Core.Constants;
     using Core.Data;
-    using Core.Events;
-    using Core.MessageBus;
     using Core.Views.UI;
     using Godot;
 
@@ -12,7 +10,7 @@
         private const string UID = "uid://b03h1pcqbp3iw";
         [Export] private Button? _continueBtn, _saveLoadBtn, _optionsBtn, _mainMenuBtn, _exitBtn;
 
-        private IGameMessageBus? _messageBus;
+        private IUiElementsManager? _uiElements;
 
         public override void _Ready()
         {
@@ -35,7 +33,7 @@
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _messageBus = provider.GetService<IGameMessageBus>();
+            _uiElements = provider.GetService<IUiElementsManager>();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -46,9 +44,11 @@
             GetTree().ChangeSceneToPacked(MainMenu.Initialize());
         }
 
-        private void OnOptionsBtnPressed() => _messageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(OptionsWindow)));
+        // Straight through the manager: the OpenWindowMessage handler is gone, published
+        // messages went nowhere.
+        private void OnOptionsBtnPressed() => _uiElements?.ToggleWindow(typeof(OptionsWindow));
 
-        private void OnSaveLoadBtnPressed()=> _messageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(SaveLoadWindow)));
+        private void OnSaveLoadBtnPressed() => _uiElements?.ToggleWindow(typeof(SaveLoadWindow));
 
         private void OnContinueBtnPressed() => UnpauseGame();
 

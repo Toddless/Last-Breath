@@ -11,7 +11,7 @@ namespace Battle.Internal.Save
     /// burning bodies) opens the save/load window. The visual is authored in the scene.
     /// </summary>
     [GlobalClass]
-    public partial class CheckpointNode : Node2D
+    internal partial class CheckpointNode : Node2D
     {
         private const float InteractDistance = 150f;
 

@@ -5,7 +5,6 @@ namespace Core.Components.NpcModifiers
     using Context;
     using Data.LootTable;
     using Entity;
-    using Interfaces;
 
     public class AdditionalItemsModifier(
         string id,

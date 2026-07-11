@@ -1,129 +1,180 @@
-[gd_scene load_steps=7 format=3 uid="uid://betq124kfglyy"]
+[gd_scene format=3 uid="uid://betq124kfglyy"]
 
-[ext_resource type="Script" uid="uid://twqbt4a617y7" path="res://Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
-[ext_resource type="PackedScene" uid="uid://1qq3je71i5vi" path="res://Source/UIElements/Scenes/Recipies.tscn" id="2_ixukq"]
-[ext_resource type="PackedScene" uid="uid://buca4c3cfieil" path="res://Internal/ItemUi.tscn" id="3_ixukq"]
-[ext_resource type="PackedScene" uid="uid://bbrpbat7251pf" path="res://Internal/Resources.tscn" id="4_hwc12"]
+[ext_resource type="Script" uid="uid://d3hl0n4arn8et" path="res://Source/UIElements/CraftingWindow.cs" id="1_1mud6"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb7l8"]
-bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwm1"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-
-[node name="CraftingWindow" type="PanelContainer" node_paths=PackedStringArray("_recipeContainer", "_buttons", "_itemUi", "_recipes", "_resourcesUi", "_canBeCrafted")]
-offset_right = 804.0
-offset_bottom = 500.0
-size_flags_vertical = 8
-mouse_filter = 1
-theme_override_styles/panel = SubResource("StyleBoxFlat_vb7l8")
+[node name="CraftingWindow" type="Control" node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_itemIcon", "_itemName", "_itemSubtitle", "_modsHeader", "_additivesHeader", "_mods", "_requirements", "_additives", "_picker", "_pickerTitle", "_pickerList", "_pickerCancel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_1mud6")
-_recipeContainer = NodePath("HBoxContainer/RecipeContainer")
-_buttons = NodePath("HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer/Buttons")
-_itemUi = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/Item")
-_recipes = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/Recipies")
-_resourcesUi = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer/Resources")
-_canBeCrafted = NodePath("HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer/Button")
+_tree = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/RecipeTree")
+_search = NodePath("Center/Panel/Margin/Layout/Body/LeftPane/Search")
+_close = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
+_actionButton = NodePath("Center/Panel/Margin/Layout/Body/RightPane/ActionBtn")
+_itemIcon = NodePath("Center/Panel/Margin/Layout/Body/RightPane/ItemHeader/ItemIcon")
+_itemName = NodePath("Center/Panel/Margin/Layout/Body/RightPane/ItemHeader/ItemInfo/ItemName")
+_itemSubtitle = NodePath("Center/Panel/Margin/Layout/Body/RightPane/ItemHeader/ItemInfo/ItemSubtitle")
+_modsHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content/ModsHeader")
+_additivesHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content/AdditivesHeader")
+_mods = NodePath("Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content/Mods")
+_requirements = NodePath("Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content/Requirements")
+_additives = NodePath("Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content/Additives")
+_picker = NodePath("Center/Panel/Margin/Layout/Body/PickerPane")
+_pickerTitle = NodePath("Center/Panel/Margin/Layout/Body/PickerPane/PickerTitle")
+_pickerList = NodePath("Center/Panel/Margin/Layout/Body/PickerPane/PickerList")
+_pickerCancel = NodePath("Center/Panel/Margin/Layout/Body/PickerPane/PickerCancel")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Panel" type="PanelContainer" parent="HBoxContainer"]
-custom_minimum_size = Vector2(1200, 900)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_2kwm1")
-
-[node name="Background" type="Panel" parent="HBoxContainer/Panel"]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background"]
+[node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = 6.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer"]
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1460, 860)
 layout_mode = 2
 
-[node name="Recipies" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer" instance=ExtResource("2_ixukq")]
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
 layout_mode = 2
-title = "Recipes"
-title_alignment = 1
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="Item" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer" instance=ExtResource("3_ixukq")]
+[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer"]
+[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+text = "Crafting"
 
-[node name="Resources" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("4_hwc12")]
+[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header"]
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+focus_mode = 0
+text = "X"
 
-[node name="Button" type="Button" parent="HBoxContainer/Panel/Background/HBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Body" type="HBoxContainer" parent="Center/Panel/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="LeftPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Search" type="LineEdit" parent="Center/Panel/Margin/Layout/Body/LeftPane"]
+layout_mode = 2
+placeholder_text = "Search..."
+clear_button_enabled = true
+
+[node name="RecipeTree" type="Tree" parent="Center/Panel/Margin/Layout/Body/LeftPane"]
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+hide_root = true
+
+[node name="RightPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ItemHeader" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ItemIcon" type="TextureRect" parent="Center/Panel/Margin/Layout/Body/RightPane/ItemHeader"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemInfo" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/ItemHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ItemName" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/ItemHeader/ItemInfo"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="ItemSubtitle" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/ItemHeader/ItemInfo"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/RightPane"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ModsHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Modifiers"
+
+[node name="Mods" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ReqHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Requirements"
+
+[node name="Requirements" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AdditivesHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+text = "Additives"
+
+[node name="Additives" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionBtn" type="Button" parent="Center/Panel/Margin/Layout/Body/RightPane"]
+custom_minimum_size = Vector2(220, 46)
 layout_mode = 2
 size_flags_horizontal = 0
 focus_mode = 0
-text = "Create"
+text = "Craft"
 
-[node name="RequirementsAndButtons" type="VBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer"]
+[node name="PickerPane" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body"]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 0.5
-theme_override_constants/separation = 1
+theme_override_constants/separation = 8
+visible = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons"]
+[node name="PickerTitle" type="Label" parent="Center/Panel/Margin/Layout/Body/PickerPane"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="PickerList" type="ItemList" parent="Center/Panel/Margin/Layout/Body/PickerPane"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 0.1
 
-[node name="CloseButtonContainer" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer"]
-custom_minimum_size = Vector2(35, 35)
+[node name="PickerCancel" type="Button" parent="Center/Panel/Margin/Layout/Body/PickerPane"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_horizontal = 10
-size_flags_vertical = 0
-size_flags_stretch_ratio = 0.1
-mouse_filter = 0
-
-[node name="Close" type="Button" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/HBoxContainer/CloseButtonContainer"]
-custom_minimum_size = Vector2(35, 35)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_stretch_ratio = 0.2
-text = "X"
-flat = true
-
-[node name="ButtonsContainer" type="MarginContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons"]
-custom_minimum_size = Vector2(0, 45)
-layout_mode = 2
-size_flags_stretch_ratio = 0.15
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 10
-
-[node name="ButtonsContainer" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-size_flags_vertical = 10
-size_flags_stretch_ratio = 0.1
-
-[node name="Buttons" type="HBoxContainer" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 1
-alignment = 1
-
-[node name="Add" type="Button" parent="HBoxContainer/Panel/Background/HBoxContainer/RequirementsAndButtons/ButtonsContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(35, 25)
-layout_mode = 2
-size_flags_horizontal = 10
-size_flags_stretch_ratio = 0.1
 focus_mode = 0
-text = "+"
-flat = true
-
-[node name="RecipeContainer" type="VBoxContainer" parent="HBoxContainer"]
-clip_contents = true
-layout_mode = 2
+text = "Cancel"

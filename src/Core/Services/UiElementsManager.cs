@@ -5,6 +5,8 @@ namespace Core.Services
     using System.Linq;
     using Data;
     using Godot;
+    using Localization;
+    using Views;
     using Views.UI;
 
     /// <inheritdoc cref="IUiElementsManager"/>
@@ -18,7 +20,7 @@ namespace Core.Services
         private ILayerManager? _layers;
         private IHud? _currentHud;
 
-        public void Subscribe(ILayerManager layers) => _layers = layers;
+        public void Subscribe(ILayerManager? layers) => _layers = layers;
 
         public IHud ChangeHud(Type hudType)
         {
@@ -49,6 +51,12 @@ namespace Core.Services
             _openPopups[popupType] = popup;
             _layers?.ShowOverlay(popup);
             return popup;
+        }
+
+        public void ShowKeyword(KeywordTooltipView view, Vector2 globalPosition)
+        {
+            var popup = ShowPopup(typeof(IKeywordTooltipPopup)) as IKeywordTooltipPopup;
+            popup?.ShowKeyword(view, globalPosition);
         }
 
         public bool HandleEscape()
@@ -105,8 +113,14 @@ namespace Core.Services
 
         private void RemoveCurrentHud()
         {
-            _currentHud?.Remove();
-            FreeIfValid(_currentHud);
+            // A scene reload frees the HUD together with the old tree while this manager
+            // survives as a service — calling into the disposed instance would crash here.
+            if (_currentHud is Node node && GodotObject.IsInstanceValid(node))
+            {
+                _currentHud.Remove();
+                node.QueueFree();
+            }
+
             _currentHud = null;
         }
 

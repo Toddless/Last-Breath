@@ -1,4 +1,4 @@
-namespace Battle.Source.UIElements
+namespace LastBreath.UI
 {
     using System.Threading.Tasks;
     using Core.Localization;

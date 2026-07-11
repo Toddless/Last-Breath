@@ -2,7 +2,6 @@
 {
     using Entity;
     using Enums;
-    using Interfaces;
 
     public record HealContext(IFightable Source, IFightable Target) : IHealContext
     {

@@ -27,6 +27,10 @@ window/size/viewport_height=920
 
 project/assembly_name="LootGeneration"
 
+[gui]
+
+theme/custom="res://Data/Shared/Assets/UI/Theme.tres"
+
 [internationalization]
 
 locale/translations=PackedStringArray("res://Data/Shared/Localization/en.po", "res://Data/Shared/Localization/ru.po")

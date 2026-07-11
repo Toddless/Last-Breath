@@ -7,6 +7,7 @@ namespace Core.Data.CraftingData
     {
         [JsonProperty("upgrade")] public List<CategoryRequirementsData> Upgrade { get; init; } = [];
         [JsonProperty("recraft")] public List<CategoryRequirementsData> Recraft { get; init; } = [];
+        [JsonProperty("ascend")] public List<CategoryRequirementsData> Ascend { get; init; } = [];
     }
 
     public record CategoryRequirementsData

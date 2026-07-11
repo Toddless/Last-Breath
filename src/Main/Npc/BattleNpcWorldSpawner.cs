@@ -18,8 +18,10 @@ namespace LastBreath.Npc
 
             var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
             npc.InjectServices(GameServiceProvider.Instance);
+            // Position BEFORE AddChild: entering the tree at (0,0) and teleporting afterwards
+            // drags bodies overlapping the origin (the player) via MoveAndSlide's platform logic.
+            npc.Position = world.ToLocal(position);
             world.AddChild(npc); // _Ready builds the components ApplyDefinition configures
-            npc.GlobalPosition = position;
             npc.ApplyDefinition(definition);
             return npc;
         }

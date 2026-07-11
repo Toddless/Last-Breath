@@ -7,7 +7,6 @@
     using Core.Crafting;
     using Core.Data;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.Items;
     using Core.Modifiers;
     using Core.Services;

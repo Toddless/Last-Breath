@@ -1,17 +1,24 @@
 [gd_scene format=3 uid="uid://crpiglshqam38"]
 
-[ext_resource type="Script" uid="uid://eavxx2vl1dkg" path="res://UI/PauseMenu.cs" id="1_up0l5"]
+[ext_resource type="Script" uid="uid://sadsift5bx6j" path="res://UI/OptionsWindow.cs" id="1_ujm85"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ixu47"]
 font_size = 48
 
-[node name="Options" type="PanelContainer" unique_id=1074496159]
+[node name="Options" type="PanelContainer" unique_id=1074496159 node_paths=PackedStringArray("_music", "_sfx", "_master", "_language", "_windowMode", "_windowResolution", "_returnButton")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_up0l5")
+script = ExtResource("1_ujm85")
+_music = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMusic/HSliderMusic")
+_sfx = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerSfx/HSliderSfx")
+_master = NodePath("MarginContainer/VBoxContainer/SoundContainer/ScrollContainer/VBoxContainer/HBoxContainerMaster/HSliderMaster")
+_language = NodePath("MarginContainer/VBoxContainer/UIContainer/ScrollContainer/VBoxContainer/HBoxContainer/OptionButtonLanguage")
+_windowMode = NodePath("MarginContainer/VBoxContainer/VideoContainer/ScrollContainer/VBoxContainer/GridContainer/OptionButtonWindowMode")
+_windowResolution = NodePath("MarginContainer/VBoxContainer/VideoContainer/ScrollContainer/VBoxContainer/GridContainer/OptionButtonResolution")
+_returnButton = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ReturnBtn")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=790476822]
 layout_mode = 2

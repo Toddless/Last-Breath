@@ -7,7 +7,6 @@
     using Core.Battle.Abilities;
     using Core.Entity;
     using Core.Enums;
-    using Core.Localization;
     using Godot;
 
     // dead ability. need attention later

@@ -9,7 +9,7 @@ namespace Battle.Internal.Save
     using Core.Services;
     using Godot;
 
-    public class SaveGameService : ISaveGameService
+    internal class SaveGameService : ISaveGameService
     {
         private const int Slots = 10;
         private const string SavedNotificationId = "Notification_Game_Saved";

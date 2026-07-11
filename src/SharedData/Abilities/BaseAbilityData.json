@@ -466,7 +466,7 @@
             "masteryLevel": 25,
             "abilityProperties": {
                 "multiplier": 0,
-                "executionThreshold": 1
+                "executionThreshold": 42
             },
             "upgrades": [
                 {
@@ -650,7 +650,7 @@
                 "thirdSpellScale": 1.8,
                 "stage1HpCost": 0.05,
                 "stage2HpCost": 0.15,
-                "stage3HpCost": 0.30,
+                "stage3HpCost": 0.5,
                 "stunDuration": 2
             },
             "upgrades": [

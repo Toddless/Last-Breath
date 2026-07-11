@@ -204,7 +204,8 @@ namespace Core.Data
             return new Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>>
             {
                 [CraftingMode.Upgrade] = LoadCategoryRequirements(data.Upgrade),
-                [CraftingMode.Recraft] = LoadCategoryRequirements(data.Recraft)
+                [CraftingMode.Recraft] = LoadCategoryRequirements(data.Recraft),
+                [CraftingMode.Ascend] = LoadCategoryRequirements(data.Ascend)
             };
         }
 

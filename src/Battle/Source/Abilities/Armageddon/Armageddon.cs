@@ -86,6 +86,9 @@ namespace Battle.Source.Abilities.Armageddon
         public int MaxStage => 3;
         public int PendingStage { get; set; }
 
+        /// <summary>The charge is a commitment: once selection begins there is no backing out.</summary>
+        public bool IsCancellable => false;
+
         public int MaxAffordableStage
         {
             get

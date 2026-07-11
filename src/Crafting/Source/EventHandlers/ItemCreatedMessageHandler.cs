@@ -1,31 +1,21 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
-    using Core.Data;
     using Core.Events;
-    using Core.Inventory;
     using Core.Items;
     using Core.Localization;
     using Core.Views.UI;
     using UIElements;
 
-    public class ItemCreatedMessageHandler(IUiElementsManager manager, IInventory inventory)
+    /// <summary>Presentation only: shows the "item created" card. The item reaches the bag in
+    /// CreateEquipItemRequestHandler — adding it here as well used to duplicate it.</summary>
+    public class ItemCreatedMessageHandler(IUiElementsManager manager)
         : IMessageHandler<ItemCreatedMessage>
     {
         public Task HandleMessageAsync(ItemCreatedMessage message)
         {
-            var notifier =ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
+            var notifier = ItemCreatedNotifier.Initialize().Instantiate<ItemCreatedNotifier>();
             ConfigureItemCreatedNotifier(message.CreatedItem, notifier);
-
-            inventory.TryAddItem(message.CreatedItem);
-
-            notifier.DestroyPressed += OnDestroyPressed;
-
-            void OnDestroyPressed()
-            {
-                // _systemMediator.Publish(new DestroyItemEvent(evnt.CreatedItem.InstanceId));
-                notifier.DestroyPressed -= OnDestroyPressed;
-            }
 
             return Task.CompletedTask;
         }

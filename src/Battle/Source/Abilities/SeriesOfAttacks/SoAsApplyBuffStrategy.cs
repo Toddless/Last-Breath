@@ -17,13 +17,17 @@
         public override async Task Execute(SeriesOfAttacks ability, IFightable owner, List<IFightable> targets, IBattleField field)
         {
             _successfulAttacks = 0;
-            Subscribe(owner);
+            Subscribe(ability, owner);
             await base.Execute(ability, owner, targets, field);
             Unsubscribe();
         }
 
-        private void Subscribe(IFightable owner)
+        private void Subscribe(SeriesOfAttacks ability, IFightable owner)
         {
+            // Both fields must be captured: ApplyBuff and Unsubscribe null-guard on them — with
+            // an unset owner the buff never applied and the subscription leaked every cast.
+            _ability = ability;
+            _owner = owner;
             owner.CombatEvents.Subscribe<AfterAttackEvent>(OnAfterAttack);
         }
 

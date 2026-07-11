@@ -73,7 +73,8 @@ namespace Battle.Internal.Player
 
         public Texture2D? Icon { get; }
         public string Description { get; }
-        public string DisplayName { get; }
+        // Never-assigned auto-property left the battle log with nameless player entries.
+        public string DisplayName => Core.Localization.Localization.Localize("Player");
         public string[] Tags { get; } = [];
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
@@ -97,6 +98,9 @@ namespace Battle.Internal.Player
         public bool CanMove { get; set; } = true;
         public string PlayerName { get; private set; } = string.Empty;
 
+        // TakeDamage owns the event order (damage beat first, death after) — see its comment.
+        private bool _suppressDeathNotify;
+
         public float CurrentHealth
         {
             get => Mathf.Max(0, field);
@@ -105,7 +109,7 @@ namespace Battle.Internal.Player
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                if (field <= 0) NotifyShouldDie();
+                if (field <= 0 && !_suppressDeathNotify) NotifyShouldDie();
                 NotifyHealthChanges(field);
             }
         }
@@ -172,6 +176,9 @@ namespace Battle.Internal.Player
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            // The barrier pool starts full like the other vitals: a Barrier stat that never
+            // filled itself read as "barrier does not work" (damage went straight to health).
+            CurrentBarrier = Parameters.MaxBarrier;
             EquipmentComponent = new EquipmentComponent(this);
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
@@ -187,6 +194,14 @@ namespace Battle.Internal.Player
             }
 
             if (!CanMove) return;
+            // Typing is not walking: WASD is polled, so a focused text field (debug console,
+            // future chat) would otherwise drive the character while the user types.
+            if (GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit)
+            {
+                Velocity = Vector2.Zero;
+                return;
+            }
+
             Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
             Velocity = inputDirection * _baseSpeed;
             SwitchState(inputDirection);
@@ -322,11 +337,18 @@ namespace Battle.Internal.Player
                 remaining -= absorbed;
             }
 
+            // The damage event must precede the death event in the timeline: the director drops
+            // "posthumous" beats, so a death recorded first swallowed its own killing hit
+            // (frozen bars, no log line). The setter's death notify is deferred past the publish.
+            bool wasAlive = IsAlive;
+            _suppressDeathNotify = true;
             if (remaining > 0) CurrentHealth -= remaining;
+            _suppressDeathNotify = false;
 
             // Combat bus only: the timeline records it and the BattleDirector republishes it
             // to the battle bus at replay time, so UI reacts when the hit is SHOWN, not resolved.
             CombatEvents.Publish(new DamageTakenEvent(context, this, VitalsSnapshot.From(this)));
+            if (wasAlive && !IsAlive) NotifyShouldDie();
             return Task.CompletedTask;
         }
 
@@ -554,7 +576,10 @@ namespace Battle.Internal.Player
             EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
             EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 500,
             EntityParameter.CriticalChance => 0.25f,
-            EntityParameter.AdditionalHitChance => 0.6f,
+            // A rare treat, not a machine gun: extra attacks chain (each one re-rolls), so a high
+            // base made attack series balloon to 2-3x their planned length. Items/passives are
+            // the intended source of this stat.
+            EntityParameter.AdditionalHitChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 1f,
             EntityParameter.Damage or EntityParameter.SpellDamage => 3000,

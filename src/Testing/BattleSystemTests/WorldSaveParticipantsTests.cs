@@ -1,6 +1,5 @@
 namespace LastBreathTest.BattleSystemTests
 {
-    using Battle.Internal.Npc;
     using Core.Ai.World;
     using Core.Ai.World.Time;
     using Core.Components;

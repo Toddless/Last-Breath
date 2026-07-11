@@ -69,6 +69,7 @@ namespace Crafting.Services
 
         public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => GetCost(CraftingMode.Upgrade, category);
         public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => GetCost(CraftingMode.Recraft, category);
+        public IReadOnlyList<IRequirement> GetAscendCost(EquipmentCategory category) => GetCost(CraftingMode.Ascend, category);
 
         public List<IRequirement> GetRecipeRequirements(string id)
         {

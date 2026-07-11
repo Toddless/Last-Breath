@@ -8,6 +8,7 @@
     using Core.Events;
     using Core.Events.GameEvents;
     using Core.Services;
+    using Core.Views;
     using Core.Views.UI;
     using Godot;
     using Source;
@@ -33,8 +34,12 @@
                 // Wire the notification pipeline: the layer manager is the sink, the factory builds the
                 // popup on demand. Returns null until Todd's NotificationPopup.tscn UID is set — the
                 // service drops the message rather than crashing.
-                _provider.GetService<NotificationService>().Setup(_layerManager, CreateNotificationPopup);
+                // TODO:
+                //  необходимо создавать NotificationPopup через uiElementsmanager.
+              //  _provider.GetService<NotificationService>().Setup(_layerManager, CreateNotificationPopup);
             }
+            // internal stuff
+            _uiElementProvider.RegisterPopupFactory(typeof(IKeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
 
             // Resolve once so it subscribes to mastery/player changes and auto-learns unlocked abilities.
             _provider.GetService<IAbilityUnlockService>();
@@ -42,7 +47,6 @@
             mastery.AddExperience(500000);
             _gameEventBus = _provider.GetService<IGameEventBus>();
             _gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleInitialized);
-            _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
         }
 
@@ -51,7 +55,6 @@
             // The game bus outlives the scene (save-load reloads it): stale subscriptions would
             // keep calling handlers on a freed node.
             _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
-            _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
         }
 
@@ -63,8 +66,6 @@
             // has no Variant conversion for Nullable — crashes at invoke time.
             Callable.From(() => { _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer); }).CallDeferred();
 
-        private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
-            _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
 
         public override void _Input(InputEvent @event)
         {
@@ -76,13 +77,6 @@
                 // GD.Print($"{item.DisplayName}");
             }
         }
-
-        private static Control? CreateNotificationPopup()
-        {
-            var scene = NotificationPopup.Initialize();
-            return scene.Instantiate<NotificationPopup>();
-        }
-
         private async void OnBattleInitialized(BattleInitializedEvent evnt)
         {
             BattleContext? context = null;

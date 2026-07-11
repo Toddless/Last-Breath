@@ -27,6 +27,7 @@ namespace Core.Data.GameData
         public const string EquipItems = "EquipItems";
         public const string EquipItemResources = "EquipItemResources";
         public const string Recipes = "Recipes";
+        public const string CraftingAdditives = "CraftingAdditives";
         public const string Resources = "Resources";
         public const string ModifierPools = "ModifierPools";
         public const string UpgradeCosts = "UpgradeCosts";

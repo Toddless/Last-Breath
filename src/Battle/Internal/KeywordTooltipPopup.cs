@@ -1,19 +1,12 @@
-namespace Battle.Source.UIElements
+﻿namespace Battle.Internal
 {
-    using Core.Data;
     using Core.Localization;
+    using Core.Views;
     using Core.Views.UI;
     using Godot;
 
-    /// <summary>
-    /// Reference card for a clicked keyword ({@Effect_X} link in a description). Overlay layer,
-    /// Pinned lifetime: the player closes it with the ✕ button, Esc or a click outside; clicking
-    /// another keyword shows a fresh card instead (ShowPopup replaces same-type popups).
-    /// Shown next to the cursor, clamped to the viewport. The root ignores mouse input so the
-    /// rest of the UI stays clickable; links inside the card are not attached — no recursion.
-    /// </summary>
     [GlobalClass]
-    public partial class KeywordTooltipPopup : Control, IPopup
+    internal partial class KeywordTooltipPopup : Control, IKeywordTooltipPopup
     {
         private const string UID = "uid://cuo3kxds4641b";
         private const float CursorOffset = 16f;
@@ -44,10 +37,6 @@ namespace Battle.Source.UIElements
             if (@event is not InputEventMouseButton { Pressed: true }) return;
             if (_panel != null && _panel.GetGlobalRect().HasPoint(_panel.GetGlobalMousePosition())) return;
             Close();
-        }
-
-        public void InjectServices(IGameServiceProvider provider)
-        {
         }
 
         public void ShowKeyword(KeywordTooltipView view, Vector2 globalPosition)

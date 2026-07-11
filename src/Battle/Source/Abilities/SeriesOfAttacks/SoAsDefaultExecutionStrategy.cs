@@ -23,7 +23,10 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
             async Task ExecuteOnTarget(IFightable target)
             {
                 var window = new AttackSeriesWindow(ability, owner, field);
-                for (int i = 0; i < attacks && window.OwnerAttacks < ability.MaxAttacks; i++)
+                // MaxAttacks caps the ROLL, not the window: the planned hits are guaranteed and
+                // reaction extras land on top (IP semantics). Counting extras against the cap
+                // silently swallowed the bought attack-count upgrades.
+                for (int i = 0; i < attacks; i++)
                 {
                     float additionalDamage = ability.Damage + ((owner.Parameters.Damage * ability.WeaponDamageScale) + (owner.Parameters.SpellDamage * ability.SpellDamageScale));
                     var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
@@ -31,7 +34,7 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         AdditionalDamage = additionalDamage,
                         Index = i,
-                        TotalCount = ability.MaxAttacks,
+                        TotalCount = attacks, // the rolled series length — "last hit" logic keys off it
                         SourceAbilityId = ability.Id
                     };
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.

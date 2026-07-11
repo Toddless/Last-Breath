@@ -6,9 +6,10 @@
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
     using Godot;
 
+    // TODO:
+    // пока что бесполезен. В будущем может быть добавлено Enviroment урон
     public record DamageContext : IDamageContext
     {
         private readonly Dictionary<DamageType, float> _damageComponents = [];

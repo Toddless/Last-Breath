@@ -53,6 +53,10 @@
         // Corpses freed their spots for latecomers but stay visible on the field until the
         // context returns them to the world; they also serve as presentation anchors.
         private readonly System.Collections.Generic.Dictionary<string, Node2D> _parkedCorpses = [];
+        // Ally/enemy semantics are group-based, so groupless same-faction fighters would be
+        // mutual enemies: a skeleton's chain lightning legally "executed" its own kin (read as
+        // a self-kill). Solo NPCs of one faction share a battle-scoped group instead.
+        private readonly System.Collections.Generic.Dictionary<Fractions, EntityGroup> _fractionGroups = [];
 
         /// <summary>The ordered record of the current battle; the presentation layer replays it.</summary>
         public IBattleTimeline Timeline => _timeline;
@@ -110,8 +114,9 @@
             _battleEventBus?.Publish(new PlayerFleeResolvedEvent(succeeded, chance));
 
             if (succeeded) EndBattle(new BattleOutcome(BattleResults.PlayerFled));
-            // Success or failure, the turn is spent; on success the loop exits by the outcome.
-            _playerTargetTcs!.SetResult(null);
+            // Success or failure, the turn is spent. Try: on success EndBattle has already
+            // completed the target task — a second SetResult would throw.
+            _playerTargetTcs!.TrySetResult(null);
         }
 
         private async void OnAbilityActivation(AbilityActivationEvent obj)
@@ -218,12 +223,31 @@
             if (freeSpot == null) return false;
 
             if (alliedWithPlayer && _player != null) _player.Group?.TryAddToGroup(fighter);
+            else EnsureFractionGroup(fighter);
 
             _fighters.Add(fighter);
             freeSpot.SetEntity(fighter);
             freeSpot.SetBattleEventBus(_battleEventBus);
             _timeline.Attach(fighter.CombatEvents);
+            // Mid-turn join: the player's current highlights were built before the newcomer
+            // existed — without a rebuild its spot stays untargetable until the next turn.
+            _selectionController?.RefreshHighlights();
             return true;
+        }
+
+        /// <summary>Groupless NPCs of one faction join a shared battle group — kin must not read
+        /// as enemies to targeting. World groups (spawned squads) are kept as they came.</summary>
+        private void EnsureFractionGroup(IFightable fighter)
+        {
+            if (fighter.Group != null || fighter is not IFightableNpc npc) return;
+
+            if (!_fractionGroups.TryGetValue(npc.Fraction, out var group))
+            {
+                group = new EntityGroup(maxMembers: _spots.Count);
+                _fractionGroups[npc.Fraction] = group;
+            }
+
+            group.TryAddToGroup(fighter);
         }
 
         public bool PrepareBattleArena(List<IFightable> fighters)
@@ -245,6 +269,7 @@
             for (int i = 0; i < fighters.Count; i++)
             {
                 var spot = _spots[i];
+                EnsureFractionGroup(fighters[i]);
                 spot.SetEntity(fighters[i]);
                 spot.SetBattleEventBus(_battleEventBus);
             }
@@ -297,6 +322,17 @@
             {
                 if (!_queueScheduler.TryGetNextFighter(out _currentFighter))
                 {
+                    // Refill HERE, not at the turn's end: dead/fled entries are skipped with
+                    // `continue` and used to drain the round past the refill — a battle where
+                    // the round ended on corpses got abandoned with live enemies standing
+                    // (latecomers enter the roster mid-round but the queue only next round).
+                    var nextRound = _queueScheduler.RefillIfEmpty(_fighters.Where(IsPresent).ToList());
+                    if (nextRound.Count > 1)
+                    {
+                        _battleEventBus?.Publish(new BattleQueueDefinedEvent(nextRound));
+                        continue;
+                    }
+
                     EndBattle(new BattleOutcome(BattleResults.BattleAbandoned));
                     break;
                 }
@@ -335,10 +371,6 @@
                 // Turn gate: the whole turn resolved instantly above; the next fighter
                 // doesn't start until the director has shown everything recorded so far.
                 await WaitForPresentationAsync();
-
-                var queue = _queueScheduler.RefillIfEmpty(_fighters.Where(IsPresent).ToList());
-                if (queue.Count > 1)
-                    _battleEventBus?.Publish(new BattleQueueDefinedEvent(queue));
             }
 
             // Final gate: death and battle-ending beats must finish before the results are handled.

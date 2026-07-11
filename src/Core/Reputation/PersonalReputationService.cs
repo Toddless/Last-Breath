@@ -2,7 +2,6 @@ namespace Core.Reputation
 {
     using System;
     using System.Collections.Generic;
-    using Data;
     using Data.FactionData;
     using Data.GameData;
     using Entity;

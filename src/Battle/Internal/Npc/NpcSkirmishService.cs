@@ -73,6 +73,9 @@ namespace Battle.Internal.Npc
                 roundWinners[0].Position, round.Number, Ids(roundWinners), Ids(roundLosers)));
         }
 
+        // TODO:
+        // победившие нпс перенимают случайный модификатор проигравших.
+        // Возможно понадобится ограничение (или нет, потестируем оба подхода)
         private void OnCompleted(NpcSkirmish skirmish)
         {
             _active.Remove(skirmish);

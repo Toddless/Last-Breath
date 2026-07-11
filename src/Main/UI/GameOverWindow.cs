@@ -1,4 +1,4 @@
-namespace Battle.Source.UIElements
+namespace LastBreath.UI
 {
     using Core.Data;
     using Core.Views.UI;

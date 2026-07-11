@@ -72,6 +72,3 @@ custom_minimum_size = Vector2(300, 46)
 layout_mode = 2
 focus_mode = 0
 text = "Quit"
-
-[node name="MusicStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=198175442]
-autoplay = true

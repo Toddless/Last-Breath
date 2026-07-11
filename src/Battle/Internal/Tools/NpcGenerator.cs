@@ -29,8 +29,10 @@ namespace Battle.Internal.Tools
             for (int i = 0; i < count; i++)
             {
                 var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
+                // Position BEFORE AddChild: entering the tree at (0,0) and teleporting afterwards
+                // drags bodies overlapping the origin (the player) via MoveAndSlide's platform logic.
+                npc.Position = world.ToLocal(origin + new Vector2(i * spacing, 0f));
                 world.AddChild(npc); // enters the tree -> _Ready builds the components we configure below
-                npc.GlobalPosition = origin + new Vector2(i * spacing, 0f);
                 ApplyDefinition(npc, npcIds, i, patrolRoute);
                 ApplyStats(npc, stats);
                 group.TryAddToGroup(npc);

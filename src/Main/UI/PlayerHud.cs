@@ -5,7 +5,6 @@
     using Core.Entity;
     using Core.Events;
     using Core.Events.GameEvents;
-    using Core.MessageBus;
     using Core.Services;
     using Core.Views.UI;
     using Crafting.Source.UIElements;
@@ -23,11 +22,11 @@
         private const float ClockRefreshSeconds = 1f;
 
         [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
-        [Export] private ProgressBar? _health, _mana;
-        [Export] private Label? _healthText, _manaText, _clock;
+        [Export] private ProgressBar? _health, _mana, _barrier;
+        [Export] private Label? _healthText, _manaText, _barrierText, _clock;
         [Export] private GridContainer? _playerEffects;
 
-        private IGameMessageBus? _gameMessageBus;
+        private IUiElementsManager? _uiElements;
         private IGameEventBus? _events;
         private IPlayerAccessor? _playerAccessor;
         private IWorldClock? _worldClock;
@@ -54,25 +53,28 @@
         {
             _events?.Unsubscribe<PlayerHealthChangesEvent>(OnHealthChanged);
             _events?.Unsubscribe<PlayerManaChangesEvent>(OnManaChanged);
+            _events?.Unsubscribe<PlayerBarrierChangesEvent>(OnBarrierChanged);
             if (_playerAccessor != null) _playerAccessor.PlayerChanged -= BindPlayer;
             UnbindPlayer();
         }
 
-        public void Remove() => GetParent().RemoveChild(this);
+        public void Remove() => GetParent()?.RemoveChild(this);
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            _gameMessageBus = provider.GetService<IGameMessageBus>();
+            _uiElements = provider.GetService<IUiElementsManager>();
             _worldClock = provider.GetService<IWorldClock>();
             _events = provider.GetService<IGameEventBus>();
             _events.Subscribe<PlayerHealthChangesEvent>(OnHealthChanged);
             _events.Subscribe<PlayerManaChangesEvent>(OnManaChanged);
-
+            _events.Subscribe<PlayerBarrierChangesEvent>(OnBarrierChanged);
             _playerAccessor = provider.GetService<IPlayerAccessor>();
             _playerAccessor.PlayerChanged += BindPlayer;
             if (_playerAccessor.Player != null) BindPlayer(_playerAccessor.Player);
             RefreshClock();
         }
+
+        private void OnBarrierChanged(PlayerBarrierChangesEvent obj) => RefreshVitals();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -102,6 +104,7 @@
 
             UpdateBar(_health, _healthText, _boundPlayer.CurrentHealth, _boundPlayer.Parameters.MaxHealth);
             UpdateBar(_mana, _manaText, _boundPlayer.CurrentMana, _boundPlayer.Parameters.MaxMana);
+            UpdateBar(_barrier, _barrierText, _boundPlayer.CurrentBarrier, _boundPlayer.Parameters.MaxBarrier);
         }
 
         private static void UpdateBar(ProgressBar? bar, Label? text, float current, float max)
@@ -112,7 +115,7 @@
                 bar.Value = current;
             }
 
-            if (text != null) text.Text = $"{Mathf.CeilToInt(current)} / {Mathf.CeilToInt(max)}";
+            text?.Text = $"{Mathf.CeilToInt(current)} / {Mathf.CeilToInt(max)}";
         }
 
         private void RefreshClock()
@@ -121,11 +124,11 @@
             _clock.Text = $"Day {_worldClock.Day}   {_worldClock.Hour:00}:{_worldClock.Minute:00}   {_worldClock.Phase}";
         }
 
-        // TODO:
-        // старый подход. Инжектим uiElementsManager и открываем окна с его помощью
-        private void OnCraftingBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(CraftingWindow)));
-        private void OnQuestBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(QuestJournalWindow)));
-        private void OnInventoryBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(InventoryWindow)));
-        private void OnCharacterBtnPressed() => _gameMessageBus?.PublishMessageAsync(new OpenWindowMessage(typeof(CharacterWindow)));
+        // Straight through the manager: the OpenWindowMessage handler is gone, published
+        // messages went nowhere. Toggle = hotkey semantics (a second press closes).
+        private void OnCraftingBtnPressed() => _uiElements?.ToggleWindow(typeof(CraftingWindow));
+        private void OnQuestBtnPressed() => _uiElements?.ToggleWindow(typeof(QuestJournalWindow));
+        private void OnInventoryBtnPressed() => _uiElements?.ToggleWindow(typeof(InventoryWindow));
+        private void OnCharacterBtnPressed() => _uiElements?.ToggleWindow(typeof(CharacterWindow));
     }
 }

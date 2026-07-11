@@ -1862,3 +1862,6 @@ msgstr "{Faction}: новое отношение — {Level}"
 
 msgid "UI_Raid_Started"
 msgstr "Рейд! {Faction} идут за вами"
+
+msgid "Player"
+msgstr "Игрок"

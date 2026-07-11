@@ -4,7 +4,6 @@ namespace Core.Components
     using Battle;
     using Battle.Abilities;
     using Context;
-    using Interfaces;
 
     public class ModifierHandlerComponent : IModifierHandlerComponent
     {

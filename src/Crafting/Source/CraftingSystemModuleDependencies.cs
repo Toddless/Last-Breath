@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Core.Crafting;
     using Core.Data;
+    using Core.Data.GameData;
     using Core.Events;
     using Core.Interfaces;
     using Core.Items;
@@ -23,11 +24,11 @@
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemAscender, ItemAscender>();
+            services.AddSingleton<CraftingResources>();
+            services.AddGameDataParticipant<ICraftingAdditiveProvider, CraftingAdditiveProvider>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
-            services.AddTransient<IRequestHandler<GetTotalItemAmountRequest, Dictionary<string, int>>, GetTotalItemAmountRequestHandler>();
-            services.AddTransient<IRequestHandler<OpenCraftingItemsWindowRequest, IEnumerable<string>>, OpenCraftingItemsWindowRequestHandler>();
             services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
             services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
@@ -45,8 +46,6 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>());
-            uiElementManager.RegisterWindowFactory(typeof(CraftingItems), () => CraftingItems.Initialize().Instantiate<CraftingItems>());
-            uiElementManager.RegisterWindowFactory(typeof(Recipes), () => Recipes.Initialize().Instantiate<Recipes>());
         }
     }
 }

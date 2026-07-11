@@ -2,6 +2,5 @@
 {
     public interface IInitializable
     {
-        // PackedScene Initialize();
     }
 }

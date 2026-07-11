@@ -14,7 +14,8 @@
             int stacks = npc.Effects.GetBy(e => e.Status == StatusEffects.Poison).Count();
             bool isBossOrArchon = npc.EntityType is EntityType.Boss or EntityType.Archon;
 
-            return stacks > stackThreshold() && !isBossOrArchon;
+            // ">=": the description promises "executes at {ExecutionThreshold} or more stacks".
+            return stacks >= stackThreshold() && !isBossOrArchon;
         }
     }
 }

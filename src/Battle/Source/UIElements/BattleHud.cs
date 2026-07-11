@@ -26,7 +26,7 @@
         private AbilityButton[] _abilitySlotsInstances = new AbilityButton[BattleConstants.AbilitySlotsPerStance];
         private IAbilityBookComponent? _abilityBook;
         private Button? _endTurnButton, _fleeButton;
-        private bool _isPlayerTurn, _isPresenting;
+        private bool _isPlayerTurn, _isPresenting, _isSelectingTargets;
         [Export] private VBoxContainer? _buttonsContainer;
         [Export] private CharacterBar? _playerBars;
         [Export] private HBoxContainer? _stanceButtons;
@@ -117,6 +117,10 @@
             _battleEventBus.Subscribe<TurnEndEvent>(OnTurnEnd);
             _battleEventBus.Subscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
             _battleEventBus.Subscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+            // Stances are locked while an ability waits for its targets: switching mid-selection
+            // would swap the ability bar under the pending cast.
+            _battleEventBus.Subscribe<PlayerSelectingTargetForAbilityEvent>(OnTargetSelectionStarted);
+            _battleEventBus.Subscribe<TargetSelectionResolvedEvent>(OnTargetSelectionResolved);
 
             foreach (AbilityButton slot in _abilitySlotsInstances)
                 slot.SetBattleEventBus(_battleEventBus);
@@ -267,13 +271,25 @@
         /// only activation input is blocked. A stunned player never gets an open window:
         /// his TurnStart and TurnEnd resolve within one synchronous logic run.
         /// </summary>
+        private void OnTargetSelectionStarted(PlayerSelectingTargetForAbilityEvent evnt)
+        {
+            _isSelectingTargets = true;
+            ApplyInputWindow();
+        }
+
+        private void OnTargetSelectionResolved(TargetSelectionResolvedEvent evnt)
+        {
+            _isSelectingTargets = false;
+            ApplyInputWindow();
+        }
+
         private void ApplyInputWindow()
         {
             bool open = _isPlayerTurn && !_isPresenting;
             foreach (AbilityButton slot in _abilitySlotsInstances)
                 slot.SetInputEnabled(open);
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
-                stanceSlot.Disabled = !open;
+                stanceSlot.Disabled = !open || _isSelectingTargets; // no stance swap mid-selection
             _endTurnButton?.Disabled = !open;
             _fleeButton?.Disabled = !open;
         }

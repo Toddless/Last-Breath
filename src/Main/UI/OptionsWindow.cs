@@ -44,7 +44,8 @@
             _settings = provider.GetService<ISettingsHandler>();
         }
 
-        public void Close() => GetParent().RemoveChild(this);
+        // Closing means dying (IWindow contract) — see SaveLoadWindow.Close for the reopen NRE.
+        public void Close() => QueueFree();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

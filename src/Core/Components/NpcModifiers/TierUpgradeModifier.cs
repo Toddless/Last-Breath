@@ -2,7 +2,6 @@ namespace Core.Components.NpcModifiers
 {
     using Context;
     using Entity;
-    using Interfaces;
 
     public class TierUpgradeModifier(
         string id,

@@ -1,6 +1,8 @@
 namespace Core.Views.UI
 {
     using System;
+    using Godot;
+    using Localization;
 
     /// <summary>
     /// The single creation point of top-level UI (HUDs, windows, overlay popups). Projects
@@ -10,7 +12,7 @@ namespace Core.Views.UI
     /// </summary>
     public interface IUiElementsManager
     {
-        void Subscribe(ILayerManager layers);
+        void Subscribe(ILayerManager? layers);
 
         IHud ChangeHud(Type hudType);
 
@@ -25,6 +27,8 @@ namespace Core.Views.UI
         /// popups of different types coexist (an item tooltip next to a notification).
         /// </summary>
         IPopup ShowPopup(Type popupType);
+
+        void ShowKeyword(KeywordTooltipView view, Vector2 globalPosition);
 
         /// <summary>
         /// Esc, layer by layer: the first press clears the Overlay layer, the next one closes

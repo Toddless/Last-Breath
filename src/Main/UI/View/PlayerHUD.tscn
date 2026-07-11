@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dw5w7qvskr8b4" path="res://UI/PlayerHud.cs" id="1_22o70"]
 [ext_resource type="PackedScene" uid="uid://bqsttrk1hud4a" path="res://UI/View/QuestTracker.tscn" id="2_l0x06"]
 
-[node name="PlayerHUD" type="Control" node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_craftingBtn", "_health", "_mana", "_healthText", "_manaText", "_clock", "_playerEffects")]
+[node name="PlayerHUD" type="Control" unique_id=1086659813 node_paths=PackedStringArray("_characterBtn", "_inventoryBtn", "_questsBtn", "_craftingBtn", "_health", "_mana", "_barrier", "_healthText", "_manaText", "_barrierText", "_clock", "_playerEffects")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,12 +18,14 @@ _questsBtn = NodePath("Margin/Buttons/Quests")
 _craftingBtn = NodePath("Margin/Buttons/Crafting")
 _health = NodePath("Margin/Vitals/Health")
 _mana = NodePath("Margin/Vitals/Mana")
+_barrier = NodePath("Margin/Vitals/Barrier")
 _healthText = NodePath("Margin/Vitals/Health/HealthText")
 _manaText = NodePath("Margin/Vitals/Mana/ManaText")
+_barrierText = NodePath("Margin/Vitals/Barrier/BarrierText")
 _clock = NodePath("Margin/Clock")
 _playerEffects = NodePath("Margin/Vitals/Effects")
 
-[node name="QuestTracker" parent="." instance=ExtResource("2_l0x06")]
+[node name="QuestTracker" parent="." unique_id=941207267 instance=ExtResource("2_l0x06")]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -36,7 +38,7 @@ offset_bottom = -320.0
 grow_horizontal = 0
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=261690111]
 z_index = 1
 layout_mode = 1
 anchors_preset = 15
@@ -50,21 +52,20 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="Vitals" type="VBoxContainer" parent="Margin"]
+[node name="Vitals" type="VBoxContainer" parent="Margin" unique_id=197663918]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 mouse_filter = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 2
 
-[node name="Health" type="ProgressBar" parent="Margin/Vitals"]
-custom_minimum_size = Vector2(300, 26)
+[node name="Barrier" type="ProgressBar" parent="Margin/Vitals" unique_id=2088016793]
+custom_minimum_size = Vector2(300, 15)
 layout_mode = 2
-theme_type_variation = &"HpBar"
-step = 0.01
+theme_type_variation = &"BarrierBar"
 show_percentage = false
 
-[node name="HealthText" type="Label" parent="Margin/Vitals/Health"]
+[node name="BarrierText" type="Label" parent="Margin/Vitals/Barrier" unique_id=1088581129]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -75,14 +76,30 @@ theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Mana" type="ProgressBar" parent="Margin/Vitals"]
+[node name="Health" type="ProgressBar" parent="Margin/Vitals" unique_id=155102817]
+custom_minimum_size = Vector2(300, 26)
+layout_mode = 2
+theme_type_variation = &"HpBar"
+show_percentage = false
+
+[node name="HealthText" type="Label" parent="Margin/Vitals/Health" unique_id=561391717]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Mana" type="ProgressBar" parent="Margin/Vitals" unique_id=583137024]
 custom_minimum_size = Vector2(300, 20)
 layout_mode = 2
 theme_type_variation = &"ManaBar"
-step = 0.01
 show_percentage = false
 
-[node name="ManaText" type="Label" parent="Margin/Vitals/Mana"]
+[node name="ManaText" type="Label" parent="Margin/Vitals/Mana" unique_id=1993968879]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -93,41 +110,41 @@ theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Effects" type="GridContainer" parent="Margin/Vitals"]
+[node name="Effects" type="GridContainer" parent="Margin/Vitals" unique_id=2124316385]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/h_separation = 1
 columns = 11
 
-[node name="Clock" type="Label" parent="Margin"]
+[node name="Clock" type="Label" parent="Margin" unique_id=805301505]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
 theme_type_variation = &"DimLabel"
 
-[node name="Buttons" type="HBoxContainer" parent="Margin"]
+[node name="Buttons" type="HBoxContainer" parent="Margin" unique_id=1522956462]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_constants/separation = 6
 
-[node name="Character" type="Button" parent="Margin/Buttons"]
+[node name="Character" type="Button" parent="Margin/Buttons" unique_id=2008808185]
 layout_mode = 2
 focus_mode = 0
 text = "Character"
 
-[node name="Inventory" type="Button" parent="Margin/Buttons"]
+[node name="Inventory" type="Button" parent="Margin/Buttons" unique_id=1162984409]
 layout_mode = 2
 focus_mode = 0
 text = "Inventory"
 
-[node name="Quests" type="Button" parent="Margin/Buttons"]
+[node name="Quests" type="Button" parent="Margin/Buttons" unique_id=809972642]
 layout_mode = 2
 focus_mode = 0
 text = "Quests"
 
-[node name="Crafting" type="Button" parent="Margin/Buttons"]
+[node name="Crafting" type="Button" parent="Margin/Buttons" unique_id=1633662129]
 layout_mode = 2
 focus_mode = 0
 text = "Crafting"

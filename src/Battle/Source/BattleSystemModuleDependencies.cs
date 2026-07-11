@@ -30,6 +30,7 @@
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
+            services.AddSingleton<ISpawnPointRegistry, SpawnPointRegistry>();
             services.AddSingleton<LoadScope>();
             services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
             services.AddSingleton<ISaveStorage>(_ => new SaveStorage(ProjectSettings.GlobalizePath("user://saves")));
@@ -58,6 +59,7 @@
                         sp.GetRequiredService<INpcProvider>(),
                         sp.GetRequiredService<INpcPopulationService>(),
                         spawner));
+                manager.Register(new SpawnPointsSaveParticipant(sp.GetRequiredService<ISpawnPointRegistry>()));
                 return manager;
             });
 
@@ -73,9 +75,6 @@
             uiElementManager.RegisterHudFactory(typeof(BattleHud), () => BattleHud.Initialize().Instantiate<BattleHud>());
             uiElementManager.RegisterWindowFactory(typeof(MartialArtMasteryWindow), () => MartialArtMasteryWindow.Initialize().Instantiate<MartialArtMasteryWindow>());
             uiElementManager.RegisterWindowFactory(typeof(AbilityUpgradeWindow), () => AbilityUpgradeWindow.Initialize().Instantiate<AbilityUpgradeWindow>());
-            uiElementManager.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>());
-            uiElementManager.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
-            uiElementManager.RegisterPopupFactory(typeof(KeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
         }
     }
 }

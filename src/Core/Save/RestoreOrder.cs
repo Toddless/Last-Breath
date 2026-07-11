@@ -27,8 +27,11 @@ namespace Core.Save
         /// <summary>HP/Mana/Barrier — strictly after everything that shapes the maximums.</summary>
         public const int Vitals = 50;
 
-        /// <summary>NPC world deltas (corpses, undead timers, spawn points).</summary>
+        /// <summary>NPC world deltas (corpses, undead timers).</summary>
         public const int Npc = 60;
+
+        /// <summary>Spawn point population: after the restored bodies claimed their population slots.</summary>
+        public const int SpawnPoints = 65;
 
         public const int PlayerPlacement = 70;
     }

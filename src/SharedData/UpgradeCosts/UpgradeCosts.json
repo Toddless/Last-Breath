@@ -62,5 +62,37 @@
                 }
             ]
         }
+    ],
+    "ascend": [
+        {
+            "category": "Weapon",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Weapon_Rune",
+                    "amount": 10
+                }
+            ]
+        },
+        {
+            "category": "Armor",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Blacksmith_Rune",
+                    "amount": 10
+                }
+            ]
+        },
+        {
+            "category": "Jewellery",
+            "requirements": [
+                {
+                    "type": "Resource",
+                    "id": "Upgrade_Resource_Jeweler_Rune",
+                    "amount": 10
+                }
+            ]
+        }
     ]
 }

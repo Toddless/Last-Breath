@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bcyue1uk1ek5e" path="res://Main.cs" id="1_r0du0"]
 [ext_resource type="PackedScene" uid="uid://geser04o26s5" path="res://MainWorld.tscn" id="2_cm0pq"]
-[ext_resource type="Script" uid="uid://ll4ctt5bd881" path="res://UI/Layers/UiLayerManager.cs" id="3_r0du0"]
+[ext_resource type="Script" uid="uid://ll4ctt5bd881" path="res://Services/UiLayerManager.cs" id="3_r0du0"]
 
 [node name="Main" type="Node2D" unique_id=2100645649 node_paths=PackedStringArray("_mainWorld", "_layerManager")]
 script = ExtResource("1_r0du0")

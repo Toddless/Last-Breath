@@ -69,6 +69,24 @@ namespace Battle.Source
         public IReadOnlyList<IFightable> TakeCommittedTargets(string selectionId) =>
             _committed.Remove(selectionId, out var targets) ? targets : [];
 
+        /// <summary>A latecomer took a spot mid-turn: highlights are built once at selection start,
+        /// so without a rebuild the newcomer stays untargetable until the next player turn.</summary>
+        public void RefreshHighlights()
+        {
+            switch (_mode)
+            {
+                case Mode.BasicAttack:
+                    StartBasicAttack();
+                    break;
+                case Mode.Ability when _caster != null && _ability is { Targeting.RequiresManualSelection: true }:
+                    ClearHighlights();
+                    HighlightValid(_ability.Targeting.GetValidTargets(_caster, _field), forAttack: false);
+                    foreach (var chosen in _chosen)
+                        SpotFor(chosen)?.SetChosen(true); // Few-targets picks survive the rebuild
+                    break;
+            }
+        }
+
         private void StartBasicAttack()
         {
             if (_caster == null) return;
@@ -83,6 +101,14 @@ namespace Battle.Source
         private void OnSelectionStarted(PlayerSelectingTargetForAbilityEvent evt)
         {
             if (_caster == null) return; // ability activation only makes sense on the player's turn
+            // A committed cast cannot be dodged by starting another ability: the newcomer is
+            // refused (its button resets via the resolved event), the committed selection stays.
+            if (IsSelectionLocked)
+            {
+                _bus.Publish<TargetSelectionResolvedEvent>(new(evt.SelectionId));
+                return;
+            }
+
             ClearHighlights();
             _chosen.Clear();
             _mode = Mode.Ability;
@@ -116,6 +142,7 @@ namespace Battle.Source
             if (_mode != Mode.Ability || evt.SelectionId != _selectionId) return;
             if (_chosen.Count == 0)
             {
+                if (IsSelectionLocked) return; // committed cast: "never mind" is not on the table
                 CancelBackToAttack(); // nothing picked yet: a confirm press means "never mind"
                 return;
             }
@@ -126,8 +153,12 @@ namespace Battle.Source
         private void OnCancel(CancelSelectionEvent evt)
         {
             if (_mode != Mode.Ability || evt.SelectionId != _selectionId) return;
+            if (IsSelectionLocked) return; // committed cast (charged Armageddon): no backing out
             CancelBackToAttack();
         }
+
+        /// <summary>An active selection of a non-cancellable ability: the player must pick a target.</summary>
+        private bool IsSelectionLocked => _mode == Mode.Ability && _ability?.IsCancellable == false;
 
         private void ToggleChosen(IFightable target)
         {

@@ -4,7 +4,6 @@ namespace Core.Components.NpcModifiers
     using Context;
     using Entity;
     using Godot;
-    using Interfaces;
 
     public abstract class NpcModifier(string id, float weight, float difficultyMultiplier, bool isUnique, string npcBuffId) : INpcModifier
     {

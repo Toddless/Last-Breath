@@ -18,19 +18,19 @@ namespace LastBreath.Services
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
     using Core.Reputation;
+    using Core.Save;
     using Core.Save.Participants;
     using Core.Services;
+    using Core.Views;
     using Core.Views.UI;
-    using Core.Save;
     using Crafting.Source;
+    using Godot;
     using Inventory;
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
     using Npc;
+    using UI;
     using World;
-    using DialogueWindow = UI.DialogueWindow;
-    using PlayerHud = UI.PlayerHud;
-    using QuestJournalWindow = UI.QuestJournalWindow;
 
     /// <summary>Project bootstrap: the shared Core provider + Main registrations. The only place touching the static root.</summary>
     public static class GameServiceProvider
@@ -77,7 +77,6 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IRaidService, RaidService>();
             services.AddSingleton<ISaveGameService, SaveGameService>();
             services.AddGameData("res://Data/", "res://Data/Shared/");
-            services.AddTransient<IMessageHandler<OpenWindowMessage>, OpenWindowMessageHandler>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
@@ -154,6 +153,11 @@ namespace LastBreath.Services
             uiElements.RegisterWindowFactory(typeof(InventoryWindow), () => InventoryWindow.Initialize().Instantiate<InventoryWindow>());
             uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>());
             uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>());
+            uiElements.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>());
+            uiElements.RegisterWindowFactory(typeof(CharacterWindow), () => CharacterWindow.Initialize().Instantiate<CharacterWindow>());
+            uiElements.RegisterWindowFactory(typeof(OptionsWindow), () => OptionsWindow.Initialize().Instantiate<OptionsWindow>());
+            uiElements.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
+            uiElements.RegisterPopupFactory(typeof(IKeywordTooltipPopup), () => KeywordTooltipPopup.Initialize().Instantiate<KeywordTooltipPopup>());
             provider.AddCraftingWindowFactories();
             provider.AddBattleUiElementsFactory();
         }

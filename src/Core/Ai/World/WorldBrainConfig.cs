@@ -45,6 +45,9 @@ namespace Core.Ai.World
         /// <summary>Keeps fleeing this long after the threat was last seen/heard, then calms down.</summary>
         public float FleeSeconds { get; init; } = 5f;
 
+        // TODO:
+        // Расширить список активностей.
+        // Нпс могут: Охотится, искать сражения с кем то, выполнять квест (простые), добывать ресурсы, отдыхать (условно сидим у костра в лагере), спать
         public WorldActivityType Activity { get; init; } = WorldActivityType.Idle;
 
         /// <summary>Wander destinations are rolled within this radius around home.</summary>

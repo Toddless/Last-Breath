@@ -13,26 +13,19 @@ namespace Crafting.Source.EventHandlers
         IInventory inventory)
         : IMessageHandler<OpenCraftingWindowMessage>
     {
-        public async Task HandleMessageAsync(OpenCraftingWindowMessage message)
+        public Task HandleMessageAsync(OpenCraftingWindowMessage message)
         {
             if (!message.IsItem || string.IsNullOrWhiteSpace(message.Id))
             {
                 uiElementsManager.ToggleWindow(typeof(CraftingWindow));
-                return;
+                return Task.CompletedTask;
             }
 
-            var window = (CraftingWindow)uiElementsManager.ToggleWindow(typeof(CraftingWindow));
+            var window = (CraftingWindow)uiElementsManager.OpenWindow(typeof(CraftingWindow));
             var item = inventory.GetItem<IEquipItem>(message.Id);
-            if (item == null) return;
-            switch (message.CraftingMode)
-            {
-                case CraftingMode.Recraft:
-                    await window.SetEquipItemForRecraftAsync(item);
-                    break;
-                case CraftingMode.Upgrade:
-                    await window.SetEquipItemForUpgradeAsync(item);
-                    break;
-            }
+            if (item != null && message.CraftingMode is CraftingMode.Upgrade or CraftingMode.Recraft or CraftingMode.Ascend)
+                window.SetItem(item, message.CraftingMode);
+            return Task.CompletedTask;
         }
     }
 }

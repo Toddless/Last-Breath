@@ -8,7 +8,6 @@
     using Core.Entity;
     using Core.Enums;
     using Core.Events.GameEvents;
-    using Core.Localization;
 
     public class ManaDevour(
         string[] tags,

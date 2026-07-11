@@ -13,11 +13,10 @@
         private const string UID = "uid://cv5svhrugien6";
         private static readonly Color s_deadTint = new(0.45f, 0.45f, 0.45f, 0.8f);
         private Tween? _tween;
-        private ProgressBar? _barrierBar;
         [Export] private Control? MainContainer { get; set; }
-        [Export] private TextureProgressBar? ManaBar { get; set; }
-        [Export] private TextureProgressBar? HealthBar { get; set; }
-        [Export] private TextureProgressBar? BarrierBar { get; set; }
+        [Export] private ProgressBar? ManaBar { get; set; }
+        [Export] private ProgressBar? HealthBar { get; set; }
+        [Export] private ProgressBar? BarrierBar { get; set; }
         [Export] private TextureRect? Icon { get; set; }
         [Export] private TextureRect? MainTexture { get; set; }
         [Export] private GridContainer? CharacterEffects { get; set; }
@@ -102,7 +101,7 @@
 
         private IEnumerable<EffectSlot> GetEffectSlots() => CharacterEffects?.GetChildren().Cast<EffectSlot>() ?? [];
 
-        private void AnimateValueChange(TextureProgressBar progressBar, float newValue, bool isMaxValue = false)
+        private void AnimateValueChange(ProgressBar progressBar, float newValue, bool isMaxValue = false)
         {
             string propertyName = isMaxValue ? "max_value" : "value";
             _tween?.TweenProperty(progressBar, propertyName, isMaxValue ? progressBar.MaxValue : progressBar.Value, newValue);
@@ -113,9 +112,9 @@
             LayoutDirection = FlipH ? LayoutDirectionEnum.Rtl : LayoutDirectionEnum.Ltr;
             Icon?.FlipH = FlipH;
             MainTexture?.FlipH = FlipH;
-            ManaBar?.FillMode = FlipH ? 1 : 0;
-            HealthBar?.FillMode = FlipH ? 1 : 0;
-            BarrierBar?.FillMode = FlipH ? 1 : 0;
+            ManaBar?.FillMode = FlipH ? (int)ProgressBar.FillModeEnum.EndToBegin : (int)ProgressBar.FillModeEnum.BeginToEnd;
+            HealthBar?.FillMode = FlipH ? (int)ProgressBar.FillModeEnum.EndToBegin : (int)ProgressBar.FillModeEnum.BeginToEnd;
+            BarrierBar?.FillMode = FlipH ? (int)ProgressBar.FillModeEnum.EndToBegin : (int)ProgressBar.FillModeEnum.BeginToEnd;
         }
     }
 }

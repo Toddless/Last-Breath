@@ -1,7 +1,5 @@
 namespace Core.Views.UI
 {
-    using Godot;
-
     /// <summary>
     /// Project-agnostic contract of the canvas-layer host with the three UI layers:
     /// Hud (persistent), Window (temporary complex screens), Overlay (tooltips, popups,

@@ -5,7 +5,6 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Components;
     using Core.Entity;
     using Core.Enums;
-    using Core.Interfaces;
     using Core.MessageBus;
     using Core.Save.Participants;
     using Core.Services;

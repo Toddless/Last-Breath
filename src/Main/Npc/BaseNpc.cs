@@ -23,6 +23,7 @@ namespace LastBreath.Npc
     using Core.Events;
     using Core.Events.GameEvents;
     using Core.Items;
+    using Core.Localization;
     using Core.Modifiers;
     using Core.Reputation;
     using Core.Services;
@@ -43,10 +44,16 @@ namespace LastBreath.Npc
         /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
         private const float SkirmishScanInterval = 0.5f;
 
+        /// <summary>No battle-starting contact right after a battle: both sides return to the
+        /// engagement point overlapping each other — without this pause the fight restarts
+        /// instantly (flee was pointless, survivors chained battles).</summary>
+        private const float PostBattleContactGraceSeconds = 3f;
+
         private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
 
         private bool _hostileToPlayer;
+        private float _contactGraceSeconds;
         private float _skirmishScanCooldown;
         private float _corpseScanCooldown;
         private float _moveSpeed;
@@ -78,8 +85,8 @@ namespace LastBreath.Npc
         [Export] public Fractions Fraction { get; private set; } = Fractions.Human;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public Texture2D? Icon { get; } = null;
-        public string Description { get; } = string.Empty;
-        public string DisplayName { get; } = string.Empty;
+        public string Description => Localization.LocalizeDescription(Id);
+        public string DisplayName => Localization.Localize(Id);
         public IEntityParametersComponent Parameters { get; private set; }
         public IPassiveSkillsComponent PassiveSkills { get; private set; }
         public IAnimationsComponent Animations => _animationsComponent;
@@ -119,6 +126,9 @@ namespace LastBreath.Npc
 
         Vector2 ISkirmishParticipant.Position => GlobalPosition;
 
+        // TakeDamage owns the event order (damage beat first, death after) — see its comment.
+        private bool _suppressDeathNotify;
+
         public float CurrentHealth
         {
             get => Mathf.Max(0, field);
@@ -127,7 +137,7 @@ namespace LastBreath.Npc
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                if (field <= 0) NotifyShouldDie();
+                if (field <= 0 && !_suppressDeathNotify) NotifyShouldDie();
                 NotifyHealthChanges(field);
             }
         }
@@ -188,6 +198,7 @@ namespace LastBreath.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -212,6 +223,7 @@ namespace LastBreath.Npc
                 return;
             }
 
+            if (_contactGraceSeconds > 0) _contactGraceSeconds -= (float)delta;
             _brain?.Tick((float)delta);
             TryScanForSkirmish((float)delta);
             TryScanForPlayerCorpse((float)delta);
@@ -261,6 +273,7 @@ namespace LastBreath.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
 
             AttachWorldBrain(definition.World);
 
@@ -307,7 +320,10 @@ namespace LastBreath.Npc
             Vector2? nearest = null;
             float nearestDistance = visionRadius;
 
-            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true } and Node2D playerNode)
+            // A fighting player is not in the world (his node stands on the arena): chasing that
+            // model parks NPCs under it for the whole battle. The battle-site marker's noise is
+            // the intended lure to an ongoing fight.
+            if (ConsidersPlayerAnEnemy() && _playerAccessor?.Player is { IsAlive: true, IsFighting: false } and Node2D playerNode)
                 Consider(playerNode.GlobalPosition, ref nearest, ref nearestDistance);
 
             if (_npcRegistry != null && _factionRelations != null)
@@ -324,7 +340,7 @@ namespace LastBreath.Npc
 
         /// <summary>Bandits/beasts carry a personal override; everyone else follows the player's
         /// faction standing shifted by THIS NPC's personal opinion (a rescued dwarf won't attack).</summary>
-        private bool ConsidersPlayerAnEnemy()
+        public bool ConsidersPlayerAnEnemy()
         {
             if (_hostileToPlayer) return true;
             if (_personalReputation != null) return _personalReputation.IsHostileToPlayer(InstanceId, Fraction);
@@ -438,6 +454,7 @@ namespace LastBreath.Npc
             }
             catch (Exception e)
             {
+                Tracker.TrackException($"Failed to receive attack: {e.Message}, {e.StackTrace}", e, this);
                 GD.Print($"{e.Message}, {e.StackTrace}");
             }
         }
@@ -467,11 +484,18 @@ namespace LastBreath.Npc
                 remaining -= absorbed;
             }
 
+            // The damage event must precede the death event in the timeline: the director drops
+            // "posthumous" beats, so a death recorded first swallowed its own killing hit
+            // (frozen bars, no log line). The setter's death notify is deferred past the publish.
+            bool wasAlive = IsAlive;
+            _suppressDeathNotify = true;
             if (remaining > 0) CurrentHealth -= remaining;
+            _suppressDeathNotify = false;
 
             // Combat bus only: the timeline records it and the BattleDirector republishes it
             // to the battle bus at replay time, so UI reacts when the hit is SHOWN, not resolved.
             CombatEvents.Publish(new DamageTakenEvent(context, this, VitalsSnapshot.From(this)));
+            if (wasAlive && !IsAlive) NotifyShouldDie();
             return Task.CompletedTask;
         }
 
@@ -566,7 +590,10 @@ namespace LastBreath.Npc
 
         private void OnBodyEnter(Node2D body)
         {
+            // TODO:
+            // возможно стоит убрать отсюда игрока. С другой стороны где и как различать что за тип боя был инициализирован?
             if (IsFighting || !IsAlive) return; // a lying body must not start battles
+            if (_contactGraceSeconds > 0) return; // fresh out of a battle: let the loser leave
             // The player's flag guards the battle-start window: a second NPC touching in the same
             // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
             // not a battle target.
@@ -583,6 +610,9 @@ namespace LastBreath.Npc
                     fighters.Add(this);
 
                 StopMoving();
+                // Permanent forensics: one line per battle start names the initiator and the spot —
+                // it has already pinned down two "battles out of nowhere" bugs. Kept cheap on purpose.
+                Tracker.TrackInfo($"Battle started by {Id} ({InstanceId}) at {GlobalPosition}, player at {(player as Node2D)?.GlobalPosition}", this);
                 _gameEventBus?.Publish(new BattleInitializedEvent(player, fighters));
                 // A fight breaking out is audible: nearby brains investigate (they filter by hearing radius).
                 _gameEventBus?.Publish(new WorldStimulusEvent(new Stimulus(StimulusType.Noise, GlobalPosition)));
@@ -614,7 +644,11 @@ namespace LastBreath.Npc
             CanMove = true;
             Position = _lastPosition;
 
-            if (IsAlive) _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+            if (IsAlive)
+            {
+                _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+                _contactGraceSeconds = PostBattleContactGraceSeconds;
+            }
             else BecomeBody();
 
             _battleEventBus = null;
@@ -704,6 +738,7 @@ namespace LastBreath.Npc
             ApplyRisingBonus(parameterBonus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
             Modulate = new Color(0.65f, 1f, 0.75f); // placeholder undead look until dedicated sprites exist
             Animations.PlayAnimation("Idle_Down");
         }
@@ -777,8 +812,10 @@ namespace LastBreath.Npc
                         value = 200;
                         break;
                     case EntityParameter.CriticalChance:
-                    case EntityParameter.AdditionalHitChance:
                         value = 0.25f;
+                        break;
+                    case EntityParameter.AdditionalHitChance:
+                        value = 0.05f; // extra attacks chain — a high base balloons attack series
                         break;
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;

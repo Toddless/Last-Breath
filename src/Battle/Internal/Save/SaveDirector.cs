@@ -12,7 +12,7 @@ namespace Battle.Internal.Save
     /// scene, this node applies the pending save file once the fresh world has settled.
     /// </summary>
     [GlobalClass]
-    public partial class SaveDirector : Node
+    internal partial class SaveDirector : Node
     {
         private ISaveGameService? _saveGame;
 

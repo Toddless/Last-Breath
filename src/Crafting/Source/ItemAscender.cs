@@ -1,9 +1,12 @@
 namespace Crafting.Source
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Core;
     using Core.Crafting;
     using Core.Data;
     using Core.Enums;
+    using Core.Interfaces;
     using Core.Items;
     using Core.Modifiers;
     using Core.Results;
@@ -18,12 +21,15 @@ namespace Crafting.Source
         public bool CanAscend(IEquipItem item) =>
             item is IAscendable { IsAscendable: true } && !item.IsSealed && item.Rarity == Rarity.Legendary;
 
+        public List<IRequirement> GetAscendResourceCost(EquipmentCategory itemCategory) =>
+            itemDataProvider.GetAscendCost(itemCategory).ToList();
+
         public AscensionResult TryAscendItem(IEquipItem item)
         {
             if (!CanAscend(item) || item is not IAscendable ascendable) return new AscensionResult(false, null);
+            if (!ascendable.TryAscend()) return new AscensionResult(false, null);
 
             var gift = TryRollGift(item);
-            ascendable.TryAscend();
             return new AscensionResult(true, gift);
         }
 

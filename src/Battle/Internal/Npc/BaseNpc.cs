@@ -42,10 +42,16 @@ namespace Battle.Internal.Npc
         /// <summary>Skirmish opportunities are scanned this often, not every physics frame.</summary>
         private const float SkirmishScanInterval = 0.5f;
 
+        /// <summary>No battle-starting contact right after a battle: both sides return to the
+        /// engagement point overlapping each other — without this pause the fight restarts
+        /// instantly (flee was pointless, survivors chained battles).</summary>
+        private const float PostBattleContactGraceSeconds = 3f;
+
         private const string UndeadRisingModifierSource = "UndeadRising";
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
+        private float _contactGraceSeconds;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
         private IPlayerAccessor? _playerAccessor;
@@ -115,6 +121,9 @@ namespace Battle.Internal.Npc
 
         Vector2 ISkirmishParticipant.Position => GlobalPosition;
 
+        // TakeDamage owns the event order (damage beat first, death after) — see its comment.
+        private bool _suppressDeathNotify;
+
         public float CurrentHealth
         {
             get => Mathf.Max(0, field);
@@ -123,7 +132,7 @@ namespace Battle.Internal.Npc
                 float clamped = Mathf.Clamp(value, 0, Parameters.MaxHealth);
                 if (Mathf.Abs(clamped - field) < 0.0001f) return;
                 field = clamped;
-                if (field <= 0) NotifyShouldDie();
+                if (field <= 0 && !_suppressDeathNotify) NotifyShouldDie();
                 NotifyHealthChanges(field);
             }
         }
@@ -184,6 +193,7 @@ namespace Battle.Internal.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -207,6 +217,7 @@ namespace Battle.Internal.Npc
                 return;
             }
 
+            if (_contactGraceSeconds > 0) _contactGraceSeconds -= (float)delta;
             _brain?.Tick((float)delta);
             TryScanForSkirmish((float)delta);
             TryScanForPlayerCorpse((float)delta);
@@ -256,6 +267,7 @@ namespace Battle.Internal.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
 
             AttachWorldBrain(definition.World);
 
@@ -457,11 +469,18 @@ namespace Battle.Internal.Npc
                 remaining -= absorbed;
             }
 
+            // The damage event must precede the death event in the timeline: the director drops
+            // "posthumous" beats, so a death recorded first swallowed its own killing hit
+            // (frozen bars, no log line). The setter's death notify is deferred past the publish.
+            bool wasAlive = IsAlive;
+            _suppressDeathNotify = true;
             if (remaining > 0) CurrentHealth -= remaining;
+            _suppressDeathNotify = false;
 
             // Combat bus only: the timeline records it and the BattleDirector republishes it
             // to the battle bus at replay time, so UI reacts when the hit is SHOWN, not resolved.
             CombatEvents.Publish(new DamageTakenEvent(context, this, VitalsSnapshot.From(this)));
+            if (wasAlive && !IsAlive) NotifyShouldDie();
             return Task.CompletedTask;
         }
 
@@ -553,6 +572,7 @@ namespace Battle.Internal.Npc
         private void OnBodyEnter(Node2D body)
         {
             if (IsFighting || !IsAlive) return; // a lying body must not start battles
+            if (_contactGraceSeconds > 0) return; // fresh out of a battle: let the loser leave
             // The player's flag guards the battle-start window: a second NPC touching in the same
             // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
             // not a battle target.
@@ -600,7 +620,11 @@ namespace Battle.Internal.Npc
             CanMove = true;
             Position = _lastPosition;
 
-            if (IsAlive) _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+            if (IsAlive)
+            {
+                _brain?.OnBattleEnded(); // grace period: no instant re-aggression at the arena exit
+                _contactGraceSeconds = PostBattleContactGraceSeconds;
+            }
             else BecomeBody();
 
             _battleEventBus = null;
@@ -688,6 +712,7 @@ namespace Battle.Internal.Npc
             ApplyRisingBonus(parameterBonus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
             Modulate = new Color(0.65f, 1f, 0.75f); // placeholder undead look until dedicated sprites exist
             Animations.PlayAnimation("Idle_Down");
         }
@@ -761,8 +786,10 @@ namespace Battle.Internal.Npc
                         value = 200;
                         break;
                     case EntityParameter.CriticalChance:
-                    case EntityParameter.AdditionalHitChance:
                         value = 0.25f;
+                        break;
+                    case EntityParameter.AdditionalHitChance:
+                        value = 0.05f; // extra attacks chain — a high base balloons attack series
                         break;
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;

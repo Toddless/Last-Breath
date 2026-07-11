@@ -10,6 +10,8 @@ namespace Core.Ai.World
         /// <summary>A non-undead body: the resurrection timer is running unless it gets burned.</summary>
         Defeated,
 
+        // TODO:
+        // Дополнить состояние цикла. Нежить через некоторое время восстает обратно.
         /// <summary>A defeated undead ("anabiosis"): lies indefinitely, only burning finishes it.</summary>
         Dormant,
 

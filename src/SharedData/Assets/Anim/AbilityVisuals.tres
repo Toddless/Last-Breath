@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="AbilityVisualLibrary" format=3 uid="uid://bh87hiqb74wbh"]
 
-[ext_resource type="Script" uid="uid://boch4m6i7q2ob" path="res://Source/Presentation/AbilityVisualConfig.cs" id="1_cfg"]
-[ext_resource type="Script" uid="uid://8bj6cfgq0817" path="res://Source/Presentation/AbilityVisualLibrary.cs" id="2_lib"]
-[ext_resource type="SpriteFrames" uid="uid://bwh6ukljuub2w" path="res://Internal/_Placeholders/Anim/VfxFrames.tres" id="3_frames"]
+[ext_resource type="Script" uid="uid://boch4m6i7q2ob" path="res://Addons/Battle/Presentation/AbilityVisualConfig.cs" id="1_cfg"]
+[ext_resource type="Script" uid="uid://8bj6cfgq0817" path="res://Addons/Battle/Presentation/AbilityVisualLibrary.cs" id="2_lib"]
+[ext_resource type="SpriteFrames" uid="uid://bwh6ukljuub2w" path="res://Data/Shared/Assets/Anim/VfxFrames.tres" id="3_frames"]
 
 [sub_resource type="Resource" id="Resource_e7d13"]
 script = ExtResource("1_cfg")

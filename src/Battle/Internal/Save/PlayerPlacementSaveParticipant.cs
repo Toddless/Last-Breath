@@ -7,7 +7,7 @@ namespace Battle.Internal.Save
     using Newtonsoft.Json.Linq;
 
     /// <summary>Godot-side participant: the position lives on the player node, not on IPlayer.</summary>
-    public class PlayerPlacementSaveParticipant(IPlayerAccessor playerAccessor) : ISaveParticipant
+    internal class PlayerPlacementSaveParticipant(IPlayerAccessor playerAccessor) : ISaveParticipant
     {
         public string SectionId => "playerPlacement";
         public int Version => 1;

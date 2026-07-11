@@ -26,6 +26,7 @@ project/assembly_name="Crafting"
 
 [gui]
 
+theme/custom="res://Internal/Data/Shared/Assets/UI/Theme.tres"
 timers/tooltip_delay_sec=0.4
 
 [internationalization]

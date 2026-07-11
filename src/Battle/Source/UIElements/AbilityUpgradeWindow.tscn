@@ -3,12 +3,6 @@
 [ext_resource type="Script" uid="uid://40loqjxv6xr0" path="res://Source/UIElements/AbilityUpgradeWindow.cs" id="1_iw8cd"]
 [ext_resource type="PackedScene" uid="uid://cfjcrk0kkryi8" path="res://Source/UIElements/AbilityUpgrades.tscn" id="2_441g7"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_fx85w"]
-font_size = 20
-
-[sub_resource type="LabelSettings" id="LabelSettings_awghw"]
-font_size = 12
-
 [node name="AbilityUpgradeWindow" type="MarginContainer" unique_id=1479837103 node_paths=PackedStringArray("_abilityUpgrades", "_abilityName", "_cost", "_cooldown", "_abilityIcon", "_abilityDescription", "_close")]
 anchors_preset = 11
 anchor_left = 1.0
@@ -68,20 +62,22 @@ layout_mode = 2
 
 [node name="Name" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1663069818]
 layout_mode = 2
+theme_type_variation = &"HeaderLabel"
 text = "Ледяная шрапнель"
-label_settings = SubResource("LabelSettings_fx85w")
 
 [node name="Cost" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=523355465]
 layout_mode = 2
 size_flags_horizontal = 0
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 13
 text = "Стоимость: 400"
-label_settings = SubResource("LabelSettings_awghw")
 
 [node name="Cooldown" type="Label" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties" unique_id=1664994067]
 layout_mode = 2
 size_flags_horizontal = 0
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 13
 text = "Перезарядка: 4"
-label_settings = SubResource("LabelSettings_awghw")
 
 [node name="MarginContainer" type="MarginContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer" unique_id=1438409670]
 layout_mode = 2

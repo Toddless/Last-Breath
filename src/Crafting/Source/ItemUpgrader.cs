@@ -1,4 +1,4 @@
-﻿namespace Crafting.Source
+namespace Crafting.Source
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@
     using Core.Results;
     using Godot;
 
-    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider) : IItemUpgrader
+    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider, ICraftingAdditiveProvider additives) : IItemUpgrader
     {
         private const float P0 = 0.95f;
         private const float P5 = 0.70f;
@@ -44,38 +44,59 @@
             return requirements.Select(IRequirement (req) => new Requirement(req.Type, req.Id, req.Amount + amount)).ToList();
         }
 
-        public IModifierInstance? TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers)
+        public IModifierInstance? TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers, IReadOnlyCollection<string>? additiveResourceIds = null)
         {
             if (item.Modifiers.All(modifier => modifier.GetHashCode() != modifierToReroll)) return null;
 
-            (List<WeightedObject<IModifier>> weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers.Concat(item.ModifiersPool));
+            // Additive pools join the roll for THIS operation only; the item's own pool never changes.
+            var candidates = modifiers.Concat(item.ModifiersPool).Concat(AdditivePools(additiveResourceIds))
+                .Where(candidate => candidate.GetHashCode() != modifierToReroll
+                                    && item.Modifiers.All(existing => existing.GetHashCode() != candidate.GetHashCode()))
+                .ToList();
+            if (candidates.Count == 0) return null; // the pool has nothing new to offer — refuse instead of looping
+
+            (List<WeightedObject<IModifier>> weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
 
             item.RemoveAdditionalModifier(modifierToReroll);
-            IModifierInstance? modifier = null;
-            while (modifier == null)
-            {
-                var newMod = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
-
-                if (item.Modifiers.Any(x => x.GetHashCode() == newMod.GetHashCode())) continue;
-
-                modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierValueType, newMod.BaseValue, item.InstanceId);
-                item.AddAdditionalModifier(modifier);
-            }
+            var newMod = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
+            var modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierValueType, newMod.BaseValue, item.InstanceId);
+            item.AddAdditionalModifier(modifier);
 
             return modifier;
         }
 
-        public ItemUpgradeResult TryUpgradeItem(IEquipItem item)
+        public ItemUpgradeResult TryUpgradeItem(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null)
         {
             if (item.UpdateLevel == item.MaxUpdateLevel) return ItemUpgradeResult.ReachedMaxLevel;
 
-            float chances = GetChance(item.UpdateLevel);
+            var effects = AdditiveEffects(additiveResourceIds);
+            float chances = Mathf.Clamp(GetChance(item.UpdateLevel) + effects.Sum(e => e.UpgradeChanceBonus), 0f, 1f);
             bool upgradeSucceed = rnd.Randf() <= chances;
 
-            if (upgradeSucceed) item.Upgrade();
+            if (upgradeSucceed)
+            {
+                item.Upgrade();
+                TryGrantExtraLevel(item, effects);
+            }
 
             return upgradeSucceed ? ItemUpgradeResult.Success : ItemUpgradeResult.Failure;
         }
+
+        /// <summary>Additives may gift a second level on success (never past the cap).</summary>
+        private void TryGrantExtraLevel(IEquipItem item, List<CraftingAdditiveEffects> effects)
+        {
+            float extraChance = Mathf.Clamp(effects.Sum(e => e.ExtraUpgradeLevelChance), 0f, 1f);
+            if (extraChance <= 0f || item.UpdateLevel >= item.MaxUpdateLevel) return;
+            if (rnd.Randf() <= extraChance) item.Upgrade();
+        }
+
+        private List<CraftingAdditiveEffects> AdditiveEffects(IReadOnlyCollection<string>? resourceIds) =>
+            resourceIds?.Select(additives.GetEffects).Where(effects => effects != null).Cast<CraftingAdditiveEffects>().ToList() ?? [];
+
+        private IEnumerable<IModifier> AdditivePools(IReadOnlyCollection<string>? resourceIds) =>
+            AdditiveEffects(resourceIds)
+                .Where(effects => !string.IsNullOrEmpty(effects.RecraftPoolId))
+                .SelectMany(effects => itemDataProvider.GetEquipItemModifierPool(effects.RecraftPoolId!));
 
         private float GetChance(int level)
         {

@@ -4,6 +4,7 @@ namespace Core.Services
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Events;
+    using Events.GameEvents;
     using Godot;
     using Views.UI;
 
@@ -27,26 +28,53 @@ namespace Core.Services
         };
 
         private readonly NotificationQueue _queue = new(MaxVisiblePerRegion);
+        private readonly List<SendNotificationMessageMessage> _heldDuringBattle = [];
         private ILayerManager? _layers;
         private Func<Control?>? _popupFactory;
+        private bool _battleRunning;
+
+        /// <summary>Toasts wait out the battle: level-ups and reputation resolve instantly at
+        /// logic time and used to pop while the fight was still animating. Held messages flush
+        /// on BattleEndEvent — published after the final presentation gate.</summary>
+        public NotificationService(IGameEventBus gameEventBus)
+        {
+            gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleStarted);
+            gameEventBus.Subscribe<BattleEndEvent>(OnBattleEnded);
+        }
+
+        private void OnBattleStarted(BattleInitializedEvent evnt) => _battleRunning = true;
+
+        private void OnBattleEnded(BattleEndEvent evnt)
+        {
+            _battleRunning = false;
+            var held = _heldDuringBattle.ToArray();
+            _heldDuringBattle.Clear();
+            foreach (var message in held)
+                _ = HandleMessageAsync(message);
+        }
 
         /// <summary>
         /// The factory returns the popup Control implementing <see cref="INotificationPopup"/>.
         /// It may return null (e.g. the popup scene isn't built yet) — the message is then dropped.
         /// Called again after a scene reload: the old layer subscription is released.
         /// </summary>
-        public void Setup(ILayerManager layers, Func<Control?> popupFactory)
+        public void Setup(ILayerManager? layers, Func<Control?> popupFactory)
         {
             if (_layers != null) _layers.OverlaysCleared -= _queue.Clear;
             _layers = layers;
             _popupFactory = popupFactory;
             _queue.Clear();
-            layers.OverlaysCleared += _queue.Clear;
+            layers?.OverlaysCleared += _queue.Clear;
         }
 
         public Task HandleMessageAsync(SendNotificationMessageMessage message)
         {
             if (_layers == null || _popupFactory == null) return Task.CompletedTask;
+            if (_battleRunning)
+            {
+                _heldDuringBattle.Add(message);
+                return Task.CompletedTask;
+            }
 
             var region = s_regions.GetValueOrDefault(message.Category, OverlayRegion.BottomRight);
             var notification = new NotificationContent(message.Id, message.Values);

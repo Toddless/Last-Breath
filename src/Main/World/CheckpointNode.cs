@@ -4,6 +4,7 @@ namespace LastBreath.World
     using Core.Services;
     using Core.Views.UI;
     using Godot;
+    using SaveLoadWindow = UI.SaveLoadWindow;
 
     /// <summary>
     /// A checkpoint in the world: clicking it with the player standing nearby (same reach as

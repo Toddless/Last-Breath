@@ -20,6 +20,10 @@
 
         /// <summary>How the ability selects its targets. Swappable per ability.</summary>
         ITargetingStrategy Targeting { get; }
+
+        /// <summary>False = no backing out once target selection began: the player must pick a
+        /// target and the cast fires (charged Armageddon). Default true.</summary>
+        bool IsCancellable => true;
         Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; }
 
         /// <summary>Riders fired once per cast, after execution (self-buffs, cast-scoped debuffs).</summary>

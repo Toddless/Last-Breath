@@ -2,47 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dwqlti1jvk41l" path="res://Source/UIElements/CharacterBar.cs" id="1_a8sqt"]
 
-[sub_resource type="Gradient" id="Gradient_yrf26"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_fx85w"]
-gradient = SubResource("Gradient_yrf26")
-
-[sub_resource type="Gradient" id="Gradient_457o6"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(8.471012e-06, 0.78414035, 0.8303062, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_457o6"]
-gradient = SubResource("Gradient_457o6")
-
-[sub_resource type="Gradient" id="Gradient_a8sqt"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_1htkg"]
-gradient = SubResource("Gradient_a8sqt")
-
-[sub_resource type="Gradient" id="Gradient_1htkg"]
-colors = PackedColorArray(0, 0, 0, 1, 1, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_rknxy"]
-gradient = SubResource("Gradient_1htkg")
-
-[sub_resource type="Gradient" id="Gradient_rknxy"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_4u1dt"]
-gradient = SubResource("Gradient_rknxy")
-
-[sub_resource type="Gradient" id="Gradient_4u1dt"]
-colors = PackedColorArray(0, 0, 0.8117647, 1, 0, 1, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_yrf26"]
-gradient = SubResource("Gradient_4u1dt")
-
-[node name="CharacterHealthBar" type="MarginContainer" unique_id=1528812868 node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "CharacterEffects")]
+[node name="CharacterHealthBar" type="MarginContainer" node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "CharacterEffects")]
 offset_right = 250.0
 offset_bottom = 68.0
 layout_direction = 2
@@ -53,51 +13,45 @@ HealthBar = NodePath("MainContainer/Bars/Health")
 BarrierBar = NodePath("MainContainer/Bars/Barrier")
 CharacterEffects = NodePath("MainContainer/VBoxContainer/GridContainer")
 
-[node name="MainContainer" type="VBoxContainer" parent="." unique_id=2084374346]
+[node name="MainContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Bars" type="VBoxContainer" parent="MainContainer" unique_id=1929722902]
+[node name="Bars" type="VBoxContainer" parent="MainContainer"]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Barrier" type="TextureProgressBar" parent="MainContainer/Bars" unique_id=1163940963]
-custom_minimum_size = Vector2(0, 25)
+[node name="Barrier" type="ProgressBar" parent="MainContainer/Bars"]
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.3
 mouse_filter = 2
+theme_type_variation = &"BarrierBar"
+step = 0.01
 value = 21.0
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture1D_fx85w")
-texture_progress = SubResource("GradientTexture1D_457o6")
-tint_progress = Color(0.2901961, 0.80784315, 1, 1)
+show_percentage = false
 
-[node name="Health" type="TextureProgressBar" parent="MainContainer/Bars" unique_id=2079201341]
-custom_minimum_size = Vector2(250, 35)
+[node name="Health" type="ProgressBar" parent="MainContainer/Bars"]
+custom_minimum_size = Vector2(250, 28)
 layout_mode = 2
-size_flags_stretch_ratio = 0.3
+mouse_filter = 2
+theme_type_variation = &"HpBar"
+step = 0.01
 value = 81.0
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture1D_1htkg")
-texture_progress = SubResource("GradientTexture1D_rknxy")
-tint_under = Color(0, 0, 0, 1)
-tint_over = Color(0.39215687, 0.54901963, 0.7254902, 0.46666667)
-tint_progress = Color(1, 0, 0, 1)
+show_percentage = false
 
-[node name="Mana" type="TextureProgressBar" parent="MainContainer/Bars" unique_id=374472612]
-custom_minimum_size = Vector2(0, 15)
+[node name="Mana" type="ProgressBar" parent="MainContainer/Bars"]
+custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
-size_flags_stretch_ratio = 0.3
+mouse_filter = 2
+theme_type_variation = &"ManaBar"
+step = 0.01
 value = 60.0
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture1D_4u1dt")
-texture_progress = SubResource("GradientTexture1D_yrf26")
+show_percentage = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer" unique_id=105328526]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer"]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="MainContainer/VBoxContainer" unique_id=1769934816]
+[node name="GridContainer" type="GridContainer" parent="MainContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 15)
 layout_mode = 2
 theme_override_constants/h_separation = 3

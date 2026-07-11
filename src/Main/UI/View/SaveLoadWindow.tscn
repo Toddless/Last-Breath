@@ -1,127 +1,48 @@
-[gd_scene load_steps=6 format=3 uid="uid://cserxppd6wiui"]
+[gd_scene format=3 uid="uid://cserxppd6wiui"]
 
-[ext_resource type="Script" uid="uid://b82dy3x5ekixn" path="res://Script/UI/View/SaveLoadWindow.cs" id="1_75103"]
-[ext_resource type="LabelSettings" uid="uid://b8bihgx3i4r2o" path="res://Assets/UI/Fonts/LabelSettings.tres" id="2_psio3"]
-[ext_resource type="LabelSettings" uid="uid://cw8vnuvheflmc" path="res://Assets/UI/Fonts/SettingsMenu.tres" id="3_m62os"]
-[ext_resource type="Script" uid="uid://d0j1nts8hqfnb" path="res://Script/UI/LocalizableLabel.cs" id="3_psio3"]
-[ext_resource type="Script" uid="uid://bxravf1ugfs0x" path="res://Script/UI/LocalizableButton.cs" id="4_75103"]
+[ext_resource type="Script" uid="uid://dmce0ge8oiwgq" path="res://UI/SaveLoadWindow.cs" id="1"]
 
-[node name="SaveLoadMenu" type="PanelContainer" node_paths=PackedStringArray("_returnButton", "_loadBtn", "_deleteBtn")]
+[node name="SaveLoadWindow" type="MarginContainer" unique_id=816297655 node_paths=PackedStringArray("_slotsContainer", "_closeButton")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-focus_mode = 2
-script = ExtResource("1_75103")
-_returnButton = NodePath("MarginContainer/VBoxContainer/HBoxContainer/Return")
-_loadBtn = NodePath("MarginContainer/VBoxContainer/HBoxContainerButtons/LoadBtn")
-_deleteBtn = NodePath("MarginContainer/VBoxContainer/HBoxContainerButtons/DeleteBtn")
+script = ExtResource("1")
+_slotsContainer = NodePath("Center/Panel/Margin/Layout/Slots")
+_closeButton = NodePath("Center/Panel/Margin/Layout/Header/CloseBtn")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 2
-theme_override_constants/margin_left = 160
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 160
-theme_override_constants/margin_bottom = 40
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 80
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "SaveLoadLabel"
-label_settings = ExtResource("2_psio3")
-horizontal_alignment = 1
-script = ExtResource("3_psio3")
-metadata/_custom_type_script = "uid://d0j1nts8hqfnb"
-
-[node name="Control" type="Control" parent="MarginContainer/VBoxContainer"]
+[node name="Center" type="CenterContainer" parent="." unique_id=1405375030]
 layout_mode = 2
 
-[node name="HBoxContainerSaves" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1271107536]
+custom_minimum_size = Vector2(640, 520)
 layout_mode = 2
-theme_override_constants/separation = 50
-alignment = 1
 
-[node name="VBoxContainerFirstSlot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainerSaves"]
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=725360479]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="TextureButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerFirstSlot"]
+[node name="Layout" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1313991962]
 layout_mode = 2
-toggle_mode = true
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerFirstSlot"]
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=2122117388]
 layout_mode = 2
-text = "Example"
-label_settings = ExtResource("3_m62os")
-horizontal_alignment = 1
 
-[node name="VBoxContainerSecondSlot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainerSaves"]
+[node name="Title" type="Label" parent="Center/Panel/Margin/Layout/Header" unique_id=529823651]
 layout_mode = 2
-theme_override_constants/separation = 15
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+text = "Save / Load"
 
-[node name="TextureButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerSecondSlot"]
+[node name="CloseBtn" type="Button" parent="Center/Panel/Margin/Layout/Header" unique_id=1639485952]
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-toggle_mode = true
+text = "X"
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerSecondSlot"]
+[node name="Slots" type="VBoxContainer" parent="Center/Panel/Margin/Layout" unique_id=1004184507]
 layout_mode = 2
-text = "Example"
-label_settings = ExtResource("3_m62os")
-horizontal_alignment = 1
-
-[node name="VBoxContainerThirdSlot" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainerSaves"]
-layout_mode = 2
-theme_override_constants/separation = 15
-
-[node name="TextureButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerThirdSlot"]
-layout_mode = 2
-toggle_mode = true
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainerSaves/VBoxContainerThirdSlot"]
-layout_mode = 2
-text = "Example"
-label_settings = ExtResource("3_m62os")
-horizontal_alignment = 1
-
-[node name="HBoxContainerButtons" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 15
-alignment = 1
-
-[node name="LoadBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainerButtons"]
-layout_mode = 2
-size_flags_horizontal = 0
-focus_mode = 0
-theme_override_font_sizes/font_size = 26
-text = "Load"
-script = ExtResource("4_75103")
-_id = "LoadBtn"
-metadata/_custom_type_script = "uid://bxravf1ugfs0x"
-
-[node name="DeleteBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainerButtons"]
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 26
-text = "Delete"
-script = ExtResource("4_75103")
-_id = "DeleteBtn"
-metadata/_custom_type_script = "uid://bxravf1ugfs0x"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 10
-alignment = 1
-
-[node name="Return" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-focus_mode = 0
-theme_override_font_sizes/font_size = 26
-text = "Return"
-script = ExtResource("4_75103")
-_id = "ReturnBtn"
-metadata/_custom_type_script = "uid://bxravf1ugfs0x"
+size_flags_vertical = 3

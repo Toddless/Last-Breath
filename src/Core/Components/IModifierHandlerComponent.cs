@@ -3,7 +3,6 @@ namespace Core.Components
     using Battle;
     using Battle.Abilities;
     using Context;
-    using Interfaces;
 
     /// <summary>
     /// Holds the entity-scoped pipeline mutators. Only context-mutating modifiers

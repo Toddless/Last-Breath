@@ -112,11 +112,11 @@
 
         private void LoadSoundSettings()
         {
-            foreach (var bus in Enum.GetValues<SoundBus>())
-            {
-                float value = (float)_config.GetValue(SettingsSection.Sound, bus.ToString());
-                AudioServer.SetBusVolumeDb((int)bus, Mathf.LinearToDb(value));
-            }
+            // foreach (var bus in Enum.GetValues<SoundBus>())
+            // {
+            //     float value = (float)_config.GetValue(SettingsSection.Sound, bus.ToString());
+            //     AudioServer.SetBusVolumeDb((int)bus, Mathf.LinearToDb(value));
+            // }
         }
 
         private void LoadVideoSettings()

@@ -5,10 +5,12 @@ namespace LastBreath.Helpers
     using Core.Data;
     using Core.Entity;
     using Core.Enums;
+    using Core.Modifiers;
     using Core.Narrative;
     using Core.Narrative.Facts;
     using Core.Narrative.Influence;
     using Core.Narrative.Quests;
+    using Core.Services;
     using Godot;
 
     /// <summary>
@@ -43,12 +45,7 @@ namespace LastBreath.Helpers
 
         private void BuildUi()
         {
-            _root = new PanelContainer
-            {
-                Visible = false,
-                AnchorRight = 1,
-                AnchorBottom = 0.45f,
-            };
+            _root = new PanelContainer { Visible = false, AnchorRight = 1, AnchorBottom = 0.45f, };
             var layout = new VBoxContainer();
             _output = new RichTextLabel { ScrollFollowing = true, SizeFlagsVertical = Control.SizeFlags.ExpandFill, FocusMode = Control.FocusModeEnum.None };
             _input = new LineEdit { PlaceholderText = "help" };
@@ -85,9 +82,11 @@ namespace LastBreath.Helpers
                 case "martial": ExecuteMartial(args); break;
                 case "rep": ExecuteReputation(args); break;
                 case "item": ExecuteItem(args); break;
+                case "stats": ExecutePlayerStats(args); break;
                 default: Print("Unknown command, try: help"); break;
             }
         }
+
 
         private void ExecuteQuest(string[] args)
         {
@@ -103,6 +102,7 @@ namespace LastBreath.Helpers
                     string progress = state == null ? "-" : ProgressOf(log, quest, state);
                     Print($"{quest.Id}: {state?.Status.ToString() ?? "NotTaken"} {progress}");
                 }
+
                 return;
             }
 
@@ -159,6 +159,33 @@ namespace LastBreath.Helpers
             }
         }
 
+        private void ExecutePlayerStats(string[] args)
+        {
+            var player = Service<IPlayerAccessor>().Player;
+            if (player == null) return;
+            // playerStats add <stat> [amount] <type>
+            if (args.Length <= 4 || !args[1].Equals("add", StringComparison.InvariantCultureIgnoreCase) || !Enum.TryParse(args[2], true, out EntityParameter stat) ||
+                !int.TryParse(args[3], out int amount) || !Enum.TryParse(args[4], true, out ModifierValueType type))
+                return;
+
+            string command = args[1].ToLowerInvariant();
+                        switch (command)
+            {
+                case "add":
+                    var modifier = ModifiersCreator.CreateModifierInstance(stat, type, amount, "debugConsole");
+                    player.ParameterModifiers.AddModifier(modifier);
+                    Print($"Added {stat} +{amount}");
+                    break;
+                case "clear":
+                    player.ParameterModifiers.RemoveModifierBySource("debugConsole");
+                    break;
+                default:
+                    Print("playerStats add <stat> [amount] <type> | playerStats clear");
+                    break;
+            }
+        }
+
+
         private void ExecuteInfluence(string[] args)
         {
             var mastery = Service<IInfluenceMastery>();
@@ -193,12 +220,13 @@ namespace LastBreath.Helpers
         {
             var relations = Service<IFactionRelationService>();
             if (args.Length > 3 && args[1].ToLowerInvariant() == "add"
-                && Enum.TryParse(args[2], true, out Fractions faction) && int.TryParse(args[3], out int delta))
+                                && Enum.TryParse(args[2], true, out Fractions faction) && int.TryParse(args[3], out int delta))
             {
                 relations.AddReputation(faction, delta, "DebugConsole");
                 Print($"{faction}: {relations.GetReputation(faction)} ({relations.GetPlayerRelation(faction)})");
                 return;
             }
+
             Print("rep add <faction> <delta>");
         }
 
@@ -208,6 +236,7 @@ namespace LastBreath.Helpers
             Print("fact set <key> [amount] | fact dump [prefix]");
             Print("influence [exp <n>] | martial [exp <n>] | item add <itemId> [amount]");
             Print("rep add <faction> <delta>");
+            Print("playerStats add <stat> [amount] <type> | playerStats clear");
         }
 
         private static bool Run(Action action)
