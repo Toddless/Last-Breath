@@ -6,13 +6,13 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "baseValue": 300,
+                    "value": 300,
                     "weight": 200
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "inc",
-                    "baseValue": 0.1,
+                    "value": 0.1,
                     "weight": 150
                 }
             ]
@@ -23,13 +23,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "baseValue": 200,
+                    "value": 200,
                     "weight": 200
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
-                    "baseValue": 0.1,
+                    "value": 0.1,
                     "weight": 150
                 }
             ]
@@ -40,13 +40,13 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "baseValue": 250,
+                    "value": 250,
                     "weight": 200
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
-                    "baseValue": 0.1,
+                    "value": 0.1,
                     "weight": 150
                 }
             ]
@@ -57,13 +57,13 @@
                 {
                     "parameter": "AllAttribute",
                     "modifierType": "flat",
-                    "baseValue": 5,
+                    "value": 5,
                     "weight": 200
                 },
                 {
                     "parameter": "AllAttribute",
                     "modifierType": "inc",
-                    "baseValue": 0.1,
+                    "value": 0.1,
                     "weight": 150
                 }
             ]
@@ -74,13 +74,13 @@
                 {
                     "parameter": "Accuracy",
                     "modifierType": "flat",
-                    "baseValue": 250,
+                    "value": 250,
                     "weight": 200
                 },
                 {
                     "parameter": "Accuracy",
                     "modifierType": "inc",
-                    "baseValue": 0.1,
+                    "value": 0.1,
                     "weight": 150
                 }
             ]
@@ -91,13 +91,13 @@
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
-                    "baseValue": 0.03,
+                    "value": 0.03,
                     "weight": 200
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
-                    "baseValue": 0.2,
+                    "value": 0.2,
                     "weight": 150
                 }
             ]
@@ -191,19 +191,13 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 250,
+                        "value": 250,
                         "weight": 50
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "baseValue": 0.15,
-                        "weight": 75
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 75
                     }
                 ]
@@ -226,13 +220,13 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 250,
+                        "value": 250,
                         "weight": 50
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 75
                     }
                 ]
@@ -255,13 +249,13 @@
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
-                        "baseValue": 70,
+                        "value": 70,
                         "weight": 100
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 80
                     }
                 ]
@@ -284,13 +278,13 @@
                     {
                         "parameter": "Movespeed",
                         "modifierType": "flat",
-                        "baseValue": 15,
+                        "value": 15,
                         "weight": 150
                     },
                     {
                         "parameter": "Movespeed",
                         "modifierType": "inc",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 100
                     }
                 ]
@@ -313,13 +307,13 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 350,
+                        "value": 350,
                         "weight": 100
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "multi",
-                        "baseValue": 1.15,
+                        "value": 1.15,
                         "weight": 50
                     }
                 ]
@@ -342,25 +336,25 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "Intelligence",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 50
                     },
                     {
                         "parameter": "Intelligence",
                         "modifierType": "flat",
-                        "baseValue": 10,
+                        "value": 10,
                         "weight": 50
                     }
                 ]
@@ -383,25 +377,25 @@
                     {
                         "parameter": "Evade",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "Dexterity",
                         "modifierType": "flat",
-                        "baseValue": 10,
+                        "value": 10,
                         "weight": 50
                     },
                     {
                         "parameter": "Dexterity",
                         "modifierType": "inc",
-                        "baseValue": 0.3,
+                        "value": 0.3,
                         "weight": 50
                     }
                 ]
@@ -424,25 +418,25 @@
                     {
                         "parameter": "Health",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "flat",
-                        "baseValue": 10,
+                        "value": 10,
                         "weight": 50
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 50
                     }
                 ]
@@ -465,19 +459,19 @@
                     {
                         "parameter": "Mana",
                         "modifierType": "flat",
-                        "baseValue": 5,
+                        "value": 5,
                         "weight": 100
                     },
                     {
                         "parameter": "Mana",
                         "modifierType": "inc",
-                        "baseValue": 0.1,
+                        "value": 0.1,
                         "weight": 80
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "flat",
-                        "baseValue": 5,
+                        "value": 5,
                         "weight": 150
                     }
                 ]
@@ -500,19 +494,19 @@
                     {
                         "parameter": "Barrier",
                         "modifierType": "multi",
-                        "baseValue": 1.2,
+                        "value": 1.2,
                         "weight": 55
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "flat",
-                        "baseValue": 200,
+                        "value": 200,
                         "weight": 50
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 100
                     }
                 ]
@@ -535,13 +529,13 @@
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
-                        "baseValue": 0.3,
+                        "value": 0.3,
                         "weight": 15
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.03,
+                        "value": 0.03,
                         "weight": 30
                     }
                 ]
@@ -564,13 +558,13 @@
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
-                        "baseValue": 0.5,
+                        "value": 0.5,
                         "weight": 15
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
-                        "baseValue": 250,
+                        "value": 250,
                         "weight": 30
                     }
                 ]
@@ -593,13 +587,13 @@
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "baseValue": 0.5,
+                        "value": 0.5,
                         "weight": 15
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 500,
+                        "value": 500,
                         "weight": 30
                     }
                 ]
@@ -622,13 +616,13 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
-                        "baseValue": 0.5,
+                        "value": 0.5,
                         "weight": 15
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 500,
+                        "value": 500,
                         "weight": 30
                     }
                 ]
@@ -651,13 +645,13 @@
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
-                        "baseValue": 0.5,
+                        "value": 0.5,
                         "weight": 15
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
-                        "baseValue": 500,
+                        "value": 500,
                         "weight": 30
                     }
                 ]
@@ -680,13 +674,13 @@
                     {
                         "parameter": "Barrier",
                         "modifierType": "inc",
-                        "baseValue": 0.5,
+                        "value": 0.5,
                         "weight": 15
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "flat",
-                        "baseValue": 500,
+                        "value": 500,
                         "weight": 30
                     }
                 ]
@@ -709,19 +703,19 @@
                     {
                         "parameter": "Barrier",
                         "modifierType": "flat",
-                        "baseValue": 250,
+                        "value": 250,
                         "weight": 100
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "inc",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 75
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "flat",
-                        "baseValue": 60,
+                        "value": 60,
                         "weight": 50
                     }
                 ]
@@ -744,19 +738,19 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 450,
+                        "value": 450,
                         "weight": 80
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 80
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
-                        "baseValue": 200,
+                        "value": 200,
                         "weight": 40
                     }
                 ]
@@ -779,19 +773,19 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 800,
+                        "value": 800,
                         "weight": 60
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "multi",
-                        "baseValue": 1.2,
+                        "value": 1.2,
                         "weight": 40
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 400,
+                        "value": 400,
                         "weight": 50
                     }
                 ]
@@ -814,25 +808,25 @@
                     {
                         "parameter": "Mana",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "Mana",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "flat",
-                        "baseValue": 100,
+                        "value": 100,
                         "weight": 50
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 50
                     }
                 ]
@@ -855,19 +849,19 @@
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 50
                     }
                 ]
@@ -890,25 +884,25 @@
                     {
                         "parameter": "Accuracy",
                         "modifierType": "multi",
-                        "baseValue": 1.25,
+                        "value": 1.25,
                         "weight": 55
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "inc",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 100
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.04,
+                        "value": 0.04,
                         "weight": 50
                     },
                     {
                         "parameter": "AdditionalHitChance",
                         "modifierType": "flat",
-                        "baseValue": 0.03,
+                        "value": 0.03,
                         "weight": 40
                     }
                 ]
@@ -931,13 +925,13 @@
                     {
                         "parameter": "Accuracy",
                         "modifierType": "flat",
-                        "baseValue": 150,
+                        "value": 150,
                         "weight": 120
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "inc",
-                        "baseValue": 0.1,
+                        "value": 0.1,
                         "weight": 80
                     }
                 ]
@@ -960,19 +954,19 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 300,
+                        "value": 300,
                         "weight": 100
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 200,
+                        "value": 200,
                         "weight": 80
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "inc",
-                        "baseValue": 0.1,
+                        "value": 0.1,
                         "weight": 60
                     }
                 ]
@@ -995,19 +989,19 @@
                     {
                         "parameter": "Accuracy",
                         "modifierType": "flat",
-                        "baseValue": 350,
+                        "value": 350,
                         "weight": 100
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 80
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.03,
+                        "value": 0.03,
                         "weight": 40
                     }
                 ]
@@ -1030,19 +1024,19 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 500,
+                        "value": 500,
                         "weight": 80
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 60
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "multi",
-                        "baseValue": 1.15,
+                        "value": 1.15,
                         "weight": 40
                     }
                 ]
@@ -1065,13 +1059,13 @@
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
-                        "baseValue": 150,
+                        "value": 150,
                         "weight": 120
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
-                        "baseValue": 0.1,
+                        "value": 0.1,
                         "weight": 80
                     }
                 ]
@@ -1094,19 +1088,19 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "baseValue": 450,
+                        "value": 450,
                         "weight": 100
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
-                        "baseValue": 250,
+                        "value": 250,
                         "weight": 70
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 60
                     }
                 ]
@@ -1129,19 +1123,19 @@
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
-                        "baseValue": 400,
+                        "value": 400,
                         "weight": 80
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "multi",
-                        "baseValue": 1.2,
+                        "value": 1.2,
                         "weight": 40
                     },
                     {
                         "parameter": "MoveSpeed",
                         "modifierType": "flat",
-                        "baseValue": 20,
+                        "value": 20,
                         "weight": 60
                     }
                 ]
@@ -1164,13 +1158,13 @@
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.02,
+                        "value": 0.02,
                         "weight": 120
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "flat",
-                        "baseValue": 100,
+                        "value": 100,
                         "weight": 60
                     }
                 ]
@@ -1193,13 +1187,13 @@
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
-                        "baseValue": 60,
+                        "value": 60,
                         "weight": 100
                     },
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
-                        "baseValue": 0.15,
+                        "value": 0.15,
                         "weight": 60
                     }
                 ]
@@ -1222,19 +1216,19 @@
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
-                        "baseValue": 0.25,
+                        "value": 0.25,
                         "weight": 80
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
-                        "baseValue": 0.2,
+                        "value": 0.2,
                         "weight": 70
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.03,
+                        "value": 0.03,
                         "weight": 40
                     }
                 ]
@@ -1257,19 +1251,19 @@
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "baseValue": 0.05,
+                        "value": 0.05,
                         "weight": 60
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
-                        "baseValue": 0.3,
+                        "value": 0.3,
                         "weight": 50
                     },
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
-                        "baseValue": 0.4,
+                        "value": 0.4,
                         "weight": 40
                     }
                 ]

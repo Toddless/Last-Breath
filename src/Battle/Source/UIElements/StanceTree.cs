@@ -44,12 +44,12 @@ namespace Battle.Source.UIElements
         {
             _uiElementsManager = provider.GetService<IUiElementsManager>();
             _messageBus = provider.GetService<IGameMessageBus>();
-            FillSlotsAsync();
+            FillSlots();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private async void FillSlotsAsync()
+        private async void FillSlots()
         {
             try
             {

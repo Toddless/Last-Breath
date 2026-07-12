@@ -7,32 +7,27 @@
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
+    using Core.Session;
     using Core.Views.UI;
     using Godot;
     using UI;
 
-    public class Inventory : IInventory, Core.Session.ISessionResettable
+    public class Inventory(IUiElementsManager uiElements) : IInventory, ISessionResettable
     {
         private const int BagSlots = 220;
 
         private readonly Dictionary<string, IItem> _itemInstances = [];
-        private readonly IUiElementsManager _uiElements;
         protected List<IInventorySlot> Slots { get; } = [];
 
-        public event Action<string, MouseInteractions, IInventory>? ItemSlotClicked;
+        public int InventoryCapacity => BagSlots;
+
         public event Action<string, string, int, int>? InventoryFull;
         public event Action<string>? NotEnoughItems;
-        public int InventoryCapacity => BagSlots;
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
         /// <summary>An equipped piece was dragged into a bag slot; the window resolves the unequip.</summary>
         public event Action<EquipmentPiece, IInventorySlot>? EquipmentDroppedIntoBag;
-
-        public Inventory(IUiElementsManager uiElements)
-        {
-            _uiElements = uiElements;
-        }
 
         /// <summary>
         /// Shows the bag inside a window's grid. The SERVICE owns the slot nodes for the whole
@@ -77,7 +72,7 @@
             var item = GetItem<IItem>(slot.CurrentItem.InstanceId);
             if (item == null) return null;
 
-            var popup = _uiElements.ShowPopup(typeof(ItemTooltipPopup)) as ItemTooltipPopup;
+            var popup = uiElements.ShowPopup(typeof(ItemTooltipPopup)) as ItemTooltipPopup;
             popup?.ShowItem(item);
             return popup;
         }
@@ -89,7 +84,6 @@
             if (item != null) ItemInteraction?.Invoke(item, interactions);
         }
 
-        public ItemInstance? GetItemInstance(string instanceId) => Slots.FirstOrDefault(x => x.CurrentItem?.InstanceId == instanceId)?.CurrentItem;
         public List<string> GetAllItemIdsWithTag(string tag) => [.. _itemInstances.Values.Where(x => x.HasTag(tag)).Select(x => x.Id)];
         T? IInventory.GetItem<T>(string instanceId) where T : class => _itemInstances.GetValueOrDefault(instanceId) as T;
 
@@ -128,6 +122,19 @@
         {
             EnsureSlots();
             return Slots.Count(x => x.CurrentItem == null);
+        }
+
+        /// <summary>One entry per held instance (equip items are unique; a resource's slots sum up).</summary>
+        public IReadOnlyList<(IItem Item, int Amount)> GetContents()
+        {
+            EnsureSlots();
+            return Slots
+                .Where(slot => slot.CurrentItem != null)
+                .GroupBy(slot => slot.CurrentItem!.InstanceId)
+                .Select(group => (Item: _itemInstances.GetValueOrDefault(group.Key), Amount: group.Sum(slot => slot.Quantity)))
+                .Where(entry => entry.Item != null)
+                .Select(entry => (entry.Item!, entry.Amount))
+                .ToList();
         }
 
         /// <summary>Repacks the bag: stacks merged, best rarity first, then by name.</summary>

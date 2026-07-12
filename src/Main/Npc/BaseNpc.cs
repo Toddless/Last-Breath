@@ -201,7 +201,7 @@ namespace LastBreath.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
-            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
+            CurrentBarrier = Parameters.MaxBarrier;
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -433,6 +433,7 @@ namespace LastBreath.Npc
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
+                        var atk = context.Attacker;
                         Calculations.CalculateInitialAttackDamage(context);
                         var damageContext = new DamageContext
                         {

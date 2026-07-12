@@ -1,6 +1,5 @@
 namespace LastBreath.World
 {
-    using Battle.Source.UIElements;
     using Core.Services;
     using Core.Views.UI;
     using Godot;

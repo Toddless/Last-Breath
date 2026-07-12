@@ -20,5 +20,11 @@
         void RemoveItemById(string itemId, int amount = 1);
         void RemoveItemByInstanceId(string instanceId);
         bool TryAddItemStacks(string itemId, int amount = 1);
+
+        /// <summary>Every distinct held item with its total amount — the source of truth for saving the bag.</summary>
+        IReadOnlyList<(IItem Item, int Amount)> GetContents();
+
+        /// <summary>Empties the bag (used before a save is restored into it).</summary>
+        void Clear();
     }
 }

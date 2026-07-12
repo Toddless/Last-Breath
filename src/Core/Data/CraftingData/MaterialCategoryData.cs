@@ -1,6 +1,7 @@
 namespace Core.Data.CraftingData
 {
     using System.Collections.Generic;
+    using EquipData;
 
-    public record MaterialCategoryData(string Id, List<MaterialModifierData> Modifiers);
+    public record MaterialCategoryData(string Id, List<ItemModifier> Modifiers);
 }

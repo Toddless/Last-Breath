@@ -13,7 +13,13 @@ namespace LastBreath.UI
     [GlobalClass]
     public partial class ItemTooltipPopup : Control, IHoverTooltipPopup
     {
-        private const string ScenePath = "res://UI/View/ItemTooltipPopup.tscn";
+        private const string ScenePath = "uid://di3yh40oyvjhe";
+
+        // Panel inner width (340 custom-min minus the 12+12 Margin). An autowrap Label with no width
+        // floor measures its HEIGHT at its narrowest width (≈ one word per line) during the container's
+        // min-size pass, which balloons the panel to fill the screen. Pinning the width makes it wrap —
+        // and measure — at the real content width, like TextTooltipPopup's fixed-width RichTextLabel.
+        private const int LineWidth = 316;
 
         [Export] private PanelContainer? _panel;
         [Export] private Label? _title;
@@ -33,7 +39,15 @@ namespace LastBreath.UI
             if (!IsPinned) HoverTooltipMotion.Follow(this, _panel);
         }
 
-        public override void _UnhandledKeyInput(InputEvent @event) => IsPinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
+        public override void _UnhandledKeyInput(InputEvent @event)
+        {
+            bool pinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
+            // Un-pinning dismisses the tooltip: once the pointer has left its source a pinned popup is
+            // orphaned (HoverTooltip.Attach dropped its handle on MouseExited), so resuming cursor-follow
+            // would make it chase the mouse forever with nothing left to close it.
+            if (IsPinned && !pinned) { Close(); return; }
+            IsPinned = pinned;
+        }
 
         public void Close() => QueueFree();
 
@@ -41,16 +55,12 @@ namespace LastBreath.UI
 
         public void ShowItem(IItem item)
         {
-            if (_title != null)
-            {
-                _title.Text = item is IEquipItem { UpdateLevel: > 0 } upgraded
-                    ? $"{item.DisplayName} +{upgraded.UpdateLevel}"
-                    : item.DisplayName;
-                _title.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(item.Rarity)));
-            }
+            _title?.Text = item is IEquipItem { UpdateLevel: > 0 } upgraded
+                ? $"{item.DisplayName} +{upgraded.UpdateLevel}"
+                : item.DisplayName;
+            _title?.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(item.Rarity)));
 
-            if (_subtitle != null)
-                _subtitle.Text = item is IEquipItem equip ? $"{item.Rarity} · {equip.EquipmentPiece}" : item.Rarity.ToString();
+            _subtitle?.Text = item is IEquipItem equip ? $"{item.Rarity} · {equip.EquipmentPiece}" : item.Rarity.ToString();
 
             if (_lines == null) return;
             if (item is IEquipItem equipItem) RenderEquipLines(equipItem);
@@ -85,7 +95,12 @@ namespace LastBreath.UI
 
         private void AddLine(string text, bool dim = false)
         {
-            var label = new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
+            var label = new Label
+            {
+                Text = text,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                CustomMinimumSize = new Vector2(LineWidth, 0),
+            };
             if (dim) label.ThemeTypeVariation = "DimLabel";
             _lines?.AddChild(label);
         }

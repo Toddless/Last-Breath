@@ -1,45 +1,16 @@
 namespace Core.Services
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Events;
 
     public class GameEventBus : IGameEventBus
     {
-        private readonly Dictionary<Type, List<Delegate>> _handlers = new();
+        private readonly EventRegistry<IGameEvent> _registry = new();
 
-        public void Publish<T>(T evnt)
-            where T : IGameEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-                return;
+        public void Publish<T>(T evnt) where T : IGameEvent => _registry.Publish(evnt, this);
 
-            foreach (var handler in handlers.Cast<Action<T>>().ToList())
-                handler(evnt);
-        }
+        public void Subscribe<T>(Action<T> handler) where T : IGameEvent => _registry.Add(handler);
 
-        public void Subscribe<T>(Action<T> handler)
-            where T : IGameEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                handlers = [];
-                _handlers[typeof(T)] = handlers;
-            }
-
-            handlers.Add(handler);
-        }
-
-        public void Unsubscribe<T>(Action<T> handler)
-            where T : IGameEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-                return;
-
-            handlers.Remove(handler);
-            if (handlers.Count == 0)
-                _handlers.Remove(typeof(T));
-        }
+        public void Unsubscribe<T>(Action<T> handler) where T : IGameEvent => _registry.Remove(handler);
     }
 }

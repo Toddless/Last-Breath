@@ -85,7 +85,8 @@ namespace LootGeneration.Services
             return item is not ICraftingRecipe recipe ? string.Empty : recipe.ResultItemId;
         }
 
-        public IReadOnlyList<IModifier> GetResourceModifiers(string id)
+        // TODO: identical GetResourceDescriptors in Crafting/Main/LootGeneration ItemDataProvider — consolidate the duplicated read path.
+        public IReadOnlyList<IModifierDescriptor> GetResourceDescriptors(string id)
         {
             if (!_itemData.TryGetValue(id, out var res) || res is not ICraftingResource crafting) return [];
             return crafting.Material?.Modifiers ?? [];

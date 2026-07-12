@@ -6,6 +6,6 @@
     public interface IMaterialCategory
     {
         string Id { get; set; }
-        IReadOnlyList<IModifier> Modifiers { get; }
+        IReadOnlyList<IModifierDescriptor> Modifiers { get; }
     }
 }

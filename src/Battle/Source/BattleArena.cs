@@ -54,10 +54,13 @@
         private CombatTextPresenter? _combatTextPresenter;
         private IPlayer? _player;
         private IFightable? _currentFighter;
+
         private readonly HashSet<string> _fledIds = [];
+
         // Corpses freed their spots for latecomers but stay visible on the field until the
         // context returns them to the world; they also serve as presentation anchors.
         private readonly System.Collections.Generic.Dictionary<string, Node2D> _parkedCorpses = [];
+
         // Ally/enemy semantics are group-based, so groupless same-faction fighters would be
         // mutual enemies: a skeleton's chain lightning legally "executed" its own kin (read as
         // a self-kill). Solo NPCs of one faction share a battle-scoped group instead.
@@ -179,7 +182,7 @@
         private void SetupTargetSelectionController()
         {
             if (_battleEventBus == null) return;
-            var allSpots = _spots.Where(_ => true).ToList();
+            List<EntitySpot> allSpots = [.._spots];
             if (_playerSpot != null) allSpots.Add(_playerSpot);
             _selectionController = new TargetSelectionController(_battleEventBus, this, allSpots);
         }
@@ -208,7 +211,6 @@
 
             return allies[_rnd.RandiRange(0, allies.Count - 1)];
         }
-
 
 
         /// <summary>
@@ -329,6 +331,11 @@
                     // `continue` and used to drain the round past the refill — a battle where
                     // the round ended on corpses got abandoned with live enemies standing
                     // (latecomers enter the roster mid-round but the queue only next round).
+                    // BY DESIGN (tracker #55 — kept as a feature): the refilled round re-sorts by
+                    // speed, so a fast fighter (a high-Dex player) who acted late in one round can
+                    // act first in the next — "two turns in a row" around a rebuild is the intended
+                    // cost of speed, not a bug. It shows most when a mid-round joiner defers the
+                    // rebuild until the original opponent dies.
                     var nextRound = _queueScheduler.RefillIfEmpty(_fighters.Where(IsPresent).ToList());
                     if (nextRound.Count > 1)
                     {

@@ -10,7 +10,7 @@ namespace Core.Views.UI
     /// </summary>
     public static class HoverTooltip
     {
-        private const float ShowDelaySeconds = 0.35f;
+        private const float ShowDelaySeconds = 0.4f;
 
         /// <summary>
         /// <paramref name="show"/> creates and fills the popup (usually via IUiElementsManager.ShowPopup)
@@ -18,7 +18,7 @@ namespace Core.Views.UI
         /// </summary>
         public static void Attach(Control source, Func<IPopup?> show)
         {
-            bool inside = false;
+            bool inside;
             IPopup? current = null;
 
             source.MouseEntered += async () =>

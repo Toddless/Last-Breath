@@ -33,11 +33,14 @@ namespace Crafting.Source.RequestHandlers
         {
             try
             {
+                // TODO: validates mastery + resource availability but NOT that UsedResources satisfy the recipe's
+                // requirements (categories/specific ids/amounts). Safe while items are only created through the
+                // crafting UI; add domain-level recipe conformance if a non-UI creation path appears.
                 if (!MasteryAllows(request.RecipeId) || !resources.HasAll(request.UsedResources))
                     return Task.FromResult<IEquipItem?>(null);
 
-                var modifiers = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceModifiers(res.Key));
-                var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, modifiers);
+                var descriptors = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceDescriptors(res.Key));
+                var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, descriptors);
                 item.SaveUsedResources(request.UsedResources.ToDictionary());
 
                 resources.TrySpend(request.UsedResources);

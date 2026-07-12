@@ -100,5 +100,15 @@ namespace Crafting.Internal.Inventory
             if (!_items.Remove(instanceId)) return;
             ItemAmountChanges?.Invoke(instanceId, 0);
         }
+
+        public IReadOnlyList<(IItem Item, int Amount)> GetContents() =>
+            _items.Values.Select(entry => (entry.Item, entry.Quantity)).ToList();
+
+        public void Clear()
+        {
+            var ids = _items.Keys.ToList();
+            _items.Clear();
+            foreach (var id in ids) ItemAmountChanges?.Invoke(id, 0);
+        }
     }
 }

@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cv5svhrugien6"]
 
-[ext_resource type="Script" uid="uid://dwqlti1jvk41l" path="res://Source/UIElements/CharacterBar.cs" id="1_a8sqt"]
+[ext_resource type="Script" uid="uid://dwqlti1jvk41l" path="res://Addons/Battle/UIElements/CharacterBar.cs" id="1_a8sqt"]
 
-[node name="CharacterHealthBar" type="MarginContainer" node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "CharacterEffects")]
+[node name="CharacterHealthBar" type="MarginContainer" unique_id=1621614326 node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "CharacterEffects")]
 offset_right = 250.0
 offset_bottom = 68.0
 layout_direction = 2
@@ -13,47 +13,44 @@ HealthBar = NodePath("MainContainer/Bars/Health")
 BarrierBar = NodePath("MainContainer/Bars/Barrier")
 CharacterEffects = NodePath("MainContainer/VBoxContainer/GridContainer")
 
-[node name="MainContainer" type="VBoxContainer" parent="."]
+[node name="MainContainer" type="VBoxContainer" parent="." unique_id=255096892]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Bars" type="VBoxContainer" parent="MainContainer"]
+[node name="Bars" type="VBoxContainer" parent="MainContainer" unique_id=1344164274]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Barrier" type="ProgressBar" parent="MainContainer/Bars"]
+[node name="Barrier" type="ProgressBar" parent="MainContainer/Bars" unique_id=1340893476]
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"BarrierBar"
-step = 0.01
 value = 21.0
 show_percentage = false
 
-[node name="Health" type="ProgressBar" parent="MainContainer/Bars"]
+[node name="Health" type="ProgressBar" parent="MainContainer/Bars" unique_id=918723202]
 custom_minimum_size = Vector2(250, 28)
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"HpBar"
-step = 0.01
 value = 81.0
 show_percentage = false
 
-[node name="Mana" type="ProgressBar" parent="MainContainer/Bars"]
+[node name="Mana" type="ProgressBar" parent="MainContainer/Bars" unique_id=1410274800]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"ManaBar"
-step = 0.01
 value = 60.0
 show_percentage = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer" unique_id=938485985]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="MainContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="MainContainer/VBoxContainer" unique_id=490351187]
 custom_minimum_size = Vector2(0, 15)
 layout_mode = 2
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
-columns = 9
+columns = 6

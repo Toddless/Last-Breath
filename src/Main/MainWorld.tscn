@@ -2,14 +2,29 @@
 
 [ext_resource type="Script" uid="uid://ceaqsxdscqa37" path="res://MainWorld.cs" id="1_4xxmu"]
 [ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Player/Player.tscn" id="2_x0tsy"]
-[ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://Npc/NpcSpawnPoint.cs" id="4_x0tsy"]
 [ext_resource type="Script" uid="uid://b6tdsalfvh1ay" path="res://World/NpcWorldDirector.cs" id="5_ngold"]
 [ext_resource type="Script" uid="uid://o4isflqmdcvu" path="res://World/SaveDirector.cs" id="6_x4wt1"]
 [ext_resource type="Script" uid="uid://bvkmjwos0jl80" path="res://World/DayNightTint.cs" id="7_y0rla"]
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
+[ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
+[ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="8_kwijy"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
 radius = 100.0
+
+[sub_resource type="Gradient" id="Gradient_y0rla"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hv00y"]
+gradient = SubResource("Gradient_y0rla")
+width = 25
+height = 25
+
+[sub_resource type="Gradient" id="Gradient_1etib"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fx85w"]
+gradient = SubResource("Gradient_1etib")
+width = 25
+height = 25
 
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
@@ -42,8 +57,26 @@ shape = SubResource("CircleShape2D_fx85w")
 position = Vector2(1, 0)
 
 [node name="Undead" type="Node2D" parent="." unique_id=1587915089]
-position = Vector2(1587, 907)
-script = ExtResource("4_x0tsy")
+position = Vector2(1000, 896)
+script = ExtResource("8_hv00y")
 _npcIds = PackedStringArray("Npc_Skeleton_Mage", "Npc_Grave_Revenant")
 _spawnRadius = 100.0
+_spawnAsGroup = true
+_pointId = "Spawn_Point_Undead"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Sprite2D" type="Sprite2D" parent="Undead" unique_id=1684334557]
+texture = SubResource("GradientTexture2D_hv00y")
+
+[node name="Bandig" type="Node2D" parent="." unique_id=123361846]
+position = Vector2(1430, 341)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Bandit", "Npc_Bandit_Veteran")
+_spawnRadius = 500.0
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Sprite2D" type="Sprite2D" parent="Bandig" unique_id=1011475319]
+texture = SubResource("GradientTexture2D_fx85w")
+
+[node name="TestNpc" parent="." unique_id=283522954 instance=ExtResource("8_kwijy")]
+position = Vector2(333, 709)

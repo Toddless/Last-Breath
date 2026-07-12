@@ -1,4 +1,4 @@
-﻿namespace LastBreath.Services
+namespace LastBreath.Services
 {
     using System;
     using System.Collections.Generic;
@@ -17,7 +17,8 @@
         IItemEffectProvider effectProvider,
         RandomNumberGenerator rnd,
         IItemDataProvider dataProvider,
-        ICraftingMastery craftingMastery) : IItemCreationService
+        ICraftingMastery craftingMastery,
+        IModifierMaterializer materializer) : IItemCreationService
     {
         public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
@@ -27,45 +28,38 @@
             return item;
         }
 
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers)
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors)
         {
             var recipe = dataProvider.GetRecipe(recipeId);
-            string resultItemId = recipe.ResultItemId;
-            switch (recipe.ItemType)
+            return recipe.ItemType switch
             {
-                case ItemType.Equipment:
-                    (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
-                    return CreateEquip(resultItemId, mods, totalWeight);
-                case ItemType.Consumable or ItemType.Quest or ItemType.Crafting:
-                    return dataProvider.CopyItem(resultItemId);
-            }
-
-            return CreateCoal();
+                ItemType.Equipment => CreateEquip(recipe.ResultItemId, descriptors.ToList(), craftingMastery.RollRarity(), craftingMastery.GetCurrentValueMultiplier()),
+                ItemType.Consumable or ItemType.Quest or ItemType.Crafting => dataProvider.CopyItem(recipe.ResultItemId),
+                _ => CreateCoal(),
+            };
         }
 
-        private IEquipItem CreateEquip(string itemId, List<WeightedObject<IModifier>> modifiers, float totalWeight)
+        // Rolls affix descriptors from the used-resource pool onto the item, scaled by crafting quality. The full
+        // (scaled, flattened) pool is saved for reroll so the item's magnitude and its reroll fodder stay in sync.
+        // Quality scaling is crafting-only — loot drops (HandleEquipItemGeneration) never build a pool and never see it.
+        private IEquipItem CreateEquip(string itemId, List<IModifierDescriptor> pool, Rarity rarity, float qualityMultiplier)
         {
             try
             {
                 var item = (IEquipItem)dataProvider.CopyItem(itemId);
-                var itemRarity = craftingMastery.RollRarity();
-                item.Rarity = itemRarity;
-                int amountModifiers = itemRarity.ConvertRarityToItemModifierAmount();
+                item.Rarity = rarity;
+                int amount = rarity.ConvertRarityToItemModifierAmount();
 
-                HashSet<IModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(modifiers, totalWeight, amountModifiers, rnd);
+                (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
+                var selected = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(weighted, totalWeight, amount, rnd);
 
-                List<IModifierInstance> mods = [];
-                mods.AddRange(takenMods.Select(mod =>
-                    ModifiersCreator.CreateModifierInstance(
-                        mod.EntityParameter,
-                        mod.ModifierValueType,
-                        ApplyPlayerMultiplier(mod.BaseValue, mod.ModifierValueType),
-                        item.InstanceId)));
+                var sink = new CollectingSink();
+                foreach (var descriptor in selected)
+                    materializer.Materialize(DescriptorOperations.Scale(descriptor, qualityMultiplier), sink, item.InstanceId);
+                foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
+                foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
 
-                item.SetModifiers(mods);
-                item.SaveModifiersPool(modifiers.Select(x => x.Obj));
-
-                // TODO : Change to get random effect/ability
+                item.SaveModifiersPool(DescriptorOperations.Flatten(pool.Select(descriptor => DescriptorOperations.Scale(descriptor, qualityMultiplier))));
                 return item;
             }
             catch (ArgumentNullException ex)
@@ -94,6 +88,7 @@
             equip.SetModifiers(chosenMods.SelectMany(mod => CreateScaledInstances(mod, modifierMultiplier, equip.InstanceId)));
         }
 
+        // TODO: duplicated verbatim in LootGeneration/Internal/ItemCreationService — consolidate loot modifier scaling.
         // Flat/Increase/Multiplicative values all store the bonus delta (Calculations.CalculateModifiers sums
         // each bucket onto 1), so one linear scale is valid for every type. Pool entries are shared between
         // items — scale fresh instances, never the originals.
@@ -106,15 +101,6 @@
                 copy.Scope = part.Scope;
                 return copy;
             });
-        }
-
-        private float ApplyPlayerMultiplier(float baseValue, ModifierValueType valueType)
-        {
-            float multiplier = craftingMastery.GetCurrentValueMultiplier();
-            if (valueType == ModifierValueType.Multiplicative)
-                return 1f + (baseValue - 1f) * multiplier;
-
-            return baseValue * multiplier;
         }
 
         private IItem CreateCoal() => dataProvider.CopyItem("Coal");

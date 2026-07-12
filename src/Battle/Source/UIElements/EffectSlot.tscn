@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://5n5bfrh72v8s"]
 
-[ext_resource type="Script" uid="uid://ogfdhlfivkew" path="res://Source/UIElements/EffectSlot.cs" id="1_qp1m6"]
+[ext_resource type="Script" uid="uid://ogfdhlfivkew" path="res://Addons/Battle/UIElements/EffectSlot.cs" id="1_qp1m6"]
 
 [node name="EffectSlot" type="MarginContainer" unique_id=1673289740 node_paths=PackedStringArray("_effectIcon", "_effectStacks")]
-offset_right = 25.0
-offset_bottom = 25.0
+offset_right = 50.0
+offset_bottom = 50.0
 mouse_filter = 0
 script = ExtResource("1_qp1m6")
 _effectIcon = NodePath("TextureRect")
@@ -16,16 +16,15 @@ layout_mode = 2
 expand_mode = 1
 
 [node name="Stacks" type="Label" parent="TextureRect" unique_id=715019399]
-custom_minimum_size = Vector2(16, 16)
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -23.0
+offset_left = -25.0
+offset_top = -25.0
 grow_horizontal = 0
 grow_vertical = 0
 horizontal_alignment = 2
-vertical_alignment = 1
+vertical_alignment = 2

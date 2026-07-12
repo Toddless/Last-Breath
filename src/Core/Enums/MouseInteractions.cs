@@ -5,10 +5,10 @@
         None = 0,
         RightClick,
         LeftClick,
-        CtrRMB,
-        CtrLMB,
-        AltLMB,
-        AltRMB,
+        CtrRmb,
+        CtrLmb,
+        AltLmb,
+        AltRmb,
         Hover
     }
 }

@@ -32,9 +32,6 @@ namespace LastBreath.Services
         public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
             new Modifier(valueType, parameter, value, weight);
 
-        public IModifier CreateMaterialModifier(EntityParameter parameter, ModifierValueType valueType, float baseValue, float weight) =>
-            new Modifier(valueType, parameter, baseValue, weight);
-
         public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
             new Requirement(type, id, amount);
 
@@ -42,13 +39,13 @@ namespace LastBreath.Services
             List<IRequirement> requirements, ItemType itemType, bool isOpened, string[] optionalResourceCategories) =>
             new CraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, isOpened);
 
-        public IMaterialCategory CreateMaterialCategory(List<IModifier> modifiers, string id) =>
+        public IMaterialCategory CreateMaterialCategory(List<IModifierDescriptor> modifiers, string id) =>
             new Core.Crafting.MaterialCategory(modifiers, id);
 
         public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory category, int maxStackSize) =>
             new UpgradeResource(id, tags, rarity, category, maxStackSize);
 
-        public IMaterial CreateMaterial(List<IModifier> modifiers, IMaterialCategory category) =>
+        public IMaterial CreateMaterial(List<IModifierDescriptor> modifiers, IMaterialCategory category) =>
             new MaterialType(modifiers, category);
 
         public ICraftingResource CreateCraftingResource(string id, int maxStackSize, string[] tags, IMaterial material, Rarity rarity) =>

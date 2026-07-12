@@ -702,6 +702,15 @@ msgstr ""
 msgid "LightningResistance"
 msgstr ""
 
+msgid "AllResistance"
+msgstr ""
+
+msgid "AllAttribute"
+msgstr ""
+
+msgid "AllDefence"
+msgstr ""
+
 msgid "MoveSpeed"
 msgstr ""
 

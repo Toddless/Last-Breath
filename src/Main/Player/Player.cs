@@ -2,6 +2,7 @@ namespace LastBreath.Player
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Battle.Source;
     using Components;
@@ -20,6 +21,7 @@ namespace LastBreath.Player
     using Core.Events.GameEvents;
     using Core.Items;
     using Core.Services;
+    using Core.Views.UI;
     using Godot;
     using Stateless;
 
@@ -62,6 +64,7 @@ namespace LastBreath.Player
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
+        private IUiContextService? _uiContext;
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
         private IFightable? _lastDamageSource;
@@ -95,7 +98,6 @@ namespace LastBreath.Player
         public bool IsAlive => CurrentHealth > 0;
         public IEffectsComponent Effects { get; private set; }
         public IParameterModifiersComponent ParameterModifiers { get; private set; }
-        public IEquipmentComponent Equipment { get; private set; }
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
@@ -168,6 +170,8 @@ namespace LastBreath.Player
             _rnd.Randomize();
             if (_camera is { Enabled: true }) _camera.MakeCurrent();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
+            // Optional service (fail-open): drives the dialogue movement gate below.
+            _uiContext = GameServiceProvider.Instance.GetServices<IUiContextService>().FirstOrDefault();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
             // The player is a scene node, not a container-built service: self-register for UI/services
@@ -175,9 +179,9 @@ namespace LastBreath.Player
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);
-            Equipment = new EquipmentComponent(this);
-            ParameterModifiers.RegisterSource(Equipment);
-            Equipment.EquipmentChanged += OnEquipmentChanged;
+            EquipmentComponent = new EquipmentComponent(this);
+            ParameterModifiers.RegisterSource(EquipmentComponent);
+            EquipmentComponent.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
             Dexterity = new Dexterity(ParameterModifiers);
@@ -199,7 +203,6 @@ namespace LastBreath.Player
             // The barrier pool starts full like the other vitals: a Barrier stat that never
             // filled itself read as "barrier does not work" (damage went straight to health).
             CurrentBarrier = Parameters.MaxBarrier;
-            EquipmentComponent = new EquipmentComponent(this);
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
             _stances.Add(Stance.Dexterity, new DexterityStance(this));
@@ -214,6 +217,15 @@ namespace LastBreath.Player
             }
 
             if (!CanMove) return;
+            // A conversation freezes walking: movement is polled here, so without this gate the
+            // player strolls away mid-dialogue. Fail-open — a project without the context tracker
+            // (Battle sandbox) isn't gated, and Dialogue only ever fires in the world.
+            if (_uiContext != null && (_uiContext.Current & UiContext.Dialogue) != 0)
+            {
+                Velocity = Vector2.Zero;
+                return;
+            }
+
             // Typing is not walking: WASD is polled, so a focused text field (debug console,
             // future chat) would otherwise drive the character while the user types.
             if (GetViewport().GuiGetFocusOwner() is LineEdit or TextEdit)
@@ -599,16 +611,16 @@ namespace LastBreath.Player
         {
             EntityParameter.Health or EntityParameter.Barrier => 10000,
             EntityParameter.Mana => 5000,
-            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
-            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 500,
-            EntityParameter.CriticalChance => 0.25f,
+            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 50f,
+            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 5000,
+            EntityParameter.CriticalChance => 0.45f,
             // A rare treat, not a machine gun: extra attacks chain (each one re-rolls), so a high
             // base made attack series balloon to 2-3x their planned length. Items/passives are
             // the intended source of this stat.
             EntityParameter.AdditionalHitChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
-            EntityParameter.MulticastChance => 1f,
-            EntityParameter.Damage or EntityParameter.SpellDamage => 300,
+            EntityParameter.MulticastChance => 0f,
+            EntityParameter.Damage or EntityParameter.SpellDamage => 2000,
             _ => 0f
         };
 
@@ -616,7 +628,7 @@ namespace LastBreath.Player
         private void OnEquipmentChanged(EquipmentPiece piece, IEquipItem? item)
         {
             if (piece != EquipmentPiece.Weapon) return;
-            var weapon = Equipment.Weapon;
+            var weapon = EquipmentComponent.Weapon;
             Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));

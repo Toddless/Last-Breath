@@ -1,6 +1,7 @@
 namespace LastBreath.Inventory
 {
     using System;
+    using Core.Constants;
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
@@ -29,10 +30,14 @@ namespace LastBreath.Inventory
             AcceptEvent();
         }
 
-        protected override void RefreshUI()
+        protected override void RefreshUi()
         {
-            base.RefreshUI();
-            if (QuantityLabel != null) QuantityLabel.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
+            base.RefreshUi();
+            QuantityLabel?.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
+            // TODO:
+            // пока что так. Чуть позже решение почище
+            var item = GetItemInstance?.Invoke(CurrentItem?.InstanceId ?? string.Empty);
+            Background?.Texture = ResourceLoader.Load<Texture2D?>(AssetPaths.SlotBackground(item?.Rarity ?? Rarity.Common));
             UpdateRarityFrame();
         }
 
@@ -41,17 +46,16 @@ namespace LastBreath.Inventory
         /// <summary>The slot frame is tinted by the item's rarity; an empty slot stays neutral.</summary>
         private void UpdateRarityFrame()
         {
-            if (Frame == null) return;
             var item = CurrentItem == null ? null : GetItemInstance?.Invoke(CurrentItem.InstanceId);
-            Frame.Modulate = item == null ? Colors.White : Color.FromHtml(TextPalette.RarityColor(item.Rarity));
+            Frame?.Modulate = item == null ? Colors.White : Color.FromHtml(TextPalette.RarityColor(item.Rarity));
         }
 
         private static MouseInteractions ToInteraction(InputEventMouseButton mb) => mb switch
         {
-            { ButtonIndex: MouseButton.Left, AltPressed: true } => MouseInteractions.AltLMB,
-            { ButtonIndex: MouseButton.Right, AltPressed: true } => MouseInteractions.AltRMB,
-            { ButtonIndex: MouseButton.Left, CtrlPressed: true } => MouseInteractions.CtrLMB,
-            { ButtonIndex: MouseButton.Right, CtrlPressed: true } => MouseInteractions.CtrRMB,
+            { ButtonIndex: MouseButton.Left, AltPressed: true } => MouseInteractions.AltLmb,
+            { ButtonIndex: MouseButton.Right, AltPressed: true } => MouseInteractions.AltRmb,
+            { ButtonIndex: MouseButton.Left, CtrlPressed: true } => MouseInteractions.CtrLmb,
+            { ButtonIndex: MouseButton.Right, CtrlPressed: true } => MouseInteractions.CtrRmb,
             { ButtonIndex: MouseButton.Right } => MouseInteractions.RightClick,
             { ButtonIndex: MouseButton.Left } => MouseInteractions.LeftClick,
             _ => MouseInteractions.None,

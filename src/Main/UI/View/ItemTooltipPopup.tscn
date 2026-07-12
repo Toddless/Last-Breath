@@ -5,13 +5,9 @@
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 20
 
-[node name="ItemTooltipPopup" type="Control" unique_id=693653492 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines")]
+[node name="ItemTooltipPopup" type="Control" unique_id=1952734347 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines")]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
 _panel = NodePath("Panel")
@@ -22,6 +18,8 @@ _lines = NodePath("Panel/Margin/Layout/Lines")
 [node name="Panel" type="PanelContainer" parent="." unique_id=585764383]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 0
+offset_right = 340.0
+offset_bottom = 98.0
 mouse_filter = 2
 
 [node name="Margin" type="MarginContainer" parent="Panel" unique_id=1202636499]

@@ -15,6 +15,7 @@ namespace Crafting.Source
     public class ItemAscender(RandomNumberGenerator rnd, IItemDataProvider itemDataProvider) : IItemAscender
     {
         private const string MythicPoolId = "Mythic";
+
         // Invented default, tune later: chance to receive a bonus mythic modifier on ascension.
         private const float GiftChance = 0.25f;
 
@@ -26,9 +27,11 @@ namespace Crafting.Source
 
         public AscensionResult TryAscendItem(IEquipItem item)
         {
-            if (!CanAscend(item) || item is not IAscendable ascendable) return new AscensionResult(false, null);
-            if (!ascendable.TryAscend()) return new AscensionResult(false, null);
+            if (!CanAscend(item) || item is not IAscendable ascendable || !ascendable.TryAscend()) return new AscensionResult(false, null);
 
+            // TODO/BUG: TryAscend already sealed the item, and AddAdditionalModifier is a no-op while IsSealed.
+            // The gift is rolled and returned in the result (UI shows it) but never actually lands on the item.
+            // Fix by applying the gift before sealing, or letting the gift path bypass the seal.
             var gift = TryRollGift(item);
             return new AscensionResult(true, gift);
         }

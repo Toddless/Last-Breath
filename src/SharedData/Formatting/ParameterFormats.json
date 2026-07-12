@@ -9,6 +9,7 @@
 		{ "parameter": "CriticalDamageMitigation", "unit": "Percent" },
 		{ "parameter": "FireResistance", "unit": "Percent" },
 		{ "parameter": "ColdResistance", "unit": "Percent" },
-		{ "parameter": "LightningResistance", "unit": "Percent" }
+		{ "parameter": "LightningResistance", "unit": "Percent" },
+		{ "parameter": "AllResistance", "unit": "Percent" }
 	]
 }

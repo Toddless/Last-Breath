@@ -71,9 +71,9 @@
                 "Evade": 450
             },
             "world": {
-                "visionRadius": 420,
+                "visionRadius": 700,
                 "hearingRadius": 800,
-                "leashRadius": 1200,
+                "leashRadius": 2000,
                 "moveSpeed": 130,
                 "chaseSpeedMultiplier": 1.7,
                 "searchSeconds": 8,

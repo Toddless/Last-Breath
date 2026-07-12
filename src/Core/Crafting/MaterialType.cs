@@ -3,26 +3,25 @@ namespace Core.Crafting
     using System.Collections.Generic;
     using Modifiers;
 
-    public class MaterialType(List<IModifier> modifiers, IMaterialCategory category) : IMaterial
+    public class MaterialType(List<IModifierDescriptor> modifiers, IMaterialCategory category) : IMaterial
     {
-        private IReadOnlyList<IModifier>? _cached;
-
         public IMaterialCategory? MaterialCategory { get; } = category;
 
-        /// <summary>Combined modifiers: category modifiers plus the material's own.</summary>
-        public IReadOnlyList<IModifier> Modifiers
+        /// <summary>Combined descriptors: the category's (shared across the category's materials — a category
+        /// bonus is more likely the more of that category you use) plus the material's own.</summary>
+        public IReadOnlyList<IModifierDescriptor> Modifiers
         {
             get
             {
-                if (_cached != null) return _cached;
+                if (field != null) return field;
 
-                var combined = new List<IModifier>();
+                var combined = new List<IModifierDescriptor>();
                 if (MaterialCategory?.Modifiers is { } categoryModifiers)
                     combined.AddRange(categoryModifiers);
                 combined.AddRange(modifiers);
 
-                _cached = combined.AsReadOnly();
-                return _cached;
+                field = combined.AsReadOnly();
+                return field;
             }
         }
     }

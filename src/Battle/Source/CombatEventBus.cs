@@ -2,47 +2,25 @@ namespace Battle.Source
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Core;
     using Core.Battle;
+    using Core.Events;
 
     public class CombatEventBus : ICombatEventBus
     {
-        private readonly Dictionary<Type, List<Delegate>> _handlers = new();
+        private readonly EventRegistry<ICombatEvent> _registry = new();
         private readonly List<Action<ICombatEvent>> _catchAllHandlers = [];
 
         public void Publish<T>(T evnt)
             where T : ICombatEvent
         {
-            NotifyCatchAll(evnt);
-            NotifyTyped(evnt);
+            // Catch-all runs BEFORE typed handlers so recorders capture the event before reactions cascade.
+            EventDispatch.Dispatch<ICombatEvent>(_catchAllHandlers, evnt, this);
+            _registry.Publish(evnt, this);
         }
 
-        public void Subscribe<T>(Action<T> handler)
-            where T : ICombatEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                handlers = [];
-                _handlers[typeof(T)] = handlers;
-            }
+        public void Subscribe<T>(Action<T> handler) where T : ICombatEvent => _registry.Add(handler);
 
-            handlers.Add(handler);
-        }
-
-        public void Unsubscribe<T>(Action<T> handler)
-            where T : ICombatEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                Tracker.TrackNotFound($"Handler for type of Action: {typeof(T)}", this);
-                return;
-            }
-
-            handlers.Remove(handler);
-            if (handlers.Count == 0)
-                _handlers.Remove(typeof(T));
-        }
+        public void Unsubscribe<T>(Action<T> handler) where T : ICombatEvent => _registry.Remove(handler);
 
         public void SubscribeAll(Action<ICombatEvent> handler) => _catchAllHandlers.Add(handler);
 
@@ -50,26 +28,9 @@ namespace Battle.Source
 
         public void Dispose()
         {
-            _handlers.Clear();
+            _registry.Clear();
             _catchAllHandlers.Clear();
             GC.SuppressFinalize(this);
-        }
-
-        /// <summary>Runs before typed handlers so recorders capture the event before reactions cascade.</summary>
-        private void NotifyCatchAll(ICombatEvent evnt)
-        {
-            foreach (var handler in _catchAllHandlers.ToList())
-                handler(evnt);
-        }
-
-        private void NotifyTyped<T>(T evnt)
-            where T : ICombatEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-                return;
-
-            foreach (var handler in handlers.Cast<Action<T>>().ToList())
-                handler(evnt);
         }
     }
 }

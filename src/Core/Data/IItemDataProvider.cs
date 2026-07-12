@@ -17,7 +17,7 @@
         ICraftingRecipe GetRecipe(string recipeId);
         List<IRequirement> GetRecipeRequirements(string id);
         string GetRecipeResultItemId(string recipeId);
-        IReadOnlyList<IModifier> GetResourceModifiers(string id);
+        IReadOnlyList<IModifierDescriptor> GetResourceDescriptors(string id);
         bool IsItemHasTag(string id, string tag);
         List<IModifier> GetEquipItemModifierPool(string id);
         Dictionary<string, int> GetEquipItemResources(string itemId);

@@ -60,7 +60,7 @@ namespace LastBreath.Npc
         {
             try
             {
-                await _messages!.PublishMessageAsync(message);
+                if (_messages != null) await _messages.PublishMessageAsync(message);
             }
             catch (System.Exception exception)
             {

@@ -26,14 +26,14 @@ namespace Core.Localization
 
         private static readonly Dictionary<DamageType, string> s_damageColors = new()
         {
-            [DamageType.Pure] = "#ffd75e",
-            [DamageType.Physical] = "#d0d0d0",
-            [DamageType.Fire] = "#ff7043",
-            [DamageType.Cold] = "#6ec6ff",
-            [DamageType.Lightning] = "#b39dff",
-            [DamageType.Poison] = "#7ccb64",
-            [DamageType.Burning] = "#ff9d45",
-            [DamageType.Bleed] = "#e05555",
+            [DamageType.Pure] = "#F5B64C",
+            [DamageType.Physical] = "#B5AEAE",
+            [DamageType.Fire] = "#E3562B",
+            [DamageType.Cold] = "#43A4E5",
+            [DamageType.Lightning] = "#8D6FF7",
+            [DamageType.Poison] = "#55D458",
+            [DamageType.Burning] = "#E35924",
+            [DamageType.Bleed] = "#E82E2E",
         };
 
         private static readonly Dictionary<Rarity, string> s_rarityColors = new()
@@ -41,10 +41,10 @@ namespace Core.Localization
             [Rarity.Common] = "#d0d0d0",
             [Rarity.Uncommon] = "#7ccb64",
             [Rarity.Rare] = "#6ec6ff",
-            [Rarity.Epic] = "#c9a0e8",
-            [Rarity.Legendary] = "#ffd75e",
-            [Rarity.Unique] = "#ff9d45",
-            [Rarity.Mythic] = "#e05555",
+            [Rarity.Epic] = "#8845BF",
+            [Rarity.Legendary] = "#E86A3F",
+            [Rarity.Unique] = "#DE791D",
+            [Rarity.Mythic] = "#D62424",
         };
 
         public static string DamageColor(DamageType type) => s_damageColors.GetValueOrDefault(type, "#ffffff");

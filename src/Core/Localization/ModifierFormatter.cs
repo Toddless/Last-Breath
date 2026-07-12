@@ -45,9 +45,10 @@ namespace Core.Localization
 
         private string RenderMultiplicative(IModifier modifier, float rangeMin, float rangeMax, TextFormat format)
         {
-            float deltaMin = (modifier.Value * rangeMin - 1f) * 100f;
-            float deltaMax = (modifier.Value * rangeMax - 1f) * 100f;
-            string value = SignedRange(deltaMin, deltaMax, isPercent: true);
+            // Multiplicative modifier Value is a DELTA, not a full multiplier: the engine folds it as
+            // (1 + Σ Value) (see Calculations.CalculateModifiers), so 0.2 means "+20% more". Rendering
+            // it as (Value - 1) turned every "more" line negative (-80% for a +20% mod).
+            string value = SignedRange(modifier.Value * rangeMin * 100f, modifier.Value * rangeMax * 100f, isPercent: true);
             return Render("Modifier_Multiplicative", value, modifier.EntityParameter, format);
         }
 

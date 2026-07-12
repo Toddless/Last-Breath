@@ -34,10 +34,10 @@
                 switch (true)
                 {
                     case var _ when mb.ButtonIndex == MouseButton.Left:
-                        RaiseEvent(MouseInteractions.AltLMB);
+                        RaiseEvent(MouseInteractions.AltLmb);
                         break;
                     case var _ when mb.ButtonIndex == MouseButton.Right:
-                        RaiseEvent(MouseInteractions.AltRMB);
+                        RaiseEvent(MouseInteractions.AltRmb);
                         break;
                 }
             }
@@ -47,10 +47,10 @@
                 switch (true)
                 {
                     case var _ when mb.ButtonIndex == MouseButton.Left:
-                        RaiseEvent(MouseInteractions.CtrLMB);
+                        RaiseEvent(MouseInteractions.CtrLmb);
                         break;
                     case var _ when mb.ButtonIndex == MouseButton.Right:
-                        RaiseEvent(MouseInteractions.CtrRMB);
+                        RaiseEvent(MouseInteractions.CtrRmb);
                         break;
                 }
             }

@@ -24,7 +24,6 @@ namespace LastBreath.Services
     using Core.Views;
     using Core.Views.UI;
     using Crafting.Source;
-    using Godot;
     using Inventory;
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;

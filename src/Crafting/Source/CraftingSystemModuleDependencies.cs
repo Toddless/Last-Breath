@@ -22,6 +22,7 @@
         public static IServiceCollection AddCraftingSystemModuleDependencies(this IServiceCollection services)
         {
             services.AddSingleton<ICraftingMastery, CraftingMastery>();
+            services.AddSingleton<IModifierMaterializer, ModifierMaterializer>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemAscender, ItemAscender>();
             services.AddSingleton<CraftingResources>();
@@ -31,7 +32,7 @@
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
             services.AddTransient<IRequestHandler<UpgradeEquipItemRequest, ItemUpgradeResult>, UpgradeEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemRecraftModifierCostRequest, IEnumerable<IRequirement>>, GetEquipItemRecraftModifierCostRequestHandler>();
-            services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>, RecraftEquipItemModifierRequestHandler>();
+            services.AddTransient<IRequestHandler<RecraftEquipItemModifierRequest, RequestResult<string>>, RecraftEquipItemModifierRequestHandler>();
             services.AddTransient<IRequestHandler<AscendEquipItemRequest, AscensionResult>, AscendEquipItemRequestHandler>();
 
             services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();

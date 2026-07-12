@@ -2,6 +2,7 @@ namespace Core.Items
 {
     using System;
     using System.Linq;
+    using Constants;
     using Crafting;
     using Enums;
     using Godot;
@@ -25,14 +26,24 @@ namespace Core.Items
             Tags = [.. source.Tags];
             Material = source.Material;
             Rarity = source.Rarity;
-            Icon = source.Icon;
+            // Icon is intentionally NOT copied: it lazy-loads from AssetPaths.ResourceIcon(Id), so the copy
+            // resolves its own texture on first access. Reading source.Icon here would force a ResourceLoader
+            // call on every copy — and hard-crash hosts without the Godot runtime (tests, loot simulation).
         }
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public int MaxStackSize { get; }
         public string[] Tags { get; }
-        public Texture2D? Icon { get; set; }
+        public Texture2D? Icon
+        {
+            get
+            {
+                if (field != null) return field;
+                field = ResourceLoader.Load<Texture2D>(AssetPaths.ResourceIcon(Id));
+                return field;
+            }
+        }
         public Rarity Rarity { get; set; }
         public IMaterial? Material { get; }
         public string DisplayName => Localization.Localization.Localize(Id);

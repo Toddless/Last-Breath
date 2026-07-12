@@ -1,5 +1,6 @@
 namespace Core.Modifiers
 {
+    using System;
     using Context;
     using Entity;
     using Enums;
@@ -13,6 +14,8 @@ namespace Core.Modifiers
     {
         private IContextModifierBinding? _binding;
 
+        // Session-local identity for reroll targeting (regenerated on Copy, like entity modifier instances).
+        public string InstanceId { get; } = Guid.NewGuid().ToString();
         public ContextParameter Parameter { get; } = parameter;
         public ModifierValueType ValueType { get; } = valueType;
         public float BaseValue { get; } = baseValue;

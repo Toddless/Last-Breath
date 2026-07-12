@@ -63,7 +63,7 @@
 
         public int CurrentLevel
         {
-            get => field + BonusLevel;
+            get;
             private set
             {
                 if (value == field) return;
@@ -92,7 +92,6 @@
         {
             if (amount <= 0) return;
             CurrentExperience += amount;
-            ExperienceChange?.Invoke(CurrentExperience);
             if (CurrentLevel >= MaxLevel) return;
             CheckForLevelUp();
         }
@@ -234,6 +233,6 @@
         }
 
         private float GetProgressFactor() =>
-            Mathf.Clamp((CurrentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
+            Mathf.Clamp((float)(CurrentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
     }
 }

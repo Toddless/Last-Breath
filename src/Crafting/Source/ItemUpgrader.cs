@@ -13,7 +13,7 @@ namespace Crafting.Source
     using Core.Results;
     using Godot;
 
-    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider, ICraftingAdditiveProvider additives) : IItemUpgrader
+    public class ItemUpgrader(RandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider, ICraftingAdditiveProvider additives, IModifierMaterializer materializer) : IItemUpgrader
     {
         private const float P0 = 0.95f;
         private const float P5 = 0.70f;
@@ -44,25 +44,30 @@ namespace Crafting.Source
             return requirements.Select(IRequirement (req) => new Requirement(req.Type, req.Id, req.Amount + amount)).ToList();
         }
 
-        public IModifierInstance? TryRecraftModifier(IEquipItem item, int modifierToReroll, IEnumerable<IModifier> modifiers, IReadOnlyCollection<string>? additiveResourceIds = null)
+        public string? TryRecraftModifier(IEquipItem item, string modifierInstanceId, IReadOnlyCollection<string>? additiveResourceIds = null)
         {
-            if (item.Modifiers.All(modifier => modifier.GetHashCode() != modifierToReroll)) return null;
+            bool onItem = item.Modifiers.Any(modifier => modifier.InstanceId == modifierInstanceId)
+                          || item.ContextModifiers.Any(entry => entry.InstanceId == modifierInstanceId);
+            if (!onItem) return null;
 
-            // Additive pools join the roll for THIS operation only; the item's own pool never changes.
-            var candidates = modifiers.Concat(item.ModifiersPool).Concat(AdditivePools(additiveResourceIds))
-                .Where(candidate => candidate.GetHashCode() != modifierToReroll
-                                    && item.Modifiers.All(existing => existing.GetHashCode() != candidate.GetHashCode()))
-                .ToList();
-            if (candidates.Count == 0) return null; // the pool has nothing new to offer — refuse instead of looping
+            // Variant B allows duplicate lines, so the whole (already quality-scaled) pool joins the roll with no
+            // value exclusion. Composites flatten to atomic parts so a reroll is 1-for-1. Additives join for THIS
+            // operation only; the item's own pool never changes.
+            var candidates = DescriptorOperations.Flatten(item.ModifiersPool.Concat(AdditivePools(additiveResourceIds))).ToList();
+            if (candidates.Count == 0) return null; // nothing to roll — refuse instead of looping
 
-            (List<WeightedObject<IModifier>> weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
+            (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
+            item.RemoveAdditionalModifier(modifierInstanceId);
 
-            item.RemoveAdditionalModifier(modifierToReroll);
-            var newMod = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
-            var modifier = ModifiersCreator.CreateModifierInstance(newMod.EntityParameter, newMod.ModifierValueType, newMod.BaseValue, item.InstanceId);
-            item.AddAdditionalModifier(modifier);
+            var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
+            var sink = new CollectingSink();
+            materializer.Materialize(picked, sink, item.InstanceId); // pool descriptors are already quality-scaled
+            foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
+            foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
 
-            return modifier;
+            return sink.Entities.Select(entity => entity.InstanceId)
+                .Concat(sink.Contexts.Select(entry => entry.InstanceId))
+                .FirstOrDefault();
         }
 
         public ItemUpgradeResult TryUpgradeItem(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null)
@@ -93,10 +98,10 @@ namespace Crafting.Source
         private List<CraftingAdditiveEffects> AdditiveEffects(IReadOnlyCollection<string>? resourceIds) =>
             resourceIds?.Select(additives.GetEffects).Where(effects => effects != null).Cast<CraftingAdditiveEffects>().ToList() ?? [];
 
-        private IEnumerable<IModifier> AdditivePools(IReadOnlyCollection<string>? resourceIds) =>
+        private IEnumerable<IModifierDescriptor> AdditivePools(IReadOnlyCollection<string>? resourceIds) =>
             AdditiveEffects(resourceIds)
                 .Where(effects => !string.IsNullOrEmpty(effects.RecraftPoolId))
-                .SelectMany(effects => itemDataProvider.GetEquipItemModifierPool(effects.RecraftPoolId!));
+                .SelectMany(effects => itemDataProvider.GetEquipItemModifierPool(effects.RecraftPoolId!).Select(DescriptorOperations.FromModifier));
 
         private float GetChance(int level)
         {

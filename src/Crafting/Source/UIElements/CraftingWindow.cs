@@ -12,7 +12,6 @@ namespace Crafting.Source.UIElements
     using Core.Localization;
     using Core.MessageBus;
     using Core.MessageBus.Requests;
-    using Core.Modifiers;
     using Core.Results;
     using Core.Views.UI;
     using Godot;
@@ -56,7 +55,7 @@ namespace Crafting.Source.UIElements
         private CraftingMode _mode = CraftingMode.Create;
         private string? _recipeId;
         private IEquipItem? _item;
-        private int? _selectedModifierHash;
+        private string? _selectedModifierInstanceId;
 
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
@@ -100,7 +99,7 @@ namespace Crafting.Source.UIElements
             _item = item;
             _mode = mode;
             _recipeId = null;
-            _selectedModifierHash = null;
+            _selectedModifierInstanceId = null;
             ResetChoices();
             _tree?.DeselectAll();
             RefreshDetails();
@@ -162,7 +161,7 @@ namespace Crafting.Source.UIElements
             _recipeId = recipeId;
             _item = null;
             _mode = CraftingMode.Create;
-            _selectedModifierHash = null;
+            _selectedModifierInstanceId = null;
             ResetChoices();
             RefreshDetails();
         }
@@ -208,24 +207,30 @@ namespace Crafting.Source.UIElements
 
             foreach (var implicitModifier in _item.Implicits)
                 _mods.AddChild(new Label { Text = Localization.Format(implicitModifier), ThemeTypeVariation = "DimLabel" });
+            foreach (var contextImplicit in _item.ContextImplicits)
+                _mods.AddChild(new Label { Text = Localization.Format(contextImplicit), ThemeTypeVariation = "DimLabel" });
 
             foreach (var modifier in _item.Modifiers)
-                _mods.AddChild(_mode == CraftingMode.Recraft ? RerollableRow(modifier) : new Label { Text = Localization.Format(modifier) });
+                _mods.AddChild(RerollableOrLabel(modifier.InstanceId, Localization.Format(modifier)));
+            foreach (var contextModifier in _item.ContextModifiers)
+                _mods.AddChild(RerollableOrLabel(contextModifier.InstanceId, Localization.Format(contextModifier)));
         }
 
-        /// <summary>In Recraft the additional lines become pickable — the chosen one gets rerolled.</summary>
-        private Button RerollableRow(IModifier modifier)
+        /// <summary>In Recraft every additional line — entity or context — is pickable; the chosen one gets rerolled.</summary>
+        private Control RerollableOrLabel(string instanceId, string text) =>
+            _mode == CraftingMode.Recraft ? RerollableRow(instanceId, text) : new Label { Text = text };
+
+        private Button RerollableRow(string instanceId, string text)
         {
-            int hash = modifier.GetHashCode();
             var row = new Button
             {
-                Text = (_selectedModifierHash == hash ? "» " : string.Empty) + Localization.Format(modifier),
+                Text = (_selectedModifierInstanceId == instanceId ? "» " : string.Empty) + text,
                 Alignment = HorizontalAlignment.Left,
                 FocusMode = FocusModeEnum.None,
             };
             row.Pressed += () =>
             {
-                _selectedModifierHash = hash;
+                _selectedModifierInstanceId = instanceId;
                 RefreshDetails();
             };
             return row;
@@ -403,7 +408,7 @@ namespace Crafting.Source.UIElements
             {
                 CraftingMode.Create => _recipeId != null && costCovered && MasteryAllows() && AllCategoriesChosen(),
                 CraftingMode.Upgrade => _item != null && _item.UpdateLevel < _item.MaxUpdateLevel && costCovered,
-                CraftingMode.Recraft => _item != null && _selectedModifierHash != null && costCovered,
+                CraftingMode.Recraft => _item != null && _selectedModifierInstanceId != null && costCovered,
                 CraftingMode.Ascend => _item != null && _ascender?.CanAscend(_item) == true && costCovered,
                 _ => false,
             };
@@ -433,9 +438,9 @@ namespace Crafting.Source.UIElements
                         await _messageBus.SendRequest<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_item!.InstanceId, cost));
                         break;
                     case CraftingMode.Recraft:
-                        await _messageBus.SendRequest<RecraftEquipItemModifierRequest, RequestResult<IModifierInstance>>(
-                            new(_item!.InstanceId, _selectedModifierHash!.Value, cost));
-                        _selectedModifierHash = null;
+                        await _messageBus.SendRequest<RecraftEquipItemModifierRequest, RequestResult<string>>(
+                            new(_item!.InstanceId, _selectedModifierInstanceId!, cost));
+                        _selectedModifierInstanceId = null;
                         break;
                     case CraftingMode.Ascend:
                         await _messageBus.SendRequest<AscendEquipItemRequest, AscensionResult>(new(_item!.InstanceId));

@@ -87,8 +87,13 @@ namespace Battle.Source
             var body = entity as CharacterBody2D;
             Entity = entity;
             ClearToIdle(); // a spot freed by a death stays Unavailable otherwise — the newcomer would be untargetable
-            body?.Position = Vector2.Zero;
+            if (body == null) return;
+            // Reparent, THEN zero the LOCAL position — both deferred, in that order. Setting the
+            // position now would be relative to the body's CURRENT parent (the world, origin 0,0),
+            // so a lagging reparent left a fighter attacking from (0,0) and dying there. After the
+            // deferred AddChild the local zero means the spot.
             CallDeferred(Node.MethodName.AddChild, body);
+            body.SetDeferred(Node2D.PropertyName.Position, Vector2.Zero);
         }
 
         public bool HasEntityInit() => Entity != null;

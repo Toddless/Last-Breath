@@ -31,7 +31,15 @@ namespace Battle.Source.UIElements
             if (!IsPinned) HoverTooltipMotion.Follow(this, _panel);
         }
 
-        public override void _UnhandledKeyInput(InputEvent @event) => IsPinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
+        public override void _UnhandledKeyInput(InputEvent @event)
+        {
+            bool pinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
+            // Un-pinning dismisses the tooltip: once the pointer has left its source a pinned popup is
+            // orphaned (HoverTooltip.Attach dropped its handle on MouseExited), so resuming cursor-follow
+            // would make it chase the mouse forever with nothing left to close it.
+            if (IsPinned && !pinned) { Close(); return; }
+            IsPinned = pinned;
+        }
 
         public void Close() => QueueFree();
 

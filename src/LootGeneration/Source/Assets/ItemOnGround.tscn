@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://d4u6h8h88ft4"]
 
-[ext_resource type="Shader" uid="uid://dllw3dsc7w1po" path="res://Source/Assets/ItemOnGroundV2.gdshader" id="1_omtdu"]
-[ext_resource type="Shader" uid="uid://cxcegl4dn6paf" path="res://Source/Assets/ItemOnGroundGlow.gdshader" id="2_mh3fj"]
-[ext_resource type="Script" uid="uid://c0bwau5otuqw1" path="res://Source/ItemOnGround.cs" id="5_gwjaa"]
-[ext_resource type="Texture2D" uid="uid://ctiqrv1nre10y" path="res://Source/Assets/DropIcon.png" id="5_h4cdb"]
-[ext_resource type="Texture2D" uid="uid://bqdyhp2n0j715" path="res://Source/Assets/Illustration.png" id="5_txkrn"]
+[ext_resource type="Shader" uid="uid://dllw3dsc7w1po" path="res://Addons/LootGeneration/Assets/ItemOnGroundV2.gdshader" id="1_omtdu"]
+[ext_resource type="Shader" uid="uid://cxcegl4dn6paf" path="res://Addons/LootGeneration/Assets/ItemOnGroundGlow.gdshader" id="2_mh3fj"]
+[ext_resource type="Script" uid="uid://c0bwau5otuqw1" path="res://Addons/LootGeneration/ItemOnGround.cs" id="5_gwjaa"]
+[ext_resource type="Texture2D" uid="uid://ctiqrv1nre10y" path="res://Addons/LootGeneration/Assets/DropIcon.png" id="5_h4cdb"]
+[ext_resource type="Texture2D" uid="uid://bqdyhp2n0j715" path="res://Addons/LootGeneration/Assets/Illustration.png" id="5_txkrn"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_txkrn"]
 atlas = ExtResource("5_h4cdb")
@@ -78,12 +78,13 @@ height = 30.664637
 script = ExtResource("5_gwjaa")
 _interactionArea = NodePath("Area2D")
 _colors = Dictionary[int, Color]({
-0: Color(0.9607843, 0.03529412, 0.05882353, 1),
-1: Color(0.38039216, 0.07058824, 0.79607844, 1),
-2: Color(0.13725491, 0.10980392, 0.93333334, 1),
-3: Color(0, 0.7254902, 0, 1),
-10: Color(0.8509804, 0.20392157, 0, 1),
-11: Color(0.92941177, 0.40784314, 0.77254903, 1)
+0: Color(0.9137255, 0.27058825, 0, 1),
+1: Color(0.33333334, 0, 0.93333334, 1),
+2: Color(0.31982034, 0.52725166, 1, 1),
+3: Color(0, 0.49411765, 0, 1),
+4: Color(0.83033526, 0.83033514, 0.83033514, 1),
+10: Color(0.9824763, 0.7263963, 0.14209849, 1),
+11: Color(0.92156863, 0, 0, 1)
 })
 _lootIcon = NodePath("Sprite2D")
 _itemBeam = NodePath("MeshInstance2D")

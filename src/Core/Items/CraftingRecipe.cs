@@ -3,6 +3,7 @@ namespace Core.Items
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Constants;
     using Crafting;
     using Enums;
     using Godot;
@@ -33,14 +34,24 @@ namespace Core.Items
             ItemType = source.ItemType;
             OptionalResourceCategories = [.. source.OptionalResourceCategories];
             IsOpened = source.IsOpened;
-            Icon = source.Icon;
+            // Icon is intentionally NOT copied: it lazy-loads the shared recipe scroll on first access.
+            // Reading source.Icon here would force a ResourceLoader call on every copy — and hard-crash
+            // hosts without the Godot runtime (tests, loot simulation).
         }
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string ResultItemId { get; }
         public string[] Tags { get; }
-        public Texture2D? Icon { get; set; }
+        public Texture2D? Icon
+        {
+            get
+            {
+                if (field != null) return field;
+                field = ResourceLoader.Load<Texture2D>(AssetPaths.RecipeIcon);
+                return field;
+            }
+        }
         public Rarity Rarity { get; set; }
         public bool IsOpened { get; }
         public int MaxStackSize => 1;

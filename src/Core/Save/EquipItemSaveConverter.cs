@@ -31,7 +31,7 @@ namespace Core.Save
             Modifiers = ToModifierData(item.Modifiers),
             ContextImplicits = ToContextData(item.ContextImplicits),
             ContextModifiers = ToContextData(item.ContextModifiers),
-            ModifiersPool = ToModifierData(item.ModifiersPool),
+            ModifiersPool = item.ModifiersPool.Select(ToDescriptorData).ToList(),
             UsedResources = new Dictionary<string, int>(item.UsedResources),
             Grants = item.Grants.Select(ToGrantData).ToList(),
             WeaponType = (item as WeaponItem)?.WeaponType,
@@ -57,7 +57,7 @@ namespace Core.Save
             item.SetModifiers(data.Modifiers.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetContextImplicits(data.ContextImplicits.Select(ToContextEntry));
             item.SetContextModifiers(data.ContextModifiers.Select(ToContextEntry));
-            item.SaveModifiersPool(data.ModifiersPool.Select(modifier => (IModifier)ToModifier(modifier, item.InstanceId)));
+            item.SaveModifiersPool(data.ModifiersPool.Select(FromDescriptorData));
             item.SaveUsedResources(new Dictionary<string, int>(data.UsedResources));
             foreach (var grant in data.Grants)
                 item.AddGrant(FromGrantData(grant, item.InstanceId));
@@ -92,6 +92,41 @@ namespace Core.Save
 
         private static IModifierInstance ToModifier(ModifierSaveData data, string source) =>
             new SimpleModifier(data.Parameter, data.ValueType, data.BaseValue, source, data.Weight) { Scope = data.Scope };
+
+        private static ModifierDescriptorSaveData ToDescriptorData(IModifierDescriptor descriptor) => descriptor switch
+        {
+            ParameterDescriptor parameter => new ModifierDescriptorSaveData
+            {
+                Kind = ModifierDescriptorSaveData.ParameterKind,
+                Parameter = parameter.Parameter,
+                ValueType = parameter.ValueType,
+                Scope = parameter.Scope,
+                Value = parameter.Value,
+                Weight = parameter.Weight,
+            },
+            ContextDescriptor context => new ModifierDescriptorSaveData
+            {
+                Kind = ModifierDescriptorSaveData.ContextKind,
+                ContextParameter = context.Parameter,
+                ValueType = context.ValueType,
+                Value = context.Value,
+                Weight = context.Weight,
+            },
+            CompositeDescriptor composite => new ModifierDescriptorSaveData
+            {
+                Kind = ModifierDescriptorSaveData.CompositeKind,
+                Weight = composite.Weight,
+                Parts = composite.Parts.Select(ToDescriptorData).ToList(),
+            },
+            _ => throw new NotSupportedException($"Descriptor {descriptor.GetType().Name} has no save representation."),
+        };
+
+        private static IModifierDescriptor FromDescriptorData(ModifierDescriptorSaveData data) => data.Kind switch
+        {
+            ModifierDescriptorSaveData.ContextKind => new ContextDescriptor(data.ContextParameter ?? default, data.ValueType ?? default, data.Value ?? 0f) { Weight = data.Weight },
+            ModifierDescriptorSaveData.CompositeKind => new CompositeDescriptor((data.Parts ?? []).Select(FromDescriptorData).ToList()) { Weight = data.Weight },
+            _ => new ParameterDescriptor(data.Parameter ?? default, data.ValueType ?? default, data.Value ?? 0f, data.Scope ?? default) { Weight = data.Weight },
+        };
 
         private static List<ContextModifierSaveData> ToContextData(IReadOnlyList<ContextModifierEntry> entries) =>
             entries.Select(entry => new ContextModifierSaveData

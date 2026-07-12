@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://byx7g1b2wlwfl"]
 
-[ext_resource type="Script" uid="uid://drrims7f874sy" path="res://Inventory/InventoryWindow.cs" id="1_plih6"]
+[ext_resource type="Script" uid="uid://bi6bbowdumghk" path="res://Inventory/InventoryWindow.cs" id="1_plih6"]
 
-[node name="InventoryWindow" type="Panel" node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_inventoryGrid", "_equipment")]
+[node name="InventoryWindow" type="Panel" unique_id=911668495 node_paths=PackedStringArray("_craftingButton", "_allStatsButton", "_sortButton", "_destroyButton", "_inventoryGrid", "_equipment")]
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
@@ -18,7 +18,7 @@ _destroyButton = NodePath("Margin/Layout/Header/Destroy")
 _inventoryGrid = NodePath("Margin/Layout/Body/Bag/InventorySlots")
 _equipment = NodePath("Margin/Layout/Body/EquipmentPanel/EquipmentMargin/Equipment")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=1436916846]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,67 +30,67 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="Layout" type="VBoxContainer" parent="Margin"]
+[node name="Layout" type="VBoxContainer" parent="Margin" unique_id=2010516068]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+[node name="Header" type="HBoxContainer" parent="Margin/Layout" unique_id=399438433]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Margin/Layout/Header"]
+[node name="Title" type="Label" parent="Margin/Layout/Header" unique_id=138511059]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"HeaderLabel"
 text = "Inventory"
 
-[node name="Sort" type="Button" parent="Margin/Layout/Header"]
+[node name="Sort" type="Button" parent="Margin/Layout/Header" unique_id=140503768]
 layout_mode = 2
 focus_mode = 0
 text = "Sort"
 
-[node name="Destroy" type="Button" parent="Margin/Layout/Header"]
+[node name="Destroy" type="Button" parent="Margin/Layout/Header" unique_id=1238492556]
 layout_mode = 2
 focus_mode = 0
 text = "Destroy"
 
-[node name="AllStatsButton" type="Button" parent="Margin/Layout/Header"]
+[node name="AllStatsButton" type="Button" parent="Margin/Layout/Header" unique_id=1038562689]
 layout_mode = 2
 focus_mode = 0
 text = "Stats"
 
-[node name="CraftingButton" type="Button" parent="Margin/Layout/Header"]
+[node name="CraftingButton" type="Button" parent="Margin/Layout/Header" unique_id=178289211]
 layout_mode = 2
 focus_mode = 0
 text = "Crafting"
 
-[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
+[node name="Body" type="HBoxContainer" parent="Margin/Layout" unique_id=2040111215]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="EquipmentPanel" type="PanelContainer" parent="Margin/Layout/Body"]
+[node name="EquipmentPanel" type="PanelContainer" parent="Margin/Layout/Body" unique_id=1932100637]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 
-[node name="EquipmentMargin" type="MarginContainer" parent="Margin/Layout/Body/EquipmentPanel"]
+[node name="EquipmentMargin" type="MarginContainer" parent="Margin/Layout/Body/EquipmentPanel" unique_id=766590792]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Equipment" type="VBoxContainer" parent="Margin/Layout/Body/EquipmentPanel/EquipmentMargin"]
+[node name="Equipment" type="VBoxContainer" parent="Margin/Layout/Body/EquipmentPanel/EquipmentMargin" unique_id=908499187]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 8
 
-[node name="Bag" type="ScrollContainer" parent="Margin/Layout/Body"]
+[node name="Bag" type="ScrollContainer" parent="Margin/Layout/Body" unique_id=170277875]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_scroll_mode = 0
 
-[node name="InventorySlots" type="GridContainer" parent="Margin/Layout/Body/Bag"]
+[node name="InventorySlots" type="GridContainer" parent="Margin/Layout/Body/Bag" unique_id=304891539]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 4

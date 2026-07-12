@@ -10,12 +10,14 @@ namespace Core.Views.UI
         {
             if (!panel.IsInsideTree()) return; // the viewport is unknown outside the tree — a caller raced ahead of AddChild
 
+            panel.Hide();
             var viewport = panel.GetViewportRect().Size;
             var size = panel.Size;
             var target = desiredGlobalPosition + offset;
             target.X = Mathf.Clamp(target.X, 0, Mathf.Max(0, viewport.X - size.X));
             target.Y = Mathf.Clamp(target.Y, 0, Mathf.Max(0, viewport.Y - size.Y));
             panel.GlobalPosition = target;
+            panel.Show();
         }
     }
 }

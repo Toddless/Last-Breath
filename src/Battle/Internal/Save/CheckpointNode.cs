@@ -3,7 +3,6 @@ namespace Battle.Internal.Save
     using Core.Services;
     using Core.Views.UI;
     using Godot;
-    using Source.UIElements;
     using GameServiceProvider = Services.GameServiceProvider;
 
     /// <summary>

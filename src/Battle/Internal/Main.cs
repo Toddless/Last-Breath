@@ -14,7 +14,6 @@
     using Source;
     using Source.UIElements;
     using GameServiceProvider = Services.GameServiceProvider;
-    using NotificationService = Core.Services.NotificationService;
 
     public partial class Main : Node2D
     {

@@ -51,7 +51,10 @@ namespace Battle.Source.UIElements
             RefreshProgress();
         }
 
-        public void Close() => GetParent().RemoveChild(this);
+        // Close = death (QueueFree), the IWindow contract: RemoveChild left a live, still-tracked
+        // node parentless, so a following Esc (CloseDismissableWindows) called Close() again on it
+        // and GetParent() was null -> NRE. Same fix as the save/options windows (bugs #27/#29).
+        public void Close() => QueueFree();
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

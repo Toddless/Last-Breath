@@ -1,6 +1,5 @@
 ﻿namespace LastBreath.Services
 {
-    using System;
     using Core;
     using Core.Constants;
     using Core.Enums;

@@ -1,50 +1,21 @@
-﻿namespace Battle.Source
+namespace Battle.Source
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Core.Events;
 
     public class BattleEventBus : IBattleEventBus
     {
-        private readonly Dictionary<Type, List<Delegate>> _handlers = new();
+        private readonly EventRegistry<IBattleEvent> _registry = new();
 
-        public void Publish<T>(T evnt) where T : IBattleEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-                return;
+        public void Publish<T>(T evnt) where T : IBattleEvent => _registry.Publish(evnt, this);
 
-            foreach (var handler in handlers.Cast<Action<T>>().ToList())
-                handler(evnt);
-        }
+        public void Subscribe<T>(Action<T> handler) where T : IBattleEvent => _registry.Add(handler);
 
-        public void Subscribe<T>(Action<T> handler) where T : IBattleEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                handlers = [];
-                _handlers[typeof(T)] = handlers;
-            }
-
-            handlers.Add(handler);
-        }
-
-        public void Unsubscribe<T>(Action<T> handler) where T : IBattleEvent
-        {
-            if (!_handlers.TryGetValue(typeof(T), out var handlers))
-            {
-                // TODO: Tracker/Logger
-                return;
-            }
-
-            handlers.Remove(handler);
-            if (handlers.Count == 0)
-                _handlers.Remove(typeof(T));
-        }
+        public void Unsubscribe<T>(Action<T> handler) where T : IBattleEvent => _registry.Remove(handler);
 
         public void Dispose()
         {
-            _handlers.Clear();
+            _registry.Clear();
             GC.SuppressFinalize(this);
         }
     }

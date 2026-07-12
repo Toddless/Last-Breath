@@ -10,7 +10,6 @@
     public abstract partial class Slot : Control
     {
         private int _quantity;
-        private ItemInstance? _instance;
         [Export] protected TextureRect? Background;
         [Export] protected TextureRect? Icon;
         [Export] protected TextureRect? Frame;
@@ -19,12 +18,12 @@
 
         public ItemInstance? CurrentItem
         {
-            get => _instance;
-            set
+            get;
+            private set
             {
-                if (_instance == value) return;
-                _instance = value;
-                RefreshUI();
+                if (field == value) return;
+                field = value;
+                RefreshUi();
             }
         }
 
@@ -36,7 +35,7 @@
                 if (_quantity == value) return;
                 _quantity = value;
                 if (_quantity <= 0) ClearSlot(true);
-                RefreshUI();
+                RefreshUi();
             }
         }
 
@@ -175,9 +174,9 @@
             return true;
         }
 
-        protected virtual void RefreshUI()
+        protected virtual void RefreshUi()
         {
-            if (Icon != null) Icon.Texture = CurrentItem == null ? null : GetItemIcon?.Invoke(CurrentItem.InstanceId);
+            Icon?.Texture = CurrentItem == null ? null : GetItemIcon?.Invoke(CurrentItem.InstanceId);
         }
     }
 }

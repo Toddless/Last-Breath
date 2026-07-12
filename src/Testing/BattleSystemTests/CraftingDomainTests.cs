@@ -67,16 +67,17 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void TryRecraftModifier_HashNotOnItem_RefusesWithoutRolling()
+        public void TryRecraftModifier_InstanceIdNotOnItem_RefusesWithoutRolling()
         {
             var upgrader = CreateUpgrader();
             var item = new Mock<IEquipItem>();
             item.SetupGet(mock => mock.Modifiers).Returns([]);
+            item.SetupGet(mock => mock.ContextModifiers).Returns([]);
 
-            var result = upgrader.TryRecraftModifier(item.Object, modifierToReroll: 12345, modifiers: []);
+            var result = upgrader.TryRecraftModifier(item.Object, modifierInstanceId: "missing");
 
             Assert.IsNull(result);
-            item.Verify(mock => mock.RemoveAdditionalModifier(It.IsAny<int>()), Times.Never);
+            item.Verify(mock => mock.RemoveAdditionalModifier(It.IsAny<string>()), Times.Never);
         }
 
         [TestMethod]
@@ -84,19 +85,21 @@ namespace LastBreathTest.BattleSystemTests
         {
             var upgrader = CreateUpgrader();
             var onItem = new Mock<IModifierInstance>();
+            onItem.SetupGet(mock => mock.InstanceId).Returns("mod-1");
             var item = new Mock<IEquipItem>();
             item.SetupGet(mock => mock.Modifiers).Returns([onItem.Object]);
+            item.SetupGet(mock => mock.ContextModifiers).Returns([]);
             item.SetupGet(mock => mock.ModifiersPool).Returns([]);
 
-            // The only candidate pool is empty once the rerolled hash is excluded — the old code span forever here.
-            var result = upgrader.TryRecraftModifier(item.Object, onItem.Object.GetHashCode(), modifiers: []);
+            // The line is on the item, but the pool is empty — nothing to draw, so refuse instead of looping.
+            var result = upgrader.TryRecraftModifier(item.Object, "mod-1");
 
             Assert.IsNull(result);
-            item.Verify(mock => mock.RemoveAdditionalModifier(It.IsAny<int>()), Times.Never);
+            item.Verify(mock => mock.RemoveAdditionalModifier(It.IsAny<string>()), Times.Never);
         }
 
         private static ItemUpgrader CreateUpgrader() =>
             new(rnd: null!, Mock.Of<ICraftingMastery>(), Mock.Of<IItemDataProvider>(),
-                Mock.Of<ICraftingAdditiveProvider>());
+                Mock.Of<ICraftingAdditiveProvider>(), new ModifierMaterializer());
     }
 }

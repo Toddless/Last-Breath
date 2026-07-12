@@ -787,6 +787,15 @@ msgstr "Cold Resistance"
 msgid "LightningResistance"
 msgstr "Lightning Resistance"
 
+msgid "AllResistance"
+msgstr "All Resistances"
+
+msgid "AllAttribute"
+msgstr "All Attributes"
+
+msgid "AllDefence"
+msgstr "All Defence"
+
 # ------------------------------
 # Ability parameters (battle UI)
 # ------------------------------

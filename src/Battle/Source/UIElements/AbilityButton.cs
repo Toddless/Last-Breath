@@ -50,6 +50,7 @@ namespace Battle.Source.UIElements
 
         /// <summary>Read access for the HUD's hover tooltip.</summary>
         public IAbility? CurrentAbility => _ability;
+
         private string _selectionId = string.Empty;
         private IBattleEventBus? _battleEventBus;
         [Export] private TextureRect? _background, _icon, _frame;
@@ -79,10 +80,6 @@ namespace Battle.Source.UIElements
             if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
                 OnActivationPressed();
         }
-
-        // TODO:
-        // Иконка способности перекрывает фрейм слота
-
 
         public override void _Ready()
         {
@@ -252,8 +249,8 @@ namespace Battle.Source.UIElements
                 .Permit(Trigger.NotAvailable, State.NotAvailable);
 
             _stateMachine.Configure(State.NotAvailable)
-                .OnEntry(() => { _frame?.SetModulate(new Color(1, 1, 1, 0.7f)); })
-                .OnExit(() => { _frame?.SetModulate(new Color(1, 1, 1, 0)); })
+                .OnEntry(() => { _icon?.SetModulate(new Color(1, 1, 1, 0.7f)); })
+                .OnExit(() => { _icon?.SetModulate(new Color(1, 1, 1, 0)); })
                 .Permit(Trigger.Ready, State.Ready);
         }
 

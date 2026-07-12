@@ -34,17 +34,11 @@ namespace LastBreath.Inventory
 
         public override void _Ready()
         {
-            if (_craftingButton != null)
-                _craftingButton.Pressed += OnCraftingButtonPressed;
-            if (_allStatsButton != null)
-                _allStatsButton.Pressed += () => _uiElementsManager?.ToggleWindow(typeof(UI.CharacterWindow));
-            if (_sortButton != null)
-                _sortButton.Pressed += () => Bag?.SortBag();
-            if (_destroyButton != null)
-            {
-                _destroyButton.ToggleMode = true;
-                _destroyButton.Toggled += pressed => _destroyMode = pressed;
-            }
+            _craftingButton?.Pressed += OnCraftingButtonPressed;
+            _allStatsButton?.Pressed += () => _uiElementsManager?.ToggleWindow(typeof(UI.CharacterWindow));
+            _sortButton?.Pressed += () => Bag?.SortBag();
+            _destroyButton?.ToggleMode = true;
+            _destroyButton?.Toggled += pressed => _destroyMode = pressed;
         }
 
         public override void _ExitTree()
@@ -154,12 +148,7 @@ namespace LastBreath.Inventory
             var equipped = Equipment?.GetEquipped(piece);
             var row = new EquipmentRow();
             row.Setup(piece, equipped, instanceId => CanEquipFromBag(piece, instanceId), EquipInstanceFromBag);
-            row.AddChild(new Label
-            {
-                Text = piece.ToString(),
-                ThemeTypeVariation = "DimLabel",
-                CustomMinimumSize = new Vector2(80, 0),
-            });
+            row.AddChild(new Label { Text = piece.ToString(), ThemeTypeVariation = "DimLabel", CustomMinimumSize = new Vector2(80, 0), });
             var name = new Label
             {
                 Text = equipped?.DisplayName ?? "—",

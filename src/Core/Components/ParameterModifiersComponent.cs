@@ -41,11 +41,6 @@
                 _modifiers[modifier.EntityParameter] = list;
             }
 
-            if (list.Contains(modifier))
-            {
-                // Tracker.TrackError("Trying to add a modifier that already exists in the list", this);
-            }
-
             list.Add(modifier);
             RaiseEvent(modifier.EntityParameter);
         }
@@ -54,7 +49,6 @@
         {
             if (!_modifiers.TryGetValue(newModifier.EntityParameter, out var list))
             {
-                // Tracker.TrackNotFound($"List for {newModifier.EntityParameter}", this);
                 list = [];
                 _modifiers[newModifier.EntityParameter] = list;
             }
@@ -62,7 +56,6 @@
             var existingModifier = list.FirstOrDefault(x => x.Source == newModifier.Source && x.ModifierValueType == newModifier.ModifierValueType);
             if (existingModifier == null)
             {
-                //  Tracker.TrackNotFound($"Modifier with parameters: Source: {newModifier.Source}, Type: {newModifier.ModifierType}", this);
                 list.Add(newModifier);
             }
             else existingModifier.Value = newModifier.Value;
@@ -94,11 +87,7 @@
 
         public void RemoveModifier(IModifierInstance modifier)
         {
-            if (!_modifiers.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list))
-            {
-                //Tracker.TrackError("Trying to remove a modifier from non-existent list", this);
-                return;
-            }
+            if (!_modifiers.TryGetValue(modifier.EntityParameter, out List<IModifierInstance>? list)) return;
 
             list.RemoveAll(x => x.InstanceId == modifier.InstanceId);
             if (list.Count == 0)
@@ -120,11 +109,19 @@
         private List<IModifierInstance> GetCombinedModifiers(EntityParameter parameter)
         {
             var modifiers = new List<IModifierInstance>();
-            if (_modifiers.TryGetValue(parameter, out var permanent))
-                modifiers.AddRange(permanent);
-            foreach (var source in _sources)
-                modifiers.AddRange(source.GetModifiers(parameter));
+            CollectModifiers(parameter, modifiers);
+            // Aggregate parameters (e.g. AllResistance) contribute their modifiers to every family member.
+            foreach (var aggregate in AggregateParameters.Aggregates(parameter))
+                CollectModifiers(aggregate, modifiers);
             return modifiers;
+        }
+
+        private void CollectModifiers(EntityParameter parameter, List<IModifierInstance> into)
+        {
+            if (_modifiers.TryGetValue(parameter, out var permanent))
+                into.AddRange(permanent);
+            foreach (var source in _sources)
+                into.AddRange(source.GetModifiers(parameter));
         }
 
         private void OnSourceChanged(IReadOnlyCollection<EntityParameter> parameters)
@@ -132,6 +129,20 @@
             foreach (var parameter in parameters) RaiseEvent(parameter);
         }
 
-        private void RaiseEvent(EntityParameter parameter) => ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(parameter, GetCombinedModifiers(parameter)));
+        // A change on an aggregate parameter refreshes every family member (nothing reads the aggregate itself).
+        private void RaiseEvent(EntityParameter parameter)
+        {
+            if (!AggregateParameters.IsAggregate(parameter))
+            {
+                RaiseSingle(parameter);
+                return;
+            }
+
+            foreach (var member in AggregateParameters.Members(parameter))
+                RaiseSingle(member);
+        }
+
+        private void RaiseSingle(EntityParameter parameter) =>
+            ModifiersChanged?.Invoke(this, new ModifiersChangedEventArgs(parameter, GetCombinedModifiers(parameter)));
     }
 }

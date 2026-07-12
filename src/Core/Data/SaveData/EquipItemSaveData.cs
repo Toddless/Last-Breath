@@ -36,7 +36,7 @@ namespace Core.Data.SaveData
         [JsonProperty("modifiers")] public List<ModifierSaveData> Modifiers { get; init; } = [];
         [JsonProperty("contextImplicits")] public List<ContextModifierSaveData> ContextImplicits { get; init; } = [];
         [JsonProperty("contextModifiers")] public List<ContextModifierSaveData> ContextModifiers { get; init; } = [];
-        [JsonProperty("modifiersPool")] public List<ModifierSaveData> ModifiersPool { get; init; } = [];
+        [JsonProperty("modifiersPool")] public List<ModifierDescriptorSaveData> ModifiersPool { get; init; } = [];
         [JsonProperty("usedResources")] public Dictionary<string, int> UsedResources { get; init; } = [];
         [JsonProperty("grants")] public List<GrantSaveData> Grants { get; init; } = [];
 

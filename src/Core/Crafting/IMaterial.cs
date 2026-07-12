@@ -5,7 +5,7 @@
 
     public interface IMaterial
     {
-        IReadOnlyList<IModifier> Modifiers { get; }
+        IReadOnlyList<IModifierDescriptor> Modifiers { get; }
         IMaterialCategory? MaterialCategory { get; }
     }
 }

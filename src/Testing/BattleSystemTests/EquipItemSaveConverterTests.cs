@@ -20,7 +20,7 @@ namespace LastBreathTest.BattleSystemTests
                 Modifier(EntityParameter.Health, ModifierValueType.Flat, 120f),
                 Modifier(EntityParameter.Evade, ModifierValueType.Increase, 0.15f)
             ]);
-            item.SaveModifiersPool([Modifier(EntityParameter.Accuracy, ModifierValueType.Flat, 30f)]);
+            item.SaveModifiersPool([new ParameterDescriptor(EntityParameter.Accuracy, ModifierValueType.Flat, 30f, ModifierScope.Global) { Weight = 100f }]);
             item.SaveUsedResources(new Dictionary<string, int> { ["Crafting_Resource_Diamond"] = 3 });
             item.Upgrade(3); // multiplier 1.3: restored Values must match, not just BaseValues
             item.Rarity = Rarity.Epic;
@@ -33,6 +33,9 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(3, restored.UpdateLevel);
             Assert.AreEqual(3, restored.UsedResources["Crafting_Resource_Diamond"]);
             Assert.AreEqual(1, restored.ModifiersPool.Count);
+            var poolEntry = (ParameterDescriptor)restored.ModifiersPool[0];
+            Assert.AreEqual(EntityParameter.Accuracy, poolEntry.Parameter);
+            Assert.AreEqual(30f, poolEntry.Value, 0.001f); // pool holds raw fodder — upgrade multiplier does not touch it
             Assert.AreEqual(1, restored.Implicits.Count);
             Assert.AreEqual(50f * 1.3f, restored.Implicits[0].Value, 0.001f);
             Assert.AreEqual(2, restored.Modifiers.Count);

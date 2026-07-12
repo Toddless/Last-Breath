@@ -40,7 +40,7 @@ namespace Battle.Source.Presentation
         private const string StunnedAnimation = "Stunned";
         // Auto-boost: a backed-up queue (big multi-sided fights) plays faster on top of the
         // player-chosen speed and drains back to normal pace as the queue empties.
-        private const int AutoBoostQueueLength = 8;
+        private const int AutoBoostQueueLength = 24;
         private const float MaxAutoBoost = 2f;
 
         private readonly Queue<TimelineEntry> _pending = new();
@@ -110,7 +110,7 @@ namespace Battle.Source.Presentation
 
                 while (_pending.Count > 0 && IsInsideTree())
                 {
-                    if (_vfx != null) _vfx.SpeedScale = CurrentSpeed;
+                    _vfx?.SpeedScale = CurrentSpeed;
                     if (TryCollectCastChord(out var cast, out var chord)) await PlayCastChord(cast, chord);
                     else if (TryCollectMeleeExchange(out var opener, out var steps)) await PlayMeleeExchange(opener, steps);
                     else await PlayBeat(_pending.Dequeue());
@@ -295,7 +295,7 @@ namespace Battle.Source.Presentation
             // A lunge: bursts forward and decelerates into the strike.
             tween.TweenProperty(node, "global_position", anchor, ApproachSeconds / CurrentSpeed)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
-            await ToSignal(tween, Tween.SignalName.Finished);
+            await PlayMovementTween(node, tween);
         }
 
         /// <summary>Back to the spot origin (the fighter's node lives as the spot's child at zero).</summary>
@@ -305,7 +305,32 @@ namespace Battle.Source.Presentation
             var tween = node.CreateTween();
             tween.TweenProperty(node, "position", Vector2.Zero, ReturnSeconds / CurrentSpeed)
                 .SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.InOut);
-            await ToSignal(tween, Tween.SignalName.Finished);
+            await PlayMovementTween(node, tween);
+        }
+
+        /// <summary>Awaits a fighter-movement tween with the body's collision suspended. The arena
+        /// shares world coordinates, so a moving CharacterBody2D would otherwise shove/drag any
+        /// overlapping world NPC (physics depenetration / platform carry — the family of bug #24).
+        /// Layer and mask are restored when the tween ends, even if it is cancelled.</summary>
+        private async Task PlayMovementTween(Node2D node, Tween tween)
+        {
+            if (node is not CharacterBody2D body) return;
+            uint layer = body.CollisionLayer;
+            uint mask = body.CollisionMask;
+            try
+            {
+                body.CollisionLayer = 0;
+                body.CollisionMask = 0;
+                await ToSignal(tween, Tween.SignalName.Finished);
+            }
+            finally
+            {
+                if (IsInstanceValid(body))
+                {
+                    body.CollisionLayer = layer;
+                    body.CollisionMask = mask;
+                }
+            }
         }
 
         private Dictionary<Type, Func<object, Task>> CreateBeatHandlers() => new()

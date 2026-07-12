@@ -75,6 +75,8 @@ namespace LootGeneration.Source
 
         private Dictionary<int, List<TableRecord>> CreateFinalLootTable(Dictionary<int, List<TableRecord>> baseTable, Dictionary<int, List<TableRecord>> additionalItems)
         {
+            // TODO:
+            // Мутация кэша.
             var lootTable = new Dictionary<int, List<TableRecord>>(baseTable);
             foreach (var kvp in additionalItems)
             {
@@ -311,6 +313,8 @@ namespace LootGeneration.Source
             float baseBudget = _configuration.BaseBudget.GetValueOrDefault(npc.EntityType, 1f);
             float rarityMultiplier = _configuration.RarityMultipliers.GetValueOrDefault(npc.Rarity, 1f);
             float difficultyMultiplier = npc.NpcModifiers.AllModifiers.Sum(mod => mod.DifficultyMultiplier);
+            // TODO:
+            // Хрупко. При изменении порядка EntityType или добавлении нового сломается
             float f = (int)npc.EntityType > 3 ? Mathf.Log(npc.Level + 1) : Mathf.Sqrt(npc.Level);
             return baseBudget * (1 + _configuration.LvlCoefficient * f) * rarityMultiplier * (1 + difficultyMultiplier);
         }

@@ -1,4 +1,4 @@
-﻿namespace Crafting.Services
+namespace Crafting.Services
 {
     using System;
     using System.Collections.Generic;
@@ -12,69 +12,46 @@
     using Core.Services;
     using Godot;
 
-    /// <summary>Crafting-side item spawner: copies a cached template from <see cref="IItemDataProvider"/> and
-    /// rolls its generated modifiers/effects (mastery- and rarity-driven) into the fresh instance. The runtime
-    /// entry point that turns a data id into a concrete, rolled item for the crafting flow.</summary>
-    public class ItemCreationService(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider)
+    /// <summary>Crafting-side item spawner: copies a cached template and rolls affix descriptors from the used
+    /// resources into the fresh instance. The runtime entry point that turns a recipe + resources into a rolled item.</summary>
+    public class ItemCreationService(ICraftingMastery craftingMastery, RandomNumberGenerator rnd, IItemDataProvider itemDataProvider, IModifierMaterializer materializer)
         : IItemCreationService
     {
-        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
-        {
-            var item = itemDataProvider.CopyItem(id);
-            switch (true)
-            {
-                //case var _ when item is IEquipItem equipItem:
+        public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) =>
+            throw new NotImplementedException("Crafting module creates items only by recipe.");
 
-                    //return CreateEquip(equipItem);
-                default: return CreateItem(item);
-            }
-        }
-
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers)
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors)
         {
             var recipe = itemDataProvider.GetRecipe(recipeId);
-            string resultItemId = recipe.ResultItemId;
-            switch (recipe.ItemType)
+            return recipe.ItemType switch
             {
-                case ItemType.Equipment:
-                    (List<WeightedObject<IModifier>> mods, float totalWeight) = WeightedRandomPicker.CalculateWeights(modifiers);
-                    return CreateEquip((IEquipItem)itemDataProvider.CopyItem(resultItemId), mods, [], totalWeight, craftingMastery.RollRarity(),
-                        craftingMastery.GetCurrentValueMultiplier());
-                case ItemType.Consumable or ItemType.Quest or ItemType.Crafting:
-                    return CreateItem(itemDataProvider.CopyItem(resultItemId));
-            }
-
-            return CreateCoal();
+                ItemType.Equipment => CreateEquip((IEquipItem)itemDataProvider.CopyItem(recipe.ResultItemId), descriptors.ToList(),
+                    craftingMastery.RollRarity(), craftingMastery.GetCurrentValueMultiplier()),
+                ItemType.Consumable or ItemType.Quest or ItemType.Crafting => itemDataProvider.CopyItem(recipe.ResultItemId),
+                _ => CreateCoal(),
+            };
         }
 
-        private IItem CreateItem(IItem item)
-        {
-            return CreateCoal();
-        }
-
-        private IEquipItem CreateEquip(IEquipItem item, List<WeightedObject<IModifier>> modifiers, List<string> itemEffects, float totalWeight, Rarity rarity,
-            float modifierMultiplier)
+        // Rolls affix descriptors from the used-resource pool onto the item, scaled by crafting quality. The full
+        // (scaled, flattened) pool is saved for reroll so the item's magnitude and its reroll fodder stay in sync.
+        // Quality scaling is crafting-only — loot drops never build a pool and never see this multiplier.
+        private IEquipItem CreateEquip(IEquipItem item, List<IModifierDescriptor> pool, Rarity rarity, float qualityMultiplier)
         {
             try
             {
                 item.Rarity = rarity;
-                int amountModifiers = rarity.ConvertRarityToItemModifierAmount();
+                int amount = rarity.ConvertRarityToItemModifierAmount();
 
-                HashSet<IModifier> takenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(modifiers, totalWeight, amountModifiers, rnd);
+                (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
+                var selected = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(weighted, totalWeight, amount, rnd);
 
-                List<IModifierInstance> mods = [];
+                var sink = new CollectingSink();
+                foreach (var descriptor in selected)
+                    materializer.Materialize(DescriptorOperations.Scale(descriptor, qualityMultiplier), sink, item.InstanceId);
+                foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
+                foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
 
-                mods.AddRange(takenMods.Select(mod =>
-                    ModifiersCreator.CreateModifierInstance(
-                        mod.EntityParameter,
-                        mod.ModifierValueType,
-                        mod.BaseValue * modifierMultiplier,
-                        item.InstanceId)));
-
-                item.SetModifiers(mods);
-                item.SaveModifiersPool(modifiers.Select(x => x.Obj));
-
-                // TODO : Change to get random effect/ability
+                item.SaveModifiersPool(DescriptorOperations.Flatten(pool.Select(descriptor => DescriptorOperations.Scale(descriptor, qualityMultiplier))));
                 return item;
             }
             catch (ArgumentNullException ex)

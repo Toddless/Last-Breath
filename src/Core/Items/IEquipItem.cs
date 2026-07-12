@@ -7,8 +7,8 @@
 
     public interface IEquipItem : IItem
     {
-        IReadOnlyList<IModifier> Implicits { get; }
-        IReadOnlyList<IModifier> Modifiers { get; }
+        IReadOnlyList<IModifierInstance> Implicits { get; }
+        IReadOnlyList<IModifierInstance> Modifiers { get; }
 
         /// <summary>Context lines ("healing efficiency +15%", "+1 bleed duration"): scale with upgrades
         /// like regular lines, but attach to the owner's pipelines on equip instead of parameter resolution.</summary>
@@ -23,7 +23,7 @@
         /// <summary>Sealed items (ascended to Mythic) can never be modified again: no upgrades, rerolls or new grants.</summary>
         bool IsSealed { get; }
         IReadOnlyDictionary<string, int> UsedResources { get; }
-        IReadOnlyList<IModifier> ModifiersPool { get; }
+        IReadOnlyList<IModifierDescriptor> ModifiersPool { get; }
 
         IEnumerable<IModifierInstance> GetResolvedModifiers(EntityParameter parameter);
         void SetImplicits(IEnumerable<IModifier> modifiers);
@@ -34,14 +34,14 @@
         void OnUnequip();
         bool Upgrade(int upgradeLevel = 1);
         bool Downgrade(int downgradeLevel = 1);
-        // TODO:
-        // старый метод для смены модификаторов.
-        // Не рассчитан на модификаторы контекста и композитные/условные модификаторы
-        void ReplaceAdditionalModifier(int hash, IModifier newModifier);
-        void SaveModifiersPool(IEnumerable<IModifier> modifiers);
+        // Additional (rolled) modifiers are identified by InstanceId: duplicates of the same parameter+type
+        // may coexist, so a rebuild/reroll targets exactly one line.
+        void ReplaceAdditionalModifier(string instanceId, IModifierInstance newModifier);
+        void SaveModifiersPool(IEnumerable<IModifierDescriptor> descriptors);
         void SaveUsedResources(Dictionary<string, int> resources);
-        void RemoveAdditionalModifier(int hash);
-        void AddAdditionalModifier(IModifier modifier);
+        void RemoveAdditionalModifier(string instanceId);
+        void AddAdditionalModifier(IModifierInstance modifier);
+        void AddAdditionalContextModifier(ContextModifierEntry entry);
         void AddGrant(IItemGrant grant);
     }
 }

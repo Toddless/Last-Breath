@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bke05jg0bjgy1"]
 
-[ext_resource type="Script" uid="uid://dwar3me1h0gbo" path="res://Source/UIElements/StanceSlot.cs" id="1_r0o61"]
+[ext_resource type="Script" uid="uid://dwar3me1h0gbo" path="res://Addons/Battle/UIElements/StanceSlot.cs" id="1_r0o61"]
 
 [sub_resource type="Gradient" id="Gradient_r0o61"]
 offsets = PackedFloat32Array(0)

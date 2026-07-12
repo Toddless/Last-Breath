@@ -205,18 +205,6 @@
                             "price": 33
                         },
                         {
-                            "id": "Recipe_Generic_Boots",
-                            "price": 33
-                        },
-                        {
-                            "id": "Recipe_Generic_Gloves",
-                            "price": 25
-                        },
-                        {
-                            "id": "Recipe_Generic_Helmet",
-                            "price": 25
-                        },
-                        {
                             "id": "Helmet_Dexterity_Feral_Instinct",
                             "price": 35
                         },

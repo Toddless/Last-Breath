@@ -6,8 +6,10 @@
     using Core;
     using Core.Data;
     using Core.Entity;
+    using Core.Enums;
     using Core.Events;
     using Core.Events.GameEvents;
+    using Core.Inventory;
     using Core.Services;
     using Core.Views.UI;
     using Godot;
@@ -47,6 +49,17 @@
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _uiElementProvider.ChangeHud(typeof(PlayerHud));
+            AddTestItems();
+        }
+
+        private void AddTestItems()
+        {
+            var inventory = _provider.GetService<IInventory>();
+            var itemCreation = _provider.GetService<IItemCreationService>();
+            inventory.TryAddItem(itemCreation.CreateItem("Gloves_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Boots_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Body_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Helmet_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
         }
 
         public override void _ExitTree()

@@ -630,57 +630,47 @@
             ]
         },
         {
-            "id": "Ability_Armageddon",
+            "id": "Ability_Double_Strike",
             "tags": [],
             "stance": 1,
             "targetType": 0,
-            "cooldown": 9,
-            "costValue": 500,
+            "cooldown": 4,
+            "costValue": 200,
             "costType": 1,
-            "masteryLevel": 15,
-            "damage": 300,
-            "weaponDamageScale": 0.75,
-            "spellDamageScale": 0.75,
+            "masteryLevel": 1,
+            "damage": 120,
+            "weaponDamageScale": 1.3,
+            "spellDamageScale": 0.1,
             "abilityProperties": {
-                "secondDamage": 600,
-                "secondWeaponScale": 1.2,
-                "secondSpellScale": 1.2,
-                "thirdDamage": 1000,
-                "thirdWeaponScale": 1.8,
-                "thirdSpellScale": 1.8,
-                "stage1HpCost": 0.05,
-                "stage2HpCost": 0.15,
-                "stage3HpCost": 0.5,
-                "stunDuration": 2
+                "secondDamage": 60,
+                "secondWeaponDamageScale": 0.9,
+                "secondSpellDamageScale": 0.05,
+                "armorReduce": 0.15,
+                "evadeReduce": 0.15,
+                "debuffDuration": 3,
+                "debuffMaxStacks": 3
             },
             "upgrades": [
                 {
-                    "id": "Ability_Arm_Upgrade_Missing_Hp_Damage",
+                    "id": "Ability_Dst_Upgrade_Both_Hits_Buff",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
-                        "rate": 1
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Shatter_Armor",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "reduceBy": 1,
+                        "amount": 0.25,
                         "duration": 3
                     }
                 },
                 {
-                    "id": "Ability_Arm_Upgrade_All_Targets",
+                    "id": "Ability_Dst_Upgrade_Restore_On_Hit",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
-                        "additionalCooldown": 3
+                        "healthRestore": 0.07,
+                        "manaRestore": 0.07
                     }
                 },
                 {
-                    "id": "Ability_Arm_Upgrade_Reduce_Hp_Cost",
+                    "id": "Ability_Dst_Upgrade_Accuracy",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {
@@ -688,315 +678,27 @@
                     }
                 },
                 {
-                    "id": "Ability_Arm_Upgrade_Stage1_Damage",
+                    "id": "Ability_Dst_Upgrade_Damage_Multiplier",
                     "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damage": 400,
-                        "weaponScale": 1.0,
-                        "spellScale": 1.0
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Stage3_Burning",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "stacks": 3,
-                        "duration": 3,
-                        "damageMultiplier": 0.7
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 100
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Arm_Upgrade_Extend_Stun",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
-                    }
-                }
-            ]
-        },
-        {
-            "id": "Ability_Porcupine",
-            "tags": [],
-            "stance": 1,
-            "targetType": 2,
-            "cooldown": 5,
-            "costValue": 100,
-            "costType": 1,
-            "masteryLevel": 10,
-            "abilityProperties": {
-                "duration": 3,
-                "damageReturn": 0.25,
-                "armorReturn": 0.15
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Porc_Upgrade_Echo",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "delayedPercent": 0.3,
-                        "turns": 2
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Incoming_Reduction",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "reduce": 0.25
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Crit_Mitigation",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.8
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Heal_On_Hit",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.07
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_More_Armor_Return",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_More_Damage_Return",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.20
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2,
-                        "additionalCost": 30
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Cooldown_Chance",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "chance": 0.15
-                    }
-                },
-                {
-                    "id": "Ability_Porc_Upgrade_Armor_Buff",
-                    "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
                         "amount": 0.25
                     }
-                }
-            ]
-        },
-        {
-            "id": "Ability_Sacrifice",
-            "tags": [],
-            "stance": 1,
-            "targetType": 2,
-            "cooldown": 5,
-            "costValue": 100,
-            "costType": 1,
-            "masteryLevel": 10,
-            "abilityProperties": {
-                "sacrificePercent": 0.15,
-                "ratePerHundred": 0.01,
-                "charges": 1
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Sac_Upgrade_Heal_From_Damage",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.15
-                    }
                 },
                 {
-                    "id": "Ability_Sac_Upgrade_Incoming_Reduction",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "reduce": 0.25,
-                        "duration": 3
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Free_Cast",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Additional_Rate",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.015
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_More_Sacrifice",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.10
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Cost_Type_Health",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Additional_Charge",
+                    "id": "Ability_Dst_Upgrade_Reduce_Cost",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
-                        "amount": 1
+                        "cost": 50
                     }
                 },
                 {
-                    "id": "Ability_Sac_Upgrade_Reduce_Cooldown",
+                    "id": "Ability_Dst_Upgrade_Reduce_Cooldown",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
                         "cooldown": 1
-                    }
-                },
-                {
-                    "id": "Ability_Sac_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 25
-                    }
-                }
-            ]
-        },
-        {
-            "id": "Ability_Berserk_Fury",
-            "tags": [],
-            "stance": 1,
-            "targetType": 0,
-            "cooldown": 7,
-            "costValue": 300,
-            "costType": 1,
-            "masteryLevel": 5,
-            "damage": 0,
-            "weaponDamageScale": 0,
-            "spellDamageScale": 0,
-            "abilityProperties": {
-                "furyDuration": 3,
-                "furyHealthPercent": 0.05
-            },
-            "upgrades": [
-                {
-                    "id": "Ability_Bf_Upgrade_Burning_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "healthAsDamageMultiplier": 1,
-                        "burningDuration": 3,
-                        "burningMaxStacks": 3
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Primal_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "damageMultiplier": 1.5
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Healing_Fury",
-                    "tier": 3,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "healAmount": 0.5
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Cost_Type_Health",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {}
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_More_Burn",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.035
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Less_Burn",
-                    "tier": 2,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "amount": 0.02
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Reduce_Cooldown",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cooldown": 2
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Reduce_Cost",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "cost": 120
-                    }
-                },
-                {
-                    "id": "Ability_Bf_Upgrade_Fury_Duration",
-                    "tier": 1,
-                    "tags": [],
-                    "upgradeProperties": {
-                        "duration": 1
                     }
                 }
             ]
@@ -1092,47 +794,55 @@
             ]
         },
         {
-            "id": "Ability_Double_Strike",
+            "id": "Ability_Porcupine",
             "tags": [],
             "stance": 1,
-            "targetType": 0,
-            "cooldown": 4,
-            "costValue": 200,
+            "targetType": 2,
+            "cooldown": 5,
+            "costValue": 100,
             "costType": 1,
-            "masteryLevel": 1,
-            "damage": 120,
-            "weaponDamageScale": 0.80,
-            "spellDamageScale": 0.65,
+            "masteryLevel": 5,
             "abilityProperties": {
-                "secondDamage": 60,
-                "secondWeaponDamageScale": 1.0,
-                "secondSpellDamageScale": 0.25,
-                "armorReduce": 0.15,
-                "evadeReduce": 0.15,
-                "debuffDuration": 3,
-                "debuffMaxStacks": 3
+                "duration": 3,
+                "damageReturn": 0.25,
+                "armorReturn": 0.15
             },
             "upgrades": [
                 {
-                    "id": "Ability_Dst_Upgrade_Both_Hits_Buff",
+                    "id": "Ability_Porc_Upgrade_Echo",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
-                        "amount": 0.25,
-                        "duration": 3
+                        "delayedPercent": 0.3,
+                        "turns": 2
                     }
                 },
                 {
-                    "id": "Ability_Dst_Upgrade_Restore_On_Hit",
+                    "id": "Ability_Porc_Upgrade_Incoming_Reduction",
                     "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
-                        "healthRestore": 0.07,
-                        "manaRestore": 0.07
+                        "reduce": 0.25
                     }
                 },
                 {
-                    "id": "Ability_Dst_Upgrade_Accuracy",
+                    "id": "Ability_Porc_Upgrade_Crit_Mitigation",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.8
+                    }
+                },
+                {
+                    "id": "Ability_Porc_Upgrade_Heal_On_Hit",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.07
+                    }
+                },
+                {
+                    "id": "Ability_Porc_Upgrade_More_Armor_Return",
                     "tier": 2,
                     "tags": [],
                     "upgradeProperties": {
@@ -1140,27 +850,127 @@
                     }
                 },
                 {
-                    "id": "Ability_Dst_Upgrade_Damage_Multiplier",
+                    "id": "Ability_Porc_Upgrade_More_Damage_Return",
                     "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.20
+                    }
+                },
+                {
+                    "id": "Ability_Porc_Upgrade_Reduce_Cooldown_Add_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 2,
+                        "additionalCost": 30
+                    }
+                },
+                {
+                    "id": "Ability_Porc_Upgrade_Cooldown_Chance",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "chance": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Porc_Upgrade_Armor_Buff",
+                    "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
                         "amount": 0.25
                     }
-                },
+                }
+            ]
+        },
+        {
+            "id": "Ability_Berserk_Fury",
+            "tags": [],
+            "stance": 1,
+            "targetType": 0,
+            "cooldown": 7,
+            "costValue": 300,
+            "costType": 1,
+            "masteryLevel": 15,
+            "damage": 0,
+            "weaponDamageScale": 0,
+            "spellDamageScale": 0,
+            "abilityProperties": {
+                "furyDuration": 3,
+                "furyHealthPercent": 0.05
+            },
+            "upgrades": [
                 {
-                    "id": "Ability_Dst_Upgrade_Reduce_Cost",
-                    "tier": 1,
+                    "id": "Ability_Bf_Upgrade_Burning_Fury",
+                    "tier": 3,
                     "tags": [],
                     "upgradeProperties": {
-                        "cost": 50
+                        "healthAsDamageMultiplier": 1,
+                        "burningDuration": 3,
+                        "burningMaxStacks": 3
                     }
                 },
                 {
-                    "id": "Ability_Dst_Upgrade_Reduce_Cooldown",
+                    "id": "Ability_Bf_Upgrade_Primal_Fury",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "damageMultiplier": 1.5
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Healing_Fury",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "healAmount": 0.5
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Cost_Type_Health",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_More_Burn",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.035
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Less_Burn",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.02
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Reduce_Cooldown",
                     "tier": 1,
                     "tags": [],
                     "upgradeProperties": {
-                        "cooldown": 1
+                        "cooldown": 2
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 120
+                    }
+                },
+                {
+                    "id": "Ability_Bf_Upgrade_Fury_Duration",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "duration": 1
                     }
                 }
             ]
@@ -1173,7 +983,7 @@
             "cooldown": 4,
             "costValue": 150,
             "costType": 1,
-            "masteryLevel": 1,
+            "masteryLevel": 25,
             "damage": 50,
             "weaponDamageScale": 0.35,
             "spellDamageScale": 0.25,
@@ -1232,6 +1042,196 @@
                     "tags": [],
                     "upgradeProperties": {
                         "cooldown": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Ability_Sacrifice",
+            "tags": [],
+            "stance": 1,
+            "targetType": 2,
+            "cooldown": 5,
+            "costValue": 100,
+            "costType": 1,
+            "masteryLevel": 25,
+            "abilityProperties": {
+                "sacrificePercent": 0.15,
+                "ratePerHundred": 0.01,
+                "charges": 1
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Sac_Upgrade_Heal_From_Damage",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Incoming_Reduction",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "reduce": 0.25,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Free_Cast",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Additional_Rate",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.015
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_More_Sacrifice",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.10
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Cost_Type_Health",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {}
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Additional_Charge",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 1
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 1
+                    }
+                },
+                {
+                    "id": "Ability_Sac_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 25
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Ability_Armageddon",
+            "tags": [],
+            "stance": 1,
+            "targetType": 0,
+            "cooldown": 9,
+            "costValue": 500,
+            "costType": 1,
+            "masteryLevel": 50,
+            "damage": 300,
+            "weaponDamageScale": 0.75,
+            "spellDamageScale": 0.75,
+            "abilityProperties": {
+                "secondDamage": 600,
+                "secondWeaponScale": 1.2,
+                "secondSpellScale": 1.2,
+                "thirdDamage": 1000,
+                "thirdWeaponScale": 1.8,
+                "thirdSpellScale": 1.8,
+                "stage1HpCost": 0.05,
+                "stage2HpCost": 0.15,
+                "stage3HpCost": 0.5,
+                "stunDuration": 2
+            },
+            "upgrades": [
+                {
+                    "id": "Ability_Arm_Upgrade_Missing_Hp_Damage",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "rate": 1
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Shatter_Armor",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "reduceBy": 1,
+                        "duration": 3
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_All_Targets",
+                    "tier": 3,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "additionalCooldown": 3
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Reduce_Hp_Cost",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "amount": 0.15
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Stage1_Damage",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "damage": 400,
+                        "weaponScale": 1.0,
+                        "spellScale": 1.0
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Stage3_Burning",
+                    "tier": 2,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "stacks": 3,
+                        "duration": 3,
+                        "damageMultiplier": 0.7
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Reduce_Cost",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cost": 100
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Reduce_Cooldown",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "cooldown": 2
+                    }
+                },
+                {
+                    "id": "Ability_Arm_Upgrade_Extend_Stun",
+                    "tier": 1,
+                    "tags": [],
+                    "upgradeProperties": {
+                        "duration": 1
                     }
                 }
             ]

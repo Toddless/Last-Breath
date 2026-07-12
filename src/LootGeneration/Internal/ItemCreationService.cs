@@ -29,7 +29,7 @@ namespace LootGeneration.Internal
             return item;
         }
 
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifier> modifiers) => throw new System.NotImplementedException();
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors) => throw new System.NotImplementedException();
 
         private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
@@ -50,6 +50,7 @@ namespace LootGeneration.Internal
             equip.SetModifiers(chosenMods.SelectMany(mod => CreateScaledInstances(mod, modifierMultiplier, equip.InstanceId)));
         }
 
+        // TODO: duplicated verbatim in Main/Services/ItemCreationService — consolidate loot modifier scaling.
         // Flat/Increase/Multiplicative values all store the bonus delta (Calculations.CalculateModifiers sums
         // each bucket onto 1), so one linear scale is valid for every type. Pool entries are shared between
         // items — scale fresh instances, never the originals.

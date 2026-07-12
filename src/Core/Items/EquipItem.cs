@@ -3,6 +3,7 @@ namespace Core.Items
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Constants;
     using Entity;
     using Enums;
     using Godot;
@@ -10,13 +11,13 @@ namespace Core.Items
 
     public class EquipItem : IEquipItem, IAscendable
     {
-        private readonly HashSet<IModifier> _implicits = [];
-        private readonly HashSet<IModifier> _modifiers = [];
+        private readonly List<IModifierInstance> _implicits = [];
+        private readonly List<IModifierInstance> _modifiers = [];
         private readonly List<ContextModifierEntry> _implicitsContextModifier = [];
         private readonly List<ContextModifierEntry> _contextModifiers = [];
-        // TODO:
-        // старый список пулов. Не рассчитан на модификаторы контекста и композитные/условные модификаторы
-        private readonly List<IModifier> _modifiersPool = [];
+        // Reroll fodder as immutable descriptors (parameter/context/composite): materialized into fresh
+        // instances on apply, so a pool entry can never mutate a shared template.
+        private readonly List<IModifierDescriptor> _modifiersPool = [];
         private readonly Dictionary<string, int> _usedResources = [];
         private readonly List<IItemGrant> _grants = [];
         private Dictionary<EntityParameter, List<IModifierInstance>>? _resolvedModifiers;
@@ -33,31 +34,27 @@ namespace Core.Items
         {
             get
             {
-                // TODO:
-                // сменить на нормальный путь позднее.
                 if (field != null) return field;
-                field = ResourceLoader.Load<Texture2D>($"res://Internal/_Placeholders/Items/{Id}.png");
+                field = ResourceLoader.Load<Texture2D>(AssetPaths.ItemIcon(Id));
                 return field;
             }
             private init;
         }
-        public Rarity Rarity { get; set; } = Rarity.Uncommon;
+        public Rarity Rarity { get; set; } = Rarity.Common;
         public int UpdateLevel { get; set; }
         public int MaxUpdateLevel { get; set; } = 12;
         public bool IsSealed { get; private set; }
         public string DisplayName => Localization.Localization.Localize(Id);
         public string Description => Localization.Localization.LocalizeDescription(Id);
 
-        public IReadOnlyList<IModifier> Implicits => [.. _implicits];
-        public IReadOnlyList<IModifier> Modifiers => [.. _modifiers];
+        public IReadOnlyList<IModifierInstance> Implicits => [.. _implicits];
+        public IReadOnlyList<IModifierInstance> Modifiers => [.. _modifiers];
         public IReadOnlyList<ContextModifierEntry> ContextImplicits => _implicitsContextModifier;
         public IReadOnlyList<ContextModifierEntry> ContextModifiers => _contextModifiers;
         public IReadOnlyList<IItemGrant> Grants => _grants;
         public IReadOnlyCollection<EntityParameter> AffectedParameters =>
             _implicits.Concat(_modifiers).Select(modifier => modifier.EntityParameter).ToHashSet();
-        // TODO:
-        // старый список пулов. Не рассчитан на модификаторы контекста и композитные/условные модификаторы
-        public IReadOnlyList<IModifier> ModifiersPool => _modifiersPool;
+        public IReadOnlyList<IModifierDescriptor> ModifiersPool => _modifiersPool;
         public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= MaxUpdateLevel;
 
@@ -129,7 +126,7 @@ namespace Core.Items
             SetContextModifiers(_contextModifiers, entries);
         }
 
-        public void AddAdditionalModifier(IModifier modifier)
+        public void AddAdditionalModifier(IModifierInstance modifier)
         {
             if (IsSealed) return;
             if (modifier is CompositeModifier composite)
@@ -143,16 +140,28 @@ namespace Core.Items
             _resolvedModifiers = null;
         }
 
-        public void RemoveAdditionalModifier(int hash)
+        // Rolled context line ("+35% burning damage"). Attaches to the owner on equip like any context line;
+        // crafting operates on inventory (unequipped) items, so there is no live owner to attach to here.
+        public void AddAdditionalContextModifier(ContextModifierEntry entry)
         {
             if (IsSealed) return;
-            _modifiers.RemoveWhere(modifier => modifier.GetHashCode() == hash);
+            entry.Value = entry.BaseValue * UpdateMultiplier;
+            _contextModifiers.Add(entry);
+        }
+
+        // Identity is InstanceId (variant B): duplicates of the same parameter+type may coexist across both
+        // channels, so only the exact instance is removed (from whichever channel holds it).
+        public void RemoveAdditionalModifier(string instanceId)
+        {
+            if (IsSealed) return;
+            _modifiers.RemoveAll(modifier => modifier.InstanceId == instanceId);
+            _contextModifiers.RemoveAll(entry => entry.InstanceId == instanceId);
             _resolvedModifiers = null;
         }
 
-        public void ReplaceAdditionalModifier(int hash, IModifier newModifier)
+        public void ReplaceAdditionalModifier(string instanceId, IModifierInstance newModifier)
         {
-            RemoveAdditionalModifier(hash);
+            RemoveAdditionalModifier(instanceId);
             AddAdditionalModifier(newModifier);
         }
 
@@ -199,7 +208,7 @@ namespace Core.Items
             _owner = null;
         }
 
-        public void SaveModifiersPool(IEnumerable<IModifier> modifiers) => _modifiersPool.AddRange(modifiers);
+        public void SaveModifiersPool(IEnumerable<IModifierDescriptor> descriptors) => _modifiersPool.AddRange(descriptors);
 
         public void SaveUsedResources(Dictionary<string, int> resources)
         {
@@ -252,25 +261,31 @@ namespace Core.Items
             }
         }
 
-        private void SetModifiers(HashSet<IModifier> itemModifiers, IEnumerable<IModifier> newModifiers)
+        private void SetModifiers(List<IModifierInstance> itemModifiers, IEnumerable<IModifier> newModifiers)
         {
             itemModifiers.Clear();
-            foreach (var modifier in newModifiers.SelectMany(ExpandIfComposite))
+            foreach (var instance in newModifiers.SelectMany(ToInstances))
             {
-                modifier.Value = modifier.BaseValue * UpdateMultiplier;
-                itemModifiers.Add(modifier);
+                instance.Value = instance.BaseValue * UpdateMultiplier;
+                itemModifiers.Add(instance);
             }
 
             _resolvedModifiers = null;
         }
 
-        private IEnumerable<IModifier> ExpandIfComposite(IModifier modifier) =>
-            modifier is CompositeModifier composite ? ExpandComposite(composite) : [modifier];
+        // Everything stored on the item is an instance: the stable InstanceId is the reroll identity (variant B),
+        // and wrapping detaches the item from shared data/material templates. Composites expand to their parts.
+        private IEnumerable<IModifierInstance> ToInstances(IModifier modifier) => modifier switch
+        {
+            CompositeModifier composite => ExpandComposite(composite),
+            IModifierInstance instance => [instance],
+            _ => [new SimpleModifier(modifier.EntityParameter, modifier.ModifierValueType, modifier.BaseValue, InstanceId, modifier.Weight) { Scope = modifier.Scope }],
+        };
 
         // Composites live in pools/data only: on the item they become plain per-parameter modifiers,
         // so scaling, resolution, save and UI stay single-parameter. Fresh instances detach from the shared pool entry.
-        private IEnumerable<IModifier> ExpandComposite(CompositeModifier composite) =>
-            composite.Parts.Select(IModifier (part) =>
+        private IEnumerable<IModifierInstance> ExpandComposite(CompositeModifier composite) =>
+            composite.Parts.Select(IModifierInstance (part) =>
             {
                 var copy = ModifiersCreator.CreateModifierInstance(part.EntityParameter, part.ModifierValueType, part.BaseValue, InstanceId);
                 copy.Scope = part.Scope;
