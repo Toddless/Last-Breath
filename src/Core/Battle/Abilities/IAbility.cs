@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Components.Decorator;
-    using Components.Module;
     using Enums;
     using Entity;
+    using Entity.Components.Decorator;
+    using Entity.Components.Module;
     using Interfaces;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable

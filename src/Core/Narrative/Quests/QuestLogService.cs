@@ -8,11 +8,11 @@ namespace Core.Narrative.Quests
     using Data;
     using Entity;
     using Events;
-    using Events.GameEvents;
     using Facts;
     using Influence;
     using Inventory;
     using MessageBus;
+    using MessageBus.Messages;
     using Save;
 
     public class QuestLogService : IQuestLogService, Session.ISessionResettable

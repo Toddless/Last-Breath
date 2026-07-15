@@ -9,7 +9,7 @@
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Localization;
     using Godot;
 

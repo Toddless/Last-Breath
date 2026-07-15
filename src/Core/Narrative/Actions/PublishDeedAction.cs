@@ -1,7 +1,6 @@
 namespace Core.Narrative.Actions
 {
     using Events;
-    using Events.GameEvents;
     using Godot;
     using Newtonsoft.Json.Linq;
     using Services;

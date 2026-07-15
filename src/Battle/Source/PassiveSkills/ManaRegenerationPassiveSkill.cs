@@ -3,7 +3,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Mana Flow): restores a percentage of max mana at the end of the owner's turn.</summary>
     public class ManaRegenerationPassiveSkill(float percentFromMaxMana)

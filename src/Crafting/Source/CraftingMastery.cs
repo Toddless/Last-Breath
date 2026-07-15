@@ -8,6 +8,7 @@
     using Core.Events;
     using Core.Localization;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Godot;
 
     public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery, Core.Session.ISessionResettable

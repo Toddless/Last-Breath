@@ -4,6 +4,8 @@
     using Core.Crafting;
     using Core.Enums;
     using Core.Events;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Godot;
 
     public class GainCraftingExperienceMessageHandler(ICraftingMastery craftingMastery)

@@ -8,6 +8,7 @@
     using Core.Interfaces;
     using Core.Items;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.MessageBus.Requests;
     using Core.Modifiers;
     using Core.Results;

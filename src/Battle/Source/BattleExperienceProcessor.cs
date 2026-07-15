@@ -7,7 +7,6 @@
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
 
     public class BattleExperienceProcessor : IDisposable

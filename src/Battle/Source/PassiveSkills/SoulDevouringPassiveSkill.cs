@@ -2,7 +2,7 @@
 {
     using Core.Battle.Skills;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class SoulDevouringPassiveSkill(float barrierRecoveryAmount)
         : Skill(id: "Passive_Skill_Soul_Devouring")

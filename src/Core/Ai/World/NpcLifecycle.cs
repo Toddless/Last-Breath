@@ -1,7 +1,7 @@
 namespace Core.Ai.World
 {
     using System;
-    using Components;
+    using Entity.Components;
 
     public enum NpcLifeStage : byte
     {

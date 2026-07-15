@@ -3,11 +3,10 @@ namespace Battle.Internal.Npc
     using System.Collections.Generic;
     using System.Linq;
     using Core.Ai.World.Skirmish;
-    using Core.Components;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
 
     /// <summary>
     /// Owns the active skirmishes: expands both sides to their squads, freezes the participants

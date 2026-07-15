@@ -4,8 +4,9 @@ namespace Core.Services
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Events;
-    using Events.GameEvents;
     using Godot;
+    using MessageBus;
+    using MessageBus.Messages;
     using Views.UI;
 
     /// <summary>

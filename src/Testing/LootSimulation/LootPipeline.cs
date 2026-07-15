@@ -1,9 +1,9 @@
 namespace LastBreathTest.LootSimulation
 {
-    using Core.Components;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Data.LootTable;
+    using Core.Entity.Components;
     using Core.Services;
     using LootGeneration.Internal;
     using LootGeneration.Services;

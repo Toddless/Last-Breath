@@ -3,7 +3,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Righteous Wrath): restores a flat amount of mana on every attack.</summary>
     public class ManaOnAttackPassiveSkill(float amount)

@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Armageddon
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: replaces the stage-1 numbers entirely (e.g. 300+(75%+75%) → 400+(100%+100%)).</summary>

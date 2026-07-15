@@ -4,7 +4,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Goliath's Sign): heals a percentage of CURRENT health at the end of the owner's turn
     /// (unlike <see cref="RegenerationPassiveSkill"/>, which scales off max health).</summary>

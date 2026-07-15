@@ -7,7 +7,6 @@ namespace Battle.Internal.Npc
     using Core.Data.SaveData;
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Source;
     using Core.Save;
     using Core.Services;

@@ -9,16 +9,15 @@ namespace LastBreath.Player
     using Core;
     using Core.Ai.World;
     using Core.Ai.World.Time;
-    using Core.Attribute;
     using Core.Battle;
-    using Core.Components;
     using Core.Constants;
     using Core.Context;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Attribute;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Items;
     using Core.Services;
     using Core.Views.UI;
@@ -217,6 +216,9 @@ namespace LastBreath.Player
             }
 
             if (!CanMove) return;
+            // TODO:
+            // Почему класс игрока что то знает о UI? Необходимо найти иной путь
+
             // A conversation freezes walking: movement is polled here, so without this gate the
             // player strolls away mid-dialogue. Fail-open — a project without the context tracker
             // (Battle sandbox) isn't gated, and Dialogue only ever fires in the world.
@@ -613,7 +615,7 @@ namespace LastBreath.Player
             EntityParameter.Mana => 5000,
             EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 50f,
             EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 5000,
-            EntityParameter.CriticalChance => 0.45f,
+            EntityParameter.CriticalChance => 0.05f,
             // A rare treat, not a machine gun: extra attacks chain (each one re-rolls), so a high
             // base made attack series balloon to 2-3x their planned length. Items/passives are
             // the intended source of this stat.

@@ -54,9 +54,26 @@ namespace Battle.Source.Presentation
         public Task PlayCastAsync(AbilityVisualConfig config, string casterInstanceId) =>
             PlayOnSpotAsync(config.CastClip, config.Scale, casterInstanceId);
 
+        /// <summary>Cast VFX anchored at a fixed arena position (above the field) instead of on the caster —
+        /// e.g. a storm cloud summoned over the arena. Sized by CastScale, independent of the strike clips.</summary>
+        public async Task PlayCastOverArenaAsync(AbilityVisualConfig config, Vector2 position)
+        {
+            if (!TryGetClip(config.CastClip, out var frames)) return;
+
+            var sprite = SpawnSprite(frames, config.CastClip, config.CastScale);
+            sprite.GlobalPosition = position;
+            await WaitClipAsync(sprite, frames, config.CastClip);
+            sprite.QueueFree();
+        }
+
         /// <summary>The impact clip lands on the target's spot.</summary>
         public Task PlayImpactAsync(AbilityVisualConfig config, string targetInstanceId) =>
             PlayOnSpotAsync(config.ImpactClip, config.Scale, targetInstanceId);
+
+        /// <summary>InstantOnTarget strike: the travel clip lands on the target's spot without rotation
+        /// (e.g. a lightning bolt coming straight down from above).</summary>
+        public Task PlayStrikeAsync(AbilityVisualConfig config, string targetInstanceId) =>
+            PlayOnSpotAsync(config.TravelClip, config.Scale, targetInstanceId);
 
         /// <summary>Self-cast aura: the travel clip plays once on the caster's spot.</summary>
         public Task PlayAuraAsync(AbilityVisualConfig config, string casterInstanceId) =>

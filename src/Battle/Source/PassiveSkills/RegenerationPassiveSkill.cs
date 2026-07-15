@@ -3,7 +3,7 @@
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class RegenerationPassiveSkill(float percentFromMaxHealth)
         : Skill(id: "Passive_Skill_Regeneration")

@@ -4,8 +4,8 @@ namespace Core.Entity
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Battle;
-    using Context;
     using Components;
+    using Context;
     using Enums;
     using Events;
 
@@ -62,7 +62,7 @@ namespace Core.Entity
         void Heal(IHealContext context);
 
         /// <summary>The single entry point for every mana gain. Runs the mana-restore pipeline,
-        /// applies the clamped gain and publishes <see cref="Events.GameEvents.ManaRestoredEvent"/>
+        /// applies the clamped gain and publishes <see cref="ManaRestoredEvent"/>
         /// with the effective amount. Default implementation is shared by all entities.</summary>
         void RestoreMana(IManaRecoveryContext context)
         {
@@ -72,7 +72,7 @@ namespace Core.Entity
             CurrentMana += context.Amount;
             float gained = CurrentMana - before; // MaxMana may clamp the gain
             if (gained <= 0) return;
-            CombatEvents.Publish(new Events.GameEvents.ManaRestoredEvent(this, gained, Data.VitalsSnapshot.From(this)));
+            CombatEvents.Publish(new ManaRestoredEvent(this, gained, Data.VitalsSnapshot.From(this)));
         }
         void OnTurnStart();
         void OnTurnEnd();

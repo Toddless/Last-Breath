@@ -21,4 +21,7 @@
     <PackageReference Update="GodotSharp" Version="4.7.0" />
     <PackageReference Update="GodotSharpEditor" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modifiers\Conditions\" />
+  </ItemGroup>
 </Project>

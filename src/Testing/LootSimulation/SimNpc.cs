@@ -1,7 +1,7 @@
 namespace LastBreathTest.LootSimulation
 {
-    using Core.Components.NpcModifiers;
     using Core.Entity;
+    using Core.Entity.Components.NpcModifiers;
     using Moq;
 
     /// <summary>Builds a minimal <see cref="IFightableNpc"/> for the drop pipeline: the loot code

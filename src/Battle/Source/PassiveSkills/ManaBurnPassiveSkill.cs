@@ -2,7 +2,7 @@
 {
     using Core.Battle.Skills;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class ManaBurnPassiveSkill(float percentToBurn)
         : Skill(id: "Passive_Skill_Mana_Burn")

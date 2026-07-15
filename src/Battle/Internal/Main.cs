@@ -6,7 +6,6 @@
     using Core.Data;
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Services;
     using Core.Views;
     using Core.Views.UI;

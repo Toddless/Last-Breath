@@ -6,7 +6,6 @@ namespace Battle.Source
     using Core.Battle.Abilities;
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
 
     /// <summary>
     /// Owns the player's target-selection phase. Highlights valid spots per the ability's
@@ -35,6 +34,9 @@ namespace Battle.Source
         private IFightable? _caster;
         private IAbility? _ability;
         private string _selectionId = string.Empty;
+
+        /// <summary>An active selection of a non-cancellable ability: the player must pick a target.</summary>
+        private bool IsSelectionLocked => _mode == Mode.Ability && _ability?.IsCancellable == false;
 
         public TargetSelectionController(IBattleEventBus bus, IBattleField field, IReadOnlyList<EntitySpot> spots)
         {
@@ -157,9 +159,6 @@ namespace Battle.Source
             CancelBackToAttack();
         }
 
-        /// <summary>An active selection of a non-cancellable ability: the player must pick a target.</summary>
-        private bool IsSelectionLocked => _mode == Mode.Ability && _ability?.IsCancellable == false;
-
         private void ToggleChosen(IFightable target)
         {
             var spot = SpotFor(target);
@@ -177,7 +176,7 @@ namespace Battle.Source
 
         private void Commit(IReadOnlyList<IFightable> targets)
         {
-            var selectionId = _selectionId;
+            string selectionId = _selectionId;
             var ability = _ability!;
             _committed[selectionId] = targets;
             ClearHighlights();
@@ -188,7 +187,7 @@ namespace Battle.Source
 
         private void CancelBackToAttack()
         {
-            var selectionId = _selectionId;
+            string selectionId = _selectionId;
             StartBasicAttack();
             _bus.Publish<TargetSelectionResolvedEvent>(new(selectionId));
         }

@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using Core.Battle.Abilities;
-    using Core.Components.Module;
+    using Core.Entity.Components.Module;
     using Core.Enums;
 
     public abstract class DamagingAbility(

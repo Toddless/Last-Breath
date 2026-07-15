@@ -2,7 +2,7 @@ namespace Battle.Source.PassiveSkills
 {
     using Core.Battle.Skills;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Ether Flow): a share of every mana gain converts into Barrier.</summary>
     public class ManaToBarrierPassiveSkill(float percent)

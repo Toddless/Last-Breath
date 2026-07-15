@@ -2,9 +2,9 @@ namespace Battle.Source.Effects
 {
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Modifiers;
 
     /// <summary>

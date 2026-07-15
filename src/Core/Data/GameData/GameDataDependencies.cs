@@ -23,7 +23,7 @@ namespace Core.Data.GameData
                 var service = new GameDataService(
                     provider.GetRequiredService<IGameDataSource>(),
                     provider.GetServices<IGameDataParticipant>());
-                service.LoadFailed += (context, e) => Core.Tracker.TrackException($"Failed to load game data '{context}'", e);
+                service.LoadFailed += (context, e) => Tracker.TrackException($"Failed to load game data '{context}'", e);
                 return service;
             });
             return services;

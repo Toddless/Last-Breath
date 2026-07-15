@@ -3,7 +3,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Ai.World;
     using Core.Ai.World.Activities;
     using Core.Ai.World.Time;
-    using Core.Components;
+    using Core.Entity.Components;
     using Godot;
 
     [TestClass]

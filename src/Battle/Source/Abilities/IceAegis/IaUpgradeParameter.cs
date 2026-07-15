@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.IceAegis
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Additive bump of one Ice Aegis parameter (base barrier / per-intelligence scale / duration).</summary>

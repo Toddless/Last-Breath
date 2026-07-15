@@ -6,7 +6,6 @@ namespace Battle.Source.UIElements
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Localization;
 
     /// <summary>

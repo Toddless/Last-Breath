@@ -2,7 +2,6 @@ namespace LastBreath.World
 {
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Narrative.Facts;
     using Godot;
     using Services;

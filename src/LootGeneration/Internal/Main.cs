@@ -9,7 +9,7 @@ namespace LootGeneration.Internal
 
     internal partial class Main : Node2D
     {
-        private readonly Internal.Spawner _spawner = new();
+        private readonly Spawner _spawner = new();
         private readonly IGameServiceProvider _gameServiceProvider = GameServiceProvider.Instance;
         [Export] private MainWorld? _mainWorld;
         [Export] LootGenerationHud? _lootGenerationHud;

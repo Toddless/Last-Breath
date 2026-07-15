@@ -6,11 +6,11 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Conditions;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Components;
-    using Core.Components.Decorator;
-    using Core.Components.Module;
     using Core.Context;
     using Core.Entity;
+    using Core.Entity.Components;
+    using Core.Entity.Components.Decorator;
+    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
 

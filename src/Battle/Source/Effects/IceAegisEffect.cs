@@ -4,7 +4,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Godot;
 
     /// <summary>

@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Sacrifice
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Additive bump of one Sacrifice parameter (charges / rate / sacrificed share / heal share).</summary>

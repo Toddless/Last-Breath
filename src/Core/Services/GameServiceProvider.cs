@@ -4,10 +4,12 @@ namespace Core.Services
     using System.Collections.Generic;
     using Data;
     using Data.GameData;
+    using Entity.Components;
     using Events;
     using Godot;
     using Localization;
     using MessageBus;
+    using MessageBus.Messages;
     using Microsoft.Extensions.DependencyInjection;
     using Views.UI;
 
@@ -73,8 +75,8 @@ namespace Core.Services
             // The same instance handles the messages: Setup is called on the singleton by the bootstrap
             services.AddSingleton<IMessageHandler<SendNotificationMessageMessage>>(provider => provider.GetRequiredService<NotificationService>());
             services.AddSingleton(_ => CreateRandomizedGenerator());
-            services.AddSingleton<Components.IRandomNumberGenerator>(provider =>
-                new Components.GodotRandomNumberGenerator(provider.GetRequiredService<RandomNumberGenerator>()));
+            services.AddSingleton<IRandomNumberGenerator>(provider =>
+                new GodotRandomNumberGenerator(provider.GetRequiredService<RandomNumberGenerator>()));
         }
 
         private static RandomNumberGenerator CreateRandomizedGenerator()

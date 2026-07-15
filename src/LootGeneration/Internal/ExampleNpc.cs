@@ -6,14 +6,13 @@ namespace LootGeneration.Internal
     using Core.Ai;
     using Core.Ai.World;
     using Core.Battle;
-    using Core.Components;
     using Core.Context;
     using Core.Data;
     using Core.Data.NpcData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Items;
     using Core.Views.UI;
     using Godot;

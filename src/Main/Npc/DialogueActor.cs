@@ -5,6 +5,7 @@ namespace LastBreath.Npc
     using Core.Enums;
     using Core.Events;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Services;
     using Godot;
 

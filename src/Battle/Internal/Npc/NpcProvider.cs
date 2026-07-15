@@ -6,11 +6,11 @@ namespace Battle.Internal.Npc
     using Core.Ai;
     using Core.Ai.World;
     using Core.Battle.Abilities;
-    using Core.Components;
     using Core.Data;
     using Core.Data.GameData;
     using Core.Data.NpcData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Newtonsoft.Json;
 

@@ -5,7 +5,6 @@ namespace Battle.Source.UIElements
     using Core.Context;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

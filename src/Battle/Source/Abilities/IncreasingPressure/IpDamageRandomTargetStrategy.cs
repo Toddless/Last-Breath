@@ -7,7 +7,7 @@ namespace Battle.Source.Abilities.IncreasingPressure
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Godot;
 
     /// <summary>

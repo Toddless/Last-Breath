@@ -3,8 +3,8 @@ namespace LootGeneration.Internal
     using System.Collections.Generic;
     using System.Linq;
     using Core;
-    using Core.Components;
     using Core.Data;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
     using Core.Modifiers;

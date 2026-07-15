@@ -1,8 +1,8 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
-    using Core.Components;
     using Core.Entity;
+    using Core.Entity.Components;
     using Moq;
 
     [TestClass]

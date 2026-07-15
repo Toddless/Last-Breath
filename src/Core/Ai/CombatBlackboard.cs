@@ -1,8 +1,8 @@
 namespace Core.Ai
 {
     using System.Collections.Generic;
-    using Components;
     using Entity;
+    using Entity.Components;
 
     /// <summary>
     /// Per-turn snapshot of the fight the planner reasons about. Refreshed after every cast

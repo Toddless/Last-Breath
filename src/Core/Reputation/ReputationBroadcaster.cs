@@ -4,8 +4,8 @@ namespace Core.Reputation
     using Entity;
     using Enums;
     using Events;
-    using Events.GameEvents;
     using MessageBus;
+    using MessageBus.Messages;
     using Save;
 
     /// <summary>

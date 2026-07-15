@@ -8,7 +8,7 @@ namespace Battle.Source.Abilities.Riders
     using Core.Data;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
 
     /// <summary>

@@ -2,7 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Core.Components;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Modifiers;
 

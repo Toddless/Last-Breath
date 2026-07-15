@@ -5,6 +5,7 @@
     using Core.Events;
     using Core.Localization;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Godot;
 
     public class MartialArtMastery(IGameMessageBus bus) : IMartialArtMastery, Core.Session.ISessionResettable

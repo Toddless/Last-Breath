@@ -1,7 +1,6 @@
 namespace Core.Narrative.Facts
 {
     using Events;
-    using Events.GameEvents;
 
     /// <summary>Flags discovered locations in the facts registry. The marker publishes once per
     /// playthrough; SetFact is idempotent anyway, so a duplicate event is harmless.</summary>

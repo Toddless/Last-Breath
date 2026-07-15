@@ -1,6 +1,6 @@
 ﻿namespace Core.Battle
 {
-    using Components;
+    using Entity.Components;
 
     public interface IStanceSkillComponent : ISkillComponent<IStanceSkill>
     {

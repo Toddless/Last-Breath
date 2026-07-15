@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.BerserkFury
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: shortens the Fury effect (less health burned overall).</summary>

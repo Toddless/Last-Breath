@@ -2,8 +2,8 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle.Abilities;
-    using Core.Components;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.MessageBus;
     using Core.Save.Participants;

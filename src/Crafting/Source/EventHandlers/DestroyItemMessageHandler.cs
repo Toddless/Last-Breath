@@ -8,6 +8,7 @@ namespace Crafting.Source.EventHandlers
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Godot;
 
     /// <summary>Shattering a crafted item: part of the used resources comes back (mastery scales

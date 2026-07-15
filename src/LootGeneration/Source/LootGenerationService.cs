@@ -5,13 +5,12 @@ namespace LootGeneration.Source
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
-    using Core.Components;
     using Core.Context;
     using Core.Data.LootTable;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Items;
     using Core.MessageBus;
     using Core.Services;

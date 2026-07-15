@@ -10,7 +10,7 @@ AbilityId = "Ability_Armageddon"
 Delivery = 3
 CastClip = "Ability_Armageddon"
 ImpactClip = "Ability_Armageddon_Impact"
-MeleeApproach = true
+Scale = 2.2
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_51yah"]
@@ -31,10 +31,12 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 [sub_resource type="Resource" id="Resource_07b7h"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Chain_Lightning"
-Delivery = 2
+Delivery = 3
 CastClip = "Ability_Chain_Lightning"
 TravelClip = "Ability_Chain_Lightning_Projectile"
 ImpactClip = "Ability_Chain_Lightning_Impact"
+CastOverArena = true
+CastScale = 3.0
 metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 
 [sub_resource type="Resource" id="Resource_owypo"]
@@ -86,7 +88,7 @@ metadata/_custom_type_script = "uid://boch4m6i7q2ob"
 [sub_resource type="Resource" id="Resource_s6stb"]
 script = ExtResource("1_cfg")
 AbilityId = "Ability_Ice_Block"
-Delivery = 1
+Delivery = 3
 CastClip = "Ability_Ice_Block"
 TravelClip = "Ability_Ice_Block_Projectile"
 ImpactClip = "Ability_Ice_Block_Impact"

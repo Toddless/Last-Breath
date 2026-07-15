@@ -4,7 +4,7 @@
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
 
     public class GiftFromTheGoddessPassiveSkill(float chance)

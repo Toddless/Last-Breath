@@ -3,8 +3,8 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Ai;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Components;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Moq;
 

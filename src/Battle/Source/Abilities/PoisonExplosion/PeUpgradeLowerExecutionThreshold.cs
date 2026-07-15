@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: lowers the poison stack count required for execution by 5.</summary>

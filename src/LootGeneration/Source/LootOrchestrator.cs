@@ -7,7 +7,6 @@ namespace LootGeneration.Source
     using Core.Data;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Inventory;
     using Core.Items;
     using Core.Save;
@@ -61,9 +60,6 @@ namespace LootGeneration.Source
                     _floor?.AddChild(item);
                     await item.AnimateAsync();
                 }
-
-                GD.Print($"Total items on floor: {_itemOnGroundsCache.Sum(x => x.Quantity)}");
-
                 _itemOnGroundsCache.Clear();
             }
             catch (Exception exception)

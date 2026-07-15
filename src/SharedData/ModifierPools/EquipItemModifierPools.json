@@ -106,25 +106,13 @@
             "id": "Amulet_Stronghold",
             "modifiersPool": [
                 {
-                    "parameter": "Armor",
-                    "modifierType": "flat",
-                    "value": 650,
-                    "weight": 50,
-                    "scope": "Local"
+                    "parameter": "Armor","modifierType": "flat","value": 650,"weight": 50,"scope": "Local"
                 },
                 {
-                    "parameter": "Armor",
-                    "modifierType": "inc",
-                    "value": 0.25,
-                    "weight": 100,
-                    "scope": "Local"
+                    "parameter": "Armor","modifierType": "inc","value": 0.25,"weight": 100,"scope": "Local"
                 },
                 {
-                    "parameter": "Armor",
-                    "modifierType": "multi",
-                    "value": 0.25,
-                    "weight": 15,
-                    "scope": "Local"
+                    "parameter": "Armor","modifierType": "multi","value": 0.25,"weight": 15,"scope": "Local"
                 }
             ]
         },
@@ -877,55 +865,25 @@
             ]
         },
         {
-            "id": "Ring_Strength_Generic",
-            "modifiersPool": []
-        },
-        {
-            "id": "Ring_Dexterity_Generic",
-            "modifiersPool": []
-        },
-        {
-            "id": "Ring_Intelligence_Generic",
-            "modifiersPool": []
-        },
-        {
             "id": "Weapons",
             "modifiersPool": [
                 {
-                    "parameter": "CriticalChance",
-                    "modifierType": "flat",
-                    "value": 0.1,
-                    "weight": 50
+                    "parameter": "CriticalChance","modifierType": "flat","value": 0.1,"weight": 50
                 },
                 {
-                    "parameter": "CriticalChance",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 100
+                    "parameter": "CriticalChance","modifierType": "inc","value": 0.1,"weight": 100
                 },
                 {
-                    "parameter": "CriticalChance",
-                    "modifierType": "multi",
-                    "value": 0.1,
-                    "weight": 15
+                    "parameter": "CriticalChance","modifierType": "multi","value": 0.1,"weight": 15
                 },
                 {
-                    "parameter": "Damage",
-                    "modifierType": "flat",
-                    "value": 250,
-                    "weight": 50
+                    "parameter": "Damage","modifierType": "flat","value": 250,"weight": 50
                 },
                 {
-                    "parameter": "Damage",
-                    "modifierType": "inc",
-                    "value": 0.5,
-                    "weight": 100
+                    "parameter": "Damage","modifierType": "inc","value": 0.5,"weight": 100
                 },
                 {
-                    "parameter": "Damage",
-                    "modifierType": "multi",
-                    "value": 0.2,
-                    "weight": 15
+                    "parameter": "Damage","modifierType": "multi","value": 0.2,"weight": 15
                 }
             ]
         }

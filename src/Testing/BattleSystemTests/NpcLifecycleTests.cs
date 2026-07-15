@@ -1,7 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World;
-    using Core.Components;
+    using Core.Entity.Components;
 
     [TestClass]
     public class NpcLifecycleTests

@@ -4,7 +4,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Ice Mage's Armor): the owner's critical attacks drop an ice
     /// meteor on the target — flat cold damage, no extra effects (yet).</summary>

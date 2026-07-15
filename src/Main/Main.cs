@@ -8,7 +8,6 @@
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Inventory;
     using Core.Services;
     using Core.Views.UI;
@@ -60,6 +59,10 @@
             inventory.TryAddItem(itemCreation.CreateItem("Boots_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Body_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Helmet_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Dagger", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Axe", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Bloodthirsty", [], Rarity.Unique, 0.3f, 1f));
         }
 
         public override void _ExitTree()

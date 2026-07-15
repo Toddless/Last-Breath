@@ -3,7 +3,7 @@
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Modifiers.Context;
 
     public class CreatorsNaturePassiveSkill(

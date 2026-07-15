@@ -4,8 +4,8 @@ namespace Core.Save.Participants
     using System.Collections.Generic;
     using System.Linq;
     using Battle.Abilities;
-    using Components;
     using Data.SaveData;
+    using Entity.Components;
     using Enums;
     using Newtonsoft.Json.Linq;
     using Services;

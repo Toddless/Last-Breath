@@ -8,7 +8,7 @@
     using Core.Battle.Abilities;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
     using Godot;
 

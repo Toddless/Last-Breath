@@ -4,9 +4,9 @@ namespace Core.Ai
     using System.Linq;
     using System.Threading.Tasks;
     using Actions;
-    using Components;
     using Considerations;
     using Entity;
+    using Entity.Components;
 
     /// <summary>
     /// Utility-scored NPC turn: greedy cast loop with re-evaluation after every cast

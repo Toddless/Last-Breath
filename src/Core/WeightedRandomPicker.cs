@@ -3,8 +3,8 @@ namespace Core
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Components;
     using Data;
+    using Entity.Components;
     using Interfaces;
     using Godot;
 

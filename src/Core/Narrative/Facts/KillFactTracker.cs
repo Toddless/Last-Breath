@@ -2,7 +2,6 @@ namespace Core.Narrative.Facts
 {
     using Entity;
     using Events;
-    using Events.GameEvents;
     using Save;
     using Services;
 

@@ -4,7 +4,7 @@
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class ChainAttackPassiveSkill()
         : Skill(id: "Passive_Skill_Chain_Attack")

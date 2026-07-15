@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>

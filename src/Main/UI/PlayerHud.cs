@@ -4,7 +4,6 @@
     using Core.Data;
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Services;
     using Core.Views.UI;
     using Crafting.Source.UIElements;

@@ -3,7 +3,7 @@ namespace Battle.Source.Effects
     using Core.Enums;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Righteous Wrath finisher: while incinerated, a BURNING target dies to any critical hit.</summary>
     public class Incineration(int duration)

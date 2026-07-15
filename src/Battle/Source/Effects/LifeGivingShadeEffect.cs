@@ -5,7 +5,7 @@
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Modifiers;
 
     public class LifeGivingShadeEffect : Effect

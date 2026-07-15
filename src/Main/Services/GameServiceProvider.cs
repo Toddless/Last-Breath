@@ -11,6 +11,8 @@ namespace LastBreath.Services
     using Core.Events;
     using Core.Interfaces;
     using Core.Inventory;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Dialogues;

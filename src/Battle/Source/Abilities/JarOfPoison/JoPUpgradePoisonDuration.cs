@@ -1,6 +1,6 @@
 ﻿namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     public class JoPUpgradePoisonDuration(string id, string[] tags, int tier, float duration) :

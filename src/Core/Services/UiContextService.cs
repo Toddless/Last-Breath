@@ -3,7 +3,6 @@ namespace Core.Services
     using System;
     using Enums;
     using Events;
-    using Events.GameEvents;
     using Narrative.Dialogues;
     using Views.UI;
 

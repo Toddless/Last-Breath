@@ -6,7 +6,7 @@
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class EchoPassiveSkill(
         float delayedDamagePercent,

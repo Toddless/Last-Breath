@@ -3,7 +3,7 @@ namespace LastBreathTest.LootSimulation
     using Core;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Items;
     using LootGeneration.Source;
 

@@ -3,7 +3,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Ai.World.Skirmish;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Reputation;
     using Core.Services;
     using Godot;

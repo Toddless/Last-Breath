@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class ExecutionEffect(
         int duration,

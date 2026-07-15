@@ -1,8 +1,8 @@
 namespace Core.Narrative.Conditions
 {
-    using Components;
     using Data;
     using Entity;
+    using Entity.Components;
     using Enums;
     using Newtonsoft.Json.Linq;
     using Services;

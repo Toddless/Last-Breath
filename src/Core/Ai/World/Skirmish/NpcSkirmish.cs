@@ -2,7 +2,7 @@ namespace Core.Ai.World.Skirmish
 {
     using System;
     using System.Collections.Generic;
-    using Components;
+    using Entity.Components;
 
     // TODO:
     // На текущий момент никто не считывает роллы участников боя.

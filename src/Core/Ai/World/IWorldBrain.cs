@@ -1,6 +1,6 @@
 ﻿namespace Core.Ai.World
 {
-    using Components;
+    using Entity.Components;
     using Godot;
 
     public interface IWorldBrain

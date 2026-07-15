@@ -3,7 +3,6 @@ namespace Battle.Internal.Npc
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
     using Services;
 

@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: poison stacks applied by the coating last additional turns.</summary>

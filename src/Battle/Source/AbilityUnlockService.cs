@@ -7,6 +7,7 @@ namespace Battle.Source
     using Core.Entity;
     using Core.Events;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Save;
     using Core.Services;
 

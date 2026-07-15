@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Ability-scoped critical chance bonus (multicast abilities roll their own crits).</summary>

@@ -2,11 +2,11 @@ namespace Core.Services
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Components.NpcModifiers;
     using Data;
     using Data.GameData;
     using Data.NpcModifiersData;
     using Entity;
+    using Entity.Components.NpcModifiers;
 
     /// <summary>
     /// Shared NPC modifier provider (used by LootGeneration and Battle): consumes the

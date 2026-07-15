@@ -2,12 +2,13 @@ namespace LastBreathTest.ReputationSimulation
 {
     using Core.Ai.World;
     using Core.Ai.World.Raids;
-    using Core.Components;
     using Core.Data.GameData;
     using Core.Data.NpcData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
+    using Core.MessageBus.Messages;
     using Core.Reputation;
     using Core.Services;
     using Godot;
@@ -225,7 +226,7 @@ namespace LastBreathTest.ReputationSimulation
             });
 
             var messages = new Mock<Core.MessageBus.IGameMessageBus>();
-            messages.Setup(m => m.PublishMessageAsync(It.IsAny<Core.Events.SendNotificationMessageMessage>())).Returns(Task.CompletedTask);
+            messages.Setup(m => m.PublishMessageAsync(It.IsAny<SendNotificationMessageMessage>())).Returns(Task.CompletedTask);
 
             var service = new SimRaidService(relations, sites, provider.Object, new SimSpawner(), new NpcPopulationService(bus),
                 accessor.Object, bus, messages.Object, new DefaultRandomNumberGenerator(seed));

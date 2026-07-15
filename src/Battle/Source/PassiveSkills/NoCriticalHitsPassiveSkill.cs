@@ -1,8 +1,8 @@
 namespace Battle.Source.PassiveSkills
 {
     using Core.Battle.Skills;
-    using Core.Components.Decorator;
     using Core.Entity;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Item-grant passive: the owner's hits can never be critical.

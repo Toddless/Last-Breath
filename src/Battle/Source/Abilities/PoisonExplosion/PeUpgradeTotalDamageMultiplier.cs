@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonExplosion
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: increases the total explosion damage by an additional multiplier.</summary>

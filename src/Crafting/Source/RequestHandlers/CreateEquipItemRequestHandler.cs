@@ -11,6 +11,7 @@ namespace Crafting.Source.RequestHandlers
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.MessageBus.Requests;
     using Core.Services;
     using Godot;

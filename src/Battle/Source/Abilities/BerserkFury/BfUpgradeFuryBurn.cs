@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.BerserkFury
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrades: attacks burn more (positive amount) or less (negative amount) health.</summary>

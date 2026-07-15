@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.Armageddon
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Additive bump of one Armageddon parameter (stun duration / hp-cost multiplier / missing-hp rate).</summary>

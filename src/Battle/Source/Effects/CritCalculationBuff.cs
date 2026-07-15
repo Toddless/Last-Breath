@@ -3,7 +3,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>
     /// Base "Crit Calculation" buff: raises critical chance by <c>value</c> and extends its own

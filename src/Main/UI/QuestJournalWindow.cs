@@ -4,7 +4,6 @@ namespace LastBreath.UI
     using System.Linq;
     using Core.Data;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Localization;
     using Core.Narrative.Facts;
     using Core.Narrative.Quests;

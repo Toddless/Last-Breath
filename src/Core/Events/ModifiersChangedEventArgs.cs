@@ -1,7 +1,7 @@
 ﻿namespace Core.Events
 {
     using System.Collections.Generic;
-    using Components;
+    using Entity.Components;
     using Enums;
     using Modifiers;
 

@@ -5,7 +5,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
 
     /// <summary>Item-grant passive (Bloodthirsty): when the target reaches the stack threshold,

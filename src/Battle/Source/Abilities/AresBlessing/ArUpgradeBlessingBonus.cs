@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrades: extra health and/or recovery bonus (either one may be zero).</summary>

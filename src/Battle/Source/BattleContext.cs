@@ -9,7 +9,6 @@
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Views.UI;
     using Godot;
     using UIElements;

@@ -2,7 +2,7 @@ namespace Core.Ai.World
 {
     using System.Collections.Generic;
     using Activities;
-    using Components;
+    using Entity.Components;
     using Godot;
     using Stateless;
     using Time;

@@ -3,6 +3,8 @@ namespace LastBreath
     using System.Threading.Tasks;
     using Core;
     using Core.Events;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Narrative.Dialogues;
     using Core.Views.UI;
     using UI;

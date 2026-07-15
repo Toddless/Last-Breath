@@ -2,7 +2,7 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World;
     using Core.Ai.World.Time;
-    using Core.Components;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Reputation;
     using Core.Save.Participants;

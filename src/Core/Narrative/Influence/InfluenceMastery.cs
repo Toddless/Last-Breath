@@ -7,6 +7,7 @@ namespace Core.Narrative.Influence
     using Events;
     using Godot;
     using MessageBus;
+    using MessageBus.Messages;
     using Newtonsoft.Json;
 
     /// <summary>

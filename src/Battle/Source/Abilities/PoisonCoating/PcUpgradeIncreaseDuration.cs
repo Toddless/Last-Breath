@@ -1,6 +1,6 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: the coating buff itself lasts additional turns.</summary>

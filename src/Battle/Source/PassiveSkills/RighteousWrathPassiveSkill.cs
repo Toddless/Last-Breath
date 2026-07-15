@@ -5,7 +5,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
 
     /// <summary>Item-grant passive (Righteous Wrath): attacks apply a burning stack to undead targets,

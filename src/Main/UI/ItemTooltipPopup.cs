@@ -62,6 +62,8 @@ namespace LastBreath.UI
 
             _subtitle?.Text = item is IEquipItem equip ? $"{item.Rarity} · {equip.EquipmentPiece}" : item.Rarity.ToString();
 
+            // TODO:
+            // Свойства оружия на данный момент не отображаются.
             if (_lines == null) return;
             if (item is IEquipItem equipItem) RenderEquipLines(equipItem);
             RenderDescription(item);

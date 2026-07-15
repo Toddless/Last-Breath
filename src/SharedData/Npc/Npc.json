@@ -5,7 +5,10 @@
             "fraction": "Human",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity", "Strength" ],
+            "stances": [
+                "Dexterity",
+                "Strength"
+            ],
             "levelMin": 1,
             "levelScaling": 0.04,
             "abilityCount": 2,
@@ -35,8 +38,17 @@
                 "activity": "Wander",
                 "wanderRadius": 220,
                 "schedule": [
-                    { "from": "06:00", "to": "22:00", "activity": "Wander", "wanderRadius": 220 },
-                    { "from": "22:00", "to": "06:00", "activity": "Idle" }
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Wander",
+                        "wanderRadius": 220
+                    },
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Idle"
+                    }
                 ]
             },
             "lifecycle": {
@@ -50,7 +62,10 @@
             "fraction": "Human",
             "entityType": "Elit",
             "aiIntellect": "Tactical",
-            "stances": [ "Dexterity", "Strength" ],
+            "stances": [
+                "Dexterity",
+                "Strength"
+            ],
             "levelMin": 10,
             "levelScaling": 0.05,
             "abilityCount": 4,
@@ -80,14 +95,18 @@
                 "hostileToPlayer": true,
                 "activity": "Patrol"
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Skeleton_Mage",
             "fraction": "Undead",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Intelligence" ],
+            "stances": [
+                "Intelligence"
+            ],
             "levelMin": 3,
             "levelScaling": 0.04,
             "abilityCount": 2,
@@ -117,8 +136,17 @@
                 "activity": "Idle",
                 "wanderRadius": 180,
                 "schedule": [
-                    { "from": "22:00", "to": "06:00", "activity": "Wander", "wanderRadius": 400 },
-                    { "from": "06:00", "to": "22:00", "activity": "Idle" }
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 400
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Idle"
+                    }
                 ]
             }
         },
@@ -127,7 +155,10 @@
             "fraction": "Undead",
             "entityType": "Unique",
             "aiIntellect": "Mastermind",
-            "stances": [ "Intelligence", "Strength" ],
+            "stances": [
+                "Intelligence",
+                "Strength"
+            ],
             "levelMin": 25,
             "levelScaling": 0.06,
             "abilityCount": 5,
@@ -158,11 +189,51 @@
             }
         },
         {
+            "id": "Npc_Cursed_Sorcerer",
+            "fraction": "Undead",
+            "entityType": "Archon",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Intelligence",
+                "Strength"
+            ],
+            "levelMin": 45,
+            "levelScaling": 0.06,
+            "abilityCount": 7,
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 1500,
+                "Mana": 3000,
+                "Strength": 20,
+                "Dexterity": 15,
+                "Intelligence": 45,
+                "Armor": 4500,
+                "CriticalChance": 0.6,
+                "AdditionalHitChance": 0.4,
+                "CriticalDamage": 2,
+                "Damage": 600,
+                "SpellDamage": 1200,
+                "Accuracy": 4300,
+                "Evade": 3300
+            },
+            "world": {
+                "visionRadius": 500,
+                "hearingRadius": 1000,
+                "leashRadius": 1500,
+                "moveSpeed": 140,
+                "chaseSpeedMultiplier": 1.8,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
             "id": "Npc_Wolf",
             "fraction": "Animal",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 1,
             "levelScaling": 0.04,
             "abilityCount": 1,
@@ -198,7 +269,9 @@
             "fraction": "Animal",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 1,
             "levelScaling": 0.04,
             "abilityCount": 1,
@@ -234,7 +307,9 @@
             "fraction": "Animal",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 1,
             "levelScaling": 0.03,
             "abilityCount": 1,
@@ -270,7 +345,9 @@
             "fraction": "Animal",
             "entityType": "Elit",
             "aiIntellect": "Simple",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 8,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -306,7 +383,9 @@
             "fraction": "Animal",
             "entityType": "Special",
             "aiIntellect": "Tactical",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 5,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -336,8 +415,17 @@
                 "activity": "Idle",
                 "wanderRadius": 400,
                 "schedule": [
-                    { "from": "22:00", "to": "06:00", "activity": "Wander", "wanderRadius": 500 },
-                    { "from": "06:00", "to": "22:00", "activity": "Idle" }
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 500
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Idle"
+                    }
                 ]
             }
         },
@@ -346,7 +434,9 @@
             "fraction": "Human",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 1,
             "levelScaling": 0.03,
             "abilityCount": 1,
@@ -376,18 +466,31 @@
                 "activity": "Wander",
                 "wanderRadius": 200,
                 "schedule": [
-                    { "from": "06:00", "to": "22:00", "activity": "Wander", "wanderRadius": 200 },
-                    { "from": "22:00", "to": "06:00", "activity": "Idle" }
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Wander",
+                        "wanderRadius": 200
+                    },
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Idle"
+                    }
                 ]
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Hunter",
             "fraction": "Human",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 3,
             "levelScaling": 0.04,
             "abilityCount": 2,
@@ -415,18 +518,30 @@
                 "chaseSpeedMultiplier": 1.6,
                 "activity": "Patrol",
                 "schedule": [
-                    { "from": "06:00", "to": "20:00", "activity": "Patrol" },
-                    { "from": "20:00", "to": "06:00", "activity": "Idle" }
+                    {
+                        "from": "06:00",
+                        "to": "20:00",
+                        "activity": "Patrol"
+                    },
+                    {
+                        "from": "20:00",
+                        "to": "06:00",
+                        "activity": "Idle"
+                    }
                 ]
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Skeleton_Warrior",
             "fraction": "Undead",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 2,
             "levelScaling": 0.04,
             "abilityCount": 2,
@@ -455,8 +570,17 @@
                 "activity": "Idle",
                 "wanderRadius": 200,
                 "schedule": [
-                    { "from": "22:00", "to": "06:00", "activity": "Wander", "wanderRadius": 350 },
-                    { "from": "06:00", "to": "22:00", "activity": "Idle" }
+                    {
+                        "from": "22:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 350
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "22:00",
+                        "activity": "Idle"
+                    }
                 ]
             }
         },
@@ -465,7 +589,9 @@
             "fraction": "Undead",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 4,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -493,8 +619,17 @@
                 "chaseSpeedMultiplier": 1.8,
                 "activity": "Idle",
                 "schedule": [
-                    { "from": "20:00", "to": "06:00", "activity": "Wander", "wanderRadius": 450 },
-                    { "from": "06:00", "to": "20:00", "activity": "Idle" }
+                    {
+                        "from": "20:00",
+                        "to": "06:00",
+                        "activity": "Wander",
+                        "wanderRadius": 450
+                    },
+                    {
+                        "from": "06:00",
+                        "to": "20:00",
+                        "activity": "Idle"
+                    }
                 ]
             }
         },
@@ -503,7 +638,9 @@
             "fraction": "Elf",
             "entityType": "Regular",
             "aiIntellect": "Tactical",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 5,
             "levelScaling": 0.05,
             "abilityCount": 3,
@@ -531,14 +668,18 @@
                 "chaseSpeedMultiplier": 1.7,
                 "activity": "Patrol"
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Elf_Mage",
             "fraction": "Elf",
             "entityType": "Special",
             "aiIntellect": "Tactical",
-            "stances": [ "Intelligence" ],
+            "stances": [
+                "Intelligence"
+            ],
             "levelMin": 8,
             "levelScaling": 0.05,
             "abilityCount": 3,
@@ -567,14 +708,18 @@
                 "activity": "Idle",
                 "wanderRadius": 250
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Dwarf_Warrior",
             "fraction": "Dwarf",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 5,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -602,14 +747,18 @@
                 "chaseSpeedMultiplier": 1.5,
                 "activity": "Patrol"
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Dwarf_Crossbowman",
             "fraction": "Dwarf",
             "entityType": "Regular",
             "aiIntellect": "Simple",
-            "stances": [ "Dexterity" ],
+            "stances": [
+                "Dexterity"
+            ],
             "levelMin": 5,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -638,14 +787,18 @@
                 "activity": "Idle",
                 "wanderRadius": 200
             },
-            "interaction": { "canTalk": true }
+            "interaction": {
+                "canTalk": true
+            }
         },
         {
             "id": "Npc_Imp",
             "fraction": "Demon",
             "entityType": "Regular",
             "aiIntellect": "Tactical",
-            "stances": [ "Intelligence" ],
+            "stances": [
+                "Intelligence"
+            ],
             "levelMin": 6,
             "levelScaling": 0.05,
             "abilityCount": 2,
@@ -680,7 +833,9 @@
             "fraction": "Demon",
             "entityType": "Elit",
             "aiIntellect": "Tactical",
-            "stances": [ "Strength" ],
+            "stances": [
+                "Strength"
+            ],
             "levelMin": 12,
             "levelScaling": 0.06,
             "abilityCount": 3,

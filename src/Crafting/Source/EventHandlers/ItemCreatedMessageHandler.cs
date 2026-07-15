@@ -4,6 +4,8 @@
     using Core.Events;
     using Core.Items;
     using Core.Localization;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Views.UI;
     using UIElements;
 

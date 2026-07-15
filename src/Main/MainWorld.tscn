@@ -57,7 +57,7 @@ shape = SubResource("CircleShape2D_fx85w")
 position = Vector2(1, 0)
 
 [node name="Undead" type="Node2D" parent="." unique_id=1587915089]
-position = Vector2(1000, 896)
+position = Vector2(865, 986)
 script = ExtResource("8_hv00y")
 _npcIds = PackedStringArray("Npc_Skeleton_Mage", "Npc_Grave_Revenant")
 _spawnRadius = 100.0
@@ -69,10 +69,11 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 texture = SubResource("GradientTexture2D_hv00y")
 
 [node name="Bandig" type="Node2D" parent="." unique_id=123361846]
-position = Vector2(1430, 341)
+position = Vector2(971, 155)
 script = ExtResource("8_hv00y")
 _npcIds = PackedStringArray("Npc_Bandit", "Npc_Bandit_Veteran")
-_spawnRadius = 500.0
+_spawnAsGroup = true
+_pointId = "Spaw_Point_Bandit"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
 [node name="Sprite2D" type="Sprite2D" parent="Bandig" unique_id=1011475319]
@@ -80,3 +81,11 @@ texture = SubResource("GradientTexture2D_fx85w")
 
 [node name="TestNpc" parent="." unique_id=283522954 instance=ExtResource("8_kwijy")]
 position = Vector2(333, 709)
+
+[node name="Sorcerer" type="Node2D" parent="." unique_id=414808614]
+position = Vector2(1700, 849)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Cursed_Sorcerer")
+_maxCount = 1
+_pointId = "Spawn_Point_Sorcerer"
+metadata/_custom_type_script = "uid://ctta8cas4isp7"

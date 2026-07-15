@@ -3,9 +3,9 @@ namespace LastBreathTest.BattleSystemTests
     using System.Collections.Generic;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Localization;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Reputation;
     using Core.Save;
     using Core.Services;

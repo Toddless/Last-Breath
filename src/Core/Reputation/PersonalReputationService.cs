@@ -7,7 +7,6 @@ namespace Core.Reputation
     using Entity;
     using Enums;
     using Events;
-    using Events.GameEvents;
     using Newtonsoft.Json;
 
     /// <summary>

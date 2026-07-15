@@ -5,6 +5,8 @@ namespace Crafting.Source.EventHandlers
     using Core.Events;
     using Core.Inventory;
     using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Views.UI;
     using UIElements;
 

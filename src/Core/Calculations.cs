@@ -4,11 +4,11 @@
     using System.Collections.Generic;
     using System.Linq;
     using Battle;
-    using Components.NpcModifiers;
     using Context;
     using Entity;
+    using Entity.Components.NpcModifiers;
     using Enums;
-    using Events.GameEvents;
+    using Events;
     using Interfaces;
     using Modifiers;
     using Godot;

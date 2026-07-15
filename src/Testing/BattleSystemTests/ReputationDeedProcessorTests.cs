@@ -4,7 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data.ReputationData;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Reputation;
     using Core.Save;
     using Core.Services;
@@ -32,7 +32,7 @@ namespace LastBreathTest.BattleSystemTests
             _witnesses = new FakeWitnessQuery();
             _personal = new PersonalReputationService(_relations, _bus);
 
-            var accessor = new Mock<Core.Services.IPlayerAccessor>();
+            var accessor = new Mock<IPlayerAccessor>();
             accessor.SetupGet(a => a.Player).Returns(() => _player);
 
             var processor = new ReputationDeedProcessor(_bus, _relations, accessor.Object, _loadScope, _witnesses, _personal);

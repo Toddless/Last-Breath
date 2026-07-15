@@ -9,7 +9,6 @@ namespace Battle.Source.Presentation
     using Core.Data;
     using Core.Entity;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>
@@ -25,19 +24,25 @@ namespace Battle.Source.Presentation
     public partial class BattleDirector : Node
     {
         private const float DelayBetweenBeats = 0.1f;
+
         private const float HitStagger = 0.12f;
+
         // Melee lunge: presentation-only movement between spot anchors — "who approaches" is never
         // a logic decision. Tune the gap/timings to taste.
         private const float MeleeGap = 120f;
         private const float ApproachSeconds = 0.25f;
+
         private const float ReturnSeconds = 0.20f;
+
         // How far into the swing clip the hit lands: the target's reaction overlaps the strike
         // point instead of waiting for the full swing to finish.
         private const float SwingImpactFraction = 0.6f;
         private const string AttackAnimation = "Fight_Attack";
         private const string HurtAnimation = "Fight_Hurt";
         private const string DeadAnimation = "Dead";
+
         private const string StunnedAnimation = "Stunned";
+
         // Auto-boost: a backed-up queue (big multi-sided fights) plays faster on top of the
         // player-chosen speed and drains back to normal pace as the queue empties.
         private const int AutoBoostQueueLength = 24;
@@ -333,21 +338,6 @@ namespace Battle.Source.Presentation
             }
         }
 
-        private Dictionary<Type, Func<object, Task>> CreateBeatHandlers() => new()
-        {
-            [typeof(BeforeAttackEvent)] = evnt => PlayAttack((BeforeAttackEvent)evnt),
-            [typeof(DamageTakenEvent)] = evnt => PlayDamageTaken((DamageTakenEvent)evnt),
-            [typeof(EntityHealedEvent)] = evnt => PlayHealed((EntityHealedEvent)evnt),
-            [typeof(TurnSkippedEvent)] = evnt => PlayTurnSkipped((TurnSkippedEvent)evnt),
-            // Republish-only beats: no animation of their own (yet), the UI (battle log) reacts at show time.
-            [typeof(AttackEvadedEvent)] = evnt => RepublishBeat((AttackEvadedEvent)evnt),
-            [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
-            [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
-            // Deaths outside a damage beat (Incineration's Kill): the corpse must still fall on screen.
-            // No republish — the battle bus received the event at resolve time.
-            [typeof(EntityDiedEvent)] = evnt => PlayEntityDied((EntityDiedEvent)evnt),
-        };
-
         private Task PlayEntityDied(EntityDiedEvent evnt)
         {
             if (!IsShownDead(evnt.Entity)) ShowDeath(evnt.Entity);
@@ -387,24 +377,6 @@ namespace Battle.Source.Presentation
             _shownDead.Add(target.InstanceId);
         }
 
-        /// <summary>
-        /// Death cuts the corpse's remaining beats: the killing hit finishes its animation
-        /// (handled in <see cref="PlayDamageTaken"/>), everything recorded after it that
-        /// involves the dead entity is dropped. Logic already prevents posthumous actions,
-        /// so this is a presentation-side guarantee, not a rules check.
-        /// </summary>
-        private bool ShouldSkipPosthumous(object evnt) => evnt switch
-        {
-            BeforeAttackEvent attack => IsShownDead(attack.Context.Attacker),
-            DamageTakenEvent damage => IsShownDead(damage.Target),
-            EntityHealedEvent healed => IsShownDead(healed.Healed),
-            AbilityActivatedEvent ability => IsShownDead(ability.Caster),
-            TurnSkippedEvent skipped => IsShownDead(skipped.Fighter),
-            AttackEvadedEvent evaded => IsShownDead(evaded.Context.Attacker),
-            AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
-            EffectAppliedEvent applied => IsShownDead(applied.Target),
-            _ => false,
-        };
 
         private bool IsShownDead(IFightable entity) => _shownDead.Contains(entity.InstanceId);
 
@@ -448,24 +420,33 @@ namespace Battle.Source.Presentation
                 {
                     if (visual != null && _vfx != null) await PlayHitlessCast(cast, chord, visual);
                 }
-                else if (visual is { Delivery: VfxDeliveryKind.Chain } && _vfx != null)
-                    await PlayChain(cast, hits, visual);
-                else if (visual is { MeleeApproach: true })
+                else switch (visual)
                 {
-                    // Melee series: the caster runs up to each target in turn, the hits land at
-                    // arm's reach, one return home at the end of the whole cast.
-                    foreach (var group in hits.GroupBy(hit => hit.Target.InstanceId))
-                    {
-                        await MoveToMeleeRangeAsync(cast.Caster, group.First().Target);
-                        await PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId);
-                    }
+                    case { Delivery: VfxDeliveryKind.Chain } when _vfx != null:
+                        await PlayChain(cast, hits, visual);
+                        break;
+                    case { MeleeApproach: true }:
+                        {
+                            // TODO:
+                            // работает не совсем корректно. Атакующий для проведения каждой атаки бегает туда сюда
 
-                    await ReturnToSpotAsync(cast.Caster);
-                }
-                else
-                {
-                    var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
-                    await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId)));
+                            // Melee series: the caster runs up to each target in turn, the hits land at
+                            // arm's reach, one return home at the end of the whole cast.
+                            foreach (var group in hits.GroupBy(hit => hit.Target.InstanceId))
+                            {
+                                await MoveToMeleeRangeAsync(cast.Caster, group.First().Target);
+                                await PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId);
+                            }
+
+                            await ReturnToSpotAsync(cast.Caster);
+                            break;
+                        }
+                    default:
+                        {
+                            var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
+                            await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId)));
+                            break;
+                        }
                 }
 
                 await WaitAsync(DelayBetweenBeats);
@@ -485,6 +466,8 @@ namespace Battle.Source.Presentation
             var target = hits[0].Target;
             if (visual is { Delivery: VfxDeliveryKind.Projectile } && _vfx != null)
                 await _vfx.PlayTravelAsync(visual, casterInstanceId, target.InstanceId);
+            else if (visual is { Delivery: VfxDeliveryKind.InstantOnTarget } && _vfx != null)
+                await _vfx.PlayStrikeAsync(visual, target.InstanceId);
 
             Task impact = visual != null && _vfx != null ? _vfx.PlayImpactAsync(visual, target.InstanceId) : Task.CompletedTask;
             var hurt = target.Animations.PlayAnimationAsync(HurtAnimation, CurrentSpeed);
@@ -585,5 +568,39 @@ namespace Battle.Source.Presentation
             if (scaled <= 0 || !IsInsideTree()) return;
             await ToSignal(GetTree().CreateTimer(scaled), SceneTreeTimer.SignalName.Timeout);
         }
+
+        /// <summary>
+        /// Death cuts the corpse's remaining beats: the killing hit finishes its animation
+        /// (handled in <see cref="PlayDamageTaken"/>), everything recorded after it that
+        /// involves the dead entity is dropped. Logic already prevents posthumous actions,
+        /// so this is a presentation-side guarantee, not a rules check.
+        /// </summary>
+        private bool ShouldSkipPosthumous(object evnt) => evnt switch
+        {
+            BeforeAttackEvent attack => IsShownDead(attack.Context.Attacker),
+            DamageTakenEvent damage => IsShownDead(damage.Target),
+            EntityHealedEvent healed => IsShownDead(healed.Healed),
+            AbilityActivatedEvent ability => IsShownDead(ability.Caster),
+            TurnSkippedEvent skipped => IsShownDead(skipped.Fighter),
+            AttackEvadedEvent evaded => IsShownDead(evaded.Context.Attacker),
+            AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
+            EffectAppliedEvent applied => IsShownDead(applied.Target),
+            _ => false,
+        };
+
+        private Dictionary<Type, Func<object, Task>> CreateBeatHandlers() => new()
+        {
+            [typeof(BeforeAttackEvent)] = evnt => PlayAttack((BeforeAttackEvent)evnt),
+            [typeof(DamageTakenEvent)] = evnt => PlayDamageTaken((DamageTakenEvent)evnt),
+            [typeof(EntityHealedEvent)] = evnt => PlayHealed((EntityHealedEvent)evnt),
+            [typeof(TurnSkippedEvent)] = evnt => PlayTurnSkipped((TurnSkippedEvent)evnt),
+            // Republish-only beats: no animation of their own (yet), the UI (battle log) reacts at show time.
+            [typeof(AttackEvadedEvent)] = evnt => RepublishBeat((AttackEvadedEvent)evnt),
+            [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
+            [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
+            // Deaths outside a damage beat (Incineration's Kill): the corpse must still fall on screen.
+            // No republish — the battle bus received the event at resolve time.
+            [typeof(EntityDiedEvent)] = evnt => PlayEntityDied((EntityDiedEvent)evnt),
+        };
     }
 }

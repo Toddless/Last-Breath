@@ -1,6 +1,6 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     public class AbilityUpgradeReduceCooldown(string id, string[] tags, int tier, float cooldown)

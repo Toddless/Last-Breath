@@ -3,7 +3,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>
     /// Buff applied to the caster. Each attack made while this effect is active applies a poison stack to the target.

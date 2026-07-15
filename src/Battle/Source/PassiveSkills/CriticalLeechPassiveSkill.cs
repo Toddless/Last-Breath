@@ -4,7 +4,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Context;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>Item-grant passive (Creator's Ring): critical hits heal the owner for a share of the damage dealt.</summary>
     public class CriticalLeechPassiveSkill(float percent)

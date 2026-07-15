@@ -11,7 +11,6 @@ namespace LastBreath.World
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Save;
     using Core.Services;
     using Godot;

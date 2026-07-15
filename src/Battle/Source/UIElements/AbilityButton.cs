@@ -4,7 +4,6 @@ namespace Battle.Source.UIElements
     using Core.Battle.Abilities;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Views.UI;
     using Godot;
     using Stateless;

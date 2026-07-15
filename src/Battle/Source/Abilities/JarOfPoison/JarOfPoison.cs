@@ -5,11 +5,11 @@ namespace Battle.Source.Abilities.JarOfPoison
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Components;
-    using Core.Components.Decorator;
-    using Core.Components.Module;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
+    using Core.Entity.Components.Decorator;
+    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
     using HitDelivery;

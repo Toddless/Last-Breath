@@ -3,7 +3,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Data;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Narrative.Dialogues;
     using Core.Services;
     using Core.Views.UI;

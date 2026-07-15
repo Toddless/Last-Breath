@@ -28,6 +28,8 @@
 
         bool IsCritical { get; set; }
         bool ForceCriticalAttack { get; set; }
+        // TODO:
+        // нужно как то быть уверенным что данные флаги были установлены единожды
         bool IsUnevadable { get; set; }
         bool IsUnblockable { get; set; }
         bool IsValid { get; }

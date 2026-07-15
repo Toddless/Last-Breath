@@ -6,8 +6,8 @@ namespace LootGeneration.Internal
     using Core;
     using Core.Data;
     using Core.Enums;
-    using Core.Components.NpcModifiers;
     using Core.Entity;
+    using Core.Entity.Components.NpcModifiers;
     using Core.Events;
     using Godot;
 

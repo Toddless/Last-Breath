@@ -5,7 +5,6 @@ namespace Core.Reputation
     using Ai.World.Skirmish;
     using Entity;
     using Events;
-    using Events.GameEvents;
     using Godot;
 
     /// <summary>

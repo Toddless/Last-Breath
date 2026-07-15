@@ -5,11 +5,11 @@ namespace Battle.Source.Abilities.ChainLightning
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Components;
-    using Core.Components.Decorator;
-    using Core.Components.Module;
     using Core.Context;
     using Core.Entity;
+    using Core.Entity.Components;
+    using Core.Entity.Components.Decorator;
+    using Core.Entity.Components.Module;
     using Core.Enums;
     using Godot;
 

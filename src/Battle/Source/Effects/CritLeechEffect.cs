@@ -4,7 +4,7 @@ namespace Battle.Source.Effects
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class CritLeechEffect(int duration, int maxStacks, float amount)
         : Effect(id: "Effect_Crit_Leech", duration, maxStacks)

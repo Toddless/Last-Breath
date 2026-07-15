@@ -2,7 +2,7 @@ namespace Core.Ai.World
 {
     using System;
     using System.Collections.Generic;
-    using Components;
+    using Entity.Components;
     using Time;
 
     public enum PlayerLifeStage : byte

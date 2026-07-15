@@ -5,7 +5,6 @@ namespace Core.Narrative.Dialogues
     using System.Linq;
     using Enums;
     using Events;
-    using Events.GameEvents;
     using Facts;
     using Godot;
     using Influence;

@@ -8,13 +8,12 @@
     using Core.Ai;
     using Core.Battle;
     using Core.Battle.Abilities;
-    using Core.Components;
     using Core.Context;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Extensions;
     using Core.Interfaces;
     using Core.Views.UI;
@@ -97,46 +96,6 @@
             _battleEventBus.Subscribe<PlayerFleeAttemptEvent>(OnPlayerFleeAttempt);
         }
 
-        /// <summary>Same input window as the attack click: the player's turn, nothing animating.</summary>
-        private bool CanResolvePlayerAction() =>
-            _currentFighter is IPlayer
-            && _director?.IsPlaying != true
-            && _playerTargetTcs is { Task.IsCompleted: false };
-
-        private void OnPlayerEndTurnRequested(PlayerEndTurnRequestedEvent evnt)
-        {
-            if (!CanResolvePlayerAction()) return;
-            _playerTargetTcs!.SetResult(null); // no target — the turn ends without an attack
-        }
-
-        private void OnPlayerFleeAttempt(PlayerFleeAttemptEvent evnt)
-        {
-            if (!CanResolvePlayerAction() || _player == null) return;
-
-            float chance = EscapeChanceCalculator.For(
-                _fighters.Where(fighter => IsPresent(fighter) && !AreAllies(_player, fighter)).OfType<IFightableNpc>());
-            bool succeeded = _rnd.Randf() <= chance;
-            _battleEventBus?.Publish(new PlayerFleeResolvedEvent(succeeded, chance));
-
-            if (succeeded) EndBattle(new BattleOutcome(BattleResults.PlayerFled));
-            // Success or failure, the turn is spent. Try: on success EndBattle has already
-            // completed the target task — a second SetResult would throw.
-            _playerTargetTcs!.TrySetResult(null);
-        }
-
-        private async void OnAbilityActivation(AbilityActivationEvent obj)
-        {
-            try
-            {
-                var targets = _selectionController?.TakeCommittedTargets(obj.SelectionId).ToList() ?? [];
-                await obj.Ability.Execute(targets, this);
-            }
-            catch (Exception e)
-            {
-                GD.Print($"Failed to activate ability {obj.Ability.Id}", e.Message, e.StackTrace);
-                Tracker.TrackException("Failed to activate ability", e, this);
-            }
-        }
 
         public void SetPlayer(IFightable player)
         {
@@ -161,6 +120,22 @@
 
         public IReadOnlyList<IFightable> GetAll() => _fighters.Where(IsPresent).ToList();
 
+
+        public void RemoveEntitiesFromArenaSpots()
+        {
+            foreach (var spot in _spots)
+                spot.RemoveEntityFromSpot();
+        }
+
+        public IFightable GetRandomAlly(IFightable entity)
+        {
+            var allies = GetAllies(entity);
+            return allies.Count == 0
+                ? entity
+                : // a lone fighter can only target itself
+                allies[_rnd.RandiRange(0, allies.Count - 1)];
+        }
+
         public IFightable GetRandomEntity(IFightable entity)
         {
             var alive = _fighters.Where(IsPresent).ToList();
@@ -168,15 +143,50 @@
             return alive[_rnd.RandiRange(0, alive.Count - 1)];
         }
 
+        /// <summary>Same input window as the attack click: the player's turn, nothing animating.</summary>
+        private bool CanResolvePlayerAction() =>
+            _currentFighter is IPlayer
+            && _director?.IsPlaying != true
+            && _playerTargetTcs is { Task.IsCompleted: false };
+
         /// <summary>Still on the field: alive and not fled. Dead fighters stay in the roster
         /// (the context returns their bodies to the world), so every query must filter here.</summary>
         private bool IsPresent(IFightable fighter) =>
             fighter.IsAlive && !_fledIds.Contains(fighter.InstanceId);
 
-        public void RemoveEntitiesFromArenaSpots()
+        private void OnPlayerEndTurnRequested(PlayerEndTurnRequestedEvent evnt)
         {
-            foreach (var spot in _spots)
-                spot.RemoveEntityFromSpot();
+            if (!CanResolvePlayerAction()) return;
+            _playerTargetTcs!.SetResult(null); // no target — the turn ends without an attack
+        }
+
+        private void OnPlayerFleeAttempt(PlayerFleeAttemptEvent evnt)
+        {
+            if (!CanResolvePlayerAction() || _player == null) return;
+
+            float chance = EscapeChanceCalculator.For(
+                _fighters.Where(fighter => IsPresent(fighter) && !AreAllies(_player, fighter)).OfType<IFightableNpc>());
+            bool succeeded = _rnd.Randf() <= chance;
+            _battleEventBus?.Publish(new PlayerFleeResolvedEvent(succeeded, chance));
+
+            if (succeeded) EndBattle(new BattleOutcome(BattleResults.PlayerFled));
+            // Success or failure, the turn is spent.
+            // Try: on success EndBattle has already completed the target task — a second SetResult would throw.
+            _playerTargetTcs!.TrySetResult(null);
+        }
+
+        private async void OnAbilityActivation(AbilityActivationEvent obj)
+        {
+            try
+            {
+                var targets = _selectionController?.TakeCommittedTargets(obj.SelectionId).ToList() ?? [];
+                await obj.Ability.Execute(targets, this);
+            }
+            catch (Exception e)
+            {
+                GD.Print($"Failed to activate ability {obj.Ability.Id}", e.Message, e.StackTrace);
+                Tracker.TrackException("Failed to activate ability", e, this);
+            }
         }
 
         private void SetupTargetSelectionController()
@@ -203,15 +213,6 @@
             if (spot != null) return spot;
             return _parkedCorpses.GetValueOrDefault(instanceId);
         }
-
-        public IFightable GetRandomAlly(IFightable entity)
-        {
-            var allies = GetAllies(entity);
-            if (allies.Count == 0) return entity; // a lone fighter can only target itself
-
-            return allies[_rnd.RandiRange(0, allies.Count - 1)];
-        }
-
 
         /// <summary>
         /// A latecomer enters the ongoing battle: takes a free spot, joins the roster and the
@@ -330,12 +331,7 @@
                     // Refill HERE, not at the turn's end: dead/fled entries are skipped with
                     // `continue` and used to drain the round past the refill — a battle where
                     // the round ended on corpses got abandoned with live enemies standing
-                    // (latecomers enter the roster mid-round but the queue only next round).
-                    // BY DESIGN (tracker #55 — kept as a feature): the refilled round re-sorts by
-                    // speed, so a fast fighter (a high-Dex player) who acted late in one round can
-                    // act first in the next — "two turns in a row" around a rebuild is the intended
-                    // cost of speed, not a bug. It shows most when a mid-round joiner defers the
-                    // rebuild until the original opponent dies.
+                    //  BY DESIGN (latecomers enter the roster mid-round but the queue only next round).
                     var nextRound = _queueScheduler.RefillIfEmpty(_fighters.Where(IsPresent).ToList());
                     if (nextRound.Count > 1)
                     {

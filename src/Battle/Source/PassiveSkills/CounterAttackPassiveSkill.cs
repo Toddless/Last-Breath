@@ -3,7 +3,7 @@
     using System;
     using Core.Battle.Skills;
     using Core.Entity;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class CounterAttackPassiveSkill(float chance = 0.5f) : Skill(id: "Passive_Skill_Counter_Attack")
     {

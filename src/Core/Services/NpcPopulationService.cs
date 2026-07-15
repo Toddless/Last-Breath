@@ -2,7 +2,6 @@ namespace Core.Services
 {
     using System;
     using Events;
-    using Events.GameEvents;
 
     /// <summary>
     /// Counts every spawn-point NPC alive in the world. A reservation survives faction changes

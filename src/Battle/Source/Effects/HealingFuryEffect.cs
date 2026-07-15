@@ -3,7 +3,7 @@
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     public class HealingFuryEffect(
         int duration,

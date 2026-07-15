@@ -4,7 +4,6 @@ namespace Battle.Source
     using Core.Entity;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
 
     /// <summary>

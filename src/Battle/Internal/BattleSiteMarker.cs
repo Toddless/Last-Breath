@@ -2,7 +2,6 @@ namespace Battle.Internal
 {
     using Core.Ai.World;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Godot;
     using Npc;
 

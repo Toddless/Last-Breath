@@ -4,7 +4,7 @@
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Effects;
 
     public class SilentFuryPassive(float chance)

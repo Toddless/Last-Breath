@@ -1,7 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Reputation;
     using Core.Save.Participants;
     using Core.Services;

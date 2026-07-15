@@ -321,7 +321,20 @@
                 },
                 {
                     "tier": 2,
-                    "items": []
+                    "items": [
+                        {
+                            "id": "Weapon_Simple_Dagger",
+                            "price": 51
+                        },
+                        {
+                            "id": "Weapon_Simple_Axe",
+                            "price": 80
+                        },
+                        {
+                            "id": "Weapon_Simple_Sword",
+                            "price": 148
+                        }
+                    ]
                 },
                 {
                     "tier": 3,
@@ -372,12 +385,7 @@
                 },
                 {
                     "tier": 1,
-                    "items": [
-                        {
-                            "id": "Weapon_Simple_Axe",
-                            "price": 133
-                        }
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 2,
@@ -494,10 +502,6 @@
                         {
                             "id": "Ring_Minor_Barrier",
                             "price": 133
-                        },
-                        {
-                            "id": "Weapon_Simple_Sword",
-                            "price": 148
                         },
                         {
                             "id": "Crafting_Resource_Topaz_Gem",
@@ -929,15 +933,6 @@
                         {
                             "id": "Upgrade_Resource_Weapon_Rune",
                             "price": 99
-                        }
-                    ]
-                },
-                {
-                    "tier": 2,
-                    "items": [
-                        {
-                            "id": "Weapon_Simple_Dagger",
-                            "price": 51
                         }
                     ]
                 },

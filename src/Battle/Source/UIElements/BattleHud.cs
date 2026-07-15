@@ -4,13 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Core.Components;
     using Core.Constants;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Views.UI;
     using Godot;
 

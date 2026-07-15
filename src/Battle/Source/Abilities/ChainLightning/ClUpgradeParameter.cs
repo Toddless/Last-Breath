@@ -1,7 +1,7 @@
 namespace Battle.Source.Abilities.ChainLightning
 {
     using Core.Battle.Abilities;
-    using Core.Components.Decorator;
+    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Additive bump of one Chain Lightning parameter (jumps / falloff — pass a negative amount to soften).</summary>

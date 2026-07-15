@@ -3,7 +3,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
 
     /// <summary>
     /// Self-extending additional-attack-chance buff — the L3 "replace" variant of

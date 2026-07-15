@@ -1,7 +1,7 @@
 ﻿namespace LastBreath.Attribute
 {
     using System.Collections.Generic;
-    using Core.Components;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Modifiers;
     using Godot;

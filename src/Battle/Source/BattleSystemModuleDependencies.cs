@@ -50,7 +50,7 @@
                 manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
                 // The bag lives only in projects that have both an inventory and item data (Main);
                 // a sandbox without them simply doesn't write the section.
-                if (sp.GetService<Core.Inventory.IInventory>() is { } inventory && sp.GetService<Core.Data.IItemDataProvider>() is { } itemData)
+                if (sp.GetService<Core.Inventory.IInventory>() is { } inventory && sp.GetService<IItemDataProvider>() is { } itemData)
                     manager.Register(new InventorySaveParticipant(inventory, itemData, sp.GetRequiredService<EquipItemSaveConverter>()));
                 manager.Register(new AbilityBookSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<IAbilityProvider>()));
                 manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
@@ -86,7 +86,7 @@
                 Add<Core.Ai.World.Raids.IRaidService>();
                 Add<Core.Ai.World.Time.IWorldClock>();
                 Add<INpcPopulationService>();
-                Add<Core.Views.UI.IUiContextService>();
+                Add<IUiContextService>();
                 return session;
 
                 void Add<T>()

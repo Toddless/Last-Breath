@@ -4,10 +4,10 @@ namespace Battle.Source.Abilities
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
-    using Core.Components.Module;
     using Core.Entity;
+    using Core.Entity.Components.Module;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Godot;
 
     /// <summary>

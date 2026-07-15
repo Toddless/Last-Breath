@@ -6,16 +6,15 @@ namespace Battle.Internal.Player
     using Core;
     using Core.Ai.World;
     using Core.Ai.World.Time;
-    using Core.Attribute;
     using Core.Battle;
-    using Core.Components;
     using Core.Constants;
     using Core.Context;
     using Core.Data;
     using Core.Entity;
+    using Core.Entity.Attribute;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
-    using Core.Events.GameEvents;
     using Core.Items;
     using Core.Services;
     using Godot;

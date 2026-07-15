@@ -2,14 +2,15 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Ai.World;
     using Core.Ai.World.Raids;
-    using Core.Components;
     using Core.Data.GameData;
     using Core.Data.NpcData;
     using Core.Entity;
+    using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events.GameEvents;
+    using Core.Events;
     using Core.Localization;
     using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Reputation;
     using Core.Services;
     using Godot;
@@ -62,7 +63,7 @@ namespace LastBreathTest.BattleSystemTests
             provider.Setup(p => p.CreateDefinition(It.IsAny<string>())).Returns<string>(Definition);
 
             var messages = new Mock<IGameMessageBus>();
-            messages.Setup(m => m.PublishMessageAsync(It.IsAny<Core.Events.SendNotificationMessageMessage>())).Returns(Task.CompletedTask);
+            messages.Setup(m => m.PublishMessageAsync(It.IsAny<SendNotificationMessageMessage>())).Returns(Task.CompletedTask);
 
             _raids = new TestRaidService(_relations, _sites, provider.Object, _spawner, _population, accessor.Object, _bus, messages.Object, new FixedRaidRandom());
             _raids.Apply(DataCatalog.Raids, ConfigFile(initialDelay: 0));
@@ -211,7 +212,7 @@ namespace LastBreathTest.BattleSystemTests
 
         /// <summary>Exposes a deterministic player position — the real one needs a Godot node in a tree.</summary>
         private sealed class TestRaidService(
-            Core.Entity.IFactionRelationService relations, IRaidSpawnRegistry sites, INpcProvider provider, INpcWorldSpawner spawner,
+            IFactionRelationService relations, IRaidSpawnRegistry sites, INpcProvider provider, INpcWorldSpawner spawner,
             INpcPopulationService population, IPlayerAccessor accessor, GameEventBus bus, IGameMessageBus messages, IRandomNumberGenerator rnd)
             : RaidService(relations, sites, provider, spawner, population, accessor, bus, messages, rnd)
         {
