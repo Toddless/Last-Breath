@@ -1,6 +1,6 @@
 namespace Core.Entity
 {
-    using Components.NpcModifiers;
+    using NpcModifiers;
 
     public interface IRarityUpgradeModifier : INpcModifier, IChangeableChances
     {

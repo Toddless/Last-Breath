@@ -23,7 +23,7 @@
                     "id": "Npc_Modifier_Scale_Double_Defence",
                     "npcBuffId": "Npc_Buff_Double_Defence",
                     "weight": 50,
-                    "difficulty": 1.7,
+                    "difficulty": 1.4,
                     "scale": 1.2,
                     "isUnique": true
                 },
@@ -31,7 +31,7 @@
                     "id": "Npc_Modifier_Scale_Double_Health_Recovery",
                     "npcBuffId": "Npc_Buff_Double_Health_Recovery",
                     "weight": 50,
-                    "difficulty": 1.7,
+                    "difficulty": 1.2,
                     "scale": 1.2,
                     "isUnique": true
                 }

@@ -17,7 +17,7 @@ namespace Battle.Internal.Npc
     using Core.Entity;
     using Core.Entity.Attribute;
     using Core.Entity.Components;
-    using Core.Entity.Components.NpcModifiers;
+    using Core.Entity.NpcModifiers;
     using Core.Enums;
     using Core.Events;
     using Core.Items;

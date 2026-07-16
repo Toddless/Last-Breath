@@ -6,7 +6,7 @@
     using Battle;
     using Context;
     using Entity;
-    using Entity.Components.NpcModifiers;
+    using Entity.NpcModifiers;
     using Enums;
     using Events;
     using Interfaces;

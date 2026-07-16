@@ -6,7 +6,7 @@ namespace Core.Services
     using Data.GameData;
     using Data.NpcModifiersData;
     using Entity;
-    using Entity.Components.NpcModifiers;
+    using Entity.NpcModifiers;
 
     /// <summary>
     /// Shared NPC modifier provider (used by LootGeneration and Battle): consumes the

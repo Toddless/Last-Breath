@@ -5,7 +5,7 @@
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 20
 
-[node name="ItemTooltipPopup" type="Control" unique_id=1952734347 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines")]
+[node name="ItemTooltipPopup" type="Control" unique_id=1952734347 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines", "_icon", "_background")]
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
@@ -14,6 +14,8 @@ _panel = NodePath("Panel")
 _title = NodePath("Panel/Margin/Layout/Title")
 _subtitle = NodePath("Panel/Margin/Layout/Subtitle")
 _lines = NodePath("Panel/Margin/Layout/Lines")
+_icon = NodePath("Panel/Margin/Layout/MarginContainer/Icon")
+_background = NodePath("Panel/Margin/Layout/MarginContainer/Background")
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=585764383]
 custom_minimum_size = Vector2(340, 0)
@@ -42,6 +44,18 @@ label_settings = SubResource("LabelSettings_title")
 layout_mode = 2
 theme_type_variation = &"DimLabel"
 text = "Rarity"
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/Margin/Layout" unique_id=336267487]
+layout_mode = 2
+
+[node name="Background" type="TextureRect" parent="Panel/Margin/Layout/MarginContainer" unique_id=881592201]
+layout_mode = 2
+expand_mode = 1
+
+[node name="Icon" type="TextureRect" parent="Panel/Margin/Layout/MarginContainer" unique_id=1852493150]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+expand_mode = 1
 
 [node name="Lines" type="VBoxContainer" parent="Panel/Margin/Layout" unique_id=963341082]
 layout_mode = 2

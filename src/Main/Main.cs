@@ -63,6 +63,11 @@
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Dagger", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Axe", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Bloodthirsty", [], Rarity.Unique, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Uncommon, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Rare, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Epic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, 0.3f, 1f));
+
         }
 
         public override void _ExitTree()

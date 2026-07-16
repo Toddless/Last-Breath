@@ -1,5 +1,6 @@
 namespace Battle.Source.Abilities.Overload
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,11 +14,12 @@ namespace Battle.Source.Abilities.Overload
     using Core.Enums;
 
     /// <summary>Cast plan of the Overload: the volley fields plus the mana-conversion knobs.</summary>
-    public class OverloadPlan : CastPlan
+    public class OverloadPlan : DamagingCastPlan
     {
         public float ManaBurnPercent { get; set; }
         public float DamagePerMana { get; set; }
         public float CritManaRefund { get; set; }
+        public List<Action<TargetHit>> OnHitRiders { get; } = [];
     }
 
     /// <summary>
@@ -29,16 +31,14 @@ namespace Battle.Source.Abilities.Overload
         string[] tags,
         int cooldown,
         int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
         float manaBurnPercent,
         float damagePerMana,
         float stageTwoDamagePerMana,
         float stageThreeCritRefund,
         Costs costType = Costs.Mana)
-        : MulticastVolleyAbility(id: "Ability_Overload", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : MulticastAbility<OverloadPlan>(id: "Ability_Overload", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, costType)
     {
+
         private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
 
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
@@ -99,18 +99,20 @@ namespace Battle.Source.Abilities.Overload
             AbilityParametersModuleManager.RemoveDecorator(id, parameter);
         }
 
+
         public override IAbility Copy()
         {
-            var copy = new Overload(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                ManaBurnPercent, DamagePerMana, stageTwoDamagePerMana, stageThreeCritRefund, CostType) { ResetCooldownOnKill = ResetCooldownOnKill };
+            var copy = new Overload(Tags, (int)Cooldown, CostValue, ManaBurnPercent, DamagePerMana, stageTwoDamagePerMana, stageThreeCritRefund, CostType)
+            {
+                ResetCooldownOnKill = ResetCooldownOnKill
+            };
             copy.SetAbilityUpgrades(Upgrades.ToDictionary());
             return copy;
         }
 
-        protected override CastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
+        protected override OverloadPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new OverloadPlan
             {
-                ProjectilesCount = 1,
                 Damage = Damage,
                 WeaponDamageScale = WeaponDamageScale,
                 SpellDamageScale = SpellDamageScale,
@@ -120,43 +122,57 @@ namespace Battle.Source.Abilities.Overload
                 DamagePerMana = DamagePerMana
             };
 
-        protected override void ApplyStage(int stage, CastPlan plan, IFightable owner, IBattleField field)
+        protected override void ApplyStage(int stage, OverloadPlan plan, IFightable owner, IBattleField field)
         {
-            if (plan is not OverloadPlan overload) return;
             switch (stage)
             {
                 case 2:
-                    overload.DamagePerMana = stageTwoDamagePerMana;
+                    plan.DamagePerMana = stageTwoDamagePerMana;
                     break;
                 case 3:
-                    overload.CritManaRefund = stageThreeCritRefund;
+                    plan.CritManaRefund = stageThreeCritRefund;
                     break;
                 case 4:
-                    overload.DamageType = DamageType.Pure;
+                    plan.DamageType = DamageType.Pure;
                     break;
             }
         }
 
-        protected override async Task ExecutePlan(CastPlan plan, IFightable owner)
+
+        protected override async Task ExecutePlan(OverloadPlan plan, IFightable owner)
         {
-            var overload = (OverloadPlan)plan;
             float baseDamage = plan.Damage;
             foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                float burned = target.CurrentMana * overload.ManaBurnPercent;
+                float burned = target.CurrentMana * ManaBurnPercent;
                 target.CurrentMana -= burned;
 
                 // Per-target flat damage: the base plus the converted mana. Restored after the hit.
-                plan.Damage = baseDamage + (burned * overload.DamagePerMana);
-                var hit = await DealProjectileDamage(plan, owner, target);
+                plan.Damage = baseDamage + (burned * DamagePerMana);
+                var hit = await DealTargetDamage(plan, owner, target);
                 plan.Damage = baseDamage;
 
-                if (hit.IsCritical && overload.CritManaRefund > 0)
-                    owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = burned * overload.CritManaRefund });
+                if (hit.IsCritical && plan.CritManaRefund > 0)
+                    owner.RestoreMana(new ManaRecoveryContext(owner, owner) { Amount = burned * plan.CritManaRefund });
                 if (ResetCooldownOnKill && !target.IsAlive) CooldownLeft = 0;
                 foreach (var rider in plan.OnHitRiders)
                     rider(hit);
             }
+        }
+
+        private async Task<TargetHit> DealTargetDamage(OverloadPlan plan, IFightable owner, IFightable target)
+        {
+            float damage = CalculateHitDamage(plan, owner);
+            bool isCritical = RollCritical(owner);
+            if (isCritical)
+            {
+                damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
+            }
+
+            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical };
+            context.Add(plan.DamageType, damage);
+            await target.TakeDamage(context);
+            return new TargetHit(target, isCritical, damage);
         }
     }
 }

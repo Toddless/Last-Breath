@@ -92,7 +92,7 @@
                 (int)data.AbilityProperties.GetValueOrDefault("stunDuration", 1),
                 (int)data.AbilityProperties.GetValueOrDefault("attacks", 1),
                 data.CostsType) { Stance = data.Stance, MasteryLevel = data.MasteryLevel, Targeting = TargetingStrategyFactory.From(data), },
-            ["Ability_Ice_Block"] = data => new IceBlock.IceBlock(
+            ["Ability_Ice_Block"] = data => new IceBlock.IceBlocks(
                 data.Tags,
                 data.Cooldown,
                 data.CostValue,
@@ -114,9 +114,6 @@
                 data.WeaponDamageScale,
                 data.SpellDamageScale,
                 data.AbilityProperties.GetValueOrDefault("manaBurnPercent", 0.25f),
-                data.AbilityProperties.GetValueOrDefault("damagePerMana", 1.5f),
-                data.AbilityProperties.GetValueOrDefault("stageTwoDamagePerMana", 2f),
-                data.AbilityProperties.GetValueOrDefault("stageThreeCritRefund", 0.15f),
                 data.CostsType) { Stance = data.Stance, MasteryLevel = data.MasteryLevel, Targeting = TargetingStrategyFactory.From(data), },
             ["Ability_Chain_Lightning"] = data => new ChainLightning.ChainLightning(
                 data.Tags,

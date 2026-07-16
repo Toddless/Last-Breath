@@ -18,7 +18,7 @@ namespace LastBreath.Npc
     using Core.Entity;
     using Core.Entity.Attribute;
     using Core.Entity.Components;
-    using Core.Entity.Components.NpcModifiers;
+    using Core.Entity.NpcModifiers;
     using Core.Enums;
     using Core.Events;
     using Core.Items;
@@ -594,8 +594,6 @@ namespace LastBreath.Npc
 
         private void OnBodyEnter(Node2D body)
         {
-            // TODO:
-            // возможно стоит убрать отсюда игрока. С другой стороны где и как различать что за тип боя был инициализирован?
             if (IsFighting || !IsAlive) return; // a lying body must not start battles
             if (_contactGraceSeconds > 0) return; // fresh out of a battle: let the loser leave
             // The player's flag guards the battle-start window: a second NPC touching in the same
@@ -613,6 +611,7 @@ namespace LastBreath.Npc
                 else
                     fighters.Add(this);
 
+                GD.Print($"Npc in fight: {this.Id}");
                 StopMoving();
                 // Permanent forensics: one line per battle start names the initiator and the spot —
                 // it has already pinned down two "battles out of nowhere" bugs. Kept cheap on purpose.

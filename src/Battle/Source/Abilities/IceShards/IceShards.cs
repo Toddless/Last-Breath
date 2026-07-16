@@ -3,6 +3,7 @@ namespace Battle.Source.Abilities.IceShards
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
@@ -32,13 +33,14 @@ namespace Battle.Source.Abilities.IceShards
         float secondStageWeaponDamageScale,
         float secondStageSpellDamageScale,
         Costs costType = Costs.Mana)
-        : MulticastVolleyAbility(id: "Ability_Ice_Shards", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+        : MulticastAbility<VolleyCastPlan>(id: "Ability_Ice_Shards", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
     {
         private const int EmpoweredShardsStage = 2;
         private const int AllTargetsStage = 3;
         private const int ShrapnelBurstStage = 4;
 
         private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
+
         private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
         {
             get
@@ -121,9 +123,9 @@ namespace Battle.Source.Abilities.IceShards
             return copy;
         }
 
-        protected override CastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)
+        protected override VolleyCastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            var plan = new CastPlan
+            var plan = new VolleyCastPlan
             {
                 ProjectilesCount = Shards,
                 Damage = Damage,
@@ -139,7 +141,7 @@ namespace Battle.Source.Abilities.IceShards
             return plan;
         }
 
-        protected override void ApplyStage(int stage, CastPlan plan, IFightable owner, IBattleField field)
+        protected override void ApplyStage(int stage, VolleyCastPlan plan, IFightable owner, IBattleField field)
         {
             switch (stage)
             {
@@ -157,10 +159,36 @@ namespace Battle.Source.Abilities.IceShards
             }
         }
 
-        private void ApplyShardEffect(IFightable owner, IFightable target)
+        protected override async Task ExecutePlan(VolleyCastPlan plan, IFightable owner)
         {
-            ShardEffectFactory?.Invoke().Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
+            for (int projectile = 0; projectile < plan.ProjectilesCount; projectile++)
+            {
+                foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
+                {
+                    var hit = await DealProjectileDamage(plan, owner, target);
+                    foreach (var rider in plan.OnHitRiders)
+                        rider(hit);
+                }
+            }
         }
+
+        protected async Task<ProjectileHit> DealProjectileDamage(DamagingCastPlan plan, IFightable owner, IFightable target)
+        {
+            float damage = CalculateHitDamage(plan, owner);
+            bool isCritical = RollCritical(owner);
+            // Crit damage is a pure additive multiplier by design: bonuses only ever add to it
+            if (isCritical) damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
+
+            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical, CastId = CastId };
+            context.Add(plan.DamageType, damage);
+            await target.TakeDamage(context);
+
+            return new ProjectileHit(target, isCritical, context.TotalDamage);
+        }
+
+
+        private void ApplyShardEffect(IFightable owner, IFightable target) =>
+            ShardEffectFactory?.Invoke().Apply(new EffectApplyingContext { Caster = owner, Target = target, Source = InstanceId });
 
         /// <summary>Stage 4: a critical shard bursts, damaging every enemy on the field.</summary>
         private void DealShrapnelBurst(ProjectileHit hit, IFightable owner, IBattleField field)

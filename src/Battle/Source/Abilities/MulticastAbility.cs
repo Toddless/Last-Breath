@@ -31,10 +31,10 @@ namespace Battle.Source.Abilities
         private const int BaseStage = 1;
 
         /// <summary>Stance-wide base chances per stage; per-ability/per-build shifts come from decorators, not data.</summary>
-        private static readonly Dictionary<int, float> s_baseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.05f };
+        private readonly Dictionary<int, float> _sBaseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.05f };
 
         /// <summary>Stance-wide caps for the final stage chance: stage 2 may become guaranteed, higher stages may not.</summary>
-        private static readonly Dictionary<int, float> s_stageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
+        private readonly Dictionary<int, float> _sStageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
 
         private readonly RandomNumberGenerator _rnd = new();
 
@@ -42,6 +42,7 @@ namespace Battle.Source.Abilities
         /// Bonus on top of entity's final critical chance. e.g 45% critical chance * 1.35 (35% bonus critical chance)
         /// </summary>
         public float CriticalChanceBonus => this[AbilityParameter.CriticalChanceBonus];
+
         public float CriticalDamageBonus => this[AbilityParameter.CriticalDamageBonus];
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
@@ -60,10 +61,10 @@ namespace Battle.Source.Abilities
         protected int RollActivationStage(IFightable owner)
         {
             float multicast = owner.Parameters.GetValueForParameter(EntityParameter.MulticastChance);
-            foreach (int stage in s_baseStageChances.Keys.OrderByDescending(s => s))
+            foreach (int stage in _sBaseStageChances.Keys.OrderByDescending(s => s))
             {
-                float cap = s_stageChanceCaps.GetValueOrDefault(stage, 1f);
-                float chance = Mathf.Clamp(s_baseStageChances[stage] * (1 + multicast), 0f, cap);
+                float cap = _sStageChanceCaps.GetValueOrDefault(stage, 1f);
+                float chance = Mathf.Clamp(_sBaseStageChances[stage] * (1 + multicast), 0f, cap);
                 if (_rnd.Randf() <= chance) return stage;
             }
 
@@ -90,5 +91,11 @@ namespace Battle.Source.Abilities
         /// <summary>Ability bonus is a fractional increase over the owner's crit chance (0.35 = +35%).</summary>
         protected bool RollCritical(IFightable owner) =>
             _rnd.Randf() <= owner.Parameters.CriticalChance * (1 + CriticalChanceBonus);
+
+        protected float CalculateHitDamage(DamagingCastPlan plan, IFightable owner) =>
+            plan.Damage
+            + owner.Parameters.Damage * plan.WeaponDamageScale
+            + owner.Parameters.SpellDamage * plan.SpellDamageScale;
+
     }
 }

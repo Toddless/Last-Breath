@@ -1,5 +1,7 @@
 namespace LastBreath.UI
 {
+    using Core.Constants;
+    using Core.Enums;
     using Core.Items;
     using Core.Localization;
     using Core.Views.UI;
@@ -61,7 +63,6 @@ namespace LastBreath.UI
             _title?.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(item.Rarity)));
 
             _subtitle?.Text = item is IEquipItem equip ? $"{item.Rarity} · {equip.EquipmentPiece}" : item.Rarity.ToString();
-
             // TODO:
             // Свойства оружия на данный момент не отображаются.
             if (_lines == null) return;

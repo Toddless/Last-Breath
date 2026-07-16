@@ -32,7 +32,6 @@ namespace Core.Entity.Components
             var piece = item.EquipmentPiece;
             if (_slots.TryGetValue(piece, out var current))
             {
-                if (current.IsSame(item.InstanceId)) return false;
                 replaced = current;
                 current.OnUnequip();
             }

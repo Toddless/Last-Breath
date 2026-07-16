@@ -27,12 +27,6 @@
     using IceAegis;
     using IceShards;
     using Overload;
-    using SacrificeAbility = Sacrifice.Sacrifice;
-    using PorcupineAbility = Porcupine.Porcupine;
-    using ArmageddonAbility = Armageddon.Armageddon;
-    using OverloadAbility = Overload.Overload;
-    using ChainLightningAbility = ChainLightning.ChainLightning;
-    using IceAegisAbility = IceAegis.IceAegis;
 
     public partial class AbilityProvider
     {
@@ -255,7 +249,7 @@
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                         maxStacks: 1)),
             ["Ability_Ov_Upgrade_Kill_Resets_Cooldown"] = data =>
-                new DelegateUpgrade<OverloadAbility>(
+                new DelegateUpgrade<Overload.Overload>(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -286,17 +280,17 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ChainLightningAbility.Parameters.Jumps,
+                    ChainLightning.ChainLightning.Parameters.Jumps,
                     data.UpgradeProperties.GetValueOrDefault("amount", 1)),
             ["Ability_Cl_Upgrade_Reduce_Falloff"] = data =>
                 new ClUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ChainLightningAbility.Parameters.DamageFalloff,
+                    ChainLightning.ChainLightning.Parameters.DamageFalloff,
                     -data.UpgradeProperties.GetValueOrDefault("amount", 0.10f)),
             ["Ability_Cl_Upgrade_Ignore_Resistances"] = data =>
-                new DelegateUpgrade<ChainLightningAbility>(
+                new DelegateUpgrade<ChainLightning.ChainLightning>(
                     data.Id,
                     data.Tags,
                     data.Tier,
@@ -319,21 +313,21 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    IceAegisAbility.Parameters.BarrierBase,
+                    IceAegis.IceAegis.Parameters.BarrierBase,
                     data.UpgradeProperties.GetValueOrDefault("amount", 300f)),
             ["Ability_Ia_Upgrade_Additional_Scale"] = data =>
                 new IaUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    IceAegisAbility.Parameters.PerIntelligenceScale,
+                    IceAegis.IceAegis.Parameters.PerIntelligenceScale,
                     data.UpgradeProperties.GetValueOrDefault("amount", 5f)),
             ["Ability_Ia_Upgrade_Additional_Duration"] = data =>
                 new IaUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    IceAegisAbility.Parameters.Duration,
+                    IceAegis.IceAegis.Parameters.Duration,
                     data.UpgradeProperties.GetValueOrDefault("amount", 1f)),
             ["Ability_Arm_Upgrade_Reduce_Cost"] = data =>
                 new AbilityUpgradeReduceCost(
@@ -352,14 +346,14 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ArmageddonAbility.Parameters.StunDuration,
+                    Armageddon.Armageddon.Parameters.StunDuration,
                     data.UpgradeProperties.GetValueOrDefault("duration", 1)),
             ["Ability_Arm_Upgrade_Reduce_Hp_Cost"] = data =>
                 new ArmUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ArmageddonAbility.Parameters.HpCostMultiplier,
+                    Armageddon.Armageddon.Parameters.HpCostMultiplier,
                     -data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Ability_Arm_Upgrade_Stage1_Damage"] = data =>
                 new ArmUpgradeStage1Override(
@@ -382,7 +376,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ArmageddonAbility.Parameters.MissingHpRate,
+                    Armageddon.Armageddon.Parameters.MissingHpRate,
                     data.UpgradeProperties.GetValueOrDefault("rate", 1f)),
             ["Ability_Arm_Upgrade_Shatter_Armor"] = data =>
                 new AbilityUpgradeImpactRider(
@@ -411,42 +405,42 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    PorcupineAbility.Parameters.CooldownReduceChance,
+                    Porcupine.Porcupine.Parameters.CooldownReduceChance,
                     data.UpgradeProperties.GetValueOrDefault("chance", 0.15f)),
             ["Ability_Porc_Upgrade_Armor_Buff"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => new ArmorBuffEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                    ability => new ArmorBuffEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.25f))),
             ["Ability_Porc_Upgrade_Heal_On_Hit"] = data =>
                 new PorcUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    PorcupineAbility.Parameters.HealOnHit,
+                    Porcupine.Porcupine.Parameters.HealOnHit,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.07f)),
             ["Ability_Porc_Upgrade_More_Armor_Return"] = data =>
                 new PorcUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    PorcupineAbility.Parameters.ArmorReturn,
+                    Porcupine.Porcupine.Parameters.ArmorReturn,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Ability_Porc_Upgrade_More_Damage_Return"] = data =>
                 new PorcUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    PorcupineAbility.Parameters.DamageReturn,
+                    Porcupine.Porcupine.Parameters.DamageReturn,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.20f)),
             ["Ability_Porc_Upgrade_Echo"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => new TemporarySkillEffect("Effect_Echo", ((PorcupineAbility)ability).Duration,
+                    ability => new TemporarySkillEffect("Effect_Echo", ((Porcupine.Porcupine)ability).Duration,
                         new EchoPassiveSkill(
                             data.UpgradeProperties.GetValueOrDefault("delayedPercent", 0.3f),
                             (int)data.UpgradeProperties.GetValueOrDefault("turns", 2)))),
@@ -455,21 +449,21 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => new IncomingDamageReductionEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                    ability => new IncomingDamageReductionEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("reduce", 0.25f))),
             ["Ability_Porc_Upgrade_Crit_Mitigation"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => new EnhanceDefenseEffect(((PorcupineAbility)ability).Duration, maxStacks: 1,
+                    ability => new EnhanceDefenseEffect(((Porcupine.Porcupine)ability).Duration, maxStacks: 1,
                         data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
             ["Ability_Sac_Upgrade_Additional_Charge"] = data =>
                 new SacUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    SacrificeAbility.Parameters.Charges,
+                    Sacrifice.Sacrifice.Parameters.Charges,
                     data.UpgradeProperties.GetValueOrDefault("amount", 1)),
             ["Ability_Sac_Upgrade_Reduce_Cooldown"] = data =>
                 new AbilityUpgradeReduceCooldown(
@@ -488,14 +482,14 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    SacrificeAbility.Parameters.RatePerHundred,
+                    Sacrifice.Sacrifice.Parameters.RatePerHundred,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.015f)),
             ["Ability_Sac_Upgrade_More_Sacrifice"] = data =>
                 new SacUpgradeParameter(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    SacrificeAbility.Parameters.SacrificePercent,
+                    Sacrifice.Sacrifice.Parameters.SacrificePercent,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.10f)),
             ["Ability_Sac_Upgrade_Cost_Type_Health"] = data =>
                 new AbilityUpgradeCostTypeOverride(
@@ -508,7 +502,7 @@
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    SacrificeAbility.Parameters.HealPercent,
+                    Sacrifice.Sacrifice.Parameters.HealPercent,
                     data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
             ["Ability_Sac_Upgrade_Incoming_Reduction"] = data =>
                 new AbilityUpgradeCastEffect(

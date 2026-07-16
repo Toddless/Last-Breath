@@ -1,4 +1,4 @@
-namespace Core.Entity.Components.NpcModifiers
+namespace Core.Entity.NpcModifiers
 {
     public interface IChangeableChances
     {

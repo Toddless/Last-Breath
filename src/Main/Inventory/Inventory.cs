@@ -108,8 +108,7 @@
         {
             if (amount <= 0) return false;
 
-            if (!_itemInstances.ContainsKey(item.InstanceId))
-                _itemInstances[item.InstanceId] = item;
+            _itemInstances.TryAdd(item.InstanceId, item);
 
             FitItemsInSlots(item.Id, item.InstanceId, amount, item.MaxStackSize);
 

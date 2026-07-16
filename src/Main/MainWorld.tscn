@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
 [ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="8_kwijy"]
+[ext_resource type="PackedScene" uid="uid://uxtq76ecjvm2" path="res://Npc/Necro.tscn" id="9_hv00y"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
 radius = 100.0
@@ -89,3 +90,6 @@ _npcIds = PackedStringArray("Npc_Cursed_Sorcerer")
 _maxCount = 1
 _pointId = "Spawn_Point_Sorcerer"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Assasin" parent="." unique_id=696234298 instance=ExtResource("9_hv00y")]
+position = Vector2(1094, 389)
