@@ -49,8 +49,30 @@ msgid "Amulet_Creators_Nature"
 msgstr "Creator`s Nature"
 
 # -----------------------
-# Crafting Resources
+# Fractions
 # -----------------------
+
+msgid "Human"
+msgstr "Human"
+
+msgid "Elf"
+msgstr "Elf"
+
+msgid "Dwarf"
+msgstr "Dwarf"
+
+msgid "Undean"
+msgstr "Undead"
+
+msgid "Animal"
+msgstr "Animal"
+
+msgid "MysticalCreature"
+msgstr "Mystical Creature"
+
+msgid "Demon"
+msgstr "Demon"
+
 
 # Upgrades
 # ----------------------
@@ -2440,3 +2462,128 @@ msgstr "Call of the Bone Pack"
 
 msgid "Ability_Summon_Bone_Wolves_Description"
 msgstr "Calls bone wolves to the summoner's side, keeping the pack at {WolvesPerCast}. Each wolf inherits {StatShare:%} of the summoner's current stats."
+
+# -----------------------
+# Loot on the ground
+# -----------------------
+
+msgid "Loot_Inventory_Full"
+msgstr "Inventory is full!"
+
+msgid "Rarity_Common"
+msgstr "Common"
+
+msgid "Rarity_Uncommon"
+msgstr "Uncommon"
+
+msgid "Rarity_Rare"
+msgstr "Rare"
+
+msgid "Rarity_Epic"
+msgstr "Epic"
+
+msgid "Rarity_Legendary"
+msgstr "Legendary"
+
+msgid "Rarity_Mythic"
+msgstr "Mythic"
+
+msgid "Rarity_Unique"
+msgstr "Unique"
+
+# -----------------------
+# Npc Modifiers
+# -----------------------
+
+msgid "Npc_Modifier_Scale_Double_Health"
+msgstr "Giant"
+
+msgid "Npc_Modifier_Scale_Double_Damage"
+msgstr "Berserk"
+
+msgid "Npc_Modifier_Scale_Double_Defence"
+msgstr "Unbreakable"
+
+msgid "Npc_Modifier_Scale_Double_Health_Recovery"
+msgstr "Regenerating"
+
+msgid "Npc_Modifier_Tier_Upgrade_To_Maximum"
+msgstr "Royal"
+
+msgid "Npc_Modifier_Tier_Upgrade_By_Two"
+msgstr "Wealthy"
+
+msgid "Npc_Modifier_Tier_Upgrade_By_One"
+msgstr "Prosperous"
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Resource"
+msgstr "Breadwinner"
+
+msgid "Npc_Modifier_Guaranteed_Items_Crafting_Upgrade"
+msgstr "Craftsman"
+
+msgid "Npc_Modifier_Guaranteed_Items_Equip"
+msgstr "The Soul Collector"
+
+msgid "Npc_Modifier_Guaranteed_Items_Essence"
+msgstr "Goblin"
+
+msgid "Npc_Modifier_Tier_Multiplier_Huge"
+msgstr "Fortune's Smile"
+
+msgid "Npc_Modifier_Tier_Multiplier_Big"
+msgstr "Impressive"
+
+msgid "Npc_Modifier_Tier_Multiplier_Mid"
+msgstr "The Gift"
+
+msgid "Npc_Modifier_Tier_Multiplier_Small"
+msgstr "Minor"
+
+msgid "Npc_Modifier_Item_Effect_Execution"
+msgstr "Executioner"
+
+msgid "Npc_Modifier_Item_Effect_Vampire"
+msgstr "Vampire"
+
+msgid "Npc_Modifier_Item_Effect_Poisoned_Claw"
+msgstr "Poisoned"
+
+msgid "Npc_Modifier_Item_Effect_Burning"
+msgstr "Burning"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Huge"
+msgstr "Precious"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Big"
+msgstr "A Storyteller for the Ages"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Mid"
+msgstr "Who Found the Curiosity"
+
+msgid "Npc_Modifier_Rarity_Upgrade_Small"
+msgstr "A Little Miracle"
+
+msgid "Npc_Modifier_Min_Rarity_Legend"
+msgstr "Who Saw the Legend"
+
+msgid "Npc_Modifier_Min_Rarity_Epic"
+msgstr "A Witness to Greatness"
+
+msgid "Npc_Modifier_Min_Rarity_Rare"
+msgstr "One Who Touched the Secret"
+
+
+msgid ""
+msgstr ""
+
+
+msgid ""
+msgstr ""
+
+
+msgid "Effect_Stage_Guard"
+msgstr "Stage Guard"
+
+msgid "Effect_Stage_Guard_Description"
+msgstr "A pending transformation shields this creature from lethal blows: damage cannot push it below the transition threshold."

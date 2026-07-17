@@ -130,6 +130,16 @@
             _battleEventBus.Subscribe<AbilityActivationEvent>(OnAbilityActivation);
             _battleEventBus.Subscribe<PlayerEndTurnRequestedEvent>(OnPlayerEndTurnRequested);
             _battleEventBus.Subscribe<PlayerFleeAttemptEvent>(OnPlayerFleeAttempt);
+            _battleEventBus.Subscribe<BossStageTransitionStartedEvent>(OnBossStageTransitionStarted);
+        }
+
+        /// <summary>A boss armed its stage transition: the current turn force-ends after the running
+        /// action (design). The player's pending input resolves to "no attack"; a mid-resolve action
+        /// is never torn — the boss's immunity already nullifies its tail. NPC turns end on their own.</summary>
+        private void OnBossStageTransitionStarted(BossStageTransitionStartedEvent evnt)
+        {
+            if (_currentFighter is not IPlayer) return;
+            _playerTargetTcs?.TrySetResult(null);
         }
 
 

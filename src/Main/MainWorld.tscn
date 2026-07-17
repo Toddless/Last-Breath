@@ -1,13 +1,14 @@
 [gd_scene format=3 uid="uid://geser04o26s5"]
 
 [ext_resource type="Script" uid="uid://ceaqsxdscqa37" path="res://MainWorld.cs" id="1_4xxmu"]
+[ext_resource type="Script" uid="uid://by0f8rrg2jn6v" path="res://Npc/NpcWorldDirector.cs" id="2_1etib"]
 [ext_resource type="PackedScene" uid="uid://bybo1ydp4jt0i" path="res://Player/Player.tscn" id="2_x0tsy"]
-[ext_resource type="Script" uid="uid://b6tdsalfvh1ay" path="res://World/NpcWorldDirector.cs" id="5_ngold"]
 [ext_resource type="Script" uid="uid://o4isflqmdcvu" path="res://World/SaveDirector.cs" id="6_x4wt1"]
 [ext_resource type="Script" uid="uid://bvkmjwos0jl80" path="res://World/DayNightTint.cs" id="7_y0rla"]
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
 [ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="8_kwijy"]
+[ext_resource type="Script" uid="uid://cpwjet55i0mhp" path="res://World/BossSpawnPoint.cs" id="9_hv00y"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
 radius = 100.0
@@ -26,12 +27,14 @@ gradient = SubResource("Gradient_1etib")
 width = 25
 height = 25
 
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5f5v3"]
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
-[node name="NpcWorldDirector" type="Node" parent="." unique_id=1348952950]
-script = ExtResource("5_ngold")
-metadata/_custom_type_script = "uid://b6tdsalfvh1ay"
+[node name="NpcWorldDirector" type="Node" parent="." unique_id=1033587405]
+script = ExtResource("2_1etib")
+metadata/_custom_type_script = "uid://by0f8rrg2jn6v"
 
 [node name="SaveDirector" type="Node" parent="." unique_id=1422095378]
 script = ExtResource("6_x4wt1")
@@ -85,6 +88,18 @@ position = Vector2(333, 709)
 [node name="Sorcerer" type="Node2D" parent="." unique_id=414808614]
 position = Vector2(1700, 849)
 script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Cursed_Sorcerer")
 _maxCount = 1
 _pointId = "Spawn_Point_Sorcerer"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="BossSpawnPoint" type="Node2D" parent="." unique_id=1901987037]
+position = Vector2(783, -527)
+script = ExtResource("9_hv00y")
+_bossId = "Npc_Boss_Rat_King"
+_factionDeathsPerRespawn = 0
+_pointId = "Boss_Rat_King"
+metadata/_custom_type_script = "uid://cpwjet55i0mhp"
+
+[node name="Sprite2D" type="Sprite2D" parent="BossSpawnPoint" unique_id=1489057577]
+texture = SubResource("NoiseTexture2D_5f5v3")

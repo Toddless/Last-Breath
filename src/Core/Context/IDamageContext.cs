@@ -35,6 +35,9 @@ namespace Core.Context
         /// <summary>Damage eaten by an <see cref="Battle.Abilities.IShieldEffect"/> layer (before the barrier).</summary>
         float AbsorbedByShield { get; set; }
 
+        /// <summary>Overkill prevented by a staged boss's transition floor (anti-oneshot).</summary>
+        float PreventedByStageGuard { get; set; }
+
         void Add(DamageType type, float amount);
         void Convert(DamageType from, DamageType to, float fraction);
         void Set(DamageType type, float amount);

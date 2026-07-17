@@ -73,12 +73,6 @@
             inventory.TryAddItem(itemCreation.CreateItem("Belt_of_Strength", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
             var resources = _provider.GetService<IItemDataProvider>().GetAllResources();
             foreach (IItem item in resources.ToList())
                 inventory.TryAddItem(item.Copy<IItem>(), 999);

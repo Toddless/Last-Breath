@@ -33,6 +33,7 @@ namespace Core.Ai.World.Skirmish
 
         public event Action<SkirmishRound>? RoundResolved;
         public event Action<NpcSkirmish>? Completed;
+        public event Action<NpcSkirmish>? Aborted;
 
         public NpcSkirmish(IReadOnlyList<ISkirmishParticipant> sideA, IReadOnlyList<ISkirmishParticipant> sideB,
             IRandomNumberGenerator rnd, SkirmishConfig? config = null)
@@ -49,6 +50,13 @@ namespace Core.Ai.World.Skirmish
         public void Tick(float delta)
         {
             if (IsCompleted) return;
+            // A participant dead mid-skirmish means outside interference (skirmish rules never
+            // kill before completion) — the fight is void, no outcome may be applied.
+            if (AnyParticipantDead())
+            {
+                Abort();
+                return;
+            }
 
             _nextRollIn -= delta;
             if (_nextRollIn > 0) return;
@@ -56,6 +64,15 @@ namespace Core.Ai.World.Skirmish
             ResolveRound();
             if (_roundsPlayed >= _config.Rounds) Complete();
             else ScheduleNextRoll();
+        }
+
+        /// <summary>Voids the skirmish without an outcome: Winners/Losers stay empty, only
+        /// <see cref="Aborted"/> fires. The owning service unfreezes the survivors.</summary>
+        public void Abort()
+        {
+            if (IsCompleted) return;
+            IsCompleted = true;
+            Aborted?.Invoke(this);
         }
 
         private void ResolveRound()
@@ -88,5 +105,14 @@ namespace Core.Ai.World.Skirmish
 
         private void ScheduleNextRoll() =>
             _nextRollIn = _rnd.RandFloatRange(_config.MinRollIntervalSeconds, _config.MaxRollIntervalSeconds);
+
+        private bool AnyParticipantDead()
+        {
+            foreach (var participant in SideA)
+                if (!participant.IsAlive) return true;
+            foreach (var participant in SideB)
+                if (!participant.IsAlive) return true;
+            return false;
+        }
     }
 }

@@ -47,6 +47,7 @@ namespace Battle.Internal.Npc
         private const float PostBattleContactGraceSeconds = 3f;
 
         private const string UndeadRisingModifierSource = "UndeadRising";
+        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
@@ -529,17 +530,6 @@ namespace Battle.Internal.Npc
             return Task.CompletedTask;
         }
 
-        /// <summary>Shield layer eats post-mitigation damage BEFORE the barrier (Боссы.md → Щит).</summary>
-        private float AbsorbByShield(IDamageContext context, float remaining)
-        {
-            if (remaining <= 0) return remaining;
-            var shield = Effects.GetBy(e => e is Core.Battle.Abilities.IShieldEffect).OfType<Core.Battle.Abilities.IShieldEffect>().FirstOrDefault();
-            if (shield == null) return remaining;
-            float leftover = shield.Absorb(remaining);
-            context.AbsorbedByShield = remaining - leftover;
-            return leftover;
-        }
-
         public Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
@@ -547,14 +537,8 @@ namespace Battle.Internal.Npc
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = AbsorbByShield(context, context.TotalDamage);
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
+            // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
+            float remaining = _damageChain.Apply(context, this, context.TotalDamage);
 
             // The damage event must precede the death event in the timeline: the director drops
             // "posthumous" beats, so a death recorded first swallowed its own killing hit
@@ -658,7 +642,23 @@ namespace Battle.Internal.Npc
             return true;
         }
 
-        public void Kill() => NotifyShouldDie();
+        /// <summary>An execute on a staged boss with a pending transition converts into the
+        /// transition instead of a death: the lethal blow routes through TakeDamage, where the
+        /// stage-guard floor clamps it to the threshold (design: the floor guards executes too).
+        /// Source = self keeps the Kill() "nobody's fault" reputation semantics.</summary>
+        public void Kill()
+        {
+            bool guarded = IsAlive && Effects.GetBy(e => e is Core.Battle.Abilities.IStageGuardEffect).Any();
+            if (!guarded)
+            {
+                NotifyShouldDie();
+                return;
+            }
+
+            var lethal = new DamageContext { Source = this, Cause = DamageCause.Ability };
+            lethal.Add(DamageType.Pure, CurrentHealth);
+            _ = TakeDamage(lethal);
+        }
 
         public IFightable ChoseTarget(List<IFightable> targets)
         {
@@ -680,8 +680,12 @@ namespace Battle.Internal.Npc
                 List<IFightable> fighters = [];
                 if (Group != null)
                 {
+                    // Only free, living squadmates join: a member frozen in an NPC skirmish must not
+                    // fight in two battles at once (tracker #62). Filter BEFORE the Attacked
+                    // notification — it raises IsFighting on the whole group.
+                    fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
+                        .Where(member => member.IsAlive && !member.IsFighting));
                     Group.NotifyAllInGroup(GroupNotification.Attacked);
-                    fighters.AddRange(Group.GetEntitiesInGroup<IFightable>());
                 }
                 else
                     fighters.Add(this);

@@ -54,6 +54,7 @@ namespace Battle.Internal.Player
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
+        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private float _baseSpeed = 500;
@@ -97,6 +98,7 @@ namespace Battle.Internal.Player
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
+        public Fractions Fractions { get; } = Fractions.Human;
         public string PlayerName { get; private set; } = string.Empty;
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
@@ -338,17 +340,6 @@ namespace Battle.Internal.Player
             return Task.CompletedTask;
         }
 
-        /// <summary>Shield layer eats post-mitigation damage BEFORE the barrier (Боссы.md → Щит).</summary>
-        private float AbsorbByShield(IDamageContext context, float remaining)
-        {
-            if (remaining <= 0) return remaining;
-            var shield = Effects.GetBy(e => e is Core.Battle.Abilities.IShieldEffect).OfType<Core.Battle.Abilities.IShieldEffect>().FirstOrDefault();
-            if (shield == null) return remaining;
-            float leftover = shield.Absorb(remaining);
-            context.AbsorbedByShield = remaining - leftover;
-            return leftover;
-        }
-
         public Task TakeDamage(IDamageContext context)
         {
             // Apply modifiers like "Reduce all damage taken"
@@ -359,14 +350,8 @@ namespace Battle.Internal.Player
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = AbsorbByShield(context, context.TotalDamage);
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
+            // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
+            float remaining = _damageChain.Apply(context, this, context.TotalDamage);
 
             // The damage event must precede the death event in the timeline: the director drops
             // "posthumous" beats, so a death recorded first swallowed its own killing hit

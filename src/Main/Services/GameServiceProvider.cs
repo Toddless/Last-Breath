@@ -73,7 +73,7 @@ namespace LastBreath.Services
             services.AddGameDataParticipant<IWorldClock, GameWorldClock>();
             services.AddGameDataParticipant<IPlayerLifecycleConfigProvider, PlayerLifecycleConfigProvider>();
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
-            services.AddSingleton<Npc.INpcSkirmishService, NpcSkirmishService>();
+            services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
             services.AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>();
             services.AddSingleton<IRaidSpawnRegistry, RaidSpawnRegistry>();
             services.AddGameDataParticipant<IRaidService, RaidService>();

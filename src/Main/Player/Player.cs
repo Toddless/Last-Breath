@@ -54,6 +54,7 @@ namespace LastBreath.Player
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
+        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         private float _baseSpeed = 500;
@@ -100,7 +101,11 @@ namespace LastBreath.Player
         public IEntityGroup? Group { get; set; }
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; } = true;
-        public string PlayerName { get; private set; } = string.Empty;
+
+        public Fractions Fractions { get; } = Fractions.Human;
+
+        // why not x)
+        public string PlayerName { get; private set; } = "Toddless";
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
         private bool _suppressDeathNotify;
@@ -368,14 +373,8 @@ namespace LastBreath.Player
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.TotalDamage;
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
+            // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
+            float remaining = _damageChain.Apply(context, this, context.TotalDamage);
 
             // The damage event must precede the death event in the timeline: the director drops
             // "posthumous" beats, so a death recorded first swallowed its own killing hit
@@ -611,10 +610,11 @@ namespace LastBreath.Player
 
         private static float GetUnarmedBaseValue(EntityParameter parameter) => parameter switch
         {
-            EntityParameter.Health or EntityParameter.Barrier => 10000,
-            EntityParameter.Mana => 5000,
-            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 50f,
-            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 5000,
+            EntityParameter.Health => 1000,
+            EntityParameter.Barrier => 100,
+            EntityParameter.Mana => 500,
+            EntityParameter.Intelligence or EntityParameter.Strength or EntityParameter.Dexterity => 5f,
+            EntityParameter.Evade or EntityParameter.Armor or EntityParameter.Accuracy => 300,
             EntityParameter.CriticalChance => 0.05f,
             // A rare treat, not a machine gun: extra attacks chain (each one re-rolls), so a high
             // base made attack series balloon to 2-3x their planned length. Items/passives are
@@ -622,7 +622,8 @@ namespace LastBreath.Player
             EntityParameter.AdditionalHitChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 0f,
-            EntityParameter.Damage or EntityParameter.SpellDamage => 2000,
+            EntityParameter.Damage => 100,
+            EntityParameter.SpellDamage => 50,
             _ => 0f
         };
 

@@ -23,6 +23,7 @@
         public string? CastId { get; set; }
         public float AbsorbedByBarrier { get; set; }
         public float AbsorbedByShield { get; set; }
+        public float PreventedByStageGuard { get; set; }
 
         public void Add(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
 

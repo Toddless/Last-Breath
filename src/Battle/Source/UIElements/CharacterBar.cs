@@ -112,9 +112,10 @@ namespace Battle.Source.UIElements
 
             foreach (var modifier in modifiers)
             {
-                string text = string.IsNullOrEmpty(modifier.Description)
-                    ? modifier.DisplayName
-                    : $"{modifier.DisplayName} · {modifier.Description}";
+                string text = modifier.DisplayName;
+                // string text = string.IsNullOrEmpty(modifier.Description)
+                //     ? modifier.DisplayName
+                //     : $"{modifier.DisplayName} · {modifier.Description}";
                 _mods.AddChild(new Label
                 {
                     Text = text,

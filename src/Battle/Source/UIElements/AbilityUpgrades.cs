@@ -13,6 +13,8 @@ namespace Battle.Source.UIElements
     public partial class AbilityUpgrades : Control
     {
         private const string UID = "uid://cfjcrk0kkryi8";
+        private const int TierCount = 3; // mirrors the three exported tier containers
+
         [Export] private BoxContainer? _tierOne, _tierTwo, _tierThree;
 
         public event Action<string, int>? AbilityUpgradeSelected;
@@ -26,8 +28,11 @@ namespace Battle.Source.UIElements
 
         public void SetOptions(IReadOnlyList<UpgradeOptionView> options)
         {
-            foreach (var tier in options.GroupBy(option => option.Tier))
-                SetTier(tier.Key, tier.ToList());
+            // Every tier renders, even an empty one: the window instance is reused between
+            // abilities (OpenWindow returns the open one), so a skipped tier would keep the
+            // previous ability's variants on screen (tracker #64).
+            for (int tier = 1; tier <= TierCount; tier++)
+                SetTier(tier, options.Where(option => option.Tier == tier).ToList());
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -35,10 +40,21 @@ namespace Battle.Source.UIElements
         private void SetTier(int tier, List<UpgradeOptionView> options)
         {
             var buttons = GetButtonsInTier(tier);
-            for (int i = 0; i < buttons.Length && i < options.Count; i++)
+            for (int i = 0; i < buttons.Length; i++)
             {
                 var button = buttons[i];
+                if (i >= options.Count)
+                {
+                    // A button without an option hides: stale text stays invisible and a click
+                    // can't send the previous ability's upgrade instance id.
+                    button.Visible = false;
+                    button.SetUpgradeTaken(false);
+                    button.SetUpgradeInstanceId(string.Empty);
+                    continue;
+                }
+
                 var option = options[i];
+                button.Visible = true;
                 button.Text = option.DisplayName;
                 button.SetUpgradeTaken(option.Selected);
                 button.SetUpgradeTier(tier);

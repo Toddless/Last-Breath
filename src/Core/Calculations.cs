@@ -18,9 +18,6 @@
         private const float EvasionScalingFactor = 10000f;
         private const float ArmorScalingFactor = 10000f;
 
-        /// <summary>Hard cap for elemental resistances: damage of a resisted type cannot be reduced by more than this fraction.</summary>
-        private const float MaxResistance = 0.8f;
-
         private static readonly Dictionary<DamageType, EntityParameter> s_resistanceByType = new()
         {
             [DamageType.Fire] = EntityParameter.FireResistance,
@@ -39,8 +36,8 @@
             context.FinalDamage = context.BaseDamage + context.AdditionalDamage;
             if (context is { IsCritical: false, ForceCriticalAttack: false }) return;
 
-            // Mitigation is 0 for most targets -> factor is 1 (no-op). Clamped so over-stacking can't invert damage.
-            float critMitigation = Mathf.Clamp(context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation), 0f, 1f);
+            // Mitigation is 0 for most targets -> factor is 1 (no-op). Bounds (0..1) live in EntityParametersComponent.
+            float critMitigation = context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation);
             context.FinalDamage *= context.RawCriticalDamage * (1 - critMitigation);
         }
 
@@ -69,7 +66,8 @@
 
         private static float ApplyResistance(float damage, IFightable target, EntityParameter resistance)
         {
-            float resist = Mathf.Clamp(target.Parameters.GetValueForParameter(resistance), 0f, MaxResistance);
+            // The 0..0.8 resistance cap lives in EntityParametersComponent's bounds table.
+            float resist = target.Parameters.GetValueForParameter(resistance);
             return damage * (1 - resist);
         }
 

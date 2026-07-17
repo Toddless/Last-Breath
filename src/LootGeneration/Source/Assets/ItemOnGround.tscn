@@ -74,7 +74,7 @@ scale_curve = SubResource("CurveTexture_txkrn")
 radius = 4.3806624
 height = 30.664637
 
-[node name="ItemOnGround" type="Node2D" unique_id=1353503778 node_paths=PackedStringArray("_interactionArea", "_lootIcon", "_itemBeam", "_lootParticle")]
+[node name="ItemOnGround" type="Node2D" unique_id=1353503778 node_paths=PackedStringArray("_interactionArea", "_lootIcon", "_glowSprite", "_itemBeam", "_lootParticle")]
 script = ExtResource("5_gwjaa")
 _interactionArea = NodePath("Area2D")
 _colors = Dictionary[int, Color]({
@@ -87,6 +87,7 @@ _colors = Dictionary[int, Color]({
 11: Color(0.92156863, 0, 0, 1)
 })
 _lootIcon = NodePath("Sprite2D")
+_glowSprite = NodePath("Sprite2D2")
 _itemBeam = NodePath("MeshInstance2D")
 _lootParticle = NodePath("GPUParticles2D")
 

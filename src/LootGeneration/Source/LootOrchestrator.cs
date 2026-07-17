@@ -15,17 +15,20 @@ namespace LootGeneration.Source
 
     /// <summary>
     /// Battle spoils: deaths DURING a player battle generate items, a won battle spills them on
-    /// the floor, a click within reach picks them up. Deaths outside a battle (skirmishes,
-    /// lifecycle) and during a save load produce nothing. IInventory/ILoadScope resolve lazily —
-    /// the standalone LootGeneration sandbox doesn't register them.
+    /// the floor, a click within reach picks them up (resources/recipes come as a whole category,
+    /// equipment piece by piece). Deaths outside a battle (skirmishes, lifecycle) and during a
+    /// save load produce nothing. IInventory/ILoadScope resolve lazily — the standalone
+    /// LootGeneration sandbox doesn't register them.
     /// </summary>
     public class LootOrchestrator : ILootOrchestrator
     {
         private const float PickupRange = 350f;
 
         private readonly ILootGenerationService _lootGenerationService;
+        private readonly IGameEventBus _gameEventBus;
         private readonly IGameServiceProvider _provider;
         private readonly List<ItemOnGround> _itemOnGroundsCache = [];
+        private readonly List<ItemOnGround> _itemsOnGround = [];
         private readonly RandomNumberGenerator _rnd;
         private Vector2 _startPosition = new(850f, 450f);
         private float _animationDurationScale = 1f;
@@ -36,13 +39,38 @@ namespace LootGeneration.Source
         {
             _rnd = rnd;
             _lootGenerationService = lootGenerationService;
+            _gameEventBus = gameEventBus;
             _provider = provider;
             gameEventBus.Subscribe<EntityDiedEvent>(OnEntityDied);
             gameEventBus.Subscribe<BattleInitializedEvent>(OnBattleStart);
             gameEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
+        public IReadOnlyList<ItemOnGround> ItemsOnGround => _itemsOnGround;
+
         public void SetFloorToSpawnItems(Node2D? floor) => _floor = floor;
+
+        public bool TryPickup(ItemOnGround item, IInventory inventory)
+        {
+            if (item.Item == null || !inventory.TryAddItem(item.Item, item.Quantity)) return false;
+
+            _itemsOnGround.Remove(item);
+            _gameEventBus.Publish(new ItemPickedUpEvent(item.Item, item.Quantity));
+            _ = ConfirmPickupSafeAsync(item);
+            return true;
+        }
+
+        private static async System.Threading.Tasks.Task ConfirmPickupSafeAsync(ItemOnGround item)
+        {
+            try
+            {
+                await item.ConfirmPickupAsync();
+            }
+            catch (Exception exception)
+            {
+                GD.Print($"{exception.Message}. {exception.StackTrace}");
+            }
+        }
 
         private async void OnBattleEnd(BattleEndEvent obj)
         {
@@ -58,6 +86,11 @@ namespace LootGeneration.Source
                 foreach (var item in _itemOnGroundsCache)
                 {
                     _floor?.AddChild(item);
+                    _itemsOnGround.Add(item);
+                    // A drop can leave the tree without going through TryPickup (scene change,
+                    // debug frees) — TreeExited keeps the pickable list honest either way.
+                    item.TreeExited += () => _itemsOnGround.Remove(item);
+                    _gameEventBus.Publish(new ItemDroppedEvent(item));
                     await item.AnimateAsync();
                 }
                 _itemOnGroundsCache.Clear();
@@ -130,8 +163,22 @@ namespace LootGeneration.Source
                 return;
             }
 
-            if (!inventory.TryAddItem(itemOnGround.Item, itemOnGround.Quantity)) return;
-            itemOnGround.QueueFree();
+            foreach (var target in GetPickupBatch(itemOnGround))
+            {
+                if (TryPickup(target, inventory)) continue;
+                target.NotifyInventoryFull();
+                break;
+            }
+        }
+
+        /// <summary>Resources and recipes come off the floor as a whole category; equipment only the clicked piece.</summary>
+        private List<ItemOnGround> GetPickupBatch(ItemOnGround clicked)
+        {
+            if (clicked.Category is not (LootCategory.Resource or LootCategory.Recipe)) return [clicked];
+
+            var batch = new List<ItemOnGround> { clicked };
+            batch.AddRange(_itemsOnGround.Where(item => item != clicked && item.Category == clicked.Category));
+            return batch;
         }
 
         private bool PlayerInReach(Node2D item) =>

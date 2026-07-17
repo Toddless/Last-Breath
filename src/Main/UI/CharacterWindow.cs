@@ -79,9 +79,6 @@ namespace LastBreath.UI
             foreach (var child in _stats.GetChildren())
                 child.QueueFree();
 
-            // TODO:
-            // сейчас берем значение напрямую из GetValueForParameter. Значения однако закламплены только в одноименных свойствах
-            // решить позднее: А. Вводить параметры максимального значения. Б. Клампить как то иначе
             RenderVitals(player);
             foreach ((string titleKey, EntityParameter[] parameters) in s_sections)
             {

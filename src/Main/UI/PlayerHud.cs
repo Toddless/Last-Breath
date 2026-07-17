@@ -1,9 +1,11 @@
 ﻿namespace LastBreath.UI
 {
+    using Battle.Source.UIElements;
     using Core.Ai.World.Time;
     using Core.Data;
     using Core.Entity;
     using Core.Events;
+    using Core.Localization;
     using Core.Services;
     using Core.Views.UI;
     using Crafting.Source.UIElements;
@@ -21,10 +23,8 @@
         private const float ClockRefreshSeconds = 1f;
 
         [Export] private Button? _characterBtn, _inventoryBtn, _questsBtn, _craftingBtn;
-        [Export] private ProgressBar? _health, _mana, _barrier;
-        [Export] private Label? _healthText, _manaText, _barrierText, _clock;
-        [Export] private GridContainer? _playerEffects;
-
+        [Export] private Label? _clock;
+        [Export] private CharacterBar? _playerBar;
         private IUiElementsManager? _uiElements;
         private IGameEventBus? _events;
         private IPlayerAccessor? _playerAccessor;
@@ -82,6 +82,9 @@
             UnbindPlayer();
             _boundPlayer = player;
             player.Parameters.ParameterChanged += OnParameterChanged;
+            _playerBar?.SetInitialValues(_boundPlayer.CurrentMana, _boundPlayer.Parameters.MaxMana, _boundPlayer.CurrentHealth, _boundPlayer.Parameters.MaxHealth,
+                _boundPlayer.CurrentBarrier, _boundPlayer.Parameters.MaxBarrier);
+            _playerBar?.SetIdentity(player.PlayerName, Localization.Localize(player.Fractions.ToString()));
             RefreshVitals();
         }
 
@@ -101,20 +104,11 @@
         {
             if (_boundPlayer == null) return;
 
-            UpdateBar(_health, _healthText, _boundPlayer.CurrentHealth, _boundPlayer.Parameters.MaxHealth);
-            UpdateBar(_mana, _manaText, _boundPlayer.CurrentMana, _boundPlayer.Parameters.MaxMana);
-            UpdateBar(_barrier, _barrierText, _boundPlayer.CurrentBarrier, _boundPlayer.Parameters.MaxBarrier);
-        }
-
-        private static void UpdateBar(ProgressBar? bar, Label? text, float current, float max)
-        {
-            if (bar != null)
-            {
-                bar.MaxValue = Mathf.Max(max, 1f);
-                bar.Value = current;
-            }
-
-            text?.Text = $"{Mathf.CeilToInt(current)} / {Mathf.CeilToInt(max)}";
+            _playerBar?.UpdateHealth(_boundPlayer.CurrentHealth);
+            _playerBar?.UpdateMaxHealth(_boundPlayer.Parameters.MaxHealth);
+            _playerBar?.UpdateMana(_boundPlayer.CurrentMana);
+            _playerBar?.UpdateMaxMana(_boundPlayer.Parameters.MaxMana);
+            _playerBar?.UpdateBarrier(_boundPlayer.CurrentBarrier, _boundPlayer.Parameters.MaxBarrier);
         }
 
         private void RefreshClock()

@@ -54,6 +54,7 @@ namespace Battle.Source
             entry.DamageHandler = handler;
             npc.CombatEvents.Subscribe(handler);
             WireAttackEffects(entry);
+            ApplyStageGuard(entry);
             _entries.Add(entry);
         }
 
@@ -66,6 +67,8 @@ namespace Battle.Source
                 UnwireAttackEffects(entry);
                 // Rage lasts "until the end of the battle" by design — a surviving boss calms down.
                 if (entry.RageTriggered) entry.Owner.ParameterModifiers.RemoveModifierBySource(RageModifierSource);
+                // The floor is battle machinery, not a world state: a surviving boss must not carry it.
+                entry.Guard?.Remove();
             }
 
             _entries.Clear();
@@ -103,6 +106,8 @@ namespace Battle.Source
             var immunity = new DamageImmunityEffect();
             _ = immunity.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = owner.InstanceId });
             owner.CombatEvents.Publish(new BossStageTransitionStartedEvent(owner, entry.PendingStage.Value));
+            // Resolve-time signal for the arena: the current turn force-ends after the running action.
+            _battleEventBus?.Publish(new BossStageTransitionStartedEvent(owner, entry.PendingStage.Value));
         }
 
         private void ExecuteTransformation(Entry entry, int nextStage)
@@ -118,7 +123,22 @@ namespace Battle.Source
             owner.CurrentMana = owner.Parameters.MaxMana;
             owner.CurrentBarrier = owner.Parameters.MaxBarrier;
             WireAttackEffects(entry);
+            // The transformation stripped every effect; a next pending transition needs a fresh floor.
+            ApplyStageGuard(entry);
             owner.CombatEvents.Publish(new BossStageChangedEvent(owner, nextStage));
+        }
+
+        /// <summary>The anti-oneshot floor: while this stage has a transition ahead, damage cannot
+        /// push health below the threshold — a lethal hit lands the boss exactly on it.</summary>
+        private void ApplyStageGuard(Entry entry)
+        {
+            if (entry.CurrentStage.NextStageAtHealthPercent is not { } threshold) return;
+            if (entry.StageIndex + 1 >= entry.Owner.Stages.Count) return;
+
+            var owner = entry.Owner;
+            var guard = new StageGuardEffect(owner.Parameters.MaxHealth * threshold);
+            entry.Guard = guard;
+            _ = guard.Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = owner.InstanceId });
         }
 
         private void TryTriggerRage(Entry entry)
@@ -187,6 +207,7 @@ namespace Battle.Source
             public NpcStageConfig CurrentStage => Owner.Stages[StageIndex];
             public int? PendingStage { get; set; }
             public bool RageTriggered { get; set; }
+            public StageGuardEffect? Guard { get; set; }
             public Action<DamageTakenEvent>? DamageHandler { get; set; }
             public Action<AfterAttackEvent>? AttackHandler { get; set; }
         }

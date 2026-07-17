@@ -8,7 +8,7 @@ namespace Battle.Source
     public sealed record ArenaFormationSettings
     {
         /// <summary>Cluster anchor's distance from the arena center.</summary>
-        public float ClusterDistance { get; init; } = 600f;
+        public float ClusterDistance { get; init; } = 350;
 
         /// <summary>Depth step of a member rank: ranks recede AWAY from the center (0 / 1,2 / 3,4...).</summary>
         public float MemberDepthStep { get; init; } = 185f;

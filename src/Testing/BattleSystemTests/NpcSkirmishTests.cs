@@ -48,6 +48,44 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ExternalDeathAbortsWithoutApplyingAnOutcome()
+        {
+            var survivor = Fake();
+            var victim = Fake();
+            var skirmish = CreateSkirmish([survivor], [victim], out var rounds, out var completions);
+            var aborts = new List<NpcSkirmish>();
+            skirmish.Aborted += aborts.Add;
+
+            skirmish.Tick(1.5f); // one round resolves while everybody is alive
+            victim.DefeatInWorld(); // outside interference: e.g. killed in the player's battle
+            for (int i = 0; i < 5; i++) skirmish.Tick(1.5f);
+
+            Assert.AreEqual(1, rounds.Count); // no round after the death
+            Assert.AreEqual(1, aborts.Count);
+            Assert.AreEqual(0, completions.Count);
+            Assert.IsTrue(skirmish.IsCompleted);
+            Assert.AreEqual(0, skirmish.Winners.Count + skirmish.Losers.Count); // void: no outcome
+            Assert.IsFalse(survivor.Defeated); // the survivor was never declared a loser
+        }
+
+        [TestMethod]
+        public void AbortFiresOnceAndBlocksFurtherRounds()
+        {
+            var skirmish = CreateSkirmish([Fake()], [Fake()], out var rounds, out var completions);
+            var aborts = new List<NpcSkirmish>();
+            skirmish.Aborted += aborts.Add;
+
+            skirmish.Abort();
+            skirmish.Abort();
+            for (int i = 0; i < 5; i++) skirmish.Tick(2f);
+
+            Assert.AreEqual(1, aborts.Count);
+            Assert.AreEqual(0, rounds.Count);
+            Assert.AreEqual(0, completions.Count);
+            Assert.IsTrue(skirmish.IsCompleted);
+        }
+
+        [TestMethod]
         public void WinnersAreTheSideWithMoreRoundWins()
         {
             var sideA = new[] { Fake() };

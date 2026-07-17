@@ -1,4 +1,4 @@
-namespace Battle.Internal.Npc
+namespace LastBreath.World
 {
     using System;
     using Core.Ai.World.Spawn;
@@ -11,7 +11,7 @@ namespace Battle.Internal.Npc
     using Core.Save;
     using Core.Services;
     using Godot;
-    using GameServiceProvider = Services.GameServiceProvider;
+    using Npc;
 
     /// <summary>
     /// A boss's lair. Two categories (Боссы.md → Механика → Респавн боссов):
@@ -47,7 +47,7 @@ namespace Battle.Internal.Npc
 
         public override void _Ready()
         {
-            _gameServiceProvider = GameServiceProvider.Instance;
+            _gameServiceProvider = Core.Services.GameServiceProvider.Instance;
             _provider = _gameServiceProvider.GetService<INpcProvider>();
             _gameEventBus = _gameServiceProvider.GetService<IGameEventBus>();
             _population = _gameServiceProvider.GetService<INpcPopulationService>();

@@ -39,7 +39,6 @@ namespace Battle.Services
                 .AddSingleton<ReputationBroadcaster>()
                 .AddSingleton<IWitnessQuery, WorldWitnessQuery>()
                 .AddGameDataParticipant<IPersonalReputationService, PersonalReputationService>()
-                .AddGameDataParticipant<Core.Battle.ICombatRulesProvider, Source.CombatRules.CombatRulesProvider>()
                 // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
                 .AddSingleton<Core.Narrative.Facts.IWorldFactsService, Core.Narrative.Facts.WorldFactsService>()
                 .AddSingleton<Core.Narrative.Facts.NpcFinalDeathFactTracker>()

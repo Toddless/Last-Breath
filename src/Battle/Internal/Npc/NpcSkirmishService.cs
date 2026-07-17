@@ -7,6 +7,8 @@ namespace Battle.Internal.Npc
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Events;
+    using Core.Session;
+    using Godot;
 
     /// <summary>
     /// Owns the active skirmishes: expands both sides to their squads, freezes the participants
@@ -14,7 +16,7 @@ namespace Battle.Internal.Npc
     /// the game bus and applies the outcome — losers die into their body lifecycles, undead
     /// losers get burned by living winners with a chance.
     /// </summary>
-    internal class NpcSkirmishService(IGameEventBus gameEventBus, IFactionRelationService relations) : INpcSkirmishService
+    internal class NpcSkirmishService(IGameEventBus gameEventBus, IFactionRelationService relations) : INpcSkirmishService, ISessionResettable
     {
         private readonly List<NpcSkirmish> _active = [];
         private readonly IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator();
@@ -39,15 +41,31 @@ namespace Battle.Internal.Npc
             var skirmish = new NpcSkirmish(sideA, sideB, _rnd, _config);
             skirmish.RoundResolved += round => OnRoundResolved(skirmish, round);
             skirmish.Completed += OnCompleted;
+            skirmish.Aborted += OnAborted;
             _active.Add(skirmish);
             return true;
         }
 
         public void Tick(float delta)
         {
-            // Reverse loop: completed skirmishes remove themselves inside their Completed handler.
+            // Reverse loop: finished skirmishes remove themselves inside their Completed/Aborted handlers.
             for (int i = _active.Count - 1; i >= 0; i--)
-                _active[i].Tick(delta);
+            {
+                var skirmish = _active[i];
+                // A freed node (burned body, despawned raider, scene reload) is invisible to the
+                // pure logic — abort before the tick touches it (tracker #62).
+                if (HasFreedParticipant(skirmish)) skirmish.Abort();
+                else skirmish.Tick(delta);
+            }
+        }
+
+        /// <summary>New game / load reloads the scene and frees every NPC node: the singleton must
+        /// drop its ghosts, or a stale skirmish resolves against disposed nodes minutes later.</summary>
+        public void ResetSession()
+        {
+            foreach (var skirmish in _active.ToList())
+                skirmish.Abort();
+            _active.Clear();
         }
 
         private static bool CanFight(ISkirmishParticipant npc) => npc is { IsAlive: true, IsFighting: false };
@@ -99,6 +117,22 @@ namespace Battle.Internal.Npc
             // на текущий момент ноль подписок на данный эвент.
             gameEventBus.Publish(new NpcSkirmishEndedEvent(position, Ids(skirmish.Winners), Ids(skirmish.Losers)));
         }
+
+        /// <summary>Outside interference (a death or a freed node) voided the fight: no outcome,
+        /// the valid survivors just unfreeze so their world brains resume.</summary>
+        private void OnAborted(NpcSkirmish skirmish)
+        {
+            _active.Remove(skirmish);
+            foreach (var participant in skirmish.SideA.Concat(skirmish.SideB))
+                if (!IsFreedNode(participant))
+                    participant.IsFighting = false;
+        }
+
+        private static bool HasFreedParticipant(NpcSkirmish skirmish) =>
+            skirmish.SideA.Concat(skirmish.SideB).Any(IsFreedNode);
+
+        private static bool IsFreedNode(ISkirmishParticipant participant) =>
+            participant is GodotObject node && !GodotObject.IsInstanceValid(node);
 
         private static List<string> Ids(IReadOnlyList<ISkirmishParticipant> side) =>
             side.Select(participant => participant.InstanceId).ToList();

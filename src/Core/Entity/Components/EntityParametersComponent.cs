@@ -11,33 +11,49 @@
 
     public class EntityParametersComponent : IEntityParametersComponent
     {
+        /// <summary>Effective-value bounds — the single owner of every parameter cap. Applied in the
+        /// indexer, so ALL read channels (named properties, GetValueForParameter, ParameterChanged,
+        /// CalculateForBase previews) agree; decorators cannot push a value past its cap (tracker #42).</summary>
+        private static readonly Dictionary<EntityParameter, (float Min, float Max)> s_bounds = new()
+        {
+            [EntityParameter.BlockChance] = (0f, 0.9f),
+            [EntityParameter.CriticalChance] = (0f, 1f),
+            [EntityParameter.AdditionalHitChance] = (0f, 0.75f),
+            [EntityParameter.ArmorPenetration] = (0f, 1f),
+            [EntityParameter.Suppress] = (0f, 0.75f),
+            [EntityParameter.CriticalDamageMitigation] = (0f, 1f),
+            [EntityParameter.LightningResistance] = (0f, 0.8f),
+            [EntityParameter.FireResistance] = (0f, 0.8f),
+            [EntityParameter.ColdResistance] = (0f, 0.8f),
+        };
+
         private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));
         private readonly IModuleManager<EntityParameter, IParameterModule<EntityParameter>, EntityParameterModuleDecorator> _moduleManager;
-        private float this[EntityParameter type] => _moduleManager.GetModule(type).GetValue();
+        private float this[EntityParameter type] => ApplyBounds(type, _moduleManager.GetModule(type).GetValue());
         private Func<EntityParameter, IReadOnlyList<IModifier>>? _getModifiersForParameter;
 
         public float MaxHealth => this[EntityParameter.Health];
         public float HealthRecovery => this[EntityParameter.HealthRecovery];
         public float Damage => this[EntityParameter.Damage];
-        public float BlockChance => Mathf.Clamp(this[EntityParameter.BlockChance], 0f, 0.9f);
+        public float BlockChance => this[EntityParameter.BlockChance];
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
-        public float CriticalChance => Mathf.Clamp(this[EntityParameter.CriticalChance], 0f, 1f);
-        public float AdditionalHit => Mathf.Clamp(this[EntityParameter.AdditionalHitChance], 0f, 0.75f);
+        public float CriticalChance => this[EntityParameter.CriticalChance];
+        public float AdditionalHit => this[EntityParameter.AdditionalHitChance];
         public float MulticastChance => this[EntityParameter.MulticastChance];
         public float SpellDamage => this[EntityParameter.SpellDamage];
         public float Accuracy => this[EntityParameter.Accuracy];
         public float Armor => this[EntityParameter.Armor];
-        public float ArmorPenetration => Mathf.Clamp(this[EntityParameter.ArmorPenetration], 0f, 1f);
+        public float ArmorPenetration => this[EntityParameter.ArmorPenetration];
         public float Evade => this[EntityParameter.Evade];
         public float MaxBarrier => this[EntityParameter.Barrier];
-        public float Suppress => Mathf.Clamp(this[EntityParameter.Suppress], 0f, 0.75f);
+        public float Suppress => this[EntityParameter.Suppress];
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
-        public float CriticalDamageMitigation => Mathf.Clamp(this[EntityParameter.CriticalDamageMitigation], 0f, 1f);
-        public float LightningResistance => Mathf.Clamp(this[EntityParameter.LightningResistance], 0f, 0.8f);
-        public float FireResistance => Mathf.Clamp(this[EntityParameter.FireResistance], 0f, 0.8f);
-        public float ColdResistance => Mathf.Clamp(this[EntityParameter.ColdResistance], 0f, 0.8f);
+        public float CriticalDamageMitigation => this[EntityParameter.CriticalDamageMitigation];
+        public float LightningResistance => this[EntityParameter.LightningResistance];
+        public float FireResistance => this[EntityParameter.FireResistance];
+        public float ColdResistance => this[EntityParameter.ColdResistance];
 
         public event Action<EntityParameter, float>? ParameterChanged;
 
@@ -62,7 +78,7 @@
         {
             var modifiers = _getModifiersForParameter?.Invoke(parameter) ?? [];
             float value = Calculations.CalculateFloatValue(modifiers, baseValue);
-            return _moduleManager.GetModule(parameter).ApplyDecoratorsForValue(value);
+            return ApplyBounds(parameter, _moduleManager.GetModule(parameter).ApplyDecoratorsForValue(value));
         }
 
         public void SetBaseValueForParameter(EntityParameter parameter, float baseValue)
@@ -86,5 +102,8 @@
 
         private void RaiseParameterChanges(EntityParameter args) =>
             ParameterChanged?.Invoke(args, this[args]);
+
+        private static float ApplyBounds(EntityParameter parameter, float value) =>
+            s_bounds.TryGetValue(parameter, out (float Min, float Max) bounds) ? Mathf.Clamp(value, bounds.Min, bounds.Max) : value;
     }
 }

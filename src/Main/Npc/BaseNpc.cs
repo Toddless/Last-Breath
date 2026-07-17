@@ -49,40 +49,37 @@ namespace LastBreath.Npc
         private const float PostBattleContactGraceSeconds = 3f;
 
         private const string UndeadRisingModifierSource = "UndeadRising";
+        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
         private const string UID = "uid://ww6a71b2bbov";
-
-        private bool _hostileToPlayer;
-        private float _contactGraceSeconds;
-        private float _skirmishScanCooldown;
-        private float _corpseScanCooldown;
-        private float _moveSpeed;
-        private string _lastMoveAnimation = string.Empty;
-        private float _baseSpeed = 500;
-
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
+        private float _contactGraceSeconds;
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
         private IPlayerAccessor? _playerAccessor;
         private IFactionRelationService? _factionRelations;
         private IPersonalReputationService? _personalReputation;
+        private IFightable? _lastDamageSource;
         private INpcWorldRegistry? _npcRegistry;
         private INpcSkirmishService? _skirmishService;
         private IWorldClock? _worldClock;
         private IWorldBrain? _brain;
         private INpcLifecycle? _lifecycle;
+        private bool _hostileToPlayer;
+        private float _skirmishScanCooldown;
+        private float _corpseScanCooldown;
         private IReadOnlyList<Vector2>? _patrolRoute;
         private Vector2? _moveDestination;
-        private IFightable? _lastDamageSource;
+        private float _moveSpeed;
+        private string _lastMoveAnimation = string.Empty;
+
+        private float _baseSpeed = 500;
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
         [Export] public string Id { get; private set; } = "Npc_Bandit_Veteran";
-        [Export] public string[] Tags { get; private set; } = [];
-        public Rarity Rarity { get; private set; } = Rarity.Epic;
-        public EntityType EntityType { get; private set; } = EntityType.Regular;
-        [Export] public Fractions Fraction { get; private set; } = Fractions.Human;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+        [Export] public string[] Tags { get; private set; } = [];
         public Texture2D? Icon { get; } = null;
         public string Description => Localization.LocalizeDescription(Id);
         public string DisplayName => Localization.Localize(Id);
@@ -105,14 +102,34 @@ namespace LastBreath.Npc
         public StatusEffects StatusEffects { get; set; } = StatusEffects.None;
         public bool CanMove { get; set; }
         public int Level { get; private set; } = 150;
+        public Rarity Rarity { get; private set; } = Rarity.Epic;
+        public EntityType EntityType { get; private set; } = EntityType.Regular;
+        [Export] public Fractions Fraction { get; private set; } = Fractions.Human;
         public INpcModifiersComponent NpcModifiers { get; private set; }
         public IBehaviorProfile? Behavior { get; set; }
+
+        /// <summary>Combat reactions from the definition; the arena's reactions driver reads them.</summary>
+        public IReadOnlyList<NpcReactionConfig> Reactions { get; private set; } = [];
+
+        /// <summary>Boss stages from the definition; the arena's stages controller reads them.</summary>
+        public IReadOnlyList<NpcStageConfig> Stages { get; private set; } = [];
+
+        /// <summary>Index into <see cref="Stages"/> this NPC currently fights in.</summary>
+        public int CurrentStageIndex { get; private set; }
+
+        /// <summary>Definition originals of the base parameters: stage multipliers always scale
+        /// from these, so switching stages never loses the base.</summary>
+        private IReadOnlyDictionary<EntityParameter, float>? _definitionParameters;
 
         /// <summary>Body state for the save system; null until <see cref="ApplyDefinition"/> ran (legacy NPCs).</summary>
         public INpcLifecycle? Lifecycle => _lifecycle;
 
         /// <summary>True after this NPC rose as undead — the save system persists risen ones as world deviations.</summary>
         public bool IsRisen { get; private set; }
+
+        /// <summary>Battle-scoped summon: no loot, no experience, no corpse, no world return.
+        /// Raised once by the battle summon spawner right after the definition is applied.</summary>
+        public bool IsSummon { get; private set; }
 
         /// <summary>Species capability from the definition (interaction.canTalk); hostility never changes it.</summary>
         public bool CanTalk { get; private set; }
@@ -200,7 +217,7 @@ namespace LastBreath.Npc
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
-            CurrentBarrier = Parameters.MaxBarrier;
+            CurrentBarrier = Parameters.MaxBarrier; // starts full like the other vitals
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -262,7 +279,10 @@ namespace LastBreath.Npc
             EntityType = definition.EntityType;
             Fraction = definition.Fraction;
             Behavior = definition.Behavior;
+            Reactions = definition.Reactions;
+            Stages = definition.Stages;
             CanTalk = definition.CanTalk;
+            _definitionParameters = definition.Parameters;
 
             foreach ((EntityParameter parameter, float value) in definition.Parameters)
                 Parameters.SetBaseValueForParameter(parameter, value);
@@ -271,8 +291,13 @@ namespace LastBreath.Npc
             foreach (var ability in definition.Abilities)
                 AbilityBook.Learn(definition.Stance, ability);
 
+            // A staged boss opens weakened: stage 0 scales the just-written bases and owns the ability set.
+            if (Stages.Count > 0) ApplyStage(0);
+
             // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
+
+            GrantControlResistance();
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
@@ -282,6 +307,54 @@ namespace LastBreath.Npc
 
             _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
             _lifecycle.ResurrectionReady += OnResurrectionReady;
+        }
+
+        /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);
+        /// the resistance fades over the bearer's turns, so the decay ticks on own turn end.</summary>
+        private void GrantControlResistance()
+        {
+            var rules = GameServiceProvider.Instance.GetService<Core.Battle.ICombatRulesProvider>().ControlResistance;
+            if (!rules.AppliesTo.Contains(EntityType)) return;
+            var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
+            ModifierHandler.Add(resistance);
+            CombatEvents.Subscribe<TurnEndEvent>(_ => resistance.DecayTick());
+        }
+
+        /// <summary>
+        /// Boss stage switch: base parameters scale from the definition originals (the base is never
+        /// lost) and the ability book is rebuilt to the stage's set. On-attack effects of the stage
+        /// are battle-scoped and wired by the arena's BossStagesController.
+        /// </summary>
+        public void ApplyStage(int stageIndex)
+        {
+            if (stageIndex < 0 || stageIndex >= Stages.Count || _definitionParameters == null) return;
+
+            var stage = Stages[stageIndex];
+            CurrentStageIndex = stageIndex;
+
+            foreach ((EntityParameter parameter, float value) in _definitionParameters)
+                Parameters.SetBaseValueForParameter(parameter, value * stage.ParameterMultiplier);
+
+            ReplaceStageAbilities(stage);
+        }
+
+        /// <summary>Unknown ids are reported and skipped — a typo must not abort the stage switch.</summary>
+        private void ReplaceStageAbilities(NpcStageConfig stage)
+        {
+            foreach (var learned in AbilityBook.AllAbilities)
+                AbilityBook.Forget(learned.InstanceId);
+
+            var provider = GameServiceProvider.Instance.GetService<Core.Battle.Abilities.IAbilityProvider>();
+            foreach (string abilityId in stage.Abilities)
+            {
+                if (!provider.KnownAbilityIds.Contains(abilityId))
+                {
+                    Tracker.TrackNotFound($"Stage ability '{abilityId}' of npc '{Id}'", this);
+                    continue;
+                }
+
+                AbilityBook.Learn(AbilityBook.CurrentStance, provider.CreateAbility(abilityId));
+            }
         }
 
         /// <summary>Must be set before <see cref="ApplyDefinition"/> — the brain takes the route at construction.</summary>
@@ -432,7 +505,6 @@ namespace LastBreath.Npc
                 switch (context.Result)
                 {
                     case AttackResults.Succeed:
-                        var atk = context.Attacker;
                         Calculations.CalculateInitialAttackDamage(context);
                         var damageContext = new DamageContext
                         {
@@ -479,14 +551,8 @@ namespace LastBreath.Npc
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.TotalDamage;
-            if (CurrentBarrier > 0)
-            {
-                float absorbed = Mathf.Min(CurrentBarrier, remaining);
-                context.AbsorbedByBarrier = absorbed;
-                CurrentBarrier -= absorbed;
-                remaining -= absorbed;
-            }
+            // Post-mitigation absorption layers (shield → barrier → stage guard); the leftover hits health.
+            float remaining = _damageChain.Apply(context, this, context.TotalDamage);
 
             // The damage event must precede the death event in the timeline: the director drops
             // "posthumous" beats, so a death recorded first swallowed its own killing hit
@@ -545,6 +611,17 @@ namespace LastBreath.Npc
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
 
+        /// <summary>Symmetric detach: a summon freed mid-battle must not hear the later
+        /// BattleEndEvent — the handler touches the freed native side.</summary>
+        public void RemoveBattleEventBus()
+        {
+            _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnd);
+            _battleEventBus = null;
+        }
+
+        /// <summary>Marks the body as a battle-scoped summon (see <see cref="IsSummon"/>).</summary>
+        public void MarkAsSummon() => IsSummon = true;
+
         public void ConsumeResource(Costs type, float amount)
         {
             switch (type)
@@ -579,10 +656,23 @@ namespace LastBreath.Npc
             return true;
         }
 
+        /// <summary>An execute on a staged boss with a pending transition converts into the
+        /// transition instead of a death: the lethal blow routes through TakeDamage, where the
+        /// stage-guard floor clamps it to the threshold (design: the floor guards executes too).
+        /// Source = self keeps the Kill() "nobody's fault" reputation semantics.</summary>
         public void Kill()
         {
-            _lastDamageSource = null; // debug/tool death — nobody gets the credit
-            NotifyShouldDie();
+            bool guarded = IsAlive && Effects.GetBy(e => e is Core.Battle.Abilities.IStageGuardEffect).Any();
+            if (!guarded)
+            {
+                _lastDamageSource = null; // debug/tool death — nobody gets the credit
+                NotifyShouldDie();
+                return;
+            }
+
+            var lethal = new DamageContext { Source = this, Cause = DamageCause.Ability };
+            lethal.Add(DamageType.Pure, CurrentHealth);
+            _ = TakeDamage(lethal);
         }
 
         public IFightable ChoseTarget(List<IFightable> targets)
@@ -605,8 +695,12 @@ namespace LastBreath.Npc
                 List<IFightable> fighters = [];
                 if (Group != null)
                 {
+                    // Only free, living squadmates join: a member frozen in an NPC skirmish must not
+                    // fight in two battles at once (tracker #62). Filter BEFORE the Attacked
+                    // notification — it raises IsFighting on the whole group.
+                    fighters.AddRange(Group.GetEntitiesInGroup<IFightable>()
+                        .Where(member => member.IsAlive && !member.IsFighting));
                     Group.NotifyAllInGroup(GroupNotification.Attacked);
-                    fighters.AddRange(Group.GetEntitiesInGroup<IFightable>());
                 }
                 else
                     fighters.Add(this);
@@ -737,6 +831,9 @@ namespace LastBreath.Npc
             Fraction = Fractions.Undead;
             IsRisen = true;
             RisingBonus = parameterBonus;
+            // A risen boss skips the weakened opening act: it stands up in its final stage
+            // (no immunity, no transition events — this is not a mid-battle transformation).
+            if (Stages.Count > 0) ApplyStage(Stages.Count - 1);
             ApplyRisingBonus(parameterBonus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;

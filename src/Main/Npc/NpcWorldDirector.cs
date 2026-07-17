@@ -1,6 +1,7 @@
 namespace LastBreath.Npc
 {
     using Core.Ai.World.Raids;
+    using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;
     using Godot;

@@ -29,6 +29,9 @@
             services.AddSingleton<IMartialArtMastery, MartialArtMastery>();
             services.AddGameDataParticipant<IAbilityProvider, AbilityProvider>();
             services.AddSingleton<IAbilityUnlockService, AbilityUnlockService>();
+            // Shared on purpose: control resistance and arena rules must exist in every project
+            // that fights (Main included) — a bootstrap-local registration left Main without them.
+            services.AddGameDataParticipant<ICombatRulesProvider, CombatRules.CombatRulesProvider>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
             services.AddSingleton<ISpawnPointRegistry, SpawnPointRegistry>();
@@ -86,6 +89,7 @@
                 Add<Core.Ai.World.Raids.IRaidService>();
                 Add<Core.Ai.World.Time.IWorldClock>();
                 Add<INpcPopulationService>();
+                Add<INpcSkirmishService>(); // ghost skirmishes must not outlive the scene's NPCs
                 Add<IUiContextService>();
                 return session;
 

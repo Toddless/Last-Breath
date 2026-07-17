@@ -2273,3 +2273,37 @@ msgstr ""
 
 msgid "Ability_Summon_Bone_Wolves_Description"
 msgstr ""
+
+# -----------------------
+# Loot on the ground
+# -----------------------
+
+msgid "Loot_Inventory_Full"
+msgstr "Инвентарь полон!"
+
+msgid "Rarity_Common"
+msgstr "Обычный"
+
+msgid "Rarity_Uncommon"
+msgstr "Необычный"
+
+msgid "Rarity_Rare"
+msgstr "Редкий"
+
+msgid "Rarity_Epic"
+msgstr "Эпический"
+
+msgid "Rarity_Legendary"
+msgstr "Легендарный"
+
+msgid "Rarity_Mythic"
+msgstr "Мифический"
+
+msgid "Rarity_Unique"
+msgstr "Уникальный"
+
+msgid "Effect_Stage_Guard"
+msgstr ""
+
+msgid "Effect_Stage_Guard_Description"
+msgstr ""
