@@ -7,10 +7,8 @@ namespace Battle.Source.Abilities.PoisonExplosion
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
 
@@ -20,46 +18,9 @@ namespace Battle.Source.Abilities.PoisonExplosion
     /// </summary>
     public class PoisonExplosion : Ability
     {
-        private readonly int _executionThreshold;
-        private readonly float _damageMultiplier;
-
-        public PoisonExplosion(string[] tags,
-            int cooldown,
-            int costValue,
-            int executionThreshold,
-            float damageMultiplier,
-            Costs costType = Costs.Mana) : base(id: "Ability_Poison_Explosion", tags, cooldown, costValue, costType)
+        public PoisonExplosion(AbilityBaseData data) : base(data)
         {
-            _executionThreshold = executionThreshold;
-            _damageMultiplier = damageMultiplier;
             ExecuteCondition = new PoisonStackExecuteCondition(() => ExecutionThreshold);
-        }
-
-        private float this[Parameters parameters] => AbilityParametersModuleManager.GetModule(parameters).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.DamageMultiplier] = new Module<Parameters>(() => _damageMultiplier, Parameters.DamageMultiplier),
-                    [Parameters.ExecutionThreshold] = new Module<Parameters>(() => _executionThreshold, Parameters.ExecutionThreshold),
-                });
-                return field;
-            }
-        }
-
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
         }
 
         public int ExecutionThreshold => (int)this[Parameters.ExecutionThreshold];
@@ -69,40 +30,20 @@ namespace Battle.Source.Abilities.PoisonExplosion
         public IPoisonSpreadMode? SpreadMode { get; set; }
         public IExecuteCondition? ExecuteCondition { get; set; }
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            ExecutionThreshold,
-            DamageMultiplier
+            public const string ExecutionThreshold = nameof(ExecutionThreshold);
+            public const string DamageMultiplier = nameof(DamageMultiplier);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.DamageMultiplier, 0f);
+            parameters.RegisterDefault(Parameters.ExecutionThreshold, 42);
         }
 
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new PoisonExplosion(Tags, (int)Cooldown, CostValue, ExecutionThreshold, DamageMultiplier, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new PoisonExplosion(Data));
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {

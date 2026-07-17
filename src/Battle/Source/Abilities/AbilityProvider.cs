@@ -40,6 +40,9 @@
         /// <summary>The mastery level at which the ability becomes learnable.</summary>
         public int GetMasteryLevel(string abilityId) => GetBaseData(abilityId).MasteryLevel;
 
+        /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
+        public bool IsHidden(string abilityId) => GetBaseData(abilityId).Hidden;
+
         private AbilityBaseData GetBaseData(string abilityId) =>
             _abilityBaseData.GetValueOrDefault(abilityId)
             ?? throw new KeyNotFoundException($"No base data loaded for ability '{abilityId}'");

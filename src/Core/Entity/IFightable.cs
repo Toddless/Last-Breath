@@ -56,6 +56,13 @@ namespace Core.Entity
         IFightable ChoseTarget(List<IFightable> targets);
         void Kill();
         void SetupBattleEventBus(IBattleEventBus bus);
+
+        /// <summary>Drops the battle-bus subscriptions taken by <see cref="SetupBattleEventBus"/>.
+        /// Needed before freeing a node mid-battle (summons): a later BattleEndEvent must not reach
+        /// a freed body. Default no-op keeps implementations without the hazard untouched.</summary>
+        void RemoveBattleEventBus()
+        {
+        }
         Task ReceiveAttack(IAttackContext context);
         Task Attack(IAttackContext context);
         Task TakeDamage(IDamageContext context);

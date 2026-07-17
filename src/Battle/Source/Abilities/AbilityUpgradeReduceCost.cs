@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities
 {
-    using Core.Entity.Components.Decorator;
+    using Core.Battle.Abilities;
     using Core.Enums;
 
     public class AbilityUpgradeReduceCost(string id, string[] tags, int tier, float cost)
-        : SimpleUpgrade<Ability, AbilityParameter>(id, tags, tier,
-            new SimpleAbilityParameterDecorator<AbilityParameter>(
+        : SimpleUpgrade<Ability>(id, tags, tier,
+            new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue,
                 Priority.Weak,
                 OperationType.Subtract,

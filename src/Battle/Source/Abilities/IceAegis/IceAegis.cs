@@ -6,10 +6,8 @@ namespace Battle.Source.Abilities.IceAegis
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
 
@@ -29,88 +27,38 @@ namespace Battle.Source.Abilities.IceAegis
     /// aegis holds, stage 4 freezes every enemy when the barrier is shattered early — the break
     /// reaction lives inside the barrier EFFECT, the ability only wires it up.
     /// </summary>
-    public class IceAegis(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float barrierBase,
-        float perIntelligenceScale,
-        int duration,
-        float stageTwoScaleBonus,
-        int clumsinessDuration,
-        int clumsinessMaxStacks,
-        float clumsinessValue,
-        int freezeDuration,
-        Costs costType = Costs.Mana)
-        : MulticastAbility<AegisPlan>(id: "Ability_Ice_Aegis", tags, cooldown, costValue, damage: 0, weaponDamageScale: 0, spellDamageScale: 0, costType)
+    public class IceAegis(AbilityBaseData data) : MulticastAbility<AegisPlan>(data)
     {
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.BarrierBase] = new Module<Parameters>(() => barrierBase, Parameters.BarrierBase),
-                    [Parameters.PerIntelligenceScale] = new Module<Parameters>(() => perIntelligenceScale, Parameters.PerIntelligenceScale),
-                    [Parameters.Duration] = new Module<Parameters>(() => duration, Parameters.Duration)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
-
         public float BarrierBase => this[Parameters.BarrierBase];
         public float PerIntelligenceScale => this[Parameters.PerIntelligenceScale];
         public int Duration => (int)this[Parameters.Duration];
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            BarrierBase,
-            PerIntelligenceScale,
-            Duration
+            public const string BarrierBase = nameof(BarrierBase);
+            public const string PerIntelligenceScale = nameof(PerIntelligenceScale);
+            public const string Duration = nameof(Duration);
+            public const string StageTwoScaleBonus = nameof(StageTwoScaleBonus);
+            public const string ClumsinessDuration = nameof(ClumsinessDuration);
+            public const string ClumsinessMaxStacks = nameof(ClumsinessMaxStacks);
+            public const string ClumsinessValue = nameof(ClumsinessValue);
+            public const string FreezeDuration = nameof(FreezeDuration);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.BarrierBase, 300f);
+            parameters.RegisterDefault(Parameters.PerIntelligenceScale, 35f);
+            parameters.RegisterDefault(Parameters.Duration, 3);
+            parameters.RegisterDefault(Parameters.StageTwoScaleBonus, 15f);
+            parameters.RegisterDefault(Parameters.ClumsinessDuration, 3);
+            parameters.RegisterDefault(Parameters.ClumsinessMaxStacks, 5);
+            parameters.RegisterDefault(Parameters.ClumsinessValue, 0.15f);
+            parameters.RegisterDefault(Parameters.FreezeDuration, 1);
         }
 
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new IceAegis(Tags, (int)Cooldown, CostValue, BarrierBase, PerIntelligenceScale, Duration,
-                stageTwoScaleBonus, clumsinessDuration, clumsinessMaxStacks, clumsinessValue, freezeDuration, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new IceAegis(Data));
 
         protected override AegisPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
@@ -125,10 +73,11 @@ namespace Battle.Source.Abilities.IceAegis
             switch (stage)
             {
                 case 2:
-                    plan.PerIntelligenceScale += stageTwoScaleBonus;
+                    plan.PerIntelligenceScale += this[Parameters.StageTwoScaleBonus];
                     break;
                 case 3:
-                    plan.AttackerEffectFactory = () => new Clumsiness(clumsinessDuration, clumsinessMaxStacks, clumsinessValue);
+                    plan.AttackerEffectFactory = () => new Clumsiness(
+                        (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);
                     break;
                 case 4:
                     plan.OnBarrierBroken = () => FreezeAllEnemies(owner, field);
@@ -136,7 +85,7 @@ namespace Battle.Source.Abilities.IceAegis
             }
         }
 
-        protected override async Task ExecutePlan(AegisPlan plan, IFightable owner)
+        protected override async Task ExecutePlan(AegisPlan plan, IFightable owner, IBattleField field)
         {
             float intelligence = owner.Parameters.GetValueForParameter(EntityParameter.Intelligence);
             float amount = plan.BarrierBase + (plan.PerIntelligenceScale * intelligence);
@@ -147,7 +96,7 @@ namespace Battle.Source.Abilities.IceAegis
         private void FreezeAllEnemies(IFightable owner, IBattleField field)
         {
             foreach (IFightable enemy in field.GetEnemies(owner).Where(e => e.IsAlive))
-                _ = new FreezeEffect(freezeDuration)
+                _ = new FreezeEffect((int)this[Parameters.FreezeDuration])
                     .Apply(new EffectApplyingContext { Caster = owner, Target = enemy, Source = InstanceId });
         }
     }

@@ -25,7 +25,7 @@ namespace Core.Narrative.Quests
         private readonly IQuestProvider _quests;
         private readonly IWorldFactsService _facts;
         private readonly IInventory _inventory;
-        private readonly IItemDataProvider _items;
+        private readonly Items.IItemMinter _items;
         private readonly IInfluenceMastery _influence;
         private readonly IWorldClock _clock;
         private readonly INpcWorldRegistry _registry;
@@ -36,7 +36,7 @@ namespace Core.Narrative.Quests
         private bool _dirty;
 
         public QuestLogService(IQuestProvider quests, IWorldFactsService facts, IInventory inventory,
-            IItemDataProvider items, IInfluenceMastery influence, IWorldClock clock,
+            Items.IItemMinter items, IInfluenceMastery influence, IWorldClock clock,
             INpcWorldRegistry registry, IGameEventBus events, IGameMessageBus messages, ILoadScope loadScope)
         {
             _quests = quests;
@@ -155,7 +155,8 @@ namespace Core.Narrative.Quests
             var state = GetState(questId)!;
 
             foreach (var reward in quest.Rewards.Items)
-                _inventory.TryAddItem(_items.CopyItem(reward.ItemId), reward.Amount);
+                // Minted, not copied: an equip reward is a fresh roll of its blueprint.
+                _inventory.TryAddItem(_items.MintItem(reward.ItemId), reward.Amount);
             if (quest.Rewards.InfluenceExp > 0) _influence.AddExperience(quest.Rewards.InfluenceExp);
             Execute(quest.Rewards.Actions, context);
 

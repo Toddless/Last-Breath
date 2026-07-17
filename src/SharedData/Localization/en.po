@@ -73,6 +73,72 @@ msgstr "Jewellery Dust"
 msgid "Upgrade_Resource_Weapon_Dust"
 msgstr "Weapon Dust"
 
+msgid "Upgrade_Resource_Simple_Flux"
+msgstr "Simple Flux"
+
+msgid "Upgrade_Resource_Simple_Flux_Description"
+msgstr "Increases the sharpening success chance by 3%."
+
+msgid "Upgrade_Resource_Fine_Flux"
+msgstr "Fine Flux"
+
+msgid "Upgrade_Resource_Fine_Flux_Description"
+msgstr "Increases the sharpening success chance by 6%."
+
+msgid "Upgrade_Resource_Quality_Flux"
+msgstr "Quality Flux"
+
+msgid "Upgrade_Resource_Quality_Flux_Description"
+msgstr "Increases the sharpening success chance by 9%."
+
+msgid "Upgrade_Resource_Perfect_Flux"
+msgstr "Perfect Flux"
+
+msgid "Upgrade_Resource_Perfect_Flux_Description"
+msgstr "Increases the sharpening success chance by 15%."
+
+msgid "Upgrade_Resource_Apprentice_Rune"
+msgstr "Apprentice`s Rune"
+
+msgid "Upgrade_Resource_Apprentice_Rune_Description"
+msgstr "Guarantees the created item is at least Uncommon."
+
+msgid "Upgrade_Resource_Journeyman_Rune"
+msgstr "Journeyman`s Rune"
+
+msgid "Upgrade_Resource_Journeyman_Rune_Description"
+msgstr "Guarantees the created item is at least Rare."
+
+msgid "Upgrade_Resource_Master_Rune"
+msgstr "Master`s Rune"
+
+msgid "Upgrade_Resource_Master_Rune_Description"
+msgstr "Guarantees the created item is at least Epic."
+
+msgid "Upgrade_Resource_Grandmaster_Rune"
+msgstr "Grand Master`s Rune"
+
+msgid "Upgrade_Resource_Grandmaster_Rune_Description"
+msgstr "Guarantees the created item is at least Legendary."
+
+msgid "Upgrade_Resource_Weaponsmith_Mark"
+msgstr "Weaponsmith Master`s Mark"
+
+msgid "Upgrade_Resource_Weaponsmith_Mark_Description"
+msgstr "The personal seal of a legendary weaponsmith. Ascends a fully sharpened legendary weapon: every property grows by 15%, the blade takes 1-69 bonus sharpening levels and may awaken a mythic power. The mark seals the weapon forever."
+
+msgid "Upgrade_Resource_Jeweler_Mark"
+msgstr "Jeweler Master`s Mark"
+
+msgid "Upgrade_Resource_Jeweler_Mark_Description"
+msgstr "The personal seal of a legendary jeweler. Ascends a fully sharpened legendary jewel: every property grows by 15%, the setting takes 1-69 bonus sharpening levels and may awaken a mythic power. The mark seals the jewel forever."
+
+msgid "Upgrade_Resource_Armorsmith_Mark"
+msgstr "Armorsmith Master`s Mark"
+
+msgid "Upgrade_Resource_Armorsmith_Mark_Description"
+msgstr "The personal seal of a legendary armorsmith. Ascends a fully sharpened legendary armor piece: every property grows by 15%, the plating takes 1-69 bonus sharpening levels and may awaken a mythic power. The mark seals the armor forever."
+
 
 # Resources
 # -----------------------
@@ -330,6 +396,29 @@ msgstr "Restores {value} mana on hit"
 msgid "Context_Modifier_HealthOnHit"
 msgstr "Restores {value} health on hit"
 
+# Range twins for unrolled spreads: {min} is a bare number, {max} carries the unit.
+
+msgid "Context_Modifier_HealingEfficiency_Range"
+msgstr "Increases healing efficiency by {min}–{max}"
+
+msgid "Context_Modifier_BleedDuration_Range"
+msgstr "Increases bleed duration by {min}–{max}"
+
+msgid "Context_Modifier_BleedDamage_Range"
+msgstr "Increases bleed damage by {min}–{max}"
+
+msgid "Context_Modifier_BurningStacks_Range"
+msgstr "Applies {min}–{max} additional burning stacks"
+
+msgid "Context_Modifier_BurningDamage_Range"
+msgstr "Increases burning damage by {min}–{max}"
+
+msgid "Context_Modifier_ManaOnHit_Range"
+msgstr "Restores {min}–{max} mana on hit"
+
+msgid "Context_Modifier_HealthOnHit_Range"
+msgstr "Restores {min}–{max} health on hit"
+
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
 # ------------------------------
@@ -342,6 +431,17 @@ msgstr "{value} increased {parameter}"
 
 msgid "Modifier_Multiplicative"
 msgstr "{value} more {parameter}"
+
+# Range twins for unrolled spreads: {min} carries the sign, {max} carries the unit ("+40–60% increased ...").
+
+msgid "Modifier_Flat_Range"
+msgstr "{min}–{max} {parameter}"
+
+msgid "Modifier_Increase_Range"
+msgstr "{min}–{max} increased {parameter}"
+
+msgid "Modifier_Multiplicative_Range"
+msgstr "{min}–{max} more {parameter}"
 
 # ------------------------------
 # UI
@@ -515,6 +615,117 @@ msgstr "Reroll modifier"
 
 msgid "UI_Craft_Ascend"
 msgstr "Ascend"
+
+msgid "UI_Craft_Recipes"
+msgstr "Recipes"
+
+msgid "UI_Craft_Result"
+msgstr "Result"
+
+msgid "UI_Craft_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Craft_Requirements"
+msgstr "Requirements"
+
+msgid "UI_Crafting_Recraft"
+msgstr "Reroll"
+
+msgid "UI_Craft_AscendWarning"
+msgstr "Ascension is irreversible: the ascended item is sealed and can never be modified again."
+
+msgid "UI_Craft_Success_Chance"
+msgstr "Success chance: {Chance:%}"
+
+msgid "UI_Item_Implicits"
+msgstr "Implicits"
+
+msgid "UI_Item_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Item_Effect"
+msgstr "Effect"
+
+msgid "UI_Inv_Sort"
+msgstr "Sort"
+
+msgid "UI_Inv_Destroy"
+msgstr "Destroy"
+
+msgid "UI_Inv_Equipment"
+msgstr "Equipment"
+
+msgid "UI_Inv_Stats"
+msgstr "Stats"
+
+msgid "UI_Inv_Search"
+msgstr "Search item..."
+
+msgid "UI_Inv_All"
+msgstr "All"
+
+msgid "UI_Inv_AllTypes"
+msgstr "All types"
+
+msgid "UI_Inv_Type_Weapon"
+msgstr "Weapon"
+
+msgid "UI_Inv_Type_Armor"
+msgstr "Armor"
+
+msgid "UI_Inv_Type_Jewellery"
+msgstr "Jewellery"
+
+msgid "UI_Inv_Type_Resources"
+msgstr "Resources"
+
+msgid "UI_Bar_Effects"
+msgstr "Effects"
+
+msgid "UI_Bar_Modifiers"
+msgstr "Modifiers"
+
+msgid "WeaponType_Dagger"
+msgstr "Dagger"
+
+msgid "WeaponType_Sword"
+msgstr "Sword"
+
+msgid "WeaponType_Bow"
+msgstr "Bow"
+
+msgid "WeaponType_Staff"
+msgstr "Staff"
+
+msgid "WeaponType_Axe"
+msgstr "Axe"
+
+msgid "WeaponType_Wand"
+msgstr "Wand"
+
+msgid "Handedness_OneHanded"
+msgstr "One-handed"
+
+msgid "Handedness_TwoHanded"
+msgstr "Two-handed"
+
+msgid "Category_Metal"
+msgstr "Metal"
+
+msgid "Category_Fabric"
+msgstr "Fabric"
+
+msgid "Category_Leather"
+msgstr "Leather"
+
+msgid "Category_Gem"
+msgstr "Gem"
+
+msgid "Category_Bone"
+msgstr "Bone"
+
+msgid "Category_Essence"
+msgstr "Essence"
 
 msgid "UI_Journal_Empty"
 msgstr "No quests yet. The world won't come asking â€” go talk to people."
@@ -2001,6 +2212,12 @@ msgstr "Fishing Mastery"
 msgid "Passive_Skill_Battle_Mastery"
 msgstr "Battle Mastery"
 
+msgid "Passive_Skill_Bloodthirsty"
+msgstr "Bloodthirsty"
+
+msgid "Passive_Skill_Bloodthirsty_Description"
+msgstr "Applies a Bleed stack upon attacking. When {StackThreshold} stacks are reached, removes all remaining stacks from the target, deals their total remaining damage, and heals for {HealPercent:%} of that damage."
+
 # ------------------------------
 # Factions & reputation
 # ------------------------------
@@ -2184,3 +2401,42 @@ msgstr "Out of the way, longlegs. Unless you carry ale or ore to trade, we have 
 
 msgid "Dlg_Dwarf_Crossbowman_Greeting_1"
 msgstr "That's far enough. State your business or keep walking."
+
+msgid "Npc_Boss_Digri"
+msgstr "Digri"
+
+msgid "Npc_Boss_Zigri"
+msgstr "Zigri"
+
+msgid "Ability_Twin_Assist_Attack"
+msgstr "Twin's Wrath"
+
+msgid "Ability_Twin_Assist_Attack_Description"
+msgstr "The twin comes to his brother's aid, striking every enemy and setting them ablaze for {BurnDuration|turn|turns}."
+
+msgid "Ability_Twin_Assist_Shield"
+msgstr "Twin's Ward"
+
+msgid "Ability_Twin_Assist_Shield_Description"
+msgstr "The twin shields his brother with a {ShieldStrength} strength ward that restores {HealthRegenPercent:%} of maximum health at each turn's end while it holds."
+
+msgid "Npc_Boss_Rat_King"
+msgstr "Rat King"
+
+msgid "Effect_Damage_Immunity"
+msgstr "Damage Immunity"
+
+msgid "Effect_Damage_Immunity_Description"
+msgstr "Immune to all damage."
+
+msgid "Npc_Boss_Bone_Pack_Leader"
+msgstr "Bone Pack Leader"
+
+msgid "Npc_Bone_Wolf"
+msgstr "Bone Wolf"
+
+msgid "Ability_Summon_Bone_Wolves"
+msgstr "Call of the Bone Pack"
+
+msgid "Ability_Summon_Bone_Wolves_Description"
+msgstr "Calls bone wolves to the summoner's side, keeping the pack at {WolvesPerCast}. Each wolf inherits {StatShare:%} of the summoner's current stats."

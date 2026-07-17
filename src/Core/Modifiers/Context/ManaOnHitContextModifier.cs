@@ -6,7 +6,7 @@
     using Enums;
 
     public class ManaOnHitContextModifier(Func<float> amount)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Mana_On_Hit"), IAttackModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Mana_On_Hit"), IAttackModifier
     {
         public ManaOnHitContextModifier(float amount)
             : this(() => amount)

@@ -8,7 +8,7 @@
     /// <summary>Scales the per-tick damage of DoTs the owner applies, filtered by status ("+35% burning damage").
     /// The bonus is read lazily, so a source whose value changes (item upgrade) is picked up without re-attach.</summary>
     public class DotDamageBonusContextModifier(StatusEffects statusFilter, Func<float> bonus)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Dot_Damage_Bonus"), IEffectApplicationModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Dot_Damage_Bonus"), IEffectApplicationModifier
     {
         public DotDamageBonusContextModifier(StatusEffects statusFilter, float bonus)
             : this(statusFilter, () => bonus)

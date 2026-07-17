@@ -21,11 +21,13 @@ namespace LastBreathTest.LootSimulation
         public required SimEventBus Events { get; init; }
         public required SimMessageBus Messages { get; init; }
         public required IRandomNumberGenerator Rnd { get; init; }
+        public required Core.Items.IItemMinter Minter { get; init; }
 
         public static LootPipeline Create(int seed)
         {
             string dataRoot = FindSharedDataRoot();
 
+            var rnd = new DefaultRandomNumberGenerator(seed);
             var factory = new ItemGameDataFactory();
             var parser = new DataParser(factory);
             var itemProvider = new ItemDataProvider(parser);
@@ -42,12 +44,15 @@ namespace LastBreathTest.LootSimulation
             if (loadFailures.Count > 0)
                 throw new InvalidOperationException($"Game data failed to load:\n{string.Join("\n", loadFailures)}");
 
-            var rnd = new DefaultRandomNumberGenerator(seed);
             var events = new SimEventBus();
             var messages = new SimMessageBus();
             messages.Register(new GetLootTableRequestHandler(tableProvider));
 
-            var itemCreation = new ItemCreationService(new ItemEffectProvider(), itemProvider, rnd);
+            // The same minting seam production DI wires: blueprints -> minter -> facade.
+            var materializer = new Core.Modifiers.ModifierMaterializer(rnd);
+            var equipMinter = new Core.Items.EquipItemMinter(itemProvider, factory, materializer, rnd);
+            var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider);
+            var itemCreation = new ItemCreationService(new ItemEffectProvider(), itemProvider, rnd, itemMinter, materializer);
             var lootService = new LootGenerationService(rnd, events, messages, itemCreation, configurationProvider);
 
             return new LootPipeline
@@ -59,6 +64,7 @@ namespace LastBreathTest.LootSimulation
                 Events = events,
                 Messages = messages,
                 Rnd = rnd,
+                Minter = itemMinter,
             };
         }
 

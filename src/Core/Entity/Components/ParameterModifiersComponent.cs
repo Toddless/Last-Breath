@@ -70,7 +70,9 @@
             {
                 if (_modifiers.TryGetValue(modifier.EntityParameter, out var existing))
                 {
-                    var existingModifier = existing.FirstOrDefault(x => ReferenceEquals(x.Source, modifier.Source) && x.ModifierValueType == modifier.ModifierValueType);
+                    // Value comparison, same as UpdateModifier: Source is a string key, reference identity
+                    // only held because EntityAttribute happens to reuse instances.
+                    var existingModifier = existing.FirstOrDefault(x => x.Source == modifier.Source && x.ModifierValueType == modifier.ModifierValueType);
                     if (existingModifier == null) existing.Add(modifier);
                     else existingModifier.Value = modifier.Value;
                 }
@@ -102,8 +104,16 @@
 
         public void RemoveModifierBySource(string source)
         {
-            foreach (var list in _modifiers.Where(list => list.Value.RemoveAll(x => x.Source == source) > 0))
-                RaiseEvent(list.Key);
+            var changed = new List<EntityParameter>();
+            foreach (var entry in _modifiers.Where(entry => entry.Value.RemoveAll(x => x.Source == source) > 0))
+                changed.Add(entry.Key);
+
+            // Emptied buckets leave the dictionary (same policy as RemoveModifier).
+            foreach (var parameter in changed)
+            {
+                if (_modifiers[parameter].Count == 0) _modifiers.Remove(parameter);
+                RaiseEvent(parameter);
+            }
         }
 
         private List<IModifierInstance> GetCombinedModifiers(EntityParameter parameter)

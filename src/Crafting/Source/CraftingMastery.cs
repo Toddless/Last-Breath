@@ -1,48 +1,32 @@
-﻿namespace Crafting.Source
+namespace Crafting.Source
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
     using Core.Crafting;
+    using Core.Data;
+    using Core.Data.CraftingData;
+    using Core.Data.GameData;
+    using Core.Entity.Components;
     using Core.Enums;
-    using Core.Events;
     using Core.Localization;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Godot;
+    using Newtonsoft.Json;
 
-    public class CraftingMastery(IGameMessageBus gameMessageBus, RandomNumberGenerator rnd) : ICraftingMastery, Core.Session.ISessionResettable
+    /// <summary>Levels 0..max (data-driven, 50 shipped) linearly lerp six bonus channels from 0 to
+    /// their json maximums: sharpening chance, created values, rarer items, extra effect, mythic
+    /// modifier, shatter refund. All tuning — curve, exp rewards, weights — lives in the
+    /// CraftingMastery catalog; the constructor reads nothing.</summary>
+    public class CraftingMastery(IGameMessageBus gameMessageBus, IRandomNumberGenerator rnd) : ICraftingMastery, IGameDataParticipant, Core.Session.ISessionResettable
     {
-        // TODO: Remove from here
-        // ________________________________________________________
-        private const float BaseSkillChance = 0.15f;
-        private const float TargetSkillChance = 0.7f;
-
-        private const float BaseResourceReturn = 0.3f;
-        private const float TargetResourceReturn = 1f;
-
-        private const float BaseValueMultiplier = 0.2f;
-        private const float TargetValueMultiplier = 1.25f;
-
-        private const float BaseMinRange = 0.4f;
-        private const float BaseMaxRange = 1.15f;
-
-        private const float TargetMinRange = 0.9f;
-        private const float TargetMaxRange = 1.25f;
-
-        private const float ExpFactor = 1.8f;
-        private const int MaxLevel = 25;
-        private const int BaseExp = 50;
-        // ---------------------------------------------------------
-
-        // TODO: Same
-        // ________________________________________________________
-        // Level one probabilities
-        private readonly float[] _rarityBase = [1f, 10f, 24f, 65f];
-
-        // Level 25 probabilities
-        private readonly float[] _rarityTarget = [10f, 30f, 35f, 25f];
-        // --------------------------------------------------------
+        private CraftingMasteryData _config = new();
+        // Enum-keyed mirrors of the string-keyed config maps, converted strictly on Apply.
+        private Dictionary<Rarity, float> _rarityWeights = ParseRarityWeights(new CraftingMasteryData());
+        private Dictionary<Rarity, int> _expByRarity = ParseExpByRarity(new CraftingMasteryData());
+        private Dictionary<CraftingMode, float> _expModeFactors = ParseExpModeFactors(new CraftingMasteryData());
 
         public string Id => "Mastery_Crafting";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
@@ -73,7 +57,7 @@
             }
         }
 
-        public int MaximumLevel => MaxLevel;
+        public int MaximumLevel => _config.MaxLevel;
 
         public int BonusLevel
         {
@@ -89,11 +73,22 @@
 
         public event Action<int>? ExperienceChange, BonusLevelChange, CurrentLevelChange;
 
+        public IReadOnlyList<string> Catalogs => [DataCatalog.CraftingMastery];
+
+        public void Apply(string catalog, GameDataFile file)
+        {
+            _config = JsonConvert.DeserializeObject<CraftingMasteryData>(file.Json)
+                      ?? throw new InvalidOperationException($"Failed to deserialize crafting mastery config '{file.FileName}'");
+            _rarityWeights = ParseRarityWeights(_config);
+            _expByRarity = ParseExpByRarity(_config);
+            _expModeFactors = ParseExpModeFactors(_config);
+        }
+
         public void AddExperience(int amount)
         {
             if (amount <= 0) return;
             CurrentExperience += amount;
-            if (CurrentLevel >= MaxLevel) return;
+            if (CurrentLevel >= MaximumLevel) return;
             CheckForLevelUp();
         }
 
@@ -108,43 +103,45 @@
             CurrentLevel = 0;
             CurrentExperience = 0;
         }
-        // TODO: Мастери должно влиять так же на шансы получить более редкий модификатор при рекрафте
-        // Позднее возможно так же добавить шансы на получение более редких способностей
-        // Сюда же шансы на апгрейд предметов
 
-        public int ExpToNextLevelRemain() => CurrentLevel >= MaxLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
+        public int ExpToNextLevelRemain() => CurrentLevel >= MaximumLevel ? 0 : Mathf.Max(0, ExpToNextLevel(CurrentLevel) - CurrentExperience);
 
-        public int ExpToNextLevelTotal() => CurrentLevel >= MaxLevel ? 0 : ExpToNextLevel(CurrentLevel);
+        public int ExpToNextLevelTotal() => CurrentLevel >= MaximumLevel ? 0 : ExpToNextLevel(CurrentLevel);
 
-        public float GetCurrentSkillChance(float skillBonus = 0)
-        {
-            float baseChance = CalculateBase(BaseSkillChance, TargetSkillChance, GetProgressFactor());
-            float finalChance = baseChance * (1f + skillBonus);
-            return Mathf.Clamp(finalChance, 0f, 1f);
-        }
+        // Channel 1: the upgrader multiplies its own level curve by (1 + this).
+        public float GetUpgradeChanceBonus() => LerpBonus(_config.Bonuses.UpgradeChance);
 
-        public float GetCurrentValueMultiplier(float multiplierBonus = 0)
-        {
-            float baseChance = CalculateBase(BaseValueMultiplier, TargetValueMultiplier, GetProgressFactor());
-            float chanceWithBonus = baseChance * (1f + multiplierBonus);
-            return Mathf.Min(chanceWithBonus, 1.9f);
-        }
+        // Channel 2: no low-mastery penalty — level 0 crafts at x1.0 and mastery only adds on top.
+        public float GetCurrentValueMultiplier(float multiplierBonus = 0) =>
+            (1f + LerpBonus(_config.Bonuses.CreatedValues)) * (1f + multiplierBonus);
 
-        public float GetCurrentResourceMultiplier(float resourceBonus = 0)
-        {
-            float baseMultiplier = CalculateBase(BaseResourceReturn, TargetResourceReturn, GetProgressFactor());
-            float finalMultiplier = baseMultiplier * (1f + resourceBonus);
-            return Math.Min(finalMultiplier, 1.5f);
-        }
+        // Channel 4: consumed by item creation — a crafted item may roll a bonus grant.
+        public float GetExtraEffectChanceBonus() => LerpBonus(_config.Bonuses.ExtraEffect);
+        public float GetExtraEffectChance() => _config.ExtraEffectBaseChance * (1f + GetExtraEffectChanceBonus());
+        public float GetMythicModifierChanceBonus() => LerpBonus(_config.Bonuses.MythicModifier);
 
-        public float GetCurrentMinRange() => CalculateBase(BaseMinRange, TargetMinRange, GetProgressFactor());
-        public float GetCurrentMaxRange() => CalculateBase(BaseMaxRange, TargetMaxRange, GetProgressFactor());
-        public float GetRandomValueRange() => rnd.RandfRange(GetCurrentMinRange(), GetCurrentMaxRange());
+        // Ascension tuning straight from data; the gate counts bonus levels exactly like the channels do.
+        public bool IsAscensionUnlocked => CurrentLevel + BonusLevel >= _config.AscensionLevelGate;
+        public float AscensionStatBonus => _config.AscensionStatBonus;
+
+        // Channel 5 applied: like channel 6, the base lives in data and mastery folds its bonus in.
+        public float GetMythicGiftChance() => _config.MythicGiftBaseChance * (1f + GetMythicModifierChanceBonus());
+
+        // Channel 6: the final refund fraction, base fraction scaled by the level bonus.
+        public float GetCurrentResourceMultiplier(float resourceBonus = 0) =>
+            _config.BaseResourceReturn * (1f + LerpBonus(_config.Bonuses.ResourceReturn)) * (1f + resourceBonus);
+
+        // Channel 6, raw: consumers that must yield ×1 at zero mastery (shatter dust) apply
+        // the lerped bonus themselves instead of the refund fraction.
+        public float GetResourceReturnBonus() => LerpBonus(_config.Bonuses.ResourceReturn);
+
+        public int GetExperienceReward(CraftingMode mode, Rarity rarity) =>
+            Mathf.RoundToInt(_expByRarity.GetValueOrDefault(rarity) * _expModeFactors.GetValueOrDefault(mode, 1f));
 
         public Rarity RollRarity(float rarityBonus = 0)
         {
             var rarityProbabilities = GetRarityProbabilities(rarityBonus);
-            float rarity = rnd.Randf();
+            float rarity = rnd.RandFloat();
             float accumulated = 0;
 
             foreach (var kvp in rarityProbabilities.OrderBy(x => x.Key))
@@ -157,29 +154,28 @@
             return rarityProbabilities.OrderByDescending(x => x.Key).First().Key;
         }
 
-        public Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = default)
+        // Channel 3: ONE weight set from data; the total bonus (mastery level + external channel)
+        // reweights it towards the rare end — the rarest entry gets the full bonus, the most common
+        // none (quadratic falloff), then everything renormalizes.
+        public Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = 0)
         {
-            float progress = GetProgressFactor();
+            float bonus = LerpBonus(_config.Bonuses.RarerItem) + rarityBonus;
 
-            float[] interpolatedWeights = new float[_rarityBase.Length];
-            float sumWeights = 0f;
-
-            for (int i = 0; i < interpolatedWeights.Length; i++)
+            // Rarity enum: lower value = rarer (Legendary=0 ... Common). Order by descending value so
+            // index 0 is the most common; the factor grows towards the rare end of the list.
+            var ordered = _rarityWeights.OrderByDescending(pair => pair.Key).ToList();
+            float sum = 0f;
+            var adjusted = new float[ordered.Count];
+            for (int i = 0; i < ordered.Count; i++)
             {
-                interpolatedWeights[i] = Mathf.Lerp(_rarityBase[i], _rarityTarget[i], progress);
-                sumWeights += interpolatedWeights[i];
+                float rarityFactor = ordered.Count == 1 ? 1f : Mathf.Pow(i / (float)(ordered.Count - 1), 2);
+                adjusted[i] = ordered[i].Value * (1f + bonus * rarityFactor);
+                sum += adjusted[i];
             }
-
-            for (int i = 0; i < interpolatedWeights.Length; i++)
-                interpolatedWeights[i] /= sumWeights;
-
-            float[] finalWeights = ApplyRarityModifiers(interpolatedWeights, rarityBonus);
 
             var result = new Dictionary<Rarity, float>();
-            for (int i = 0; i < finalWeights.Length; i++)
-            {
-                result[(Rarity)i] = Mathf.Clamp(finalWeights[i], 0f, 1f);
-            }
+            for (int i = 0; i < ordered.Count; i++)
+                result[ordered[i].Key] = sum <= 0f ? 0f : adjusted[i] / sum;
 
             return result;
         }
@@ -187,11 +183,33 @@
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
-        private float CalculateBase(float baseValue, float targetValue, float progression) => Mathf.Lerp(baseValue, targetValue, progression);
+
+        /// <summary>Strict enum-keyed map conversion: a typo key is reported and dropped, never silently defaulted.</summary>
+        private static Dictionary<TEnum, TValue> ParseEnumMap<TEnum, TValue>(Dictionary<string, TValue> source, string context)
+            where TEnum : struct, Enum
+        {
+            var result = new Dictionary<TEnum, TValue>();
+            foreach ((string key, var value) in source)
+            {
+                if (EnumParser.TryParseEnum<TEnum>(key, out var parsed)) result[parsed] = value;
+                else Tracker.TrackError($"Skipping crafting mastery {context} entry: '{key}' is not a valid {typeof(TEnum).Name}");
+            }
+
+            return result;
+        }
+
+        private static Dictionary<Rarity, float> ParseRarityWeights(CraftingMasteryData config) =>
+            ParseEnumMap<Rarity, float>(config.RarityWeights, "rarityWeights");
+
+        private static Dictionary<Rarity, int> ParseExpByRarity(CraftingMasteryData config) =>
+            ParseEnumMap<Rarity, int>(config.ExpRewards.ByRarity, "expRewards.byRarity");
+
+        private static Dictionary<CraftingMode, float> ParseExpModeFactors(CraftingMasteryData config) =>
+            ParseEnumMap<CraftingMode, float>(config.ExpRewards.ModeFactors, "expRewards.modeFactors");
 
         private void CheckForLevelUp()
         {
-            while (CurrentLevel < MaxLevel)
+            while (CurrentLevel < MaximumLevel)
             {
                 int need = ExpToNextLevel(CurrentLevel);
                 if (CurrentExperience >= need)
@@ -208,32 +226,16 @@
         private int ExpToNextLevel(int level)
         {
             if (level < 1) level = 1;
-            if (level >= MaxLevel) return int.MaxValue;
-            float value = BaseExp * Mathf.Pow(level, ExpFactor);
+            if (level >= MaximumLevel) return int.MaxValue;
+            float value = _config.BaseExp * Mathf.Pow(level, _config.ExpFactor);
             return Mathf.RoundToInt(value);
         }
 
-        private float[] ApplyRarityModifiers(float[] baseWeights, float rarityBonus)
-        {
-            var adjustedWeights = new float[baseWeights.Length];
-            float sumAdjusted = 0f;
-
-            for (int i = 0; i < baseWeights.Length; i++)
-            {
-                float rarityFactor = (float)Math.Pow(i / (float)(baseWeights.Length - 1), 2);
-                float bonusMultiplier = 1f + rarityBonus * rarityFactor;
-
-                adjustedWeights[i] = baseWeights[i] * bonusMultiplier;
-                sumAdjusted += adjustedWeights[i];
-            }
-
-            for (int i = 0; i < adjustedWeights.Length; i++)
-                adjustedWeights[i] /= sumAdjusted;
-
-            return adjustedWeights;
-        }
+        // Level progress 0..max lerps a bonus channel 0..maxBonus; equipment bonus levels count in
+        // (and clamp at the cap, so over-stacked gear can't push a channel past its maximum).
+        private float LerpBonus(float maxBonus) => maxBonus * GetProgressFactor();
 
         private float GetProgressFactor() =>
-            Mathf.Clamp((float)(CurrentLevel + BonusLevel - 1) / (MaxLevel + BonusLevel - 1), 0f, 1f);
+            MaximumLevel <= 0 ? 0f : Mathf.Clamp((CurrentLevel + BonusLevel) / (float)MaximumLevel, 0f, 1f);
     }
 }

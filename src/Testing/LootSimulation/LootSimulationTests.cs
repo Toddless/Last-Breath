@@ -76,52 +76,138 @@
         [TestMethod]
         public async Task EquipStatsScaleLinearlyWithModifierMultiplier()
         {
-            var creation = new LootGeneration.Internal.ItemCreationService(
-                new LootGeneration.Services.ItemEffectProvider(), s_pipeline.ItemProvider, s_pipeline.Rnd);
+            var creation = CreateItemCreation();
+            var equipIds = await GetRollableEquipIdsAsync();
 
+            foreach (string id in equipIds)
+            foreach (float multiplier in (float[])[1f, 2f])
+            {
+                var poolValues = CombinedPool(id)
+                    .SelectMany(descriptor => DescriptorOperations.Flatten([descriptor]))
+                    .OfType<ParameterDescriptor>()
+                    .ToLookup(leaf => (leaf.Parameter, leaf.ValueType), leaf => leaf.Value);
+
+                var generated = (Core.Items.IEquipItem)creation.CreateItem(id, [], Rarity.Rare, 0f, multiplier);
+                // Rolled lines are stamped with an affix; authored blueprint lines (Affix == None) come
+                // from the item template, not the pool, and are out of this test's scope.
+                // Pool entries carry roll spreads, so linearity means BOTH bounds scale with the
+                // multiplier: the rolled value must land inside some entry's [Min, Max] × multiplier.
+                foreach (var modifier in generated.Modifiers.OfType<SimpleModifier>().Where(line => line.Affix != AffixKind.None))
+                {
+                    float epsilon = 0.001f * Math.Max(1f, Math.Abs(modifier.Value));
+                    bool matchesPool = poolValues[(modifier.EntityParameter, modifier.ModifierValueType)]
+                        .Any(range => modifier.Value >= (range.Min * multiplier) - epsilon
+                                      && modifier.Value <= (range.Max * multiplier) + epsilon);
+                    Assert.IsTrue(matchesPool,
+                        $"{id} x{multiplier}: {modifier.EntityParameter}/{modifier.ModifierValueType} = {modifier.Value} lands in no pool range.");
+                }
+            }
+        }
+
+        [TestMethod]
+        public async Task GeneratedEquipCarriesExactlyTheAffixSlotsOfItsRarity()
+        {
+            var creation = CreateItemCreation();
+            var equipIds = await GetRollableEquipIdsAsync();
+
+            foreach (string id in equipIds)
+            {
+                var pool = CombinedPool(id);
+                int prefixEntries = pool.Count(descriptor => descriptor.Affix == AffixKind.Prefix);
+                int suffixEntries = pool.Count(descriptor => descriptor.Affix == AffixKind.Suffix);
+
+                foreach (var rarity in (Rarity[])[Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Epic, Rarity.Legendary])
+                {
+                    var generated = (Core.Items.IEquipItem)creation.CreateItem(id, [], rarity, 0f, 1f);
+                    (int prefixLines, int suffixLines) = CountAffixLines(generated);
+
+                    // A composite pick is ONE line (unit = GroupId); a thin bucket may under-fill its slots
+                    // but can never overshoot, and a family never bleeds into the other's slots.
+                    (int maxPrefixSlots, int maxSuffixSlots, int capacity) = rarity switch
+                    {
+                        Rarity.Uncommon => (1, 1, 1),
+                        Rarity.Rare => (1, 1, 2),
+                        Rarity.Epic => (2, 2, 3),
+                        Rarity.Legendary => (2, 2, 4),
+                        _ => (0, 0, 0),
+                    };
+                    Assert.IsTrue(prefixLines <= Math.Min(maxPrefixSlots, prefixEntries),
+                        $"{id}/{rarity}: {prefixLines} prefix lines exceed min({maxPrefixSlots}, {prefixEntries}).");
+                    Assert.IsTrue(suffixLines <= Math.Min(maxSuffixSlots, suffixEntries),
+                        $"{id}/{rarity}: {suffixLines} suffix lines exceed min({maxSuffixSlots}, {suffixEntries}).");
+                    Assert.IsTrue(prefixLines + suffixLines <= capacity,
+                        $"{id}/{rarity}: {prefixLines + suffixLines} lines exceed the capacity {capacity}.");
+
+                    // Fixed-split rarities fill exactly when the pool is rich enough.
+                    if (rarity == Rarity.Rare)
+                    {
+                        Assert.AreEqual(Math.Min(1, prefixEntries), prefixLines, $"{id}/Rare under-filled its prefix slot.");
+                        Assert.AreEqual(Math.Min(1, suffixEntries), suffixLines, $"{id}/Rare under-filled its suffix slot.");
+                    }
+
+                    if (rarity == Rarity.Legendary)
+                    {
+                        Assert.AreEqual(Math.Min(2, prefixEntries), prefixLines, $"{id}/Legendary under-filled its prefix slots.");
+                        Assert.AreEqual(Math.Min(2, suffixEntries), suffixLines, $"{id}/Legendary under-filled its suffix slots.");
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void UniqueAndMythicTemplatesGetNoAffixRolls()
+        {
+            var creation = CreateItemCreation();
+            var templates = s_pipeline.ItemProvider.AllBlueprints
+                .Where(blueprint => blueprint.Rarity is Rarity.Unique or Rarity.Mythic)
+                .ToList();
+            Assert.IsTrue(templates.Count > 0, "No Unique/Mythic templates in the data — the early-out is untestable.");
+
+            foreach (var blueprint in templates)
+            {
+                var generated = (Core.Items.IEquipItem)creation.CreateItem(blueprint.Id, [], Rarity.Rare, 0f, 2f);
+
+                Assert.AreEqual(blueprint.Rarity, generated.Rarity, $"{blueprint.Id}: generation re-rolled a template rarity.");
+                (int prefixLines, int suffixLines) = CountAffixLines(generated);
+                Assert.AreEqual(0, prefixLines + suffixLines, $"{blueprint.Id}: a fixed template received affix rolls.");
+            }
+        }
+
+        private static LootGeneration.Internal.ItemCreationService CreateItemCreation() => new(
+            new LootGeneration.Services.ItemEffectProvider(), s_pipeline.ItemProvider, s_pipeline.Rnd,
+            s_pipeline.Minter, new ModifierMaterializer(s_pipeline.Rnd));
+
+        private static async Task<List<string>> GetRollableEquipIdsAsync()
+        {
             var table = await s_pipeline.GetCombinedTableAsync(ScenarioCatalog.Baseline);
             var equipIds = table.Values.SelectMany(records => records)
                 .Select(record => record.Id)
                 .Where(id => !string.IsNullOrWhiteSpace(id))
                 .Distinct()
-                .Where(id => TryCopy(id) is Core.Items.IEquipItem { Rarity: <= Rarity.Common })
+                .Where(id => s_pipeline.ItemProvider.GetBlueprint(id) is { Rarity: <= Rarity.Common })
                 .Take(10)
                 .ToList();
             Assert.IsTrue(equipIds.Count > 0, "No rollable equip items found in the baseline loot table.");
-
-            foreach (string id in equipIds)
-            foreach (float multiplier in (float[])[1f, 2f])
-            {
-                var poolValues = s_pipeline.ItemProvider.GetEquipItemModifierPool(id)
-                    .Concat(s_pipeline.ItemProvider.GetEquipItemBaseModifierPool(id))
-                    .SelectMany(ExpandLeaves)
-                    .ToLookup(leaf => (leaf.EntityParameter, leaf.ModifierValueType), leaf => leaf.BaseValue);
-
-                var generated = (Core.Items.IEquipItem)creation.CreateItem(id, [], Rarity.Rare, 0f, multiplier);
-                foreach (var modifier in generated.Modifiers)
-                {
-                    bool matchesPool = poolValues[(modifier.EntityParameter, modifier.ModifierValueType)]
-                        .Any(baseValue => Math.Abs(baseValue * multiplier - modifier.Value) <= 0.001f * Math.Max(1f, Math.Abs(modifier.Value)));
-                    Assert.IsTrue(matchesPool,
-                        $"{id} x{multiplier}: {modifier.EntityParameter}/{modifier.ModifierValueType} = {modifier.Value} matches no pool value.");
-                }
-            }
+            return equipIds;
         }
 
-        private static IEnumerable<IModifier> ExpandLeaves(IModifier modifier) =>
-            modifier is CompositeModifier composite ? composite.Parts : [modifier];
+        private static List<IModifierDescriptor> CombinedPool(string id) =>
+            s_pipeline.ItemProvider.GetEquipItemModifierPool(id)
+                .Concat(s_pipeline.ItemProvider.GetEquipItemBaseModifierPool(id))
+                .ToList();
 
-        /// <summary>Loot tables reference ids that have no item data yet â€” those cannot be rolled.</summary>
-        private static Core.Items.IItem? TryCopy(string id)
+        /// <summary>Rolled lines per family, counting a composite (shared GroupId) as ONE line across both channels.</summary>
+        private static (int Prefixes, int Suffixes) CountAffixLines(Core.Items.IEquipItem item)
         {
-            try
-            {
-                return s_pipeline.ItemProvider.CopyItem(id);
-            }
-            catch (ArgumentNullException)
-            {
-                return null;
-            }
+            var units = item.Modifiers.OfType<SimpleModifier>()
+                .Where(line => line.Affix != AffixKind.None)
+                .Select(line => (line.Affix, Unit: line.GroupId ?? line.InstanceId))
+                .Concat(item.ContextModifiers
+                    .Where(entry => entry.Affix != AffixKind.None)
+                    .Select(entry => (entry.Affix, Unit: entry.GroupId ?? entry.InstanceId)))
+                .Distinct()
+                .ToList();
+            return (units.Count(unit => unit.Affix == AffixKind.Prefix), units.Count(unit => unit.Affix == AffixKind.Suffix));
         }
 
         [TestMethod]

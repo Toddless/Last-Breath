@@ -1,299 +1,588 @@
-﻿{
-	"items": [
-		{
-			"id": "Ring_Of_Dwarfs",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Strength", "modifierType": "flat", "value": 30, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Dexterity",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 30, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Intelligence",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 30, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Of_Archmage",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "Mana", "modifierType": "flat", "value": 300, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Of_Limitless_Magic",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 15, "scope": "Local" },
-				{ "parameter": "Mana", "modifierType": "flat", "value": 400, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Minor_Barrier",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "Barrier", "modifierType": "flat", "value": 120, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Archmage_Signet",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "MulticastChance", "modifierType": "flat", "value": 0.05, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Hunter",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "Accuracy", "modifierType": "flat", "value": 500, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Assasin",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "CriticalChance", "modifierType": "flat", "value": 0.05, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Trickster",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "AdditionalHitChance", "modifierType": "flat", "value": 0.05, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Knight",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Strength", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "BlockChance", "modifierType": "flat", "value": 0.05, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Of_Legionnaire",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Strength", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "Armor", "modifierType": "flat", "value": 300, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Giant",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Common",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Strength", "modifierType": "flat", "value": 20, "scope": "Local" },
-				{ "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Ring_Hell_Servant",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Unique",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Dexterity", "modifierType": "flat", "value": 25 },
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 25 },
-				{ "parameter": "Strength", "modifierType": "flat", "value": 25 }
-			],
-			"modifiers": [
-				{ "parameter": "Dexterity", "modifierType": "inc", "value": 0.15 },
-				{ "parameter": "Intelligence", "modifierType": "inc", "value": 0.15 },
-				{ "parameter": "Strength", "modifierType": "inc", "value": 0.15 }
-			],
-			"grants": [
-				{
-					"id": "Passive_Skill_Servant_Hell",
-					"kind": "Passive",
-					"properties": {
-						"chance": 0.1
-					}
-				}
-			]
-		},
-		{
-			"id": "Ring_Submittion_Mark",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Unique",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Intelligence", "modifierType": "flat", "value": 25 }
-			],
-			"modifiers": [
-				{ "parameter": "Strength", "modifierType": "inc", "value": 0.15 }
-			],
-			"grants": [
-				{
-					"id": "Passive_Skill_No_Critical_Hits",
-					"kind": "Passive",
-					"properties": {}
-				}
-			]
-		},
-		{
-			"id": "Ring_Of_Fire_Demon",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Unique",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Health", "modifierType": "flat", "value": 600 },
-				{ "parameter": "Strength", "modifierType": "flat", "value": 30 }
-			],
-			"modifiers": [
-				{ "parameter": "Health", "modifierType": "inc", "value": 0.30 },
-				{ "parameter": "HealthRecovery", "modifierType": "flat", "value": 50 },
-				{ "parameter": "Strength", "modifierType": "inc", "value": 0.30 }
-			],
-			"grants": []
-		},
-		{
-			"id": "Ring_of_Creators",
-			"equipmentPart": "Ring",
-			"maxStackSize": 1,
-			"rarity": "Mythic",
-			"tags": [ "Ring", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 0,
-			"implicits": [
-				{ "parameter": "CriticalDamage", "modifierType": "flat", "value": 150 },
-				{ "parameter": "CriticalChance", "modifierType": "flat", "value": 0.1 },
-				{ "parameter": "Damage", "modifierType": "flat", "value": 500 }
-			],
-			"modifiers": [
-				{ "parameter": "Damage", "modifierType": "multi", "value": 0.4 },
-				{ "parameter": "CriticalChance", "modifierType": "multi", "value": 0.4 }
-			],
-			"grants": [
-				{
-					"id": "Passive_Skill_Critical_Leech",
-					"kind": "Passive",
-					"properties": {
-						"percent": 0.07
-					}
-				},
-				{
-					"id": "Passive_Skill_Critical_Mana_Leech",
-					"kind": "Passive",
-					"properties": {
-						"percent": 0.07
-					}
-				}
-			]
-		}
-	]
+{
+    "items": [
+        {
+            "id": "Ring_Of_Dwarfs",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 30,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Dexterity",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 30,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Intelligence",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 30,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Of_Archmage",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": 300,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Of_Limitless_Magic",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 15,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": 400,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Minor_Barrier",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": 120,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Archmage_Signet",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "flat",
+                    "value": 0.05,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Hunter",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "flat",
+                    "value": 500,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Assasin",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": 0.05,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Trickster",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "flat",
+                    "value": 0.05,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Knight",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "flat",
+                    "value": 0.05,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Of_Legionnaire",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": 300,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Giant",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": 20,
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": 150,
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Hell_Servant",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 20,
+                        "max": 30
+                    }
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 20,
+                        "max": 30
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 20,
+                        "max": 30
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.12,
+                        "max": 0.18
+                    }
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.12,
+                        "max": 0.18
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.12,
+                        "max": 0.18
+                    }
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Servant_Hell",
+                    "kind": "Passive",
+                    "properties": {
+                        "chance": 0.1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "Ring_Submittion_Mark",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 20,
+                        "max": 30
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.12,
+                        "max": 0.18
+                    }
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_No_Critical_Hits",
+                    "kind": "Passive",
+                    "properties": {}
+                }
+            ]
+        },
+        {
+            "id": "Ring_Of_Fire_Demon",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 500,
+                        "max": 700
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 25,
+                        "max": 35
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.35
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 40,
+                        "max": 60
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.35
+                    }
+                }
+            ],
+            "grants": []
+        },
+        {
+            "id": "Ring_of_Creators",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Mythic",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 0,
+            "implicits": [
+                {
+                    "parameter": "CriticalDamage",
+                    "modifierType": "flat",
+                    "value": 150
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.08,
+                        "max": 0.12
+                    }
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 400,
+                        "max": 600
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Damage",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.35,
+                        "max": 0.45
+                    }
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.35,
+                        "max": 0.45
+                    }
+                }
+            ],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Critical_Leech",
+                    "kind": "Passive",
+                    "properties": {
+                        "percent": 0.07
+                    }
+                },
+                {
+                    "id": "Passive_Skill_Critical_Mana_Leech",
+                    "kind": "Passive",
+                    "properties": {
+                        "percent": 0.07
+                    }
+                }
+            ]
+        }
+    ]
 }

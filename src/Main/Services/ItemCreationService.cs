@@ -6,60 +6,71 @@ namespace LastBreath.Services
     using Core;
     using Core.Crafting;
     using Core.Data;
+    using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
     using Core.Modifiers;
     using Core.Services;
-    using Godot;
     using LootGeneration.Source;
 
     public class ItemCreationService(
         IItemEffectProvider effectProvider,
-        RandomNumberGenerator rnd,
+        IRandomNumberGenerator rnd,
         IItemDataProvider dataProvider,
         ICraftingMastery craftingMastery,
-        IModifierMaterializer materializer) : IItemCreationService
+        IModifierMaterializer materializer,
+        IItemMinter itemMinter,
+        IEquipItemMinter equipMinter,
+        ICraftingEffectProvider effectCatalog,
+        IItemGameDataFactory grantFactory) : IItemCreationService
     {
         public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
-            var item = dataProvider.CopyItem(id);
+            // The facade mints equips (rolling their authored ranges) and copies plain resources.
+            var item = itemMinter.MintItem(id);
             if (item is IEquipItem equipItem) HandleEquipItemGeneration(equipItem, additionalItemEffects, rarity, equipEffectChance, modifierMultiplier);
 
             return item;
         }
 
-        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors)
+        public IItem CreateItemByRecipe(string recipeId, IEnumerable<IModifierDescriptor> descriptors, Rarity? minRarity = null)
         {
             var recipe = dataProvider.GetRecipe(recipeId);
+            // Creation runes floor the mastery roll BEFORE the affix slot split — the raised
+            // rarity buys its full line count, not just a label.
             return recipe.ItemType switch
             {
-                ItemType.Equipment => CreateEquip(recipe.ResultItemId, descriptors.ToList(), craftingMastery.RollRarity(), craftingMastery.GetCurrentValueMultiplier()),
+                ItemType.Equipment => CreateEquip(recipe.ResultItemId, descriptors.ToList(),
+                    craftingMastery.RollRarity().ApplyRarityFloor(minRarity), craftingMastery.GetCurrentValueMultiplier()),
                 ItemType.Consumable or ItemType.Quest or ItemType.Crafting => dataProvider.CopyItem(recipe.ResultItemId),
                 _ => CreateCoal(),
             };
         }
 
-        // Rolls affix descriptors from the used-resource pool onto the item, scaled by crafting quality. The full
-        // (scaled, flattened) pool is saved for reroll so the item's magnitude and its reroll fodder stay in sync.
-        // Quality scaling is crafting-only — loot drops (HandleEquipItemGeneration) never build a pool and never see it.
-        private IEquipItem CreateEquip(string itemId, List<IModifierDescriptor> pool, Rarity rarity, float qualityMultiplier)
+        // Rolls affix descriptors from the union of the result item's generation pools (family + own) and
+        // the used resources: mastery rarity gives the slot split, mastery quality scales the value bounds.
+        // The quality is stamped as PowerMultiplier — the LIVE reroll pool (recomputed from the same sources
+        // on every recraft) rescales by it, so nothing is stored on the item.
+        private IEquipItem CreateEquip(string itemId, List<IModifierDescriptor> resourceDescriptors, Rarity rarity, float qualityMultiplier)
         {
             try
             {
-                var item = (IEquipItem)dataProvider.CopyItem(itemId);
+                var item = equipMinter.Mint(itemId);
                 item.Rarity = rarity;
-                int amount = rarity.ConvertRarityToItemModifierAmount();
+                item.PowerMultiplier = qualityMultiplier;
 
-                (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
-                var selected = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(weighted, totalWeight, amount, rnd);
-
+                var scaled = dataProvider.GetGenerationPool(item.Id)
+                    .Concat(resourceDescriptors)
+                    .Select(descriptor => DescriptorOperations.Scale(descriptor, qualityMultiplier))
+                    .ToList();
+                (int prefixes, int suffixes) = AffixRules.SlotsFor(rarity, rnd);
                 var sink = new CollectingSink();
-                foreach (var descriptor in selected)
-                    materializer.Materialize(DescriptorOperations.Scale(descriptor, qualityMultiplier), sink, item.InstanceId);
+                foreach (var descriptor in AffixRoller.Roll(scaled, prefixes, suffixes, rnd))
+                    materializer.Materialize(descriptor, sink, item.InstanceId);
                 foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
                 foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
+                TryRollBonusEffect(item);
 
-                item.SaveModifiersPool(DescriptorOperations.Flatten(pool.Select(descriptor => DescriptorOperations.Scale(descriptor, qualityMultiplier))));
                 return item;
             }
             catch (ArgumentNullException ex)
@@ -69,38 +80,43 @@ namespace LastBreath.Services
             }
         }
 
+        // Mint already happened: the drop only rolls its affix lines here. Rarity gives the slot split,
+        // the union of item + family pools gives the candidates, and the difficulty multiplier scales the
+        // value bounds linearly (flat/inc/multi all store the bonus delta). The multiplier is stamped as
+        // PowerMultiplier so the LIVE reroll pool (same union, recomputed at recraft time) rescales to
+        // the drop's magnitude — loot is rerollable like any equip.
         private void HandleEquipItemGeneration(IEquipItem equip, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
             if (equip.Rarity is Rarity.Mythic or Rarity.Unique) return;
 
             equip.Rarity = rarity;
+            equip.PowerMultiplier = modifierMultiplier;
 
-            var modifiersPool = dataProvider.GetEquipItemModifierPool(equip.Id);
-            var basePool = dataProvider.GetEquipItemBaseModifierPool(equip.Id);
-            // Don't forget to concat item modifiers with modifier from context
-            var weighted = WeightedRandomPicker.CalculateWeights(modifiersPool.Concat(basePool));
-            var chosenMods = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(
-                weighted.WeightedObjects,
-                weighted.TotalWeight,
-                rarity.ConvertRarityToItemModifierAmount(),
-                rnd);
+            var pool = dataProvider.GetGenerationPool(equip.Id)
+                .Select(descriptor => DescriptorOperations.Scale(descriptor, modifierMultiplier))
+                .ToList();
 
-            equip.SetModifiers(chosenMods.SelectMany(mod => CreateScaledInstances(mod, modifierMultiplier, equip.InstanceId)));
+            (int prefixes, int suffixes) = AffixRules.SlotsFor(rarity, rnd);
+            var sink = new CollectingSink();
+            foreach (var descriptor in AffixRoller.Roll(pool, prefixes, suffixes, rnd))
+                materializer.Materialize(descriptor, sink, equip.InstanceId);
+
+            foreach (var entity in sink.Entities) equip.AddAdditionalModifier(entity);
+            foreach (var context in sink.Contexts) equip.AddAdditionalContextModifier(context);
         }
 
-        // TODO: duplicated verbatim in LootGeneration/Internal/ItemCreationService — consolidate loot modifier scaling.
-        // Flat/Increase/Multiplicative values all store the bonus delta (Calculations.CalculateModifiers sums
-        // each bucket onto 1), so one linear scale is valid for every type. Pool entries are shared between
-        // items — scale fresh instances, never the originals.
-        private static IEnumerable<IModifier> CreateScaledInstances(IModifier modifier, float multiplier, string instanceId)
+        // Mastery channel 4: a crafted item may roll ONE bonus effect (grant) from the ItemEffects
+        // catalog — chance = data base × (1 + mastery bonus); the numeric payload travels with the
+        // entry, so the strict skill factories always get their properties. Crafting only: loot
+        // effects are a separate (not yet wired) pipeline via IItemEffectProvider.
+        private void TryRollBonusEffect(IEquipItem item)
         {
-            IEnumerable<IModifier> parts = modifier is CompositeModifier composite ? composite.Parts : [modifier];
-            return parts.Select(IModifier (part) =>
-            {
-                var copy = ModifiersCreator.CreateModifierInstance(part.EntityParameter, part.ModifierValueType, part.BaseValue * multiplier, instanceId);
-                copy.Scope = part.Scope;
-                return copy;
-            });
+            if (effectCatalog.Effects.Count == 0 || rnd.RandFloat() > craftingMastery.GetExtraEffectChance()) return;
+
+            (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(effectCatalog.Effects);
+            var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
+            var grant = grantFactory.CreateGrant(picked.Kind, picked.Id, [], picked.Properties);
+            if (grant != null) item.AddGrant(grant);
         }
 
         private IItem CreateCoal() => dataProvider.CopyItem("Coal");

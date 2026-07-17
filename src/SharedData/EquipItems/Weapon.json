@@ -74,22 +74,34 @@
                 {
                     "parameter": "criticalChance",
                     "modifierType": "inc",
-                    "value": 0.35
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.4
+                    }
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
-                    "value": 0.45
+                    "value": {
+                        "min": 0.4,
+                        "max": 0.5
+                    }
                 },
                 {
                     "parameter": "damage",
                     "modifierType": "inc",
-                    "value": 0.5
+                    "value": {
+                        "min": 0.4,
+                        "max": 0.6
+                    }
                 },
                 {
                     "parameter": "healingEfficiency",
                     "modifierType": "inc",
-                    "value": 0.15
+                    "value": {
+                        "min": 0.12,
+                        "max": 0.18
+                    }
                 }
             ],
             "grants": [
@@ -127,12 +139,18 @@
                 {
                     "parameter": "damage",
                     "modifierType": "inc",
-                    "value": 0.5
+                    "value": {
+                        "min": 0.4,
+                        "max": 0.6
+                    }
                 },
                 {
                     "parameter": "burningDamage",
                     "modifierType": "inc",
-                    "value": 0.35
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.4
+                    }
                 }
             ],
             "grants": [
@@ -172,17 +190,26 @@
                 {
                     "parameter": "damage",
                     "modifierType": "inc",
-                    "value": 0.5
+                    "value": {
+                        "min": 0.4,
+                        "max": 0.6
+                    }
                 },
                 {
                     "parameter": "burningDamage",
                     "modifierType": "inc",
-                    "value": 0.35
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.4
+                    }
                 },
                 {
                     "parameter": "manaOnHit",
                     "modifierType": "flat",
-                    "value": 50
+                    "value": {
+                        "min": 40,
+                        "max": 60
+                    }
                 }
             ],
             "grants": [
@@ -204,9 +231,12 @@
             "criticalChance": 0.06,
             "CriticalDamage": 1.6,
             "maxStackSize": 1,
-            "rarity": "Unique",
+            "rarity": "Mythic",
             "tags": [],
-            "updateLevel": 0,
+            "updateLevel": {
+                "min": 1,
+                "max": 69
+            },
             "maxUpdateLevel": 69,
             "implicits": [],
             "modifiers": [],

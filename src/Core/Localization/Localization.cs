@@ -34,6 +34,12 @@ namespace Core.Localization
 
         public static string Format<T>(T obj) => obj == null ? string.Empty : Service.Format(obj);
 
+        public static string Format<T>(T obj, TextFormat format) => obj == null ? string.Empty : Service.Format(obj, format);
+
+        /// <summary>The roll spread of a materialized item line ("40–60") for the Alt reveal; null when fixed.</summary>
+        public static string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain) =>
+            Service.FormatRolledRange(line, format);
+
         public static string Format<T>(T obj, float minValueMultiplier, float maxValueMultiplier) =>
             obj is IModifier modifier
                 ? Service.FormatModifier(modifier, minValueMultiplier, maxValueMultiplier)

@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.DarkShroud
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>
@@ -15,9 +14,9 @@ namespace Battle.Source.Abilities.DarkShroud
 
         public override void ApplyUpgrade(DarkShroud ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<DarkShroud.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 DarkShroud.Parameters.Effectiveness, Priority.Weak, OperationType.Add, additionalEffectiveness, EffectivenessDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<DarkShroud.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 DarkShroud.Parameters.Stacks, Priority.Weak, OperationType.Subtract, amountStacks, StacksDecoratorId, Id));
         }
 

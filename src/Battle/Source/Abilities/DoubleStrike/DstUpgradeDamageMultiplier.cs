@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: both strikes deal a percentage more damage.</summary>
@@ -11,7 +10,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         private const string DecoratorId = "Ability_Parameter_Decorator_Dst_Damage_Multiplier";
 
         public override void ApplyUpgrade(DoubleStrike ability) =>
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<DoubleStrike.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 DoubleStrike.Parameters.DamageMultiplier, Priority.Weak, OperationType.Add, amount, DecoratorId, Id));
 
         public override void RemoveUpgrade(DoubleStrike ability) =>

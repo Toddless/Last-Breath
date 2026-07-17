@@ -7,7 +7,7 @@ namespace Battle.Source.Abilities.Modifiers
     using Effects;
 
     public class PoisonAttackContextModifier()
-        : ContextModifier(priority: Priority.Weak, id: "Modifier_Poison_Attack"), IAttackModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Modifier_Poison_Attack"), IAttackModifier
     {
         public void Apply(IAttackContext context)
         {

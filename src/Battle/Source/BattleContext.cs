@@ -36,6 +36,9 @@
             _battleArena.SetupEventBus(_localBus);
             _battleArena.InjectServices(provider);
             _battleExperienceProcessor = new BattleExperienceProcessor(_localBus, provider, player);
+            // Summons enter mid-battle from the arena's side; the context only mirrors the
+            // latecomer path's HUD bars (the summon never reaches the return-to-world list).
+            _localBus.Subscribe<SummonSpawnedEvent>(OnSummonSpawned);
             parent.CallDeferred(Node.MethodName.AddChild, _battleArena);
             _player.SetupBattleEventBus(_localBus);
             // The context owns the fighting status: the flag goes up synchronously inside the
@@ -52,13 +55,11 @@
             {
                 _battleHud = (BattleHud)_uiElementManager.ChangeHud(typeof(BattleHud));
                 await _battleHud.SetupEventBus(_localBus);
-                _battleHud.SetPlayerInitialValues(_player.Parameters.MaxHealth, _player.Parameters.MaxMana, _player.CurrentHealth, _player.CurrentMana,
-                    _player.Parameters.MaxBarrier, _player.CurrentBarrier);
+                _battleHud.SetPlayerInitialValues(_player);
                 _battleHud.SetPlayerStance(_player.AbilityBook.CurrentStance);
                 _battleHud.SetAbilityBook(_player.AbilityBook);
                 foreach (IFightable entity in _entities)
-                    _battleHud.CreateEntityBarsWithInitialValues(entity.InstanceId, entity.Parameters.MaxHealth, entity.Parameters.MaxMana, entity.CurrentHealth,
-                        entity.CurrentMana, entity.Parameters.MaxBarrier, entity.CurrentBarrier);
+                    _battleHud.CreateEntityBarsWithInitialValues(entity);
 
                 _battleArena.SetPlayer(_player);
                 if (!_battleArena.PrepareBattleArena(_entities)) return results;
@@ -98,8 +99,7 @@
                 node.GetParent()?.RemoveChild(node); // the spot already claimed the node via deferred AddChild
 
             _entities.Add(fighter); // the return-to-world list must include the latecomer
-            _battleHud?.CreateEntityBarsWithInitialValues(fighter.InstanceId, fighter.Parameters.MaxHealth, fighter.Parameters.MaxMana, fighter.CurrentHealth,
-                fighter.CurrentMana, fighter.Parameters.MaxBarrier, fighter.CurrentBarrier);
+            _battleHud?.CreateEntityBarsWithInitialValues(fighter);
             return true;
         }
 
@@ -107,9 +107,13 @@
         {
             ReturnParticipantsToWorld();
             _battleExperienceProcessor.Dispose();
+            _localBus.Unsubscribe<SummonSpawnedEvent>(OnSummonSpawned);
             _battleArena.QueueFree();
             _localBus.Dispose();
         }
+
+        private void OnSummonSpawned(SummonSpawnedEvent evt) =>
+            _battleHud?.CreateEntityBarsWithInitialValues(evt.Summon);
 
         private void ReturnParticipantsToWorld()
         {

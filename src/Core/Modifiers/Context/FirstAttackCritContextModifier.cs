@@ -4,7 +4,7 @@ namespace Core.Modifiers.Context
     using Enums;
 
     public class FirstAttackCritContextModifier(float criticalDamageBonus)
-        : ContextModifier(priority:Priority.Weak, id:"Modifier_First_Attack_Crit"),IAttackModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id:"Modifier_First_Attack_Crit"),IAttackModifier
     {
         public void Apply(IAttackContext context)
         {

@@ -1,11 +1,13 @@
 namespace Battle.Source.Abilities
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
+    using Activation;
     using Core.Battle;
+    using Core.Battle.Abilities;
+    using Core.Context;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Core.Events;
     using Godot;
@@ -15,28 +17,18 @@ namespace Battle.Source.Abilities
     /// Stages are cumulative — a stage-4 roll applies the mutations of stages 2 and 3 to the cast plan.
     /// <typeparamref name="TPlan"/> is the per-cast state shape: a damage volley, a shield, a debuff set —
     /// the base only guarantees the roll, the cumulative stage loop and that a plan lives exactly one cast.
+    /// Carries NO damage parameters — damaging descendants register those keys themselves.
     /// </summary>
-    public abstract class MulticastAbility<TPlan>(
-        string id,
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        Costs costType = Costs.Mana)
-        : DamagingAbility(id, tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public abstract class MulticastAbility<TPlan>(AbilityBaseData data)
+        : Ability(data)
         where TPlan : class
     {
         private const int BaseStage = 1;
 
-        /// <summary>Stance-wide base chances per stage; per-ability/per-build shifts come from decorators, not data.</summary>
-        private readonly Dictionary<int, float> _sBaseStageChances = new() { [2] = 0.5f, [3] = 0.25f, [4] = 0.05f };
-
-        /// <summary>Stance-wide caps for the final stage chance: stage 2 may become guaranteed, higher stages may not.</summary>
-        private readonly Dictionary<int, float> _sStageChanceCaps = new() { [2] = 1f, [3] = 0.65f, [4] = 0.4f };
-
         private readonly RandomNumberGenerator _rnd = new();
+
+        /// <summary>The stance activation roll; the knobs live inside (future upgrades/boss phases swap or tune it).</summary>
+        protected MulticastActivation Activation { get; } = new();
 
         /// <summary>
         /// Bonus on top of entity's final critical chance. e.g 45% critical chance * 1.35 (35% bonus critical chance)
@@ -47,28 +39,14 @@ namespace Battle.Source.Abilities
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            int stage = RollActivationStage(owner);
+            int stage = Activation.Roll(owner);
             owner.CombatEvents.Publish(new AbilityStageActivatedEvent(this, stage));
 
             var plan = CreateBasePlan(targets, owner, field);
             for (int current = BaseStage + 1; current <= stage; current++)
                 ApplyStage(current, plan, owner, field);
 
-            await ExecutePlan(plan, owner);
-        }
-
-        /// <summary>Top-down roll: chance = clamp(base * (1 + MulticastChance), cap). Stage 1 always fires.</summary>
-        protected int RollActivationStage(IFightable owner)
-        {
-            float multicast = owner.Parameters.GetValueForParameter(EntityParameter.MulticastChance);
-            foreach (int stage in _sBaseStageChances.Keys.OrderByDescending(s => s))
-            {
-                float cap = _sStageChanceCaps.GetValueOrDefault(stage, 1f);
-                float chance = Mathf.Clamp(_sBaseStageChances[stage] * (1 + multicast), 0f, cap);
-                if (_rnd.Randf() <= chance) return stage;
-            }
-
-            return BaseStage;
+            await ExecutePlan(plan, owner, field);
         }
 
         /// <summary>The stage-1 cast built from the ability's current (post-upgrade) parameters.</summary>
@@ -78,14 +56,30 @@ namespace Battle.Source.Abilities
         protected abstract void ApplyStage(int stage, TPlan plan, IFightable owner, IBattleField field);
 
         /// <summary>Executes the fully mutated plan.</summary>
-        protected abstract Task ExecutePlan(TPlan plan, IFightable owner);
+        protected abstract Task ExecutePlan(TPlan plan, IFightable owner, IBattleField field);
 
-        protected override Dictionary<AbilityParameter, IParameterModule<AbilityParameter>> CreateBaseModules()
+        /// <summary>
+        /// One damaging hit of a plan: ability-boosted crit roll, the cast's CastId stamped for chord
+        /// grouping. Every plan-based delivery deals its damage through this — the single seam.
+        /// </summary>
+        protected async Task<ProjectileHit> DealPlanDamage(DamagingCastPlan plan, IFightable owner, IFightable target)
         {
-            var modules = base.CreateBaseModules();
-            modules[AbilityParameter.CriticalChanceBonus] = new Module<AbilityParameter>(() => 0f, AbilityParameter.CriticalChanceBonus);
-            modules[AbilityParameter.CriticalDamageBonus] = new Module<AbilityParameter>(() => 0f, AbilityParameter.CriticalDamageBonus);
-            return modules;
+            float damage = CalculateHitDamage(plan, owner);
+            bool isCritical = RollCritical(owner);
+            // Crit damage is a pure additive multiplier by design: bonuses only ever add to it
+            if (isCritical) damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
+
+            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical, CastId = CastId };
+            context.Add(plan.DamageType, damage);
+            await target.TakeDamage(context);
+            return new ProjectileHit(target, isCritical, context.TotalDamage);
+        }
+
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(AbilityParameter.CriticalChanceBonus, 0f);
+            parameters.RegisterDefault(AbilityParameter.CriticalDamageBonus, 0f);
         }
 
         /// <summary>Ability bonus is a fractional increase over the owner's crit chance (0.35 = +35%).</summary>

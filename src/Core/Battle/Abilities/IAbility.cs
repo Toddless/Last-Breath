@@ -5,8 +5,6 @@
     using System.Threading.Tasks;
     using Enums;
     using Entity;
-    using Entity.Components.Decorator;
-    using Entity.Components.Module;
     using Interfaces;
 
     public interface IAbility : IIdentifiable, IDisplayable, ITaggable
@@ -36,7 +34,7 @@
         /// <summary>The chosen upgrade per tier (one of three); selection is changeable outside battle.</summary>
         IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades { get; }
 
-        event Action<Enum>? OnParameterChanged;
+        event Action<string>? OnParameterChanged;
         event Action<IAbility, bool>? AbilityResourceChanges;
         event Action<IAbility, int>? CooldownLeftChanges;
 
@@ -49,8 +47,8 @@
         /// <summary>Removes the tier's chosen upgrade without selecting a replacement.</summary>
         void ClearUpgrade(int tier);
         Task Execute(List<IFightable> targets, IBattleField field);
-        void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator) where T : struct, Enum;
-        void RemoveParameterDecorator<T>(string id, T key) where T : struct, Enum;
+        void AddParameterDecorator(AbilityParameterDecorator decorator);
+        void RemoveParameterDecorator(string decoratorId, string parameter);
         void SetOwner(IFightable owner);
         bool IsEnoughResource();
 

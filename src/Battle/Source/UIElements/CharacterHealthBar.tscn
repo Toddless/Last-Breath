@@ -1,56 +1,243 @@
-[gd_scene format=3 uid="uid://cv5svhrugien6"]
+[gd_scene load_steps=5 format=3 uid="uid://cv5svhrugien6"]
 
 [ext_resource type="Script" uid="uid://dwqlti1jvk41l" path="res://Addons/Battle/UIElements/CharacterBar.cs" id="1_a8sqt"]
 
-[node name="CharacterHealthBar" type="MarginContainer" unique_id=1621614326 node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "CharacterEffects")]
-offset_right = 250.0
-offset_bottom = 68.0
-layout_direction = 2
+[sub_resource type="StyleBoxFlat" id="card_frame"]
+bg_color = Color(0.075, 0.066, 0.055, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.19, 1)
+
+[sub_resource type="StyleBoxFlat" id="portrait_slot"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.055, 0.05, 0.042, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.19, 1)
+
+[sub_resource type="StyleBoxFlat" id="faction_badge"]
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 8.0
+content_margin_bottom = 3.0
+bg_color = Color(0.05, 0.045, 0.04, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.23, 0.2, 0.16, 1)
+
+[node name="CharacterHealthBar" type="PanelContainer" node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "Icon", "CharacterEffects", "_name", "_factionBadge", "_factionLabel", "_hpText", "_manaText", "_effectsSection", "_effectsHeaderLabel", "_modsSection", "_modsHeaderLabel", "_mods")]
+custom_minimum_size = Vector2(340, 0)
+offset_right = 340.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("card_frame")
 script = ExtResource("1_a8sqt")
-MainContainer = NodePath("MainContainer")
-ManaBar = NodePath("MainContainer/Bars/Mana")
-HealthBar = NodePath("MainContainer/Bars/Health")
-BarrierBar = NodePath("MainContainer/Bars/Barrier")
-CharacterEffects = NodePath("MainContainer/VBoxContainer/GridContainer")
+MainContainer = NodePath("Body/Margin/Layout")
+ManaBar = NodePath("Body/Margin/Layout/Header/Info/ManaArea/Mana")
+HealthBar = NodePath("Body/Margin/Layout/Header/Info/HpArea/Health")
+BarrierBar = NodePath("Body/Margin/Layout/Header/Info/HpArea/Barrier")
+Icon = NodePath("Body/Margin/Layout/Header/PortraitPanel/Portrait")
+CharacterEffects = NodePath("Body/Margin/Layout/EffectsSection/CharacterEffects")
+_name = NodePath("Body/Margin/Layout/Header/Info/NameRow/Name")
+_factionBadge = NodePath("Body/Margin/Layout/Header/Info/NameRow/FactionBadge")
+_factionLabel = NodePath("Body/Margin/Layout/Header/Info/NameRow/FactionBadge/FactionLabel")
+_hpText = NodePath("Body/Margin/Layout/Header/Info/HpArea/HpText")
+_manaText = NodePath("Body/Margin/Layout/Header/Info/ManaArea/ManaText")
+_effectsSection = NodePath("Body/Margin/Layout/EffectsSection")
+_effectsHeaderLabel = NodePath("Body/Margin/Layout/EffectsSection/EffectsHeader/EffectsLabel")
+_modsSection = NodePath("Body/Margin/Layout/ModsSection")
+_modsHeaderLabel = NodePath("Body/Margin/Layout/ModsSection/ModsHeader/ModsLabel")
+_mods = NodePath("Body/Margin/Layout/ModsSection/Mods")
 
-[node name="MainContainer" type="VBoxContainer" parent="." unique_id=255096892]
+[node name="Body" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 0
 
-[node name="Bars" type="VBoxContainer" parent="MainContainer" unique_id=1344164274]
+[node name="Accent" type="ColorRect" parent="Body"]
+custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
-theme_override_constants/separation = 1
+color = Color(0.71, 0.54, 0.24, 0.9)
 
-[node name="Barrier" type="ProgressBar" parent="MainContainer/Bars" unique_id=1340893476]
-custom_minimum_size = Vector2(0, 12)
+[node name="Margin" type="MarginContainer" parent="Body"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Body/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Body/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortraitPanel" type="PanelContainer" parent="Body/Margin/Layout/Header"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("portrait_slot")
+
+[node name="Portrait" type="TextureRect" parent="Body/Margin/Layout/Header/PortraitPanel"]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Body/Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameRow" type="HBoxContainer" parent="Body/Margin/Layout/Header/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+theme_override_font_sizes/font_size = 16
+text = "Name"
+text_overrun_behavior = 3
+
+[node name="FactionBadge" type="PanelContainer" parent="Body/Margin/Layout/Header/Info/NameRow"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("faction_badge")
+
+[node name="FactionLabel" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow/FactionBadge"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 10
+text = "Faction"
+
+[node name="HpArea" type="Control" parent="Body/Margin/Layout/Header/Info"]
+custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 mouse_filter = 2
-theme_type_variation = &"BarrierBar"
-value = 21.0
-show_percentage = false
 
-[node name="Health" type="ProgressBar" parent="MainContainer/Bars" unique_id=918723202]
-custom_minimum_size = Vector2(250, 28)
-layout_mode = 2
+[node name="Health" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_type_variation = &"HpBar"
 value = 81.0
 show_percentage = false
 
-[node name="Mana" type="ProgressBar" parent="MainContainer/Bars" unique_id=1410274800]
+[node name="Barrier" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"BarrierBar"
+value = 21.0
+show_percentage = false
+
+[node name="HpText" type="Label" parent="Body/Margin/Layout/Header/Info/HpArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ManaArea" type="Control" parent="Body/Margin/Layout/Header/Info"]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
+mouse_filter = 2
+
+[node name="Mana" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/ManaArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_type_variation = &"ManaBar"
 value = 60.0
 show_percentage = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer" unique_id=938485985]
-layout_mode = 2
+[node name="ManaText" type="Label" parent="Body/Margin/Layout/Header/Info/ManaArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="MainContainer/VBoxContainer" unique_id=490351187]
-custom_minimum_size = Vector2(0, 15)
+[node name="EffectsSection" type="VBoxContainer" parent="Body/Margin/Layout"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EffectsHeader" type="HBoxContainer" parent="Body/Margin/Layout/EffectsSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectsLabel" type="Label" parent="Body/Margin/Layout/EffectsSection/EffectsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+text = "EFFECTS"
+
+[node name="EffectsRule" type="HSeparator" parent="Body/Margin/Layout/EffectsSection/EffectsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="CharacterEffects" type="GridContainer" parent="Body/Margin/Layout/EffectsSection"]
 layout_mode = 2
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
-columns = 6
+columns = 7
+
+[node name="ModsSection" type="VBoxContainer" parent="Body/Margin/Layout"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ModsHeader" type="HBoxContainer" parent="Body/Margin/Layout/ModsSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ModsLabel" type="Label" parent="Body/Margin/Layout/ModsSection/ModsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+text = "MODIFIERS"
+
+[node name="ModsRule" type="HSeparator" parent="Body/Margin/Layout/ModsSection/ModsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Mods" type="VBoxContainer" parent="Body/Margin/Layout/ModsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2

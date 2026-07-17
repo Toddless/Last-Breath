@@ -21,5 +21,9 @@ namespace Core.Data.CraftingData
 
         /// <summary>Modifier pool mixed into a recraft roll while this additive is used.</summary>
         [JsonProperty("recraftPoolId")] public string? RecraftPoolId { get; init; }
+
+        /// <summary>Creation rune: the guaranteed minimum rarity of the created item (a <see cref="Core.Enums.Rarity"/>
+        /// name, parsed strictly — a typo drops the whole entry).</summary>
+        [JsonProperty("minRarity")] public string? MinRarity { get; init; }
     }
 }

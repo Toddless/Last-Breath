@@ -6,7 +6,7 @@ namespace Core.Modifiers.Context
 
     /// <summary>Amplifies every damage component of incoming CRITICAL hits by <c>amp</c> (0.35 = +35%).</summary>
     public class CritDamageTakenContextModifier(float amp)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Crit_Damage_Taken"), IDamageModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Crit_Damage_Taken"), IDamageModifier
     {
         public void Apply(IDamageContext context)
         {

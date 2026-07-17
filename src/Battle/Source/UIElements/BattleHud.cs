@@ -192,20 +192,27 @@
             }
         }
 
-        public void CreateEntityBarsWithInitialValues(string id, float maxHealth, float maxMana, float currentHealth, float currentMana, float maxBarrier = 0f, float currentBarrier = 0f)
+        /// <summary>The card reads everything off the entity itself: vitals for the bars, the
+        /// display name, the faction badge (NPCs only) and the difficulty modifier list.</summary>
+        public void CreateEntityBarsWithInitialValues(IFightable entity)
         {
             var bar = CharacterBar.Initialize().Instantiate<CharacterBar>();
-            bar.SetInitialValues(maxMana, currentMana, maxHealth, currentHealth, maxBarrier, currentBarrier);
+            bar.SetInitialValues(entity.Parameters.MaxMana, entity.CurrentMana, entity.Parameters.MaxHealth, entity.CurrentHealth,
+                entity.Parameters.MaxBarrier, entity.CurrentBarrier);
+            bar.SetIdentity(entity.DisplayName, entity is INpc npc ? Core.Localization.Localization.Localize($"Fraction_{npc.Fraction}") : null);
+            bar.SetModifiers((entity as IFightableNpc)?.NpcModifiers.AllModifiers ?? []);
             bar.FlipH = true;
-            _characterBars.Add(id, bar);
+            _characterBars.Add(entity.InstanceId, bar);
             _entityBars?.AddChild(bar);
         }
 
         public void SetPlayerStance(Stance stance) => _stanceButtons?.GetChildren().Cast<StanceSlot>().FirstOrDefault(slot => slot.Stance == stance)?.InitializeStance();
 
-        public void SetPlayerInitialValues(float maxHealth, float maxMana, float health, float mana, float maxBarrier = 0f, float barrier = 0f)
+        public void SetPlayerInitialValues(IFightable player)
         {
-            _playerBars?.SetInitialValues(maxMana, mana, maxHealth, health, maxBarrier, barrier);
+            _playerBars?.SetInitialValues(player.Parameters.MaxMana, player.CurrentMana, player.Parameters.MaxHealth, player.CurrentHealth,
+                player.Parameters.MaxBarrier, player.CurrentBarrier);
+            _playerBars?.SetIdentity(player.DisplayName, null);
         }
 
         public void InjectServices(IGameServiceProvider provider)

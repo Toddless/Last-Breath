@@ -64,6 +64,7 @@ namespace Battle.Source
 
             foreach (string abilityId in _abilityProvider.KnownAbilityIds)
             {
+                if (_abilityProvider.IsHidden(abilityId)) continue; // boss reactions are not for the player's book
                 if (learnedIds.Contains(abilityId)) continue;
                 if (_abilityProvider.GetMasteryLevel(abilityId) > _mastery.CurrentLevel) continue;
 

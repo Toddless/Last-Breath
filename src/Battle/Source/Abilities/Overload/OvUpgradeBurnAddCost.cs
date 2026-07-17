@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.Overload
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: burns a bigger share of the target's mana at the price of an increased cost.</summary>
@@ -13,9 +12,9 @@ namespace Battle.Source.Abilities.Overload
 
         public override void ApplyUpgrade(Overload ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<Overload.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 Overload.Parameters.ManaBurnPercent, Priority.Weak, OperationType.Override, burnPercent, BurnDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue, Priority.Weak, OperationType.Add, additionalCost, CostDecoratorId, Id));
         }
 

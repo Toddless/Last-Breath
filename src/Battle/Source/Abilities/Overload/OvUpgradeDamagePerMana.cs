@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.Overload
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: every burned mana point converts into more damage.</summary>
@@ -11,7 +10,7 @@ namespace Battle.Source.Abilities.Overload
         private const string DecoratorId = "Ability_Parameter_Decorator_Ov_Damage_Per_Mana";
 
         public override void ApplyUpgrade(Overload ability) =>
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<Overload.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 Overload.Parameters.DamagePerMana, Priority.Weak, OperationType.Add, amount, DecoratorId, Id));
 
         public override void RemoveUpgrade(Overload ability) =>

@@ -12,7 +12,7 @@ namespace Core.Save.Participants
     public class EquipmentSaveParticipant(IPlayerAccessor playerAccessor, EquipItemSaveConverter converter) : ISaveParticipant
     {
         public string SectionId => "equipment";
-        public int Version => 1;
+        public int Version => 4; // v4: usedResources split into required/optional creation parts
         public int RestoreOrder => Save.RestoreOrder.Items;
 
         public JToken Capture()

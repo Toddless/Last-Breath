@@ -2,16 +2,12 @@ namespace Battle.Source.Abilities.BerserkFury
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
-    using Core.Enums;
     using Effects;
     using Godot;
 
@@ -20,46 +16,10 @@ namespace Battle.Source.Abilities.BerserkFury
     /// puts the Fury effect on the caster (burns health per attack) — the series self-balances.
     /// L3 swaps the Fury variant through <see cref="FuryFactory"/>.
     /// </summary>
-    public class BerserkFury(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        int furyDuration,
-        float furyHealthPercent,
-        Costs costType = Costs.Mana)
-        : DamagingAbility(id: "Ability_Berserk_Fury", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public class BerserkFury(AbilityBaseData data) : DamagingAbility(data)
     {
         private const float MinContinueChance = 0.05f;
         private const float MaxContinueChance = 0.80f;
-
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.FuryDuration] = new Module<Parameters>(() => furyDuration, Parameters.FuryDuration),
-                    [Parameters.FuryHealthPercent] = new Module<Parameters>(() => furyHealthPercent, Parameters.FuryHealthPercent)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
 
         public int FuryDuration => (int)this[Parameters.FuryDuration];
         public float FuryHealthPercent => this[Parameters.FuryHealthPercent];
@@ -69,44 +29,23 @@ namespace Battle.Source.Abilities.BerserkFury
         public Func<int, float, IEffect> FuryFactory { get; set; } =
             (duration, healthPercent) => new FuryEffect(duration, maxStacks: 1, healthPercent);
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            FuryDuration,
-            FuryHealthPercent
+            public const string FuryDuration = nameof(FuryDuration);
+            public const string FuryHealthPercent = nameof(FuryHealthPercent);
+        }
+
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.FuryDuration, 3);
+            parameters.RegisterDefault(Parameters.FuryHealthPercent, 0.05f);
         }
 
         public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);
         public void RemoveAttackModifier(string id) => AttackModifiers.Remove(id);
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
-        {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
-        }
-
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new BerserkFury(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                FuryDuration, FuryHealthPercent, CostType) { FuryFactory = FuryFactory };
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new BerserkFury(Data) { FuryFactory = FuryFactory });
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {

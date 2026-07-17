@@ -7,37 +7,36 @@
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Core.Events;
     using Core.Localization;
     using Godot;
     using Targeting;
 
-    public abstract class Ability(
-        string id,
-        string[] tags,
-        int cooldown,
-        int costValue,
-        Costs costType = Costs.Mana) : IAbility
+    public abstract class Ability(AbilityBaseData data) : IAbility
     {
         protected IFightable? Owner;
 
-        protected IModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>> ModuleManager
+        /// <summary>The data record the ability was built from — the single source of base values;
+        /// <see cref="Copy"/> rebuilds fresh instances from it.</summary>
+        protected AbilityBaseData Data { get; } = data;
+
+        /// <summary>The single parameter store: base values registered by the ability, decorated by upgrades.</summary>
+        protected AbilityParameterSet Params
         {
             get
             {
                 if (field != null) return field;
-                field = new ModuleManager<AbilityParameter, IParameterModule<AbilityParameter>, AbilityParameterDecorator<AbilityParameter>>(CreateBaseModules());
-                field.ModuleChanges += OnModuleChanges;
+                field = new AbilityParameterSet();
+                RegisterBaseParameters(field);
+                field.ParameterChanged += OnParameterChangedInternal;
                 return field;
             }
         }
 
-        protected float this[AbilityParameter parameter] => ModuleManager.GetModule(parameter).GetValue();
+        protected float this[string parameter] => Params[parameter];
 
         /// <summary>
         /// Presentation grouping key of the CURRENT activation, regenerated per <see cref="Execute"/>.
@@ -47,30 +46,30 @@
         protected string CastId { get; private set; } = string.Empty;
 
         /// <summary>
-        /// Named values for the description template: placeholder = parameter name ({Cooldown},
-        /// {Damage}, {StunDuration}...). Values go through decorators, so upgrades change the text
-        /// automatically. Descendants with their own parameter enum add it via
-        /// <see cref="AddModuleValues{TKey}"/>; percent-fractions are rescaled in place (×100).
+        /// Named values for the description template: placeholder = parameter key ({Cooldown},
+        /// {Damage}, {StunDuration}...). Every registered parameter is exposed, decorated values —
+        /// upgrades change the text automatically; percent-fractions are rescaled by the template.
         /// </summary>
         protected virtual Dictionary<string, object?> DescriptionValues
         {
             get
             {
                 var values = new Dictionary<string, object?>();
-                AddModuleValues(values, ModuleManager);
-                values.Remove(nameof(AbilityParameter.CostType)); // enum stored as float — meaningless as a number
+                foreach (string key in Params.Keys)
+                    values[key] = Params[key];
+                values.Remove(AbilityParameter.CostType); // enum stored as float — meaningless as a number
                 return values;
             }
         }
 
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
-        public Stance Stance { get; set; }
-        public ITargetingStrategy Targeting { get; set; } = new SingleTargetTargeting(TargetRelation.Enemies);
+        public Stance Stance { get; set; } = data.Stance;
+        public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
-        public int MasteryLevel { get; set; }
-        public string Id { get; } = id;
+        public int MasteryLevel { get; set; } = data.MasteryLevel;
+        public string Id { get; } = data.Id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
-        public string[] Tags { get; } = tags;
+        public string[] Tags { get; } = data.Tags;
 
         public int CooldownLeft
         {
@@ -105,7 +104,7 @@
         }
 
 
-        public event Action<Enum>? OnParameterChanged;
+        public event Action<string>? OnParameterChanged;
         public event Action<IAbility, int>? CooldownLeftChanges;
         public event Action<IAbility, bool>? AbilityResourceChanges;
 
@@ -178,19 +177,9 @@
                 await rider.Apply(impact);
         }
 
-        public virtual void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
-            where T : struct, Enum
-        {
-            if (decorator is not AbilityParameterDecorator<AbilityParameter> moduleDecorator) return;
-            ModuleManager.AddDecorator(moduleDecorator);
-        }
+        public void AddParameterDecorator(AbilityParameterDecorator decorator) => Params.AddDecorator(decorator);
 
-        public virtual void RemoveParameterDecorator<T>(string id, T key)
-            where T : struct, Enum
-        {
-            if (key is not AbilityParameter abilityParameter) return;
-            ModuleManager.RemoveDecorator(id, abilityParameter);
-        }
+        public void RemoveParameterDecorator(string decoratorId, string parameter) => Params.RemoveDecorator(decoratorId, parameter);
 
         public virtual void SetOwner(IFightable owner)
         {
@@ -241,19 +230,7 @@
 
         protected void StartCooldown(float cd) => CooldownLeft = (int)cd;
 
-        protected void OnModuleChanges<TKey>(TKey key) where TKey : struct, Enum => OnParameterChanged?.Invoke(key);
-
         protected string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
-
-        /// <summary>Adds every parameter of a module manager under its enum name; decorated values, not base ones.</summary>
-        protected static void AddModuleValues<TKey>(
-            Dictionary<string, object?> values,
-            IModuleManager<TKey, IParameterModule<TKey>, AbilityParameterDecorator<TKey>> manager)
-            where TKey : struct, Enum
-        {
-            foreach (TKey key in manager.Keys)
-                values[key.ToString()] = manager.GetModule(key).GetValue();
-        }
 
         protected void OnTurnEnd(TurnEndEvent obj)
         {
@@ -261,14 +238,40 @@
             CooldownLeft--;
         }
 
-        protected virtual Dictionary<AbilityParameter, IParameterModule<AbilityParameter>> CreateBaseModules() => new()
+        /// <summary>
+        /// Registers the ability's base parameter values: the common keys plus EVERYTHING from the
+        /// data's abilityProperties (json camelCase → PascalCase key). Descendants only add
+        /// <see cref="AbilityParameterSet.RegisterDefault"/> fallbacks for keys the data may omit.
+        /// </summary>
+        protected virtual void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            [AbilityParameter.Cooldown] = new Module<AbilityParameter>(() => cooldown, AbilityParameter.Cooldown),
-            [AbilityParameter.CostValue] = new Module<AbilityParameter>(() => costValue, AbilityParameter.CostValue),
-            [AbilityParameter.CostType] = new Module<AbilityParameter>(() => (float)costType, AbilityParameter.CostType),
-        };
+            parameters.Register(AbilityParameter.Cooldown, Data.Cooldown);
+            parameters.Register(AbilityParameter.CostValue, Data.CostValue);
+            parameters.Register(AbilityParameter.CostType, (float)Data.CostsType);
+            foreach (var (key, value) in Data.AbilityProperties)
+                parameters.Register(ToParameterKey(key), value);
+        }
+
+        /// <summary>Damage keys from the data fields — for every damage-dealing ability regardless of family.</summary>
+        protected void RegisterDamageParameters(AbilityParameterSet parameters)
+        {
+            parameters.Register(AbilityParameter.Damage, Data.Damage);
+            parameters.Register(AbilityParameter.WeaponDamageScale, Data.WeaponDamageScale);
+            parameters.Register(AbilityParameter.SpellDamageScale, Data.SpellDamageScale);
+        }
+
+        /// <summary>Shared tail of every Copy(): fresh instance from the same data + the upgrade catalog.</summary>
+        protected IAbility CopyUpgradesTo(Ability copy)
+        {
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            return copy;
+        }
+
+        private static string ToParameterKey(string jsonKey) => char.ToUpperInvariant(jsonKey[0]) + jsonKey[1..];
 
         private bool IsOwnerParalyzed => Owner != null && (Owner.StatusEffects & StatusEffects.Paralysis) != 0;
+
+        private void OnParameterChangedInternal(string parameter) => OnParameterChanged?.Invoke(parameter);
 
         private void OnResourceChanges(float obj) => NotifyAvailabilityChanged();
 

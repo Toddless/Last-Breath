@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     public class SoAsUpgradeAdditionalAttacks(string id, string[] tags, int tier, int amountAttacks)
@@ -12,9 +11,9 @@
 
         public override void ApplyUpgrade(SeriesOfAttacks ability)
         {
-            var minAttacksDecorator = new SimpleAbilityParameterDecorator<SeriesOfAttacks.Parameters>(SeriesOfAttacks.Parameters.MinAttacks, Priority.Weak, OperationType.Add,
+            var minAttacksDecorator = new SimpleAbilityParameterDecorator(SeriesOfAttacks.Parameters.MinAttacks, Priority.Weak, OperationType.Add,
                 amountAttacks, MinAttacksDecoratorId, Id);
-            var maxAttacksDecorator = new SimpleAbilityParameterDecorator<SeriesOfAttacks.Parameters>(SeriesOfAttacks.Parameters.MaxAttacks, Priority.Weak, OperationType.Add,
+            var maxAttacksDecorator = new SimpleAbilityParameterDecorator(SeriesOfAttacks.Parameters.MaxAttacks, Priority.Weak, OperationType.Add,
                 amountAttacks, MaxAttacksDecoratorId, Id);
             ability.AddParameterDecorator(minAttacksDecorator);
             ability.AddParameterDecorator(maxAttacksDecorator);

@@ -4,6 +4,8 @@
 
     public interface IUpgradingResource : IResource
     {
-        EquipmentCategory Category { get; }
+        /// <summary>Null for category-agnostic consumables (fluxes, creation runes) — dusts and
+        /// sharpening runes serve exactly one equipment category.</summary>
+        EquipmentCategory? Category { get; }
     }
 }

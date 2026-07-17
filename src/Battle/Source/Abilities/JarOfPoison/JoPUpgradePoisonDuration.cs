@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities.JarOfPoison
 {
-    using Core.Entity.Components.Decorator;
+    using Core.Battle.Abilities;
     using Core.Enums;
 
     public class JoPUpgradePoisonDuration(string id, string[] tags, int tier, float duration) :
-        SimpleUpgrade<JarOfPoison, JarOfPoison.Parameters>(id, tags, tier,
-            new SimpleAbilityParameterDecorator<JarOfPoison.Parameters>(
+        SimpleUpgrade<JarOfPoison>(id, tags, tier,
+            new SimpleAbilityParameterDecorator(
                 JarOfPoison.Parameters.PoisonDuration,
                 Priority.Weak,
                 OperationType.Add,

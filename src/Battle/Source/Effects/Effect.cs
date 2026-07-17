@@ -75,6 +75,15 @@
                     _ = Copy().Apply(context with { IsBonusStack = true });
             }
 
+            // Target-side pipeline sees the final outgoing instance: resistances shorten it or resist outright.
+            var incoming = new IncomingEffectContext(context.Caster, context.Target, this);
+            context.Target.ModifierHandler.Apply(incoming);
+            if (incoming.Rejected)
+            {
+                context.Target.CombatEvents.Publish(new EffectResistedEvent(this, context.Target, context.Caster));
+                return Task.CompletedTask;
+            }
+
             Context = context;
             Target = context.Target;
             Source = context.Source;

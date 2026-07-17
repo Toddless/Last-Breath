@@ -2,6 +2,8 @@ namespace Core.Modifiers
 {
     using System;
     using System.Collections.Generic;
+    using Entity.Components;
+    using Enums;
 
     /// <summary>Where a materialized line lands. The item implements this for its rolled ("additional") bucket;
     /// <see cref="CollectingSink"/> accumulates for template parse.</summary>
@@ -27,41 +29,58 @@ namespace Core.Modifiers
         void Materialize(IModifierDescriptor descriptor, IModifierSink sink, string source);
     }
 
-    /// <summary>Registry-dispatched materialization: each descriptor kind has a handler, new kind = new entry.
-    /// Always mints fresh instances, so pool descriptors stay pristine.</summary>
-    public sealed class ModifierMaterializer : IModifierMaterializer
+    /// <summary>Kind-dispatched materialization (new descriptor kind = new switch arm). Always mints fresh
+    /// instances, so pool descriptors stay pristine. The single point where a value range becomes a concrete
+    /// number: ranges roll on the injected RNG, fixed values pass through bit-identical and consume no roll
+    /// (seeded sequences must not shift for legacy single-value content). Each line is stamped with its roll
+    /// provenance: Affix, the source range, and — for composite parts — a shared GroupId.</summary>
+    public sealed class ModifierMaterializer(IRandomNumberGenerator rnd) : IModifierMaterializer
     {
-        private readonly IReadOnlyDictionary<Type, Action<IModifierDescriptor, IModifierSink, string>> _handlers;
+        // Group affix/id stamped onto every line of one composite roll; empty for atomic descriptors.
+        private readonly record struct LineStamp(AffixKind? Affix, string? GroupId);
 
-        public ModifierMaterializer()
+        public void Materialize(IModifierDescriptor descriptor, IModifierSink sink, string source) =>
+            Materialize(descriptor, sink, source, default);
+
+        private void Materialize(IModifierDescriptor descriptor, IModifierSink sink, string source, LineStamp stamp)
         {
-            _handlers = new Dictionary<Type, Action<IModifierDescriptor, IModifierSink, string>>
+            switch (descriptor)
             {
-                [typeof(ParameterDescriptor)] = (descriptor, sink, source) => MaterializeParameter((ParameterDescriptor)descriptor, sink, source),
-                [typeof(ContextDescriptor)] = (descriptor, sink, _) => MaterializeContext((ContextDescriptor)descriptor, sink),
-                [typeof(CompositeDescriptor)] = (descriptor, sink, source) => MaterializeComposite((CompositeDescriptor)descriptor, sink, source),
-            };
+                case ParameterDescriptor parameter: MaterializeParameter(parameter, sink, source, stamp); break;
+                case ContextDescriptor context: MaterializeContext(context, sink, stamp); break;
+                case CompositeDescriptor composite: MaterializeComposite(composite, sink, source, stamp); break;
+                default: Tracker.TrackError($"No materializer registered for descriptor {descriptor.GetType().Name}"); break;
+            }
         }
 
-        public void Materialize(IModifierDescriptor descriptor, IModifierSink sink, string source)
+        private void MaterializeParameter(ParameterDescriptor descriptor, IModifierSink sink, string source, LineStamp stamp)
         {
-            if (_handlers.TryGetValue(descriptor.GetType(), out var handler)) handler(descriptor, sink, source);
-            else Tracker.TrackError($"No materializer registered for descriptor {descriptor.GetType().Name}");
-        }
-
-        private static void MaterializeParameter(ParameterDescriptor descriptor, IModifierSink sink, string source)
-        {
-            var modifier = ModifiersCreator.CreateModifierInstance(descriptor.Parameter, descriptor.ValueType, descriptor.Value, source);
+            var modifier = ModifiersCreator.CreateModifierInstance(descriptor.Parameter, descriptor.ValueType, descriptor.Value.Roll(rnd), source);
             modifier.Scope = descriptor.Scope;
+            if (modifier is SimpleModifier simple)
+            {
+                simple.Affix = stamp.Affix ?? descriptor.Affix;
+                simple.GroupId = stamp.GroupId;
+                simple.RolledRange = descriptor.Value.IsFixed ? null : descriptor.Value;
+            }
+
             sink.AddEntity(modifier);
         }
 
-        private static void MaterializeContext(ContextDescriptor descriptor, IModifierSink sink) =>
-            sink.AddContext(new ContextModifierEntry(descriptor.Parameter, descriptor.ValueType, descriptor.Value, descriptor.Weight));
+        private void MaterializeContext(ContextDescriptor descriptor, IModifierSink sink, LineStamp stamp) =>
+            sink.AddContext(new ContextModifierEntry(descriptor.Parameter, descriptor.ValueType, descriptor.Value.Roll(rnd), descriptor.Weight)
+            {
+                Affix = stamp.Affix ?? descriptor.Affix,
+                GroupId = stamp.GroupId,
+                RolledRange = descriptor.Value.IsFixed ? null : descriptor.Value,
+            });
 
-        private void MaterializeComposite(CompositeDescriptor descriptor, IModifierSink sink, string source)
+        // All parts of one composite share a GroupId (they present as a single line) and inherit the ROOT
+        // affix — parts carry none by parse contract. A nested composite keeps the outermost group.
+        private void MaterializeComposite(CompositeDescriptor descriptor, IModifierSink sink, string source, LineStamp stamp)
         {
-            foreach (var part in descriptor.Parts) Materialize(part, sink, source);
+            var groupStamp = new LineStamp(stamp.Affix ?? descriptor.Affix, stamp.GroupId ?? Guid.NewGuid().ToString());
+            foreach (var part in descriptor.Parts) Materialize(part, sink, source, groupStamp);
         }
     }
 }

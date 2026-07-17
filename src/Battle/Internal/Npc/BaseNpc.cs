@@ -103,11 +103,28 @@ namespace Battle.Internal.Npc
         public INpcModifiersComponent NpcModifiers { get; private set; }
         public IBehaviorProfile? Behavior { get; set; }
 
+        /// <summary>Combat reactions from the definition; the arena's reactions driver reads them.</summary>
+        public IReadOnlyList<NpcReactionConfig> Reactions { get; private set; } = [];
+
+        /// <summary>Boss stages from the definition; the arena's stages controller reads them.</summary>
+        public IReadOnlyList<NpcStageConfig> Stages { get; private set; } = [];
+
+        /// <summary>Index into <see cref="Stages"/> this NPC currently fights in.</summary>
+        public int CurrentStageIndex { get; private set; }
+
+        /// <summary>Definition originals of the base parameters: stage multipliers always scale
+        /// from these, so switching stages never loses the base.</summary>
+        private IReadOnlyDictionary<EntityParameter, float>? _definitionParameters;
+
         /// <summary>Body state for the save system; null until <see cref="ApplyDefinition"/> ran (legacy NPCs).</summary>
         public INpcLifecycle? Lifecycle => _lifecycle;
 
         /// <summary>True after this NPC rose as undead — the save system persists risen ones as world deviations.</summary>
         public bool IsRisen { get; private set; }
+
+        /// <summary>Battle-scoped summon: no loot, no experience, no corpse, no world return.
+        /// Raised once by the battle summon spawner right after the definition is applied.</summary>
+        public bool IsSummon { get; private set; }
 
         /// <summary>Species capability from the definition (interaction.canTalk); hostility never changes it.</summary>
         public bool CanTalk { get; private set; }
@@ -256,7 +273,10 @@ namespace Battle.Internal.Npc
             EntityType = definition.EntityType;
             Fraction = definition.Fraction;
             Behavior = definition.Behavior;
+            Reactions = definition.Reactions;
+            Stages = definition.Stages;
             CanTalk = definition.CanTalk;
+            _definitionParameters = definition.Parameters;
 
             foreach ((EntityParameter parameter, float value) in definition.Parameters)
                 Parameters.SetBaseValueForParameter(parameter, value);
@@ -265,8 +285,13 @@ namespace Battle.Internal.Npc
             foreach (var ability in definition.Abilities)
                 AbilityBook.Learn(definition.Stance, ability);
 
+            // A staged boss opens weakened: stage 0 scales the just-written bases and owns the ability set.
+            if (Stages.Count > 0) ApplyStage(0);
+
             // Loot-side today (difficulty/budget); parameter buffs come when NpcBuffId gets a consumer.
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
+
+            GrantControlResistance();
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
@@ -276,6 +301,54 @@ namespace Battle.Internal.Npc
 
             _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
             _lifecycle.ResurrectionReady += OnResurrectionReady;
+        }
+
+        /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);
+        /// the resistance fades over the bearer's turns, so the decay ticks on own turn end.</summary>
+        private void GrantControlResistance()
+        {
+            var rules = GameServiceProvider.Instance.GetService<Core.Battle.ICombatRulesProvider>().ControlResistance;
+            if (!rules.AppliesTo.Contains(EntityType)) return;
+            var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
+            ModifierHandler.Add(resistance);
+            CombatEvents.Subscribe<TurnEndEvent>(_ => resistance.DecayTick());
+        }
+
+        /// <summary>
+        /// Boss stage switch: base parameters scale from the definition originals (the base is never
+        /// lost) and the ability book is rebuilt to the stage's set. On-attack effects of the stage
+        /// are battle-scoped and wired by the arena's BossStagesController.
+        /// </summary>
+        public void ApplyStage(int stageIndex)
+        {
+            if (stageIndex < 0 || stageIndex >= Stages.Count || _definitionParameters == null) return;
+
+            var stage = Stages[stageIndex];
+            CurrentStageIndex = stageIndex;
+
+            foreach ((EntityParameter parameter, float value) in _definitionParameters)
+                Parameters.SetBaseValueForParameter(parameter, value * stage.ParameterMultiplier);
+
+            ReplaceStageAbilities(stage);
+        }
+
+        /// <summary>Unknown ids are reported and skipped — a typo must not abort the stage switch.</summary>
+        private void ReplaceStageAbilities(NpcStageConfig stage)
+        {
+            foreach (var learned in AbilityBook.AllAbilities)
+                AbilityBook.Forget(learned.InstanceId);
+
+            var provider = GameServiceProvider.Instance.GetService<Core.Battle.Abilities.IAbilityProvider>();
+            foreach (string abilityId in stage.Abilities)
+            {
+                if (!provider.KnownAbilityIds.Contains(abilityId))
+                {
+                    Tracker.TrackNotFound($"Stage ability '{abilityId}' of npc '{Id}'", this);
+                    continue;
+                }
+
+                AbilityBook.Learn(AbilityBook.CurrentStance, provider.CreateAbility(abilityId));
+            }
         }
 
         /// <summary>Must be set before <see cref="ApplyDefinition"/> — the brain takes the route at construction.</summary>
@@ -456,6 +529,17 @@ namespace Battle.Internal.Npc
             return Task.CompletedTask;
         }
 
+        /// <summary>Shield layer eats post-mitigation damage BEFORE the barrier (Боссы.md → Щит).</summary>
+        private float AbsorbByShield(IDamageContext context, float remaining)
+        {
+            if (remaining <= 0) return remaining;
+            var shield = Effects.GetBy(e => e is Core.Battle.Abilities.IShieldEffect).OfType<Core.Battle.Abilities.IShieldEffect>().FirstOrDefault();
+            if (shield == null) return remaining;
+            float leftover = shield.Absorb(remaining);
+            context.AbsorbedByShield = remaining - leftover;
+            return leftover;
+        }
+
         public Task TakeDamage(IDamageContext context)
         {
             ModifierHandler.Apply(context);
@@ -463,7 +547,7 @@ namespace Battle.Internal.Npc
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.TotalDamage;
+            float remaining = AbsorbByShield(context, context.TotalDamage);
             if (CurrentBarrier > 0)
             {
                 float absorbed = Mathf.Min(CurrentBarrier, remaining);
@@ -528,6 +612,17 @@ namespace Battle.Internal.Npc
             _battleEventBus = bus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
         }
+
+        /// <summary>Symmetric detach: a summon freed mid-battle must not hear the later
+        /// BattleEndEvent — the handler touches the freed native side.</summary>
+        public void RemoveBattleEventBus()
+        {
+            _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnd);
+            _battleEventBus = null;
+        }
+
+        /// <summary>Marks the body as a battle-scoped summon (see <see cref="IsSummon"/>).</summary>
+        public void MarkAsSummon() => IsSummon = true;
 
         public void ConsumeResource(Costs type, float amount)
         {
@@ -712,6 +807,9 @@ namespace Battle.Internal.Npc
             Fraction = Fractions.Undead;
             IsRisen = true;
             RisingBonus = parameterBonus;
+            // A risen boss skips the weakened opening act: it stands up in its final stage
+            // (no immunity, no transition events — this is not a mid-battle transformation).
+            if (Stages.Count > 0) ApplyStage(Stages.Count - 1);
             ApplyRisingBonus(parameterBonus);
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;

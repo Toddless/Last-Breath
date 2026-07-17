@@ -32,6 +32,10 @@ namespace LastBreathTest.BattleSystemTests
                     EnumParser.ParseEnum<Stance>(stance);
                 foreach (string parameter in npc.BaseParameters.Keys)
                     EnumParser.ParseEnum<EntityParameter>(parameter);
+                if (!string.IsNullOrEmpty(npc.Rarity))
+                    EnumParser.ParseEnum<Rarity>(npc.Rarity);
+                foreach (var reaction in npc.Reactions)
+                    EnumParser.ParseEnum<ReactionTrigger>(reaction.Trigger);
             }
         }
 

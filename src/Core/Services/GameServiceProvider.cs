@@ -65,6 +65,7 @@ namespace Core.Services
             services.AddSingleton<ITextFormatter, ModifierTextFormatter>();
             services.AddSingleton<ContextModifierFormatter>();
             services.AddSingleton<ITextFormatter, ContextModifierTextFormatter>();
+            services.AddSingleton<ITextFormatter, ModifierDescriptorTextFormatter>();
             services.AddSingleton<ILocalizationService, LocalizationService>();
             services.AddSingleton<IKeywordProvider, LocalizationKeywordProvider>();
             services.AddSingleton<IUiElementsManager, UiElementsManager>();

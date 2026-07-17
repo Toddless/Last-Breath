@@ -1,6 +1,7 @@
 ﻿namespace LastBreath
 {
     using System;
+    using System.Linq;
     using Battle.Source;
     using Battle.Source.UIElements;
     using Core;
@@ -9,6 +10,7 @@
     using Core.Enums;
     using Core.Events;
     using Core.Inventory;
+    using Core.Items;
     using Core.Services;
     using Core.Views.UI;
     using Godot;
@@ -67,7 +69,19 @@
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Rare, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Epic, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, 0.3f, 1f));
-
+            inventory.TryAddItem(itemCreation.CreateItem("Amulet_Of_Recovery", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Belt_of_Strength", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_All_Cutting", [], Rarity.Mythic, 0.3f, 1f));
+            var resources = _provider.GetService<IItemDataProvider>().GetAllResources();
+            foreach (IItem item in resources.ToList())
+                inventory.TryAddItem(item.Copy<IItem>(), 999);
         }
 
         public override void _ExitTree()

@@ -19,6 +19,15 @@
             return true;
         }
 
+        /// <summary>Battle-side membership beats the squad's world capacity: a summon must share
+        /// the summoner's side even when the world group was authored full.</summary>
+        public void ForceAddToGroup(IFightable entity)
+        {
+            if (entity.Group != null) return;
+            _entitiesInGroup.Add(entity);
+            entity.Group = this;
+        }
+
 
         public void NotifyAllInGroup(GroupNotification notification)
         {

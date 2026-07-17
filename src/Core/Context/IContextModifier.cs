@@ -5,7 +5,7 @@
 
     public interface IContextModifier<in T> : IIdentifiable
     {
-        Priority Priority { get; }
+        ContextModifierPriority Priority { get; }
 
         void Apply(T context);
     }

@@ -17,32 +17,36 @@ namespace Crafting.Source.UIElements
     using Godot;
 
     /// <summary>
-    /// The one crafting screen: recipe tree with search on the left, the item and its costs on
-    /// the right, one action button for all four modes (Create / Upgrade / Recraft / Ascend).
-    /// Reads go straight to the services; only the crafting COMMANDS travel the bus. Rows are
-    /// plain code-built controls — the scene holds containers, not slots.
+    /// The one crafting screen, composed after the bench layout of the crafting UI kit:
+    /// recipe tree with search on the left; on the right a mode tab row (Create / Upgrade /
+    /// Reroll / Ascend), a bench of result preview (icon, name, modifier lines — recipe results
+    /// render their blueprint descriptors with value spreads) next to requirement/additive slot
+    /// cards, and an action bar at the bottom. Reads go straight to the services; only the
+    /// crafting COMMANDS travel the bus. Cards and rows are code-built — the scene holds
+    /// containers, not slots.
     /// </summary>
     public partial class CraftingWindow : Control, IWindow
     {
         private const string UID = "uid://betq124kfglyy";
         private const int AdditiveSlots = 3;
+        private static readonly Vector2 s_cardIconSize = new(46, 46);
+        private static readonly Vector2 s_cardMinSize = new(0, 130);
 
         [Export] private Tree? _tree;
         [Export] private LineEdit? _search;
         [Export] private Button? _close, _actionButton;
+        [Export] private Button? _modeCreate, _modeUpgrade, _modeRecraft, _modeAscend;
         [Export] private TextureRect? _itemIcon;
-        [Export] private Label? _itemName, _itemSubtitle, _modsHeader, _additivesHeader;
-        [Export] private VBoxContainer? _mods, _requirements;
-        [Export] private HBoxContainer? _additives;
-        [Export] private Control? _picker;
-        [Export] private Label? _pickerTitle;
-        [Export] private ItemList? _pickerList;
-        [Export] private Button? _pickerCancel;
+        [Export] private Label? _title, _listTitle, _itemName, _itemSubtitle, _previewTag, _requirementsHeader, _additivesHeader, _ascendWarning;
+        [Export] private VBoxContainer? _mods;
+        [Export] private GridContainer? _requirements, _additives;
+        [Export] private Control? _chanceBox;
+        [Export] private ProgressBar? _chanceBar;
+        [Export] private Label? _chanceLabel;
 
         private readonly Dictionary<string, string> _categoryChoices = [];
         private readonly string?[] _additiveChoices = new string?[AdditiveSlots];
-        private readonly List<string> _pickerIds = [];
-        private Action<string>? _pickerCallback;
+        private ResourcePickerPopup? _pickerPopup;
 
         private IItemDataProvider? _dataProvider;
         private IInventory? _inventory;
@@ -51,6 +55,7 @@ namespace Crafting.Source.UIElements
         private IItemAscender? _ascender;
         private ICraftingAdditiveProvider? _additiveProvider;
         private IGameMessageBus? _messageBus;
+        private IUiElementsManager? _uiElements;
 
         private CraftingMode _mode = CraftingMode.Create;
         private string? _recipeId;
@@ -65,12 +70,19 @@ namespace Crafting.Source.UIElements
             _search?.TextChanged += _ => BuildTree();
             _close?.Pressed += Close;
             _actionButton?.Pressed += OnActionPressed;
-            _pickerCancel?.Pressed += ClosePicker;
-            _pickerList?.ItemActivated += OnPickerActivated;
+
+            _modeCreate?.Pressed += () => SwitchMode(CraftingMode.Create);
+            _modeUpgrade?.Pressed += () => SwitchMode(CraftingMode.Upgrade);
+            _modeRecraft?.Pressed += () => SwitchMode(CraftingMode.Recraft);
+            _modeAscend?.Pressed += () => SwitchMode(CraftingMode.Ascend);
+
+            LocalizeStaticLabels();
         }
 
         public override void _ExitTree()
         {
+            // The picker lives in the Overlay layer — a window closed by hotkey must not orphan it.
+            ClosePicker();
             if (_inventory != null) _inventory.ItemAmountChanges -= OnItemAmountChanged;
         }
 
@@ -83,6 +95,7 @@ namespace Crafting.Source.UIElements
             _ascender = provider.GetService<IItemAscender>();
             _additiveProvider = provider.GetService<ICraftingAdditiveProvider>();
             _messageBus = provider.GetService<IGameMessageBus>();
+            _uiElements = provider.GetService<IUiElementsManager>();
 
             _inventory.ItemAmountChanges += OnItemAmountChanged;
             BuildTree();
@@ -105,6 +118,49 @@ namespace Crafting.Source.UIElements
             RefreshDetails();
         }
 
+        private void LocalizeStaticLabels()
+        {
+            _title?.Text = Localization.Localize("UI_Crafting");
+            _requirementsHeader?.Text = Localization.Localize("UI_Craft_Requirements");
+            _additivesHeader?.Text = Localization.Localize("UI_Craft_Additives");
+            _ascendWarning?.Text = Localization.Localize("UI_Craft_AscendWarning");
+            _modeCreate?.Text = Localization.Localize("UI_Crafting_Create");
+            _modeUpgrade?.Text = Localization.Localize("UI_Crafting_Upgrade");
+            _modeRecraft?.Text = Localization.Localize("UI_Crafting_Recraft");
+            _modeAscend?.Text = Localization.Localize("UI_Crafting_Ascend");
+        }
+
+        // ---------------------------------------------------------------- mode tabs
+
+        /// <summary>Create always leads back to recipe browsing; the item modes need an item on the
+        /// bench (tabs are disabled otherwise, this is the guard for hotkey/race paths).</summary>
+        private void SwitchMode(CraftingMode mode)
+        {
+            if (mode != CraftingMode.Create && _item == null) { RefreshModeTabs(); return; }
+            if (_mode == mode) { RefreshModeTabs(); return; }
+
+            _mode = mode;
+            if (mode == CraftingMode.Create) _item = null;
+            _selectedModifierInstanceId = null;
+            ResetChoices();
+            RefreshDetails();
+        }
+
+        private void RefreshModeTabs()
+        {
+            SyncTab(_modeCreate, CraftingMode.Create, enabled: true);
+            SyncTab(_modeUpgrade, CraftingMode.Upgrade, _item != null);
+            SyncTab(_modeRecraft, CraftingMode.Recraft, _item != null);
+            SyncTab(_modeAscend, CraftingMode.Ascend, _item != null);
+        }
+
+        private void SyncTab(Button? tab, CraftingMode mode, bool enabled)
+        {
+            if (tab == null) return;
+            tab.Disabled = !enabled;
+            tab.SetPressedNoSignal(_mode == mode);
+        }
+
         // ---------------------------------------------------------------- tree
 
         private void BuildTree()
@@ -115,6 +171,7 @@ namespace Crafting.Source.UIElements
             _tree.Clear();
             _tree.HideRoot = true;
             var root = _tree.CreateItem();
+            int totalShown = 0;
 
             foreach (var group in _dataProvider.GetCraftingRecipes()
                          .GroupBy(RecipeCategory)
@@ -128,6 +185,7 @@ namespace Crafting.Source.UIElements
                 var category = _tree.CreateItem(root);
                 category.SetText(0, Localization.Localize(group.Key.ToString()));
                 category.SetSelectable(0, false);
+                totalShown += matching.Count;
 
                 foreach (var recipe in matching)
                 {
@@ -138,6 +196,8 @@ namespace Crafting.Source.UIElements
                     entry.SetSelectable(0, recipe.IsOpened);
                 }
             }
+
+            _listTitle?.Text = $"{Localization.Localize("UI_Craft_Recipes")} ({totalShown})";
         }
 
         private static RecipeCategories RecipeCategory(ICraftingRecipe recipe) =>
@@ -148,9 +208,27 @@ namespace Crafting.Source.UIElements
         {
             var requirements = _dataProvider?.GetRecipeRequirements(recipeId) ?? [];
             int amount = int.MaxValue;
-            foreach (var requirement in requirements.Where(entry => entry.Type == RequirementType.Resource))
-                amount = Math.Min(amount, (_inventory?.GetTotalItemAmount(requirement.Id) ?? 0) / requirement.Amount);
+            foreach (var requirement in requirements)
+            {
+                int owned = requirement.Type switch
+                {
+                    RequirementType.Resource => _inventory?.GetTotalItemAmount(requirement.Id) ?? 0,
+                    // The optimistic ceiling: any owned member of the category counts toward the slot.
+                    RequirementType.ResourceCategory => CategoryOwnedTotal(requirement.Id),
+                    _ => -1,
+                };
+                if (owned < 0) continue;
+                amount = Math.Min(amount, owned / requirement.Amount);
+            }
+
             return amount == int.MaxValue ? 0 : amount;
+        }
+
+        private int CategoryOwnedTotal(string categoryId)
+        {
+            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
+            var ownedIds = members.Count > 0 ? members : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
+            return ownedIds.Distinct().Sum(id => _inventory?.GetTotalItemAmount(id) ?? 0);
         }
 
         private void OnRecipeSelected()
@@ -171,11 +249,37 @@ namespace Crafting.Source.UIElements
         private void RefreshDetails()
         {
             ClosePicker();
+            RefreshModeTabs();
             RenderItemHeader();
             RenderModifiers();
             RenderRequirements();
             RenderAdditives();
+            RenderUpgradeChance();
             RenderAction();
+        }
+
+        /// <summary>The kit's success-chance bar in the action bar, Upgrade mode only. Lives inside
+        /// RefreshDetails, so it updates live with every additive pick and after every attempt (the
+        /// level moved — the curve point moved). A capped item shows no bar at all, mirroring the
+        /// disabled action button. Same resource set as the actual roll — one formula, one place.</summary>
+        private void RenderUpgradeChance()
+        {
+            bool visible = _mode == CraftingMode.Upgrade && _upgrader != null
+                && _item is { } item && item.UpdateLevel < item.MaxUpdateLevel;
+            _chanceBox?.Visible = visible;
+            if (!visible) return;
+
+            float chance = _upgrader!.GetUpgradeChance(_item!, BuildCost().Keys);
+            _chanceBar?.Value = chance;
+            _chanceLabel?.Text = Localization.Render("UI_Craft_Success_Chance",
+                new Dictionary<string, object?> { ["Chance"] = chance });
+        }
+
+        private EquipItemBlueprint? SelectedBlueprint()
+        {
+            if (_recipeId == null || _dataProvider == null) return null;
+            string resultId = _dataProvider.GetRecipeResultItemId(_recipeId);
+            return resultId.Length == 0 ? null : _dataProvider.GetBlueprint(resultId);
         }
 
         private void RenderItemHeader()
@@ -183,15 +287,26 @@ namespace Crafting.Source.UIElements
             if (_item != null)
             {
                 _itemIcon?.Texture = _item.Icon;
-                _itemName?.Text = _item.DisplayName;
+                SetItemName(_item.DisplayName, _item.Rarity);
                 _itemSubtitle?.Text = $"{Localization.Localize(_item.Rarity.ToString())}   +{_item.UpdateLevel} / {_item.MaxUpdateLevel}";
                 return;
             }
 
             string resultId = _recipeId == null ? string.Empty : _dataProvider?.GetRecipeResultItemId(_recipeId) ?? string.Empty;
+            var blueprint = SelectedBlueprint();
             _itemIcon?.Texture = resultId.Length > 0 ? _dataProvider?.GetItemIcon(resultId) : null;
-            _itemName?.Text = _recipeId == null ? Localization.Localize("UI_Craft_PickRecipe") : Localization.Localize(_recipeId);
-            _itemSubtitle?.Text = string.Empty;
+            SetItemName(
+                _recipeId == null ? Localization.Localize("UI_Craft_PickRecipe") : Localization.Localize(_recipeId),
+                blueprint?.Rarity);
+            _itemSubtitle?.Text = blueprint == null ? string.Empty : Localization.Localize(blueprint.Rarity.ToString());
+        }
+
+        private void SetItemName(string text, Rarity? rarity)
+        {
+            if (_itemName == null) return;
+            _itemName.Text = text;
+            if (rarity == null) _itemName.RemoveThemeColorOverride("font_color");
+            else _itemName.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.RarityColor(rarity.Value)));
         }
 
         private void RenderModifiers()
@@ -200,25 +315,49 @@ namespace Crafting.Source.UIElements
             foreach (var child in _mods.GetChildren())
                 child.QueueFree();
 
-            bool visible = _item != null;
-            _modsHeader?.Visible = visible;
+            var blueprint = _item == null ? SelectedBlueprint() : null;
+            bool visible = _item != null || blueprint != null;
+            _previewTag?.Visible = visible;
             _mods.Visible = visible;
-            if (_item == null) return;
+            _previewTag?.Text = Localization.Localize(_item != null ? "UI_Craft_Modifiers" : "UI_Craft_Result");
 
-            foreach (var implicitModifier in _item.Implicits)
-                _mods.AddChild(new Label { Text = Localization.Format(implicitModifier), ThemeTypeVariation = "DimLabel" });
-            foreach (var contextImplicit in _item.ContextImplicits)
-                _mods.AddChild(new Label { Text = Localization.Format(contextImplicit), ThemeTypeVariation = "DimLabel" });
-
-            foreach (var modifier in _item.Modifiers)
-                _mods.AddChild(RerollableOrLabel(modifier.InstanceId, Localization.Format(modifier)));
-            foreach (var contextModifier in _item.ContextModifiers)
-                _mods.AddChild(RerollableOrLabel(contextModifier.InstanceId, Localization.Format(contextModifier)));
+            if (_item != null) RenderItemModifiers(_item);
+            else if (blueprint != null) RenderBlueprintModifiers(blueprint);
         }
 
-        /// <summary>In Recraft every additional line — entity or context — is pickable; the chosen one gets rerolled.</summary>
+        /// <summary>Live item lines: parts of one composite roll present as a single row (the row's
+        /// id is the first part — the group-reroll target).</summary>
+        private void RenderItemModifiers(IEquipItem item)
+        {
+            foreach (var line in EquipItemLines.ComposeImplicits(item))
+                _mods?.AddChild(new Label { Text = line.Text, ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart });
+
+            foreach (var line in EquipItemLines.ComposeRolled(item))
+                _mods?.AddChild(RerollableOrLabel(line.InstanceId, line.Text));
+
+            foreach (var grant in item.Grants)
+                _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });
+        }
+
+        /// <summary>Recipe result preview straight from the blueprint: descriptors with value spreads
+        /// render through the range templates ("+40–60 Strength"), fixed lines render as usual.</summary>
+        private void RenderBlueprintModifiers(EquipItemBlueprint blueprint)
+        {
+            foreach (var descriptor in blueprint.Implicits)
+                _mods?.AddChild(new Label { Text = Localization.Format(descriptor), ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart });
+
+            foreach (var descriptor in blueprint.Modifiers)
+                _mods?.AddChild(new Label { Text = Localization.Format(descriptor), AutowrapMode = TextServer.AutowrapMode.WordSmart });
+
+            foreach (var grant in blueprint.Grants)
+                _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });
+        }
+
+        /// <summary>In Recraft every additional row — entity, context or grouped — is pickable; the chosen one gets rerolled.</summary>
         private Control RerollableOrLabel(string instanceId, string text) =>
-            _mode == CraftingMode.Recraft ? RerollableRow(instanceId, text) : new Label { Text = text };
+            _mode == CraftingMode.Recraft
+                ? RerollableRow(instanceId, text)
+                : new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
 
         private Button RerollableRow(string instanceId, string text)
         {
@@ -227,6 +366,7 @@ namespace Crafting.Source.UIElements
                 Text = (_selectedModifierInstanceId == instanceId ? "» " : string.Empty) + text,
                 Alignment = HorizontalAlignment.Left,
                 FocusMode = FocusModeEnum.None,
+                ClipText = true,
             };
             row.Pressed += () =>
             {
@@ -235,6 +375,8 @@ namespace Crafting.Source.UIElements
             };
             return row;
         }
+
+        // ---------------------------------------------------------------- requirement / additive cards
 
         private void RenderRequirements()
         {
@@ -245,43 +387,37 @@ namespace Crafting.Source.UIElements
             foreach (var requirement in CurrentRequirements())
             {
                 if (requirement.Type == RequirementType.ResourceCategory)
-                    _requirements.AddChild(CategoryRow(requirement));
+                    _requirements.AddChild(CategoryCard(requirement));
                 else
-                    _requirements.AddChild(StaticRow(requirement));
+                    _requirements.AddChild(StaticCard(requirement));
             }
+
+            _ascendWarning?.Visible = _mode == CraftingMode.Ascend && _item != null;
         }
 
-        private Control StaticRow(Core.Interfaces.IRequirement requirement)
+        private Control StaticCard(Core.Interfaces.IRequirement requirement)
         {
             int have = requirement.Type == RequirementType.MasteryLevel
                 ? _mastery?.CurrentLevel ?? 0
                 : _inventory?.GetTotalItemAmount(requirement.Id) ?? 0;
+            var icon = requirement.Type == RequirementType.Resource ? _dataProvider?.GetItemIcon(requirement.Id) : null;
 
-            var row = new HBoxContainer();
-            row.AddChild(new Label { Text = Localization.Localize(requirement.Id), SizeFlagsHorizontal = SizeFlags.ExpandFill });
-            row.AddChild(new Label
-            {
-                Text = $"{have} / {requirement.Amount}",
-                ThemeTypeVariation = have >= requirement.Amount ? null : "DimLabel",
-            });
-            return row;
+            var card = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, CustomMinimumSize = s_cardMinSize };
+            card.AddChild(CardContent(icon, Localization.Localize(requirement.Id), $"{have} / {requirement.Amount}", have >= requirement.Amount));
+            return card;
         }
 
         /// <summary>A category requirement is a slot: click → pick a concrete resource carrying the tag.</summary>
-        private Control CategoryRow(Core.Interfaces.IRequirement requirement)
+        private Control CategoryCard(Core.Interfaces.IRequirement requirement)
         {
             bool chosen = _categoryChoices.TryGetValue(requirement.Id, out string? resourceId);
             int have = chosen ? _inventory?.GetTotalItemAmount(resourceId!) ?? 0 : 0;
 
-            var row = new Button
-            {
-                Text = chosen
-                    ? $"{Localization.Localize(resourceId!)}   {have} / {requirement.Amount}"
-                    : $"{Localization.Localize("UI_Craft_Choose")}: {Localization.Localize(requirement.Id)}",
-                Alignment = HorizontalAlignment.Left,
-                FocusMode = FocusModeEnum.None,
-            };
-            row.Pressed += () => OpenPicker(
+            var card = SlotButton();
+            card.AddChild(chosen
+                ? CardContent(_dataProvider?.GetItemIcon(resourceId!), Localization.Localize(resourceId!), $"{have} / {requirement.Amount}", have >= requirement.Amount)
+                : CardContent(null, $"{Localization.Localize("UI_Craft_Choose")}: {Localization.Localize(requirement.Id)}", null, countMet: true));
+            card.Pressed += () => OpenPicker(
                 Localization.Localize(requirement.Id),
                 CategoryResourceIds(requirement.Id),
                 picked =>
@@ -289,14 +425,23 @@ namespace Crafting.Source.UIElements
                     _categoryChoices[requirement.Id] = picked;
                     RefreshDetails();
                 });
-            return row;
+            return card;
         }
 
-        private List<string> CategoryResourceIds(string categoryTag) =>
-            (_inventory?.GetAllItemIdsWithTag(categoryTag) ?? [])
-            .Distinct()
-            .Where(id => !_categoryChoices.ContainsValue(id))
-            .ToList();
+        /// <summary>Owned candidates of one category slot. Membership comes from the resources'
+        /// material data when the id names a real category; legacy bare-tag requirements fall back
+        /// to the inventory tag lookup.</summary>
+        private List<string> CategoryResourceIds(string categoryId)
+        {
+            var members = _dataProvider?.GetResourceIdsInCategory(categoryId) ?? [];
+            var owned = members.Count > 0
+                ? members.Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0)
+                : _inventory?.GetAllItemIdsWithTag(categoryId) ?? [];
+            return owned
+                .Distinct()
+                .Where(id => !_categoryChoices.ContainsValue(id))
+                .ToList();
+        }
 
         private void RenderAdditives()
         {
@@ -314,13 +459,11 @@ namespace Crafting.Source.UIElements
             {
                 int index = slot;
                 string? choice = _additiveChoices[slot];
-                var button = new Button
-                {
-                    Text = choice == null ? "+" : Localization.Localize(choice),
-                    CustomMinimumSize = new Vector2(120, 40),
-                    FocusMode = FocusModeEnum.None,
-                };
-                button.Pressed += () =>
+                var card = SlotButton();
+                card.AddChild(choice == null
+                    ? CardContent(null, "+", null, countMet: true)
+                    : CardContent(_dataProvider?.GetItemIcon(choice), Localization.Localize(choice), null, countMet: true));
+                card.Pressed += () =>
                 {
                     if (_additiveChoices[index] != null)
                     {
@@ -335,8 +478,62 @@ namespace Crafting.Source.UIElements
                         RefreshDetails();
                     });
                 };
-                _additives.AddChild(button);
+                _additives.AddChild(card);
             }
+        }
+
+        /// <summary>Clickable slot card: the button is the frame, the content overlays it mouse-transparently.</summary>
+        private static Button SlotButton() => new()
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            CustomMinimumSize = s_cardMinSize,
+            FocusMode = FocusModeEnum.None,
+        };
+
+        /// <summary>Vertical slot-card content after the kit's resource slot: icon, name, have/need.</summary>
+        private static Control CardContent(Texture2D? icon, string name, string? count, bool countMet)
+        {
+            var content = new VBoxContainer
+            {
+                MouseFilter = MouseFilterEnum.Ignore,
+                Alignment = BoxContainer.AlignmentMode.Center,
+            };
+            content.SetAnchorsPreset(LayoutPreset.FullRect);
+            content.AddThemeConstantOverride("separation", 4);
+
+            if (icon != null)
+            {
+                content.AddChild(new TextureRect
+                {
+                    Texture = icon,
+                    CustomMinimumSize = s_cardIconSize,
+                    ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                    StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                    SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
+                    MouseFilter = MouseFilterEnum.Ignore,
+                });
+            }
+
+            content.AddChild(new Label
+            {
+                Text = name,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                MouseFilter = MouseFilterEnum.Ignore,
+            });
+
+            if (count != null)
+            {
+                content.AddChild(new Label
+                {
+                    Text = count,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    ThemeTypeVariation = countMet ? null : "DimLabel",
+                    MouseFilter = MouseFilterEnum.Ignore,
+                });
+            }
+
+            return content;
         }
 
         private List<string> AvailableAdditiveIds() =>
@@ -370,14 +567,16 @@ namespace Crafting.Source.UIElements
             return _mode switch
             {
                 CraftingMode.Upgrade => _upgrader.GetUpgradeResourceCost(_item.Rarity, category),
-                CraftingMode.Recraft => _upgrader.GetRecraftResourceCost(_item.Rarity, category),
+                // Item-aware price: includes the growing-reroll multiplier, so the cards show the
+                // ACTUAL next-reroll cost (RefreshDetails after each reroll re-reads it).
+                CraftingMode.Recraft => _upgrader.GetRecraftResourceCost(_item),
                 CraftingMode.Ascend => _ascender.GetAscendResourceCost(category),
                 _ => [],
             };
         }
 
-        /// <summary>Everything the operation consumes: fixed resources, chosen category resources, additives.</summary>
-        private Dictionary<string, int> BuildCost()
+        /// <summary>The mandatory part of the cost: fixed resources plus chosen category resources.</summary>
+        private Dictionary<string, int> BuildRequiredCost()
         {
             var cost = new Dictionary<string, int>();
             foreach (var requirement in CurrentRequirements())
@@ -393,9 +592,26 @@ namespace Crafting.Source.UIElements
                 }
             }
 
+            return cost;
+        }
+
+        /// <summary>The optional part: whatever sits in the additive slots.</summary>
+        private Dictionary<string, int> BuildOptionalCost()
+        {
+            var cost = new Dictionary<string, int>();
             foreach (string? additive in _additiveChoices)
                 if (additive != null)
                     cost[additive] = cost.GetValueOrDefault(additive) + 1;
+            return cost;
+        }
+
+        /// <summary>Everything the operation consumes, merged — for availability checks and the
+        /// single-map item operations (upgrade/recraft).</summary>
+        private Dictionary<string, int> BuildCost()
+        {
+            var cost = BuildRequiredCost();
+            foreach ((string id, int amount) in BuildOptionalCost())
+                cost[id] = cost.GetValueOrDefault(id) + amount;
             return cost;
         }
 
@@ -432,14 +648,18 @@ namespace Crafting.Source.UIElements
                 switch (_mode)
                 {
                     case CraftingMode.Create:
-                        await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new(_recipeId!, cost));
+                        // The split travels to the item: the window knows which resources came from
+                        // requirement cards and which from additive slots.
+                        await _messageBus.SendRequest<CreateEquipItemRequest, IEquipItem?>(new(_recipeId!, BuildRequiredCost(), BuildOptionalCost()));
                         break;
                     case CraftingMode.Upgrade:
                         await _messageBus.SendRequest<UpgradeEquipItemRequest, ItemUpgradeResult>(new(_item!.InstanceId, cost));
                         break;
                     case CraftingMode.Recraft:
+                        // Only the additives travel: the handler recomputes and spends the mandatory
+                        // price itself — the window's requirement cards are a mirror, not the source.
                         await _messageBus.SendRequest<RecraftEquipItemModifierRequest, RequestResult<string>>(
-                            new(_item!.InstanceId, _selectedModifierInstanceId!, cost));
+                            new(_item!.InstanceId, _selectedModifierInstanceId!, BuildOptionalCost()));
                         _selectedModifierInstanceId = null;
                         break;
                     case CraftingMode.Ascend:
@@ -458,37 +678,25 @@ namespace Crafting.Source.UIElements
 
         // ---------------------------------------------------------------- picker
 
+        /// <summary>The candidate list opens as an Overlay popup at the cursor — the bench layout
+        /// never moves. RefreshDetails (and a dying window) closes whatever picker is up.</summary>
         private void OpenPicker(string title, List<string> ids, Action<string> onPicked)
         {
-            if (_picker == null || _pickerList == null) return;
+            var entries = ids
+                .Select(id => new ResourcePickerPopup.PickerEntry(
+                    id,
+                    $"{Localization.Localize(id)}   ({_inventory?.GetTotalItemAmount(id) ?? 0})",
+                    _dataProvider?.GetItemIcon(id)))
+                .ToList();
 
-            _pickerCallback = onPicked;
-            _pickerTitle?.Text = title;
-            _pickerList.Clear();
-            _pickerIds.Clear();
-
-            foreach (string id in ids)
-            {
-                _pickerIds.Add(id);
-                _pickerList.AddItem($"{Localization.Localize(id)}   ({_inventory?.GetTotalItemAmount(id) ?? 0})", _dataProvider?.GetItemIcon(id));
-            }
-
-            _picker.Visible = true;
-        }
-
-        private void OnPickerActivated(long index)
-        {
-            if (index < 0 || index >= _pickerIds.Count) return;
-            var callback = _pickerCallback;
-            string picked = _pickerIds[(int)index];
-            ClosePicker();
-            callback?.Invoke(picked);
+            _pickerPopup = _uiElements?.ShowPopup(typeof(ResourcePickerPopup)) as ResourcePickerPopup;
+            _pickerPopup?.Present(title, entries, onPicked);
         }
 
         private void ClosePicker()
         {
-            _pickerCallback = null;
-            if (_picker != null) _picker.Visible = false;
+            if (_pickerPopup != null && IsInstanceValid(_pickerPopup)) _pickerPopup.Close();
+            _pickerPopup = null;
         }
 
         // ---------------------------------------------------------------- misc

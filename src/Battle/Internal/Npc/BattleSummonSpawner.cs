@@ -1,0 +1,33 @@
+namespace Battle.Internal.Npc
+{
+    using Core.Data.NpcData;
+    using Core.Entity;
+    using Godot;
+    using GameServiceProvider = Services.GameServiceProvider;
+
+    /// <summary>
+    /// Battle-side <see cref="IBattleNpcSpawner"/>: spawns summon bodies straight into the arena
+    /// (never the world) with the summon flag raised. Registered in the project bootstrap — the
+    /// only layer allowed to know Internal classes; the arena consumes the interface.
+    /// </summary>
+    internal class BattleSummonSpawner : IBattleNpcSpawner
+    {
+        public IFightableNpc? Spawn(NpcDefinition definition, Node2D parent, Vector2 globalPosition)
+        {
+            var npc = BaseNpc.Initialize().Instantiate<BaseNpc>();
+            npc.InjectServices(GameServiceProvider.Instance);
+            // Position BEFORE AddChild: entering the tree at (0,0) and teleporting afterwards
+            // drags bodies overlapping the origin via MoveAndSlide's platform logic.
+            npc.Position = parent.ToLocal(globalPosition);
+            parent.AddChild(npc); // _Ready builds the components ApplyDefinition configures
+            npc.ApplyDefinition(definition);
+            npc.MarkAsSummon();
+            return npc;
+        }
+
+        public void Despawn(IFightableNpc npc)
+        {
+            if (npc is Node node) node.QueueFree();
+        }
+    }
+}

@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dupapy2hnba7p"]
+
+[ext_resource type="Script" uid="uid://b3oilj0r8insy" path="res://Addons/Crafting/UIElements/ResourcePickerPopup.cs" id="1_rpick"]
+
+[node name="ResourcePickerPopup" type="Control" unique_id=1984158304 node_paths=PackedStringArray("_panel", "_title", "_list", "_cancel")]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_rpick")
+_panel = NodePath("Panel")
+_title = NodePath("Panel/Margin/Layout/Title")
+_list = NodePath("Panel/Margin/Layout/List")
+_cancel = NodePath("Panel/Margin/Layout/Cancel")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=2088539979]
+visible = false
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 420.0
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=850203576]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin" unique_id=459132602]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/Margin/Layout" unique_id=469971544]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+
+[node name="List" type="ItemList" parent="Panel/Margin/Layout" unique_id=1355409234]
+custom_minimum_size = Vector2(336, 320)
+layout_mode = 2
+size_flags_vertical = 3
+fixed_icon_size = Vector2i(24, 24)
+
+[node name="Cancel" type="Button" parent="Panel/Margin/Layout" unique_id=1647899993]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+focus_mode = 0
+text = "Cancel"

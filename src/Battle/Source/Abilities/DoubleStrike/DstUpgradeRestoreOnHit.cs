@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.DoubleStrike
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L3 upgrade: a landed first strike restores health, a landed second strike restores mana.</summary>
@@ -13,9 +12,9 @@ namespace Battle.Source.Abilities.DoubleStrike
 
         public override void ApplyUpgrade(DoubleStrike ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<DoubleStrike.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 DoubleStrike.Parameters.HealthRestore, Priority.Weak, OperationType.Add, healthRestore, HealthDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<DoubleStrike.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 DoubleStrike.Parameters.ManaRestore, Priority.Weak, OperationType.Add, manaRestore, ManaDecoratorId, Id));
         }
 

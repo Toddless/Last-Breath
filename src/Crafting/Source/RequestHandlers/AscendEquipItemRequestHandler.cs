@@ -20,12 +20,12 @@ namespace Crafting.Source.RequestHandlers
         public Task<AscensionResult> HandleRequest(AscendEquipItemRequest request)
         {
             var item = inventory.GetItem<IEquipItem>(request.InstanceId);
-            if (item == null || !itemAscender.CanAscend(item)) return Task.FromResult(new AscensionResult(false, null));
+            if (item == null || !itemAscender.CanAscend(item)) return Task.FromResult(new AscensionResult(false, []));
 
             var cost = itemAscender.GetAscendResourceCost(item.EquipmentPiece.ConvertEquipmentPartToCategory())
                 .Where(requirement => requirement.Type == RequirementType.Resource)
                 .ToDictionary(requirement => requirement.Id, requirement => requirement.Amount);
-            if (!resources.TrySpend(cost)) return Task.FromResult(new AscensionResult(false, null));
+            if (!resources.TrySpend(cost)) return Task.FromResult(new AscensionResult(false, []));
 
             var result = itemAscender.TryAscendItem(item);
             if (result.Succeeded)

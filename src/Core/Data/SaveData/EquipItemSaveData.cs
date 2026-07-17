@@ -32,12 +32,25 @@ namespace Core.Data.SaveData
         [JsonProperty("isSealed")] public bool IsSealed { get; init; }
         [JsonProperty("itemEffect")] public string ItemEffect { get; init; } = string.Empty;
 
+        // The generation multiplier (loot difficulty / crafting quality). Nullable so pre-field saves
+        // (which also carried a stored reroll pool, now dead) restore with the default of 1.
+        [JsonProperty("powerMultiplier", NullValueHandling = NullValueHandling.Ignore)] public float? PowerMultiplier { get; init; }
+
+        // Successful modifier rerolls (drives the growing recraft price). Nullable so legacy saves
+        // restore at 0 — their next recraft costs the base price.
+        [JsonProperty("recraftCount", NullValueHandling = NullValueHandling.Ignore)] public int? RecraftCount { get; init; }
+
+        // Ascension's flat stat scale (both line channels recompute by it). Nullable so pre-ascension-rework
+        // saves — including already-sealed mythics — restore with the neutral 1.
+        [JsonProperty("ascensionMultiplier", NullValueHandling = NullValueHandling.Ignore)] public float? AscensionMultiplier { get; init; }
+
         [JsonProperty("implicits")] public List<ModifierSaveData> Implicits { get; init; } = [];
         [JsonProperty("modifiers")] public List<ModifierSaveData> Modifiers { get; init; } = [];
         [JsonProperty("contextImplicits")] public List<ContextModifierSaveData> ContextImplicits { get; init; } = [];
         [JsonProperty("contextModifiers")] public List<ContextModifierSaveData> ContextModifiers { get; init; } = [];
-        [JsonProperty("modifiersPool")] public List<ModifierDescriptorSaveData> ModifiersPool { get; init; } = [];
-        [JsonProperty("usedResources")] public Dictionary<string, int> UsedResources { get; init; } = [];
+        // v4: the flat id->amount map became a required/optional split (the item remembers which
+        // creation slot each resource came from). Pre-v4 saves restore with empty parts.
+        [JsonProperty("usedResources")] public UsedResourcesSaveData UsedResources { get; init; } = new();
         [JsonProperty("grants")] public List<GrantSaveData> Grants { get; init; } = [];
 
         // Weapon-only block (Kind == WeaponKind)
@@ -52,5 +65,12 @@ namespace Core.Data.SaveData
         [JsonProperty("baseDamage", NullValueHandling = NullValueHandling.Ignore)] public float? BaseDamage { get; init; }
         [JsonProperty("criticalChance", NullValueHandling = NullValueHandling.Ignore)] public float? CriticalChance { get; init; }
         [JsonProperty("criticalDamage", NullValueHandling = NullValueHandling.Ignore)] public float? CriticalDamage { get; init; }
+    }
+
+    /// <summary>The creation resource split: the recipe's mandatory part and the optional additives.</summary>
+    public class UsedResourcesSaveData
+    {
+        [JsonProperty("required")] public Dictionary<string, int> Required { get; init; } = [];
+        [JsonProperty("optional")] public Dictionary<string, int> Optional { get; init; } = [];
     }
 }

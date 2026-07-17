@@ -19,8 +19,10 @@ namespace Crafting.Services
     internal class ItemDataProvider(IDataParser dataParser) : IItemDataProvider, IGameDataParticipant
     {
         private readonly Dictionary<string, IItem> _itemData = [];
-        private readonly Dictionary<string, List<IModifier>> _equipItemModifierPools = [];
-        private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<IRequirement>>> _upgradeCosts = [];
+        // Equip templates never enter _itemData: they live as blueprints and are born through the minter only.
+        private readonly Dictionary<string, EquipItemBlueprint> _blueprints = [];
+        private readonly Dictionary<string, List<IModifierDescriptor>> _equipItemModifierPools = [];
+        private Dictionary<CraftingMode, Dictionary<EquipmentCategory, List<CostRequirement>>> _upgradeCosts = [];
 
         public IReadOnlyList<string> Catalogs =>
         [
@@ -36,7 +38,7 @@ namespace Crafting.Services
             switch (catalog)
             {
                 case DataCatalog.EquipItems:
-                    AddItems(dataParser.ParseEquipItems(file.Json));
+                    AddBlueprints(dataParser.ParseEquipItems(file.Json));
                     break;
                 case DataCatalog.Recipes:
                     AddItems(dataParser.ParseRecipes(file.Json));
@@ -56,26 +58,44 @@ namespace Crafting.Services
 
         public IItem CopyItem(string id) => TryGetItem(id)?.Copy<IItem>() ?? throw new ArgumentNullException($"Item not found: {id}");
 
-        public Texture2D? GetItemIcon(string id) => TryGetItem(id)?.Icon;
+        public EquipItemBlueprint? GetBlueprint(string id) => _blueprints.GetValueOrDefault(id);
 
-        public List<IModifier> GetEquipItemModifierPool(string id)
-        {
-            if (!_equipItemModifierPools.TryGetValue(id, out var data)) return [];
-            return [.. data];
-        }
+        public IEnumerable<EquipItemBlueprint> AllBlueprints => _blueprints.Values;
+
+        // Equip icons resolve from the blueprint id (the same path a live EquipItem lazy-loads).
+        public Texture2D? GetItemIcon(string id) =>
+            _blueprints.ContainsKey(id)
+                ? ResourceLoader.Load<Texture2D>(Core.Constants.AssetPaths.ItemIcon(id))
+                : TryGetItem(id)?.Icon;
+
+        // Descriptors are immutable records — the cached lists can be handed out without defensive copies.
+        public IReadOnlyList<IModifierDescriptor> GetEquipItemModifierPool(string id) =>
+            !_equipItemModifierPools.TryGetValue(id, out var data) ? [] : data;
 
         public Dictionary<string, int> GetEquipItemResources(string itemId) => throw new NotImplementedException();
-        public List<IModifier> GetEquipItemBaseModifierPool(string id) => throw new NotImplementedException();
 
-        public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category) => GetCost(CraftingMode.Upgrade, category);
-        public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category) => GetCost(CraftingMode.Recraft, category);
-        public IReadOnlyList<IRequirement> GetAscendCost(EquipmentCategory category) => GetCost(CraftingMode.Ascend, category);
+        public IReadOnlyList<IModifierDescriptor> GetEquipItemBaseModifierPool(string id) =>
+            !_equipItemModifierPools.TryGetValue(id.Split('_')[0], out var modifiers) ? [] : modifiers;
+
+        public IReadOnlyList<IRequirement> GetUpgradeCost(EquipmentCategory category, Rarity rarity) => GetCost(CraftingMode.Upgrade, category, rarity);
+        public IReadOnlyList<IRequirement> GetRecraftCost(EquipmentCategory category, Rarity rarity) => GetCost(CraftingMode.Recraft, category, rarity);
+        // Only Legendary items ascend, so the section resolves against that single rarity.
+        public IReadOnlyList<IRequirement> GetAscendCost(EquipmentCategory category) => GetCost(CraftingMode.Ascend, category, Rarity.Legendary);
 
         public List<IRequirement> GetRecipeRequirements(string id)
         {
             var item = TryGetItem(id);
-            return item is not ICraftingRecipe recipe ? [] : recipe.Requirements;
+            return item is not ICraftingRecipe recipe ? [] : recipe.Requirements.Normalize(IsMaterialCategory);
         }
+
+        public bool IsMaterialCategory(string id) => _itemData.Values
+            .OfType<ICraftingResource>()
+            .Any(resource => resource.Material?.MaterialCategory?.Id == id);
+
+        public IReadOnlyList<string> GetResourceIdsInCategory(string categoryId) => [.. _itemData.Values
+            .OfType<ICraftingResource>()
+            .Where(resource => resource.Material?.MaterialCategory?.Id == categoryId)
+            .Select(resource => resource.Id)];
 
         public string GetRecipeResultItemId(string recipeId)
         {
@@ -97,7 +117,10 @@ namespace Crafting.Services
             return recipe;
         }
 
-        public bool IsItemHasTag(string id, string tag) => TryGetItem(id)?.HasTag(tag) ?? false;
+        public bool IsItemHasTag(string id, string tag) =>
+            _blueprints.TryGetValue(id, out var blueprint)
+                ? blueprint.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase)
+                : TryGetItem(id)?.HasTag(tag) ?? false;
 
         public IEnumerable<IItem> GetAllResources() => [.. _itemData.Values.Where(x => x is IResource)];
 
@@ -105,8 +128,12 @@ namespace Crafting.Services
 
         private void AddItems(List<IItem> data) => data.ForEach(item => _itemData.TryAdd(item.Id, item));
 
-        private IReadOnlyList<IRequirement> GetCost(CraftingMode mode, EquipmentCategory category) =>
-            _upgradeCosts.TryGetValue(mode, out var categories) && categories.TryGetValue(category, out var requirements) ? requirements : [];
+        private void AddBlueprints(List<EquipItemBlueprint> data) => data.ForEach(blueprint => _blueprints.TryAdd(blueprint.Id, blueprint));
+
+        private IReadOnlyList<IRequirement> GetCost(CraftingMode mode, EquipmentCategory category, Rarity rarity) =>
+            _upgradeCosts.TryGetValue(mode, out var categories) && categories.TryGetValue(category, out var requirements)
+                ? requirements.Select(requirement => requirement.Resolve(rarity)).OfType<IRequirement>().ToList()
+                : [];
 
         private IItem? TryGetItem(string id)
         {

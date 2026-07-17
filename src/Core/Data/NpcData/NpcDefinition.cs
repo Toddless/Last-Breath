@@ -23,6 +23,13 @@ namespace Core.Data.NpcData
 
         /// <summary>Rolled NPC modifiers (count = type × rarity); copies, ready to attach.</summary>
         public IReadOnlyList<INpcModifier> Modifiers { get; init; } = [];
+
+        /// <summary>Combat reactions (hidden triggered casts, e.g. the twin's assist). Empty for most NPCs.</summary>
+        public IReadOnlyList<NpcReactionConfig> Reactions { get; init; } = [];
+
+        /// <summary>Boss stages (weakened opening act → transformation). Empty for most NPCs;
+        /// when present, <see cref="Abilities"/> is empty — each stage owns its ability set.</summary>
+        public IReadOnlyList<NpcStageConfig> Stages { get; init; } = [];
         public BehaviorProfile? Behavior { get; init; }
 
         /// <summary>World-mode brain tuning; null = the NPC stands still like before.</summary>

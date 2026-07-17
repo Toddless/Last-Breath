@@ -1,62 +1,192 @@
-[gd_scene format=3 uid="uid://di3yh40oyvjhe"]
+[gd_scene load_steps=4 format=3 uid="uid://di3yh40oyvjhe"]
 
 [ext_resource type="Script" uid="uid://dxk3i5x34sfio" path="res://UI/ItemTooltipPopup.cs" id="1"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_title"]
-font_size = 20
+[sub_resource type="StyleBoxFlat" id="tooltip_frame"]
+bg_color = Color(0.075, 0.066, 0.055, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.19, 1)
 
-[node name="ItemTooltipPopup" type="Control" unique_id=1952734347 node_paths=PackedStringArray("_panel", "_title", "_subtitle", "_lines", "_icon", "_background")]
+[sub_resource type="StyleBoxFlat" id="icon_slot"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.055, 0.05, 0.042, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.34, 0.19, 1)
+
+[node name="ItemTooltipPopup" type="Control" node_paths=PackedStringArray("_panel", "_accent", "_icon", "_title", "_subtitle", "_baseStats", "_implicitsSection", "_implicitsHeader", "_implicits", "_modsSection", "_modsHeader", "_mods", "_effectSection", "_effectHeader", "_effects", "_loreSection", "_lore")]
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
 _panel = NodePath("Panel")
-_title = NodePath("Panel/Margin/Layout/Title")
-_subtitle = NodePath("Panel/Margin/Layout/Subtitle")
-_lines = NodePath("Panel/Margin/Layout/Lines")
-_icon = NodePath("Panel/Margin/Layout/MarginContainer/Icon")
-_background = NodePath("Panel/Margin/Layout/MarginContainer/Background")
+_accent = NodePath("Panel/Body/Accent")
+_icon = NodePath("Panel/Body/Margin/Layout/Header/IconPanel/Icon")
+_title = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/Title")
+_subtitle = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/Subtitle")
+_baseStats = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/BaseStats")
+_implicitsSection = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection")
+_implicitsHeader = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection/ImplicitsHeader/ImplicitsLabel")
+_implicits = NodePath("Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection/Implicits")
+_modsSection = NodePath("Panel/Body/Margin/Layout/ModsSection")
+_modsHeader = NodePath("Panel/Body/Margin/Layout/ModsSection/ModsHeader/ModsLabel")
+_mods = NodePath("Panel/Body/Margin/Layout/ModsSection/Mods")
+_effectSection = NodePath("Panel/Body/Margin/Layout/EffectSection")
+_effectHeader = NodePath("Panel/Body/Margin/Layout/EffectSection/EffectHeader/EffectLabel")
+_effects = NodePath("Panel/Body/Margin/Layout/EffectSection/Effects")
+_loreSection = NodePath("Panel/Body/Margin/Layout/LoreSection")
+_lore = NodePath("Panel/Body/Margin/Layout/LoreSection/Lore")
 
-[node name="Panel" type="PanelContainer" parent="." unique_id=585764383]
-custom_minimum_size = Vector2(340, 0)
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(468, 0)
 layout_mode = 0
-offset_right = 340.0
-offset_bottom = 98.0
+offset_right = 468.0
+offset_bottom = 120.0
 mouse_filter = 2
+theme_override_styles/panel = SubResource("tooltip_frame")
 
-[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1202636499]
+[node name="Body" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/separation = 0
 
-[node name="Layout" type="VBoxContainer" parent="Panel/Margin" unique_id=451112163]
+[node name="Accent" type="ColorRect" parent="Panel/Body"]
+custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
-theme_override_constants/separation = 6
+color = Color(0.71, 0.54, 0.24, 0.9)
 
-[node name="Title" type="Label" parent="Panel/Margin/Layout" unique_id=1784585446]
+[node name="Margin" type="MarginContainer" parent="Panel/Body"]
 layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Body/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Panel/Body/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconPanel" type="PanelContainer" parent="Panel/Body/Margin/Layout/Header"]
+custom_minimum_size = Vector2(168, 168)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("icon_slot")
+
+[node name="Icon" type="TextureRect" parent="Panel/Body/Margin/Layout/Header/IconPanel"]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeaderInfo" type="VBoxContainer" parent="Panel/Body/Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Panel/Body/Margin/Layout/Header/HeaderInfo"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "Item"
-label_settings = SubResource("LabelSettings_title")
+autowrap_mode = 3
 
-[node name="Subtitle" type="Label" parent="Panel/Margin/Layout" unique_id=1539792530]
+[node name="Subtitle" type="Label" parent="Panel/Body/Margin/Layout/Header/HeaderInfo"]
 layout_mode = 2
 theme_type_variation = &"DimLabel"
 text = "Rarity"
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel/Margin/Layout" unique_id=336267487]
-layout_mode = 2
-
-[node name="Background" type="TextureRect" parent="Panel/Margin/Layout/MarginContainer" unique_id=881592201]
-layout_mode = 2
-expand_mode = 1
-
-[node name="Icon" type="TextureRect" parent="Panel/Margin/Layout/MarginContainer" unique_id=1852493150]
-custom_minimum_size = Vector2(0, 400)
-layout_mode = 2
-expand_mode = 1
-
-[node name="Lines" type="VBoxContainer" parent="Panel/Margin/Layout" unique_id=963341082]
+[node name="BaseStats" type="VBoxContainer" parent="Panel/Body/Margin/Layout/Header/HeaderInfo"]
 layout_mode = 2
 theme_override_constants/separation = 2
+
+[node name="ImplicitsSection" type="VBoxContainer" parent="Panel/Body/Margin/Layout/Header/HeaderInfo"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ImplicitsHeader" type="HBoxContainer" parent="Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ImplicitsLabel" type="Label" parent="Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection/ImplicitsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+text = "IMPLICITS"
+
+[node name="ImplicitsRule" type="HSeparator" parent="Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection/ImplicitsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Implicits" type="VBoxContainer" parent="Panel/Body/Margin/Layout/Header/HeaderInfo/ImplicitsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ModsSection" type="VBoxContainer" parent="Panel/Body/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ModsHeader" type="HBoxContainer" parent="Panel/Body/Margin/Layout/ModsSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ModsLabel" type="Label" parent="Panel/Body/Margin/Layout/ModsSection/ModsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+text = "MODIFIERS"
+
+[node name="ModsRule" type="HSeparator" parent="Panel/Body/Margin/Layout/ModsSection/ModsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Mods" type="VBoxContainer" parent="Panel/Body/Margin/Layout/ModsSection"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EffectSection" type="VBoxContainer" parent="Panel/Body/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="EffectHeader" type="HBoxContainer" parent="Panel/Body/Margin/Layout/EffectSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EffectLabel" type="Label" parent="Panel/Body/Margin/Layout/EffectSection/EffectHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+text = "EFFECT"
+
+[node name="EffectRule" type="HSeparator" parent="Panel/Body/Margin/Layout/EffectSection/EffectHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Effects" type="VBoxContainer" parent="Panel/Body/Margin/Layout/EffectSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LoreSection" type="VBoxContainer" parent="Panel/Body/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LoreRule" type="HSeparator" parent="Panel/Body/Margin/Layout/LoreSection"]
+layout_mode = 2
+
+[node name="Lore" type="Label" parent="Panel/Body/Margin/Layout/LoreSection"]
+custom_minimum_size = Vector2(436, 0)
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+autowrap_mode = 3

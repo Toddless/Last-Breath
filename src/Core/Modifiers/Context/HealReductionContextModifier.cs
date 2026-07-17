@@ -4,7 +4,7 @@
     using Enums;
 
     public class HealReductionContextModifier(float reduceBy)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Heal_Reduction"), IHealModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Heal_Reduction"), IHealModifier
     {
         public void Apply(IHealContext context) => context.Amount *= 1 - reduceBy;
     }

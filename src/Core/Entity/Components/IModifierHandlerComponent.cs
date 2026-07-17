@@ -16,6 +16,7 @@ namespace Core.Entity.Components
         void Add(IHealModifier modifier);
         void Add(IManaRecoveryModifier modifier);
         void Add(IEffectApplicationModifier modifier);
+        void Add(IIncomingEffectModifier modifier);
         void Add(IAbilityActivationModifier modifier);
 
         void Remove(IAttackModifier modifier);
@@ -30,6 +31,7 @@ namespace Core.Entity.Components
         void Apply(IHealContext context);
         void Apply(IManaRecoveryContext context);
         void Apply(IEffectApplicationContext context);
+        void Apply(IIncomingEffectContext context);
         void Apply(IAbilityActivationContext context);
     }
 }

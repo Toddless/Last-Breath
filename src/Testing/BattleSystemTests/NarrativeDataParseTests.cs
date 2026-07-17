@@ -63,7 +63,7 @@ namespace LastBreathTest.BattleSystemTests
             var actionFactories = new List<INarrativeActionFactory>
             {
                 new SetFactActionFactory(_facts),
-                new GiveItemActionFactory(Mock.Of<IItemDataProvider>(), inventory.Object),
+                new GiveItemActionFactory(Mock.Of<Core.Items.IItemMinter>(), inventory.Object),
                 new TakeItemActionFactory(inventory.Object),
                 new PublishDeedActionFactory(_events, Mock.Of<IPlayerAccessor>()),
                 new AddReputationActionFactory(new Core.Reputation.FactionRelationService(FactionTestData.Create())),
@@ -80,7 +80,7 @@ namespace LastBreathTest.BattleSystemTests
             ApplyCatalog(_quests, DataCatalog.Quests);
             ApplyCatalog(_dialogues, DataCatalog.Dialogues);
 
-            _questLog = new QuestLogService(_quests, _facts, inventory.Object, Mock.Of<IItemDataProvider>(),
+            _questLog = new QuestLogService(_quests, _facts, inventory.Object, Mock.Of<Core.Items.IItemMinter>(),
                 _influence, clock.Object, Mock.Of<Core.Ai.World.Skirmish.INpcWorldRegistry>(),
                 _events, Mock.Of<Core.MessageBus.IGameMessageBus>(), Mock.Of<Core.Save.ILoadScope>());
         }

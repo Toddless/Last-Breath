@@ -11,14 +11,18 @@ namespace Core.Items
 
     public class EquipItem : IEquipItem, IAscendable
     {
+        // Design reference: each sharpening level adds +5% to every line value.
+        private const float UpgradeBonusPerLevel = 0.05f;
+
         private readonly List<IModifierInstance> _implicits = [];
         private readonly List<IModifierInstance> _modifiers = [];
         private readonly List<ContextModifierEntry> _implicitsContextModifier = [];
         private readonly List<ContextModifierEntry> _contextModifiers = [];
-        // Reroll fodder as immutable descriptors (parameter/context/composite): materialized into fresh
-        // instances on apply, so a pool entry can never mutate a shared template.
-        private readonly List<IModifierDescriptor> _modifiersPool = [];
-        private readonly Dictionary<string, int> _usedResources = [];
+        // Two carriers by design: the recipe's mandatory resources and the optional additives are
+        // different currencies (a rune of creation cares which slot fed the pool), but most consumers
+        // read the merged UsedResources view.
+        private readonly Dictionary<string, int> _usedRequiredResources = [];
+        private readonly Dictionary<string, int> _usedOptionalResources = [];
         private readonly List<IItemGrant> _grants = [];
         private Dictionary<EntityParameter, List<IModifierInstance>>? _resolvedModifiers;
         private IFightable? _owner;
@@ -41,7 +45,30 @@ namespace Core.Items
             private init;
         }
         public Rarity Rarity { get; set; } = Rarity.Common;
-        public int UpdateLevel { get; set; }
+        // The item's caliber: loot stamps the kill's difficulty multiplier, crafting stamps the mastery
+        // quality multiplier. Scales the LIVE reroll pool on every recraft, so a rerolled line matches
+        // the magnitude the item was born with. Never touched by upgrades (that's UpdateMultiplier).
+        public float PowerMultiplier { get; set; } = 1f;
+        // Successful rerolls only (the upgrader increments): drives the growing recraft price.
+        public int RecraftCount { get; set; }
+
+        // Ascension's "everything +15%": a factor on top of the sharpening scale, part of the one
+        // line-value formula (Base × UpdateMultiplier × AscensionMultiplier). Assigning recomputes
+        // every line so the multiplier can never desync from the values; sealed items refuse like
+        // every other mutation (restore assigns it BEFORE the seal replay).
+        public float AscensionMultiplier
+        {
+            get;
+            set
+            {
+                if (IsSealed) return;
+                field = value;
+                UpdateModifiersValue();
+            }
+        } = 1f;
+        // No public setter: levels only move through Upgrade/Downgrade so the multiplier and
+        // line values can never desync from the level.
+        public int UpdateLevel { get; private set; }
         public int MaxUpdateLevel { get; set; } = 12;
         public bool IsSealed { get; private set; }
         public string DisplayName => Localization.Localization.Localize(Id);
@@ -54,8 +81,18 @@ namespace Core.Items
         public IReadOnlyList<IItemGrant> Grants => _grants;
         public IReadOnlyCollection<EntityParameter> AffectedParameters =>
             _implicits.Concat(_modifiers).Select(modifier => modifier.EntityParameter).ToHashSet();
-        public IReadOnlyList<IModifierDescriptor> ModifiersPool => _modifiersPool;
-        public IReadOnlyDictionary<string, int> UsedResources => _usedResources;
+        public IReadOnlyDictionary<string, int> UsedRequiredResources => _usedRequiredResources;
+        public IReadOnlyDictionary<string, int> UsedOptionalResources => _usedOptionalResources;
+        public IReadOnlyDictionary<string, int> UsedResources
+        {
+            get
+            {
+                var merged = new Dictionary<string, int>(_usedRequiredResources);
+                foreach ((string id, int amount) in _usedOptionalResources)
+                    merged[id] = merged.GetValueOrDefault(id) + amount;
+                return merged;
+            }
+        }
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= MaxUpdateLevel;
 
         public EquipItem(EquipmentPiece piece, string id, string[] tags)
@@ -74,18 +111,22 @@ namespace Core.Items
             // own texture on first access. Reading source.Icon here would force a ResourceLoader call
             // on every copy — and hard-crash hosts without the Godot runtime (tests, simulations).
             Rarity = source.Rarity;
+            PowerMultiplier = source.PowerMultiplier;
+            RecraftCount = source.RecraftCount;
             UpdateLevel = source.UpdateLevel;
             MaxUpdateLevel = source.MaxUpdateLevel;
             UpdateMultiplier = source.UpdateMultiplier;
+            AscensionMultiplier = source.AscensionMultiplier; // before the lines: Set* below scale by it
 
             SetImplicits(CopyModifiers(source._implicits));
             SetModifiers(CopyModifiers(source._modifiers));
             SetContextImplicits(source._implicitsContextModifier.Select(entry => entry.Copy()));
             SetContextModifiers(source._contextModifiers.Select(entry => entry.Copy()));
             _grants.AddRange(source._grants.Select(grant => grant.Copy()));
-            _modifiersPool.AddRange(source._modifiersPool);
-            foreach (var resource in source._usedResources)
-                _usedResources.Add(resource.Key, resource.Value);
+            foreach (var resource in source._usedRequiredResources)
+                _usedRequiredResources.Add(resource.Key, resource.Value);
+            foreach (var resource in source._usedOptionalResources)
+                _usedOptionalResources.Add(resource.Key, resource.Value);
             IsSealed = source.IsSealed;
         }
 
@@ -135,7 +176,7 @@ namespace Core.Items
                 return;
             }
 
-            modifier.Value = modifier.BaseValue * UpdateMultiplier;
+            modifier.Value = modifier.BaseValue * LineMultiplier;
             _modifiers.Add(modifier);
             _resolvedModifiers = null;
         }
@@ -145,7 +186,7 @@ namespace Core.Items
         public void AddAdditionalContextModifier(ContextModifierEntry entry)
         {
             if (IsSealed) return;
-            entry.Value = entry.BaseValue * UpdateMultiplier;
+            entry.Value = entry.BaseValue * LineMultiplier;
             _contextModifiers.Add(entry);
         }
 
@@ -170,7 +211,7 @@ namespace Core.Items
             if (IsSealed) return false;
             if (UpdateLevel >= MaxUpdateLevel) return false;
             int appliedLevels = Math.Min(upgradeLevel, MaxUpdateLevel - UpdateLevel);
-            UpdateMultiplier += appliedLevels / 10f;
+            UpdateMultiplier += appliedLevels * UpgradeBonusPerLevel;
             UpdateLevel += appliedLevels;
             UpdateModifiersValue();
             return true;
@@ -181,7 +222,7 @@ namespace Core.Items
             if (IsSealed) return false;
             if (UpdateLevel == 0) return false;
             int appliedLevels = Math.Min(downgradeLevel, UpdateLevel);
-            UpdateMultiplier = Math.Max(1f, UpdateMultiplier - (appliedLevels / 10f));
+            UpdateMultiplier = Math.Max(1f, UpdateMultiplier - (appliedLevels * UpgradeBonusPerLevel));
             UpdateLevel -= appliedLevels;
             UpdateModifiersValue();
             return true;
@@ -191,6 +232,15 @@ namespace Core.Items
         {
             if (IsSealed) return;
             _grants.Add(grant);
+        }
+
+        // One-time by design (ascension): grants do not scale with sharpening, so their payloads have no
+        // recomputable base — the scaled copies simply become the item's grants and save as such.
+        public void ScaleGrantValues(float factor)
+        {
+            if (IsSealed) return;
+            for (int i = 0; i < _grants.Count; i++)
+                _grants[i] = _grants[i].WithScaledValues(factor);
         }
 
         public void OnEquip(IFightable owner)
@@ -208,12 +258,12 @@ namespace Core.Items
             _owner = null;
         }
 
-        public void SaveModifiersPool(IEnumerable<IModifierDescriptor> descriptors) => _modifiersPool.AddRange(descriptors);
-
-        public void SaveUsedResources(Dictionary<string, int> resources)
+        public void SaveUsedResources(IReadOnlyDictionary<string, int> required, IReadOnlyDictionary<string, int> optional)
         {
-            foreach (var resource in resources)
-                _usedResources.TryAdd(resource.Key, resource.Value);
+            foreach (var resource in required)
+                _usedRequiredResources.TryAdd(resource.Key, resource.Value);
+            foreach (var resource in optional)
+                _usedOptionalResources.TryAdd(resource.Key, resource.Value);
         }
 
         // State transition only; the ascension gift roll lives in the crafting-side ascender.
@@ -235,6 +285,10 @@ namespace Core.Items
 
         protected IEnumerable<IModifier> AllModifiers => _implicits.Concat(_modifiers);
 
+        // THE line-value formula: every stored line (both channels, implicit or rolled) is worth
+        // Base × sharpening scale × ascension scale. All five write paths go through this.
+        private float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
+
         protected virtual EquipItem CreateCopy() => new(this);
 
         // Parameters whose local bucket is consumed outside the generic resolution
@@ -246,6 +300,7 @@ namespace Core.Items
             {
                 var copy = ModifiersCreator.CreateModifierInstance(modifier.EntityParameter, modifier.ModifierValueType, modifier.BaseValue, InstanceId);
                 copy.Scope = modifier.Scope;
+                SimpleModifier.TransferStamps(modifier, copy); // roll provenance must survive an item copy
                 return copy;
             });
 
@@ -256,7 +311,7 @@ namespace Core.Items
             itemEntries.Clear();
             foreach (var entry in newEntries)
             {
-                entry.Value = entry.BaseValue * UpdateMultiplier;
+                entry.Value = entry.BaseValue * LineMultiplier;
                 itemEntries.Add(entry);
             }
         }
@@ -266,7 +321,7 @@ namespace Core.Items
             itemModifiers.Clear();
             foreach (var instance in newModifiers.SelectMany(ToInstances))
             {
-                instance.Value = instance.BaseValue * UpdateMultiplier;
+                instance.Value = instance.BaseValue * LineMultiplier;
                 itemModifiers.Add(instance);
             }
 
@@ -289,15 +344,16 @@ namespace Core.Items
             {
                 var copy = ModifiersCreator.CreateModifierInstance(part.EntityParameter, part.ModifierValueType, part.BaseValue, InstanceId);
                 copy.Scope = part.Scope;
+                SimpleModifier.TransferStamps(part, copy);
                 return copy;
             });
 
         private void UpdateModifiersValue()
         {
             foreach (var modifier in _implicits.Concat(_modifiers))
-                modifier.Value = modifier.BaseValue * UpdateMultiplier;
+                modifier.Value = modifier.BaseValue * LineMultiplier;
             foreach (var entry in AllContextModifiers)
-                entry.Value = entry.BaseValue * UpdateMultiplier;
+                entry.Value = entry.BaseValue * LineMultiplier;
 
             _resolvedModifiers = null;
         }
@@ -305,9 +361,8 @@ namespace Core.Items
         private Dictionary<EntityParameter, List<IModifierInstance>> BuildResolvedModifiers()
         {
             var resolved = new Dictionary<EntityParameter, List<IModifierInstance>>();
-            // NOTE:
-            // Здесь мы обрабатываем только простые модификаторы изменяющие параметры Что с контекстными?
-            // NOTE: Композитные модификаторы разбираются ДО резолва
+            // Only plain parameter modifiers resolve here: context lines deliberately travel their own
+            // channel (Attach to the owner's pipelines on equip), and composites are expanded before resolve.
             foreach (var group in _implicits.Concat(_modifiers).GroupBy(modifier => modifier.EntityParameter))
             {
                 var modifiers = new List<IModifierInstance>();

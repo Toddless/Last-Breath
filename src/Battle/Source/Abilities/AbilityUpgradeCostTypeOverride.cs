@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>
@@ -15,7 +14,7 @@ namespace Battle.Source.Abilities
         private const string DecoratorId = "Ability_Parameter_Decorator_Cost_Type_Override";
 
         public override void ApplyUpgrade(Ability ability) =>
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostType, Priority.Absolute, OperationType.Override, (float)costType, DecoratorId, Id));
 
         public override void RemoveUpgrade(Ability ability) =>

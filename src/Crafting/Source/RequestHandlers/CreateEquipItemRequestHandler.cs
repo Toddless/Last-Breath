@@ -1,6 +1,7 @@
 namespace Crafting.Source.RequestHandlers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core;
@@ -27,6 +28,7 @@ namespace Crafting.Source.RequestHandlers
         IItemDataProvider itemDataProvider,
         ICraftingMastery mastery,
         CraftingResources resources,
+        ICraftingAdditiveProvider additives,
         IInventory inventory)
         : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
     {
@@ -34,17 +36,20 @@ namespace Crafting.Source.RequestHandlers
         {
             try
             {
-                // TODO: validates mastery + resource availability but NOT that UsedResources satisfy the recipe's
+                // TODO: validates mastery + resource availability but NOT that the resources satisfy the recipe's
                 // requirements (categories/specific ids/amounts). Safe while items are only created through the
                 // crafting UI; add domain-level recipe conformance if a non-UI creation path appears.
-                if (!MasteryAllows(request.RecipeId) || !resources.HasAll(request.UsedResources))
+                var allResources = MergeResources(request.RequiredResources, request.OptionalResources);
+                if (!MasteryAllows(request.RecipeId) || !resources.HasAll(allResources))
                     return Task.FromResult<IEquipItem?>(null);
 
-                var descriptors = request.UsedResources.SelectMany(res => itemDataProvider.GetResourceDescriptors(res.Key));
-                var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, descriptors);
-                item.SaveUsedResources(request.UsedResources.ToDictionary());
+                // Required and optional resources both feed the creation pool by design.
+                var descriptors = allResources.Keys.SelectMany(itemDataProvider.GetResourceDescriptors);
+                // Creation runes ride the optional slots: the best floor among them guarantees the rarity.
+                var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, descriptors, BestMinRarity(request.OptionalResources.Keys));
+                item.SaveUsedResources(request.RequiredResources, request.OptionalResources);
 
-                resources.TrySpend(request.UsedResources);
+                resources.TrySpend(allResources);
                 gameMessageBus.PublishMessageAsync(new GainCraftingExpirienceMessage(CraftingMode.Create, item.Rarity));
                 inventory.TryAddItem(item);
                 return Task.FromResult<IEquipItem?>(item);
@@ -56,6 +61,24 @@ namespace Crafting.Source.RequestHandlers
                 return Task.FromResult<IEquipItem?>(null);
             }
         }
+
+        /// <summary>One spendable map: a resource picked in both a requirement and an additive slot sums.</summary>
+        private static Dictionary<string, int> MergeResources(Dictionary<string, int> required, Dictionary<string, int> optional)
+        {
+            var merged = new Dictionary<string, int>(required);
+            foreach ((string id, int amount) in optional)
+                merged[id] = merged.GetValueOrDefault(id) + amount;
+            return merged;
+        }
+
+        /// <summary>The BEST rarity floor among the used optional resources (lower enum value = better —
+        /// Math.Min over the enum); null when no creation rune took part.</summary>
+        private Rarity? BestMinRarity(IEnumerable<string> optionalResourceIds) =>
+            optionalResourceIds
+                .Select(id => additives.GetEffects(id)?.MinRarity)
+                .Where(minRarity => minRarity != null)
+                .OrderBy(minRarity => minRarity!.Value)
+                .FirstOrDefault();
 
         private bool MasteryAllows(string recipeId) =>
             itemDataProvider.GetRecipeRequirements(recipeId)

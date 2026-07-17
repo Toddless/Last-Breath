@@ -1,26 +1,32 @@
 {
-	"items": [
-		{
-			"id": "Creators_Cloak",
-			"equipmentPart": "Cloak",
-			"rarity": "Mythic",
-			"tags": [],
-			"effectId": "",
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{
-					"parameter": "Health",
-					"modifierType": "multi",
-					"value": 0.1
-				},
-				{
-					"parameter": "Armor",
-					"modifierType": "multi",
-					"value": 0.1
-				}
-			],
-			"modifiers": []
-		}
-	]
+    "items": [
+        {
+            "id": "Creators_Cloak",
+            "equipmentPart": "Cloak",
+            "rarity": "Mythic",
+            "tags": [],
+            "effectId": "",
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.08,
+                        "max": 0.12
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.08,
+                        "max": 0.12
+                    }
+                }
+            ],
+            "modifiers": []
+        }
+    ]
 }

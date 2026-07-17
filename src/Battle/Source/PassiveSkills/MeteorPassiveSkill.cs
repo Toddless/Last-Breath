@@ -39,7 +39,7 @@ namespace Battle.Source.PassiveSkills
         }
 
         private sealed class MeteorOnBurningModifier(IFightable owner, float damage)
-            : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Meteor_On_Burning"), IEffectApplicationModifier
+            : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Meteor_On_Burning"), IEffectApplicationModifier
         {
             public void Apply(IEffectApplicationContext context)
             {

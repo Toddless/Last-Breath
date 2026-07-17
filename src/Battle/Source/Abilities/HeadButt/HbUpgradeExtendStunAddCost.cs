@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.HeadButt
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrade: the stun lasts longer at the price of an increased resource cost.</summary>
@@ -13,9 +12,9 @@ namespace Battle.Source.Abilities.HeadButt
 
         public override void ApplyUpgrade(HeadButt ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<HeadButt.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 HeadButt.Parameters.StunDuration, Priority.Weak, OperationType.Add, stunDuration, StunDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue, Priority.Weak, OperationType.Add, additionalCost, CostDecoratorId, Id));
         }
 

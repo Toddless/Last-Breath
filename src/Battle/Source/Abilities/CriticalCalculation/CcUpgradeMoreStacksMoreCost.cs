@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.CriticalCalculation
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>
@@ -15,9 +14,9 @@ namespace Battle.Source.Abilities.CriticalCalculation
 
         public override void ApplyUpgrade(CriticalCalculation ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<CriticalCalculation.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 CriticalCalculation.Parameters.Stacks, Priority.Weak, OperationType.Add, stacks, StacksDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue, Priority.Weak, OperationType.Add, cost, CostDecoratorId, Id));
         }
 

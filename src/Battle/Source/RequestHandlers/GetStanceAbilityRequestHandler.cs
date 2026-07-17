@@ -29,6 +29,7 @@ namespace Battle.Source.RequestHandlers
             unlockService.Reconcile(notify: false);
 
             var views = abilityProvider.KnownAbilityIds
+                .Where(id => !abilityProvider.IsHidden(id)) // boss reactions never surface in the tree
                 .Where(id => abilityProvider.GetAbilityStance(id) == request.Stance)
                 .OrderBy(abilityProvider.GetMasteryLevel)
                 .Select(ToView)

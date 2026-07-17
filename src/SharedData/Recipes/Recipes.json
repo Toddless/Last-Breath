@@ -10,7 +10,7 @@
 				"Equipment"
 			],
 			"rarity": "Rare",
-			"isOpened": true,
+			"isOpened": false,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -48,22 +48,22 @@
 				"Equipment"
 			],
 			"rarity": "Rare",
-			"isOpened": true,
+			"isOpened": false,
 			"itemType": "Equipment",
 			"requirements": [
 				{
 					"type": "ResourceCategory",
-					"id": "Leather",
+					"id": "Category_Leather",
 					"amount": 4
 				},
 				{
 					"type": "ResourceCategory",
-					"id": "Metal",
+					"id": "Category_Metal",
 					"amount": 4
 				},
 				{
 					"type": "ResourceCategory",
-					"id": "Fabric",
+					"id": "Category_Fabric",
 					"amount": 3
 				},
 				{
@@ -123,6 +123,411 @@
 					"type": "Resource",
 					"id": "Crafting_Resource_Deer_Leather",
 					"amount": 2
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Weapon_Simple_Sword",
+			"resultItemId": "Weapon_Simple_Sword",
+			"tags": [
+				"Weapon",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Uncommon",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Iron_Ore",
+					"amount": 2
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Weapon_Simple_Dagger",
+			"resultItemId": "Weapon_Simple_Dagger",
+			"tags": [
+				"Weapon",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Uncommon",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Iron_Ore",
+					"amount": 1
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Weapon_Simple_Axe",
+			"resultItemId": "Weapon_Simple_Axe",
+			"tags": [
+				"Weapon",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Uncommon",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Crafting_Resource_Iron_Ore",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Body_Iron_Bastion",
+			"resultItemId": "Body_Iron_Bastion",
+			"tags": [
+				"Body",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Metal",
+					"amount": 5
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Body_Dexterity_Shadowstep",
+			"resultItemId": "Body_Dexterity_Shadowstep",
+			"tags": [
+				"Body",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Bone",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 5
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Body_Intelligence_Eternal_Reserve",
+			"resultItemId": "Body_Intelligence_Eternal_Reserve",
+			"tags": [
+				"Body",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Gem",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Fabric",
+					"amount": 5
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Helmet_Iron_Bastion",
+			"resultItemId": "Helmet_Iron_Bastion",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Metal",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 1
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Helmet_Dexterity_Shadowstep",
+			"resultItemId": "Helmet_Dexterity_Shadowstep",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Bone",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Helmet_Intelligence_Eternal_Reserve",
+			"resultItemId": "Helmet_Intelligence_Eternal_Reserve",
+			"tags": [
+				"Helmet",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Gem",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Fabric",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Boots_Iron_Bastion",
+			"resultItemId": "Boots_Iron_Bastion",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Metal",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 1
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Boots_Dexterity_Shadowstep",
+			"resultItemId": "Boots_Dexterity_Shadowstep",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Bone",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Boots_Intelligence_Eternal_Reserve",
+			"resultItemId": "Boots_Intelligence_Eternal_Reserve",
+			"tags": [
+				"Boots",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Gem",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Fabric",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Gloves_Iron_Bastion",
+			"resultItemId": "Gloves_Iron_Bastion",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Metal",
+					"amount": 3
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 1
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Gloves_Dexterity_Shadowstep",
+			"resultItemId": "Gloves_Dexterity_Shadowstep",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Bone",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Leather",
+					"amount": 3
+				}
+			],
+			"optionalResourceCategories": [
+				"Essence"
+			]
+		},
+		{
+			"id": "Recipe_Gloves_Intelligence_Eternal_Reserve",
+			"resultItemId": "Gloves_Intelligence_Eternal_Reserve",
+			"tags": [
+				"Gloves",
+				"Recipe",
+				"Crafting",
+				"Equipment"
+			],
+			"rarity": "Epic",
+			"isOpened": true,
+			"itemType": "Equipment",
+			"requirements": [
+				{
+					"type": "Resource",
+					"id": "Category_Gem",
+					"amount": 1
+				},
+				{
+					"type": "Resource",
+					"id": "Category_Fabric",
+					"amount": 3
 				}
 			],
 			"optionalResourceCategories": [

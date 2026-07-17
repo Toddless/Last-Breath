@@ -48,7 +48,8 @@ namespace LootGeneration.Source
 
         public async Task<List<ItemStack>> GenerateItemsAsync(IFightable diedEntity)
         {
-            if (diedEntity is not IFightableNpc npc || _diedEntities.Contains(diedEntity.InstanceId)) return [];
+            // A summon is a spell manifestation, not a creature: it drops nothing by design.
+            if (diedEntity is not IFightableNpc { IsSummon: false } npc || _diedEntities.Contains(diedEntity.InstanceId)) return [];
 
             float budget = CalculateBudget(npc);
 

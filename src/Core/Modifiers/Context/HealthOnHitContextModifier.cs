@@ -6,7 +6,7 @@
     using Core.Context;
 
     public class HealthOnHitContextModifier(Func<float> amount)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Health_On_Hit"), IAttackModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Health_On_Hit"), IAttackModifier
     {
         public HealthOnHitContextModifier(float amount)
             : this(() => amount)

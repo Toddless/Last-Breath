@@ -31,9 +31,6 @@ namespace Crafting.Internal
             _ => null
         };
 
-        public IModifier CreateModifier(EntityParameter parameter, ModifierValueType valueType, float value, float weight) =>
-            new Modifier(valueType, parameter, value, weight);
-
         public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
             new Requirement(type, id, amount);
 
@@ -44,7 +41,7 @@ namespace Crafting.Internal
         public IMaterialCategory CreateMaterialCategory(List<IModifierDescriptor> modifiers, string id) =>
             new Core.Crafting.MaterialCategory(modifiers, id);
 
-        public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory category, int maxStackSize) =>
+        public IUpgradingResource CreateUpgradeResource(string id, string[] tags, Rarity rarity, EquipmentCategory? category, int maxStackSize) =>
             new UpgradeResource(id, tags, rarity, category, maxStackSize);
 
         public IMaterial CreateMaterial(List<IModifierDescriptor> modifiers, IMaterialCategory category) =>

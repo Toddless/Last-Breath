@@ -2,15 +2,12 @@ namespace Battle.Source.Abilities.DoubleStrike
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
 
@@ -19,53 +16,10 @@ namespace Battle.Source.Abilities.DoubleStrike
     /// the second shreds evasion. L3a: both landing grants a damage buff (factory-injected);
     /// L3b: the first hit restores health, the second — mana.
     /// </summary>
-    public class DoubleStrike(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        float secondDamage,
-        float secondWeaponDamageScale,
-        float secondSpellDamageScale,
-        float armorReduce,
-        float evadeReduce,
-        int debuffDuration,
-        int debuffMaxStacks,
-        Costs costType = Costs.Mana)
-        : DamagingAbility(id: "Ability_Double_Strike", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public class DoubleStrike(AbilityBaseData data) : DamagingAbility(data)
     {
-        private float this[Parameters parameter] => AbilityParameterDecorator.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParameterDecorator
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.SecondDamage] = new Module<Parameters>(() => secondDamage, Parameters.SecondDamage),
-                    [Parameters.SecondWeaponScale] = new Module<Parameters>(() => secondWeaponDamageScale, Parameters.SecondWeaponScale),
-                    [Parameters.SecondSpellScale] = new Module<Parameters>(() => secondSpellDamageScale, Parameters.SecondSpellScale),
-                    [Parameters.DamageMultiplier] = new Module<Parameters>(() => 1f, Parameters.DamageMultiplier),
-                    [Parameters.HealthRestore] = new Module<Parameters>(() => 0f, Parameters.HealthRestore),
-                    [Parameters.ManaRestore] = new Module<Parameters>(() => 0f, Parameters.ManaRestore)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParameterDecorator);
-                return values;
-            }
-        }
-
+        public int DebuffDuration => (int)this[Parameters.DebuffDuration];
+        public int DebuffMaxStacks => (int)this[Parameters.DebuffMaxStacks];
         public float SecondDamage => this[Parameters.SecondDamage];
         public float SecondWeaponScale => this[Parameters.SecondWeaponScale];
         public float SecondSpellScale => this[Parameters.SecondSpellScale];
@@ -77,51 +31,40 @@ namespace Battle.Source.Abilities.DoubleStrike
         /// <summary>L3 upgrade point: built when both strikes land, applied to the owner.</summary>
         public Func<IEffect>? BothHitsBuffFactory { get; set; }
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            SecondDamage,
-            SecondWeaponScale,
-            SecondSpellScale,
-            DamageMultiplier,
-            HealthRestore,
-            ManaRestore
+            public const string SecondDamage = nameof(SecondDamage);
+            public const string SecondWeaponScale = nameof(SecondWeaponScale);
+            public const string SecondSpellScale = nameof(SecondSpellScale);
+            public const string ArmorReduce = nameof(ArmorReduce);
+            public const string EvadeReduce = nameof(EvadeReduce);
+            public const string DebuffDuration = nameof(DebuffDuration);
+            public const string DebuffMaxStacks = nameof(DebuffMaxStacks);
+            public const string DamageMultiplier = nameof(DamageMultiplier);
+            public const string HealthRestore = nameof(HealthRestore);
+            public const string ManaRestore = nameof(ManaRestore);
+        }
+
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.SecondDamage, 60f);
+            parameters.RegisterDefault(Parameters.SecondWeaponScale, 1f);
+            parameters.RegisterDefault(Parameters.SecondSpellScale, 0.25f);
+            parameters.RegisterDefault(Parameters.ArmorReduce, 0.15f);
+            parameters.RegisterDefault(Parameters.EvadeReduce, 0.15f);
+            parameters.RegisterDefault(Parameters.DebuffDuration, 3);
+            parameters.RegisterDefault(Parameters.DebuffMaxStacks, 3);
+            parameters.RegisterDefault(Parameters.DamageMultiplier, 1f);
+            parameters.RegisterDefault(Parameters.HealthRestore, 0f);
+            parameters.RegisterDefault(Parameters.ManaRestore, 0f);
         }
 
         public void AddAttackModifier(IAttackModifier modifier) => AttackModifiers.Add(modifier);
         public void RemoveAttackModifier(string id) => AttackModifiers.Remove(id);
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
-        {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParameterDecorator.AddDecorator(parameterDecorator);
-        }
-
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParameterDecorator.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new DoubleStrike(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                SecondDamage, SecondWeaponScale, SecondSpellScale, armorReduce, evadeReduce, debuffDuration, debuffMaxStacks, CostType)
-            {
-                BothHitsBuffFactory = BothHitsBuffFactory
-            };
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() =>
+            CopyUpgradesTo(new DoubleStrike(Data) { BothHitsBuffFactory = BothHitsBuffFactory });
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
@@ -152,13 +95,13 @@ namespace Battle.Source.Abilities.DoubleStrike
                     if (strike == 0)
                     {
                         firstLanded = true;
-                        await ApplyDebuff(new ArmorReductionEffect(debuffDuration, debuffMaxStacks, armorReduce), owner, target);
+                        await ApplyDebuff(new ArmorReductionEffect(DebuffDuration, DebuffMaxStacks, this[Parameters.ArmorReduce]), owner, target);
                         RestoreHealth(owner);
                     }
                     else
                     {
                         secondLanded = true;
-                        await ApplyDebuff(new Clumsiness(debuffDuration, debuffMaxStacks, evadeReduce), owner, target);
+                        await ApplyDebuff(new Clumsiness(DebuffDuration, DebuffMaxStacks, this[Parameters.EvadeReduce]), owner, target);
                         RestoreMana(owner);
                     }
                 }

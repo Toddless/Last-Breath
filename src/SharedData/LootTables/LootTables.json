@@ -101,6 +101,26 @@
                         {
                             "id": "Body_No_Way_Back",
                             "price": 450
+                        },
+                        {
+                            "id": "Upgrade_Resource_Perfect_Flux",
+                            "price": 470
+                        },
+                        {
+                            "id": "Upgrade_Resource_Grandmaster_Rune",
+                            "price": 475
+                        },
+                        {
+                            "id": "Upgrade_Resource_Weaponsmith_Mark",
+                            "price": 650
+                        },
+                        {
+                            "id": "Upgrade_Resource_Jeweler_Mark",
+                            "price": 630
+                        },
+                        {
+                            "id": "Upgrade_Resource_Armorsmith_Mark",
+                            "price": 640
                         }
                     ]
                 },
@@ -182,6 +202,14 @@
                         {
                             "id": "Amulet_Stronghold",
                             "price": 90
+                        },
+                        {
+                            "id": "Upgrade_Resource_Quality_Flux",
+                            "price": 270
+                        },
+                        {
+                            "id": "Upgrade_Resource_Master_Rune",
+                            "price": 275
                         }
                     ]
                 },
@@ -199,10 +227,6 @@
                         {
                             "id": "Upgrade_Resource_Weapon_Dust",
                             "price": 45
-                        },
-                        {
-                            "id": "Recipe_Creators_Ring",
-                            "price": 33
                         },
                         {
                             "id": "Helmet_Dexterity_Feral_Instinct",
@@ -227,6 +251,66 @@
                         {
                             "id": "Amulet_Life_Core",
                             "price": 35
+                        },
+                        {
+                            "id": "Upgrade_Resource_Fine_Flux",
+                            "price": 100
+                        },
+                        {
+                            "id": "Upgrade_Resource_Journeyman_Rune",
+                            "price": 105
+                        },
+                        {
+                            "id": "Recipe_Body_Strength_Iron_Bastion",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Body_Iron_Bastion",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Body_Dexterity_Shadowstep",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Body_Intelligence_Eternal_Reserve",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Helmet_Iron_Bastion",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Helmet_Dexterity_Shadowstep",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Helmet_Intelligence_Eternal_Reserve",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Boots_Iron_Bastion",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Boots_Dexterity_Shadowstep",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Boots_Intelligence_Eternal_Reserve",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Gloves_Iron_Bastion",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Gloves_Dexterity_Shadowstep",
+                            "price": 130
+                        },
+                        {
+                            "id": "Recipe_Gloves_Intelligence_Eternal_Reserve",
+                            "price": 130
                         }
                     ]
                 },
@@ -292,6 +376,50 @@
                         {
                             "id": "Boots_Intelligence_Arcane_Bulwark",
                             "price": 10
+                        },
+                        {
+                            "id": "Upgrade_Resource_Simple_Flux",
+                            "price": 13
+                        },
+                        {
+                            "id": "Upgrade_Resource_Apprentice_Rune",
+                            "price": 14
+                        },
+                        {
+                            "id": "Upgrade_Resource_Weapon_Rune",
+                            "price": 13
+                        },
+                        {
+                            "id": "Upgrade_Resource_Blacksmith_Rune",
+                            "price": 13
+                        },
+                        {
+                            "id": "Upgrade_Resource_Jeweler_Rune",
+                            "price": 13
+                        },
+                        {
+                            "id": "Upgrade_Resource_Weapon_Dust",
+                            "price": 14
+                        },
+                        {
+                            "id": "Upgrade_Resource_Armor_Dust",
+                            "price": 14
+                        },
+                        {
+                            "id": "Upgrade_Resource_Jewellery_Dust",
+                            "price": 14
+                        },
+                        {
+                            "id": "Recipe_Weapon_Simple_Sword",
+                            "price": 15
+                        },
+                        {
+                            "id": "Recipe_Weapon_Simple_Axe",
+                            "price": 15
+                        },
+                        {
+                            "id": "Recipe_Weapon_Simple_Dagger",
+                            "price": 15
                         }
                     ]
                 }
@@ -348,20 +476,12 @@
                             "price": 4
                         },
                         {
-                            "id": "Crafting_Resource_Pine_Wood",
-                            "price": 4
-                        },
-                        {
                             "id": "Crafting_Resource_Copper_Ore",
                             "price": 3
                         },
                         {
                             "id": "Crafting_Resource_Deer_Leather",
                             "price": 3
-                        },
-                        {
-                            "id": "Crafting_Resource_Oak_Wood",
-                            "price": 12
                         }
                     ]
                 }
@@ -373,10 +493,6 @@
                 {
                     "tier": 0,
                     "items": [
-                        {
-                            "id": "Recipe_Body_Intelligence_Aegis",
-                            "price": 636
-                        },
                         {
                             "id": "Belt_Mana_Flow",
                             "price": 445
@@ -393,6 +509,10 @@
                         {
                             "id": "Belt_Of_Life",
                             "price": 76
+                        },
+                        {
+                            "id": "Recipe_Body_Intelligence_Aegis",
+                            "price": 50
                         }
                     ]
                 },
@@ -429,20 +549,12 @@
                         {
                             "id": "Amulet_Strength_Intelligence",
                             "price": 193
-                        },
-                        {
-                            "id": "Crafting_Resource_Ironwood",
-                            "price": 260
                         }
                     ]
                 },
                 {
                     "tier": 2,
                     "items": [
-                        {
-                            "id": "Crafting_Resource_Yew_Wood",
-                            "price": 90
-                        },
                         {
                             "id": "Crafting_Resource_Amethyst_Gem",
                             "price": 120
@@ -459,14 +571,6 @@
                         {
                             "id": "Belt_of_Strength",
                             "price": 13
-                        },
-                        {
-                            "id": "Crafting_Resource_Pine_Wood",
-                            "price": 4
-                        },
-                        {
-                            "id": "Crafting_Resource_Oak_Wood",
-                            "price": 12
                         },
                         {
                             "id": "Crafting_Resource_Linen_Fabric",
@@ -604,10 +708,6 @@
                 {
                     "tier": 0,
                     "items": [
-                        {
-                            "id": "Recipe_Body_Strength_Iron_Bastion",
-                            "price": 437
-                        },
                         {
                             "id": "Ring_Submittion_Mark",
                             "price": 529

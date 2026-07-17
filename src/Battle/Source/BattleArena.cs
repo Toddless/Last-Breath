@@ -22,9 +22,13 @@
     using Presentation;
     using UIElements;
 
-    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField, ICombatEnvironment
+    public partial class BattleArena : Node2D, IInitializable, IRequireServices, ICameraFocus, IBattleField, ICombatEnvironment, ISummonHandler
     {
         private const string UID = "uid://bcj35twqggu1d";
+
+        // Anchor of the slot formation in arena space: the scene's player spot sits one
+        // ClusterDistance to its left, so the classic 1-group battle keeps today's look.
+        private static readonly Vector2 s_formationCenter = new(1000f, 550f);
         private readonly RandomNumberGenerator _rnd = new();
         private readonly ICombatTurnPlanner _turnPlanner = new UtilityTurnPlanner(new DefaultRandomNumberGenerator());
         private readonly AttackContextScheduler _attackContextScheduler = new();
@@ -34,9 +38,26 @@
         private TargetSelectionController? _selectionController;
         private IBattleEventBus? _battleEventBus;
         private IGameEventBus? _gameEventBus;
+        private IAbilityProvider? _abilityProvider;
+        private Core.Narrative.Facts.IWorldFactsService? _worldFacts;
+        private NpcReactionsDriver? _reactionsDriver;
+        private BossStagesController? _bossStagesController;
+        private SummonService? _summonService;
+        private Core.Entity.INpcProvider? _npcProvider;
+        private IBattleNpcSpawner? _summonSpawner;
+        private ArenaRules _arenaRules = ArenaRules.Default;
+        private ArenaFormation? _formation;
         private List<IFightable> _fighters = [];
         private BattleOutcome? _battleOutcome;
         [Export] private Array<EntitySpot> _spots = [];
+
+        // Every slot of this battle: the authored scene pool, the player's spot and the
+        // programmatic ones (latecomers past the pool, summons). The selection controller holds
+        // the same live list, so new slots are targetable without rewiring.
+        private readonly List<EntitySpot> _allSpots = [];
+
+        // Summon slots die with their summon (no corpse holds them), so they are tracked apart.
+        private readonly System.Collections.Generic.Dictionary<string, EntitySpot> _summonSpots = [];
 
         [Export] private EntitySpot? _playerSpot;
 
@@ -73,16 +94,31 @@
 
         public override void _ExitTree()
         {
+            _reactionsDriver?.Dispose();
+            _reactionsDriver = null;
+            _bossStagesController?.Dispose();
+            _bossStagesController = null;
+            _summonService?.DespawnAll(); // belt-and-suspenders: an aborted battle must not leak orphaned summon nodes
+            _summonService?.Dispose();
+            _summonService = null;
             _battleEventBus = null;
             _gameEventBus = null;
             _timeline.DetachAll();
-            foreach (EntitySpot entitySpot in _spots)
+            foreach (EntitySpot entitySpot in _allSpots)
                 entitySpot.RemoveBattleEventBus();
         }
 
         public void InjectServices(IGameServiceProvider provider)
         {
             _gameEventBus = provider.GetService<IGameEventBus>();
+            _abilityProvider = provider.GetService<IAbilityProvider>();
+            // Optional like IInventory in the loot pipeline: a sandbox without world facts
+            // still fights, the twin gate simply never blocks.
+            _worldFacts = provider.GetServices<Core.Narrative.Facts.IWorldFactsService>().FirstOrDefault();
+            // All optional for the same reason: a project without them fights with defaults and no summons.
+            _arenaRules = provider.GetServices<ICombatRulesProvider>().FirstOrDefault()?.Arena ?? ArenaRules.Default;
+            _npcProvider = provider.GetServices<Core.Entity.INpcProvider>().FirstOrDefault();
+            _summonSpawner = provider.GetServices<IBattleNpcSpawner>().FirstOrDefault();
         }
 
         public void SetupEventBus(IBattleEventBus battleEventBus)
@@ -123,8 +159,11 @@
 
         public void RemoveEntitiesFromArenaSpots()
         {
-            foreach (var spot in _spots)
+            foreach (var spot in _allSpots)
+            {
+                if (spot == _playerSpot) continue; // the player leaves through RemovePlayerFromArenaSpot
                 spot.RemoveEntityFromSpot();
+            }
         }
 
         public IFightable GetRandomAlly(IFightable entity)
@@ -192,9 +231,9 @@
         private void SetupTargetSelectionController()
         {
             if (_battleEventBus == null) return;
-            List<EntitySpot> allSpots = [.._spots];
-            if (_playerSpot != null) allSpots.Add(_playerSpot);
-            _selectionController = new TargetSelectionController(_battleEventBus, this, allSpots);
+            // The LIVE list on purpose: slots created later (latecomers, summons) become
+            // selectable without rewiring — RefreshHighlights re-reads it.
+            _selectionController = new TargetSelectionController(_battleEventBus, this, _allSpots);
         }
 
         private void SetupCombatTextPresenter(IBattleEventBus battleEventBus)
@@ -208,8 +247,7 @@
         /// the entity, or the parked corpse node itself (its spot was freed for a latecomer).</summary>
         private Node2D? FindSpotFor(string instanceId)
         {
-            if (_playerSpot?.Entity?.IsSame(instanceId) == true) return _playerSpot;
-            var spot = _spots.FirstOrDefault(s => s.Entity?.IsSame(instanceId) == true);
+            var spot = _allSpots.FirstOrDefault(s => s.Entity?.IsSame(instanceId) == true);
             if (spot != null) return spot;
             return _parkedCorpses.GetValueOrDefault(instanceId);
         }
@@ -221,24 +259,55 @@
         /// </summary>
         public bool TryJoinBattle(IFightable fighter, bool alliedWithPlayer)
         {
-            if (_battleEventBus == null || _battleOutcome != null) return false;
+            if (_battleEventBus == null || _battleOutcome != null || _formation == null) return false;
             if (_fighters.Any(existing => existing.IsSame(fighter.InstanceId))) return false;
-
-            var freeSpot = _spots.FirstOrDefault(spot => !spot.HasEntityInit());
-            if (freeSpot == null) return false;
+            // The slot budget counts the roster, not free spot nodes: corpses and the fled hold
+            // their slots until the battle ends; summon slots live outside the budget.
+            if (OccupiedBattleSlots() >= _arenaRules.MaxBattleSlots) return false;
 
             if (alliedWithPlayer && _player != null) _player.Group?.TryAddToGroup(fighter);
             else EnsureFractionGroup(fighter);
+
+            var freeSpot = TakeFreeSpot();
+            freeSpot.Position = s_formationCenter + _formation.ReserveSlot(FormationGroupKey(fighter));
 
             _fighters.Add(fighter);
             freeSpot.SetEntity(fighter);
             freeSpot.SetBattleEventBus(_battleEventBus);
             _timeline.Attach(fighter.CombatEvents);
+            _reactionsDriver?.TryAttach(fighter);
+            _bossStagesController?.TryAttach(fighter);
+            _summonService?.TryAttach(fighter);
             // Mid-turn join: the player's current highlights were built before the newcomer
             // existed — without a rebuild its spot stays untargetable until the next turn.
             _selectionController?.RefreshHighlights();
             return true;
         }
+
+        /// <summary>Slots spent from the battle budget: the whole roster (the player, corpses and
+        /// the fled included) minus summons — their slots are free of charge by design.</summary>
+        private int OccupiedBattleSlots() => _fighters.Count(fighter => fighter is not IFightableNpc { IsSummon: true });
+
+        /// <summary>A free authored spot, or a fresh programmatic one — the scene pool is a seed,
+        /// not the limit (CombatRules.arena owns the budget).</summary>
+        private EntitySpot TakeFreeSpot()
+        {
+            // Corpse-freed spots (scene or programmatic) are reused first; occupied summon spots
+            // never match — they hold their summon until it dies and die with it.
+            var free = _allSpots.FirstOrDefault(spot => spot != _playerSpot && !spot.HasEntityInit());
+            return free ?? CreateDynamicSpot();
+        }
+
+        private EntitySpot CreateDynamicSpot()
+        {
+            var spot = EntitySpot.Initialize().Instantiate<EntitySpot>();
+            AddChild(spot);
+            _allSpots.Add(spot);
+            return spot;
+        }
+
+        /// <summary>Formation clusters are keyed by group; a groupless non-NPC fighter is its own cluster.</summary>
+        private static object FormationGroupKey(IFightable fighter) => (object?)fighter.Group ?? fighter;
 
         /// <summary>Groupless NPCs of one faction join a shared battle group — kin must not read
         /// as enemies to targeting. World groups (spawned squads) are kept as they came.</summary>
@@ -248,7 +317,9 @@
 
             if (!_fractionGroups.TryGetValue(npc.Fraction, out var group))
             {
-                group = new EntityGroup(maxMembers: _spots.Count);
+                // Battle-scoped semantic grouping, not a squad: capacity must never split kin
+                // (slots are budgeted elsewhere, summons sit outside that budget entirely).
+                group = new EntityGroup(maxMembers: int.MaxValue);
                 _fractionGroups[npc.Fraction] = group;
             }
 
@@ -258,11 +329,11 @@
         public bool PrepareBattleArena(List<IFightable> fighters)
         {
             if (_battleEventBus == null) return false;
-            if (fighters.Count > _spots.Count)
+            if (fighters.Count + 1 > _arenaRules.MaxBattleSlots) // +1 — the player's slot
             {
-                // A clean abort instead of an index crash mid-setup; the context's finally
+                // A clean abort instead of a crash mid-setup; the context's finally
                 // still publishes BattleEndEvent, so nothing is left stuck in Fight.
-                Tracker.TrackError($"Not enough arena spots: {fighters.Count} fighters for {_spots.Count} spots", this);
+                Tracker.TrackError($"Battle slot budget exceeded: {fighters.Count} fighters + the player for {_arenaRules.MaxBattleSlots} slots", this);
                 return false;
             }
 
@@ -271,11 +342,29 @@
             _fighters = [.. fighters];
             if (_player != null) _fighters.Add(_player);
 
-            for (int i = 0; i < fighters.Count; i++)
+            // Exports are populated at instantiation, but _Ready may not have run yet (the arena
+            // enters the tree via a deferred AddChild) — seed the slot registry here, not there.
+            if (_allSpots.Count == 0)
             {
-                var spot = _spots[i];
-                EnsureFractionGroup(fighters[i]);
-                spot.SetEntity(fighters[i]);
+                _allSpots.AddRange(_spots);
+                if (_playerSpot != null) _allSpots.Add(_playerSpot);
+            }
+
+            // Groups first — the formation clusters by them: the player's side is one cluster,
+            // every hostile group its own, so allies never end up in each other's backs.
+            foreach (var fighter in fighters)
+                EnsureFractionGroup(fighter);
+            _formation = new ArenaFormation(new ArenaFormationSettings());
+            _formation.PlanGroups(CollectGroupKeys(fighters));
+
+            if (_player != null && _playerSpot != null)
+                _playerSpot.Position = s_formationCenter + _formation.ReserveSlot(FormationGroupKey(_player));
+
+            foreach (var fighter in fighters)
+            {
+                var spot = TakeFreeSpot();
+                spot.Position = s_formationCenter + _formation.ReserveSlot(FormationGroupKey(fighter));
+                spot.SetEntity(fighter);
                 spot.SetBattleEventBus(_battleEventBus);
             }
 
@@ -287,10 +376,27 @@
             SetupCombatTextPresenter(_battleEventBus);
             StartTimelineRecording();
             SetupBattleDirector(_battleEventBus);
+            SetupReactionsDriver(_battleEventBus);
+            SetupBossStagesController(_battleEventBus);
+            SetupSummonService();
 
             var fightersQueue = _queueScheduler.AddFighters(_fighters);
             _battleEventBus.Publish<BattleQueueDefinedEvent>(new(fightersQueue));
             return true;
+        }
+
+        /// <summary>Distinct group keys in encounter order, the player's side first.</summary>
+        private List<object> CollectGroupKeys(List<IFightable> fighters)
+        {
+            List<object> keys = [];
+            if (_player != null) keys.Add(FormationGroupKey(_player));
+            foreach (var fighter in fighters)
+            {
+                var key = FormationGroupKey(fighter);
+                if (!keys.Contains(key)) keys.Add(key);
+            }
+
+            return keys;
         }
 
         /// <summary>NPC cast path: straight to Execute — TargetSelectionController is the player's UI path.</summary>
@@ -377,10 +483,16 @@
                 // Turn gate: the whole turn resolved instantly above; the next fighter
                 // doesn't start until the director has shown everything recorded so far.
                 await WaitForPresentationAsync();
+                // A dead summon's node and slot go only AFTER the killing blow was shown —
+                // the beats need their anchor. No corpse remains by design.
+                _summonService?.CleanupDead();
             }
 
             // Final gate: death and battle-ending beats must finish before the results are handled.
             await WaitForPresentationAsync();
+            // ANY outcome (the player's flight included) dissolves the summons like spells:
+            // they never reach the context's return-to-world list.
+            _summonService?.DespawnAll();
             _timeline.DetachAll();
 
             return _battleOutcome?.Results ?? BattleResults.BattleAbandoned;
@@ -397,6 +509,135 @@
         {
             // FindSpotFor doubles as the melee-approach anchor lookup for attack phrases.
             _director?.Setup(_timeline, battleEventBus, CreateVfxPresenter(), FindSpotFor);
+        }
+
+        /// <summary>Combat reactions of NPCs (hidden triggered casts): one driver per battle, wired
+        /// to every fighter with a reactions section; latecomers attach in TryJoinBattle.</summary>
+        private void SetupReactionsDriver(IBattleEventBus battleEventBus)
+        {
+            if (_abilityProvider == null) return;
+            _reactionsDriver?.Dispose();
+            _reactionsDriver = new NpcReactionsDriver(
+                this, _abilityProvider, _worldFacts, new DefaultRandomNumberGenerator(),
+                () => _battleOutcome == null, battleEventBus);
+            foreach (var fighter in _fighters)
+                _reactionsDriver.TryAttach(fighter);
+        }
+
+        /// <summary>Boss stage transitions (the "stages" section of Npc.json): one controller per
+        /// battle, wired to every staged fighter; latecomers attach in TryJoinBattle.</summary>
+        private void SetupBossStagesController(IBattleEventBus battleEventBus)
+        {
+            _bossStagesController?.Dispose();
+            _bossStagesController = new BossStagesController(
+                new DefaultRandomNumberGenerator(), () => _battleOutcome == null, battleEventBus);
+            foreach (var fighter in _fighters)
+                _bossStagesController.TryAttach(fighter);
+        }
+
+        /// <summary>Summons (hidden summoning casts of bosses): one service per battle, listening on
+        /// every fighter; latecomers attach in TryJoinBattle. Without the project wiring
+        /// (npc provider + battle spawner) the battle simply has no summons.</summary>
+        private void SetupSummonService()
+        {
+            _summonService?.Dispose();
+            _summonService = null;
+            if (_npcProvider == null || _summonSpawner == null) return;
+
+            _summonService = new SummonService(this, () => _battleOutcome == null);
+            foreach (var fighter in _fighters)
+                _summonService.TryAttach(fighter);
+        }
+
+        /// <summary>ISummonHandler: spawn the summon beside its summoner and join it to the battle.
+        /// The summon slot sits OUTSIDE the battle-slot budget by design.</summary>
+        IFightableNpc? ISummonHandler.SpawnSummon(IFightable summoner, string npcId, float statShare)
+        {
+            if (_battleEventBus == null || _battleOutcome != null || _formation == null) return null;
+            if (_npcProvider == null || _summonSpawner == null) return null;
+            if (FindSpotFor(summoner.InstanceId) is not EntitySpot summonerSpot) return null;
+
+            Core.Data.NpcData.NpcDefinition definition;
+            try
+            {
+                definition = _npcProvider.CreateDefinition(npcId);
+            }
+            catch (Exception e)
+            {
+                Tracker.TrackException($"Summon npc '{npcId}' cannot be created", e, this);
+                return null;
+            }
+
+            var spot = CreateDynamicSpot();
+            spot.Position = s_formationCenter + _formation.ReserveSummonSlot(summoner.InstanceId, summonerSpot.Position - s_formationCenter);
+
+            var summon = _summonSpawner.Spawn(definition, this, spot.GlobalPosition);
+            if (summon == null)
+            {
+                _allSpots.Remove(spot);
+                spot.QueueFree();
+                return null;
+            }
+
+            InheritSummonerParameters(summon, summoner, statShare);
+            JoinAsSummon(summon, summoner, spot);
+            return summon;
+        }
+
+        /// <summary>ISummonHandler: the summon leaves the field for good — slot destroyed, node freed,
+        /// nothing returns to the world. Called after the death beat was shown, or at battle end.</summary>
+        void ISummonHandler.RemoveSummon(IFightableNpc summon)
+        {
+            summon.Group?.RemoveFromGroup(summon);
+            _fighters.RemoveAll(fighter => fighter.IsSame(summon.InstanceId));
+
+            if (_summonSpots.Remove(summon.InstanceId, out var spot))
+            {
+                spot.RemoveEntityFromSpot();
+                spot.RemoveBattleEventBus();
+                _allSpots.Remove(spot);
+                spot.QueueFree();
+            }
+
+            // A freed body must not hear the later BattleEndEvent — its handler touches the native side.
+            summon.RemoveBattleEventBus();
+            _summonSpawner?.Despawn(summon);
+            _selectionController?.RefreshHighlights();
+        }
+
+        /// <summary>The wolves are a shadow of their master: every parameter = the summoner's
+        /// CURRENT value × share (cast-time snapshot), vitals start full.</summary>
+        private static void InheritSummonerParameters(IFightableNpc summon, IFightable summoner, float statShare)
+        {
+            foreach (EntityParameter parameter in Enum.GetValues<EntityParameter>())
+                summon.Parameters.SetBaseValueForParameter(parameter, summoner.Parameters.GetValueForParameter(parameter) * statShare);
+
+            summon.CurrentHealth = summon.Parameters.MaxHealth;
+            summon.CurrentMana = summon.Parameters.MaxMana;
+            summon.CurrentBarrier = summon.Parameters.MaxBarrier;
+        }
+
+        private void JoinAsSummon(IFightableNpc summon, IFightable summoner, EntitySpot spot)
+        {
+            // The summoner's EXACT group, capacity notwithstanding: a groupless wolf would read
+            // as everyone's enemy — its own master included.
+            EnsureGroup(summoner);
+            summoner.Group!.ForceAddToGroup(summon);
+
+            _fighters.Add(summon);
+            _summonSpots[summon.InstanceId] = spot;
+            spot.SetEntity(summon); // SetEntity claims the node via deferred AddChild
+            spot.SetBattleEventBus(_battleEventBus!);
+            if (summon is Node node) node.GetParent()?.RemoveChild(node); // spawner's parent releases it before the deferred claim runs
+
+            summon.SetupBattleEventBus(_battleEventBus!);
+            summon.IsFighting = true;
+            _timeline.Attach(summon.CombatEvents);
+            _reactionsDriver?.TryAttach(summon);
+            _summonService?.TryAttach(summon);
+            // The queue picks the wolf up with the next round's refill — same as any latecomer.
+            _selectionController?.RefreshHighlights();
+            _battleEventBus!.Publish(new SummonSpawnedEvent(summon, summoner));
         }
 
         /// <summary>VFX live in arena space (spot anchors); without a library the director plays without ability VFX.</summary>
@@ -492,6 +733,15 @@
         private void OnEntityDead(EntityDiedEvent obj)
         {
             if (obj.Entity is IPlayer) return; // the player's defeat resolves through PlayerDiedEvent
+            if (obj.Entity is IFightableNpc { IsSummon: true })
+            {
+                // No corpse, no parked spot: the summon service tears the slot down after the
+                // death beat has been shown (the battle loop drives the cleanup).
+                _summonService?.OnSummonDied(obj.Entity);
+                CheckPlayerVictory();
+                return;
+            }
+
             FreeSpotOf(obj.Entity);
             CheckPlayerVictory();
         }
@@ -500,7 +750,7 @@
         /// same position (still lying on the field, returned to the world by the context at the end).</summary>
         private void FreeSpotOf(IFightable entity)
         {
-            var spot = _spots.FirstOrDefault(s => s.Entity?.IsSame(entity.InstanceId) == true);
+            var spot = _allSpots.FirstOrDefault(s => s.Entity?.IsSame(entity.InstanceId) == true);
             if (spot == null || entity is not Node2D corpse) return;
 
             var worldPosition = corpse.GlobalPosition;

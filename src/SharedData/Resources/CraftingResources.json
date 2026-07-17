@@ -7,13 +7,15 @@
                     "parameter": "Armor",
                     "modifierType": "flat",
                     "value": 300,
-                    "weight": 200
+                    "weight": 200,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "inc",
                     "value": 0.1,
-                    "weight": 150
+                    "weight": 150,
+                    "affix": "Prefix"
                 }
             ]
         },
@@ -24,13 +26,15 @@
                     "parameter": "Barrier",
                     "modifierType": "flat",
                     "value": 200,
-                    "weight": 200
+                    "weight": 200,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
                     "value": 0.1,
-                    "weight": 150
+                    "weight": 150,
+                    "affix": "Prefix"
                 }
             ]
         },
@@ -41,13 +45,15 @@
                     "parameter": "Evade",
                     "modifierType": "flat",
                     "value": 250,
-                    "weight": 200
+                    "weight": 200,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
                     "value": 0.1,
-                    "weight": 150
+                    "weight": 150,
+                    "affix": "Prefix"
                 }
             ]
         },
@@ -58,30 +64,15 @@
                     "parameter": "AllAttribute",
                     "modifierType": "flat",
                     "value": 5,
-                    "weight": 200
+                    "weight": 200,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "AllAttribute",
                     "modifierType": "inc",
                     "value": 0.1,
-                    "weight": 150
-                }
-            ]
-        },
-        {
-            "id": "Category_Wood",
-            "modifiers": [
-                {
-                    "parameter": "Accuracy",
-                    "modifierType": "flat",
-                    "value": 250,
-                    "weight": 200
-                },
-                {
-                    "parameter": "Accuracy",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 150
+                    "weight": 150,
+                    "affix": "Suffix"
                 }
             ]
         },
@@ -92,13 +83,15 @@
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
                     "value": 0.03,
-                    "weight": 200
+                    "weight": 200,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
                     "value": 0.2,
-                    "weight": 150
+                    "weight": 150,
+                    "affix": "Prefix"
                 }
             ]
         },
@@ -179,6 +172,133 @@
             "rarity": "Uncommon",
             "category": "Weapon",
             "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Simple_Flux",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Flux"
+            ],
+            "rarity": "Uncommon",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Fine_Flux",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Flux"
+            ],
+            "rarity": "Rare",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Quality_Flux",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Flux"
+            ],
+            "rarity": "Epic",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Perfect_Flux",
+            "tags": [
+                "Crafting",
+                "Upgrade",
+                "Resource",
+                "Flux"
+            ],
+            "rarity": "Legendary",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Apprentice_Rune",
+            "tags": [
+                "Crafting",
+                "Create",
+                "Resource",
+                "Rune"
+            ],
+            "rarity": "Uncommon",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Journeyman_Rune",
+            "tags": [
+                "Crafting",
+                "Create",
+                "Resource",
+                "Rune"
+            ],
+            "rarity": "Rare",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Master_Rune",
+            "tags": [
+                "Crafting",
+                "Create",
+                "Resource",
+                "Rune"
+            ],
+            "rarity": "Epic",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Grandmaster_Rune",
+            "tags": [
+                "Crafting",
+                "Create",
+                "Resource",
+                "Rune"
+            ],
+            "rarity": "Legendary",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Weaponsmith_Mark",
+            "tags": [
+                "Crafting",
+                "Ascend",
+                "Resource",
+                "Mark",
+                "Weapon"
+            ],
+            "rarity": "Mythic",
+            "category": "Weapon",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Jeweler_Mark",
+            "tags": [
+                "Crafting",
+                "Ascend",
+                "Resource",
+                "Mark",
+                "Jewellery"
+            ],
+            "rarity": "Mythic",
+            "category": "Jewellery",
+            "maxStackSize": 999
+        },
+        {
+            "id": "Upgrade_Resource_Armorsmith_Mark",
+            "tags": [
+                "Crafting",
+                "Ascend",
+                "Resource",
+                "Mark",
+                "Armor"
+            ],
+            "rarity": "Mythic",
+            "category": "Armor",
+            "maxStackSize": 999
         }
     ],
     "craftingResources": [
@@ -192,13 +312,15 @@
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 75
+                        "weight": 75,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -221,13 +343,15 @@
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 75
+                        "weight": 75,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -250,13 +374,15 @@
                         "parameter": "Damage",
                         "modifierType": "flat",
                         "value": 70,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -279,13 +405,15 @@
                         "parameter": "Movespeed",
                         "modifierType": "flat",
                         "value": 15,
-                        "weight": 150
+                        "weight": 150,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Movespeed",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -308,13 +436,15 @@
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 350,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "multi",
-                        "value": 1.15,
-                        "weight": 50
+                        "value": 0.15,
+                        "weight": 50,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -336,26 +466,30 @@
                     {
                         "parameter": "Armor",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Intelligence",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Intelligence",
                         "modifierType": "flat",
                         "value": 10,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -377,26 +511,30 @@
                     {
                         "parameter": "Evade",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Dexterity",
                         "modifierType": "flat",
                         "value": 10,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Dexterity",
                         "modifierType": "inc",
                         "value": 0.3,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -418,26 +556,30 @@
                     {
                         "parameter": "Health",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "flat",
                         "value": 10,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -460,19 +602,22 @@
                         "parameter": "Mana",
                         "modifierType": "flat",
                         "value": 5,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Mana",
                         "modifierType": "inc",
                         "value": 0.1,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "flat",
                         "value": 5,
-                        "weight": 150
+                        "weight": 150,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -494,20 +639,23 @@
                     {
                         "parameter": "Barrier",
                         "modifierType": "multi",
-                        "value": 1.2,
-                        "weight": 55
+                        "value": 0.2,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "flat",
                         "value": 200,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -530,13 +678,15 @@
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
                         "value": 0.3,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.03,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -559,13 +709,15 @@
                         "parameter": "Damage",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -588,13 +740,15 @@
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -617,13 +771,15 @@
                         "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -646,13 +802,15 @@
                         "parameter": "Evade",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -675,13 +833,15 @@
                         "parameter": "Barrier",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15
+                        "weight": 15,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30
+                        "weight": 30,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -704,19 +864,22 @@
                         "parameter": "Barrier",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 75
+                        "weight": 75,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "flat",
                         "value": 60,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -739,19 +902,22 @@
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 450,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 200,
-                        "weight": 40
+                        "weight": 40,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -774,19 +940,22 @@
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 800,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "multi",
-                        "value": 1.2,
-                        "weight": 40
+                        "value": 0.2,
+                        "weight": 40,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 400,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -808,26 +977,30 @@
                     {
                         "parameter": "Mana",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Mana",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "flat",
                         "value": 100,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -849,20 +1022,23 @@
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "SpellDamage",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -884,26 +1060,30 @@
                     {
                         "parameter": "Accuracy",
                         "modifierType": "multi",
-                        "value": 1.25,
-                        "weight": 55
+                        "value": 0.25,
+                        "weight": 55,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "inc",
                         "value": 0.25,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.04,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "AdditionalHitChance",
                         "modifierType": "flat",
                         "value": 0.03,
-                        "weight": 40
+                        "weight": 40,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -917,140 +1097,6 @@
             "rarity": "Epic"
         },
         {
-            "id": "Crafting_Resource_Pine_Wood",
-            "material": {
-                "id": "Material_Pine",
-                "categoryId": "Category_Wood",
-                "modifiers": [
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "flat",
-                        "value": 150,
-                        "weight": 120
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "inc",
-                        "value": 0.1,
-                        "weight": 80
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Wood",
-                "Pine"
-            ],
-            "rarity": "Common"
-        },
-        {
-            "id": "Crafting_Resource_Oak_Wood",
-            "material": {
-                "id": "Material_Oak",
-                "categoryId": "Category_Wood",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 300,
-                        "weight": 100
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 200,
-                        "weight": 80
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "inc",
-                        "value": 0.1,
-                        "weight": 60
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Wood",
-                "Oak"
-            ],
-            "rarity": "Uncommon"
-        },
-        {
-            "id": "Crafting_Resource_Yew_Wood",
-            "material": {
-                "id": "Material_Yew",
-                "categoryId": "Category_Wood",
-                "modifiers": [
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "flat",
-                        "value": 350,
-                        "weight": 100
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 80
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.03,
-                        "weight": 40
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Wood",
-                "Yew"
-            ],
-            "rarity": "Rare"
-        },
-        {
-            "id": "Crafting_Resource_Ironwood",
-            "material": {
-                "id": "Material_Ironwood",
-                "categoryId": "Category_Wood",
-                "modifiers": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 500,
-                        "weight": 80
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 60
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "multi",
-                        "value": 1.15,
-                        "weight": 40
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Wood",
-                "Ironwood"
-            ],
-            "rarity": "Epic"
-        },
-        {
             "id": "Crafting_Resource_Wolf_Leather",
             "material": {
                 "id": "Material_Wolf_Leather",
@@ -1060,13 +1106,15 @@
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 150,
-                        "weight": 120
+                        "weight": 120,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
                         "value": 0.1,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -1089,19 +1137,22 @@
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 450,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 70
+                        "weight": 70,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -1124,19 +1175,22 @@
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 400,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "multi",
-                        "value": 1.2,
-                        "weight": 40
+                        "value": 0.2,
+                        "weight": 40,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "MoveSpeed",
                         "modifierType": "flat",
                         "value": 20,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -1159,13 +1213,15 @@
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.02,
-                        "weight": 120
+                        "weight": 120,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "flat",
                         "value": 100,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -1188,13 +1244,15 @@
                         "parameter": "Damage",
                         "modifierType": "flat",
                         "value": 60,
-                        "weight": 100
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
                         "value": 0.15,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -1217,19 +1275,22 @@
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
                         "value": 0.25,
-                        "weight": 80
+                        "weight": 80,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 70
+                        "weight": 70,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.03,
-                        "weight": 40
+                        "weight": 40,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -1252,19 +1313,22 @@
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.05,
-                        "weight": 60
+                        "weight": 60,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
                         "value": 0.3,
-                        "weight": 50
+                        "weight": 50,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
                         "value": 0.4,
-                        "weight": 40
+                        "weight": 40,
+                        "affix": "Prefix"
                     }
                 ]
             },

@@ -1,3 +1,36 @@
 {
-  "additives": []
+  "additives": [
+    {
+      "resourceId": "Upgrade_Resource_Simple_Flux",
+      "upgradeChanceBonus": 0.03
+    },
+    {
+      "resourceId": "Upgrade_Resource_Fine_Flux",
+      "upgradeChanceBonus": 0.06
+    },
+    {
+      "resourceId": "Upgrade_Resource_Quality_Flux",
+      "upgradeChanceBonus": 0.09
+    },
+    {
+      "resourceId": "Upgrade_Resource_Perfect_Flux",
+      "upgradeChanceBonus": 0.15
+    },
+    {
+      "resourceId": "Upgrade_Resource_Apprentice_Rune",
+      "minRarity": "Uncommon"
+    },
+    {
+      "resourceId": "Upgrade_Resource_Journeyman_Rune",
+      "minRarity": "Rare"
+    },
+    {
+      "resourceId": "Upgrade_Resource_Master_Rune",
+      "minRarity": "Epic"
+    },
+    {
+      "resourceId": "Upgrade_Resource_Grandmaster_Rune",
+      "minRarity": "Legendary"
+    }
+  ]
 }

@@ -1,11 +1,11 @@
 ﻿namespace Battle.Source.Abilities.SeriesOfAttacks
 {
-    using Core.Entity.Components.Decorator;
+    using Core.Battle.Abilities;
     using Core.Enums;
 
     public class SoAsUpgradeMaxAmountAttacks(string id, string[] tags, int tier, int additionalAmountAttacks)
-        : SimpleUpgrade<SeriesOfAttacks, SeriesOfAttacks.Parameters>(id, tags, tier,
-            new SimpleAbilityParameterDecorator<SeriesOfAttacks.Parameters>(
+        : SimpleUpgrade<SeriesOfAttacks>(id, tags, tier,
+            new SimpleAbilityParameterDecorator(
                 SeriesOfAttacks.Parameters.MaxAttacks,
                 Priority.Weak,
                 OperationType.Add,

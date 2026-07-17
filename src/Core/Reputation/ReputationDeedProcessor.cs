@@ -68,6 +68,8 @@ namespace Core.Reputation
             // Точно ли я хочу сравнивать по референсу? Возможно стоит сменить на Id игрока.
             if (evnt.Killer == null || !ReferenceEquals(evnt.Killer, _playerAccessor.Player)) return;
             if (evnt.Entity is not INpc npc) return;
+            // A summon is a spell, not a member of its faction: killing one is not a deed.
+            if (evnt.Entity is IFightableNpc { IsSummon: true }) return;
 
             ApplyDeed(DeedIds.KillNpc, npc.Fraction, npc.InstanceId, npc.Position);
         }

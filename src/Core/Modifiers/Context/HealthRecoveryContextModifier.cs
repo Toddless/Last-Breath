@@ -8,7 +8,7 @@
     /// </summary>
     /// <param name="amount"> 1.3 for increase, 0.9 for reduce</param>
     public class HealthRecoveryContextModifier(float amount)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Mana_Recovery"), IHealModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Mana_Recovery"), IHealModifier
     {
         public void Apply(IHealContext context) => context.Amount *= amount;
     }

@@ -6,10 +6,9 @@ namespace Battle.Source.Abilities.ChainLightning
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Godot;
 
@@ -24,7 +23,6 @@ namespace Battle.Source.Abilities.ChainLightning
         public float LastJumpMultiplier { get; set; } = 1f;
         public bool IgnoreResistances { get; set; }
         public List<IFightable> Targets { get; set; } = [];
-        public IBattleField? Field { get; set; }
     }
 
     /// <summary>
@@ -32,48 +30,13 @@ namespace Battle.Source.Abilities.ChainLightning
     /// Stage 2 adds a jump, stage 3 softens the falloff, stage 4 doubles the last jump.
     /// The chain sequence is its own plan shape — exactly why the multicast base is generic.
     /// </summary>
-    public class ChainLightning(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        int jumps,
-        float damageFalloff,
-        float stageThreeFalloffReduction,
-        float stageFourLastJumpMultiplier,
-        Costs costType = Costs.Mana)
-        : MulticastAbility<ChainPlan>(id: "Ability_Chain_Lightning", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public class ChainLightning(AbilityBaseData data) : MulticastAbility<ChainPlan>(data)
     {
         private readonly RandomNumberGenerator _rnd = CreateRandom();
 
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.Jumps] = new Module<Parameters>(() => jumps, Parameters.Jumps),
-                    [Parameters.DamageFalloff] = new Module<Parameters>(() => damageFalloff, Parameters.DamageFalloff)
-                });
-                return field;
-            }
-        }
-
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
+        public float Damage => this[AbilityParameter.Damage];
+        public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
+        public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
 
         public int Jumps => (int)this[Parameters.Jumps];
         public float DamageFalloff => this[Parameters.DamageFalloff];
@@ -81,41 +44,26 @@ namespace Battle.Source.Abilities.ChainLightning
         /// <summary>L3 upgrade point: the lightning ignores elemental resistances.</summary>
         public bool IgnoreResistances { get; set; }
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            Jumps,
-            DamageFalloff
+            public const string Jumps = nameof(Jumps);
+            public const string DamageFalloff = nameof(DamageFalloff);
+            public const string StageThreeFalloffReduction = nameof(StageThreeFalloffReduction);
+            public const string StageFourLastJumpMultiplier = nameof(StageFourLastJumpMultiplier);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
+            base.RegisterBaseParameters(parameters);
+            RegisterDamageParameters(parameters);
+            parameters.RegisterDefault(Parameters.Jumps, 2);
+            parameters.RegisterDefault(Parameters.DamageFalloff, 0.25f);
+            parameters.RegisterDefault(Parameters.StageThreeFalloffReduction, 0.15f);
+            parameters.RegisterDefault(Parameters.StageFourLastJumpMultiplier, 2f);
         }
 
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new ChainLightning(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                Jumps, DamageFalloff, stageThreeFalloffReduction, stageFourLastJumpMultiplier, CostType) { IgnoreResistances = IgnoreResistances };
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() =>
+            CopyUpgradesTo(new ChainLightning(Data) { IgnoreResistances = IgnoreResistances });
 
         protected override ChainPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
@@ -126,8 +74,7 @@ namespace Battle.Source.Abilities.ChainLightning
                 Jumps = Jumps,
                 DamageFalloff = DamageFalloff,
                 IgnoreResistances = IgnoreResistances,
-                Targets = targets,
-                Field = field
+                Targets = targets
             };
 
         protected override void ApplyStage(int stage, ChainPlan plan, IFightable owner, IBattleField field)
@@ -138,25 +85,25 @@ namespace Battle.Source.Abilities.ChainLightning
                     plan.Jumps += 1;
                     break;
                 case 3:
-                    plan.DamageFalloff = Mathf.Max(0f, plan.DamageFalloff - stageThreeFalloffReduction);
+                    plan.DamageFalloff = Mathf.Max(0f, plan.DamageFalloff - this[Parameters.StageThreeFalloffReduction]);
                     break;
                 case 4:
-                    plan.LastJumpMultiplier = stageFourLastJumpMultiplier;
+                    plan.LastJumpMultiplier = this[Parameters.StageFourLastJumpMultiplier];
                     break;
             }
         }
 
-        protected override async Task ExecutePlan(ChainPlan plan, IFightable owner)
+        protected override async Task ExecutePlan(ChainPlan plan, IFightable owner, IBattleField field)
         {
             var initial = plan.Targets.FirstOrDefault(t => t.IsAlive);
-            if (initial == null || plan.Field == null) return;
+            if (initial == null) return;
 
             float strikeDamage = plan.Damage + (owner.Parameters.Damage * plan.WeaponDamageScale) + (owner.Parameters.SpellDamage * plan.SpellDamageScale);
             IFightable? previous = null;
             int totalStrikes = 1 + plan.Jumps;
             for (int strike = 0; strike < totalStrikes; strike++)
             {
-                var target = strike == 0 ? initial : PickJumpTarget(plan.Field, owner, previous);
+                var target = strike == 0 ? initial : PickJumpTarget(field, owner, previous);
                 if (target == null) break;
 
                 float hitDamage = strikeDamage * Mathf.Pow(1 - plan.DamageFalloff, strike);
@@ -175,6 +122,7 @@ namespace Battle.Source.Abilities.ChainLightning
                 };
                 context.Add(DamageType.Lightning, hitDamage);
                 await target.TakeDamage(context);
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, isCritical, context.TotalDamage));
                 previous = target;
             }
         }

@@ -7,7 +7,7 @@
     /// <summary>Grants extra stacks of matching effects the owner applies ("+1 burning stack per application").
     /// The bonus is read lazily, so a source whose value changes (item upgrade) is picked up without re-attach.</summary>
     public class BonusEffectStacksContextModifier(StatusEffects statusFilter, Func<int> stacks)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Bonus_Effect_Stacks"), IEffectApplicationModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Bonus_Effect_Stacks"), IEffectApplicationModifier
     {
         public BonusEffectStacksContextModifier(StatusEffects statusFilter, int stacks)
             : this(statusFilter, () => stacks)

@@ -20,11 +20,33 @@ namespace Core.Data.NpcData
 
         [JsonProperty("levelMin")] public int LevelMin { get; init; } = 1;
 
+        /// <summary>Roll ceiling override; absent = the EntityType cap. levelMax == levelMin pins the level (bosses).</summary>
+        [JsonProperty("levelMax")] public int? LevelMax { get; init; }
+
         /// <summary>Per-level fraction added to every base parameter: value * (1 + (level - 1) * levelScaling).</summary>
         [JsonProperty("levelScaling")] public float LevelScaling { get; init; }
 
         /// <summary>Learned ability count; 0 = derive from entity type (2/3/4/5, bosses take all).</summary>
         [JsonProperty("abilityCount")] public int AbilityCount { get; init; }
+
+        /// <summary>Fixed rarity name (bosses/uniques). Empty = rolled by weight at spawn.</summary>
+        [JsonProperty("rarity")] public string? Rarity { get; init; }
+
+        /// <summary>Authored ability list (bosses). Non-empty = exactly these instead of the archetype roll.</summary>
+        [JsonProperty("abilities")] public List<string> Abilities { get; init; } = [];
+
+        /// <summary>Per-NPC override of the archetype's flee threshold; 0 = never flees (bosses).</summary>
+        [JsonProperty("fleeHealthThreshold")] public float? FleeHealthThreshold { get; init; }
+
+        /// <summary>Per-NPC planner entries merged OVER the stance archetype: how the combat AI
+        /// scores authored abilities that live outside the archetype pool (boss kits).</summary>
+        [JsonProperty("abilityBehaviors")] public List<NpcAbilityBehaviorData> AbilityBehaviors { get; init; } = [];
+
+        /// <summary>Combat reactions (hidden triggered casts); a broken entry is reported and skipped.</summary>
+        [JsonProperty("reactions")] public List<NpcReactionData> Reactions { get; init; } = [];
+
+        /// <summary>Boss stages; a broken entry drops the whole section (see NpcStageParser).</summary>
+        [JsonProperty("stages")] public List<NpcStageData> Stages { get; init; } = [];
 
         [JsonProperty("baseParameters")] public Dictionary<string, float> BaseParameters { get; init; } = [];
 
@@ -81,6 +103,49 @@ namespace Core.Data.NpcData
         [JsonProperty("to")] public string To { get; init; } = "00:00";
         [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
         [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
+    }
+
+    /// <summary>One "reactions" entry — parsed strictly into NpcReactionConfig by NpcReactionParser.</summary>
+    public record NpcReactionData
+    {
+        [JsonProperty("abilityId")] public string AbilityId { get; init; } = string.Empty;
+        [JsonProperty("trigger")] public string Trigger { get; init; } = string.Empty;
+        [JsonProperty("chance")] public float Chance { get; init; }
+        [JsonProperty("maxPerTurn")] public int MaxPerTurn { get; init; } = 1;
+
+        /// <summary>Npc id whose final death (world fact) permanently disables this reaction.</summary>
+        [JsonProperty("blockedByFinalDeathOf")] public string? BlockedByFinalDeathOf { get; init; }
+    }
+
+    /// <summary>One "stages" entry — parsed strictly into NpcStageConfig by NpcStageParser.</summary>
+    public record NpcStageData
+    {
+        [JsonProperty("parameterMultiplier")] public float ParameterMultiplier { get; init; } = 1f;
+
+        /// <summary>The stage's full ability set — replaces the book's content on stage entry.</summary>
+        [JsonProperty("abilities")] public List<string> Abilities { get; init; } = [];
+
+        /// <summary>Effects riding every landed attack while this stage is active.</summary>
+        [JsonProperty("attackEffects")] public List<NpcStageAttackEffectData> AttackEffects { get; init; } = [];
+
+        /// <summary>Health share arming the one-way transition to the next stage. Absent = final stage.</summary>
+        [JsonProperty("nextStageAtHealthPercent")] public float? NextStageAtHealthPercent { get; init; }
+
+        /// <summary>Health share arming the one-time rage burst; requires <see cref="RageBonus"/>.</summary>
+        [JsonProperty("rageAtHealthPercent")] public float? RageAtHealthPercent { get; init; }
+
+        /// <summary>Increase bonus (0.25 = +25%) to Damage/CriticalChance/AdditionalHitChance until the battle ends.</summary>
+        [JsonProperty("rageBonus")] public float? RageBonus { get; init; }
+    }
+
+    /// <summary>One on-attack effect of a boss stage; damagePercent is the effect's magnitude.</summary>
+    public record NpcStageAttackEffectData
+    {
+        [JsonProperty("effect")] public string Effect { get; init; } = string.Empty;
+        [JsonProperty("chance")] public float Chance { get; init; }
+        [JsonProperty("damagePercent")] public float? DamagePercent { get; init; }
+        [JsonProperty("duration")] public int Duration { get; init; }
+        [JsonProperty("maxStacks")] public int MaxStacks { get; init; }
     }
 
     public record NpcsData

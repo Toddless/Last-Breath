@@ -7,28 +7,31 @@ namespace Core.Modifiers
     /// <summary>Pure transforms over modifier descriptors used by the crafting roll.</summary>
     public static class DescriptorOperations
     {
-        /// <summary>Scales a descriptor's value(s) by a quality multiplier, delta-aware for multiplicative lines
-        /// (1.25 at x2 quality -> 1.5, not 2.5). Returns a fresh descriptor; composites scale each part.</summary>
+        /// <summary>Scales a descriptor's value bounds by a quality multiplier — LINEAR for every value type:
+        /// flat/increase/multiplicative all store the bonus delta (multi data is 0.15, never 1.15), so one
+        /// scale rule fits all. Returns a fresh descriptor; composites scale each part.</summary>
         public static IModifierDescriptor Scale(IModifierDescriptor descriptor, float multiplier) => descriptor switch
         {
-            ParameterDescriptor parameter => parameter with { Value = ScaledValue(parameter.ValueType, parameter.Value, multiplier) },
-            ContextDescriptor context => context with { Value = ScaledValue(context.ValueType, context.Value, multiplier) },
+            ParameterDescriptor parameter => parameter with { Value = parameter.Value.Scale(multiplier) },
+            ContextDescriptor context => context with { Value = context.Value.Scale(multiplier) },
             CompositeDescriptor composite => composite with { Parts = composite.Parts.Select(part => Scale(part, multiplier)).ToList() },
             _ => descriptor,
         };
 
-        /// <summary>Expands composites into their atomic parts — the reroll pool is flat so a reroll is 1-for-1.</summary>
+        /// <summary>Expands composites into their atomic parts — the reroll pool is flat so a reroll is 1-for-1.
+        /// The root's affix survives on every atom (parts carry none by parse contract).</summary>
         public static IEnumerable<IModifierDescriptor> Flatten(IEnumerable<IModifierDescriptor> descriptors) =>
-            descriptors.SelectMany(descriptor => descriptor is CompositeDescriptor composite ? Flatten(composite.Parts) : [descriptor]);
+            descriptors.SelectMany(descriptor => descriptor is CompositeDescriptor composite
+                ? Flatten(composite.Parts).Select(part => WithAffix(part, composite.Affix))
+                : [descriptor]);
 
-        /// <summary>Bridges a designed pool modifier (loot/additive pools authored as IModifier) into a descriptor.</summary>
-        public static IModifierDescriptor FromModifier(IModifier modifier) => modifier switch
-        {
-            CompositeModifier composite => new CompositeDescriptor(composite.Parts.Select(FromModifier).ToList()) { Weight = composite.Weight },
-            _ => new ParameterDescriptor(modifier.EntityParameter, modifier.ModifierValueType, modifier.BaseValue, modifier.Scope) { Weight = modifier.Weight },
-        };
-
-        private static float ScaledValue(ModifierValueType type, float value, float multiplier) =>
-            type == ModifierValueType.Multiplicative ? 1f + (value - 1f) * multiplier : value * multiplier;
+        private static IModifierDescriptor WithAffix(IModifierDescriptor descriptor, AffixKind affix) => affix == AffixKind.None
+            ? descriptor
+            : descriptor switch
+            {
+                ParameterDescriptor parameter => parameter with { Affix = affix },
+                ContextDescriptor context => context with { Affix = affix },
+                _ => descriptor,
+            };
     }
 }

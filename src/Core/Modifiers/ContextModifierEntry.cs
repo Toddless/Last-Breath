@@ -22,6 +22,11 @@ namespace Core.Modifiers
         public float Value { get; set; } = baseValue;
         public float Weight { get; set; } = weight;
 
+        // Roll provenance, stamped by the materializer (see SimpleModifier for the field contract).
+        public AffixKind Affix { get; set; }
+        public string? GroupId { get; set; }
+        public ValueRange? RolledRange { get; set; }
+
         /// <summary>Floored view for whole-number knobs (durations, stacks).</summary>
         public int WholeValue => (int)Value;
 
@@ -37,6 +42,7 @@ namespace Core.Modifiers
             _binding = null;
         }
 
-        public ContextModifierEntry Copy() => new(Parameter, ValueType, BaseValue, Weight) { Value = Value };
+        public ContextModifierEntry Copy() =>
+            new(Parameter, ValueType, BaseValue, Weight) { Value = Value, Affix = Affix, GroupId = GroupId, RolledRange = RolledRange };
     }
 }

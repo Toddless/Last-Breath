@@ -3,13 +3,6 @@
 [ext_resource type="Script" uid="uid://du3vq3ps2k46l" path="res://Inventory/InventorySlot.cs" id="1_yg5o5"]
 [ext_resource type="Texture2D" uid="uid://b572r33tnufoy" path="res://Data/Shared/Assets/UI/Slot_Frame.png" id="2_wwg8p"]
 
-[sub_resource type="Gradient" id="Gradient_sbkx4"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0.19434911, 0.19434932, 0.1943492, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_ng85e"]
-gradient = SubResource("Gradient_sbkx4")
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_kk0k1"]
 atlas = ExtResource("2_wwg8p")
 
@@ -32,7 +25,6 @@ Frame = NodePath("Frame")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1536586556]
 layout_mode = 2
-texture = SubResource("GradientTexture1D_ng85e")
 expand_mode = 1
 
 [node name="Icon" type="TextureRect" parent="." unique_id=1775427976]

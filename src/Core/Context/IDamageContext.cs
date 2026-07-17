@@ -32,6 +32,9 @@ namespace Core.Context
         /// <summary>Amount of this hit that was soaked by the target's barrier. Health damage = <see cref="TotalDamage"/> - this.</summary>
         float AbsorbedByBarrier { get; set; }
 
+        /// <summary>Damage eaten by an <see cref="Battle.Abilities.IShieldEffect"/> layer (before the barrier).</summary>
+        float AbsorbedByShield { get; set; }
+
         void Add(DamageType type, float amount);
         void Convert(DamageType from, DamageType to, float fraction);
         void Set(DamageType type, float amount);

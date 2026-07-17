@@ -1,7 +1,9 @@
-﻿namespace Core.MessageBus.Requests
+namespace Core.MessageBus.Requests
 {
     using System.Collections.Generic;
     using Items;
 
-    public record CreateEquipItemRequest(string RecipeId, Dictionary<string, int> UsedResources) : IRequest<IEquipItem?> { }
+    /// <summary>The recipe's mandatory resources and the optional additives travel split: the item
+    /// remembers which slot each resource came from (required vs optional creation part).</summary>
+    public record CreateEquipItemRequest(string RecipeId, Dictionary<string, int> RequiredResources, Dictionary<string, int> OptionalResources) : IRequest<IEquipItem?> { }
 }

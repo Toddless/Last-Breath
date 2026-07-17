@@ -27,12 +27,18 @@ namespace Core.Save
             UpdateLevel = item.UpdateLevel,
             MaxUpdateLevel = item.MaxUpdateLevel,
             IsSealed = item.IsSealed,
+            PowerMultiplier = item.PowerMultiplier,
+            RecraftCount = item.RecraftCount,
+            AscensionMultiplier = item.AscensionMultiplier,
             Implicits = ToModifierData(item.Implicits),
             Modifiers = ToModifierData(item.Modifiers),
             ContextImplicits = ToContextData(item.ContextImplicits),
             ContextModifiers = ToContextData(item.ContextModifiers),
-            ModifiersPool = item.ModifiersPool.Select(ToDescriptorData).ToList(),
-            UsedResources = new Dictionary<string, int>(item.UsedResources),
+            UsedResources = new UsedResourcesSaveData
+            {
+                Required = new Dictionary<string, int>(item.UsedRequiredResources),
+                Optional = new Dictionary<string, int>(item.UsedOptionalResources)
+            },
             Grants = item.Grants.Select(ToGrantData).ToList(),
             WeaponType = (item as WeaponItem)?.WeaponType,
             Handedness = (item as WeaponItem)?.Handedness,
@@ -53,12 +59,18 @@ namespace Core.Save
                     data.Id, data.Tags)
                 : new EquipItem(data.Piece, data.Id, data.Tags);
 
+            // A missing field (pre-live-pool save) reads as the neutral 1 — the reroll pool is live now,
+            // recomputed from data on every recraft, so nothing else needs restoring for it.
+            item.PowerMultiplier = data.PowerMultiplier ?? 1f;
+            item.RecraftCount = data.RecraftCount ?? 0; // legacy saves predate the counter: base price
+            // Assigned BEFORE the lines and the seal replay: the Set*/Upgrade calls below recompute
+            // every value through it. Legacy saves (pre-rework mythics included) read as the neutral 1.
+            item.AscensionMultiplier = data.AscensionMultiplier ?? 1f;
             item.SetImplicits(data.Implicits.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetModifiers(data.Modifiers.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetContextImplicits(data.ContextImplicits.Select(ToContextEntry));
             item.SetContextModifiers(data.ContextModifiers.Select(ToContextEntry));
-            item.SaveModifiersPool(data.ModifiersPool.Select(FromDescriptorData));
-            item.SaveUsedResources(new Dictionary<string, int>(data.UsedResources));
+            item.SaveUsedResources(data.UsedResources.Required, data.UsedResources.Optional);
             foreach (var grant in data.Grants)
                 item.AddGrant(FromGrantData(grant, item.InstanceId));
 
@@ -87,46 +99,21 @@ namespace Core.Save
                 ValueType = modifier.ModifierValueType,
                 Scope = modifier.Scope,
                 BaseValue = modifier.BaseValue,
-                Weight = modifier.Weight
+                Weight = modifier.Weight,
+                Affix = (modifier as SimpleModifier)?.Affix is { } affix and not AffixKind.None ? affix : null,
+                GroupId = (modifier as SimpleModifier)?.GroupId,
+                RangeMin = (modifier as SimpleModifier)?.RolledRange?.Min,
+                RangeMax = (modifier as SimpleModifier)?.RolledRange?.Max
             }).ToList();
 
         private static IModifierInstance ToModifier(ModifierSaveData data, string source) =>
-            new SimpleModifier(data.Parameter, data.ValueType, data.BaseValue, source, data.Weight) { Scope = data.Scope };
-
-        private static ModifierDescriptorSaveData ToDescriptorData(IModifierDescriptor descriptor) => descriptor switch
-        {
-            ParameterDescriptor parameter => new ModifierDescriptorSaveData
+            new SimpleModifier(data.Parameter, data.ValueType, data.BaseValue, source, data.Weight)
             {
-                Kind = ModifierDescriptorSaveData.ParameterKind,
-                Parameter = parameter.Parameter,
-                ValueType = parameter.ValueType,
-                Scope = parameter.Scope,
-                Value = parameter.Value,
-                Weight = parameter.Weight,
-            },
-            ContextDescriptor context => new ModifierDescriptorSaveData
-            {
-                Kind = ModifierDescriptorSaveData.ContextKind,
-                ContextParameter = context.Parameter,
-                ValueType = context.ValueType,
-                Value = context.Value,
-                Weight = context.Weight,
-            },
-            CompositeDescriptor composite => new ModifierDescriptorSaveData
-            {
-                Kind = ModifierDescriptorSaveData.CompositeKind,
-                Weight = composite.Weight,
-                Parts = composite.Parts.Select(ToDescriptorData).ToList(),
-            },
-            _ => throw new NotSupportedException($"Descriptor {descriptor.GetType().Name} has no save representation."),
-        };
-
-        private static IModifierDescriptor FromDescriptorData(ModifierDescriptorSaveData data) => data.Kind switch
-        {
-            ModifierDescriptorSaveData.ContextKind => new ContextDescriptor(data.ContextParameter ?? default, data.ValueType ?? default, data.Value ?? 0f) { Weight = data.Weight },
-            ModifierDescriptorSaveData.CompositeKind => new CompositeDescriptor((data.Parts ?? []).Select(FromDescriptorData).ToList()) { Weight = data.Weight },
-            _ => new ParameterDescriptor(data.Parameter ?? default, data.ValueType ?? default, data.Value ?? 0f, data.Scope ?? default) { Weight = data.Weight },
-        };
+                Scope = data.Scope,
+                Affix = data.Affix ?? AffixKind.None,
+                GroupId = data.GroupId,
+                RolledRange = ToRolledRange(data.RangeMin, data.RangeMax)
+            };
 
         private static List<ContextModifierSaveData> ToContextData(IReadOnlyList<ContextModifierEntry> entries) =>
             entries.Select(entry => new ContextModifierSaveData
@@ -134,11 +121,23 @@ namespace Core.Save
                 Parameter = entry.Parameter,
                 ValueType = entry.ValueType,
                 BaseValue = entry.BaseValue,
-                Weight = entry.Weight
+                Weight = entry.Weight,
+                Affix = entry.Affix != AffixKind.None ? entry.Affix : null,
+                GroupId = entry.GroupId,
+                RangeMin = entry.RolledRange?.Min,
+                RangeMax = entry.RolledRange?.Max
             }).ToList();
 
         private static ContextModifierEntry ToContextEntry(ContextModifierSaveData data) =>
-            new(data.Parameter, data.ValueType, data.BaseValue, data.Weight);
+            new(data.Parameter, data.ValueType, data.BaseValue, data.Weight)
+            {
+                Affix = data.Affix ?? AffixKind.None,
+                GroupId = data.GroupId,
+                RolledRange = ToRolledRange(data.RangeMin, data.RangeMax)
+            };
+
+        private static ValueRange? ToRolledRange(float? min, float? max) =>
+            min is { } rangeMin && max is { } rangeMax ? new ValueRange(rangeMin, rangeMax) : null;
 
         private GrantSaveData ToGrantData(IItemGrant grant) => grant switch
         {

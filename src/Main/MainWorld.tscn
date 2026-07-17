@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
 [ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="8_kwijy"]
-[ext_resource type="PackedScene" uid="uid://uxtq76ecjvm2" path="res://Npc/Necro.tscn" id="9_hv00y"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
 radius = 100.0
@@ -60,7 +59,7 @@ position = Vector2(1, 0)
 [node name="Undead" type="Node2D" parent="." unique_id=1587915089]
 position = Vector2(865, 986)
 script = ExtResource("8_hv00y")
-_npcIds = PackedStringArray("Npc_Skeleton_Mage", "Npc_Grave_Revenant")
+_npcIds = PackedStringArray("Npc_Skeleton_Mage")
 _spawnRadius = 100.0
 _spawnAsGroup = true
 _pointId = "Spawn_Point_Undead"
@@ -70,7 +69,7 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 texture = SubResource("GradientTexture2D_hv00y")
 
 [node name="Bandig" type="Node2D" parent="." unique_id=123361846]
-position = Vector2(971, 155)
+position = Vector2(1575, 76)
 script = ExtResource("8_hv00y")
 _npcIds = PackedStringArray("Npc_Bandit", "Npc_Bandit_Veteran")
 _spawnAsGroup = true
@@ -86,10 +85,6 @@ position = Vector2(333, 709)
 [node name="Sorcerer" type="Node2D" parent="." unique_id=414808614]
 position = Vector2(1700, 849)
 script = ExtResource("8_hv00y")
-_npcIds = PackedStringArray("Npc_Cursed_Sorcerer")
 _maxCount = 1
 _pointId = "Spawn_Point_Sorcerer"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
-
-[node name="Assasin" parent="." unique_id=696234298 instance=ExtResource("9_hv00y")]
-position = Vector2(1094, 389)

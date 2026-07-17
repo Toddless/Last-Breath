@@ -1,51 +1,121 @@
 {
     "pools": [
         {
-            "id": "Mythic",
+            "id": "Mythic_Weapon",
             "modifiersPool": [
                 {
                     "parameter": "Damage",
                     "modifierType": "inc",
                     "value": 0.4,
                     "weight": 100,
-                    "scope": "Global"
+                    "scope": "Global",
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "SpellDamage",
                     "modifierType": "inc",
                     "value": 0.4,
                     "weight": 100,
-                    "scope": "Global"
-                },
-                {
-                    "parameter": "CriticalChance",
-                    "modifierType": "flat",
-                    "value": 0.1,
-                    "weight": 50,
-                    "scope": "Global"
+                    "scope": "Global",
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
                     "value": 0.5,
-                    "weight": 50
+                    "weight": 50,
+                    "affix": "Prefix"
                 },
+                {
+                    "parameter": "HealthOnHit",
+                    "modifierType": "flat",
+                    "value": 50,
+                    "weight": 40,
+                    "affix": "Suffix"
+                },
+                {
+                    "extraUpgradeLevels": {
+                        "min": 1,
+                        "max": 69
+                    },
+                    "weight": 60,
+                    "affix": "Prefix"
+                }
+            ]
+        },
+        {
+            "id": "Mythic_Jewellery",
+            "modifiersPool": [
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": 0.1,
+                    "weight": 50,
+                    "scope": "Global",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealingEfficiency",
+                    "modifierType": "inc",
+                    "value": 1,
+                    "weight": 40,
+                    "affix": "Suffix"
+                },
+                {
+                    "weight": 40,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "BleedDamage",
+                            "modifierType": "inc",
+                            "value": 0.69
+                        },
+                        {
+                            "parameter": "BurningDamage",
+                            "modifierType": "inc",
+                            "value": 0.69
+                        }
+                    ]
+                },
+                {
+                    "parameter": "ManaOnHit",
+                    "modifierType": "flat",
+                    "value": 25,
+                    "weight": 40,
+                    "affix": "Suffix"
+                },
+                {
+                    "extraUpgradeLevels": {
+                        "min": 1,
+                        "max": 69
+                    },
+                    "weight": 60,
+                    "affix": "Prefix"
+                }
+            ]
+        },
+        {
+            "id": "Mythic_Armor",
+            "modifiersPool": [
                 {
                     "parameter": "Health",
                     "modifierType": "multi",
                     "value": 0.3,
                     "weight": 30,
-                    "scope": "Global"
+                    "scope": "Global",
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "multi",
                     "value": 0.3,
                     "weight": 30,
-                    "scope": "Global"
+                    "scope": "Global",
+                    "affix": "Prefix"
                 },
                 {
                     "weight": 30,
+                    "affix": "Prefix",
                     "parts": [
                         {
                             "parameter": "Armor",
@@ -60,6 +130,21 @@
                             "scope": "Global"
                         }
                     ]
+                },
+                {
+                    "parameter": "HealingEfficiency",
+                    "modifierType": "inc",
+                    "value": 0.5,
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "extraUpgradeLevels": {
+                        "min": 1,
+                        "max": 69
+                    },
+                    "weight": 60,
+                    "affix": "Prefix"
                 }
             ]
         }

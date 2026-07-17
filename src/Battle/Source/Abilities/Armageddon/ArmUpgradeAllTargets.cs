@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.Armageddon
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
     using HitDelivery;
 
@@ -16,7 +15,7 @@ namespace Battle.Source.Abilities.Armageddon
         {
             _previousDelivery = ability.HitSequence;
             ability.HitSequence = new AllEnemiesHits();
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.Cooldown, Priority.Weak, OperationType.Add, additionalCooldown, CooldownDecoratorId, Id));
         }
 

@@ -45,6 +45,7 @@ namespace LastBreath.Services
             provider.GetService<ReputationBroadcaster>(); // eager: nobody injects it, it lives on bus subscriptions
             provider.GetService<KillFactTracker>(); // eager: same, bus subscriptions only
             provider.GetService<LocationFactTracker>();
+            provider.GetService<NpcFinalDeathFactTracker>();
             provider.GetService<IQuestLogService>(); // eager: lives on facts/inventory/clock subscriptions
             provider.GetService<QuestNotificationBroadcaster>();
             RegisterUiFactories(provider);
@@ -95,6 +96,7 @@ namespace LastBreath.Services
             services.AddSingleton<IWorldFactsService, WorldFactsService>();
             services.AddSingleton<KillFactTracker>();
             services.AddSingleton<LocationFactTracker>();
+            services.AddSingleton<NpcFinalDeathFactTracker>();
             services.AddGameDataParticipant<IInfluenceMastery, InfluenceMastery>();
             services.AddGameDataParticipant<IQuestProvider, QuestProvider>();
             services.AddSingleton<IQuestLogService, QuestLogService>();
@@ -116,15 +118,15 @@ namespace LastBreath.Services
 
             // Quest vocabulary: Func-injected — the data loaders own the parsers, a direct
             // IQuestLogService/IQuestProvider dependency here would close a DI cycle.
-            services.AddSingleton<INarrativeConditionFactory>(sp => new QuestStatusConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
-            services.AddSingleton<INarrativeConditionFactory>(sp => new CanAcceptQuestConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
-            services.AddSingleton<INarrativeConditionFactory>(sp => new CanTurnInQuestConditionFactory(() => sp.GetRequiredService<IQuestLogService>()));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new QuestStatusConditionFactory(sp.GetRequiredService<IQuestLogService>));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new CanAcceptQuestConditionFactory(sp.GetRequiredService<IQuestLogService>));
+            services.AddSingleton<INarrativeConditionFactory>(sp => new CanTurnInQuestConditionFactory(sp.GetRequiredService<IQuestLogService>));
             services.AddSingleton<INarrativeConditionFactory>(sp => new QuestOfferRollConditionFactory(
                 sp.GetRequiredService<IWorldFactsService>(),
                 sp.GetRequiredService<IInfluenceMastery>(),
                 sp.GetRequiredService<IWorldClock>(),
                 sp.GetRequiredService<Godot.RandomNumberGenerator>(),
-                () => sp.GetRequiredService<IQuestProvider>()));
+                sp.GetRequiredService<IQuestProvider>));
 
             services.AddSingleton<INarrativeActionParser, NarrativeActionParser>();
             services.AddSingleton<INarrativeActionFactory, SetFactActionFactory>();
@@ -134,7 +136,7 @@ namespace LastBreath.Services
             services.AddSingleton<INarrativeActionFactory, AddReputationActionFactory>();
             services.AddSingleton<INarrativeActionFactory, AddInfluenceExpActionFactory>();
             foreach (var kind in System.Enum.GetValues<QuestActionKind>())
-                services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(() => sp.GetRequiredService<IQuestLogService>(), kind));
+                services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(sp.GetRequiredService<IQuestLogService>, kind));
         }
 
         /// <summary>The Battle module owns the ISaveManager factory; Main-only sections are

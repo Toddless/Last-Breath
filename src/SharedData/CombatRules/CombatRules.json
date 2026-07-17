@@ -1,0 +1,11 @@
+{
+    "controlResistance": {
+        "hardControlStatuses": [ "Stun", "Freeze", "Paralysis" ],
+        "durationMultipliers": [ 1, 0.5, 0.25 ],
+        "appliesTo": [ "Boss", "Archon" ],
+        "resistanceDecayTurns": 7
+    },
+    "arena": {
+        "maxBattleSlots": 10
+    }
+}

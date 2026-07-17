@@ -18,5 +18,14 @@ namespace Core.Data.SaveData
 
         [JsonProperty("baseValue")] public float BaseValue { get; init; }
         [JsonProperty("weight")] public float Weight { get; init; }
+
+        // Roll provenance stamps (see SimpleModifier): absent for pre-range lines — restore keeps them None/null.
+        [JsonProperty("affix", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AffixKind? Affix { get; init; }
+
+        [JsonProperty("groupId", NullValueHandling = NullValueHandling.Ignore)] public string? GroupId { get; init; }
+        [JsonProperty("rangeMin", NullValueHandling = NullValueHandling.Ignore)] public float? RangeMin { get; init; }
+        [JsonProperty("rangeMax", NullValueHandling = NullValueHandling.Ignore)] public float? RangeMax { get; init; }
     }
 }

@@ -10,7 +10,7 @@ namespace Core.Modifiers.Context
     /// DoT ticks — they belong to their own effects, not to the cast being boosted.
     /// </summary>
     public class PureDamageBonusContextModifier(IFightable owner, float bonus)
-        : ContextModifier(priority: Priority.Weak, id: "Context_Modifier_Pure_Damage_Bonus"), IDamageModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Context_Modifier_Pure_Damage_Bonus"), IDamageModifier
     {
         /// <summary>Total damage this modifier boosted — the sacrifice heal upgrade reads it.</summary>
         public float DamageSeen { get; private set; }

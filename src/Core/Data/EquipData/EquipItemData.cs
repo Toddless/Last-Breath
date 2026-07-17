@@ -15,7 +15,7 @@ namespace Core.Data.EquipData
         [JsonProperty("maxStackSize")] public int MaxStackSize { get; init; } = 1;
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];
-        [JsonProperty("updateLevel")] public int UpdateLevel { get; init; }
+        [JsonProperty("updateLevel")] public LevelRangeData UpdateLevel { get; init; }
         [JsonProperty("maxUpdateLevel")] public int MaxUpdateLevel { get; init; }
         [JsonProperty("implicits")] public List<ItemModifier> Implicits { get; init; } = [];
         [JsonProperty("modifiers")] public List<ItemModifier> Modifiers { get; init; } = [];

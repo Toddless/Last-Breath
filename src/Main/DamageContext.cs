@@ -9,7 +9,7 @@
     using Godot;
 
     // TODO:
-    // пока что бесполезен. В будущем может быть добавлено Enviroment урон
+    // пока что бесполезен рамках основного проекта. В будущем может быть добавлено Enviroment урон
     public record DamageContext : IDamageContext
     {
         private readonly Dictionary<DamageType, float> _damageComponents = [];
@@ -22,6 +22,7 @@
         public string? SourceAbilityId { get; set; }
         public string? CastId { get; set; }
         public float AbsorbedByBarrier { get; set; }
+        public float AbsorbedByShield { get; set; }
 
         public void Add(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
 

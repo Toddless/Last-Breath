@@ -22,12 +22,20 @@
     {
         public static IServiceCollection AddCraftingSystemModuleDependencies(this IServiceCollection services)
         {
-            services.AddSingleton<ICraftingMastery, CraftingMastery>();
+            // Mastery tuning (curve, six bonus channels, exp rewards) loads from the CraftingMastery catalog.
+            services.AddGameDataParticipant<ICraftingMastery, CraftingMastery>();
             services.AddSingleton<IModifierMaterializer, ModifierMaterializer>();
+            // The minting seam: blueprints (the project's IItemDataProvider) -> rolled items. One Core
+            // implementation for every project, so roll rules can't drift between loot/craft/quests.
+            services.AddSingleton<IEquipBlueprintProvider>(provider => provider.GetRequiredService<IItemDataProvider>());
+            services.AddSingleton<IEquipItemMinter, EquipItemMinter>();
+            services.AddSingleton<IItemMinter, ItemMinter>();
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemAscender, ItemAscender>();
             services.AddSingleton<CraftingResources>();
             services.AddGameDataParticipant<ICraftingAdditiveProvider, CraftingAdditiveProvider>();
+            // The "extra effect" pool crafted items roll from (mastery channel 4).
+            services.AddGameDataParticipant<ICraftingEffectProvider, CraftingEffectProvider>();
 
             services.AddTransient<IRequestHandler<CreateEquipItemRequest, IEquipItem?>, CreateEquipItemRequestHandler>();
             services.AddTransient<IRequestHandler<GetEquipItemUpgradeCostRequest, IEnumerable<IRequirement>>, GetEquipItemUpgradeCostRequestHandler>();
@@ -48,6 +56,7 @@
         {
             var uiElementManager = provider.GetService<IUiElementsManager>();
             uiElementManager.RegisterWindowFactory(typeof(CraftingWindow), () => CraftingWindow.Initialize().Instantiate<CraftingWindow>(), UiContext.World);
+            uiElementManager.RegisterPopupFactory(typeof(ResourcePickerPopup), () => ResourcePickerPopup.Initialize().Instantiate<ResourcePickerPopup>());
         }
     }
 }

@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.ChainLightning
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: bigger damage scales at the price of an increased resource cost.</summary>
@@ -14,11 +13,11 @@ namespace Battle.Source.Abilities.ChainLightning
 
         public override void ApplyUpgrade(ChainLightning ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.WeaponDamageScale, Priority.Weak, OperationType.Add, weaponScale, WeaponDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.SpellDamageScale, Priority.Weak, OperationType.Add, spellScale, SpellDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue, Priority.Weak, OperationType.Add, additionalCost, CostDecoratorId, Id));
         }
 

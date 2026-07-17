@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L1 upgrade: the blessing lasts longer.</summary>
@@ -11,7 +10,7 @@ namespace Battle.Source.Abilities.AresBlessing
         private const string DecoratorId = "Ability_Parameter_Decorator_Ar_Duration";
 
         public override void ApplyUpgrade(AresBlessing ability) =>
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AresBlessing.Parameters>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AresBlessing.Parameters.Duration, Priority.Weak, OperationType.Add, amount, DecoratorId, Id));
 
         public override void RemoveUpgrade(AresBlessing ability) =>

@@ -1,15 +1,11 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
-    using Core.Enums;
     using Effects;
 
     /// <summary>
@@ -17,82 +13,28 @@ namespace Battle.Source.Abilities.AresBlessing
     /// L3 upgrades add extra cast effects (incoming damage reduction / turn-end heal / damage buff)
     /// through activation riders with deferred factories, so they follow the current duration.
     /// </summary>
-    public class AresBlessing(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        int duration,
-        float healthBonus,
-        float recoveryBonus,
-        Costs costType = Costs.Mana)
-        : Ability(id: "Ability_Ares_Blessing", tags, cooldown, costValue, costType)
+    public class AresBlessing(AbilityBaseData data) : Ability(data)
     {
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.Duration] = new Module<Parameters>(() => duration, Parameters.Duration),
-                    [Parameters.HealthBonus] = new Module<Parameters>(() => healthBonus, Parameters.HealthBonus),
-                    [Parameters.RecoveryBonus] = new Module<Parameters>(() => recoveryBonus, Parameters.RecoveryBonus)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
-
         public int Duration => (int)this[Parameters.Duration];
         public float HealthBonus => this[Parameters.HealthBonus];
         public float RecoveryBonus => this[Parameters.RecoveryBonus];
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            Duration,
-            HealthBonus,
-            RecoveryBonus
+            public const string Duration = nameof(Duration);
+            public const string HealthBonus = nameof(HealthBonus);
+            public const string RecoveryBonus = nameof(RecoveryBonus);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.Duration, 3);
+            parameters.RegisterDefault(Parameters.HealthBonus, 0.3f);
+            parameters.RegisterDefault(Parameters.RecoveryBonus, 0.3f);
         }
 
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new AresBlessing(Tags, (int)Cooldown, CostValue, Duration, HealthBonus, RecoveryBonus, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new AresBlessing(Data));
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field) =>
             await new AresBlessingEffect(Duration, HealthBonus, RecoveryBonus)

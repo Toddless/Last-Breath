@@ -17,13 +17,37 @@
         IReadOnlyList<IItemGrant> Grants { get; }
         IReadOnlyCollection<EntityParameter> AffectedParameters { get; }
         EquipmentPiece EquipmentPiece { get; }
-        int UpdateLevel { get; set; }
+        /// <summary>Read-only by design: levels move only through <see cref="Upgrade"/>/<see cref="Downgrade"/>,
+        /// which keep the update multiplier (and every line value) in sync.</summary>
+        int UpdateLevel { get; }
         int MaxUpdateLevel { get; set; }
 
         /// <summary>Sealed items (ascended to Mythic) can never be modified again: no upgrades, rerolls or new grants.</summary>
         bool IsSealed { get; }
+
+        /// <summary>The recipe's mandatory resources the item was crafted from (loot items have none).</summary>
+        IReadOnlyDictionary<string, int> UsedRequiredResources { get; }
+
+        /// <summary>Optional creation resources (additive slots: essences and the like).</summary>
+        IReadOnlyDictionary<string, int> UsedOptionalResources { get; }
+
+        /// <summary>Merged view of both parts (amounts of a shared id summed) — for consumers that
+        /// treat every used resource the same (shatter refund, live reroll pool).</summary>
         IReadOnlyDictionary<string, int> UsedResources { get; }
-        IReadOnlyList<IModifierDescriptor> ModifiersPool { get; }
+
+        /// <summary>The item's caliber: the multiplier its lines were generated with (loot difficulty or
+        /// crafting quality). Scales the LIVE reroll pool on every recraft; defaults to 1.</summary>
+        float PowerMultiplier { get; set; }
+
+        /// <summary>How many modifier rerolls actually happened on this item — each one raises the next
+        /// recraft's price. The setter exists for restore/copy plumbing; gameplay increments live in the
+        /// upgrader and fire ONLY on a reroll that took place (a refusal is free and does not count).</summary>
+        int RecraftCount { get; set; }
+
+        /// <summary>Ascension's "everything +15%": a separate factor on top of the sharpening scale —
+        /// every line of both channels recomputes as Base × UpdateMultiplier × AscensionMultiplier.
+        /// Defaults to 1; the ascender sets it (from data) right before the seal, the save restores it.</summary>
+        float AscensionMultiplier { get; set; }
 
         IEnumerable<IModifierInstance> GetResolvedModifiers(EntityParameter parameter);
         void SetImplicits(IEnumerable<IModifier> modifiers);
@@ -37,11 +61,15 @@
         // Additional (rolled) modifiers are identified by InstanceId: duplicates of the same parameter+type
         // may coexist, so a rebuild/reroll targets exactly one line.
         void ReplaceAdditionalModifier(string instanceId, IModifierInstance newModifier);
-        void SaveModifiersPool(IEnumerable<IModifierDescriptor> descriptors);
-        void SaveUsedResources(Dictionary<string, int> resources);
+        void SaveUsedResources(IReadOnlyDictionary<string, int> required, IReadOnlyDictionary<string, int> optional);
         void RemoveAdditionalModifier(string instanceId);
         void AddAdditionalModifier(IModifierInstance modifier);
         void AddAdditionalContextModifier(ContextModifierEntry entry);
         void AddGrant(IItemGrant grant);
+
+        /// <summary>Ascension-only: scales every grant's numeric payload ONCE (passive skill properties,
+        /// granted modifier values). Unlike <see cref="AscensionMultiplier"/> this is not recomputable —
+        /// the scaled values persist through save as the new base.</summary>
+        void ScaleGrantValues(float factor);
     }
 }

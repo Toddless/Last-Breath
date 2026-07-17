@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>Reduces the ability's cooldown at the price of an increased resource cost.</summary>
@@ -13,9 +12,9 @@ namespace Battle.Source.Abilities
 
         public override void ApplyUpgrade(Ability ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.Cooldown, Priority.Weak, OperationType.Subtract, cooldown, CooldownDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.CostValue, Priority.Weak, OperationType.Add, additionalCost, CostDecoratorId, Id));
         }
 

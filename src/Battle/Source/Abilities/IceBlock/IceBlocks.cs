@@ -7,6 +7,8 @@ namespace Battle.Source.Abilities.IceBlock
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
     using Core.Enums;
     using Effects;
@@ -15,53 +17,56 @@ namespace Battle.Source.Abilities.IceBlock
     public class IceBlockPlan : DamagingCastPlan
     {
         public int StunDuration { get; set; }
-        public List<Action<TargetHit>> OnHitRiders { get; } = [];
+        public List<Action<ProjectileHit>> OnHitRiders { get; } = [];
     }
 
     /// <summary>
     /// Drops a huge ice block on the target: one heavy cold hit that stuns. Stage 2 extends the stun,
     /// stage 3 adds a Withering Curse stack, stage 4 drops three extra blocks at half damage.
     /// </summary>
-    public class IceBlocks(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        int stunDuration,
-        int witheringDuration,
-        int witheringMaxStacks,
-        float witheringValue,
-        int extraBlocks,
-        float extraBlockDamagePercent,
-        Costs costType = Costs.Mana)
-        : MulticastAbility<IceBlockPlan>(id: "Ability_Ice_Block", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public class IceBlocks(AbilityBaseData data) : MulticastAbility<IceBlockPlan>(data)
     {
-        // No upgrades touch these, so plain properties are enough for live description values (no ModuleManager).
-        protected override Dictionary<string, object?> DescriptionValues
+        public float Damage => this[AbilityParameter.Damage];
+        public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
+        public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
+        public int StunDuration => (int)this[Parameters.StunDuration];
+        public int ExtraBlocks => (int)this[Parameters.ExtraBlocks];
+
+        public static class Parameters
         {
-            get
+            public const string StunDuration = nameof(StunDuration);
+            public const string WitheringDuration = nameof(WitheringDuration);
+            public const string WitheringMaxStacks = nameof(WitheringMaxStacks);
+            public const string WitheringValue = nameof(WitheringValue);
+            public const string ExtraBlocks = nameof(ExtraBlocks);
+            public const string ExtraBlockDamagePercent = nameof(ExtraBlockDamagePercent);
+        }
+
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
+        {
+            base.RegisterBaseParameters(parameters);
+            RegisterDamageParameters(parameters);
+            parameters.RegisterDefault(Parameters.StunDuration, 1);
+            parameters.RegisterDefault(Parameters.WitheringDuration, 3);
+            parameters.RegisterDefault(Parameters.WitheringMaxStacks, 3);
+            parameters.RegisterDefault(Parameters.WitheringValue, 0.15f);
+            parameters.RegisterDefault(Parameters.ExtraBlocks, 3);
+            parameters.RegisterDefault(Parameters.ExtraBlockDamagePercent, 0.5f);
+        }
+
+        public override IAbility Copy() => CopyUpgradesTo(new IceBlocks(Data));
+
+        /// <summary>One heavy block per target: the hit stuns (base plan rider), stage riders and the
+        /// ability's impact riders fire per crushed target.</summary>
+        protected override async Task ExecutePlan(IceBlockPlan plan, IFightable owner, IBattleField field)
+        {
+            foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                var values = base.DescriptionValues;
-                values["StunDuration"] = stunDuration;
-                values["ExtraBlocks"] = extraBlocks;
-                values["ExtraBlockDamagePercent"] = extraBlockDamagePercent;
-                return values;
+                var hit = await DealPlanDamage(plan, owner, target);
+                foreach (var rider in plan.OnHitRiders)
+                    rider(hit);
+                await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
             }
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new IceBlocks(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                stunDuration, witheringDuration, witheringMaxStacks, witheringValue, extraBlocks, extraBlockDamagePercent, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
-
-        protected override Task ExecutePlan(IceBlockPlan plan, IFightable owner)
-        {
-            return Task.CompletedTask;
         }
 
         protected override IceBlockPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)
@@ -73,7 +78,7 @@ namespace Battle.Source.Abilities.IceBlock
                 SpellDamageScale = SpellDamageScale,
                 DamageType = DamageType.Cold,
                 Targets = targets,
-                StunDuration = stunDuration
+                StunDuration = StunDuration
             };
             // The rider closes over the plan: stage 2 mutations to StunDuration are picked up automatically.
             plan.OnHitRiders.Add(hit => _ = new StunEffect(plan.StunDuration)
@@ -89,7 +94,8 @@ namespace Battle.Source.Abilities.IceBlock
                     plan.StunDuration += 1;
                     break;
                 case 3:
-                    plan.OnHitRiders.Add(hit => _ = new WitheringCurseEffect(witheringDuration, witheringMaxStacks, witheringValue)
+                    plan.OnHitRiders.Add(hit => _ = new WitheringCurseEffect(
+                            (int)this[Parameters.WitheringDuration], (int)this[Parameters.WitheringMaxStacks], this[Parameters.WitheringValue])
                         .Apply(new EffectApplyingContext { Caster = owner, Target = hit.Target, Source = InstanceId }));
                     break;
                 case 4:
@@ -103,8 +109,8 @@ namespace Battle.Source.Abilities.IceBlock
         /// <summary>Stage 4: three more blocks crash down, each at a share of the main block's damage.</summary>
         private void DropExtraBlocks(IceBlockPlan plan, IFightable owner, IFightable target)
         {
-            float blockDamage = CalculateHitDamage(plan, owner) * extraBlockDamagePercent;
-            for (int i = 0; i < extraBlocks; i++)
+            float blockDamage = CalculateHitDamage(plan, owner) * this[Parameters.ExtraBlockDamagePercent];
+            for (int i = 0; i < ExtraBlocks; i++)
             {
                 if (!target.IsAlive) return;
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };

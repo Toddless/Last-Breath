@@ -26,22 +26,30 @@ namespace Core.Entity.Components
         public IEnumerable<IModifierInstance> GetModifiers(EntityParameter parameter) =>
             _slots.Values.SelectMany(item => item.GetResolvedModifiers(parameter));
 
-        public bool TryEquip(IEquipItem item, out IEquipItem? replaced)
+        public bool TryEquip(IEquipItem item, out IEquipItem? replaced, EquipmentPiece? targetSlot = null)
         {
             replaced = null;
-            var piece = item.EquipmentPiece;
-            if (_slots.TryGetValue(piece, out var current))
+            var slot = targetSlot ?? ResolveTargetSlot(item.EquipmentPiece);
+            if (slot.AcceptedItemPiece() != item.EquipmentPiece) return false;
+
+            if (_slots.TryGetValue(slot, out var current))
             {
                 replaced = current;
                 current.OnUnequip();
             }
 
-            _slots[piece] = item;
+            _slots[slot] = item;
             item.OnEquip(owner);
-            EquipmentChanged?.Invoke(piece, item);
+            EquipmentChanged?.Invoke(slot, item);
             NotifyChanged(CollectParameters(item, replaced));
             return true;
         }
+
+        /// <summary>Rings occupy either ring slot: the first free one wins; both busy replaces the left.</summary>
+        private EquipmentPiece ResolveTargetSlot(EquipmentPiece piece) =>
+            piece != EquipmentPiece.Ring || !_slots.ContainsKey(EquipmentPiece.Ring) ? piece
+            : !_slots.ContainsKey(EquipmentPiece.Ring2) ? EquipmentPiece.Ring2
+            : EquipmentPiece.Ring;
 
         public bool TryUnequip(EquipmentPiece piece, out IEquipItem? removed)
         {

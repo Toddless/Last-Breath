@@ -6,290 +6,847 @@
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": 800,
-                    "weight": 50
+                    "value": { "min": 600, "max": 1000 },
+                    "weight": 50,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "inc",
-                    "value": 0.3,
-                    "weight": 100
+                    "value": { "min": 0.225, "max": 0.375 },
+                    "weight": 100,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "multi",
-                    "value": 0.3,
-                    "weight": 15
+                    "value": { "min": 0.225, "max": 0.375 },
+                    "weight": 15,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 800,
-                    "weight": 50
+                    "value": { "min": 600, "max": 1000 },
+                    "weight": 50,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "inc",
-                    "value": 0.3,
-                    "weight": 100
+                    "value": { "min": 0.225, "max": 0.375 },
+                    "weight": 100,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "multi",
-                    "value": 0.3,
-                    "weight": 15
+                    "value": { "min": 0.225, "max": 0.375 },
+                    "weight": 15,
+                    "affix": "Prefix"
                 },
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 50,
-                    "weight": 50
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Strength",
                     "modifierType": "inc",
-                    "value": 0.35,
-                    "weight": 100
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Strength",
                     "modifierType": "multi",
-                    "value": 0.25,
-                    "weight": 15
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 50
+                    "value": { "min": 38, "max": 62 },
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Dexterity",
                     "modifierType": "inc",
-                    "value": 0.35,
-                    "weight": 100
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Dexterity",
                     "modifierType": "multi",
-                    "value": 0.25,
-                    "weight": 15
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 50
+                    "value": { "min": 38, "max": 62 },
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Intelligence",
                     "modifierType": "inc",
-                    "value": 0.35,
-                    "weight": 100
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
                 },
                 {
                     "parameter": "Intelligence",
                     "modifierType": "multi",
-                    "value": 0.25,
-                    "weight": 15
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
                 },
-                { "parameter": "ManaRecovery", "modifierType": "flat", "value": 200, "weight": 50 },
-                { "parameter": "ManaRecovery", "modifierType": "inc", "value": 0.4, "weight": 100 },
-                { "parameter": "ManaRecovery", "modifierType": "multi", "value": 0.35, "weight": 15 },
-                { "parameter": "HealthRecovery", "modifierType": "flat", "value": 200, "weight": 50 },
-                { "parameter": "HealthRecovery", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "HealthRecovery", "modifierType": "multi", "value": 0.35, "weight": 15 },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.25, "weight": 30 }
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 250 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "inc",
+                    "value": { "min": 0.3, "max": 0.5 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 250 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Amulet_Stronghold",
             "modifiersPool": [
                 {
-                    "parameter": "Armor","modifierType": "flat","value": 650,"weight": 50,"scope": "Local"
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 488, "max": 812 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Prefix"
                 },
                 {
-                    "parameter": "Armor","modifierType": "inc","value": 0.25,"weight": 100,"scope": "Local"
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Prefix"
                 },
                 {
-                    "parameter": "Armor","modifierType": "multi","value": 0.25,"weight": 15,"scope": "Local"
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Prefix"
                 }
             ]
         },
         {
             "id": "Amulet_Of_Recovery",
             "modifiersPool": [
-                { "weight": 50, "parts": [
-                    { "parameter": "ManaRecovery", "modifierType": "flat", "value": 25, "scope": "Local" },
-                    { "parameter": "HealthRecovery", "modifierType": "flat", "value": 50, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "ManaRecovery", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "HealthRecovery", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "ManaRecovery", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "HealthRecovery", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 50,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "ManaRecovery",
+                            "modifierType": "flat",
+                            "value": { "min": 19, "max": 31 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "HealthRecovery",
+                            "modifierType": "flat",
+                            "value": { "min": 38, "max": 62 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "ManaRecovery",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "HealthRecovery",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "ManaRecovery",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "HealthRecovery",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Amulet_Onyx_Medallion",
             "modifiersPool": [
-                { "weight": 50, "parts": [
-                    { "parameter": "Mana", "modifierType": "flat", "value": 25, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Mana", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "Mana", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Mana",
+                            "modifierType": "flat",
+                            "value": { "min": 19, "max": 31 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 19, "max": 31 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Mana",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Mana",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Amulet_Life_Core",
             "modifiersPool": [
-                { "parameter": "Health", "modifierType": "flat", "value": 25, "weight": 50, "scope": "Local" },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 19, "max": 31 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                }
             ]
         },
         {
             "id": "Amulet_Intelligence",
             "modifiersPool": [
-                { "parameter": "Intelligence", "modifierType": "flat", "value": 25, "weight": 50, "scope": "Local" },
-                { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Intelligence", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 19, "max": 31 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Amulet_Strength",
             "modifiersPool": [
-                { "parameter": "Strength", "modifierType": "flat", "value": 25, "weight": 50, "scope": "Local" },
-                { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Strength", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 19, "max": 31 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Amulet_Dexterity",
             "modifiersPool": [
-                { "parameter": "Dexterity", "modifierType": "flat", "value": 25, "weight": 50, "scope": "Local" },
-                { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Dexterity", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 19, "max": 31 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Amulet_Trinity",
             "modifiersPool": [
-                { "weight": 100, "parts": [
-                    { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "Strength", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Dexterity", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 100,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Amulet_Dexterity_Intelligence",
             "modifiersPool": [
-                { "weight": 100, "parts": [
-                    { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "Dexterity", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 100,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Amulet_Dexterity_Strength",
             "modifiersPool": [
-                { "weight": 100, "parts": [
-                    { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "Dexterity", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Strength", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 100,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Amulet_Strength_Intelligence",
             "modifiersPool": [
-                { "weight": 100, "parts": [
-                    { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 15, "parts": [
-                    { "parameter": "Strength", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Intelligence", "modifierType": "multi", "value": 0.35, "scope": "Local" }
-                ] }
+                {
+                    "weight": 100,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Belt",
             "modifiersPool": [
-                { "parameter": "Health", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Mana", "modifierType": "flat", "value": 250, "weight": 50 },
-                { "parameter": "Mana", "modifierType": "inc", "value": 0.10, "weight": 100 },
-                { "parameter": "Mana", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Barrier", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Barrier", "modifierType": "inc", "value": 0.10, "weight": 100 },
-                { "parameter": "Barrier", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Armor", "modifierType": "flat", "value": 500, "weight": 50 },
-                { "parameter": "Armor", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Armor", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Evade", "modifierType": "flat", "value": 500, "weight": 50 },
-                { "parameter": "Evade", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Evade", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "weight": 50, "parts": [
-                    { "parameter": "Strength", "modifierType": "flat", "value": 50 },
-                    { "parameter": "Dexterity", "modifierType": "flat", "value": 50 },
-                    { "parameter": "Intelligence", "modifierType": "flat", "value": 50 }
-                ] }
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": { "min": 188, "max": 312 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 375, "max": 625 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": { "min": 375, "max": 625 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "weight": 50,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "flat",
+                            "value": { "min": 38, "max": 62 }
+                        },
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "flat",
+                            "value": { "min": 38, "max": 62 }
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "flat",
+                            "value": { "min": 38, "max": 62 }
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Belt_of_Strength",
             "modifiersPool": [
-                { "parameter": "Strength", "modifierType": "flat", "value": 15, "weight": 50, "scope": "Local" },
-                { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Strength", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 11, "max": 19 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Belt_of_Dexterity",
             "modifiersPool": [
-                { "parameter": "Dexterity", "modifierType": "flat", "value": 15, "weight": 50, "scope": "Local" },
-                { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Dexterity", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 11, "max": 19 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Belt_of_Intelligence",
             "modifiersPool": [
-                { "parameter": "Intelligence", "modifierType": "flat", "value": 15, "weight": 50, "scope": "Local" },
-                { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Intelligence", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 11, "max": 19 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Belt_of_Knight",
             "modifiersPool": [
-                { "parameter": "BlockChance", "modifierType": "flat", "value": 0.05, "weight": 50, "scope": "Local" },
-                { "parameter": "BlockChance", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" }
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Suffix"
+                }
             ]
         },
         {
@@ -299,38 +856,170 @@
         {
             "id": "Body",
             "modifiersPool": [
-                { "parameter": "Health", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "Barrier", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Barrier", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "Armor", "modifierType": "flat", "value": 1300, "weight": 50 },
-                { "parameter": "Armor", "modifierType": "inc", "value": 0.50, "weight": 100 },
-                { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "parameter": "Evade", "modifierType": "flat", "value": 1300, "weight": 50 },
-                { "parameter": "Evade", "modifierType": "inc", "value": 0.50, "weight": 100 },
-                { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.45, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.45, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.45, "weight": 30 }
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 975, "max": 1625 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.375, "max": 0.625 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": { "min": 975, "max": 1625 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": { "min": 0.375, "max": 0.625 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Body_Strength_Stoneheart",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.15, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Armor", "modifierType": "flat", "value": 250, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 120, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1125, "max": 0.1875 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 188, "max": 312 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 90, "max": 150 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -348,35 +1037,119 @@
         {
             "id": "Body_Dexterity_Hunters_Dream",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.30, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Health", "modifierType": "flat", "value": 200, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 240, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.225, "max": 0.375 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 150, "max": 250 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 180, "max": 300 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Body_Dexterity_Feral_Instinct",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 120, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 80, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 90, "max": 150 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 60, "max": 100 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -386,72 +1159,288 @@
         {
             "id": "Body_Intelligence_Arcane_Bulwark",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Body_Intelligence_Aegis",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Boots",
             "modifiersPool": [
-                { "parameter": "MoveSpeed", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "MoveSpeed", "modifierType": "inc", "value": 0.50, "weight": 100 },
-                { "parameter": "MoveSpeed", "modifierType": "multi", "value": 0.30, "weight": 15 },
-                { "parameter": "Armor", "modifierType": "flat", "value": 200, "weight": 50 },
-                { "parameter": "Armor", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Armor", "modifierType": "multi", "value": 0.35, "weight": 15 },
-                { "parameter": "Evade", "modifierType": "flat", "value": 200, "weight": 50 },
-                { "parameter": "Evade", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Evade", "modifierType": "multi", "value": 0.35, "weight": 15 },
-                { "parameter": "Health", "modifierType": "flat", "value": 150, "weight": 50 },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.25, "weight": 30 }
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "inc",
+                    "value": { "min": 0.375, "max": 0.625 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "MoveSpeed",
+                    "modifierType": "multi",
+                    "value": { "min": 0.225, "max": 0.375 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 250 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 250 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 112, "max": 188 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Boots_Strength_Stoneheart",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -469,35 +1458,119 @@
         {
             "id": "Boots_Dexterity_Hunters_Dream",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Boots_Dexterity_Feral_Instinct",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -507,61 +1580,271 @@
         {
             "id": "Boots_Intelligence_Arcane_Bulwark",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Boots_Intelligence_Aegis",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Cloak",
             "modifiersPool": [
-                { "parameter": "Mana", "modifierType": "flat", "value": 150, "weight": 50 },
-                { "parameter": "Mana", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Mana", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Health", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Barrier", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Barrier", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Barrier", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Armor", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "Armor", "modifierType": "multi", "value": 0.10, "weight": 15 },
-                { "parameter": "Evade", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "Evade", "modifierType": "multi", "value": 0.10, "weight": 15 },
-                { "parameter": "ManaRecovery", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "ManaRecovery", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "ManaRecovery", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "HealthRecovery", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "HealthRecovery", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "HealthRecovery", "modifierType": "multi", "value": 0.05, "weight": 15 }
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": { "min": 112, "max": 188 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ManaRecovery",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
@@ -571,39 +1854,177 @@
         {
             "id": "Gloves",
             "modifiersPool": [
-                { "parameter": "CriticalChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "CriticalChance", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "CriticalChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "AdditionalHitChance", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "AdditionalHitChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "CriticalDamage", "modifierType": "flat", "value": 0.70, "weight": 50 },
-                { "parameter": "Damage", "modifierType": "flat", "value": 200, "weight": 50 },
-                { "parameter": "Damage", "modifierType": "inc", "value": 0.50, "weight": 100 },
-                { "parameter": "Damage", "modifierType": "multi", "value": 0.35, "weight": 15 },
-                { "parameter": "SpellDamage", "modifierType": "flat", "value": 150, "weight": 50 },
-                { "parameter": "SpellDamage", "modifierType": "inc", "value": 0.45, "weight": 100 },
-                { "parameter": "SpellDamage", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.25, "weight": 30 }
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "CriticalDamage",
+                    "modifierType": "flat",
+                    "value": { "min": 0.525, "max": 0.875 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 250 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "inc",
+                    "value": { "min": 0.375, "max": 0.625 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Damage",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "flat",
+                    "value": { "min": 112, "max": 188 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "inc",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "SpellDamage",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Gloves_Strength_Stoneheart",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -621,35 +2042,119 @@
         {
             "id": "Gloves_Dexterity_Hunters_Dream",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Gloves_Dexterity_Feral_Instinct",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -659,72 +2164,288 @@
         {
             "id": "Gloves_Intelligence_Arcane_Bulwark",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Gloves_Intelligence_Aegis",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Helmet",
             "modifiersPool": [
-                { "parameter": "Health", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Health", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Health", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Barrier", "modifierType": "flat", "value": 300, "weight": 50 },
-                { "parameter": "Barrier", "modifierType": "inc", "value": 0.15, "weight": 100 },
-                { "parameter": "Barrier", "modifierType": "multi", "value": 0.05, "weight": 15 },
-                { "parameter": "Armor", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "Armor", "modifierType": "multi", "value": 0.10, "weight": 15 },
-                { "parameter": "Evade", "modifierType": "flat", "value": 600, "weight": 50 },
-                { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "weight": 100 },
-                { "parameter": "Evade", "modifierType": "multi", "value": 0.10, "weight": 15 },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.25, "weight": 30 }
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Health",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Barrier",
+                    "modifierType": "multi",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": { "min": 450, "max": 750 },
+                    "weight": 50,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 100,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "multi",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 15,
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Helmet_Strength_Stoneheart",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -742,35 +2463,119 @@
         {
             "id": "Helmet_Dexterity_Hunters_Dream",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Helmet_Dexterity_Feral_Instinct",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -780,110 +2585,438 @@
         {
             "id": "Helmet_Intelligence_Arcane_Bulwark",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Armor", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Helmet_Intelligence_Aegis",
             "modifiersPool": [
-                { "weight": 15, "parts": [
-                    { "parameter": "Barrier", "modifierType": "multi", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "multi", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 100, "parts": [
-                    { "parameter": "Barrier", "modifierType": "inc", "value": 0.35, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-                ] },
-                { "weight": 50, "parts": [
-                    { "parameter": "Barrier", "modifierType": "flat", "value": 150, "scope": "Local" },
-                    { "parameter": "Evade", "modifierType": "flat", "value": 150, "scope": "Local" }
-                ] }
+                {
+                    "weight": 15,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "multi",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "multi",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 100,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "inc",
+                            "value": { "min": 0.2625, "max": 0.4375 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "inc",
+                            "value": { "min": 0.1875, "max": 0.3125 },
+                            "scope": "Local"
+                        }
+                    ]
+                },
+                {
+                    "weight": 50,
+                    "affix": "Prefix",
+                    "parts": [
+                        {
+                            "parameter": "Barrier",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Evade",
+                            "modifierType": "flat",
+                            "value": { "min": 112, "max": 188 },
+                            "scope": "Local"
+                        }
+                    ]
+                }
             ]
         },
         {
             "id": "Ring",
             "modifiersPool": [
-                { "parameter": "CriticalChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "CriticalChance", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "CriticalChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "AdditionalHitChance", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "AdditionalHitChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "BlockChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "BlockChance", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "BlockChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "MulticastChance", "modifierType": "flat", "value": 0.05, "weight": 50 },
-                { "parameter": "MulticastChance", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "MulticastChance", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "Accuracy", "modifierType": "flat", "value": 900, "weight": 50 },
-                { "parameter": "Accuracy", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Accuracy", "modifierType": "multi", "value": 0.15, "weight": 15 },
-                { "parameter": "Strength", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "Strength", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Strength", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "parameter": "Dexterity", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "Dexterity", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Dexterity", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "parameter": "Intelligence", "modifierType": "flat", "value": 50, "weight": 50 },
-                { "parameter": "Intelligence", "modifierType": "inc", "value": 0.35, "weight": 100 },
-                { "parameter": "Intelligence", "modifierType": "multi", "value": 0.25, "weight": 15 },
-                { "weight": 15, "parts": [
-                    { "parameter": "Strength", "modifierType": "multi", "value": 0.10 },
-                    { "parameter": "Dexterity", "modifierType": "multi", "value": 0.10 },
-                    { "parameter": "Intelligence", "modifierType": "multi", "value": 0.10 }
-                ] },
-                { "parameter": "FireResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "LightningResistance", "modifierType": "flat", "value": 0.25, "weight": 30 },
-                { "parameter": "ColdResistance", "modifierType": "flat", "value": 0.25, "weight": 30 }
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "BlockChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.0375, "max": 0.0625 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "MulticastChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "flat",
+                    "value": { "min": 675, "max": 1125 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Accuracy",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1125, "max": 0.1875 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 38, "max": 62 },
+                    "weight": 50,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "multi",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 15,
+                    "affix": "Suffix"
+                },
+                {
+                    "weight": 15,
+                    "affix": "Suffix",
+                    "parts": [
+                        {
+                            "parameter": "Strength",
+                            "modifierType": "multi",
+                            "value": { "min": 0.075, "max": 0.125 }
+                        },
+                        {
+                            "parameter": "Dexterity",
+                            "modifierType": "multi",
+                            "value": { "min": 0.075, "max": 0.125 }
+                        },
+                        {
+                            "parameter": "Intelligence",
+                            "modifierType": "multi",
+                            "value": { "min": 0.075, "max": 0.125 }
+                        }
+                    ]
+                },
+                {
+                    "parameter": "FireResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "LightningResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                },
+                {
+                    "parameter": "ColdResistance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.1875, "max": 0.3125 },
+                    "weight": 30,
+                    "affix": "Suffix"
+                }
             ]
         },
         {
             "id": "Ring_Of_Archmage",
             "modifiersPool": [
-                { "parameter": "Mana", "modifierType": "flat", "value": 150, "weight": 50, "scope": "Local" },
-                { "parameter": "Mana", "modifierType": "inc", "value": 0.35, "weight": 100, "scope": "Local" },
-                { "parameter": "Mana", "modifierType": "multi", "value": 0.35, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": { "min": 112, "max": 188 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": { "min": 0.2625, "max": 0.4375 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                }
             ]
         },
         {
             "id": "Ring_Of_Limitless_Magic",
             "modifiersPool": [
-                { "parameter": "Mana", "modifierType": "flat", "value": 300, "weight": 50, "scope": "Local" },
-                { "parameter": "Mana", "modifierType": "inc", "value": 0.45, "weight": 100, "scope": "Local" },
-                { "parameter": "Mana", "modifierType": "multi", "value": 0.45, "weight": 15, "scope": "Local" }
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": { "min": 225, "max": 375 },
+                    "weight": 50,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "inc",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 100,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "multi",
+                    "value": { "min": 0.3375, "max": 0.5625 },
+                    "weight": 15,
+                    "scope": "Local",
+                    "affix": "Prefix"
+                }
             ]
         },
         {
-            "id": "Weapons",
+            "id": "Weapon",
             "modifiersPool": [
                 {
-                    "parameter": "CriticalChance","modifierType": "flat","value": 0.1,"weight": 50
+                    "parameter": "CriticalChance",
+                    "modifierType": "flat",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 50,
+                    "affix": "Suffix"
                 },
                 {
-                    "parameter": "CriticalChance","modifierType": "inc","value": 0.1,"weight": 100
+                    "parameter": "CriticalChance",
+                    "modifierType": "inc",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 100,
+                    "affix": "Suffix"
                 },
                 {
-                    "parameter": "CriticalChance","modifierType": "multi","value": 0.1,"weight": 15
+                    "parameter": "CriticalChance",
+                    "modifierType": "multi",
+                    "value": { "min": 0.075, "max": 0.125 },
+                    "weight": 15,
+                    "affix": "Suffix"
                 },
                 {
-                    "parameter": "Damage","modifierType": "flat","value": 250,"weight": 50
+                    "parameter": "Damage",
+                    "modifierType": "flat",
+                    "value": { "min": 188, "max": 312 },
+                    "weight": 50,
+                    "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage","modifierType": "inc","value": 0.5,"weight": 100
+                    "parameter": "Damage",
+                    "modifierType": "inc",
+                    "value": { "min": 0.375, "max": 0.625 },
+                    "weight": 100,
+                    "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage","modifierType": "multi","value": 0.2,"weight": 15
+                    "parameter": "Damage",
+                    "modifierType": "multi",
+                    "value": { "min": 0.15, "max": 0.25 },
+                    "weight": 15,
+                    "affix": "Prefix"
                 }
             ]
         }

@@ -212,7 +212,7 @@ namespace LastBreath.Helpers
 
             int amount = args.Length > 3 && int.TryParse(args[3], out int parsed) ? parsed : 1;
             var inventory = Service<Core.Inventory.IInventory>();
-            inventory.TryAddItem(Service<IItemDataProvider>().CopyItem(args[2]), amount);
+            inventory.TryAddItem(Service<Core.Items.IItemMinter>().MintItem(args[2]), amount);
             Print($"{args[2]}: now {inventory.GetTotalItemAmount(args[2])}");
         }
 

@@ -8,6 +8,7 @@ namespace Core.Localization
     public class LocalizationService(
         ILocalizationProvider provider,
         ModifierFormatter modifierFormatter,
+        ContextModifierFormatter contextModifierFormatter,
         IEnumerable<ITextFormatter> formatters) : ILocalizationService
     {
         private readonly TextTemplateEngine _engine = new(provider);
@@ -30,6 +31,13 @@ namespace Core.Localization
 
         public string FormatModifier(IModifier modifier, float rangeMinValue, float rangeMaxValue, TextFormat format = TextFormat.Plain) =>
             modifierFormatter.FormatRanged(modifier, rangeMinValue, rangeMaxValue, format);
+
+        public string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain) => line switch
+        {
+            IModifier modifier => modifierFormatter.FormatRolledRange(modifier, format),
+            ContextModifierEntry entry => contextModifierFormatter.FormatRolledRange(entry, format),
+            _ => null,
+        };
 
         public string FormatParameterChange(EntityParameter parameter, float value, OperationType operation, TextFormat format = TextFormat.Plain) =>
             modifierFormatter.FormatParameterChange(parameter, value, operation, format);

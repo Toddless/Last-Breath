@@ -1,25 +1,26 @@
 namespace Battle.Source.Abilities
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
-    /// <summary>Adds flat bonuses to the ability's weapon and spell damage scales.</summary>
+    /// <summary>Adds flat bonuses to the ability's weapon and spell damage scales. Typed to the base
+    /// Ability: the keys are registered by every damage-dealing ability (multicast ones included);
+    /// applying to an ability without them is a loud Tracker warning.</summary>
     public class AbilityUpgradeAdditionalScales(string id, string[] tags, int tier, float weaponScale, float spellScale)
-        : AbilityUpgrade<DamagingAbility>(id, tags, tier)
+        : AbilityUpgrade<Ability>(id, tags, tier)
     {
         private const string WeaponDecoratorId = "Ability_Parameter_Decorator_Additional_Weapon_Scale";
         private const string SpellDecoratorId = "Ability_Parameter_Decorator_Additional_Spell_Scale";
 
-        public override void ApplyUpgrade(DamagingAbility ability)
+        public override void ApplyUpgrade(Ability ability)
         {
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.WeaponDamageScale, Priority.Weak, OperationType.Add, weaponScale, WeaponDecoratorId, Id));
-            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AbilityParameter>(
+            ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                 AbilityParameter.SpellDamageScale, Priority.Weak, OperationType.Add, spellScale, SpellDecoratorId, Id));
         }
 
-        public override void RemoveUpgrade(DamagingAbility ability)
+        public override void RemoveUpgrade(Ability ability)
         {
             ability.RemoveParameterDecorator(WeaponDecoratorId, AbilityParameter.WeaponDamageScale);
             ability.RemoveParameterDecorator(SpellDecoratorId, AbilityParameter.SpellDamageScale);

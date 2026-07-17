@@ -5,7 +5,7 @@
     using Enums;
 
     public class LeechOnCritAttackContextModifier(float leechPercent)
-        : ContextModifier(priority: Priority.Weak, id: "Attack_Modifier_Leech_On_Crit"), IAttackModifier
+        : ContextModifier(priority: ContextModifierPriority.Normal, id: "Attack_Modifier_Leech_On_Crit"), IAttackModifier
     {
         public void Apply(IAttackContext context)
         {

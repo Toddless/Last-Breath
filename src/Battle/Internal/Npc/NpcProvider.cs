@@ -63,8 +63,10 @@ namespace Battle.Internal.Npc
             var stance = overrides?.Stance ?? RollStance(data);
             var behaviorData = _behaviors.GetValueOrDefault(stance)
                                ?? throw new KeyNotFoundException($"No behavior archetype loaded for stance '{stance}'");
-            int level = overrides?.Level ?? _rnd.RandIntRange(data.LevelMin, NpcTypeDefaults.MaxLevel(entityType));
-            var rarity = overrides?.Rarity ?? RollRarity();
+            int level = overrides?.Level ?? _rnd.RandIntRange(data.LevelMin, data.LevelMax ?? NpcTypeDefaults.MaxLevel(entityType));
+            // Authored rarity (bosses/uniques) beats the weighted roll; explicit overrides beat both.
+            var rarity = overrides?.Rarity ?? ParseFixedRarity(data) ?? RollRarity();
+            var stages = NpcStageParser.Parse(data.Id, data.Stages);
 
             return new NpcDefinition
             {
@@ -76,11 +78,14 @@ namespace Battle.Internal.Npc
                 Fraction = EnumParser.ParseEnum<Fractions>(data.Fraction),
                 Stance = stance,
                 Parameters = ScaleParameters(data, level),
-                Abilities = PickAbilities(data, behaviorData, entityType),
-                Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect)),
+                // Staged bosses learn per-stage sets via ApplyStage — a rolled/authored list would be discarded.
+                Abilities = stages.Count > 0 ? [] : PickAbilities(data, behaviorData, entityType),
+                Behavior = BuildProfile(behaviorData, EnumParser.ParseEnum<AiIntellect>(data.AiIntellect), data.FleeHealthThreshold, data.AbilityBehaviors),
                 World = BuildWorldConfig(data.World),
                 Lifecycle = BuildLifecycleConfig(data.Lifecycle),
                 CanTalk = data.Interaction?.CanTalk ?? false,
+                Reactions = NpcReactionParser.Parse(data.Id, data.Reactions),
+                Stages = stages,
             };
         }
 
@@ -132,6 +137,10 @@ namespace Battle.Internal.Npc
             return EnumParser.ParseEnum<Stance>(rolled);
         }
 
+        /// <summary>Fixed rarity from the data ("rarity" field, bosses/uniques); absent = roll by weight.</summary>
+        private static Rarity? ParseFixedRarity(NpcData data) =>
+            string.IsNullOrEmpty(data.Rarity) ? null : EnumParser.ParseEnum<Rarity>(data.Rarity);
+
         private Rarity RollRarity()
         {
             long index = _rnd.RandWeighted(s_rarityWeights.Select(entry => entry.Weight).ToArray());
@@ -169,9 +178,12 @@ namespace Battle.Internal.Npc
             return parameters;
         }
 
-        /// <summary>Weighted pick without replacement from the archetype pool, capped by the book's slots upstream.</summary>
+        /// <summary>Authored list ("abilities" field, bosses) is exact and deterministic; otherwise a
+        /// weighted pick without replacement from the archetype pool, capped by the book's slots upstream.</summary>
         private List<IAbility> PickAbilities(NpcData data, NpcBehaviorData behavior, EntityType entityType)
         {
+            if (data.Abilities.Count > 0) return CreateAuthoredAbilities(data);
+
             int count = data.AbilityCount > 0 ? data.AbilityCount : NpcTypeDefaults.DefaultAbilityCount(entityType);
             var pool = behavior.Abilities.Where(entry => _abilityProvider.KnownAbilityIds.Contains(entry.Id)).ToList();
 
@@ -187,7 +199,26 @@ namespace Battle.Internal.Npc
             return picked;
         }
 
-        private static BehaviorProfile BuildProfile(NpcBehaviorData data, AiIntellect intellect) => new()
+        /// <summary>Unknown ids are reported and skipped — a typo must not abort the whole spawn.</summary>
+        private List<IAbility> CreateAuthoredAbilities(NpcData data)
+        {
+            List<IAbility> abilities = [];
+            foreach (string abilityId in data.Abilities)
+            {
+                if (!_abilityProvider.KnownAbilityIds.Contains(abilityId))
+                {
+                    Core.Tracker.TrackNotFound($"Authored ability '{abilityId}' of npc '{data.Id}'", this);
+                    continue;
+                }
+
+                abilities.Add(_abilityProvider.CreateAbility(abilityId));
+            }
+
+            return abilities;
+        }
+
+        private static BehaviorProfile BuildProfile(
+            NpcBehaviorData data, AiIntellect intellect, float? fleeOverride, List<NpcAbilityBehaviorData> npcEntries) => new()
         {
             Id = data.Id,
             Stance = EnumParser.ParseEnum<Stance>(data.Stance),
@@ -198,11 +229,23 @@ namespace Battle.Internal.Npc
             Caution = data.Caution,
             Greed = data.Greed,
             CastScoreThreshold = data.CastScoreThreshold,
-            FleeHealthThreshold = data.FleeHealthThreshold,
-            Abilities = data.Abilities.ToDictionary(
-                entry => entry.Id,
-                entry => new AbilityBehavior(entry.Id, entry.Weight, EnumParser.ParseEnum<AbilityRole>(entry.Role))),
+            // Per-NPC override beats the stance archetype: bosses author 0 (they never flee).
+            FleeHealthThreshold = fleeOverride ?? data.FleeHealthThreshold,
+            Abilities = MergeAbilityBehaviors(data, npcEntries),
         };
+
+        /// <summary>Per-NPC planner entries win over the archetype's: authored kit abilities that
+        /// live outside the stance pool (summons and future boss-only casts) get scored too —
+        /// without an entry the planner never picks the ability up.</summary>
+        private static Dictionary<string, AbilityBehavior> MergeAbilityBehaviors(NpcBehaviorData data, List<NpcAbilityBehaviorData> npcEntries)
+        {
+            var merged = data.Abilities.ToDictionary(
+                entry => entry.Id,
+                entry => new AbilityBehavior(entry.Id, entry.Weight, EnumParser.ParseEnum<AbilityRole>(entry.Role)));
+            foreach (var entry in npcEntries)
+                merged[entry.Id] = new AbilityBehavior(entry.Id, entry.Weight, EnumParser.ParseEnum<AbilityRole>(entry.Role));
+            return merged;
+        }
 
         private void ParseNpcs(string json)
         {

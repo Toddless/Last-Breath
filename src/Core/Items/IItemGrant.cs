@@ -11,5 +11,10 @@ namespace Core.Items
         void Attach(IFightable owner);
         void Detach(IFightable owner);
         IItemGrant Copy();
+
+        /// <summary>A copy with every numeric value scaled by <paramref name="factor"/> — the ascension
+        /// "+15% to everything" applied to grants. One-time by design: the scaled numbers become the new
+        /// base and round-trip through save as such (grants deliberately do not scale with sharpening).</summary>
+        IItemGrant WithScaledValues(float factor);
     }
 }

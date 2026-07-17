@@ -1,6 +1,8 @@
 namespace Core.Results
 {
-    using Modifiers;
+    using System.Collections.Generic;
 
-    public record AscensionResult(bool Succeeded, IModifierInstance? GiftedModifier);
+    /// <summary>Gift lines are reported by InstanceId (a composite pool entry lands as several
+    /// atomic lines on the item); empty when no gift was rolled.</summary>
+    public record AscensionResult(bool Succeeded, IReadOnlyList<string> GiftedModifierIds);
 }

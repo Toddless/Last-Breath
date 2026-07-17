@@ -18,10 +18,20 @@
             EquipmentPiece.Gloves => EquipmentCategory.Armor,
             EquipmentPiece.Boots => EquipmentCategory.Armor,
             EquipmentPiece.Helmet => EquipmentCategory.Armor,
-            EquipmentPiece.Amulet or EquipmentPiece.Belt or EquipmentPiece.Ring => EquipmentCategory.Jewellery,
+            EquipmentPiece.Amulet or EquipmentPiece.Belt or EquipmentPiece.Ring or EquipmentPiece.Ring2 => EquipmentCategory.Jewellery,
             EquipmentPiece.Weapon => EquipmentCategory.Weapon,
             _ => throw new ArgumentOutOfRangeException(nameof(equipment))
         };
+
+        /// <summary>The paperdoll has two ring SLOTS while ring items all carry the single Ring
+        /// piece: a slot key maps back to the item piece it accepts.</summary>
+        public static EquipmentPiece AcceptedItemPiece(this EquipmentPiece slot) =>
+            slot == EquipmentPiece.Ring2 ? EquipmentPiece.Ring : slot;
+
+        /// <summary>Creation-rune floor: lower enum value = better, so the roll is raised to the floor
+        /// (Math.Min over the enum value) when worse and left untouched when already better.</summary>
+        public static Rarity ApplyRarityFloor(this Rarity rolled, Rarity? minRarity) =>
+            minRarity == null ? rolled : (Rarity)Math.Min((byte)rolled, (byte)minRarity.Value);
 
         public static DamageType GetDamageType(this StatusEffects effect) => effect switch
         {
@@ -29,15 +39,6 @@
             StatusEffects.Burning => DamageType.Burning,
             StatusEffects.Poison => DamageType.Poison,
             _ => DamageType.Pure
-        };
-
-        public static int ConvertRarityToItemModifierAmount(this Rarity rarity) => rarity switch
-        {
-            Rarity.Uncommon => 1,
-            Rarity.Rare => 2,
-            Rarity.Epic => 3,
-            Rarity.Legendary => 4,
-            _ => 0
         };
 
         public static float ConvertEntityTypeToThresholdPenalty(this EntityType type) => type switch

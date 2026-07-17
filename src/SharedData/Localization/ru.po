@@ -390,6 +390,153 @@ msgstr ""
 msgid "Context_Modifier_HealthOnHit"
 msgstr ""
 
+msgid "Modifier_Flat_Range"
+msgstr ""
+
+msgid "Modifier_Increase_Range"
+msgstr ""
+
+msgid "Modifier_Multiplicative_Range"
+msgstr ""
+
+msgid "Context_Modifier_HealingEfficiency_Range"
+msgstr ""
+
+msgid "Context_Modifier_BleedDuration_Range"
+msgstr ""
+
+msgid "Context_Modifier_BleedDamage_Range"
+msgstr ""
+
+msgid "Context_Modifier_BurningStacks_Range"
+msgstr ""
+
+msgid "Context_Modifier_BurningDamage_Range"
+msgstr ""
+
+msgid "Context_Modifier_ManaOnHit_Range"
+msgstr ""
+
+msgid "Context_Modifier_HealthOnHit_Range"
+msgstr ""
+
+msgid "UI_Craft_Recipes"
+msgstr ""
+
+msgid "UI_Craft_Result"
+msgstr ""
+
+msgid "UI_Craft_Modifiers"
+msgstr ""
+
+msgid "UI_Craft_Requirements"
+msgstr ""
+
+msgid "UI_Crafting_Upgrade"
+msgstr ""
+
+msgid "UI_Crafting_Recraft"
+msgstr ""
+
+msgid "UI_Crafting_Ascend"
+msgstr ""
+
+msgid "UI_Craft_AscendWarning"
+msgstr ""
+
+msgid "UI_Craft_Success_Chance"
+msgstr ""
+
+msgid "UI_Item_Implicits"
+msgstr ""
+
+msgid "UI_Item_Modifiers"
+msgstr ""
+
+msgid "UI_Item_Effect"
+msgstr ""
+
+msgid "UI_Inv_Sort"
+msgstr ""
+
+msgid "UI_Inv_Destroy"
+msgstr ""
+
+msgid "UI_Inv_Equipment"
+msgstr ""
+
+msgid "UI_Inv_Stats"
+msgstr ""
+
+msgid "UI_Inv_Search"
+msgstr ""
+
+msgid "UI_Inv_All"
+msgstr ""
+
+msgid "UI_Inv_AllTypes"
+msgstr ""
+
+msgid "UI_Inv_Type_Weapon"
+msgstr ""
+
+msgid "UI_Inv_Type_Armor"
+msgstr ""
+
+msgid "UI_Inv_Type_Jewellery"
+msgstr ""
+
+msgid "UI_Inv_Type_Resources"
+msgstr ""
+
+msgid "UI_Bar_Effects"
+msgstr ""
+
+msgid "UI_Bar_Modifiers"
+msgstr ""
+
+msgid "WeaponType_Dagger"
+msgstr ""
+
+msgid "WeaponType_Sword"
+msgstr ""
+
+msgid "WeaponType_Bow"
+msgstr ""
+
+msgid "WeaponType_Staff"
+msgstr ""
+
+msgid "WeaponType_Axe"
+msgstr ""
+
+msgid "WeaponType_Wand"
+msgstr ""
+
+msgid "Handedness_OneHanded"
+msgstr ""
+
+msgid "Handedness_TwoHanded"
+msgstr ""
+
+msgid "Category_Metal"
+msgstr ""
+
+msgid "Category_Fabric"
+msgstr ""
+
+msgid "Category_Leather"
+msgstr ""
+
+msgid "Category_Gem"
+msgstr ""
+
+msgid "Category_Bone"
+msgstr ""
+
+msgid "Category_Essence"
+msgstr ""
+
 msgid "Belt_Life_Flow"
 msgstr ""
 
@@ -570,16 +717,82 @@ msgstr ""
 msgid "UI_Save"
 msgstr ""
 
+msgid "Upgrade_Resource_Apprentice_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Apprentice_Rune_Description"
+msgstr ""
+
 msgid "Upgrade_Resource_Armor_Dust"
 msgstr ""
 
 msgid "Upgrade_Resource_Blacksmith_Rune"
 msgstr ""
 
+msgid "Upgrade_Resource_Fine_Flux"
+msgstr ""
+
+msgid "Upgrade_Resource_Fine_Flux_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Grandmaster_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Grandmaster_Rune_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Weaponsmith_Mark"
+msgstr ""
+
+msgid "Upgrade_Resource_Weaponsmith_Mark_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Jeweler_Mark"
+msgstr ""
+
+msgid "Upgrade_Resource_Jeweler_Mark_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Armorsmith_Mark"
+msgstr ""
+
+msgid "Upgrade_Resource_Armorsmith_Mark_Description"
+msgstr ""
+
 msgid "Upgrade_Resource_Jeweler_Rune"
 msgstr ""
 
 msgid "Upgrade_Resource_Jewellery_Dust"
+msgstr ""
+
+msgid "Upgrade_Resource_Journeyman_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Journeyman_Rune_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Master_Rune"
+msgstr ""
+
+msgid "Upgrade_Resource_Master_Rune_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Perfect_Flux"
+msgstr ""
+
+msgid "Upgrade_Resource_Perfect_Flux_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Quality_Flux"
+msgstr ""
+
+msgid "Upgrade_Resource_Quality_Flux_Description"
+msgstr ""
+
+msgid "Upgrade_Resource_Simple_Flux"
+msgstr ""
+
+msgid "Upgrade_Resource_Simple_Flux_Description"
 msgstr ""
 
 msgid "Upgrade_Resource_Weapon_Dust"
@@ -2020,4 +2233,43 @@ msgid "Dlg_Dwarf_Warrior_Greeting_1"
 msgstr ""
 
 msgid "Dlg_Dwarf_Crossbowman_Greeting_1"
+msgstr ""
+
+msgid "Npc_Boss_Digri"
+msgstr ""
+
+msgid "Npc_Boss_Zigri"
+msgstr ""
+
+msgid "Ability_Twin_Assist_Attack"
+msgstr ""
+
+msgid "Ability_Twin_Assist_Attack_Description"
+msgstr ""
+
+msgid "Ability_Twin_Assist_Shield"
+msgstr ""
+
+msgid "Ability_Twin_Assist_Shield_Description"
+msgstr ""
+
+msgid "Npc_Boss_Rat_King"
+msgstr ""
+
+msgid "Effect_Damage_Immunity"
+msgstr ""
+
+msgid "Effect_Damage_Immunity_Description"
+msgstr ""
+
+msgid "Npc_Boss_Bone_Pack_Leader"
+msgstr ""
+
+msgid "Npc_Bone_Wolf"
+msgstr ""
+
+msgid "Ability_Summon_Bone_Wolves"
+msgstr ""
+
+msgid "Ability_Summon_Bone_Wolves_Description"
 msgstr ""

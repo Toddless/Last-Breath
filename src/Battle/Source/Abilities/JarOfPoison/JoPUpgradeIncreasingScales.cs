@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.Abilities.JarOfPoison
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     public class JoPUpgradeIncreasingScales(string id, string[] tags, int tier, float weaponScale, float spellScale)
@@ -12,9 +11,9 @@
 
         public override void ApplyUpgrade(JarOfPoison ability)
         {
-            var weaponScaleDecorator = new SimpleAbilityParameterDecorator<AbilityParameter>(AbilityParameter.WeaponDamageScale, Priority.Weak, OperationType.Add, weaponScale,
+            var weaponScaleDecorator = new SimpleAbilityParameterDecorator(AbilityParameter.WeaponDamageScale, Priority.Weak, OperationType.Add, weaponScale,
                 WeaponScaleDecoratorId, Id);
-            var spellScaleDecorator = new SimpleAbilityParameterDecorator<AbilityParameter>(AbilityParameter.SpellDamageScale, Priority.Weak, OperationType.Add, spellScale,
+            var spellScaleDecorator = new SimpleAbilityParameterDecorator(AbilityParameter.SpellDamageScale, Priority.Weak, OperationType.Add, spellScale,
                 SpellScaleDecoratorId, Id);
             ability.AddParameterDecorator(weaponScaleDecorator);
             ability.AddParameterDecorator(spellScaleDecorator);

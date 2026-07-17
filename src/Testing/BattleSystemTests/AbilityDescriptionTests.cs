@@ -1,6 +1,7 @@
 namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source.Abilities.HeadButt;
+    using Core.Data.AbilityData;
     using Core.Localization;
 
     [TestClass]
@@ -14,10 +15,16 @@ namespace LastBreathTest.BattleSystemTests
                 "Perform {Attacks|lunge|lunges} dealing {Damage} damage. Stuns for {StunDuration|turn|turns}.";
             provider.Plurals["lunge"] = ("lunge", "lunges");
             provider.Plurals["turn"] = ("turn", "turns");
-            Localization.Override(new LocalizationService(provider, new ModifierFormatter(provider, new ParameterFormatProvider()), []));
+            Localization.Override(new LocalizationService(provider, new ModifierFormatter(provider, new ParameterFormatProvider()), new ContextModifierFormatter(provider), []));
 
-            var ability = new HeadButt([], cooldown: 2, costValue: 10, damage: 40f,
-                weaponDamageScale: 0f, spellDamageScale: 0f, stunDuration: 1, attacks: 2);
+            var ability = new HeadButt(new AbilityBaseData
+            {
+                Id = "Ability_Head_Butt",
+                Cooldown = 2,
+                CostValue = 10,
+                Damage = 40f,
+                AbilityProperties = new() { ["stunDuration"] = 1, ["attacks"] = 2 }
+            });
 
             string text = ability.Description;
 

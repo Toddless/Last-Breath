@@ -11,7 +11,7 @@ namespace Core.Items
         string id,
         string[] tags,
         Rarity rarity,
-        EquipmentCategory category,
+        EquipmentCategory? category,
         int maxStackSize)
         : IUpgradingResource, IItem
     {
@@ -35,7 +35,7 @@ namespace Core.Items
             }
         }
         public Rarity Rarity { get; set; } = rarity;
-        public EquipmentCategory Category { get; } = category;
+        public EquipmentCategory? Category { get; } = category;
         public int MaxStackSize { get; } = maxStackSize;
         public string DisplayName => Localization.Localization.Localize(Id);
         public string Description => Localization.Localization.LocalizeDescription(Id);

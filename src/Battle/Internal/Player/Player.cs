@@ -2,6 +2,7 @@ namespace Battle.Internal.Player
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Core;
     using Core.Ai.World;
@@ -337,6 +338,17 @@ namespace Battle.Internal.Player
             return Task.CompletedTask;
         }
 
+        /// <summary>Shield layer eats post-mitigation damage BEFORE the barrier (Боссы.md → Щит).</summary>
+        private float AbsorbByShield(IDamageContext context, float remaining)
+        {
+            if (remaining <= 0) return remaining;
+            var shield = Effects.GetBy(e => e is Core.Battle.Abilities.IShieldEffect).OfType<Core.Battle.Abilities.IShieldEffect>().FirstOrDefault();
+            if (shield == null) return remaining;
+            float leftover = shield.Absorb(remaining);
+            context.AbsorbedByShield = remaining - leftover;
+            return leftover;
+        }
+
         public Task TakeDamage(IDamageContext context)
         {
             // Apply modifiers like "Reduce all damage taken"
@@ -347,7 +359,7 @@ namespace Battle.Internal.Player
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
             Calculations.CalculateMitigation(context, this);
 
-            float remaining = context.TotalDamage;
+            float remaining = AbsorbByShield(context, context.TotalDamage);
             if (CurrentBarrier > 0)
             {
                 float absorbed = Mathf.Min(CurrentBarrier, remaining);

@@ -26,7 +26,8 @@
             var item = _inventory.GetItem<IEquipItem>(request.ItemInstanceId);
             if (item == null) return Task.FromResult<IEnumerable<IRequirement>>([]);
 
-            var recraftCost = _itemUpgrader?.GetRecraftResourceCost(item.Rarity, item.EquipmentPiece.ConvertEquipmentPartToCategory()) ?? [];
+            // The item-aware price (includes the growing-reroll multiplier) — the same one the recraft handler spends.
+            var recraftCost = _itemUpgrader?.GetRecraftResourceCost(item) ?? [];
 
             return Task.FromResult<IEnumerable<IRequirement>>(recraftCost);
         }

@@ -161,6 +161,9 @@ namespace LastBreathTest.BattleSystemTests
             _provider.Strings["Modifier_Flat"] = "{value} {parameter}";
             _provider.Strings["Modifier_Increase"] = "{value} increased {parameter}";
             _provider.Strings["Modifier_Multiplicative"] = "{value} more {parameter}";
+            _provider.Strings["Modifier_Flat_Range"] = "{min}–{max} {parameter}";
+            _provider.Strings["Modifier_Increase_Range"] = "{min}–{max} increased {parameter}";
+            _provider.Strings["Modifier_Multiplicative_Range"] = "{min}–{max} more {parameter}";
             _provider.Strings["Damage"] = "Damage";
             _provider.Strings["CriticalChance"] = "Critical Chance";
 
@@ -184,16 +187,53 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual("+10% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, 0.1f)));
 
         [TestMethod]
-        public void MultiplicativeRendersDeltaFromOne() =>
-            Assert.AreEqual("+20% more Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.Damage, 1.2f)));
+        public void MultiplicativeRendersDeltaAsPercent() =>
+            // multiplicative values in data are DELTAS folded as (1 + Σ value): 0.2 = "+20% more"
+            Assert.AreEqual("+20% more Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.Damage, 0.2f)));
 
         [TestMethod]
         public void NegativeValuesCarryMinusSign() =>
             Assert.AreEqual("-15% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, -0.15f)));
 
         [TestMethod]
-        public void RangedFlatRendersRolledInterval() =>
-            Assert.AreEqual("+40-60 Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 50f), 0.8f, 1.2f));
+        public void RangedFlatRendersThroughTheRangeTemplate() =>
+            Assert.AreEqual("+40–60 Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 50f), 0.8f, 1.2f));
+
+        [TestMethod]
+        public void RangedIncreaseCarriesUnitOnMaxOnly() =>
+            Assert.AreEqual("+10–20% increased Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, 0.2f), 0.5f, 1f));
+
+        [TestMethod]
+        public void DescriptorWithSpreadRendersRangeTemplate() =>
+            Assert.AreEqual("+40–60 Damage", _formatter.FormatDescriptor(
+                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(40f, 60f), ModifierScope.Global)));
+
+        [TestMethod]
+        public void DescriptorWithFixedValueRendersLikeALiveModifier() =>
+            Assert.AreEqual("+50 Damage", _formatter.FormatDescriptor(
+                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 50f, ModifierScope.Global)));
+
+        [TestMethod]
+        public void DescriptorPercentParameterScalesBothBounds() =>
+            Assert.AreEqual("+4–6% Critical Chance", _formatter.FormatDescriptor(
+                new ParameterDescriptor(EntityParameter.CriticalChance, ModifierValueType.Flat, new ValueRange(0.04f, 0.06f), ModifierScope.Global)));
+
+        [TestMethod]
+        public void RolledRangeRendersBareIntervalScaledToTheCurrentValue()
+        {
+            // BaseValue 50 rolled from [40..60]; the item then upgraded the line to 100 (×2) —
+            // the interval follows the value channel so bounds stay comparable with the shown number.
+            var line = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, 50f, "test")
+            {
+                RolledRange = new ValueRange(40f, 60f),
+                Value = 100f,
+            };
+            Assert.AreEqual("80–120", _formatter.FormatRolledRange(line));
+        }
+
+        [TestMethod]
+        public void RolledRangeIsNullForFixedRolls() =>
+            Assert.IsNull(_formatter.FormatRolledRange(new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, 50f, "test")));
 
         [TestMethod]
         public void DecimalsUseDotRegardlessOfSystemCulture() =>

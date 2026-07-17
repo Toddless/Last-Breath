@@ -24,6 +24,10 @@ namespace Core.Localization
 
         string FormatModifier(IModifier modifier, float rangeMinValue, float rangeMaxValue, TextFormat format = TextFormat.Plain);
 
+        /// <summary>The roll spread of a materialized item line ("40–60", "4–8%") for the Alt reveal;
+        /// null when the line rolled no range (or the type carries no roll provenance).</summary>
+        string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain);
+
         /// <summary>One ParameterChange as a display value, unit-aware ("+5%", "-50", "+20%").</summary>
         string FormatParameterChange(EntityParameter parameter, float value, OperationType operation, TextFormat format = TextFormat.Plain);
     }

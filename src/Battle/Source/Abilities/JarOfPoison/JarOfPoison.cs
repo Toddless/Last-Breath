@@ -1,94 +1,35 @@
 namespace Battle.Source.Abilities.JarOfPoison
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
     using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
     using HitDelivery;
 
-    public class JarOfPoison(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        int poisonDuration,
-        Costs costType = Costs.Mana)
-        : DamagingAbility(id: "Ability_Jar_Of_Poison", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType)
+    public class JarOfPoison(AbilityBaseData data) : DamagingAbility(data)
     {
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.PoisonDuration] = new Module<Parameters>(() => poisonDuration, Parameters.PoisonDuration)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
-
-
         public int PoisonDuration => (int)this[Parameters.PoisonDuration];
 
         /// <summary>How the jar reaches its victims: the selected target, N bounces or every enemy (L3 upgrades swap it).</summary>
         public IHitSequenceStrategy HitSequence { get; set; } = new SelectedTargetsHits();
 
-        public enum Parameters : byte
+        public static class Parameters
         {
-            PoisonDuration
+            public const string PoisonDuration = nameof(PoisonDuration);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.PoisonDuration, 3);
         }
 
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new JarOfPoison(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale, PoisonDuration, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new JarOfPoison(Data));
 
         /// <summary>Each landing applies a poison stack AND fires the impact riders — every touched target gets the L2 debuffs.</summary>
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)

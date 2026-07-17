@@ -12,6 +12,7 @@ namespace Core.Entity.Components
         private readonly ModifierList<IHealContext> _healModifiers = new();
         private readonly ModifierList<IManaRecoveryContext> _manaRecoveryModifiers = new();
         private readonly ModifierList<IEffectApplicationContext> _effectApplicationModifiers = new();
+        private readonly ModifierList<IIncomingEffectContext> _incomingEffectModifiers = new();
         private readonly ModifierList<IAbilityActivationContext> _abilityActivationModifiers = new();
 
         public void Add(IAttackModifier modifier) => _attackModifiers.Add(modifier);
@@ -19,6 +20,7 @@ namespace Core.Entity.Components
         public void Add(IHealModifier modifier) => _healModifiers.Add(modifier);
         public void Add(IManaRecoveryModifier modifier) => _manaRecoveryModifiers.Add(modifier);
         public void Add(IEffectApplicationModifier modifier) => _effectApplicationModifiers.Add(modifier);
+        public void Add(IIncomingEffectModifier modifier) => _incomingEffectModifiers.Add(modifier);
         public void Add(IAbilityActivationModifier modifier) => _abilityActivationModifiers.Add(modifier);
 
         public void Remove(IAttackModifier modifier) => _attackModifiers.Remove(modifier);
@@ -26,6 +28,7 @@ namespace Core.Entity.Components
         public void Remove(IHealModifier modifier) => _healModifiers.Remove(modifier);
         public void Remove(IManaRecoveryModifier modifier) => _manaRecoveryModifiers.Remove(modifier);
         public void Remove(IEffectApplicationModifier modifier) => _effectApplicationModifiers.Remove(modifier);
+        public void Remove(IIncomingEffectModifier modifier) => _incomingEffectModifiers.Remove(modifier);
         public void Remove(IAbilityActivationModifier modifier) => _abilityActivationModifiers.Remove(modifier);
 
         public void Apply(IAttackContext context) => _attackModifiers.Apply(context);
@@ -33,6 +36,7 @@ namespace Core.Entity.Components
         public void Apply(IHealContext context) => _healModifiers.Apply(context);
         public void Apply(IManaRecoveryContext context) => _manaRecoveryModifiers.Apply(context);
         public void Apply(IEffectApplicationContext context) => _effectApplicationModifiers.Apply(context);
+        public void Apply(IIncomingEffectContext context) => _incomingEffectModifiers.Apply(context);
         public void Apply(IAbilityActivationContext context) => _abilityActivationModifiers.Apply(context);
 
         /// <summary>Priority-ordered list of context mutators for a single pipeline.</summary>

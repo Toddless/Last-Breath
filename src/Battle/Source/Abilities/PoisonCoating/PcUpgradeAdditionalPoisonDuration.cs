@@ -1,11 +1,11 @@
 namespace Battle.Source.Abilities.PoisonCoating
 {
-    using Core.Entity.Components.Decorator;
+    using Core.Battle.Abilities;
     using Core.Enums;
 
     /// <summary>L2 upgrade: poison stacks applied by the coating last additional turns.</summary>
     public class PcUpgradeAdditionalPoisonDuration(string id, string[] tags, int tier, int additionalDuration)
-        : SimpleUpgrade<PoisonCoating, PoisonCoating.Parameters>(id, tags, tier, new SimpleAbilityParameterDecorator<PoisonCoating.Parameters>(
+        : SimpleUpgrade<PoisonCoating>(id, tags, tier, new SimpleAbilityParameterDecorator(
             PoisonCoating.Parameters.PoisonDuration,
             Priority.Weak,
             OperationType.Add,

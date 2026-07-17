@@ -18,6 +18,9 @@
         [JsonProperty("maxTargets")] public int MaxTargets { get; init; } = 1;
         /// <summary>The mastery level at which the ability becomes learnable.</summary>
         [JsonProperty("masteryLevel")] public int MasteryLevel { get; init; } = 1;
+
+        /// <summary>Internal-cast-only ability (boss reactions): never learnable, never shown in trees.</summary>
+        [JsonProperty("hidden")] public bool Hidden { get; init; }
         [JsonProperty("damage")] public float Damage { get; init; }
         [JsonProperty("weaponDamageScale")] public float WeaponDamageScale { get; init; }
         [JsonProperty("spellDamageScale")] public float SpellDamageScale { get; init; }

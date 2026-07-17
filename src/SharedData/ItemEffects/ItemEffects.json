@@ -1,13 +1,40 @@
 {
     "effects": [
         {
-            "id": "",
-            "properties": [
-                {
-                    "property": "",
-                    "value": 1
-                }
-            ]
+            "id": "Passive_Skill_Regeneration",
+            "kind": "Passive",
+            "weight": 100,
+            "properties": { "percent": 0.03 }
+        },
+        {
+            "id": "Passive_Skill_Mana_Regeneration",
+            "kind": "Passive",
+            "weight": 100,
+            "properties": { "percent": 0.03 }
+        },
+        {
+            "id": "Passive_Skill_Critical_Leech",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": { "percent": 0.05 }
+        },
+        {
+            "id": "Passive_Skill_Critical_Mana_Leech",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": { "percent": 0.05 }
+        },
+        {
+            "id": "Passive_Skill_Mana_On_Attack",
+            "kind": "Passive",
+            "weight": 80,
+            "properties": { "amount": 15 }
+        },
+        {
+            "id": "Passive_Skill_Bleeding",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": { "percentFromDamage": 0.15, "duration": 2, "maxStacks": 3 }
         }
     ]
 }

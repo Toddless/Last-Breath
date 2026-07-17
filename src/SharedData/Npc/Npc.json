@@ -864,6 +864,265 @@
                 "activity": "Idle",
                 "wanderRadius": 300
             }
+        },
+        {
+            "id": "Npc_Boss_Digri",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 30,
+            "levelMax": 30,
+            "levelScaling": 0.0,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Dark_Shroud",
+                "Ability_Increasing_Pressure"
+            ],
+            "reactions": [
+                {
+                    "abilityId": "Ability_Twin_Assist_Attack",
+                    "trigger": "DamagedByAttack",
+                    "chance": 0.15,
+                    "maxPerTurn": 3,
+                    "blockedByFinalDeathOf": "Npc_Boss_Zigri"
+                }
+            ],
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 1000,
+                "Mana": 1200,
+                "Strength": 15,
+                "Dexterity": 35,
+                "Intelligence": 10,
+                "Armor": 2500,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.35,
+                "CriticalDamage": 2.0,
+                "Damage": 500,
+                "SpellDamage": 300,
+                "Accuracy": 4200,
+                "Evade": 5600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 130,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Zigri",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 30,
+            "levelMax": 30,
+            "levelScaling": 0.0,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Ares_Blessing",
+                "Ability_Double_Strike"
+            ],
+            "reactions": [
+                {
+                    "abilityId": "Ability_Twin_Assist_Shield",
+                    "trigger": "DamagedByAttack",
+                    "chance": 0.15,
+                    "maxPerTurn": 3,
+                    "blockedByFinalDeathOf": "Npc_Boss_Digri"
+                }
+            ],
+            "baseParameters": {
+                "Health": 10000,
+                "Barrier": 2000,
+                "Mana": 1200,
+                "Strength": 35,
+                "Dexterity": 20,
+                "Intelligence": 15,
+                "Armor": 4000,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 2.8,
+                "Damage": 500,
+                "SpellDamage": 300,
+                "Accuracy": 2300,
+                "Evade": 1600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 110,
+                "chaseSpeedMultiplier": 1.6,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Rat_King",
+            "fraction": "Animal",
+            "entityType": "Archon",
+            "rarity": "Mythic",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 15,
+            "levelMax": 15,
+            "levelScaling": 0.0,
+            "fleeHealthThreshold": 0,
+            "stages": [
+                {
+                    "parameterMultiplier": 0.15,
+                    "abilities": [],
+                    "attackEffects": [
+                        {
+                            "effect": "Poison",
+                            "chance": 0.35,
+                            "damagePercent": 0.75,
+                            "duration": 3,
+                            "maxStacks": 999
+                        }
+                    ],
+                    "nextStageAtHealthPercent": 0.35
+                },
+                {
+                    "parameterMultiplier": 1.0,
+                    "abilities": [
+                        "Ability_Increasing_Pressure",
+                        "Ability_Poison_Explosion"
+                    ],
+                    "attackEffects": [
+                        {
+                            "effect": "Poison",
+                            "chance": 1.0,
+                            "damagePercent": 0.75,
+                            "duration": 3,
+                            "maxStacks": 999
+                        },
+                        {
+                            "effect": "WitheringCurse",
+                            "chance": 0.15,
+                            "damagePercent": 0.15,
+                            "duration": 3,
+                            "maxStacks": 3
+                        }
+                    ],
+                    "rageAtHealthPercent": 0.3,
+                    "rageBonus": 0.25
+                }
+            ],
+            "baseParameters": {
+                "Health": 5000,
+                "Barrier": 500,
+                "Mana": 1200,
+                "Strength": 8,
+                "Dexterity": 15,
+                "Intelligence": 5,
+                "Armor": 600,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.3,
+                "CriticalDamage": 1.9,
+                "Damage": 200,
+                "SpellDamage": 100,
+                "Accuracy": 700,
+                "Evade": 1600
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 120,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Boss_Bone_Pack_Leader",
+            "fraction": "Undead",
+            "entityType": "Boss",
+            "rarity": "Unique",
+            "aiIntellect": "Mastermind",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 10,
+            "levelMax": 10,
+            "levelScaling": 0.0,
+            "fleeHealthThreshold": 0,
+            "abilities": [
+                "Ability_Critical_Calculation",
+                "Ability_Summon_Bone_Wolves"
+            ],
+            "abilityBehaviors": [
+                { "id": "Ability_Summon_Bone_Wolves", "weight": 1.2, "role": "Utility" }
+            ],
+            "baseParameters": {
+                "Health": 3000,
+                "Barrier": 200,
+                "Mana": 500,
+                "Strength": 5,
+                "Dexterity": 25,
+                "Intelligence": 10,
+                "Armor": 300,
+                "CriticalChance": 0.15,
+                "AdditionalHitChance": 0.35,
+                "CriticalDamage": 2.0,
+                "Damage": 200,
+                "SpellDamage": 50,
+                "Accuracy": 700,
+                "Evade": 1500
+            },
+            "world": {
+                "visionRadius": 450,
+                "hearingRadius": 900,
+                "leashRadius": 1200,
+                "moveSpeed": 125,
+                "chaseSpeedMultiplier": 1.7,
+                "searchSeconds": 10,
+                "activity": "Idle"
+            }
+        },
+        {
+            "id": "Npc_Bone_Wolf",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Dexterity"
+            ],
+            "levelMin": 1,
+            "levelMax": 1,
+            "levelScaling": 0.0,
+            "abilityCount": 1,
+            "baseParameters": {
+                "Health": 500,
+                "Barrier": 0,
+                "Mana": 100,
+                "Strength": 2,
+                "Dexterity": 6,
+                "Intelligence": 1,
+                "Armor": 75,
+                "CriticalChance": 0.1,
+                "AdditionalHitChance": 0.1,
+                "CriticalDamage": 1.5,
+                "Damage": 50,
+                "SpellDamage": 15,
+                "Accuracy": 175,
+                "Evade": 375
+            }
         }
     ]
 }

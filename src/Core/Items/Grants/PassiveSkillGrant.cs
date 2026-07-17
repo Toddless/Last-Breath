@@ -2,6 +2,7 @@ namespace Core.Items.Grants
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Battle.Skills;
     using Entity;
 
@@ -36,5 +37,12 @@ namespace Core.Items.Grants
         }
 
         public IItemGrant Copy() => new PassiveSkillGrant(id, skillId, properties, providerAccessor);
+
+        // Properties are the numeric balance payload the skill provider consumes (SkillProperties):
+        // scaling every float here is exactly "the granted effect gets +15%". Keys stay untouched.
+        public IItemGrant WithScaledValues(float factor) =>
+            new PassiveSkillGrant(id, skillId,
+                properties.ToDictionary(property => property.Key, property => property.Value * factor),
+                providerAccessor);
     }
 }

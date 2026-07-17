@@ -13,6 +13,12 @@ namespace Core.Narrative.Facts
 
         public static string FactionKillCount(Fractions faction) => $"Kill_Count_Faction:{faction}";
 
+        /// <summary>The NPC definition is finally dead (burned/despawned for good) — bosses gate on it.</summary>
+        public static string NpcFinalDeath(string npcId) => $"Npc_Final_Death:{npcId}";
+
+        /// <summary>Faction deaths accumulated toward the boss's next respawn (BossSpawnPoint counter).</summary>
+        public static string BossRespawnDeaths(string bossId) => $"Boss_Respawn_Deaths:{bossId}";
+
         public static string NpcTalked(string npcId) => $"Npc_Talked:{npcId}";
 
         /// <summary>A once-per-game dialogue option already chosen.</summary>

@@ -611,7 +611,6 @@ namespace LastBreath.Npc
                 else
                     fighters.Add(this);
 
-                GD.Print($"Npc in fight: {this.Id}");
                 StopMoving();
                 // Permanent forensics: one line per battle start names the initiator and the spot —
                 // it has already pinned down two "battles out of nowhere" bugs. Kept cheap on purpose.

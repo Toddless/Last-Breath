@@ -110,7 +110,7 @@
             "spellDamageScale": 0.35,
             "abilityProperties": {
                 "attacks": 5,
-                "damageMultiplier": 0.15
+                "attackDamageStepMultiplier": 0.15
             },
             "upgrades": [
                 {
@@ -375,7 +375,8 @@
             "costType": 1,
             "masteryLevel": 10,
             "abilityProperties": {
-                "buffDuration": 3,
+                "stacks": 3,
+                "duration": 3,
                 "additionalDurationAmount": 1
             },
             "upgrades": [
@@ -465,7 +466,7 @@
             "costType": 1,
             "masteryLevel": 25,
             "abilityProperties": {
-                "multiplier": 0,
+                "damageMultiplier": 0,
                 "executionThreshold": 42
             },
             "upgrades": [
@@ -549,7 +550,7 @@
             "masteryLevel": 50,
             "abilityProperties": {
                 "poisonMultiplier": 0.45,
-                "buffDuration": 3,
+                "coatingDuration": 3,
                 "poisonDuration": 5
             },
             "upgrades": [
@@ -643,8 +644,8 @@
             "spellDamageScale": 0.1,
             "abilityProperties": {
                 "secondDamage": 60,
-                "secondWeaponDamageScale": 0.9,
-                "secondSpellDamageScale": 0.05,
+                "secondWeaponScale": 0.9,
+                "secondSpellScale": 0.05,
                 "armorReduce": 0.15,
                 "evadeReduce": 0.15,
                 "debuffDuration": 3,
@@ -1480,7 +1481,7 @@
             "weaponDamageScale": 0.25,
             "spellDamageScale": 0.90,
             "abilityProperties": {
-                "projectiles": 3,
+                "shards": 3,
                 "shrapnelDamage": 50,
                 "shrapnelWeaponDamageScale": 0.15,
                 "shrapnelSpellDamageScale": 0.55,
@@ -1550,6 +1551,53 @@
                     }
                 }
             ]
+        },
+        {
+            "id": "Ability_Twin_Assist_Attack",
+            "tags": [],
+            "stance": 0,
+            "targetType": 2,
+            "cooldown": 0,
+            "costValue": 0,
+            "costType": 1,
+            "masteryLevel": 1,
+            "hidden": true,
+            "damage": 0,
+            "weaponDamageScale": 1.0,
+            "spellDamageScale": 0,
+            "abilityProperties": {
+                "burnDuration": 4
+            }
+        },
+        {
+            "id": "Ability_Twin_Assist_Shield",
+            "tags": [],
+            "stance": 1,
+            "targetType": 2,
+            "cooldown": 0,
+            "costValue": 0,
+            "costType": 1,
+            "masteryLevel": 1,
+            "hidden": true,
+            "abilityProperties": {
+                "shieldStrength": 500,
+                "healthRegenPercent": 0.05
+            }
+        },
+        {
+            "id": "Ability_Summon_Bone_Wolves",
+            "tags": [],
+            "stance": 0,
+            "targetType": 2,
+            "cooldown": 4,
+            "costValue": 200,
+            "costType": 1,
+            "masteryLevel": 1,
+            "hidden": true,
+            "abilityProperties": {
+                "wolvesPerCast": 3,
+                "statShare": 0.25
+            }
         }
     ]
 }

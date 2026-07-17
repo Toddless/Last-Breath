@@ -74,9 +74,10 @@
             _diedEntities.Add(entity.InstanceId); // counted once: a fled enemy killed later doesn't double-dip
         }
 
-        /// <summary>Only the player's ENEMIES are worth experience: a fallen companion is a loss, not a reward.</summary>
+        /// <summary>Only the player's ENEMIES are worth experience: a fallen companion is a loss,
+        /// not a reward, and a summon is a spell, not a kill.</summary>
         private bool CanGetExperience(IFightable entity) =>
-            entity is not IPlayer && entity is IFightableNpc && !_diedEntities.Contains(entity.InstanceId) && !IsPlayerAlly(entity);
+            entity is not IPlayer && entity is IFightableNpc { IsSummon: false } && !_diedEntities.Contains(entity.InstanceId) && !IsPlayerAlly(entity);
 
         private bool IsPlayerAlly(IFightable entity) =>
             entity.Group != null && ReferenceEquals(entity.Group, _player.Group);

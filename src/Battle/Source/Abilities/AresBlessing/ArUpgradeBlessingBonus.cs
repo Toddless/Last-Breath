@@ -1,7 +1,6 @@
 namespace Battle.Source.Abilities.AresBlessing
 {
     using Core.Battle.Abilities;
-    using Core.Entity.Components.Decorator;
     using Core.Enums;
 
     /// <summary>L2 upgrades: extra health and/or recovery bonus (either one may be zero).</summary>
@@ -14,10 +13,10 @@ namespace Battle.Source.Abilities.AresBlessing
         public override void ApplyUpgrade(AresBlessing ability)
         {
             if (healthBonus > 0)
-                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AresBlessing.Parameters>(
+                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                     AresBlessing.Parameters.HealthBonus, Priority.Weak, OperationType.Add, healthBonus, HealthDecoratorId, Id));
             if (recoveryBonus > 0)
-                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator<AresBlessing.Parameters>(
+                ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(
                     AresBlessing.Parameters.RecoveryBonus, Priority.Weak, OperationType.Add, recoveryBonus, RecoveryDecoratorId, Id));
         }
 

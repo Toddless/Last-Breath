@@ -8,10 +8,8 @@ namespace Battle.Source.Abilities.Armageddon
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Data;
+    using Core.Data.AbilityData;
     using Core.Entity;
-    using Core.Entity.Components;
-    using Core.Entity.Components.Decorator;
-    using Core.Entity.Components.Module;
     using Core.Enums;
     using Effects;
     using Godot;
@@ -23,55 +21,14 @@ namespace Battle.Source.Abilities.Armageddon
     /// Stage-1 numbers live in the base damage modules so upgrades can override them; if health runs
     /// short at cast time the stage downgrades to the highest affordable one.
     /// </summary>
-    public class Armageddon(
-        string[] tags,
-        int cooldown,
-        int costValue,
-        float damage,
-        float weaponDamageScale,
-        float spellDamageScale,
-        float secondDamage,
-        float secondWeaponScale,
-        float secondSpellScale,
-        float thirdDamage,
-        float thirdWeaponScale,
-        float thirdSpellScale,
-        float stage1HpCost,
-        float stage2HpCost,
-        float stage3HpCost,
-        int stunDuration,
-        Costs costType = Costs.Mana)
-        : DamagingAbility(id: "Ability_Armageddon", tags, cooldown, costValue, damage, weaponDamageScale, spellDamageScale, costType), IChargedAbility
+    public class Armageddon(AbilityBaseData data) : DamagingAbility(data), IChargedAbility
     {
         /// <summary>"+1 damage per every 5 missing health" — the missing-health step of the L3 upgrade.</summary>
         private const float MissingHpStep = 5f;
 
-        private float this[Parameters parameter] => AbilityParametersModuleManager.GetModule(parameter).GetValue();
-
-        private IModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>> AbilityParametersModuleManager
-        {
-            get
-            {
-                if (field != null) return field;
-                field = new ModuleManager<Parameters, IParameterModule<Parameters>, AbilityParameterDecorator<Parameters>>(new()
-                {
-                    [Parameters.StunDuration] = new Module<Parameters>(() => stunDuration, Parameters.StunDuration),
-                    [Parameters.HpCostMultiplier] = new Module<Parameters>(() => 1f, Parameters.HpCostMultiplier),
-                    [Parameters.MissingHpRate] = new Module<Parameters>(() => 0f, Parameters.MissingHpRate)
-                });
-                return field;
-            }
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                AddModuleValues(values, AbilityParametersModuleManager);
-                return values;
-            }
-        }
+        /// <summary>Charge bookkeeping; lazy — the affordability gate needs the owner.</summary>
+        private Activation.ChargedActivation Charge =>
+            field ??= new Activation.ChargedActivation(maxStage: 3, stage => Owner != null && HpCost(stage) < Owner.CurrentHealth);
 
         public int StunDuration => (int)this[Parameters.StunDuration];
         public float HpCostMultiplier => this[Parameters.HpCostMultiplier];
@@ -83,68 +40,58 @@ namespace Battle.Source.Abilities.Armageddon
         public Func<IEffect>? Stage3EffectFactory { get; set; }
         public int Stage3EffectStacks { get; set; } = 1;
 
-        public int MaxStage => 3;
-        public int PendingStage { get; set; }
+        public int MaxStage => Charge.MaxStage;
+
+        public int PendingStage
+        {
+            get => Charge.PendingStage;
+            set => Charge.PendingStage = value;
+        }
 
         /// <summary>The charge is a commitment: once selection begins there is no backing out.</summary>
         public bool IsCancellable => false;
 
-        public int MaxAffordableStage
+        public int MaxAffordableStage => Charge.MaxAffordableStage;
+
+        public static class Parameters
         {
-            get
-            {
-                if (Owner == null) return 1;
-                for (int stage = MaxStage; stage > 1; stage--)
-                    if (HpCost(stage) < Owner.CurrentHealth)
-                        return stage;
-                return 1;
-            }
+            public const string StunDuration = nameof(StunDuration);
+            public const string HpCostMultiplier = nameof(HpCostMultiplier);
+            public const string MissingHpRate = nameof(MissingHpRate);
+            public const string SecondDamage = nameof(SecondDamage);
+            public const string SecondWeaponScale = nameof(SecondWeaponScale);
+            public const string SecondSpellScale = nameof(SecondSpellScale);
+            public const string ThirdDamage = nameof(ThirdDamage);
+            public const string ThirdWeaponScale = nameof(ThirdWeaponScale);
+            public const string ThirdSpellScale = nameof(ThirdSpellScale);
+            public const string Stage1HpCost = nameof(Stage1HpCost);
+            public const string Stage2HpCost = nameof(Stage2HpCost);
+            public const string Stage3HpCost = nameof(Stage3HpCost);
         }
 
-        public enum Parameters : byte
+        protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
-            StunDuration,
-            HpCostMultiplier,
-            MissingHpRate
+            base.RegisterBaseParameters(parameters);
+            parameters.RegisterDefault(Parameters.StunDuration, 2);
+            parameters.RegisterDefault(Parameters.HpCostMultiplier, 1f);
+            parameters.RegisterDefault(Parameters.MissingHpRate, 0f);
+            parameters.RegisterDefault(Parameters.SecondDamage, 600f);
+            parameters.RegisterDefault(Parameters.SecondWeaponScale, 1.2f);
+            parameters.RegisterDefault(Parameters.SecondSpellScale, 1.2f);
+            parameters.RegisterDefault(Parameters.ThirdDamage, 1000f);
+            parameters.RegisterDefault(Parameters.ThirdWeaponScale, 1.8f);
+            parameters.RegisterDefault(Parameters.ThirdSpellScale, 1.8f);
+            parameters.RegisterDefault(Parameters.Stage1HpCost, 0.05f);
+            parameters.RegisterDefault(Parameters.Stage2HpCost, 0.15f);
+            parameters.RegisterDefault(Parameters.Stage3HpCost, 0.30f);
         }
 
-        public override void AddParameterDecorator<T>(IModuleDecorator<T, IParameterModule<T>> decorator)
-        {
-            if (decorator is not AbilityParameterDecorator<Parameters> parameterDecorator)
-            {
-                base.AddParameterDecorator(decorator);
-                return;
-            }
-
-            AbilityParametersModuleManager.AddDecorator(parameterDecorator);
-        }
-
-        public override void RemoveParameterDecorator<T>(string id, T key)
-        {
-            if (key is not Parameters parameter)
-            {
-                base.RemoveParameterDecorator(id, key);
-                return;
-            }
-
-            AbilityParametersModuleManager.RemoveDecorator(id, parameter);
-        }
-
-        public override IAbility Copy()
-        {
-            var copy = new Armageddon(Tags, (int)Cooldown, CostValue, Damage, WeaponDamageScale, SpellDamageScale,
-                secondDamage, secondWeaponScale, secondSpellScale, thirdDamage, thirdWeaponScale, thirdSpellScale,
-                stage1HpCost, stage2HpCost, stage3HpCost, StunDuration, CostType);
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
-            return copy;
-        }
+        public override IAbility Copy() => CopyUpgradesTo(new Armageddon(Data));
 
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
-            int stage = Mathf.Clamp(PendingStage == 0 ? 1 : PendingStage, 1, MaxStage);
-            PendingStage = 0;
             // "При отсутствии необходимого уровня здоровья активируется последняя достигнутая стадия."
-            stage = Mathf.Min(stage, MaxAffordableStage);
+            int stage = Charge.ConsumeStage();
             owner.ConsumeResource(Costs.Health, HpCost(stage));
 
             float abilityDamage = StageDamage(stage, owner);
@@ -177,16 +124,16 @@ namespace Battle.Source.Abilities.Armageddon
 
         private float StageHpPercent(int stage) => stage switch
         {
-            1 => stage1HpCost,
-            2 => stage2HpCost,
-            _ => stage3HpCost
+            1 => this[Parameters.Stage1HpCost],
+            2 => this[Parameters.Stage2HpCost],
+            _ => this[Parameters.Stage3HpCost]
         };
 
         private float StageDamage(int stage, IFightable owner) => stage switch
         {
             1 => Damage + (owner.Parameters.Damage * WeaponDamageScale) + (owner.Parameters.SpellDamage * SpellDamageScale),
-            2 => secondDamage + (owner.Parameters.Damage * secondWeaponScale) + (owner.Parameters.SpellDamage * secondSpellScale),
-            _ => thirdDamage + (owner.Parameters.Damage * thirdWeaponScale) + (owner.Parameters.SpellDamage * thirdSpellScale)
+            2 => this[Parameters.SecondDamage] + (owner.Parameters.Damage * this[Parameters.SecondWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.SecondSpellScale]),
+            _ => this[Parameters.ThirdDamage] + (owner.Parameters.Damage * this[Parameters.ThirdWeaponScale]) + (owner.Parameters.SpellDamage * this[Parameters.ThirdSpellScale])
         };
     }
 }

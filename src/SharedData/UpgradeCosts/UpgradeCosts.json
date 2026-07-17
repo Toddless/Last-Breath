@@ -6,7 +6,15 @@
                 {
                     "type": "Resource",
                     "id": "Upgrade_Resource_Weapon_Rune",
-                    "amount": 1
+                    "byRarity": {
+                        "Common": { "amount": 1 },
+                        "Uncommon": { "amount": 1 },
+                        "Rare": { "amount": 2 },
+                        "Epic": { "amount": 3 },
+                        "Legendary": { "amount": 4 },
+                        "Unique": { "amount": 4 },
+                        "Mythic": { "amount": 4 }
+                    }
                 }
             ]
         },
@@ -16,7 +24,15 @@
                 {
                     "type": "Resource",
                     "id": "Upgrade_Resource_Blacksmith_Rune",
-                    "amount": 1
+                    "byRarity": {
+                        "Common": { "amount": 1 },
+                        "Uncommon": { "amount": 1 },
+                        "Rare": { "amount": 2 },
+                        "Epic": { "amount": 3 },
+                        "Legendary": { "amount": 4 },
+                        "Unique": { "amount": 4 },
+                        "Mythic": { "amount": 4 }
+                    }
                 }
             ]
         },
@@ -26,7 +42,15 @@
                 {
                     "type": "Resource",
                     "id": "Upgrade_Resource_Jeweler_Rune",
-                    "amount": 1
+                    "byRarity": {
+                        "Common": { "amount": 1 },
+                        "Uncommon": { "amount": 1 },
+                        "Rare": { "amount": 2 },
+                        "Epic": { "amount": 3 },
+                        "Legendary": { "amount": 4 },
+                        "Unique": { "amount": 4 },
+                        "Mythic": { "amount": 4 }
+                    }
                 }
             ]
         }
@@ -39,6 +63,19 @@
                     "type": "Resource",
                     "id": "Upgrade_Resource_Weapon_Dust",
                     "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "amount": 1,
+                    "byRarity": {
+                        "Common": { "id": "Crafting_Resource_Copper_Ore" },
+                        "Uncommon": { "id": "Crafting_Resource_Iron_Ore" },
+                        "Rare": { "id": "Crafting_Resource_Silver_Ore" },
+                        "Epic": { "id": "Crafting_Resource_Mithril_Ore" },
+                        "Legendary": { "id": "Crafting_Resource_Adamantite_Ore" },
+                        "Unique": { "id": "Crafting_Resource_Adamantite_Ore" },
+                        "Mythic": { "id": "Crafting_Resource_Adamantite_Ore" }
+                    }
                 }
             ]
         },
@@ -49,6 +86,19 @@
                     "type": "Resource",
                     "id": "Upgrade_Resource_Armor_Dust",
                     "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "amount": 1,
+                    "byRarity": {
+                        "Common": { "id": "Crafting_Resource_Copper_Ore" },
+                        "Uncommon": { "id": "Crafting_Resource_Iron_Ore" },
+                        "Rare": { "id": "Crafting_Resource_Silver_Ore" },
+                        "Epic": { "id": "Crafting_Resource_Mithril_Ore" },
+                        "Legendary": { "id": "Crafting_Resource_Adamantite_Ore" },
+                        "Unique": { "id": "Crafting_Resource_Adamantite_Ore" },
+                        "Mythic": { "id": "Crafting_Resource_Adamantite_Ore" }
+                    }
                 }
             ]
         },
@@ -59,6 +109,19 @@
                     "type": "Resource",
                     "id": "Upgrade_Resource_Jewellery_Dust",
                     "amount": 1
+                },
+                {
+                    "type": "Resource",
+                    "amount": 1,
+                    "byRarity": {
+                        "Common": { "id": "Crafting_Resource_Emerald_Gem" },
+                        "Uncommon": { "id": "Crafting_Resource_Ruby_Gem" },
+                        "Rare": { "id": "Crafting_Resource_Sapphire_Gem" },
+                        "Epic": { "id": "Crafting_Resource_Topaz_Gem" },
+                        "Legendary": { "id": "Crafting_Resource_Diamond_Gem" },
+                        "Unique": { "id": "Crafting_Resource_Diamond_Gem" },
+                        "Mythic": { "id": "Crafting_Resource_Diamond_Gem" }
+                    }
                 }
             ]
         }
@@ -69,8 +132,8 @@
             "requirements": [
                 {
                     "type": "Resource",
-                    "id": "Upgrade_Resource_Weapon_Rune",
-                    "amount": 10
+                    "id": "Upgrade_Resource_Weaponsmith_Mark",
+                    "amount": 1
                 }
             ]
         },
@@ -79,8 +142,8 @@
             "requirements": [
                 {
                     "type": "Resource",
-                    "id": "Upgrade_Resource_Blacksmith_Rune",
-                    "amount": 10
+                    "id": "Upgrade_Resource_Armorsmith_Mark",
+                    "amount": 1
                 }
             ]
         },
@@ -89,8 +152,8 @@
             "requirements": [
                 {
                     "type": "Resource",
-                    "id": "Upgrade_Resource_Jeweler_Rune",
-                    "amount": 10
+                    "id": "Upgrade_Resource_Jeweler_Mark",
+                    "amount": 1
                 }
             ]
         }

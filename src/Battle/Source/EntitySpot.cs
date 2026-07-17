@@ -13,6 +13,7 @@ namespace Battle.Source
     /// </summary>
     public partial class EntitySpot : Node2D
     {
+        private const string UID = "uid://chwl8e6atuhnk";
         private const float HighlightRadius = 125f;
         private const float HighlightWidth = 5f;
         private static readonly Color s_validAttackColor = new(0.95f, 0.3f, 0.25f, 0.9f);
@@ -34,6 +35,9 @@ namespace Battle.Source
         [Export] private Area2D? _spotArea;
 
         public IFightable? Entity { get; private set; }
+
+        /// <summary>Scene for programmatic slots: the arena grows the battlefield beyond the authored spots.</summary>
+        public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
         public override void _Ready() => _spotArea?.InputEvent += OnInputEvent;
 
