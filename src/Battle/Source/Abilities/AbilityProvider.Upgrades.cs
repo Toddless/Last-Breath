@@ -24,9 +24,13 @@
     using ChainLightning;
     using Core.Battle.Abilities;
     using Core.Modifiers.Context;
+    using DeepFreeze;
+    using Discharge;
     using IceAegis;
+    using IceBlock;
     using IceShards;
     using Overload;
+    using StaticArmor;
 
     public partial class AbilityProvider
     {
@@ -178,7 +182,7 @@
                     new ApplyEffectImpactRider(new BlindEffect(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
+                        data.UpgradeProperties.GetValueOrDefault("accuracyReduce", 0.15f)))),
             ["Ability_JoP_Upgrade_Apply_Weakness"] = data =>
                 new JoPDebuffUpgrade(
                     data.Id,
@@ -187,7 +191,7 @@
                     new ApplyEffectImpactRider(new Weakness(
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 5),
                         (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 5),
-                        data.UpgradeProperties.GetValueOrDefault("evadeReduce", 0.05f)))),
+                        data.UpgradeProperties.GetValueOrDefault("damageReduce", 0.15f)))),
             ["Ability_JoP_Upgrade_Increasing_Scales"] = data =>
                 new JoPUpgradeIncreasingScales(
                     data.Id,
@@ -220,41 +224,58 @@
                     data.Tier,
                     data.UpgradeProperties.GetValueOrDefault("burnPercent", 0.30f),
                     data.UpgradeProperties.GetValueOrDefault("additionalCost", 50)),
-            ["Ability_Ov_Upgrade_Additional_Scales"] = data =>
-                new AbilityUpgradeAdditionalScales(
+            ["Ability_Ov_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.05f),
-                    data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.15f)),
-            ["Ability_Ov_Upgrade_Damage_Per_Mana"] = data =>
-                new OvUpgradeDamagePerMana(
+                    data.UpgradeProperties.GetValueOrDefault("cost", 50)),
+            ["Ability_Ov_Upgrade_Mana_Step"] = data =>
+                new SimpleUpgrade<Ability>(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("amount", 0.5f)),
-            ["Ability_Ov_Upgrade_Additional_Crit_Chance"] = data =>
-                new AbilityUpgradeAdditionalCritChance(
+                    new SimpleAbilityParameterDecorator(
+                        Overload.Overload.Parameters.ManaPerStep, Priority.Weak, OperationType.Subtract,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1.5f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Ov_Upgrade_Additional_Multiplier"] = data =>
+                new SimpleUpgrade<Ability>(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    data.UpgradeProperties.GetValueOrDefault("amount", 0.25f)),
+                    new SimpleAbilityParameterDecorator(
+                        Overload.Overload.Parameters.DamagePerStep, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.02f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Ov_Upgrade_Random_Cooldown"] = data =>
+                new AbilityUpgradeActivationRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ReduceRandomCooldownActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 1))),
             ["Ability_Ov_Upgrade_Mana_Flow"] = data =>
                 new AbilityUpgradeCastEffect(
                     data.Id,
                     data.Tags,
                     data.Tier,
                     _ => new ManaRegenerationEffect(
-                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.05f),
+                        data.UpgradeProperties.GetValueOrDefault("regenAmount", 0.15f),
                         (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
-                        maxStacks: 1)),
-            ["Ability_Ov_Upgrade_Kill_Resets_Cooldown"] = data =>
+                        maxStacks: 1,
+                        id: "Effect_Mana_Flow")),
+            ["Ability_Ov_Upgrade_Next_Cast_Pure"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new NextCastPureConversionEffect(ability.Id,
+                        data.UpgradeProperties.GetValueOrDefault("fraction", 0.3f))),
+            ["Ability_Ov_Upgrade_Stage4_Resets_Cooldown"] = data =>
                 new DelegateUpgrade<Overload.Overload>(
                     data.Id,
                     data.Tags,
                     data.Tier,
-                    ability => ability.ResetCooldownOnKill = true,
-                    ability => ability.ResetCooldownOnKill = false),
+                    ability => ability.ResetCooldownOnFinalStage = true,
+                    ability => ability.ResetCooldownOnFinalStage = false),
             ["Ability_Cl_Upgrade_Reduce_Cooldown"] = data =>
                 new AbilityUpgradeReduceCooldown(
                     data.Id,
@@ -998,6 +1019,307 @@
                     (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
                     (int)data.UpgradeProperties.GetValueOrDefault("maxStacks", 3),
                     data.UpgradeProperties.GetValueOrDefault("critDamageAmp", 0.35f)),
+            ["Ability_Is_Upgrade_Multicast"] = data =>
+                new DelegateUpgrade<IceShards.IceShards>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.Activation.BonusChance += data.UpgradeProperties.GetValueOrDefault("amount", 0.25f),
+                    ability => ability.Activation.BonusChance -= data.UpgradeProperties.GetValueOrDefault("amount", 0.25f)),
+            ["Ability_Is_Upgrade_Crit_Ignores_Cold_Res"] = data =>
+                new DelegateUpgrade<IceShards.IceShards>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.CritIgnoresColdResistance = true,
+                    ability => ability.CritIgnoresColdResistance = false),
+            ["Ability_Ia_Upgrade_Reflect"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegis.IceAegis.Parameters.ReflectPercent,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Ia_Upgrade_Stun_Attackers"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegis.IceAegis.Parameters.StunAttackersChance,
+                    data.UpgradeProperties.GetValueOrDefault("chance", 0.25f)),
+            ["Ability_Ia_Upgrade_Turn_End_Heal"] = data =>
+                new IaUpgradeParameter(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    IceAegis.IceAegis.Parameters.HealPerTurn,
+                    data.UpgradeProperties.GetValueOrDefault("amount", 0.15f)),
+            ["Ability_Ia_Upgrade_Crit_Mitigation"] = data =>
+                new AbilityUpgradeCastEffect(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => new EnhanceDefenseEffect(((IceAegis.IceAegis)ability).Duration, maxStacks: 1,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.8f))),
+            ["Ability_Ib_Upgrade_Withering_Value"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        IceBlocks.Parameters.WitheringValue, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.05f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Ib_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 1)),
+            ["Ability_Ib_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Ib_Upgrade_Withering_Stacks"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        IceBlocks.Parameters.WitheringMaxStacks, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Ib_Upgrade_Extra_Block_Damage"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        IceBlocks.Parameters.ExtraBlockDamagePercent, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.25f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Ib_Upgrade_Heavy_Blocks"] = data =>
+                new AbilityUpgradeParameterSet(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    [
+                        (AbilityParameter.Damage, data.UpgradeProperties.GetValueOrDefault("damage", 150f)),
+                        (AbilityParameter.WeaponDamageScale, data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.15f)),
+                        (AbilityParameter.SpellDamageScale, data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.45f))
+                    ]),
+            ["Ability_Ib_Upgrade_Reset_Chance"] = data =>
+                new DelegateUpgrade<IceBlocks>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ResetCooldownChance = data.UpgradeProperties.GetValueOrDefault("chance", 0.25f),
+                    ability => ability.ResetCooldownChance = 0f),
+            ["Ability_Ib_Upgrade_Random_Extra_Blocks"] = data =>
+                new DelegateUpgrade<IceBlocks>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ExtraBlocksHitRandomTargets = true,
+                    ability => ability.ExtraBlocksHitRandomTargets = false),
+            ["Ability_Ib_Upgrade_Consume_Stun"] = data =>
+                new DelegateUpgrade<IceBlocks>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ConsumeStunForDoubleDamage = true,
+                    ability => ability.ConsumeStunForDoubleDamage = false),
+            ["Ability_Df_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Df_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Df_Upgrade_Frostbite_Duration"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        DeepFreeze.DeepFreeze.Parameters.FrostbiteDuration, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Df_Upgrade_Spread_Freeze"] = data =>
+                new DelegateUpgrade<DeepFreeze.DeepFreeze>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.SpreadFreezeChance = data.UpgradeProperties.GetValueOrDefault("chance", 0.5f),
+                    ability => ability.SpreadFreezeChance = 0f),
+            ["Ability_Df_Upgrade_Extend_Effects"] = data =>
+                new DelegateUpgrade<DeepFreeze.DeepFreeze>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ExtendTargetEffects = true,
+                    ability => ability.ExtendTargetEffects = false),
+            ["Ability_Df_Upgrade_More_Shred"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        DeepFreeze.DeepFreeze.Parameters.ColdResistanceShred, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.15f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Df_Upgrade_Enemy_Cooldown"] = data =>
+                new AbilityUpgradeImpactRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ApplyEffectImpactRider(new NextAbilityCooldownEffect(
+                        (int)data.UpgradeProperties.GetValueOrDefault("duration", 3),
+                        data.UpgradeProperties.GetValueOrDefault("amount", 3f)))),
+            ["Ability_Df_Upgrade_Reduce_All_Cooldowns"] = data =>
+                new AbilityUpgradeActivationRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ReduceAllCooldownsActivationRider(data.Id, (int)data.UpgradeProperties.GetValueOrDefault("amount", 2))),
+            ["Ability_Df_Upgrade_Execute"] = data =>
+                new AbilityUpgradeImpactRider(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new ExecuteImpactRider(data.Id, data.UpgradeProperties.GetValueOrDefault("threshold", 0.30f))),
+            ["Ability_Dis_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Dis_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Dis_Upgrade_Multiplier"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        Discharge.Discharge.Parameters.BarrierMultiplier, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.5f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Dis_Upgrade_More_Multiplier"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        Discharge.Discharge.Parameters.BarrierMultiplier, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Dis_Upgrade_More_Restore"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        Discharge.Discharge.Parameters.StageThreeBarrierRestore, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.25f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Dis_Upgrade_Spell_Scale"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        AbilityParameter.SpellDamageScale, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.35f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Dis_Upgrade_Overkill"] = data =>
+                new DelegateUpgrade<Discharge.Discharge>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.OverkillToRandom = true,
+                    ability => ability.OverkillToRandom = false),
+            ["Ability_Dis_Upgrade_Ignore_Resistances"] = data =>
+                new DelegateUpgrade<Discharge.Discharge>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.AlwaysIgnoreResistances = true,
+                    ability => ability.AlwaysIgnoreResistances = false),
+            ["Ability_Dis_Upgrade_Consume_Mana"] = data =>
+                new DelegateUpgrade<Discharge.Discharge>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.ConsumeManaInstead = true,
+                    ability => ability.ConsumeManaInstead = false),
+            ["Ability_Sa_Upgrade_Reduce_Cost"] = data =>
+                new AbilityUpgradeReduceCost(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    data.UpgradeProperties.GetValueOrDefault("cost", 100)),
+            ["Ability_Sa_Upgrade_Reduce_Cooldown"] = data =>
+                new AbilityUpgradeReduceCooldown(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    (int)data.UpgradeProperties.GetValueOrDefault("cooldown", 2)),
+            ["Ability_Sa_Upgrade_Detonation_Scales"] = data =>
+                new AbilityUpgradeParameterSet(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    [
+                        (StaticArmor.StaticArmor.Parameters.DetonationWeaponScale, data.UpgradeProperties.GetValueOrDefault("weaponDamageScale", 0.25f)),
+                        (StaticArmor.StaticArmor.Parameters.DetonationSpellScale, data.UpgradeProperties.GetValueOrDefault("spellDamageScale", 0.35f))
+                    ]),
+            ["Ability_Sa_Upgrade_Buff_Duration"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        StaticArmor.StaticArmor.Parameters.Duration, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Sa_Upgrade_More_Splash"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        StaticArmor.StaticArmor.Parameters.StageThreeSplashDamage, Priority.Weak, OperationType.Add,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 0.5f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Sa_Upgrade_Less_Stacks"] = data =>
+                new SimpleUpgrade<Ability>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    new SimpleAbilityParameterDecorator(
+                        StaticArmor.StaticArmor.Parameters.RequiredStacks, Priority.Weak, OperationType.Subtract,
+                        data.UpgradeProperties.GetValueOrDefault("amount", 1f), $"Ability_Parameter_Decorator_{data.Id}", data.Id)),
+            ["Ability_Sa_Upgrade_Overkill"] = data =>
+                new DelegateUpgrade<StaticArmor.StaticArmor>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.OverkillToRandom = true,
+                    ability => ability.OverkillToRandom = false),
+            ["Ability_Sa_Upgrade_Ignore_Resistances"] = data =>
+                new DelegateUpgrade<StaticArmor.StaticArmor>(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    ability => ability.IgnoreResistances = true,
+                    ability => ability.IgnoreResistances = false),
+            ["Ability_Sa_Upgrade_Cost_Barrier"] = data =>
+                new AbilityUpgradeCostTypeOverride(
+                    data.Id,
+                    data.Tags,
+                    data.Tier,
+                    Costs.Barrier),
         };
     }
 }

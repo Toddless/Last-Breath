@@ -20,7 +20,7 @@ namespace LootGeneration.Services
             "Passive_Skill_Regeneration",
             "Passive_Skill_SoulDevouring",
             "Passive_Skill_Trapped_Beast",
-            "Passive_Skill_Vampier",
+            "Passive_Skill_Vampire",
             "Passive_Skill_Mana_Burn",
             "Passive_Skill_Burning",
             "Passive_Skill_Gift_From_The_Goddess",

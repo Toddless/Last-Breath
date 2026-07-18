@@ -19,7 +19,7 @@ namespace LastBreath.Npc
     /// stance from the allowed set (the behavior archetype follows it), level within the
     /// EntityType cap, rarity by weight, a weighted ability pick from the archetype pool.
     /// </summary>
-    public class NpcProvider : INpcProvider, IGameDataParticipant
+    public class NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider) : INpcProvider, IGameDataParticipant
     {
         private static readonly (Rarity Rarity, float Weight)[] s_rarityWeights =
         [
@@ -32,15 +32,7 @@ namespace LastBreath.Npc
 
         private readonly Dictionary<string, NpcData> _npcs = [];
         private readonly Dictionary<Stance, NpcBehaviorData> _behaviors = [];
-        private readonly IAbilityProvider _abilityProvider;
-        private readonly INpcModifierProvider _modifierProvider;
         private readonly IRandomNumberGenerator _rnd = new DefaultRandomNumberGenerator();
-
-        public NpcProvider(IAbilityProvider abilityProvider, INpcModifierProvider modifierProvider)
-        {
-            _abilityProvider = abilityProvider;
-            _modifierProvider = modifierProvider;
-        }
 
         public IReadOnlyList<string> Catalogs => [DataCatalog.Npc, DataCatalog.NpcBehaviors];
 
@@ -151,7 +143,7 @@ namespace LastBreath.Npc
         private List<INpcModifier> RollModifiers(EntityType entityType, Rarity rarity)
         {
             int count = NpcTypeDefaults.ModifierCount(entityType, rarity);
-            var pool = _modifierProvider.GetAllModifiers().ToList();
+            var pool = modifierProvider.GetAllModifiers().ToList();
 
             List<INpcModifier> rolled = [];
             while (rolled.Count < count && pool.Count > 0)
@@ -159,7 +151,7 @@ namespace LastBreath.Npc
                 long index = _rnd.RandWeighted(pool.Select(modifier => modifier.Weight).ToArray());
                 var picked = pool[Math.Max(0, (int)index)];
                 pool.Remove(picked);
-                rolled.Add(_modifierProvider.GetModifier(picked.Id));
+                rolled.Add(modifierProvider.GetModifier(picked.Id));
             }
 
             return rolled;
@@ -185,7 +177,7 @@ namespace LastBreath.Npc
             if (data.Abilities.Count > 0) return CreateAuthoredAbilities(data);
 
             int count = data.AbilityCount > 0 ? data.AbilityCount : NpcTypeDefaults.DefaultAbilityCount(entityType);
-            var pool = behavior.Abilities.Where(entry => _abilityProvider.KnownAbilityIds.Contains(entry.Id)).ToList();
+            var pool = behavior.Abilities.Where(entry => abilityProvider.KnownAbilityIds.Contains(entry.Id)).ToList();
 
             List<IAbility> picked = [];
             while (picked.Count < count && pool.Count > 0)
@@ -193,7 +185,7 @@ namespace LastBreath.Npc
                 long index = _rnd.RandWeighted(pool.Select(entry => entry.Weight).ToArray());
                 var entry = pool[Math.Max(0, (int)index)];
                 pool.Remove(entry);
-                picked.Add(_abilityProvider.CreateAbility(entry.Id));
+                picked.Add(abilityProvider.CreateAbility(entry.Id));
             }
 
             return picked;
@@ -205,13 +197,13 @@ namespace LastBreath.Npc
             List<IAbility> abilities = [];
             foreach (string abilityId in data.Abilities)
             {
-                if (!_abilityProvider.KnownAbilityIds.Contains(abilityId))
+                if (!abilityProvider.KnownAbilityIds.Contains(abilityId))
                 {
                     Core.Tracker.TrackNotFound($"Authored ability '{abilityId}' of npc '{data.Id}'", this);
                     continue;
                 }
 
-                abilities.Add(_abilityProvider.CreateAbility(abilityId));
+                abilities.Add(abilityProvider.CreateAbility(abilityId));
             }
 
             return abilities;

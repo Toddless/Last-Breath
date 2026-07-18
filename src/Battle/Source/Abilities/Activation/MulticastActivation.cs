@@ -23,9 +23,12 @@ namespace Battle.Source.Abilities.Activation
 
         private readonly RandomNumberGenerator _rnd = new();
 
+        /// <summary>Per-ability multicast bonus on top of the owner's MulticastChance (upgrades set it).</summary>
+        public float BonusChance { get; set; }
+
         public int Roll(IFightable owner)
         {
-            float multicast = owner.Parameters.GetValueForParameter(EntityParameter.MulticastChance);
+            float multicast = owner.Parameters.GetValueForParameter(EntityParameter.MulticastChance) + BonusChance;
             foreach (int stage in _baseStageChances.Keys.OrderByDescending(s => s))
             {
                 float cap = _stageChanceCaps.GetValueOrDefault(stage, 1f);

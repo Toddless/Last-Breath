@@ -202,6 +202,7 @@
             bar.SetIdentity(entity.DisplayName, entity is INpc npc ? Core.Localization.Localization.Localize($"Fraction_{npc.Fraction}") : null);
             bar.SetModifiers((entity as IFightableNpc)?.NpcModifiers.AllModifiers ?? []);
             bar.FlipH = true;
+            if (entity is IFightableNpc fightableNpc) bar.SetLevel(fightableNpc.Level);
             _characterBars.Add(entity.InstanceId, bar);
             _entityBars?.AddChild(bar);
         }

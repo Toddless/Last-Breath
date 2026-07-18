@@ -1,28 +1,28 @@
 # Loot simulation report
 
-Seed: `20260710`, date: 2026-07-17 19:32
+Seed: `20260710`, date: 2026-07-18 18:18
 
 ## Summary
 
 | Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty |
 |---|---|---|---|---|---|---|---|
 | Baseline_Regular | 10000 | 0 | 1.92 | 6.32 | 8 | 8.91 | 6.32 |
-| Baseline_Boss | 10000 | 0 | 12.77 | 469.01 | 710 | 344.54 | 469.01 |
-| Axis_Npc_Modifier_Scale_Double_Health | 10000 | 1.9 | 23.99 | 1249.3 | 1565 | 999.17 | 657.53 |
-| Axis_Npc_Modifier_Tier_Upgrade_To_Maximum | 10000 | 0.9 | 20.01 | 2631.18 | 4354 | 654.63 | 2923.54 |
-| Axis_Npc_Modifier_Tier_Upgrade_By_One | 10000 | 0.5 | 17.09 | 1384.69 | 2010 | 516.81 | 2769.39 |
-| Axis_Npc_Modifier_Guaranteed_Items_Crafting_Resource | 10000 | 0.4 | 20.31 | 655.28 | 926 | 482.36 | 1638.19 |
-| Axis_Npc_Modifier_Tier_Multiplier_Huge | 10000 | 0.3 | 15.33 | 598.46 | 872 | 447.9 | 1994.88 |
-| Axis_Npc_Modifier_Item_Effect_Vampire | 10000 | 0.3 | 15.34 | 599.21 | 859 | 447.9 | 1997.37 |
-| Axis_Npc_Modifier_Rarity_Upgrade_Huge | 10000 | 0.3 | 15.41 | 600.82 | 855 | 447.9 | 2002.75 |
-| Axis_Npc_Modifier_Min_Rarity_Epic | 10000 | 0.3 | 15.4 | 598.57 | 855 | 447.9 | 1995.24 |
-| Stack_1_mods | 10000 | 0.58 | 25.21 | 1883.64 | 3147 | 1651.36 | 3255.71 |
-| Stack_3_mods | 10000 | 1.75 | 26.5 | 3542.66 | 5966 | 2881.88 | 2018.8 |
-| Stack_5_mods | 10000 | 2.9 | 27.59 | 5411.58 | 9432 | 4077.92 | 1867.25 |
-| Stack_7_mods | 10000 | 4.08 | 28.59 | 7473.68 | 12156 | 5309.25 | 1833.94 |
-| Stack_11_mods | 10000 | 6.39 | 30.59 | 10806.57 | 13061 | 7731.46 | 1691 |
-| Extreme_Archon | 10000 | 6.39 | 30.56 | 11520.8 | 12667 | 14664.47 | 1802.93 |
-| Extreme_Lvl1 | 10000 | 0 | 1.91 | 5.83 | 6 | 6.75 | 5.83 |
+| Baseline_Boss | 10000 | 0 | 12.71 | 472.28 | 719 | 344.54 | 472.28 |
+| Axis_Npc_Modifier_Scale_Double_Health | 10000 | 1.9 | 23.88 | 1253.11 | 1568 | 999.17 | 659.53 |
+| Axis_Npc_Modifier_Tier_Upgrade_To_Maximum | 10000 | 0.9 | 19.82 | 2601.64 | 4274 | 654.63 | 2890.71 |
+| Axis_Npc_Modifier_Tier_Upgrade_By_One | 10000 | 0.5 | 16.91 | 1396.99 | 2018 | 516.81 | 2793.97 |
+| Axis_Npc_Modifier_Guaranteed_Items_Crafting_Resource | 10000 | 0.4 | 20.08 | 657.54 | 928 | 482.36 | 1643.85 |
+| Axis_Npc_Modifier_Tier_Multiplier_Huge | 10000 | 0.3 | 15.12 | 598.71 | 871 | 447.9 | 1995.69 |
+| Axis_Npc_Modifier_Item_Effect_Vampire | 10000 | 0.3 | 15.24 | 599.94 | 855 | 447.9 | 1999.8 |
+| Axis_Npc_Modifier_Rarity_Upgrade_Huge | 10000 | 0.3 | 15.31 | 602.41 | 871 | 447.9 | 2008.05 |
+| Axis_Npc_Modifier_Min_Rarity_Epic | 10000 | 0.3 | 15.16 | 599.47 | 865 | 447.9 | 1998.24 |
+| Stack_1_mods | 10000 | 0.58 | 25.19 | 1902.48 | 3160 | 1657.1 | 3257.4 |
+| Stack_3_mods | 10000 | 1.73 | 26.46 | 3522.51 | 6063 | 2859.8 | 2031.75 |
+| Stack_5_mods | 10000 | 2.92 | 27.54 | 5460.98 | 9530 | 4102.15 | 1869.36 |
+| Stack_7_mods | 10000 | 4.08 | 28.5 | 7493.13 | 12161 | 5311.85 | 1837.59 |
+| Stack_11_mods | 10000 | 6.4 | 30.56 | 10825.19 | 13107 | 7742.47 | 1691.13 |
+| Extreme_Archon | 10000 | 6.41 | 30.64 | 11528.49 | 12678 | 14707.83 | 1797.99 |
+| Extreme_Lvl1 | 10000 | 0 | 1.91 | 5.82 | 6 | 6.75 | 5.82 |
 
 ## Baseline_Regular
 
@@ -53,7 +53,7 @@ Top drops:
 - Crafting_Resource_Diamond_Gem: 1615
 - Upgrade_Resource_Jeweler_Rune: 787
 
-Orphans (91): Amulet_Dexterity_Intelligence, Amulet_Dexterity_Strength, Amulet_Goliath_Sign, Amulet_Life_Core, Amulet_Of_Recovery, Amulet_Onyx_Medallion, Amulet_Stronghold, Body_All_Evade_To_Armor, Body_Dexterity_Feral_Instinct, Body_Dexterity_Hunters_Dream, Body_Dexterity_Shadowstep, Body_Intelligence_Aegis, Body_Intelligence_Arcane_Bulwark, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Body_Porcupine, Body_Strength_Iron_Bastion, Body_Strength_Stoneheart, Body_Strength_Vital_Core, Boots_Dexterity_Feral_Instinct, Boots_Dexterity_Hunters_Dream, Boots_Dexterity_Shadowstep, Boots_Intelligence_Aegis, Boots_Intelligence_Arcane_Bulwark, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Iron_Bastion, Boots_Strength_Stoneheart, Boots_Strength_Vital_Core, Crafting_Resource_Essence_Critical_Chance, Gloves_Dexterity_Feral_Instinct, Gloves_Dexterity_Hunters_Dream, Gloves_Dexterity_Shadowstep, Gloves_Intelligence_Aegis, Gloves_Intelligence_Arcane_Bulwark, Gloves_Intelligence_Eternal_Reserve, Gloves_Strength_Iron_Bastion, Gloves_Strength_Stoneheart, Gloves_Strength_Vital_Core, Helmet_Dexterity_Feral_Instinct, Helmet_Dexterity_Hunters_Dream, Helmet_Dexterity_Shadowstep, Helmet_Intelligence_Aegis, Helmet_Intelligence_Arcane_Bulwark, Helmet_Intelligence_Eternal_Reserve, Helmet_Strength_Iron_Bastion, Helmet_Strength_Stoneheart, Helmet_Strength_Vital_Core, Recipe_Body_Dexterity_Shadowstep, Recipe_Body_Intelligence_Eternal_Reserve, Recipe_Body_Iron_Bastion, Recipe_Body_Strength_Iron_Bastion, Recipe_Boots_Dexterity_Shadowstep, Recipe_Boots_Intelligence_Eternal_Reserve, Recipe_Boots_Iron_Bastion, Recipe_Gloves_Dexterity_Shadowstep, Recipe_Gloves_Intelligence_Eternal_Reserve, Recipe_Gloves_Iron_Bastion, Recipe_Helmet_Dexterity_Shadowstep, Recipe_Helmet_Intelligence_Eternal_Reserve, Recipe_Helmet_Iron_Bastion, Recipe_Weapon_Simple_Axe, Recipe_Weapon_Simple_Dagger, Recipe_Weapon_Simple_Sword, Ring_Dexterity, Ring_Hell_Servant, Ring_Intelligence, Ring_of_Creators, Ring_Of_Fire_Demon, Ring_of_Hunter, Ring_Of_Legionnaire, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Armor_Dust, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Blacksmith_Rune, Upgrade_Resource_Fine_Flux, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Jewellery_Dust, Upgrade_Resource_Journeyman_Rune, Upgrade_Resource_Master_Rune, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Quality_Flux, Upgrade_Resource_Simple_Flux, Upgrade_Resource_Weapon_Dust, Upgrade_Resource_Weapon_Rune, Upgrade_Resource_Weaponsmith_Mark, Weapon_Bloodthirsty, Weapon_Silent_Fury, Weapon_Simple_Axe, Weapon_Simple_Dagger, Weapon_Simple_Sword
+Orphans (89): Amulet_Goliath_Seal, Amulet_Onyx_Medallion, Amulet_Pathfinder_Sign, Amulet_Recovery_Source, Amulet_Ruby, Amulet_Trapper_Talisman, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Feral_Instinct, Body_Hunter_Chestplate, Body_Hunters_Dream, Body_Mysterious_Bastion, Body_Porcupine, Body_Steel_Bastion, Body_Stoneheart, Body_Vital_Core, Boots_Aegis, Boots_Archmage_Sandals, Boots_Feral_Instinct, Boots_Hunter, Boots_Hunters_Dream, Boots_Mysterious_Bastion, Boots_Steel_Greaves, Boots_Stone_Tread, Boots_Vital_Core, Crafting_Resource_Essence_Critical_Chance, Gloves_Aegis, Gloves_Archmage, Gloves_Feral_Instinct, Gloves_Hunter, Gloves_Hunters_Dream, Gloves_Mysterious_Bastion, Gloves_Steel, Gloves_Stoneheart, Gloves_Vital_Core, Helmet_Aegis, Helmet_Archmage_Cap, Helmet_Feral_Instinct, Helmet_Hunter, Helmet_Hunters_Dream, Helmet_Mysterious_Bastion, Helmet_Steel, Helmet_Stoneheart, Helmet_Vital_Core, Recipe_Body_Archmage_Mantle, Recipe_Body_Hunter_Chestplate, Recipe_Body_Iron_Bastion, Recipe_Body_Steel_Bastion, Recipe_Boots_Archmage_Sandals, Recipe_Boots_Hunter, Recipe_Boots_Iron_Bastion, Recipe_Gloves_Archmage, Recipe_Gloves_Hunter, Recipe_Gloves_Iron_Bastion, Recipe_Helmet_Archmage_Cap, Recipe_Helmet_Hunter, Recipe_Helmet_Iron_Bastion, Recipe_Weapon_Simple_Axe, Recipe_Weapon_Simple_Dagger, Recipe_Weapon_Simple_Sword, Ring_Dexterity, Ring_Hell_Servant, Ring_Intelligence, Ring_of_Creators, Ring_Of_Fire_Demon, Ring_of_Hunter, Ring_Of_Legionnaire, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Armor_Dust, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Blacksmith_Rune, Upgrade_Resource_Fine_Flux, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Jewellery_Dust, Upgrade_Resource_Journeyman_Rune, Upgrade_Resource_Master_Rune, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Quality_Flux, Upgrade_Resource_Simple_Flux, Upgrade_Resource_Weapon_Dust, Upgrade_Resource_Weapon_Rune, Upgrade_Resource_Weaponsmith_Mark, Weapon_Bloodthirsty, Weapon_Silent_Fury, Weapon_Simple_Axe, Weapon_Simple_Dagger, Weapon_Simple_Sword
 
 ## Baseline_Boss
 
@@ -62,35 +62,35 @@ Boss/Legendary/lvl 50, modifiers: []
 | Tier | Rolls | Share |
 |---|---|---|
 | 0 | 0 | 0% |
-| 1 | 896 | 0.7% |
-| 2 | 32844 | 25.72% |
-| 3 | 93936 | 73.57% |
+| 1 | 828 | 0.65% |
+| 2 | 32559 | 25.61% |
+| 3 | 93756 | 73.74% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 87 | 0.07% |
-| Epic | 14903 | 11.67% |
-| Rare | 12446 | 9.75% |
-| Uncommon | 100240 | 78.51% |
+| Legendary | 84 | 0.07% |
+| Epic | 15008 | 11.8% |
+| Rare | 12260 | 9.64% |
+| Uncommon | 99791 | 78.49% |
 
 Top drops:
-- Crafting_Resource_Gold_Ore: 4375
-- Crafting_Resource_Wild_Boar_Leather: 4353
-- Upgrade_Resource_Jewellery_Dust: 4346
-- Upgrade_Resource_Armor_Dust: 4342
-- Crafting_Resource_Deer_Leather: 4326
-- Upgrade_Resource_Weapon_Dust: 4298
-- Crafting_Resource_Linen_Fabric: 4293
-- Crafting_Resource_Ruby_Gem: 4285
-- Crafting_Resource_Emerald_Gem: 4284
-- Crafting_Resource_Copper_Ore: 4284
-- Crafting_Resource_Iron_Ore: 4245
-- Crafting_Resource_Diamond_Gem: 4204
-- Crafting_Resource_Silk_Fabric: 4170
-- Boots_Intelligence_Arcane_Bulwark: 3084
-- Amulet_Of_Recovery: 2983
+- Upgrade_Resource_Weapon_Dust: 4486
+- Upgrade_Resource_Armor_Dust: 4432
+- Upgrade_Resource_Jewellery_Dust: 4376
+- Crafting_Resource_Gold_Ore: 4338
+- Crafting_Resource_Ruby_Gem: 4321
+- Crafting_Resource_Copper_Ore: 4283
+- Crafting_Resource_Linen_Fabric: 4282
+- Crafting_Resource_Wild_Boar_Leather: 4276
+- Crafting_Resource_Diamond_Gem: 4254
+- Crafting_Resource_Iron_Ore: 4246
+- Crafting_Resource_Deer_Leather: 4243
+- Crafting_Resource_Silk_Fabric: 4232
+- Crafting_Resource_Emerald_Gem: 4167
+- Gloves_Mysterious_Bastion: 3056
+- Boots_Mysterious_Bastion: 2962
 
-Orphans (32): Amulet_Creators_Nature, Amulet_Goliath_Sign, Amulet_Onyx_Medallion, Belt_Mana_Flow, Body_All_Evade_To_Armor, Body_Dexterity_Hunters_Dream, Body_Intelligence_Aegis, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Body_Porcupine, Body_Strength_Vital_Core, Boots_Dexterity_Hunters_Dream, Boots_Intelligence_Aegis, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Vital_Core, Creators_Cloak, Gloves_Dexterity_Hunters_Dream, Gloves_Intelligence_Aegis, Gloves_Intelligence_Eternal_Reserve, Gloves_Strength_Vital_Core, Helmet_Dexterity_Hunters_Dream, Helmet_Intelligence_Aegis, Helmet_Intelligence_Eternal_Reserve, Helmet_Strength_Vital_Core, Ring_Hell_Servant, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
+Orphans (31): Amulet_Creators_Nature, Amulet_Goliath_Seal, Amulet_Onyx_Medallion, Belt_Mana_Flow, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Hunters_Dream, Body_Porcupine, Body_Vital_Core, Boots_Aegis, Boots_Archmage_Sandals, Boots_Hunters_Dream, Boots_Vital_Core, Cloak_Creators_Cassock, Gloves_Aegis, Gloves_Archmage, Gloves_Hunters_Dream, Gloves_Vital_Core, Helmet_Aegis, Helmet_Archmage_Cap, Helmet_Hunters_Dream, Helmet_Vital_Core, Ring_Hell_Servant, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
 
 ## Axis_Npc_Modifier_Scale_Double_Health
 
@@ -98,36 +98,36 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Scale_Double_Health]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 1000 | 0.42% |
-| 1 | 4465 | 1.86% |
-| 2 | 87817 | 36.6% |
-| 3 | 146628 | 61.12% |
+| 0 | 960 | 0.4% |
+| 1 | 3976 | 1.67% |
+| 2 | 87061 | 36.46% |
+| 3 | 146788 | 61.47% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 266 | 0.11% |
-| Epic | 43898 | 18.3% |
-| Rare | 29897 | 12.46% |
-| Uncommon | 165581 | 69.02% |
-| Unique | 151 | 0.06% |
-| Mythic | 117 | 0.05% |
+| Legendary | 251 | 0.11% |
+| Epic | 44083 | 18.46% |
+| Rare | 29741 | 12.46% |
+| Uncommon | 164446 | 68.87% |
+| Unique | 175 | 0.07% |
+| Mythic | 89 | 0.04% |
 
 Top drops:
-- Upgrade_Resource_Armor_Dust: 9365
-- Upgrade_Resource_Weapon_Dust: 9228
-- Upgrade_Resource_Jewellery_Dust: 9171
-- Body_Intelligence_Arcane_Bulwark: 5802
-- Crafting_Resource_Essence_Barrier: 5778
-- Boots_Intelligence_Arcane_Bulwark: 5740
-- Upgrade_Resource_Weapon_Rune: 5672
-- Crafting_Resource_Essence_Damage: 5605
-- Upgrade_Resource_Jeweler_Rune: 5602
-- Amulet_Of_Recovery: 5600
-- Recipe_Weapon_Simple_Sword: 5596
-- Upgrade_Resource_Apprentice_Rune: 5541
-- Recipe_Weapon_Simple_Dagger: 5532
-- Recipe_Weapon_Simple_Axe: 5510
-- Upgrade_Resource_Blacksmith_Rune: 5508
+- Upgrade_Resource_Weapon_Dust: 9354
+- Upgrade_Resource_Armor_Dust: 9353
+- Upgrade_Resource_Jewellery_Dust: 9258
+- Crafting_Resource_Essence_Barrier: 5739
+- Body_Mysterious_Bastion: 5690
+- Upgrade_Resource_Weapon_Rune: 5667
+- Recipe_Weapon_Simple_Dagger: 5660
+- Amulet_Recovery_Source: 5646
+- Upgrade_Resource_Blacksmith_Rune: 5639
+- Gloves_Mysterious_Bastion: 5634
+- Upgrade_Resource_Simple_Flux: 5550
+- Upgrade_Resource_Jeweler_Rune: 5547
+- Upgrade_Resource_Apprentice_Rune: 5535
+- Boots_Mysterious_Bastion: 5532
+- Crafting_Resource_Essence_Damage: 5525
 
 No orphan items — every table entry dropped at least once.
 
@@ -137,36 +137,36 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Tier_Upgrade_To_Maximum]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 40342 | 20.16% |
-| 1 | 1161 | 0.58% |
-| 2 | 48093 | 24.03% |
-| 3 | 110537 | 55.23% |
+| 0 | 39569 | 19.97% |
+| 1 | 1117 | 0.56% |
+| 2 | 47604 | 24.02% |
+| 3 | 109888 | 55.45% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 2688 | 1.34% |
-| Epic | 26933 | 13.46% |
-| Rare | 22865 | 11.42% |
-| Uncommon | 131342 | 65.63% |
-| Unique | 7549 | 3.77% |
-| Mythic | 8756 | 4.38% |
+| Legendary | 2773 | 1.4% |
+| Epic | 27015 | 13.63% |
+| Rare | 23124 | 11.67% |
+| Uncommon | 129946 | 65.57% |
+| Unique | 7654 | 3.86% |
+| Mythic | 7666 | 3.87% |
 
 Top drops:
-- Upgrade_Resource_Weapon_Dust: 5783
-- Upgrade_Resource_Armor_Dust: 5706
-- Upgrade_Resource_Jewellery_Dust: 5683
-- Crafting_Resource_Deer_Leather: 4530
-- Crafting_Resource_Linen_Fabric: 4452
-- Crafting_Resource_Emerald_Gem: 4419
+- Upgrade_Resource_Weapon_Dust: 5875
+- Upgrade_Resource_Jewellery_Dust: 5765
+- Upgrade_Resource_Armor_Dust: 5648
+- Crafting_Resource_Emerald_Gem: 4517
+- Crafting_Resource_Iron_Ore: 4504
+- Crafting_Resource_Linen_Fabric: 4457
+- Crafting_Resource_Silk_Fabric: 4439
+- Crafting_Resource_Deer_Leather: 4411
 - Crafting_Resource_Gold_Ore: 4399
-- Crafting_Resource_Ruby_Gem: 4397
-- Crafting_Resource_Iron_Ore: 4394
-- Crafting_Resource_Copper_Ore: 4388
-- Crafting_Resource_Wild_Boar_Leather: 4377
-- Crafting_Resource_Silk_Fabric: 4370
-- Crafting_Resource_Diamond_Gem: 4348
-- Amulet_Of_Recovery: 3881
-- Boots_Intelligence_Arcane_Bulwark: 3876
+- Crafting_Resource_Diamond_Gem: 4370
+- Crafting_Resource_Wild_Boar_Leather: 4369
+- Crafting_Resource_Ruby_Gem: 4320
+- Crafting_Resource_Copper_Ore: 4289
+- Body_Mysterious_Bastion: 3844
+- Boots_Mysterious_Bastion: 3813
 
 No orphan items — every table entry dropped at least once.
 
@@ -176,36 +176,36 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Tier_Upgrade_By_One]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 797 | 0.47% |
-| 1 | 24131 | 14.12% |
-| 2 | 85315 | 49.91% |
-| 3 | 60705 | 35.51% |
+| 0 | 734 | 0.43% |
+| 1 | 23939 | 14.16% |
+| 2 | 84457 | 49.95% |
+| 3 | 59965 | 35.46% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 201 | 0.12% |
-| Epic | 46906 | 27.44% |
-| Rare | 28623 | 16.74% |
-| Uncommon | 94941 | 55.54% |
-| Unique | 163 | 0.1% |
-| Mythic | 114 | 0.07% |
+| Legendary | 232 | 0.14% |
+| Epic | 47353 | 28% |
+| Rare | 28061 | 16.59% |
+| Uncommon | 93231 | 55.14% |
+| Unique | 122 | 0.07% |
+| Mythic | 96 | 0.06% |
 
 Top drops:
-- Upgrade_Resource_Jewellery_Dust: 5374
-- Upgrade_Resource_Weapon_Dust: 5250
-- Upgrade_Resource_Armor_Dust: 5227
-- Helmet_Dexterity_Feral_Instinct: 4643
-- Body_Dexterity_Feral_Instinct: 4614
-- Gloves_Dexterity_Feral_Instinct: 4573
-- Amulet_Life_Core: 3549
-- Belt: 3478
-- Ring_Intelligence: 3347
-- Ring_Dexterity: 3330
-- Recipe_Body_Intelligence_Aegis: 3259
-- Belt_Of_Life: 3152
-- Crafting_Resource_Essence_Barrier: 3058
-- Upgrade_Resource_Journeyman_Rune: 3034
-- Recipe_Boots_Intelligence_Eternal_Reserve: 3024
+- Upgrade_Resource_Weapon_Dust: 5419
+- Upgrade_Resource_Jewellery_Dust: 5379
+- Upgrade_Resource_Armor_Dust: 5353
+- Gloves_Feral_Instinct: 4851
+- Body_Feral_Instinct: 4790
+- Helmet_Feral_Instinct: 4693
+- Amulet_Ruby: 3602
+- Ring_Intelligence: 3506
+- Ring_Dexterity: 3496
+- Recipe_Body_Aegis: 3481
+- Belt_Of_Life: 3190
+- Upgrade_Resource_Fine_Flux: 3159
+- Recipe_Gloves_Iron_Bastion: 3136
+- Recipe_Body_Steel_Bastion: 3130
+- Recipe_Boots_Hunter: 3113
 
 No orphan items — every table entry dropped at least once.
 
@@ -215,37 +215,37 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Guaranteed_Items_Crafting_Resour
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 190 | 0.12% |
-| 1 | 1109 | 0.68% |
-| 2 | 45013 | 27.6% |
-| 3 | 116759 | 71.6% |
+| 0 | 202 | 0.13% |
+| 1 | 990 | 0.62% |
+| 2 | 44344 | 27.58% |
+| 3 | 115247 | 71.68% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 112 | 0.06% |
-| Epic | 21080 | 10.38% |
-| Rare | 16684 | 8.22% |
-| Uncommon | 165172 | 81.34% |
-| Unique | 23 | 0.01% |
+| Legendary | 110 | 0.05% |
+| Epic | 21487 | 10.7% |
+| Rare | 16145 | 8.04% |
+| Uncommon | 163019 | 81.19% |
+| Unique | 22 | 0.01% |
 
 Top drops:
-- Crafting_Resource_Copper_Ore: 15056
-- Crafting_Resource_Deer_Leather: 15049
-- Crafting_Resource_Diamond_Gem: 15008
-- Crafting_Resource_Linen_Fabric: 14971
-- Upgrade_Resource_Weapon_Dust: 5699
-- Upgrade_Resource_Jewellery_Dust: 5602
-- Upgrade_Resource_Armor_Dust: 5595
-- Crafting_Resource_Gold_Ore: 5113
-- Crafting_Resource_Wild_Boar_Leather: 5075
-- Crafting_Resource_Ruby_Gem: 5062
-- Crafting_Resource_Iron_Ore: 5049
-- Crafting_Resource_Emerald_Gem: 5013
+- Crafting_Resource_Linen_Fabric: 15039
+- Crafting_Resource_Diamond_Gem: 14993
+- Crafting_Resource_Copper_Ore: 14987
+- Crafting_Resource_Deer_Leather: 14936
+- Upgrade_Resource_Armor_Dust: 5842
+- Upgrade_Resource_Jewellery_Dust: 5703
+- Upgrade_Resource_Weapon_Dust: 5668
+- Crafting_Resource_Emerald_Gem: 5003
+- Crafting_Resource_Gold_Ore: 5003
+- Crafting_Resource_Wild_Boar_Leather: 4973
 - Crafting_Resource_Silk_Fabric: 4965
-- Body_Intelligence_Arcane_Bulwark: 3906
-- Crafting_Resource_Essence_Barrier: 3864
+- Crafting_Resource_Iron_Ore: 4942
+- Crafting_Resource_Ruby_Gem: 4912
+- Body_Mysterious_Bastion: 3860
+- Amulet_Recovery_Source: 3828
 
-Orphans (11): Amulet_Creators_Nature, Amulet_Goliath_Sign, Body_All_Evade_To_Armor, Body_Intelligence_Aegis, Boots_Intelligence_Aegis, Creators_Cloak, Helmet_Intelligence_Aegis, Ring_of_Creators, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Weaponsmith_Mark
+Orphans (11): Amulet_Creators_Nature, Amulet_Goliath_Seal, Body_Aegis, Body_Carapace, Boots_Aegis, Cloak_Creators_Cassock, Helmet_Aegis, Ring_of_Creators, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Weaponsmith_Mark
 
 ## Axis_Npc_Modifier_Tier_Multiplier_Huge
 
@@ -253,37 +253,37 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Tier_Multiplier_Huge]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 263 | 0.17% |
-| 1 | 1201 | 0.78% |
-| 2 | 41411 | 27.02% |
-| 3 | 110387 | 72.03% |
+| 0 | 271 | 0.18% |
+| 1 | 1057 | 0.7% |
+| 2 | 40772 | 26.96% |
+| 3 | 109132 | 72.16% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 95 | 0.06% |
-| Epic | 19310 | 12.6% |
-| Rare | 15427 | 10.07% |
-| Uncommon | 118398 | 77.25% |
-| Unique | 32 | 0.02% |
+| Legendary | 104 | 0.07% |
+| Epic | 19745 | 13.06% |
+| Rare | 15086 | 9.98% |
+| Uncommon | 116267 | 76.88% |
+| Unique | 30 | 0.02% |
 
 Top drops:
-- Upgrade_Resource_Armor_Dust: 5363
-- Upgrade_Resource_Weapon_Dust: 5300
-- Upgrade_Resource_Jewellery_Dust: 5259
-- Crafting_Resource_Gold_Ore: 4959
-- Crafting_Resource_Ruby_Gem: 4905
-- Crafting_Resource_Linen_Fabric: 4878
-- Crafting_Resource_Emerald_Gem: 4844
-- Crafting_Resource_Deer_Leather: 4831
-- Crafting_Resource_Wild_Boar_Leather: 4809
-- Crafting_Resource_Diamond_Gem: 4803
-- Crafting_Resource_Iron_Ore: 4800
-- Crafting_Resource_Copper_Ore: 4748
-- Crafting_Resource_Silk_Fabric: 4728
-- Boots_Intelligence_Arcane_Bulwark: 3635
-- Amulet_Of_Recovery: 3606
+- Upgrade_Resource_Weapon_Dust: 5356
+- Upgrade_Resource_Armor_Dust: 5289
+- Upgrade_Resource_Jewellery_Dust: 5222
+- Crafting_Resource_Wild_Boar_Leather: 4863
+- Crafting_Resource_Gold_Ore: 4840
+- Crafting_Resource_Iron_Ore: 4827
+- Crafting_Resource_Emerald_Gem: 4783
+- Crafting_Resource_Linen_Fabric: 4782
+- Crafting_Resource_Silk_Fabric: 4763
+- Crafting_Resource_Ruby_Gem: 4762
+- Crafting_Resource_Deer_Leather: 4714
+- Crafting_Resource_Copper_Ore: 4705
+- Crafting_Resource_Diamond_Gem: 4641
+- Gloves_Mysterious_Bastion: 3623
+- Boots_Mysterious_Bastion: 3605
 
-Orphans (21): Amulet_Creators_Nature, Amulet_Goliath_Sign, Body_All_Evade_To_Armor, Body_Dexterity_Hunters_Dream, Body_Intelligence_Aegis, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Boots_Intelligence_Aegis, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Vital_Core, Creators_Cloak, Gloves_Intelligence_Eternal_Reserve, Helmet_Dexterity_Hunters_Dream, Helmet_Intelligence_Aegis, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
+Orphans (20): Amulet_Creators_Nature, Amulet_Goliath_Seal, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Hunters_Dream, Boots_Aegis, Boots_Archmage_Sandals, Boots_Vital_Core, Cloak_Creators_Cassock, Gloves_Archmage, Helmet_Aegis, Helmet_Hunters_Dream, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
 
 ## Axis_Npc_Modifier_Item_Effect_Vampire
 
@@ -291,37 +291,37 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Item_Effect_Vampire]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 166 | 0.11% |
-| 1 | 1006 | 0.66% |
-| 2 | 41992 | 27.38% |
-| 3 | 110204 | 71.86% |
+| 0 | 183 | 0.12% |
+| 1 | 913 | 0.6% |
+| 2 | 41354 | 27.13% |
+| 3 | 109985 | 72.15% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 132 | 0.09% |
-| Epic | 19791 | 12.9% |
-| Rare | 15379 | 10.03% |
-| Uncommon | 118053 | 76.97% |
-| Unique | 13 | 0.01% |
+| Legendary | 114 | 0.07% |
+| Epic | 19866 | 13.03% |
+| Rare | 15083 | 9.89% |
+| Uncommon | 117350 | 76.98% |
+| Unique | 22 | 0.01% |
 
 Top drops:
-- Upgrade_Resource_Jewellery_Dust: 5345
-- Upgrade_Resource_Weapon_Dust: 5258
-- Upgrade_Resource_Armor_Dust: 5205
-- Crafting_Resource_Linen_Fabric: 4913
-- Crafting_Resource_Ruby_Gem: 4889
-- Crafting_Resource_Gold_Ore: 4877
-- Crafting_Resource_Deer_Leather: 4847
-- Crafting_Resource_Iron_Ore: 4837
-- Crafting_Resource_Copper_Ore: 4818
-- Crafting_Resource_Wild_Boar_Leather: 4796
-- Crafting_Resource_Diamond_Gem: 4782
-- Crafting_Resource_Silk_Fabric: 4750
-- Crafting_Resource_Emerald_Gem: 4704
-- Gloves_Intelligence_Arcane_Bulwark: 3633
-- Crafting_Resource_Essence_Barrier: 3632
+- Upgrade_Resource_Weapon_Dust: 5522
+- Upgrade_Resource_Jewellery_Dust: 5283
+- Upgrade_Resource_Armor_Dust: 5217
+- Crafting_Resource_Deer_Leather: 5016
+- Crafting_Resource_Ruby_Gem: 4873
+- Crafting_Resource_Copper_Ore: 4859
+- Crafting_Resource_Wild_Boar_Leather: 4852
+- Crafting_Resource_Linen_Fabric: 4845
+- Crafting_Resource_Silk_Fabric: 4813
+- Crafting_Resource_Emerald_Gem: 4794
+- Crafting_Resource_Iron_Ore: 4760
+- Crafting_Resource_Diamond_Gem: 4758
+- Crafting_Resource_Gold_Ore: 4746
+- Gloves_Mysterious_Bastion: 3632
+- Amulet_Recovery_Source: 3603
 
-Orphans (21): Amulet_Creators_Nature, Amulet_Goliath_Sign, Body_All_Evade_To_Armor, Body_Dexterity_Hunters_Dream, Body_Intelligence_Aegis, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Boots_Intelligence_Aegis, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Vital_Core, Creators_Cloak, Gloves_Intelligence_Eternal_Reserve, Helmet_Dexterity_Hunters_Dream, Helmet_Intelligence_Aegis, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
+Orphans (20): Amulet_Creators_Nature, Amulet_Goliath_Seal, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Hunters_Dream, Boots_Aegis, Boots_Archmage_Sandals, Boots_Vital_Core, Cloak_Creators_Cassock, Gloves_Archmage, Helmet_Aegis, Helmet_Hunters_Dream, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
 
 ## Axis_Npc_Modifier_Rarity_Upgrade_Huge
 
@@ -329,37 +329,37 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Rarity_Upgrade_Huge]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 194 | 0.13% |
-| 1 | 985 | 0.64% |
-| 2 | 41807 | 27.12% |
-| 3 | 111162 | 72.11% |
+| 0 | 155 | 0.1% |
+| 1 | 971 | 0.63% |
+| 2 | 41466 | 27.08% |
+| 3 | 110523 | 72.18% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 120 | 0.08% |
-| Epic | 23038 | 14.95% |
-| Rare | 14449 | 9.37% |
-| Uncommon | 116517 | 75.59% |
+| Legendary | 103 | 0.07% |
+| Epic | 22774 | 14.87% |
+| Rare | 14244 | 9.3% |
+| Uncommon | 115970 | 75.74% |
 | Unique | 24 | 0.02% |
 
 Top drops:
-- Upgrade_Resource_Weapon_Dust: 5369
-- Upgrade_Resource_Jewellery_Dust: 5334
-- Upgrade_Resource_Armor_Dust: 5260
-- Crafting_Resource_Linen_Fabric: 4936
-- Crafting_Resource_Wild_Boar_Leather: 4890
-- Crafting_Resource_Ruby_Gem: 4878
-- Crafting_Resource_Diamond_Gem: 4868
-- Crafting_Resource_Gold_Ore: 4845
-- Crafting_Resource_Emerald_Gem: 4816
-- Crafting_Resource_Silk_Fabric: 4807
-- Crafting_Resource_Copper_Ore: 4803
-- Crafting_Resource_Iron_Ore: 4794
-- Crafting_Resource_Deer_Leather: 4713
-- Boots_Intelligence_Arcane_Bulwark: 3743
-- Crafting_Resource_Essence_Barrier: 3692
+- Upgrade_Resource_Weapon_Dust: 5487
+- Upgrade_Resource_Armor_Dust: 5456
+- Upgrade_Resource_Jewellery_Dust: 5408
+- Crafting_Resource_Iron_Ore: 4941
+- Crafting_Resource_Copper_Ore: 4876
+- Crafting_Resource_Wild_Boar_Leather: 4865
+- Crafting_Resource_Ruby_Gem: 4821
+- Crafting_Resource_Linen_Fabric: 4821
+- Crafting_Resource_Silk_Fabric: 4815
+- Crafting_Resource_Diamond_Gem: 4797
+- Crafting_Resource_Gold_Ore: 4787
+- Crafting_Resource_Emerald_Gem: 4772
+- Crafting_Resource_Deer_Leather: 4752
+- Amulet_Recovery_Source: 3636
+- Body_Mysterious_Bastion: 3620
 
-Orphans (21): Amulet_Creators_Nature, Amulet_Goliath_Sign, Body_All_Evade_To_Armor, Body_Dexterity_Hunters_Dream, Body_Intelligence_Aegis, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Boots_Intelligence_Aegis, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Vital_Core, Creators_Cloak, Gloves_Intelligence_Eternal_Reserve, Helmet_Dexterity_Hunters_Dream, Helmet_Intelligence_Aegis, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
+Orphans (20): Amulet_Creators_Nature, Amulet_Goliath_Seal, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Hunters_Dream, Boots_Aegis, Boots_Archmage_Sandals, Boots_Vital_Core, Cloak_Creators_Cassock, Gloves_Archmage, Helmet_Aegis, Helmet_Hunters_Dream, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
 
 ## Axis_Npc_Modifier_Min_Rarity_Epic
 
@@ -367,37 +367,37 @@ Boss/Legendary/lvl 50, modifiers: [Npc_Modifier_Min_Rarity_Epic]
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 181 | 0.12% |
-| 1 | 989 | 0.64% |
-| 2 | 41998 | 27.27% |
-| 3 | 110814 | 71.97% |
+| 0 | 205 | 0.14% |
+| 1 | 949 | 0.63% |
+| 2 | 41414 | 27.33% |
+| 3 | 108991 | 71.91% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 129 | 0.08% |
-| Epic | 49535 | 32.17% |
-| Rare | 5640 | 3.66% |
-| Uncommon | 98652 | 64.07% |
-| Unique | 26 | 0.02% |
+| Legendary | 94 | 0.06% |
+| Epic | 48047 | 31.7% |
+| Rare | 5969 | 3.94% |
+| Uncommon | 97416 | 64.28% |
+| Unique | 33 | 0.02% |
 
 Top drops:
-- Upgrade_Resource_Armor_Dust: 5470
-- Upgrade_Resource_Jewellery_Dust: 5325
-- Upgrade_Resource_Weapon_Dust: 5252
-- Crafting_Resource_Iron_Ore: 5011
-- Crafting_Resource_Linen_Fabric: 4897
-- Crafting_Resource_Ruby_Gem: 4893
-- Crafting_Resource_Gold_Ore: 4884
-- Crafting_Resource_Diamond_Gem: 4809
-- Crafting_Resource_Deer_Leather: 4791
-- Crafting_Resource_Emerald_Gem: 4778
-- Crafting_Resource_Silk_Fabric: 4770
-- Crafting_Resource_Copper_Ore: 4763
-- Crafting_Resource_Wild_Boar_Leather: 4717
-- Amulet_Of_Recovery: 3709
-- Body_Intelligence_Arcane_Bulwark: 3702
+- Upgrade_Resource_Jewellery_Dust: 5352
+- Upgrade_Resource_Armor_Dust: 5317
+- Upgrade_Resource_Weapon_Dust: 5315
+- Crafting_Resource_Emerald_Gem: 4846
+- Crafting_Resource_Deer_Leather: 4830
+- Crafting_Resource_Iron_Ore: 4792
+- Crafting_Resource_Gold_Ore: 4776
+- Crafting_Resource_Copper_Ore: 4765
+- Crafting_Resource_Silk_Fabric: 4754
+- Crafting_Resource_Wild_Boar_Leather: 4749
+- Crafting_Resource_Ruby_Gem: 4738
+- Crafting_Resource_Linen_Fabric: 4708
+- Crafting_Resource_Diamond_Gem: 4667
+- Amulet_Recovery_Source: 3641
+- Body_Mysterious_Bastion: 3567
 
-Orphans (21): Amulet_Creators_Nature, Amulet_Goliath_Sign, Body_All_Evade_To_Armor, Body_Dexterity_Hunters_Dream, Body_Intelligence_Aegis, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Boots_Intelligence_Aegis, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Vital_Core, Creators_Cloak, Gloves_Intelligence_Eternal_Reserve, Helmet_Dexterity_Hunters_Dream, Helmet_Intelligence_Aegis, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
+Orphans (20): Amulet_Creators_Nature, Amulet_Goliath_Seal, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Hunters_Dream, Boots_Aegis, Boots_Archmage_Sandals, Boots_Vital_Core, Cloak_Creators_Cassock, Gloves_Archmage, Helmet_Aegis, Helmet_Hunters_Dream, Ring_of_Creators, Ring_Of_Fire_Demon, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Weaponsmith_Mark
 
 ## Stack_1_mods
 
@@ -405,36 +405,36 @@ Boss/Mythic/lvl 100, modifiers: [] + 1 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 8378 | 3.39% |
-| 1 | 14013 | 5.67% |
-| 2 | 108540 | 43.94% |
-| 3 | 116094 | 47% |
+| 0 | 8358 | 3.38% |
+| 1 | 13602 | 5.51% |
+| 2 | 107988 | 43.73% |
+| 3 | 117002 | 47.38% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 1352 | 0.54% |
-| Epic | 59675 | 23.67% |
-| Rare | 36275 | 14.39% |
-| Uncommon | 151707 | 60.18% |
-| Unique | 1593 | 0.63% |
-| Mythic | 1496 | 0.59% |
+| Legendary | 1345 | 0.53% |
+| Epic | 60458 | 24% |
+| Rare | 35779 | 14.2% |
+| Uncommon | 151448 | 60.11% |
+| Unique | 1602 | 0.64% |
+| Mythic | 1314 | 0.52% |
 
 Top drops:
-- Upgrade_Resource_Armor_Dust: 10066
-- Upgrade_Resource_Jewellery_Dust: 9900
-- Upgrade_Resource_Weapon_Dust: 9847
-- Helmet_Dexterity_Feral_Instinct: 5916
-- Body_Dexterity_Feral_Instinct: 5805
-- Gloves_Dexterity_Feral_Instinct: 5723
-- Recipe_Weapon_Simple_Sword: 5395
-- Recipe_Weapon_Simple_Dagger: 5389
-- Upgrade_Resource_Weapon_Rune: 5380
-- Recipe_Weapon_Simple_Axe: 5375
-- Helmet_Intelligence_Arcane_Bulwark: 5364
-- Upgrade_Resource_Apprentice_Rune: 5345
-- Upgrade_Resource_Blacksmith_Rune: 5282
-- Upgrade_Resource_Jeweler_Rune: 5246
-- Amulet_Life_Core: 5091
+- Upgrade_Resource_Armor_Dust: 10323
+- Upgrade_Resource_Weapon_Dust: 10233
+- Upgrade_Resource_Jewellery_Dust: 10131
+- Helmet_Feral_Instinct: 6295
+- Body_Feral_Instinct: 6104
+- Gloves_Feral_Instinct: 5944
+- Helmet_Mysterious_Bastion: 5471
+- Recipe_Weapon_Simple_Sword: 5470
+- Upgrade_Resource_Apprentice_Rune: 5383
+- Recipe_Weapon_Simple_Axe: 5380
+- Amulet_Ruby: 5368
+- Upgrade_Resource_Jeweler_Rune: 5351
+- Upgrade_Resource_Blacksmith_Rune: 5334
+- Recipe_Weapon_Simple_Dagger: 5326
+- Upgrade_Resource_Weapon_Rune: 5188
 
 No orphan items — every table entry dropped at least once.
 
@@ -444,36 +444,36 @@ Boss/Mythic/lvl 100, modifiers: [] + 3 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 31862 | 12.76% |
-| 1 | 36169 | 14.49% |
-| 2 | 126743 | 50.77% |
-| 3 | 54869 | 21.98% |
+| 0 | 30876 | 12.37% |
+| 1 | 34833 | 13.96% |
+| 2 | 126928 | 50.86% |
+| 3 | 56935 | 22.81% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 4382 | 1.65% |
-| Epic | 81917 | 30.91% |
-| Rare | 51590 | 19.46% |
-| Uncommon | 114684 | 43.27% |
-| Unique | 6025 | 2.27% |
-| Mythic | 6445 | 2.43% |
+| Legendary | 4510 | 1.7% |
+| Epic | 82105 | 31.02% |
+| Rare | 50951 | 19.25% |
+| Uncommon | 115699 | 43.72% |
+| Unique | 5908 | 2.23% |
+| Mythic | 5472 | 2.07% |
 
 Top drops:
-- Upgrade_Resource_Jewellery_Dust: 8373
-- Upgrade_Resource_Weapon_Dust: 8353
-- Upgrade_Resource_Armor_Dust: 8331
-- Helmet_Dexterity_Feral_Instinct: 6862
-- Body_Dexterity_Feral_Instinct: 6735
-- Gloves_Dexterity_Feral_Instinct: 6727
-- Ring_Dexterity: 5299
-- Ring_Intelligence: 5266
-- Belt: 5210
-- Amulet_Life_Core: 5192
-- Amulet_Trinity: 4883
-- Recipe_Gloves_Dexterity_Shadowstep: 4754
-- Recipe_Gloves_Iron_Bastion: 4750
-- Recipe_Body_Intelligence_Eternal_Reserve: 4725
-- Upgrade_Resource_Journeyman_Rune: 4720
+- Upgrade_Resource_Weapon_Dust: 8874
+- Upgrade_Resource_Armor_Dust: 8802
+- Upgrade_Resource_Jewellery_Dust: 8651
+- Body_Feral_Instinct: 7180
+- Helmet_Feral_Instinct: 7153
+- Gloves_Feral_Instinct: 7152
+- Ring_Intelligence: 5614
+- Ring_Dexterity: 5542
+- Amulet_Ruby: 5513
+- Amulet_Trinity: 5247
+- Recipe_Helmet_Iron_Bastion: 4930
+- Upgrade_Resource_Fine_Flux: 4910
+- Recipe_Helmet_Archmage_Cap: 4888
+- Recipe_Body_Steel_Bastion: 4885
+- Upgrade_Resource_Journeyman_Rune: 4839
 
 No orphan items — every table entry dropped at least once.
 
@@ -483,36 +483,36 @@ Boss/Mythic/lvl 100, modifiers: [] + 5 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 65673 | 26.27% |
-| 1 | 60411 | 24.17% |
-| 2 | 105247 | 42.11% |
-| 3 | 18617 | 7.45% |
+| 0 | 65914 | 26.37% |
+| 1 | 59036 | 23.62% |
+| 2 | 105931 | 42.38% |
+| 3 | 19075 | 7.63% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 9032 | 3.27% |
-| Epic | 94089 | 34.1% |
-| Rare | 63573 | 23.04% |
-| Uncommon | 83581 | 30.29% |
-| Unique | 12274 | 4.45% |
-| Mythic | 13372 | 4.85% |
+| Legendary | 9414 | 3.42% |
+| Epic | 96325 | 34.97% |
+| Rare | 61670 | 22.39% |
+| Uncommon | 83260 | 30.23% |
+| Unique | 12600 | 4.57% |
+| Mythic | 12170 | 4.42% |
 
 Top drops:
-- Gloves_Dexterity_Feral_Instinct: 5451
-- Helmet_Dexterity_Feral_Instinct: 5057
-- Upgrade_Resource_Jewellery_Dust: 5051
-- Upgrade_Resource_Armor_Dust: 4997
-- Body_Dexterity_Feral_Instinct: 4922
-- Upgrade_Resource_Weapon_Dust: 4908
-- Recipe_Body_Iron_Bastion: 4766
-- Recipe_Gloves_Intelligence_Eternal_Reserve: 4746
-- Recipe_Helmet_Intelligence_Eternal_Reserve: 4718
-- Recipe_Boots_Intelligence_Eternal_Reserve: 4711
-- Recipe_Helmet_Iron_Bastion: 4698
-- Recipe_Body_Dexterity_Shadowstep: 4638
-- Recipe_Body_Strength_Iron_Bastion: 4616
-- Recipe_Body_Intelligence_Eternal_Reserve: 4607
-- Recipe_Gloves_Iron_Bastion: 4589
+- Gloves_Feral_Instinct: 5819
+- Helmet_Feral_Instinct: 5501
+- Body_Feral_Instinct: 5413
+- Upgrade_Resource_Armor_Dust: 5318
+- Upgrade_Resource_Jewellery_Dust: 5262
+- Upgrade_Resource_Weapon_Dust: 5255
+- Recipe_Body_Hunter_Chestplate: 4899
+- Recipe_Body_Steel_Bastion: 4817
+- Recipe_Helmet_Hunter: 4803
+- Recipe_Helmet_Archmage_Cap: 4782
+- Recipe_Gloves_Iron_Bastion: 4767
+- Recipe_Gloves_Hunter: 4704
+- Recipe_Gloves_Archmage: 4694
+- Recipe_Boots_Archmage_Sandals: 4686
+- Recipe_Boots_Iron_Bastion: 4654
 
 No orphan items — every table entry dropped at least once.
 
@@ -522,36 +522,36 @@ Boss/Mythic/lvl 100, modifiers: [] + 7 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 112548 | 45.02% |
-| 1 | 68396 | 27.36% |
-| 2 | 63379 | 25.35% |
-| 3 | 5673 | 2.27% |
+| 0 | 112070 | 44.83% |
+| 1 | 69096 | 27.64% |
+| 2 | 62734 | 25.09% |
+| 3 | 6092 | 2.44% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 14476 | 5.06% |
-| Epic | 92885 | 32.49% |
-| Rare | 65977 | 23.08% |
-| Uncommon | 67657 | 23.66% |
-| Unique | 21192 | 7.41% |
-| Mythic | 23719 | 8.3% |
+| Legendary | 14569 | 5.11% |
+| Epic | 93629 | 32.85% |
+| Rare | 67350 | 23.63% |
+| Uncommon | 67370 | 23.63% |
+| Unique | 21462 | 7.53% |
+| Mythic | 20668 | 7.25% |
 
 Top drops:
-- Crafting_Resource_Deer_Leather: 5438
-- Crafting_Resource_Copper_Ore: 5433
-- Crafting_Resource_Diamond_Gem: 5433
-- Crafting_Resource_Linen_Fabric: 5424
-- Gloves_Strength_Stoneheart: 4809
-- Boots_Strength_Stoneheart: 4800
-- Body_Strength_Stoneheart: 4334
-- Gloves_Dexterity_Feral_Instinct: 4086
-- Crafting_Resource_Essence_Barrier: 3928
-- Helmet_Intelligence_Eternal_Reserve: 3920
-- Helmet_Strength_Vital_Core: 3879
-- Amulet_Onyx_Medallion: 3829
-- Gloves_Strength_Vital_Core: 3656
-- Upgrade_Resource_Grandmaster_Rune: 3638
-- Ring_Hell_Servant: 3607
+- Crafting_Resource_Deer_Leather: 5160
+- Crafting_Resource_Copper_Ore: 5157
+- Crafting_Resource_Linen_Fabric: 5153
+- Crafting_Resource_Diamond_Gem: 5152
+- Gloves_Stoneheart: 5035
+- Boots_Stone_Tread: 4956
+- Body_Stoneheart: 4597
+- Gloves_Feral_Instinct: 4287
+- Crafting_Resource_Essence_Barrier: 4089
+- Amulet_Onyx_Medallion: 3988
+- Helmet_Archmage_Cap: 3984
+- Helmet_Vital_Core: 3902
+- Gloves_Vital_Core: 3823
+- Gloves_Hunters_Dream: 3817
+- Boots_Hunters_Dream: 3733
 
 No orphan items — every table entry dropped at least once.
 
@@ -561,38 +561,38 @@ Boss/Mythic/lvl 100, modifiers: [] + 11 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 202439 | 80.98% |
-| 1 | 34309 | 13.72% |
-| 2 | 12836 | 5.13% |
-| 3 | 416 | 0.17% |
+| 0 | 201872 | 80.75% |
+| 1 | 35403 | 14.16% |
+| 2 | 12274 | 4.91% |
+| 3 | 451 | 0.18% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 24952 | 8.16% |
-| Epic | 74995 | 24.52% |
-| Rare | 62661 | 20.49% |
-| Uncommon | 61902 | 20.24% |
-| Unique | 37898 | 12.39% |
-| Mythic | 43448 | 14.21% |
+| Legendary | 25522 | 8.35% |
+| Epic | 76634 | 25.07% |
+| Rare | 63900 | 20.91% |
+| Uncommon | 62475 | 20.44% |
+| Unique | 39023 | 12.77% |
+| Mythic | 38075 | 12.46% |
 
 Top drops:
-- Crafting_Resource_Copper_Ore: 8327
-- Crafting_Resource_Deer_Leather: 8327
-- Crafting_Resource_Diamond_Gem: 8327
-- Crafting_Resource_Linen_Fabric: 8327
-- Helmet_Intelligence_Eternal_Reserve: 6866
-- Helmet_Strength_Vital_Core: 6794
-- Amulet_Onyx_Medallion: 6683
-- Ring_Hell_Servant: 6502
-- Gloves_Dexterity_Hunters_Dream: 6489
-- Body_Porcupine: 6464
-- Body_Strength_Vital_Core: 6451
-- Boots_Dexterity_Hunters_Dream: 6423
-- Upgrade_Resource_Perfect_Flux: 6420
-- Boots_Intelligence_Eternal_Reserve: 6393
-- Boots_Strength_Vital_Core: 6388
+- Crafting_Resource_Copper_Ore: 8346
+- Crafting_Resource_Deer_Leather: 8346
+- Crafting_Resource_Diamond_Gem: 8346
+- Crafting_Resource_Linen_Fabric: 8346
+- Helmet_Vital_Core: 6900
+- Amulet_Onyx_Medallion: 6820
+- Helmet_Archmage_Cap: 6788
+- Gloves_Vital_Core: 6663
+- Body_Vital_Core: 6639
+- Ring_Of_Fire_Demon: 6634
+- Boots_Hunters_Dream: 6599
+- Upgrade_Resource_Perfect_Flux: 6585
+- Body_Porcupine: 6584
+- Boots_Vital_Core: 6582
+- Gloves_Aegis: 6579
 
-Orphans (6): Crafting_Resource_Emerald_Gem, Crafting_Resource_Iron_Ore, Crafting_Resource_Ruby_Gem, Crafting_Resource_Silk_Fabric, Crafting_Resource_Wild_Boar_Leather, Gloves_Intelligence_Arcane_Bulwark
+Orphans (3): Crafting_Resource_Ruby_Gem, Crafting_Resource_Silk_Fabric, Crafting_Resource_Wild_Boar_Leather
 
 ## Extreme_Archon
 
@@ -600,38 +600,38 @@ Archon/Mythic/lvl 150, modifiers: [] + 11 random
 
 | Tier | Rolls | Share |
 |---|---|---|
-| 0 | 237305 | 94.92% |
-| 1 | 11407 | 4.56% |
-| 2 | 1285 | 0.51% |
-| 3 | 3 | 0% |
+| 0 | 237184 | 94.87% |
+| 1 | 11406 | 4.56% |
+| 2 | 1409 | 0.56% |
+| 3 | 1 | 0% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Legendary | 27910 | 9.13% |
-| Epic | 73963 | 24.2% |
-| Rare | 62695 | 20.51% |
-| Uncommon | 59193 | 19.37% |
-| Unique | 37054 | 12.12% |
-| Mythic | 44818 | 14.66% |
+| Legendary | 28106 | 9.17% |
+| Epic | 76183 | 24.86% |
+| Rare | 64758 | 21.13% |
+| Uncommon | 61095 | 19.94% |
+| Unique | 38140 | 12.45% |
+| Mythic | 38145 | 12.45% |
 
 Top drops:
-- Crafting_Resource_Copper_Ore: 8272
-- Crafting_Resource_Deer_Leather: 8272
-- Crafting_Resource_Diamond_Gem: 8272
-- Crafting_Resource_Linen_Fabric: 8272
-- Body_All_Evade_To_Armor: 7599
-- Boots_Dexterity_Hunters_Dream: 7580
-- Body_Porcupine: 7511
-- Upgrade_Resource_Armorsmith_Mark: 7508
-- Amulet_Intelligence: 7499
-- Upgrade_Resource_Weaponsmith_Mark: 7495
-- Gloves_Strength_Vital_Core: 7493
-- Ring_Of_Limitless_Magic: 7488
-- Helmet_Intelligence_Eternal_Reserve: 7470
-- Helmet_Intelligence_Aegis: 7462
-- Ring_of_Creators: 7441
+- Crafting_Resource_Copper_Ore: 8436
+- Crafting_Resource_Deer_Leather: 8436
+- Crafting_Resource_Diamond_Gem: 8436
+- Crafting_Resource_Linen_Fabric: 8436
+- Boots_Vital_Core: 7783
+- Upgrade_Resource_Jeweler_Mark: 7780
+- Helmet_Aegis: 7760
+- Gloves_Aegis: 7734
+- Gloves_Archmage: 7719
+- Body_Hunters_Dream: 7717
+- Ring_of_Creators: 7709
+- Body_Archmage_Mantle: 7706
+- Gloves_Vital_Core: 7698
+- Body_Carapace: 7697
+- Body_Aegis: 7693
 
-Orphans (14): Amulet_Of_Recovery, Amulet_Strength, Body_Intelligence_Arcane_Bulwark, Boots_Intelligence_Arcane_Bulwark, Crafting_Resource_Emerald_Gem, Crafting_Resource_Gold_Ore, Crafting_Resource_Iron_Ore, Crafting_Resource_Ruby_Gem, Crafting_Resource_Silk_Fabric, Crafting_Resource_Wild_Boar_Leather, Gloves_Intelligence_Arcane_Bulwark, Recipe_Weapon_Simple_Sword, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Simple_Flux
+Orphans (16): Amulet_Garnet, Amulet_Recovery_Source, Body_Mysterious_Bastion, Boots_Mysterious_Bastion, Crafting_Resource_Emerald_Gem, Crafting_Resource_Gold_Ore, Crafting_Resource_Iron_Ore, Crafting_Resource_Ruby_Gem, Crafting_Resource_Silk_Fabric, Crafting_Resource_Wild_Boar_Leather, Gloves_Mysterious_Bastion, Helmet_Mysterious_Bastion, Recipe_Weapon_Simple_Axe, Recipe_Weapon_Simple_Sword, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Simple_Flux
 
 ## Extreme_Lvl1
 
@@ -642,23 +642,23 @@ Regular/Uncommon/lvl 1, modifiers: []
 | 0 | 0 | 0% |
 | 1 | 0 | 0% |
 | 2 | 0 | 0% |
-| 3 | 19130 | 100% |
+| 3 | 19084 | 100% |
 
 | Rarity | Items | Share |
 |---|---|---|
-| Uncommon | 19130 | 100% |
+| Uncommon | 19084 | 100% |
 
 Top drops:
-- Crafting_Resource_Emerald_Gem: 1890
-- Crafting_Resource_Silk_Fabric: 1851
-- Crafting_Resource_Diamond_Gem: 1838
-- Crafting_Resource_Linen_Fabric: 1830
-- Crafting_Resource_Copper_Ore: 1812
-- Crafting_Resource_Gold_Ore: 1811
-- Crafting_Resource_Iron_Ore: 1810
-- Crafting_Resource_Ruby_Gem: 1809
-- Crafting_Resource_Deer_Leather: 1809
-- Crafting_Resource_Wild_Boar_Leather: 1800
-- Crafting_Resource_Essence_Health: 870
+- Crafting_Resource_Wild_Boar_Leather: 1914
+- Crafting_Resource_Diamond_Gem: 1877
+- Crafting_Resource_Linen_Fabric: 1854
+- Crafting_Resource_Silk_Fabric: 1852
+- Crafting_Resource_Iron_Ore: 1850
+- Crafting_Resource_Gold_Ore: 1802
+- Crafting_Resource_Ruby_Gem: 1799
+- Crafting_Resource_Deer_Leather: 1768
+- Crafting_Resource_Emerald_Gem: 1727
+- Crafting_Resource_Copper_Ore: 1725
+- Crafting_Resource_Essence_Health: 916
 
-Orphans (92): Amulet_Dexterity_Intelligence, Amulet_Dexterity_Strength, Amulet_Goliath_Sign, Amulet_Life_Core, Amulet_Of_Recovery, Amulet_Onyx_Medallion, Amulet_Stronghold, Body_All_Evade_To_Armor, Body_Dexterity_Feral_Instinct, Body_Dexterity_Hunters_Dream, Body_Dexterity_Shadowstep, Body_Intelligence_Aegis, Body_Intelligence_Arcane_Bulwark, Body_Intelligence_Eternal_Reserve, Body_No_Way_Back, Body_Porcupine, Body_Strength_Iron_Bastion, Body_Strength_Stoneheart, Body_Strength_Vital_Core, Boots_Dexterity_Feral_Instinct, Boots_Dexterity_Hunters_Dream, Boots_Dexterity_Shadowstep, Boots_Intelligence_Aegis, Boots_Intelligence_Arcane_Bulwark, Boots_Intelligence_Eternal_Reserve, Boots_Strength_Iron_Bastion, Boots_Strength_Stoneheart, Boots_Strength_Vital_Core, Crafting_Resource_Essence_Critical_Chance, Gloves_Dexterity_Feral_Instinct, Gloves_Dexterity_Hunters_Dream, Gloves_Dexterity_Shadowstep, Gloves_Intelligence_Aegis, Gloves_Intelligence_Arcane_Bulwark, Gloves_Intelligence_Eternal_Reserve, Gloves_Strength_Iron_Bastion, Gloves_Strength_Stoneheart, Gloves_Strength_Vital_Core, Helmet_Dexterity_Feral_Instinct, Helmet_Dexterity_Hunters_Dream, Helmet_Dexterity_Shadowstep, Helmet_Intelligence_Aegis, Helmet_Intelligence_Arcane_Bulwark, Helmet_Intelligence_Eternal_Reserve, Helmet_Strength_Iron_Bastion, Helmet_Strength_Stoneheart, Helmet_Strength_Vital_Core, Recipe_Body_Dexterity_Shadowstep, Recipe_Body_Intelligence_Eternal_Reserve, Recipe_Body_Iron_Bastion, Recipe_Body_Strength_Iron_Bastion, Recipe_Boots_Dexterity_Shadowstep, Recipe_Boots_Intelligence_Eternal_Reserve, Recipe_Boots_Iron_Bastion, Recipe_Gloves_Dexterity_Shadowstep, Recipe_Gloves_Intelligence_Eternal_Reserve, Recipe_Gloves_Iron_Bastion, Recipe_Helmet_Dexterity_Shadowstep, Recipe_Helmet_Intelligence_Eternal_Reserve, Recipe_Helmet_Iron_Bastion, Recipe_Weapon_Simple_Axe, Recipe_Weapon_Simple_Dagger, Recipe_Weapon_Simple_Sword, Ring_Dexterity, Ring_Hell_Servant, Ring_Intelligence, Ring_of_Creators, Ring_Of_Fire_Demon, Ring_of_Hunter, Ring_Of_Legionnaire, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Armor_Dust, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Blacksmith_Rune, Upgrade_Resource_Fine_Flux, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Jeweler_Rune, Upgrade_Resource_Jewellery_Dust, Upgrade_Resource_Journeyman_Rune, Upgrade_Resource_Master_Rune, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Quality_Flux, Upgrade_Resource_Simple_Flux, Upgrade_Resource_Weapon_Dust, Upgrade_Resource_Weapon_Rune, Upgrade_Resource_Weaponsmith_Mark, Weapon_Bloodthirsty, Weapon_Silent_Fury, Weapon_Simple_Axe, Weapon_Simple_Dagger, Weapon_Simple_Sword
+Orphans (90): Amulet_Goliath_Seal, Amulet_Onyx_Medallion, Amulet_Pathfinder_Sign, Amulet_Recovery_Source, Amulet_Ruby, Amulet_Trapper_Talisman, Body_Aegis, Body_Archmage_Mantle, Body_Carapace, Body_Feral_Instinct, Body_Hunter_Chestplate, Body_Hunters_Dream, Body_Mysterious_Bastion, Body_Porcupine, Body_Steel_Bastion, Body_Stoneheart, Body_Vital_Core, Boots_Aegis, Boots_Archmage_Sandals, Boots_Feral_Instinct, Boots_Hunter, Boots_Hunters_Dream, Boots_Mysterious_Bastion, Boots_Steel_Greaves, Boots_Stone_Tread, Boots_Vital_Core, Crafting_Resource_Essence_Critical_Chance, Gloves_Aegis, Gloves_Archmage, Gloves_Feral_Instinct, Gloves_Hunter, Gloves_Hunters_Dream, Gloves_Mysterious_Bastion, Gloves_Steel, Gloves_Stoneheart, Gloves_Vital_Core, Helmet_Aegis, Helmet_Archmage_Cap, Helmet_Feral_Instinct, Helmet_Hunter, Helmet_Hunters_Dream, Helmet_Mysterious_Bastion, Helmet_Steel, Helmet_Stoneheart, Helmet_Vital_Core, Recipe_Body_Archmage_Mantle, Recipe_Body_Hunter_Chestplate, Recipe_Body_Iron_Bastion, Recipe_Body_Steel_Bastion, Recipe_Boots_Archmage_Sandals, Recipe_Boots_Hunter, Recipe_Boots_Iron_Bastion, Recipe_Gloves_Archmage, Recipe_Gloves_Hunter, Recipe_Gloves_Iron_Bastion, Recipe_Helmet_Archmage_Cap, Recipe_Helmet_Hunter, Recipe_Helmet_Iron_Bastion, Recipe_Weapon_Simple_Axe, Recipe_Weapon_Simple_Dagger, Recipe_Weapon_Simple_Sword, Ring_Dexterity, Ring_Hell_Servant, Ring_Intelligence, Ring_of_Creators, Ring_Of_Fire_Demon, Ring_of_Hunter, Ring_Of_Legionnaire, Upgrade_Resource_Apprentice_Rune, Upgrade_Resource_Armor_Dust, Upgrade_Resource_Armorsmith_Mark, Upgrade_Resource_Blacksmith_Rune, Upgrade_Resource_Fine_Flux, Upgrade_Resource_Grandmaster_Rune, Upgrade_Resource_Jeweler_Mark, Upgrade_Resource_Jeweler_Rune, Upgrade_Resource_Jewellery_Dust, Upgrade_Resource_Journeyman_Rune, Upgrade_Resource_Master_Rune, Upgrade_Resource_Perfect_Flux, Upgrade_Resource_Quality_Flux, Upgrade_Resource_Simple_Flux, Upgrade_Resource_Weapon_Dust, Upgrade_Resource_Weapon_Rune, Upgrade_Resource_Weaponsmith_Mark, Weapon_Bloodthirsty, Weapon_Silent_Fury, Weapon_Simple_Axe, Weapon_Simple_Dagger, Weapon_Simple_Sword

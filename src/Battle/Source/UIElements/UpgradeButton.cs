@@ -8,7 +8,7 @@
     {
         private string _upgradeInstanceId = string.Empty;
         private int _upgradeTier;
-
+        [Export] private RichTextLabel? _description;
         public event Action<string, int>? UpgradeSelected;
 
         public override void _Ready()
@@ -19,6 +19,7 @@
         public void SetUpgradeTier(int upgradeTier) => _upgradeTier = upgradeTier;
         public void SetUpgradeInstanceId(string upgradeInstanceId) => _upgradeInstanceId = upgradeInstanceId;
         public void SetUpgradeTaken(bool isTaken) => SetPressedNoSignal(isTaken);
+        public void SetDescription(string description) => _description?.Text = description;
 
         private void OnToggled(bool toggledOn)
         {

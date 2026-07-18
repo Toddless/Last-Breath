@@ -21,7 +21,20 @@
  },
  "Ability_Overload": {
   "cast": 26,
-  "impact": 30
+  "aura": 26
+ },
+ "Ability_Deep_Freeze": {
+  "cast": 26,
+  "impact": 26
+ },
+ "Ability_Discharge": {
+  "cast": 26,
+  "projectile": 18,
+  "impact": 26
+ },
+ "Ability_Static_Armor": {
+  "cast": 26,
+  "impact": 26
  },
  "Ability_Armageddon": {
   "cast": 26,

@@ -1,24 +1,35 @@
-﻿namespace Battle.Source.Effects
+namespace Battle.Source.Effects
 {
+    using System.Threading.Tasks;
     using Core.Battle.Abilities;
-    using Core.Enums;
+    using Core.Context;
+    using Core.Modifiers.Context;
 
-    public class Weakness(
-        int duration,
-        int maxStacks,
-        float value)
-        : ParameterChangeEffect(
-            id: "Effect_Weakness",
-            duration,
-            maxStacks,
-            value: 1 - value,
-            parameter: EntityParameter.Damage,
-            type: OperationType.Multiply,
-            priority: Priority.Weak,
-            statusEffect: StatusEffects.None)
-
+    /// <summary>
+    /// "Бессилие": the target's ability HITS deal <c>value</c> less damage per stack (attacks are the
+    /// domain of <see cref="FeeblenessEffect"/>). Each stack carries its own outgoing-damage modifier,
+    /// so stacks multiply.
+    /// </summary>
+    public class Weakness(int duration, int maxStacks, float value)
+        : Effect(id: "Effect_Weakness", duration, maxStacks)
     {
-        // Copy takes the primary-ctor value, not the transformed base Value — re-inverting would flip it.
+        private IDamageModifier? _modifier;
+
+        public override async Task Apply(EffectApplyingContext context)
+        {
+            await base.Apply(context);
+            if (!IsApplied || Target == null) return; // a rejected stack must not weaken anything
+
+            _modifier = new HitDamageDealtContextModifier(Target, 1 - value);
+            Target.ModifierHandler.Add(_modifier);
+        }
+
+        public override void Remove()
+        {
+            if (_modifier != null) Target?.ModifierHandler.Remove(_modifier);
+            base.Remove();
+        }
+
         public override IEffect Copy() => new Weakness(Duration, MaxStacks, value);
     }
 }

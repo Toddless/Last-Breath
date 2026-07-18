@@ -51,6 +51,23 @@
             "grants": []
         },
         {
+            "id": "Weapon_Simple_Wand",
+            "equipmentPart": "Weapon",
+            "weaponType": "Wand",
+            "handedness": "OneHanded",
+            "damage": 80,
+            "criticalChance": 0.09,
+            "CriticalDamage": 1.5,
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [],
+            "modifiers": [],
+            "grants": []
+        },
+        {
             "id": "Weapon_Bloodthirsty",
             "equipmentPart": "Weapon",
             "weaponType": "Dagger",
@@ -75,32 +92,34 @@
                     "parameter": "criticalChance",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.3,
-                        "max": 0.4
-                    }
+                        "min": 0.35,
+                        "max": 0.8
+                    },
+                    "scope": "Local"
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
                     "value": {
-                        "min": 0.4,
-                        "max": 0.5
+                        "min": 0.45,
+                        "max": 0.7
                     }
                 },
                 {
                     "parameter": "damage",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.4,
-                        "max": 0.6
-                    }
+                        "min": 0.5,
+                        "max": 1.2
+                    },
+                    "scope": "Local"
                 },
                 {
                     "parameter": "healingEfficiency",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.12,
-                        "max": 0.18
+                        "min": 0.15,
+                        "max": 0.3
                     }
                 }
             ],
@@ -140,16 +159,17 @@
                     "parameter": "damage",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.4,
-                        "max": 0.6
-                    }
+                        "min": 0.8,
+                        "max": 1.6
+                    },
+                    "scope": "Local"
                 },
                 {
                     "parameter": "burningDamage",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.3,
-                        "max": 0.4
+                        "min": 0.2,
+                        "max": 0.35
                     }
                 }
             ],
@@ -171,7 +191,7 @@
             "equipmentPart": "Weapon",
             "weaponType": "Axe",
             "handedness": "TwoHanded",
-            "damage": 380,
+            "damage": 280,
             "criticalChance": 0.05,
             "CriticalDamage": 1.4,
             "maxStackSize": 1,
@@ -191,24 +211,25 @@
                     "parameter": "damage",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.4,
-                        "max": 0.6
+                        "min": 0.5,
+                        "max": 1.2
+                    },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "manaOnHit",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 30,
+                        "max": 50
                     }
                 },
                 {
                     "parameter": "burningDamage",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.3,
-                        "max": 0.4
-                    }
-                },
-                {
-                    "parameter": "manaOnHit",
-                    "modifierType": "flat",
-                    "value": {
-                        "min": 40,
-                        "max": 60
+                        "min": 0.2,
+                        "max": 0.35
                     }
                 }
             ],

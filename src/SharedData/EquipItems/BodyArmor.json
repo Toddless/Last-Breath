@@ -1,7 +1,7 @@
 {
     "items": [
         {
-            "id": "Body_Strength_Stoneheart",
+            "id": "Body_Stoneheart",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -14,13 +14,13 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 180, "max": 350 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 700,
+                    "value": { "min": 300, "max": 750 },
                     "scope": "Local"
                 }
             ],
@@ -28,7 +28,7 @@
             "grants": []
         },
         {
-            "id": "Body_Strength_Iron_Bastion",
+            "id": "Body_Steel_Bastion",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -41,13 +41,13 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 900,
+                    "value": { "min": 500, "max": 900 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "inc",
-                    "value": 0.35,
+                    "value": { "min": 0.25, "max": 0.6 },
                     "scope": "Local"
                 }
             ],
@@ -55,7 +55,7 @@
             "grants": []
         },
         {
-            "id": "Body_Strength_Vital_Core",
+            "id": "Body_Vital_Core",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -68,13 +68,13 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 900,
+                    "value": { "min": 300, "max": 500 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "inc",
-                    "value": 0.35,
+                    "value": { "min": 0.2, "max": 0.35 },
                     "scope": "Local"
                 }
             ],
@@ -82,7 +82,7 @@
             "grants": []
         },
         {
-            "id": "Body_Dexterity_Shadowstep",
+            "id": "Body_Hunter_Chestplate",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -95,13 +95,13 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": 900,
+                    "value": { "min": 500, "max": 900 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
-                    "value": 0.35,
+                    "value": { "min": 0.25, "max": 0.6 },
                     "scope": "Local"
                 }
             ],
@@ -109,7 +109,7 @@
             "grants": []
         },
         {
-            "id": "Body_Dexterity_Hunters_Dream",
+            "id": "Body_Hunters_Dream",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -122,13 +122,13 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 280, "max": 420 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 400,
+                    "value": { "min": 200, "max": 350 },
                     "scope": "Local"
                 }
             ],
@@ -136,7 +136,7 @@
             "grants": []
         },
         {
-            "id": "Body_Dexterity_Feral_Instinct",
+            "id": "Body_Feral_Instinct",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -149,13 +149,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 220, "max": 440 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 400,
+                    "value": { "min": 200, "max": 400 },
                     "scope": "Local"
                 }
             ],
@@ -163,7 +163,7 @@
             "grants": []
         },
         {
-            "id": "Body_Intelligence_Eternal_Reserve",
+            "id": "Body_Archmage_Mantle",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -176,13 +176,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 900,
+                    "value": { "min": 400, "max": 900 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
-                    "value": 0.35,
+                    "value": { "min": 0.25, "max": 0.6 },
                     "scope": "Local"
                 }
             ],
@@ -190,7 +190,7 @@
             "grants": []
         },
         {
-            "id": "Body_Intelligence_Arcane_Bulwark",
+            "id": "Body_Mysterious_Bastion",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -203,13 +203,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 180, "max": 280 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 300, "max": 500 },
                     "scope": "Local"
                 }
             ],
@@ -217,7 +217,7 @@
             "grants": []
         },
         {
-            "id": "Body_Intelligence_Aegis",
+            "id": "Body_Aegis",
             "equipmentPart": "Body",
             "rarity": "Common",
             "tags": [
@@ -230,13 +230,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 180, "max": 280 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 300, "max": 500 },
                     "scope": "Local"
                 }
             ],
@@ -256,20 +256,21 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Barrier",
+                    "parameter": "Armor",
                     "modifierType": "flat",
                     "value": {
-                        "min": 300,
-                        "max": 400
+                        "min": 420,
+                        "max": 660
                     }
                 },
                 {
-                    "parameter": "Health",
-                    "modifierType": "flat",
+                    "parameter": "Armor",
+                    "modifierType": "inc",
                     "value": {
-                        "min": 400,
-                        "max": 600
-                    }
+                        "min": 0.25,
+                        "max": 0.8
+                    },
+                    "scope": "Local"
                 }
             ],
             "modifiers": [],
@@ -285,44 +286,70 @@
             ]
         },
         {
-            "id": "Body_Power",
+            "id": "Body_Carapace",
             "equipmentPart": "Body",
             "rarity": "Unique",
             "tags": [
                 "Body",
                 "Equipment"
             ],
+            "effectId": "",
             "updateLevel": 0,
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Armor",
+                    "parameter": "Evade",
                     "modifierType": "flat",
                     "value": {
-                        "min": 500,
-                        "max": 700
+                        "min": 420,
+                        "max": 660
                     }
-                }
-            ],
-            "modifiers": [
+                },
                 {
-                    "parameter": "Health",
+                    "parameter": "Evade",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.2,
-                        "max": 0.3
-                    }
+                        "min": 0.25,
+                        "max": 0.8
+                    },
+                    "scope": "Local"
                 }
             ],
-            "grants": [
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Body_Strong_Spirit",
+            "equipmentPart": "Body",
+            "rarity": "Unique",
+            "tags": [
+                "Body",
+                "Equipment"
+            ],
+            "effectId": "",
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
                 {
-                    "id": "Passive_Skill_Meteor",
-                    "kind": "Passive",
-                    "properties": {
-                        "damage": 300
+                    "parameter": "Evade",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 420,
+                        "max": 660
                     }
+                },
+                {
+                    "parameter": "Evade",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.8
+                    },
+                    "scope": "Local"
                 }
-            ]
+            ],
+            "modifiers": [],
+            "grants": []
         },
         {
             "id": "Body_Ice_Mage",
@@ -339,21 +366,21 @@
                     "parameter": "Barrier",
                     "modifierType": "flat",
                     "value": {
-                        "min": 500,
-                        "max": 700
+                        "min": 280,
+                        "max": 430
                     }
-                }
-            ],
-            "modifiers": [
+                },
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.2,
-                        "max": 0.3
-                    }
+                        "min": 0.25,
+                        "max": 0.5
+                    },
+                    "scope": "Local"
                 }
             ],
+            "modifiers": [],
             "grants": [
                 {
                     "id": "Passive_Skill_Ice_Meteor",
@@ -365,66 +392,99 @@
             ]
         },
         {
-            "id": "Body_No_Way_Back",
+            "id": "Body_Disaster_Herald",
             "equipmentPart": "Body",
             "rarity": "Unique",
             "tags": [
                 "Body",
                 "Equipment"
             ],
-            "effectId": "",
             "updateLevel": 0,
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Barrier",
+                    "parameter": "Armor",
                     "modifierType": "flat",
                     "value": {
-                        "min": 300,
-                        "max": 400
+                        "min": 400,
+                        "max": 700
                     }
                 },
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
+                    "modifierType": "inc",
                     "value": {
-                        "min": 400,
-                        "max": 600
+                        "min": 0.25,
+                        "max": 0.45
                     }
                 }
             ],
-            "modifiers": []
+            "modifiers": [],
+            "grants": [
+                {
+                    "id": "Passive_Skill_Meteor",
+                    "kind": "Passive",
+                    "properties": {
+                        "damage": 300
+                    }
+                }
+            ]
         },
         {
-            "id": "Body_All_Evade_To_Armor",
+            "id": "Body_Creators_Vestment",
             "equipmentPart": "Body",
             "rarity": "Mythic",
             "tags": [
                 "Body",
                 "Equipment"
             ],
-            "effectId": "",
             "updateLevel": 0,
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Barrier",
+                    "parameter": "Armor",
                     "modifierType": "flat",
                     "value": {
-                        "min": 300,
-                        "max": 400
+                        "min": 600,
+                        "max": 1000
                     }
                 },
                 {
-                    "parameter": "Health",
+                    "parameter": "Suppress",
                     "modifierType": "flat",
                     "value": {
-                        "min": 400,
-                        "max": 600
+                        "min": 0.25,
+                        "max": 0.35
                     }
                 }
             ],
-            "modifiers": []
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 0.35,
+                        "max": 0.45
+                    }
+                },
+                {
+                    "parameter": "Armor",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.75,
+                        "max": 1.2
+                    }
+                },
+                {
+                    "parameter": "Suppress",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.4,
+                        "max": 0.55
+                    }
+                }
+            ],
+            "grants": []
         }
     ]
 }

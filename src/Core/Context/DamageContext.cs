@@ -16,6 +16,7 @@
         public DamageCause Cause { get; set; }
         public bool IsCrit { get; set; }
         public bool IgnoreResistances { get; set; }
+        public bool IgnoreBarrier { get; set; }
         public string? CastId { get; set; }
         public string? SourceAbilityId { get; set; }
         public float AbsorbedByBarrier { get; set; }

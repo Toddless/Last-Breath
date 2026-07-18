@@ -66,6 +66,14 @@ namespace Core.Ai.World
             ReviveReady?.Invoke();
         }
 
+        /// <summary>Debug/design seam: skips the lie-down timer. No-op unless defeated.</summary>
+        public void ForceRevive()
+        {
+            if (Stage != PlayerLifeStage.Defeated) return;
+            Stage = PlayerLifeStage.Alive;
+            ReviveReady?.Invoke();
+        }
+
         /// <summary>
         /// A passer-by reached the corpse: rolls the burn chance ONCE per NPC per death
         /// (a bystander standing next to the body must not re-roll every frame).

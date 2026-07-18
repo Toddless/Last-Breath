@@ -77,8 +77,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Body_Strength_Iron_Bastion",
-			"resultItemId": "Body_Strength_Iron_Bastion",
+			"id": "Recipe_Body_Steel_Bastion",
+			"resultItemId": "Body_Steel_Bastion",
 			"tags": [
 				"Gloves",
 				"Recipe",
@@ -106,8 +106,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Body_Intelligence_Aegis",
-			"resultItemId": "Body_Intelligence_Aegis",
+			"id": "Recipe_Body_Aegis",
+			"resultItemId": "Body_Aegis",
 			"tags": [
 				"Helmet",
 				"Recipe",
@@ -227,8 +227,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Body_Dexterity_Shadowstep",
-			"resultItemId": "Body_Dexterity_Shadowstep",
+			"id": "Recipe_Body_Hunter_Chestplate",
+			"resultItemId": "Body_Hunter_Chestplate",
 			"tags": [
 				"Body",
 				"Recipe",
@@ -255,8 +255,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Body_Intelligence_Eternal_Reserve",
-			"resultItemId": "Body_Intelligence_Eternal_Reserve",
+			"id": "Recipe_Body_Archmage_Mantle",
+			"resultItemId": "Body_Archmage_Mantle",
 			"tags": [
 				"Body",
 				"Recipe",
@@ -311,8 +311,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Helmet_Dexterity_Shadowstep",
-			"resultItemId": "Helmet_Dexterity_Shadowstep",
+			"id": "Recipe_Helmet_Hunter",
+			"resultItemId": "Helmet_Hunter",
 			"tags": [
 				"Helmet",
 				"Recipe",
@@ -339,8 +339,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Helmet_Intelligence_Eternal_Reserve",
-			"resultItemId": "Helmet_Intelligence_Eternal_Reserve",
+			"id": "Recipe_Helmet_Archmage_Cap",
+			"resultItemId": "Helmet_Archmage_Cap",
 			"tags": [
 				"Helmet",
 				"Recipe",
@@ -395,8 +395,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Boots_Dexterity_Shadowstep",
-			"resultItemId": "Boots_Dexterity_Shadowstep",
+			"id": "Recipe_Boots_Hunter",
+			"resultItemId": "Boots_Hunter",
 			"tags": [
 				"Boots",
 				"Recipe",
@@ -423,8 +423,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Boots_Intelligence_Eternal_Reserve",
-			"resultItemId": "Boots_Intelligence_Eternal_Reserve",
+			"id": "Recipe_Boots_Archmage_Sandals",
+			"resultItemId": "Boots_Archmage_Sandals",
 			"tags": [
 				"Boots",
 				"Recipe",
@@ -479,8 +479,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Gloves_Dexterity_Shadowstep",
-			"resultItemId": "Gloves_Dexterity_Shadowstep",
+			"id": "Recipe_Gloves_Hunter",
+			"resultItemId": "Gloves_Hunter",
 			"tags": [
 				"Gloves",
 				"Recipe",
@@ -507,8 +507,8 @@
 			]
 		},
 		{
-			"id": "Recipe_Gloves_Intelligence_Eternal_Reserve",
-			"resultItemId": "Gloves_Intelligence_Eternal_Reserve",
+			"id": "Recipe_Gloves_Archmage",
+			"resultItemId": "Gloves_Archmage",
 			"tags": [
 				"Gloves",
 				"Recipe",

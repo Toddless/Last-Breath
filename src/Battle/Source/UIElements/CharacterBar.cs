@@ -33,6 +33,7 @@ namespace Battle.Source.UIElements
         [Export] private Label? _factionLabel;
         [Export] private Label? _hpText;
         [Export] private Label? _manaText;
+        [Export] private Label? _level;
         [Export] private Control? _effectsSection;
         [Export] private Label? _effectsHeaderLabel;
         [Export] private Control? _modsSection;
@@ -90,6 +91,8 @@ namespace Battle.Source.UIElements
             BarrierBar?.Value = value;
             BarrierBar?.Visible = value > 0f;
         }
+
+        public void SetLevel(int level) => _level?.Text = level.ToString();
 
         /// <summary>Grey out the fallen: the bar stays in the list, but the living roster must read at a glance.</summary>
         public void SetDead() => Modulate = s_deadTint;

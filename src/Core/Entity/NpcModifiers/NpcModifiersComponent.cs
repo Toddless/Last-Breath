@@ -11,7 +11,7 @@ namespace Core.Entity.NpcModifiers
 
         public IReadOnlyList<INpcModifier> AllModifiers => _modifiers;
 
-        public event Action<INpcModifier>? ModifierAdded;
+        public event System.Action<INpcModifier>? ModifierAdded;
 
         public void AddModifiers(List<INpcModifier> modifiers) => modifiers.ForEach(AddModifier);
 

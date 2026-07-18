@@ -7,7 +7,6 @@
 [ext_resource type="Script" uid="uid://bvkmjwos0jl80" path="res://World/DayNightTint.cs" id="7_y0rla"]
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
-[ext_resource type="PackedScene" uid="uid://ww6a71b2bbov" path="res://Npc/TestNpc.tscn" id="8_kwijy"]
 [ext_resource type="Script" uid="uid://cpwjet55i0mhp" path="res://World/BossSpawnPoint.cs" id="9_hv00y"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
@@ -28,6 +27,12 @@ width = 25
 height = 25
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5f5v3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fx85w"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_s1n7v"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fmhhv"]
 
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
@@ -82,18 +87,15 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 [node name="Sprite2D" type="Sprite2D" parent="Bandig" unique_id=1011475319]
 texture = SubResource("GradientTexture2D_fx85w")
 
-[node name="TestNpc" parent="." unique_id=283522954 instance=ExtResource("8_kwijy")]
-position = Vector2(333, 709)
-
 [node name="Sorcerer" type="Node2D" parent="." unique_id=414808614]
-position = Vector2(1700, 849)
+position = Vector2(2268, 1025)
 script = ExtResource("8_hv00y")
 _npcIds = PackedStringArray("Npc_Cursed_Sorcerer")
 _maxCount = 1
 _pointId = "Spawn_Point_Sorcerer"
 metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
-[node name="BossSpawnPoint" type="Node2D" parent="." unique_id=1901987037]
+[node name="RatKing" type="Node2D" parent="." unique_id=1901987037]
 position = Vector2(783, -527)
 script = ExtResource("9_hv00y")
 _bossId = "Npc_Boss_Rat_King"
@@ -101,5 +103,38 @@ _factionDeathsPerRespawn = 0
 _pointId = "Boss_Rat_King"
 metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 
-[node name="Sprite2D" type="Sprite2D" parent="BossSpawnPoint" unique_id=1489057577]
+[node name="Sprite2D" type="Sprite2D" parent="RatKing" unique_id=1489057577]
 texture = SubResource("NoiseTexture2D_5f5v3")
+
+[node name="BossSpawnPoint2" type="Node2D" parent="." unique_id=359407581]
+position = Vector2(-1188, 613)
+script = ExtResource("9_hv00y")
+_bossId = "Npc_Boss_Bone_Pack_Leader"
+_factionDeathsPerRespawn = 0
+_pointId = "Boss_Spawn_Pack_Leader"
+metadata/_custom_type_script = "uid://cpwjet55i0mhp"
+
+[node name="Sprite2D" type="Sprite2D" parent="BossSpawnPoint2" unique_id=741400143]
+texture = SubResource("NoiseTexture2D_fx85w")
+
+[node name="Digri" type="Node2D" parent="." unique_id=1321080777]
+position = Vector2(-127, -1643)
+script = ExtResource("9_hv00y")
+_bossId = "Npc_Boss_Digri"
+_factionDeathsPerRespawn = 0
+_pointId = "Boss_Digri"
+metadata/_custom_type_script = "uid://cpwjet55i0mhp"
+
+[node name="Sprite2D" type="Sprite2D" parent="Digri" unique_id=1059919439]
+texture = SubResource("NoiseTexture2D_s1n7v")
+
+[node name="Zigri" type="Node2D" parent="." unique_id=1681300777]
+position = Vector2(-1237, -954)
+script = ExtResource("9_hv00y")
+_bossId = "Npc_Boss_Zigri"
+_factionDeathsPerRespawn = 0
+_pointId = "Boss_Zigri"
+metadata/_custom_type_script = "uid://cpwjet55i0mhp"
+
+[node name="Sprite2D" type="Sprite2D" parent="Zigri" unique_id=1479148786]
+texture = SubResource("NoiseTexture2D_fmhhv")

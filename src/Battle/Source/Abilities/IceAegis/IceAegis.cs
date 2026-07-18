@@ -10,6 +10,7 @@ namespace Battle.Source.Abilities.IceAegis
     using Core.Entity;
     using Core.Enums;
     using Effects;
+    using Godot;
 
     /// <summary>Cast plan of the Ice Aegis: barrier numbers and the optional stage payloads.</summary>
     public class AegisPlan
@@ -17,6 +18,8 @@ namespace Battle.Source.Abilities.IceAegis
         public float BarrierBase { get; set; }
         public float PerIntelligenceScale { get; set; }
         public int Duration { get; set; }
+        public float ReflectPercent { get; set; }
+        public float HealPerTurnPercent { get; set; }
         public Func<IEffect>? AttackerEffectFactory { get; set; }
         public Action? OnBarrierBroken { get; set; }
     }
@@ -29,6 +32,8 @@ namespace Battle.Source.Abilities.IceAegis
     /// </summary>
     public class IceAegis(AbilityBaseData data) : MulticastAbility<AegisPlan>(data)
     {
+        private readonly RandomNumberGenerator _rnd = new();
+
         public float BarrierBase => this[Parameters.BarrierBase];
         public float PerIntelligenceScale => this[Parameters.PerIntelligenceScale];
         public int Duration => (int)this[Parameters.Duration];
@@ -43,12 +48,16 @@ namespace Battle.Source.Abilities.IceAegis
             public const string ClumsinessMaxStacks = nameof(ClumsinessMaxStacks);
             public const string ClumsinessValue = nameof(ClumsinessValue);
             public const string FreezeDuration = nameof(FreezeDuration);
+            public const string ReflectPercent = nameof(ReflectPercent);
+            public const string HealPerTurn = nameof(HealPerTurn);
+            public const string StunAttackersChance = nameof(StunAttackersChance);
+            public const string StunDuration = nameof(StunDuration);
         }
 
         protected override void RegisterBaseParameters(AbilityParameterSet parameters)
         {
             base.RegisterBaseParameters(parameters);
-            parameters.RegisterDefault(Parameters.BarrierBase, 300f);
+            parameters.RegisterDefault(Parameters.BarrierBase, 500f);
             parameters.RegisterDefault(Parameters.PerIntelligenceScale, 35f);
             parameters.RegisterDefault(Parameters.Duration, 3);
             parameters.RegisterDefault(Parameters.StageTwoScaleBonus, 15f);
@@ -56,6 +65,11 @@ namespace Battle.Source.Abilities.IceAegis
             parameters.RegisterDefault(Parameters.ClumsinessMaxStacks, 5);
             parameters.RegisterDefault(Parameters.ClumsinessValue, 0.15f);
             parameters.RegisterDefault(Parameters.FreezeDuration, 1);
+            // Zero by default; upgrades raise them with decorators — the ability knows nothing about the upgrades
+            parameters.RegisterDefault(Parameters.ReflectPercent, 0f);
+            parameters.RegisterDefault(Parameters.HealPerTurn, 0f);
+            parameters.RegisterDefault(Parameters.StunAttackersChance, 0f);
+            parameters.RegisterDefault(Parameters.StunDuration, 1);
         }
 
         public override IAbility Copy() => CopyUpgradesTo(new IceAegis(Data));
@@ -65,7 +79,9 @@ namespace Battle.Source.Abilities.IceAegis
             {
                 BarrierBase = BarrierBase,
                 PerIntelligenceScale = PerIntelligenceScale,
-                Duration = Duration
+                Duration = Duration,
+                ReflectPercent = this[Parameters.ReflectPercent],
+                HealPerTurnPercent = this[Parameters.HealPerTurn]
             };
 
         protected override void ApplyStage(int stage, AegisPlan plan, IFightable owner, IBattleField field)
@@ -76,8 +92,7 @@ namespace Battle.Source.Abilities.IceAegis
                     plan.PerIntelligenceScale += this[Parameters.StageTwoScaleBonus];
                     break;
                 case 3:
-                    plan.AttackerEffectFactory = () => new Clumsiness(
-                        (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);
+                    plan.AttackerEffectFactory = CreateAttackerEffect;
                     break;
                 case 4:
                     plan.OnBarrierBroken = () => FreezeAllEnemies(owner, field);
@@ -89,8 +104,20 @@ namespace Battle.Source.Abilities.IceAegis
         {
             float intelligence = owner.Parameters.GetValueForParameter(EntityParameter.Intelligence);
             float amount = plan.BarrierBase + (plan.PerIntelligenceScale * intelligence);
-            await new IceAegisEffect(plan.Duration, amount, plan.AttackerEffectFactory, plan.OnBarrierBroken)
+            await new IceAegisEffect(plan.Duration, amount, plan.AttackerEffectFactory, plan.OnBarrierBroken,
+                    plan.ReflectPercent, plan.HealPerTurnPercent)
                 .Apply(new EffectApplyingContext { Caster = owner, Target = owner, Source = InstanceId });
+        }
+
+        /// <summary>Stage-3 payload for attackers: Clumsiness, or (with the L3 upgrade) a chance-rolled stun.</summary>
+        private IEffect CreateAttackerEffect()
+        {
+            float stunChance = this[Parameters.StunAttackersChance];
+            if (stunChance > 0 && _rnd.Randf() <= stunChance)
+                return new StunEffect((int)this[Parameters.StunDuration]);
+
+            return new Clumsiness(
+                (int)this[Parameters.ClumsinessDuration], (int)this[Parameters.ClumsinessMaxStacks], this[Parameters.ClumsinessValue]);
         }
 
         private void FreezeAllEnemies(IFightable owner, IBattleField field)

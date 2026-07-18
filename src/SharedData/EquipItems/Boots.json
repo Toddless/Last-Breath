@@ -1,130 +1,176 @@
 {
-	"items": [
-		{
-			"id": "Boots_Strength_Stoneheart",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Health", "modifierType": "flat", "value": 150, "scope": "Local" },
-				{ "parameter": "Armor", "modifierType": "flat", "value": 400, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Strength_Iron_Bastion",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Armor", "modifierType": "flat", "value": 450, "scope": "Local" },
-				{ "parameter": "Armor", "modifierType": "inc", "value": 0.25, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Strength_Vital_Core",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Health", "modifierType": "flat", "value": 400, "scope": "Local" },
-				{ "parameter": "Health", "modifierType": "inc", "value": 0.15, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Dexterity_Shadowstep",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Evade", "modifierType": "flat", "value": 900, "scope": "Local" },
-				{ "parameter": "Evade", "modifierType": "inc", "value": 0.35, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Dexterity_Hunters_Dream",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Evade", "modifierType": "flat", "value": 400, "scope": "Local" },
-				{ "parameter": "Health", "modifierType": "flat", "value": 200, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Dexterity_Feral_Instinct",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Barrier", "modifierType": "flat", "value": 400, "scope": "Local" },
-				{ "parameter": "Health", "modifierType": "flat", "value": 200, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Intelligence_Eternal_Reserve",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
-				{ "parameter": "Barrier", "modifierType": "inc", "value": 0.15, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Intelligence_Arcane_Bulwark",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
-				{ "parameter": "Armor", "modifierType": "flat", "value": 300, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		},
-		{
-			"id": "Boots_Intelligence_Aegis",
-			"equipmentPart": "Boots",
-			"rarity": "Common",
-			"tags": [ "Boots", "Equipment" ],
-			"updateLevel": 0,
-			"maxUpdateLevel": 12,
-			"implicits": [
-				{ "parameter": "Barrier", "modifierType": "flat", "value": 300, "scope": "Local" },
-				{ "parameter": "Evade", "modifierType": "flat", "value": 300, "scope": "Local" }
-			],
-			"modifiers": [],
-			"grants": []
-		}
-	]
+    "items": [
+        {
+            "id": "Boots_Stone_Tread",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 150 }, "scope": "Local" },
+                { "parameter": "Armor", "modifierType": "flat", "value": { "min": 180, "max": 400 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Steel_Greaves",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Armor", "modifierType": "flat", "value": { "min": 220, "max": 480 }, "scope": "Local" },
+                { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.25, "max": 0.6 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Vital_Core",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Health", "modifierType": "flat", "value": { "min": 120, "max": 220 }, "scope": "Local" },
+                { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.15, "max": 0.45 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Hunter",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Evade", "modifierType": "flat", "value": { "min": 220, "max": 480 }, "scope": "Local" },
+                { "parameter": "Evade", "modifierType": "inc", "value": { "min": 0.25, "max": 0.6 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Hunters_Dream",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Evade", "modifierType": "flat", "value": { "min": 180, "max": 320 }, "scope": "Local" },
+                { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 150 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Feral_Instinct",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 180, "max": 320 }, "scope": "Local" },
+                { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 150 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Archmage_Sandals",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 180, "max": 420 }, "scope": "Local" },
+                { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.2, "max": 0.55 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Mysterious_Bastion",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 180, "max": 250 }, "scope": "Local" },
+                { "parameter": "Armor", "modifierType": "flat", "value": { "min": 220, "max": 380 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Aegis",
+            "equipmentPart": "Boots",
+            "rarity": "Common",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 180, "max": 250 }, "scope": "Local" },
+                { "parameter": "Evade", "modifierType": "flat", "value": { "min": 220, "max": 380 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Talaria",
+            "equipmentPart": "Boots",
+            "rarity": "Unique",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 50, "max": 100 } },
+                { "parameter": "MoveSpeed", "modifierType": "inc", "value": { "min": 0.35, "max": 0.65 }, "scope": "Local" }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Rebirth_Tread",
+            "equipmentPart": "Boots",
+            "rarity": "Unique",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 45, "max": 100 } },
+                { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 45, "max": 100 } }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Boots_Creators_Trace",
+            "equipmentPart": "Boots",
+            "rarity": "Mythic",
+            "tags": [ "Boots", "Equipment" ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 120, "max": 200 } },
+                { "parameter": "MoveSpeed", "modifierType": "multi", "value": { "min": 0.35, "max": 0.55 }, "scope": "Local" }
+            ],
+            "modifiers": [
+                { "parameter": "Evade", "modifierType": "multi", "value": { "min": 0.25, "max": 0.35 } },
+                { "parameter": "Armor", "modifierType": "multi", "value": { "min": 0.25, "max": 0.35 } },
+                { "parameter": "Health", "modifierType": "multi", "value": { "min": 0.25, "max": 0.35 } }
+            ],
+            "grants": []
+        }
+    ]
 }

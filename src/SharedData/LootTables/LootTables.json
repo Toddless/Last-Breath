@@ -7,19 +7,19 @@
                     "tier": 0,
                     "items": [
                         {
-                            "id": "Helmet_Dexterity_Hunters_Dream",
+                            "id": "Helmet_Hunters_Dream",
                             "price": 452
                         },
                         {
-                            "id": "Body_Dexterity_Hunters_Dream",
+                            "id": "Body_Hunters_Dream",
                             "price": 454
                         },
                         {
-                            "id": "Gloves_Dexterity_Hunters_Dream",
+                            "id": "Gloves_Hunters_Dream",
                             "price": 415
                         },
                         {
-                            "id": "Boots_Dexterity_Hunters_Dream",
+                            "id": "Boots_Hunters_Dream",
                             "price": 405
                         },
                         {
@@ -27,51 +27,51 @@
                             "price": 352
                         },
                         {
-                            "id": "Helmet_Intelligence_Aegis",
+                            "id": "Helmet_Aegis",
                             "price": 484
                         },
                         {
-                            "id": "Body_Intelligence_Aegis",
+                            "id": "Body_Aegis",
                             "price": 636
                         },
                         {
-                            "id": "Gloves_Intelligence_Aegis",
+                            "id": "Gloves_Aegis",
                             "price": 435
                         },
                         {
-                            "id": "Boots_Intelligence_Aegis",
+                            "id": "Boots_Aegis",
                             "price": 565
                         },
                         {
-                            "id": "Helmet_Strength_Vital_Core",
+                            "id": "Helmet_Vital_Core",
                             "price": 350
                         },
                         {
-                            "id": "Body_Strength_Vital_Core",
+                            "id": "Body_Vital_Core",
                             "price": 420
                         },
                         {
-                            "id": "Gloves_Strength_Vital_Core",
+                            "id": "Gloves_Vital_Core",
                             "price": 410
                         },
                         {
-                            "id": "Boots_Strength_Vital_Core",
+                            "id": "Boots_Vital_Core",
                             "price": 450
                         },
                         {
-                            "id": "Helmet_Intelligence_Eternal_Reserve",
+                            "id": "Helmet_Archmage_Cap",
                             "price": 355
                         },
                         {
-                            "id": "Body_Intelligence_Eternal_Reserve",
+                            "id": "Body_Archmage_Mantle",
                             "price": 451
                         },
                         {
-                            "id": "Gloves_Intelligence_Eternal_Reserve",
+                            "id": "Gloves_Archmage",
                             "price": 451
                         },
                         {
-                            "id": "Boots_Intelligence_Eternal_Reserve",
+                            "id": "Boots_Archmage_Sandals",
                             "price": 451
                         },
                         {
@@ -83,7 +83,7 @@
                             "price": 613
                         },
                         {
-                            "id": "Amulet_Goliath_Sign",
+                            "id": "Amulet_Goliath_Seal",
                             "price": 498
                         },
                         {
@@ -95,12 +95,8 @@
                             "price": 474
                         },
                         {
-                            "id": "Body_All_Evade_To_Armor",
+                            "id": "Body_Carapace",
                             "price": 596
-                        },
-                        {
-                            "id": "Body_No_Way_Back",
-                            "price": 450
                         },
                         {
                             "id": "Upgrade_Resource_Perfect_Flux",
@@ -128,80 +124,76 @@
                     "tier": 1,
                     "items": [
                         {
-                            "id": "Gloves_Dexterity_Feral_Instinct",
+                            "id": "Gloves_Feral_Instinct",
                             "price": 150
                         },
                         {
-                            "id": "Body_Dexterity_Feral_Instinct",
+                            "id": "Body_Feral_Instinct",
                             "price": 115
                         },
                         {
-                            "id": "Boots_Dexterity_Feral_Instinct",
+                            "id": "Boots_Feral_Instinct",
                             "price": 215
                         },
                         {
-                            "id": "Helmet_Dexterity_Feral_Instinct",
+                            "id": "Helmet_Feral_Instinct",
                             "price": 115
                         },
                         {
-                            "id": "Amulet_Dexterity_Strength",
+                            "id": "Amulet_Trapper_Talisman",
                             "price": 175
                         },
                         {
-                            "id": "Boots_Strength_Iron_Bastion",
+                            "id": "Boots_Steel_Greaves",
                             "price": 150
                         },
                         {
-                            "id": "Body_Strength_Iron_Bastion",
+                            "id": "Body_Steel_Bastion",
                             "price": 145
                         },
                         {
-                            "id": "Gloves_Strength_Iron_Bastion",
+                            "id": "Gloves_Steel",
                             "price": 155
                         },
                         {
-                            "id": "Helmet_Strength_Iron_Bastion",
+                            "id": "Helmet_Steel",
                             "price": 175
                         },
                         {
-                            "id": "Boots_Strength_Stoneheart",
+                            "id": "Boots_Stone_Tread",
                             "price": 165
                         },
                         {
-                            "id": "Helmet_Strength_Stoneheart",
+                            "id": "Helmet_Stoneheart",
                             "price": 195
                         },
                         {
-                            "id": "Gloves_Strength_Stoneheart",
+                            "id": "Gloves_Stoneheart",
                             "price": 175
                         },
                         {
-                            "id": "Body_Strength_Stoneheart",
+                            "id": "Body_Stoneheart",
                             "price": 145
                         },
                         {
-                            "id": "Amulet_Dexterity_Intelligence",
+                            "id": "Amulet_Pathfinder_Sign",
                             "price": 165
                         },
                         {
-                            "id": "Helmet_Dexterity_Shadowstep",
+                            "id": "Helmet_Hunter",
                             "price": 195
                         },
                         {
-                            "id": "Body_Dexterity_Shadowstep",
+                            "id": "Body_Hunter_Chestplate",
                             "price": 155
                         },
                         {
-                            "id": "Boots_Dexterity_Shadowstep",
+                            "id": "Boots_Hunter",
                             "price": 154
                         },
                         {
-                            "id": "Gloves_Dexterity_Shadowstep",
+                            "id": "Gloves_Hunter",
                             "price": 151
-                        },
-                        {
-                            "id": "Amulet_Stronghold",
-                            "price": 90
                         },
                         {
                             "id": "Upgrade_Resource_Quality_Flux",
@@ -229,15 +221,15 @@
                             "price": 45
                         },
                         {
-                            "id": "Helmet_Dexterity_Feral_Instinct",
+                            "id": "Helmet_Feral_Instinct",
                             "price": 35
                         },
                         {
-                            "id": "Body_Dexterity_Feral_Instinct",
+                            "id": "Body_Feral_Instinct",
                             "price": 35
                         },
                         {
-                            "id": "Gloves_Dexterity_Feral_Instinct",
+                            "id": "Gloves_Feral_Instinct",
                             "price": 35
                         },
                         {
@@ -249,7 +241,7 @@
                             "price": 40
                         },
                         {
-                            "id": "Amulet_Life_Core",
+                            "id": "Amulet_Ruby",
                             "price": 35
                         },
                         {
@@ -261,7 +253,7 @@
                             "price": 105
                         },
                         {
-                            "id": "Recipe_Body_Strength_Iron_Bastion",
+                            "id": "Recipe_Body_Steel_Bastion",
                             "price": 130
                         },
                         {
@@ -269,11 +261,11 @@
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Body_Dexterity_Shadowstep",
+                            "id": "Recipe_Body_Hunter_Chestplate",
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Body_Intelligence_Eternal_Reserve",
+                            "id": "Recipe_Body_Archmage_Mantle",
                             "price": 130
                         },
                         {
@@ -281,11 +273,11 @@
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Helmet_Dexterity_Shadowstep",
+                            "id": "Recipe_Helmet_Hunter",
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Helmet_Intelligence_Eternal_Reserve",
+                            "id": "Recipe_Helmet_Archmage_Cap",
                             "price": 130
                         },
                         {
@@ -293,11 +285,11 @@
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Boots_Dexterity_Shadowstep",
+                            "id": "Recipe_Boots_Hunter",
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Boots_Intelligence_Eternal_Reserve",
+                            "id": "Recipe_Boots_Archmage_Sandals",
                             "price": 130
                         },
                         {
@@ -305,11 +297,11 @@
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Gloves_Dexterity_Shadowstep",
+                            "id": "Recipe_Gloves_Hunter",
                             "price": 130
                         },
                         {
-                            "id": "Recipe_Gloves_Intelligence_Eternal_Reserve",
+                            "id": "Recipe_Gloves_Archmage",
                             "price": 130
                         }
                     ]
@@ -358,23 +350,23 @@
                             "price": 3
                         },
                         {
-                            "id": "Amulet_Of_Recovery",
+                            "id": "Amulet_Recovery_Source",
                             "price": 10
                         },
                         {
-                            "id": "Helmet_Intelligence_Arcane_Bulwark",
+                            "id": "Helmet_Mysterious_Bastion",
                             "price": 15
                         },
                         {
-                            "id": "Body_Intelligence_Arcane_Bulwark",
+                            "id": "Body_Mysterious_Bastion",
                             "price": 10
                         },
                         {
-                            "id": "Gloves_Intelligence_Arcane_Bulwark",
+                            "id": "Gloves_Mysterious_Bastion",
                             "price": 10
                         },
                         {
-                            "id": "Boots_Intelligence_Arcane_Bulwark",
+                            "id": "Boots_Mysterious_Bastion",
                             "price": 10
                         },
                         {
@@ -511,7 +503,7 @@
                             "price": 76
                         },
                         {
-                            "id": "Recipe_Body_Intelligence_Aegis",
+                            "id": "Recipe_Body_Aegis",
                             "price": 50
                         }
                     ]
@@ -547,7 +539,7 @@
                     "tier": 1,
                     "items": [
                         {
-                            "id": "Amulet_Strength_Intelligence",
+                            "id": "Amulet_Symbol_Of_Faith",
                             "price": 193
                         }
                     ]
@@ -565,11 +557,11 @@
                     "tier": 3,
                     "items": [
                         {
-                            "id": "Amulet_Dexterity",
+                            "id": "Amulet_Malachite_Medallion",
                             "price": 13
                         },
                         {
-                            "id": "Belt_of_Strength",
+                            "id": "Belt_Leather",
                             "price": 13
                         },
                         {
@@ -687,7 +679,7 @@
                     "tier": 3,
                     "items": [
                         {
-                            "id": "Belt_of_Dexterity",
+                            "id": "Belt_Scout_Sash",
                             "price": 11
                         },
                         {
@@ -744,7 +736,7 @@
                     "tier": 3,
                     "items": [
                         {
-                            "id": "Belt_of_Intelligence",
+                            "id": "Belt_Cloth",
                             "price": 3
                         },
                         {
@@ -808,7 +800,7 @@
                     "tier": 3,
                     "items": [
                         {
-                            "id": "Amulet_Strength",
+                            "id": "Amulet_Garnet",
                             "price": 7
                         }
                     ]
@@ -864,7 +856,7 @@
                     "tier": 0,
                     "items": [
                         {
-                            "id": "Body_Power",
+                            "id": "Body_Disaster_Herald",
                             "price": 539
                         },
                         {
@@ -881,7 +873,7 @@
                     "tier": 2,
                     "items": [
                         {
-                            "id": "Ring_Of_Dwarfs",
+                            "id": "Ring_Dwarven_Signet",
                             "price": 60
                         },
                         {
@@ -957,12 +949,7 @@
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {
-                            "id": "Ring_Of_Archmage",
-                            "price": 42
-                        }
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
@@ -986,7 +973,7 @@
                             "price": 568
                         },
                         {
-                            "id": "Creators_Cloak",
+                            "id": "Cloak_Creators_Cassock",
                             "price": 646
                         }
                     ]
@@ -1002,12 +989,7 @@
                 },
                 {
                     "tier": 2,
-                    "items": [
-                        {
-                            "id": "Belt",
-                            "price": 43
-                        }
-                    ]
+                    "items": []
                 },
                 {
                     "tier": 3,
@@ -1022,7 +1004,7 @@
                     "tier": 0,
                     "items": [
                         {
-                            "id": "Amulet_Intelligence",
+                            "id": "Amulet_Lazurite",
                             "price": 266
                         }
                     ]

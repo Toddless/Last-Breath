@@ -1,7 +1,7 @@
 {
     "items": [
         {
-            "id": "Belt_of_Strength",
+            "id": "Belt_Leather",
             "equipmentPart": "Belt",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -12,7 +12,7 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -20,7 +20,7 @@
             "grants": []
         },
         {
-            "id": "Belt_of_Dexterity",
+            "id": "Belt_Scout_Sash",
             "equipmentPart": "Belt",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -31,7 +31,7 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -39,7 +39,7 @@
             "grants": []
         },
         {
-            "id": "Belt_of_Intelligence",
+            "id": "Belt_Cloth",
             "equipmentPart": "Belt",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -50,7 +50,7 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -69,13 +69,13 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 100, "max": 250 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 100, "max": 250 },
                     "scope": "Local"
                 }
             ],
@@ -94,13 +94,13 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 200, "max": 370 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "BlockChance",
                     "modifierType": "flat",
-                    "value": 0.03,
+                    "value": { "min": 0.01, "max": 0.05 },
                     "scope": "Local"
                 }
             ],
@@ -119,13 +119,13 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 120, "max": 200 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": 150,
+                    "value": { "min": 75, "max": 155 },
                     "scope": "Local"
                 }
             ],
@@ -144,57 +144,12 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 150, "max": 270 },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
             "grants": []
-        },
-        {
-            "id": "Belt",
-            "equipmentPart": "Belt",
-            "rarity": "Common",
-            "tags": [],
-            "effectId": "",
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Health",
-                    "modifierType": "flat",
-                    "value": 600
-                },
-                {
-                    "parameter": "Armor",
-                    "modifierType": "flat",
-                    "value": 500
-                }
-            ],
-            "modifiers": []
-        },
-        {
-            "id": "Test_Belt",
-            "equipmentPart": "Belt",
-            "rarity": "Uncommon",
-            "tags": [],
-            "attributeType": "None",
-            "effectId": "",
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Health",
-                    "modifierType": "flat",
-                    "value": 500
-                },
-                {
-                    "parameter": "Evade",
-                    "modifierType": "flat",
-                    "value": 800
-                }
-            ],
-            "modifiers": []
         },
         {
             "id": "Belt_Life_Flow",
@@ -209,7 +164,7 @@
                     "parameter": "Health",
                     "modifierType": "flat",
                     "value": {
-                        "min": 250,
+                        "min": 200,
                         "max": 350
                     }
                 }
@@ -238,8 +193,8 @@
                     "parameter": "Mana",
                     "modifierType": "flat",
                     "value": {
-                        "min": 250,
-                        "max": 350
+                        "min": 170,
+                        "max": 250
                     }
                 }
             ],
@@ -267,8 +222,8 @@
                     "parameter": "ManaRecovery",
                     "modifierType": "flat",
                     "value": {
-                        "min": 40,
-                        "max": 60
+                        "min": 25,
+                        "max": 55
                     }
                 }
             ],
@@ -282,6 +237,44 @@
                     }
                 }
             ]
+        },
+        {
+            "id": "Belt_Creators_Core",
+            "equipmentPart": "Belt",
+            "maxStackSize": 1,
+            "rarity": "Mythic",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 555,
+                        "max": 777
+                    }
+                },
+                {
+                    "parameter": "Mana",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 333,
+                        "max": 444
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "AllResistance",
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.22,
+                        "max": 0.33
+                    }
+                }
+            ],
+            "grants": []
         }
     ]
 }

@@ -50,15 +50,16 @@ namespace Battle.Source.UIElements
                     button.Visible = false;
                     button.SetUpgradeTaken(false);
                     button.SetUpgradeInstanceId(string.Empty);
+                    button.SetDescription(string.Empty);
                     continue;
                 }
 
                 var option = options[i];
                 button.Visible = true;
-                button.Text = option.DisplayName;
                 button.SetUpgradeTaken(option.Selected);
                 button.SetUpgradeTier(tier);
                 button.SetUpgradeInstanceId(option.UpgradeInstanceId);
+                button.SetDescription(option.Description);
             }
         }
 

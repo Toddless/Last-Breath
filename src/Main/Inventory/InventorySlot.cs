@@ -34,10 +34,8 @@ namespace LastBreath.Inventory
         {
             base.RefreshUi();
             QuantityLabel?.Text = Quantity > 1 ? Quantity.ToString() : string.Empty;
-            // TODO:
-            // пока что так. Чуть позже решение почище
             var item = GetItemInstance?.Invoke(CurrentItem?.InstanceId ?? string.Empty);
-            Background?.Texture = ResourceLoader.Load<Texture2D?>(AssetPaths.SlotBackground(item?.Rarity ?? Rarity.Common));
+            Background?.Texture = item is null ? null : ResourceLoader.Load<Texture2D?>(AssetPaths.SlotBackground(item.Rarity));
             UpdateRarityFrame();
         }
 

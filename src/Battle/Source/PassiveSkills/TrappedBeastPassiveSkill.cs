@@ -29,9 +29,10 @@
         {
             if (Owner == null) return;
             float percentLost = 1 - (currentHealth / Owner.Parameters.MaxHealth);
-            int steps = (int)(percentLost / DamageBonus);
-            float bonus = 1f + steps * DamageBonus;
-            _increaseDamageModifier.Value = bonus;
+            // Steps are counted by missing-health chunks; each step adds DamageBonus as an Increase
+            // (the component already sums increases on top of 1 — no manual "1 +" here).
+            int steps = (int)(percentLost / HealthPercent);
+            _increaseDamageModifier.Value = steps * DamageBonus;
             Owner.ParameterModifiers.UpdateModifier(_increaseDamageModifier);
         }
 

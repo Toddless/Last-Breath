@@ -1,6 +1,6 @@
 [
     {
-        "itemId": "Amulet_Of_Recovery",
+        "itemId": "Amulet_Recovery_Source",
         "resources": [
             {
                 "resourceId": "",
@@ -27,7 +27,7 @@
         ]
     },
     {
-        "itemId": "Amulet_Dexterity_Strength",
+        "itemId": "Amulet_Trapper_Talisman",
         "resources": [
             {
                 "resourceId": "",
@@ -36,7 +36,7 @@
         ]
     },
     {
-        "itemId": "Amulet_Dexterity_Intelligence",
+        "itemId": "Amulet_Pathfinder_Sign",
         "resources": [
             {
                 "resourceId": "",
@@ -81,7 +81,7 @@
         ]
     },
     {
-        "itemId": "Amulet_Goliath_Sign",
+        "itemId": "Amulet_Goliath_Seal",
         "resources": [
             {
                 "resourceId": "",
@@ -90,7 +90,7 @@
         ]
     },
     {
-        "itemId": "Belt",
+        "itemId": "Body_Stoneheart",
         "resources": [
             {
                 "resourceId": "",
@@ -99,7 +99,7 @@
         ]
     },
     {
-        "itemId": "Test_Belt",
+        "itemId": "Body_Steel_Bastion",
         "resources": [
             {
                 "resourceId": "",
@@ -108,7 +108,7 @@
         ]
     },
     {
-        "itemId": "Body_Strength_Stoneheart",
+        "itemId": "Body_Vital_Core",
         "resources": [
             {
                 "resourceId": "",
@@ -117,7 +117,7 @@
         ]
     },
     {
-        "itemId": "Body_Strength_Iron_Bastion",
+        "itemId": "Body_Hunter_Chestplate",
         "resources": [
             {
                 "resourceId": "",
@@ -126,7 +126,7 @@
         ]
     },
     {
-        "itemId": "Body_Strength_Vital_Core",
+        "itemId": "Body_Hunters_Dream",
         "resources": [
             {
                 "resourceId": "",
@@ -135,7 +135,7 @@
         ]
     },
     {
-        "itemId": "Body_Dexterity_Shadowstep",
+        "itemId": "Body_Feral_Instinct",
         "resources": [
             {
                 "resourceId": "",
@@ -144,7 +144,7 @@
         ]
     },
     {
-        "itemId": "Body_Dexterity_Hunters_Dream",
+        "itemId": "Body_Archmage_Mantle",
         "resources": [
             {
                 "resourceId": "",
@@ -153,7 +153,7 @@
         ]
     },
     {
-        "itemId": "Body_Dexterity_Feral_Instinct",
+        "itemId": "Body_Mysterious_Bastion",
         "resources": [
             {
                 "resourceId": "",
@@ -162,25 +162,7 @@
         ]
     },
     {
-        "itemId": "Body_Intelligence_Eternal_Reserve",
-        "resources": [
-            {
-                "resourceId": "",
-                "amount": 1
-            }
-        ]
-    },
-    {
-        "itemId": "Body_Intelligence_Arcane_Bulwark",
-        "resources": [
-            {
-                "resourceId": "",
-                "amount": 1
-            }
-        ]
-    },
-    {
-        "itemId": "Body_Intelligence_Aegis",
+        "itemId": "Body_Aegis",
         "resources": [
             {
                 "resourceId": "",
@@ -198,7 +180,7 @@
         ]
     },
     {
-        "itemId": "Body_No_Way_Back",
+        "itemId": "Body_Carapace",
         "resources": [
             {
                 "resourceId": "",
@@ -207,7 +189,7 @@
         ]
     },
     {
-        "itemId": "Body_All_Evade_To_Armor",
+        "itemId": "Boots_Stone_Tread",
         "resources": [
             {
                 "resourceId": "",
@@ -216,7 +198,7 @@
         ]
     },
     {
-        "itemId": "Boots_Strength_Stoneheart",
+        "itemId": "Boots_Steel_Greaves",
         "resources": [
             {
                 "resourceId": "",
@@ -225,7 +207,7 @@
         ]
     },
     {
-        "itemId": "Boots_Strength_Iron_Bastion",
+        "itemId": "Boots_Vital_Core",
         "resources": [
             {
                 "resourceId": "",
@@ -234,7 +216,7 @@
         ]
     },
     {
-        "itemId": "Boots_Strength_Vital_Core",
+        "itemId": "Boots_Hunter",
         "resources": [
             {
                 "resourceId": "",
@@ -243,7 +225,7 @@
         ]
     },
     {
-        "itemId": "Boots_Dexterity_Shadowstep",
+        "itemId": "Boots_Hunters_Dream",
         "resources": [
             {
                 "resourceId": "",
@@ -252,7 +234,7 @@
         ]
     },
     {
-        "itemId": "Boots_Dexterity_Hunters_Dream",
+        "itemId": "Boots_Feral_Instinct",
         "resources": [
             {
                 "resourceId": "",
@@ -261,7 +243,7 @@
         ]
     },
     {
-        "itemId": "Boots_Dexterity_Feral_Instinct",
+        "itemId": "Boots_Archmage_Sandals",
         "resources": [
             {
                 "resourceId": "",
@@ -270,7 +252,7 @@
         ]
     },
     {
-        "itemId": "Boots_Intelligence_Eternal_Reserve",
+        "itemId": "Boots_Mysterious_Bastion",
         "resources": [
             {
                 "resourceId": "",
@@ -279,7 +261,7 @@
         ]
     },
     {
-        "itemId": "Boots_Intelligence_Arcane_Bulwark",
+        "itemId": "Boots_Aegis",
         "resources": [
             {
                 "resourceId": "",
@@ -288,7 +270,7 @@
         ]
     },
     {
-        "itemId": "Boots_Intelligence_Aegis",
+        "itemId": "Cloak_Creators_Cassock",
         "resources": [
             {
                 "resourceId": "",
@@ -297,7 +279,7 @@
         ]
     },
     {
-        "itemId": "Creators_Cloak",
+        "itemId": "Helmet_Stoneheart",
         "resources": [
             {
                 "resourceId": "",
@@ -306,7 +288,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Strength_Stoneheart",
+        "itemId": "Helmet_Steel",
         "resources": [
             {
                 "resourceId": "",
@@ -315,7 +297,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Strength_Iron_Bastion",
+        "itemId": "Helmet_Vital_Core",
         "resources": [
             {
                 "resourceId": "",
@@ -324,7 +306,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Strength_Vital_Core",
+        "itemId": "Helmet_Hunter",
         "resources": [
             {
                 "resourceId": "",
@@ -333,7 +315,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Dexterity_Shadowstep",
+        "itemId": "Helmet_Hunters_Dream",
         "resources": [
             {
                 "resourceId": "",
@@ -342,7 +324,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Dexterity_Hunters_Dream",
+        "itemId": "Helmet_Feral_Instinct",
         "resources": [
             {
                 "resourceId": "",
@@ -351,7 +333,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Dexterity_Feral_Instinct",
+        "itemId": "Helmet_Archmage_Cap",
         "resources": [
             {
                 "resourceId": "",
@@ -360,7 +342,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Intelligence_Eternal_Reserve",
+        "itemId": "Helmet_Mysterious_Bastion",
         "resources": [
             {
                 "resourceId": "",
@@ -369,7 +351,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Intelligence_Arcane_Bulwark",
+        "itemId": "Helmet_Aegis",
         "resources": [
             {
                 "resourceId": "",
@@ -378,7 +360,7 @@
         ]
     },
     {
-        "itemId": "Helmet_Intelligence_Aegis",
+        "itemId": "Gloves_Stoneheart",
         "resources": [
             {
                 "resourceId": "",
@@ -387,7 +369,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Strength_Stoneheart",
+        "itemId": "Gloves_Steel",
         "resources": [
             {
                 "resourceId": "",
@@ -396,7 +378,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Strength_Iron_Bastion",
+        "itemId": "Gloves_Vital_Core",
         "resources": [
             {
                 "resourceId": "",
@@ -405,7 +387,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Strength_Vital_Core",
+        "itemId": "Gloves_Hunter",
         "resources": [
             {
                 "resourceId": "",
@@ -414,7 +396,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Dexterity_Shadowstep",
+        "itemId": "Gloves_Hunters_Dream",
         "resources": [
             {
                 "resourceId": "",
@@ -423,7 +405,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Dexterity_Hunters_Dream",
+        "itemId": "Gloves_Feral_Instinct",
         "resources": [
             {
                 "resourceId": "",
@@ -432,7 +414,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Dexterity_Feral_Instinct",
+        "itemId": "Gloves_Archmage",
         "resources": [
             {
                 "resourceId": "",
@@ -441,7 +423,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Intelligence_Eternal_Reserve",
+        "itemId": "Gloves_Mysterious_Bastion",
         "resources": [
             {
                 "resourceId": "",
@@ -450,16 +432,7 @@
         ]
     },
     {
-        "itemId": "Gloves_Intelligence_Arcane_Bulwark",
-        "resources": [
-            {
-                "resourceId": "",
-                "amount": 1
-            }
-        ]
-    },
-    {
-        "itemId": "Gloves_Intelligence_Aegis",
+        "itemId": "Gloves_Aegis",
         "resources": [
             {
                 "resourceId": "",

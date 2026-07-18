@@ -12,6 +12,7 @@ namespace Battle.Source.Abilities.IceBlock
     using Core.Entity;
     using Core.Enums;
     using Effects;
+    using Godot;
 
     /// <summary>Cast plan of the Ice Block: the volley fields plus the stage-mutable stun length.</summary>
     public class IceBlockPlan : DamagingCastPlan
@@ -26,11 +27,22 @@ namespace Battle.Source.Abilities.IceBlock
     /// </summary>
     public class IceBlocks(AbilityBaseData data) : MulticastAbility<IceBlockPlan>(data)
     {
+        private readonly RandomNumberGenerator _rnd = new();
+
         public float Damage => this[AbilityParameter.Damage];
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
         public int StunDuration => (int)this[Parameters.StunDuration];
         public int ExtraBlocks => (int)this[Parameters.ExtraBlocks];
+
+        /// <summary>L3 upgrade point: chance to reset the cooldown after the cast.</summary>
+        public float ResetCooldownChance { get; set; }
+
+        /// <summary>L3 upgrade point: the stage-4 extra blocks crash on random enemies instead of the target.</summary>
+        public bool ExtraBlocksHitRandomTargets { get; set; }
+
+        /// <summary>L3 upgrade point: an existing stun is consumed from the target and the block hits twice as hard.</summary>
+        public bool ConsumeStunForDoubleDamage { get; set; }
 
         public static class Parameters
         {
@@ -54,7 +66,12 @@ namespace Battle.Source.Abilities.IceBlock
             parameters.RegisterDefault(Parameters.ExtraBlockDamagePercent, 0.5f);
         }
 
-        public override IAbility Copy() => CopyUpgradesTo(new IceBlocks(Data));
+        public override IAbility Copy() => CopyUpgradesTo(new IceBlocks(Data)
+        {
+            ResetCooldownChance = ResetCooldownChance,
+            ExtraBlocksHitRandomTargets = ExtraBlocksHitRandomTargets,
+            ConsumeStunForDoubleDamage = ConsumeStunForDoubleDamage
+        });
 
         /// <summary>One heavy block per target: the hit stuns (base plan rider), stage riders and the
         /// ability's impact riders fire per crushed target.</summary>
@@ -62,11 +79,14 @@ namespace Battle.Source.Abilities.IceBlock
         {
             foreach (IFightable target in plan.Targets.Where(t => t.IsAlive).ToList())
             {
-                var hit = await DealPlanDamage(plan, owner, target);
+                float multiplier = TryConsumeStun(target) ? 2f : 1f;
+                var hit = await DealBlockDamage(plan, owner, target, multiplier);
                 foreach (var rider in plan.OnHitRiders)
                     rider(hit);
                 await ApplyImpactRiders(new AbilityImpact(owner, target, field, Succeeded: true, hit.IsCritical, hit.Damage));
             }
+
+            if (ResetCooldownChance > 0 && _rnd.Randf() <= ResetCooldownChance) CooldownLeft = 0;
         }
 
         protected override IceBlockPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field)
@@ -99,24 +119,57 @@ namespace Battle.Source.Abilities.IceBlock
                         .Apply(new EffectApplyingContext { Caster = owner, Target = hit.Target, Source = InstanceId }));
                     break;
                 case 4:
-                    plan.OnHitRiders.Add(hit => DropExtraBlocks(plan, owner, hit.Target));
+                    plan.OnHitRiders.Add(hit => DropExtraBlocks(plan, owner, field, hit.Target));
                     break;
             }
         }
 
+        /// <summary>The upgrade eats the target's stun instead of stacking on it — the block converts
+        /// the lost control into double damage.</summary>
+        private bool TryConsumeStun(IFightable target)
+        {
+            if (!ConsumeStunForDoubleDamage) return false;
+            var stuns = target.Effects.GetBy(effect => effect.IsSame("Effect_Stun")).ToList();
+            if (stuns.Count == 0) return false;
 
+            foreach (IEffect stun in stuns) stun.Remove();
+            return true;
+        }
 
-        /// <summary>Stage 4: three more blocks crash down, each at a share of the main block's damage.</summary>
-        private void DropExtraBlocks(IceBlockPlan plan, IFightable owner, IFightable target)
+        /// <summary>The whole hit (flat + scales) is doubled, so the multiplier scales the plan for
+        /// one strike and restores it — the plan lives for the rest of the cast.</summary>
+        private async Task<ProjectileHit> DealBlockDamage(IceBlockPlan plan, IFightable owner, IFightable target, float multiplier)
+        {
+            if (multiplier == 1f) return await DealPlanDamage(plan, owner, target);
+
+            (float damage, float weapon, float spell) = (plan.Damage, plan.WeaponDamageScale, plan.SpellDamageScale);
+            plan.Damage *= multiplier;
+            plan.WeaponDamageScale *= multiplier;
+            plan.SpellDamageScale *= multiplier;
+            var hit = await DealPlanDamage(plan, owner, target);
+            (plan.Damage, plan.WeaponDamageScale, plan.SpellDamageScale) = (damage, weapon, spell);
+            return hit;
+        }
+
+        /// <summary>Stage 4: three more blocks crash down, each at a share of the main block's damage.
+        /// With the L3 upgrade every extra block picks its own random enemy.</summary>
+        private void DropExtraBlocks(IceBlockPlan plan, IFightable owner, IBattleField field, IFightable target)
         {
             float blockDamage = CalculateHitDamage(plan, owner) * this[Parameters.ExtraBlockDamagePercent];
             for (int i = 0; i < ExtraBlocks; i++)
             {
-                if (!target.IsAlive) return;
+                IFightable? victim = ExtraBlocksHitRandomTargets ? RandomEnemy(owner, field) : target;
+                if (victim is not { IsAlive: true }) return;
                 var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, CastId = CastId };
                 context.Add(DamageType.Cold, blockDamage);
-                _ = target.TakeDamage(context);
+                _ = victim.TakeDamage(context);
             }
+        }
+
+        private IFightable? RandomEnemy(IFightable owner, IBattleField field)
+        {
+            var enemies = field.GetEnemies(owner).Where(enemy => enemy.IsAlive).ToList();
+            return enemies.Count == 0 ? null : enemies[_rnd.RandiRange(0, enemies.Count - 1)];
         }
     }
 }

@@ -9,5 +9,9 @@ namespace Core.Ai.World.Raids
         float CooldownRemaining { get; set; }
 
         void Tick(float delta);
+
+        /// <summary>Debug/design seam: launches a raid NOW, bypassing cooldown and chance. Still
+        /// requires an alive non-fighting player and a Hatred faction with a raid-capable site.</summary>
+        bool ForceRaid();
     }
 }

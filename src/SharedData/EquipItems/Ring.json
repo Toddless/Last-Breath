@@ -1,7 +1,7 @@
 {
     "items": [
         {
-            "id": "Ring_Of_Dwarfs",
+            "id": "Ring_Dwarven_Signet",
             "equipmentPart": "Ring",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -15,7 +15,7 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 30,
+                    "value": { "min": 10, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -37,7 +37,7 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 30,
+                    "value": { "min": 10, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -59,35 +59,7 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 30,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Ring_Of_Archmage",
-            "equipmentPart": "Ring",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [
-                "Ring",
-                "Equipment"
-            ],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "flat",
-                    "value": 20,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Mana",
-                    "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 10, "max": 15 },
                     "scope": "Local"
                 }
             ],
@@ -109,13 +81,13 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 15,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": 400,
+                    "value": { "min": 100, "max": 200 },
                     "scope": "Local"
                 }
             ],
@@ -137,13 +109,13 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": 120,
+                    "value": { "min": 120, "max": 200 },
                     "scope": "Local"
                 }
             ],
@@ -165,13 +137,13 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "MulticastChance",
                     "modifierType": "flat",
-                    "value": 0.05,
+                    "value": { "min": 0.01, "max": 0.05 },
                     "scope": "Local"
                 }
             ],
@@ -193,13 +165,13 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Accuracy",
                     "modifierType": "flat",
-                    "value": 500,
+                    "value": { "min": 250, "max": 380 },
                     "scope": "Local"
                 }
             ],
@@ -221,13 +193,13 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
-                    "value": 0.05,
+                    "value": { "min": 0.01, "max": 0.05 },
                     "scope": "Local"
                 }
             ],
@@ -249,13 +221,13 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "AdditionalHitChance",
                     "modifierType": "flat",
-                    "value": 0.05,
+                    "value": { "min": 0.01, "max": 0.05 },
                     "scope": "Local"
                 }
             ],
@@ -277,13 +249,13 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "BlockChance",
                     "modifierType": "flat",
-                    "value": 0.05,
+                    "value": { "min": 0.01, "max": 0.05 },
                     "scope": "Local"
                 }
             ],
@@ -305,13 +277,13 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": 300,
+                    "value": { "min": 150, "max": 280 },
                     "scope": "Local"
                 }
             ],
@@ -333,17 +305,74 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": 20,
+                    "value": { "min": 5, "max": 10 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 150,
+                    "value": { "min": 100, "max": 190 },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Ring_Of_Fire_Demon",
+            "equipmentPart": "Ring",
+            "maxStackSize": 1,
+            "rarity": "Unique",
+            "tags": [
+                "Ring",
+                "Equipment"
+            ],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 20,
+                        "max": 35
+                    }
+                }
+            ],
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.3
+                    }
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 35,
+                        "max": 50
+                    }
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.3
+                    }
+                }
+            ],
             "grants": []
         },
         {
@@ -359,53 +388,53 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": {
+                        "min": 6,
+                        "max": 33
+                    }
+                },
+                {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
                     "value": {
-                        "min": 20,
-                        "max": 30
+                        "min": 6,
+                        "max": 33
                     }
                 },
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
                     "value": {
-                        "min": 20,
-                        "max": 30
-                    }
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": {
-                        "min": 20,
-                        "max": 30
+                        "min": 6,
+                        "max": 33
                     }
                 }
             ],
             "modifiers": [
                 {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.06,
+                        "max": 0.33
+                    }
+                },
+                {
                     "parameter": "Dexterity",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.12,
-                        "max": 0.18
+                        "min": 0.06,
+                        "max": 0.33
                     }
                 },
                 {
                     "parameter": "Intelligence",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.12,
-                        "max": 0.18
-                    }
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.12,
-                        "max": 0.18
+                        "min": 0.06,
+                        "max": 0.33
                     }
                 }
             ],
@@ -435,18 +464,18 @@
                     "parameter": "Intelligence",
                     "modifierType": "flat",
                     "value": {
-                        "min": 20,
-                        "max": 30
+                        "min": 15,
+                        "max": 25
                     }
                 }
             ],
             "modifiers": [
                 {
-                    "parameter": "Strength",
+                    "parameter": "Intelligence",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.12,
-                        "max": 0.18
+                        "min": 0.1,
+                        "max": 0.25
                     }
                 }
             ],
@@ -457,63 +486,6 @@
                     "properties": {}
                 }
             ]
-        },
-        {
-            "id": "Ring_Of_Fire_Demon",
-            "equipmentPart": "Ring",
-            "maxStackSize": 1,
-            "rarity": "Unique",
-            "tags": [
-                "Ring",
-                "Equipment"
-            ],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Health",
-                    "modifierType": "flat",
-                    "value": {
-                        "min": 500,
-                        "max": 700
-                    }
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": {
-                        "min": 25,
-                        "max": 35
-                    }
-                }
-            ],
-            "modifiers": [
-                {
-                    "parameter": "Health",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.25,
-                        "max": 0.35
-                    }
-                },
-                {
-                    "parameter": "HealthRecovery",
-                    "modifierType": "flat",
-                    "value": {
-                        "min": 40,
-                        "max": 60
-                    }
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.25,
-                        "max": 0.35
-                    }
-                }
-            ],
-            "grants": []
         },
         {
             "id": "Ring_of_Creators",
@@ -530,23 +502,23 @@
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
-                    "value": 150
+                    "value": {
+                        "min": 1.0,
+                        "max": 1.5
+                    }
                 },
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
                     "value": {
-                        "min": 0.08,
-                        "max": 0.12
+                        "min": 0.05,
+                        "max": 0.1
                     }
                 },
                 {
                     "parameter": "Damage",
                     "modifierType": "flat",
-                    "value": {
-                        "min": 400,
-                        "max": 600
-                    }
+                    "value": 500
                 }
             ],
             "modifiers": [
@@ -554,16 +526,16 @@
                     "parameter": "Damage",
                     "modifierType": "multi",
                     "value": {
-                        "min": 0.35,
-                        "max": 0.45
+                        "min": 0.25,
+                        "max": 0.4
                     }
                 },
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "multi",
                     "value": {
-                        "min": 0.35,
-                        "max": 0.45
+                        "min": 0.3,
+                        "max": 0.4
                     }
                 }
             ],

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cv5svhrugien6"]
+[gd_scene format=3 uid="uid://cv5svhrugien6"]
 
 [ext_resource type="Script" uid="uid://dwqlti1jvk41l" path="res://Addons/Battle/UIElements/CharacterBar.cs" id="1_a8sqt"]
 
@@ -34,7 +34,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.23, 0.2, 0.16, 1)
 
-[node name="CharacterHealthBar" type="PanelContainer" node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "Icon", "CharacterEffects", "_name", "_factionBadge", "_factionLabel", "_hpText", "_manaText", "_effectsSection", "_effectsHeaderLabel", "_modsSection", "_modsHeaderLabel", "_mods")]
+[node name="CharacterHealthBar" type="PanelContainer" unique_id=912470484 node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "Icon", "CharacterEffects", "_name", "_factionBadge", "_factionLabel", "_hpText", "_manaText", "_level", "_effectsSection", "_effectsHeaderLabel", "_modsSection", "_modsHeaderLabel", "_mods")]
 custom_minimum_size = Vector2(340, 0)
 offset_right = 340.0
 offset_bottom = 120.0
@@ -52,57 +52,58 @@ _factionBadge = NodePath("Body/Margin/Layout/Header/Info/NameRow/FactionBadge")
 _factionLabel = NodePath("Body/Margin/Layout/Header/Info/NameRow/FactionBadge/FactionLabel")
 _hpText = NodePath("Body/Margin/Layout/Header/Info/HpArea/HpText")
 _manaText = NodePath("Body/Margin/Layout/Header/Info/ManaArea/ManaText")
+_level = NodePath("Body/Margin/Layout/Header/Info/NameRow/Level")
 _effectsSection = NodePath("Body/Margin/Layout/EffectsSection")
 _effectsHeaderLabel = NodePath("Body/Margin/Layout/EffectsSection/EffectsHeader/EffectsLabel")
 _modsSection = NodePath("Body/Margin/Layout/ModsSection")
 _modsHeaderLabel = NodePath("Body/Margin/Layout/ModsSection/ModsHeader/ModsLabel")
 _mods = NodePath("Body/Margin/Layout/ModsSection/Mods")
 
-[node name="Body" type="VBoxContainer" parent="."]
+[node name="Body" type="VBoxContainer" parent="." unique_id=48887936]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Accent" type="ColorRect" parent="Body"]
+[node name="Accent" type="ColorRect" parent="Body" unique_id=912921127]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 color = Color(0.71, 0.54, 0.24, 0.9)
 
-[node name="Margin" type="MarginContainer" parent="Body"]
+[node name="Margin" type="MarginContainer" parent="Body" unique_id=1312502271]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="Layout" type="VBoxContainer" parent="Body/Margin"]
+[node name="Layout" type="VBoxContainer" parent="Body/Margin" unique_id=906743734]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Header" type="HBoxContainer" parent="Body/Margin/Layout"]
+[node name="Header" type="HBoxContainer" parent="Body/Margin/Layout" unique_id=41792133]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PortraitPanel" type="PanelContainer" parent="Body/Margin/Layout/Header"]
+[node name="PortraitPanel" type="PanelContainer" parent="Body/Margin/Layout/Header" unique_id=1025136556]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_styles/panel = SubResource("portrait_slot")
 
-[node name="Portrait" type="TextureRect" parent="Body/Margin/Layout/Header/PortraitPanel"]
+[node name="Portrait" type="TextureRect" parent="Body/Margin/Layout/Header/PortraitPanel" unique_id=431785688]
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Body/Margin/Layout/Header"]
+[node name="Info" type="VBoxContainer" parent="Body/Margin/Layout/Header" unique_id=1190159886]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="NameRow" type="HBoxContainer" parent="Body/Margin/Layout/Header/Info"]
+[node name="NameRow" type="HBoxContainer" parent="Body/Margin/Layout/Header/Info" unique_id=707338004]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow"]
+[node name="Name" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow" unique_id=1209493328]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"HeaderLabel"
@@ -110,24 +111,28 @@ theme_override_font_sizes/font_size = 16
 text = "Name"
 text_overrun_behavior = 3
 
-[node name="FactionBadge" type="PanelContainer" parent="Body/Margin/Layout/Header/Info/NameRow"]
-visible = false
+[node name="Level" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow" unique_id=1351076677]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 12
+
+[node name="FactionBadge" type="PanelContainer" parent="Body/Margin/Layout/Header/Info/NameRow" unique_id=1047020485]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("faction_badge")
 
-[node name="FactionLabel" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow/FactionBadge"]
+[node name="FactionLabel" type="Label" parent="Body/Margin/Layout/Header/Info/NameRow/FactionBadge" unique_id=570020859]
 layout_mode = 2
 theme_type_variation = &"DimLabel"
 theme_override_font_sizes/font_size = 10
 text = "Faction"
 
-[node name="HpArea" type="Control" parent="Body/Margin/Layout/Header/Info"]
+[node name="HpArea" type="Control" parent="Body/Margin/Layout/Header/Info" unique_id=2043635670]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Health" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea"]
+[node name="Health" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea" unique_id=1427037539]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -139,7 +144,7 @@ theme_type_variation = &"HpBar"
 value = 81.0
 show_percentage = false
 
-[node name="Barrier" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea"]
+[node name="Barrier" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/HpArea" unique_id=1661129195]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -151,24 +156,23 @@ theme_type_variation = &"BarrierBar"
 value = 21.0
 show_percentage = false
 
-[node name="HpText" type="Label" parent="Body/Margin/Layout/Header/Info/HpArea"]
+[node name="HpText" type="Label" parent="Body/Margin/Layout/Header/Info/HpArea" unique_id=1713524398]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ManaArea" type="Control" parent="Body/Margin/Layout/Header/Info"]
+[node name="ManaArea" type="Control" parent="Body/Margin/Layout/Header/Info" unique_id=2110510416]
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Mana" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/ManaArea"]
+[node name="Mana" type="ProgressBar" parent="Body/Margin/Layout/Header/Info/ManaArea" unique_id=376222283]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -180,64 +184,63 @@ theme_type_variation = &"ManaBar"
 value = 60.0
 show_percentage = false
 
-[node name="ManaText" type="Label" parent="Body/Margin/Layout/Header/Info/ManaArea"]
+[node name="ManaText" type="Label" parent="Body/Margin/Layout/Header/Info/ManaArea" unique_id=2081060297]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EffectsSection" type="VBoxContainer" parent="Body/Margin/Layout"]
+[node name="EffectsSection" type="VBoxContainer" parent="Body/Margin/Layout" unique_id=1388502862]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="EffectsHeader" type="HBoxContainer" parent="Body/Margin/Layout/EffectsSection"]
+[node name="EffectsHeader" type="HBoxContainer" parent="Body/Margin/Layout/EffectsSection" unique_id=99170180]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="EffectsLabel" type="Label" parent="Body/Margin/Layout/EffectsSection/EffectsHeader"]
+[node name="EffectsLabel" type="Label" parent="Body/Margin/Layout/EffectsSection/EffectsHeader" unique_id=1895165603]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
 theme_override_font_sizes/font_size = 11
 text = "EFFECTS"
 
-[node name="EffectsRule" type="HSeparator" parent="Body/Margin/Layout/EffectsSection/EffectsHeader"]
+[node name="EffectsRule" type="HSeparator" parent="Body/Margin/Layout/EffectsSection/EffectsHeader" unique_id=800683859]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="CharacterEffects" type="GridContainer" parent="Body/Margin/Layout/EffectsSection"]
+[node name="CharacterEffects" type="GridContainer" parent="Body/Margin/Layout/EffectsSection" unique_id=335983686]
 layout_mode = 2
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
 columns = 7
 
-[node name="ModsSection" type="VBoxContainer" parent="Body/Margin/Layout"]
+[node name="ModsSection" type="VBoxContainer" parent="Body/Margin/Layout" unique_id=975332003]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ModsHeader" type="HBoxContainer" parent="Body/Margin/Layout/ModsSection"]
+[node name="ModsHeader" type="HBoxContainer" parent="Body/Margin/Layout/ModsSection" unique_id=1312185256]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ModsLabel" type="Label" parent="Body/Margin/Layout/ModsSection/ModsHeader"]
+[node name="ModsLabel" type="Label" parent="Body/Margin/Layout/ModsSection/ModsHeader" unique_id=1093087878]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
 theme_override_font_sizes/font_size = 11
 text = "MODIFIERS"
 
-[node name="ModsRule" type="HSeparator" parent="Body/Margin/Layout/ModsSection/ModsHeader"]
+[node name="ModsRule" type="HSeparator" parent="Body/Margin/Layout/ModsSection/ModsHeader" unique_id=1078831083]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="Mods" type="VBoxContainer" parent="Body/Margin/Layout/ModsSection"]
+[node name="Mods" type="VBoxContainer" parent="Body/Margin/Layout/ModsSection" unique_id=1136472618]
 layout_mode = 2
 theme_override_constants/separation = 2

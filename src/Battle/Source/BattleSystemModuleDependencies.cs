@@ -34,6 +34,8 @@
             services.AddGameDataParticipant<ICombatRulesProvider, CombatRules.CombatRulesProvider>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
+            // Shared on purpose: NPC looks resolve by NpcId for every spawn path in every project.
+            services.AddSingleton<Presentation.INpcVisualProvider, Presentation.NpcVisualProvider>();
             services.AddSingleton<ISpawnPointRegistry, SpawnPointRegistry>();
             services.AddSingleton<LoadScope>();
             services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());

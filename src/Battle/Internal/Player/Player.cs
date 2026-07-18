@@ -482,6 +482,8 @@ namespace Battle.Internal.Player
 
         private void OnBattleEnds(BattleEndEvent obj)
         {
+            // Own bus first: per-battle passive/effect state resets before the cleanup below
+            CombatEvents.Publish(obj);
             _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
             Effects.RemoveAllEffects();

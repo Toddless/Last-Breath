@@ -46,6 +46,23 @@
 
         public void PlayAnimation(string animation) => _animatedSprite2D?.Play(animation);
 
+        /// <summary>
+        /// Swaps the sprite's clip set (per-NPC art from the visual library) and restarts the
+        /// current clip so the swap is seamless. Scale multiplies the scene's base sprite scale —
+        /// call once per freshly instantiated scene, not on re-application.
+        /// </summary>
+        public void ApplyVisual(SpriteFrames frames, float scale = 1f)
+        {
+            if (_animatedSprite2D == null) return;
+
+            string current = _animatedSprite2D.GetAnimation();
+            _animatedSprite2D.SpriteFrames = frames;
+            if (scale != 1f) _animatedSprite2D.Scale *= scale;
+
+            if (frames.HasAnimation(current)) _animatedSprite2D.Play(current);
+            else if (frames.HasAnimation(_previousAnimation)) _animatedSprite2D.Play(_previousAnimation);
+        }
+
         public float GetClipSeconds(string animation) =>
             _animatedSprite2D?.SpriteFrames is { } sf && sf.HasAnimation(animation)
                 ? GetClipDuration(sf, animation)

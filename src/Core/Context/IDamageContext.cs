@@ -20,6 +20,9 @@ namespace Core.Context
         /// <summary>Elemental resistances (Fire/Cold/Lightning) are skipped in mitigation for this hit.</summary>
         bool IgnoreResistances { get; set; }
 
+        /// <summary>The target's barrier does not absorb this hit (the Soulless passive).</summary>
+        bool IgnoreBarrier { get; set; }
+
         /// <summary>Id of the ability whose ATTACK produced this damage (null otherwise) — presentation plays its impact VFX.</summary>
         string? SourceAbilityId { get; set; }
 

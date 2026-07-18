@@ -57,7 +57,6 @@ namespace LastBreath.Player
         private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
-        private float _baseSpeed = 500;
         [Export] private AnimationsComponent? _animationsComponent;
         [Export] private Area2D? _interactionArea;
         [Export] private Camera2D? _camera;
@@ -242,7 +241,7 @@ namespace LastBreath.Player
             }
 
             Vector2 inputDirection = Input.GetVector(Settings.MoveLeft, Settings.MoveRight, Settings.MoveUp, Settings.MoveDown);
-            Velocity = inputDirection * _baseSpeed;
+            Velocity = inputDirection * Parameters.GetValueForParameter(EntityParameter.MoveSpeed);
             SwitchState(inputDirection);
             MoveAndSlide();
         }
@@ -501,6 +500,8 @@ namespace LastBreath.Player
 
         private void OnBattleEnds(BattleEndEvent obj)
         {
+            // Own bus first: per-battle passive/effect state resets before the cleanup below
+            CombatEvents.Publish(obj);
             _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnds);
             _battleEventBus?.Unsubscribe<PlayerChangesStanceEvent>(OnStanceChanges);
             Effects.RemoveAllEffects();
@@ -624,6 +625,7 @@ namespace LastBreath.Player
             EntityParameter.MulticastChance => 0f,
             EntityParameter.Damage => 100,
             EntityParameter.SpellDamage => 50,
+            EntityParameter.MoveSpeed => 500,
             _ => 0f
         };
 

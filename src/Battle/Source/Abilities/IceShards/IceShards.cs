@@ -23,6 +23,9 @@ namespace Battle.Source.Abilities.IceShards
         public float WeaponDamageScale => this[AbilityParameter.WeaponDamageScale];
         public float SpellDamageScale => this[AbilityParameter.SpellDamageScale];
 
+        /// <summary>L3 upgrade point: critical shards skip the target's cold resistance.</summary>
+        public bool CritIgnoresColdResistance { get; set; }
+
         private const int EmpoweredShardsStage = 2;
         private const int AllTargetsStage = 3;
         private const int ShrapnelBurstStage = 4;
@@ -57,7 +60,7 @@ namespace Battle.Source.Abilities.IceShards
             parameters.RegisterDefault(Parameters.ShrapnelBarrierLeach, 0f);
         }
 
-        public override IAbility Copy() => CopyUpgradesTo(new IceShards(Data));
+        public override IAbility Copy() => CopyUpgradesTo(new IceShards(Data) { CritIgnoresColdResistance = CritIgnoresColdResistance });
 
         protected override VolleyCastPlan CreateBasePlan(List<IFightable> targets, IFightable owner, IBattleField field) =>
             new()
@@ -67,7 +70,8 @@ namespace Battle.Source.Abilities.IceShards
                 WeaponDamageScale = WeaponDamageScale,
                 SpellDamageScale = SpellDamageScale,
                 DamageType = DamageType.Cold,
-                Targets = targets
+                Targets = targets,
+                CritIgnoresResistances = CritIgnoresColdResistance
             };
 
         protected override void ApplyStage(int stage, VolleyCastPlan plan, IFightable owner, IBattleField field)

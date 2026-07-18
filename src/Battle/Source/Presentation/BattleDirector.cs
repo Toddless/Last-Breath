@@ -205,10 +205,17 @@ namespace Battle.Source.Presentation
 
             while (_pending.Count > 0)
             {
+                // Logic-phase records (BeforeDamageTaken, AfterAttack, ...) sit between a blow and
+                // its resolution in the catch-all timeline; playback skips them silently anyway,
+                // but left in place they broke the batching — every attack became its own lunge.
+                DiscardSilentEntries();
+                if (_pending.Count == 0) break;
+
                 object evnt = _pending.Peek().Event;
                 if (evnt is BeforeAttackEvent attack && IsSamePair(opener, attack))
                 {
                     _pending.Dequeue();
+                    DiscardSilentEntries();
                     object? resolution = null;
                     if (_pending.Count > 0 && IsResolutionOf(attack, _pending.Peek().Event))
                         resolution = _pending.Dequeue().Event;
@@ -220,6 +227,16 @@ namespace Battle.Source.Presentation
             }
 
             return true;
+        }
+
+        /// <summary>An event without a beat handler is invisible to playback (PlayBeat skips it
+        /// silently) — phrase collectors treat such entries as transparent.</summary>
+        private bool IsSilent(object evnt) => !_beatHandlers.ContainsKey(evnt.GetType());
+
+        private void DiscardSilentEntries()
+        {
+            while (_pending.Count > 0 && IsSilent(_pending.Peek().Event))
+                _pending.Dequeue();
         }
 
         private static bool IsSamePair(BeforeAttackEvent first, BeforeAttackEvent next) =>
@@ -236,6 +253,7 @@ namespace Battle.Source.Presentation
                 {
                     case EntityHealedEvent or EffectAppliedEvent: continue;
                     case BeforeAttackEvent attack: return IsSamePair(opener, attack);
+                    case var silent when IsSilent(silent): continue;
                     default: return false;
                 }
             }
@@ -556,6 +574,9 @@ namespace Battle.Source.Presentation
                 case EffectAppliedEvent applied when !IsShownDead(applied.Target):
                     Republish(applied);
                     break;
+                case AbilityStageActivatedEvent stage when !IsShownDead(stage.Caster):
+                    Republish(stage);
+                    break;
             }
         }
 
@@ -585,6 +606,7 @@ namespace Battle.Source.Presentation
             AttackEvadedEvent evaded => IsShownDead(evaded.Context.Attacker),
             AttackBlockedEvent blocked => IsShownDead(blocked.Context.Attacker),
             EffectAppliedEvent applied => IsShownDead(applied.Target),
+            AbilityStageActivatedEvent stage => IsShownDead(stage.Caster),
             _ => false,
         };
 
@@ -598,6 +620,7 @@ namespace Battle.Source.Presentation
             [typeof(AttackEvadedEvent)] = evnt => RepublishBeat((AttackEvadedEvent)evnt),
             [typeof(AttackBlockedEvent)] = evnt => RepublishBeat((AttackBlockedEvent)evnt),
             [typeof(EffectAppliedEvent)] = evnt => RepublishBeat((EffectAppliedEvent)evnt),
+            [typeof(AbilityStageActivatedEvent)] = evnt => RepublishBeat((AbilityStageActivatedEvent)evnt),
             // Deaths outside a damage beat (Incineration's Kill): the corpse must still fall on screen.
             // No republish — the battle bus received the event at resolve time.
             [typeof(EntityDiedEvent)] = evnt => PlayEntityDied((EntityDiedEvent)evnt),

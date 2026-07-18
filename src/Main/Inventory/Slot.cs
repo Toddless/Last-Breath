@@ -157,6 +157,7 @@
                 leftover = amount;
                 return false;
             }
+
             int available = CurrentItem.MaxStackSize - Quantity;
             int toAdd = Mathf.Min(available, amount);
             Quantity += toAdd;

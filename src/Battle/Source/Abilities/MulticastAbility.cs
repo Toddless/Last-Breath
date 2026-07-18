@@ -27,8 +27,8 @@ namespace Battle.Source.Abilities
 
         private readonly RandomNumberGenerator _rnd = new();
 
-        /// <summary>The stance activation roll; the knobs live inside (future upgrades/boss phases swap or tune it).</summary>
-        protected MulticastActivation Activation { get; } = new();
+        /// <summary>The stance activation roll; the knobs live inside (upgrades/boss phases tune it).</summary>
+        public MulticastActivation Activation { get; } = new();
 
         /// <summary>
         /// Bonus on top of entity's final critical chance. e.g 45% critical chance * 1.35 (35% bonus critical chance)
@@ -40,7 +40,7 @@ namespace Battle.Source.Abilities
         protected override async Task ExecuteInternal(List<IFightable> targets, IFightable owner, IBattleField field)
         {
             int stage = Activation.Roll(owner);
-            owner.CombatEvents.Publish(new AbilityStageActivatedEvent(this, stage));
+            owner.CombatEvents.Publish(new AbilityStageActivatedEvent(this, owner, stage));
 
             var plan = CreateBasePlan(targets, owner, field);
             for (int current = BaseStage + 1; current <= stage; current++)
@@ -69,7 +69,14 @@ namespace Battle.Source.Abilities
             // Crit damage is a pure additive multiplier by design: bonuses only ever add to it
             if (isCritical) damage *= owner.Parameters.CriticalDamage + CriticalDamageBonus;
 
-            var context = new DamageContext { Source = owner, Cause = DamageCause.Ability, IsCrit = isCritical, CastId = CastId };
+            var context = new DamageContext
+            {
+                Source = owner,
+                Cause = DamageCause.Ability,
+                IsCrit = isCritical,
+                CastId = CastId,
+                IgnoreResistances = plan.IgnoreResistances || (isCritical && plan.CritIgnoresResistances)
+            };
             context.Add(plan.DamageType, damage);
             await target.TakeDamage(context);
             return new ProjectileHit(target, isCritical, context.TotalDamage);

@@ -1,7 +1,176 @@
 {
     "items": [
         {
-            "id": "Amulet_Of_Recovery",
+            "id": "Amulet_Lazurite",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 10, "max": 15 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "inc",
+                    "value": { "min": 0.05, "max": 0.1 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Garnet",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 10, "max": 15 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "inc",
+                    "value": { "min": 0.05, "max": 0.1 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Malachite_Medallion",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 10, "max": 15 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "inc",
+                    "value": { "min": 0.05, "max": 0.1 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Trinity",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "AllAttribute",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Pathfinder_Sign",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Trapper_Talisman",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Dexterity",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Symbol_Of_Faith",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Intelligence",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                },
+                {
+                    "parameter": "Strength",
+                    "modifierType": "flat",
+                    "value": { "min": 5, "max": 10 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Recovery_Source",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -12,13 +181,13 @@
                 {
                     "parameter": "HealthRecovery",
                     "modifierType": "flat",
-                    "value": 50,
+                    "value": { "min": 10, "max": 25 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "ManaRecovery",
                     "modifierType": "flat",
-                    "value": 25,
+                    "value": { "min": 5, "max": 20 },
                     "scope": "Local"
                 }
             ],
@@ -26,7 +195,7 @@
             "grants": []
         },
         {
-            "id": "Amulet_Stronghold",
+            "id": "Amulet_Diamond",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
             "rarity": "Common",
@@ -35,9 +204,28 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Armor",
+                    "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": 200,
+                    "value": { "min": 100, "max": 250 },
+                    "scope": "Local"
+                }
+            ],
+            "modifiers": [],
+            "grants": []
+        },
+        {
+            "id": "Amulet_Ruby",
+            "equipmentPart": "Amulet",
+            "maxStackSize": 1,
+            "rarity": "Common",
+            "tags": [],
+            "updateLevel": 0,
+            "maxUpdateLevel": 12,
+            "implicits": [
+                {
+                    "parameter": "Health",
+                    "modifierType": "flat",
+                    "value": { "min": 150, "max": 300 },
                     "scope": "Local"
                 }
             ],
@@ -56,13 +244,13 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": 200,
+                    "value": { "min": 50, "max": 150 },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": 200,
+                    "value": { "min": 25, "max": 125 },
                     "scope": "Local"
                 }
             ],
@@ -70,207 +258,7 @@
             "grants": []
         },
         {
-            "id": "Amulet_Life_Core",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Health",
-                    "modifierType": "flat",
-                    "value": 400,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Intelligence",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "inc",
-                    "value": 0.3,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Strength",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "inc",
-                    "value": 0.3,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Dexterity",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "inc",
-                    "value": 0.3,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Trinity",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "flat",
-                    "value": 40,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Dexterity_Intelligence",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Dexterity_Strength",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Strength_Intelligence",
-            "equipmentPart": "Amulet",
-            "maxStackSize": 1,
-            "rarity": "Common",
-            "tags": [],
-            "updateLevel": 0,
-            "maxUpdateLevel": 12,
-            "implicits": [
-                {
-                    "parameter": "Strength",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "flat",
-                    "value": 25,
-                    "scope": "Local"
-                }
-            ],
-            "modifiers": [],
-            "grants": []
-        },
-        {
-            "id": "Amulet_Goliath_Sign",
+            "id": "Amulet_Goliath_Seal",
             "equipmentPart": "Amulet",
             "maxStackSize": 1,
             "rarity": "Unique",
@@ -279,37 +267,37 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "health",
+                    "parameter": "Health",
                     "modifierType": "flat",
                     "value": {
-                        "min": 750,
-                        "max": 1050
+                        "min": 300,
+                        "max": 500
                     }
                 },
                 {
-                    "parameter": "strength",
+                    "parameter": "Strength",
                     "modifierType": "flat",
                     "value": {
-                        "min": 30,
-                        "max": 40
+                        "min": 15,
+                        "max": 25
                     }
                 }
             ],
             "modifiers": [
                 {
-                    "parameter": "health",
+                    "parameter": "Strength",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.25,
-                        "max": 0.35
+                        "min": 0.2,
+                        "max": 0.3
                     }
                 },
                 {
-                    "parameter": "strength",
+                    "parameter": "Health",
                     "modifierType": "inc",
                     "value": {
-                        "min": 0.25,
-                        "max": 0.35
+                        "min": 0.2,
+                        "max": 0.3
                     }
                 }
             ],
@@ -333,45 +321,54 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "mana",
+                    "parameter": "Mana",
                     "modifierType": "flat",
                     "value": {
-                        "min": 500,
-                        "max": 700
+                        "min": 300,
+                        "max": 500
                     }
                 },
                 {
-                    "parameter": "health",
+                    "parameter": "Health",
                     "modifierType": "flat",
                     "value": {
-                        "min": 750,
-                        "max": 1050
+                        "min": 400,
+                        "max": 800
                     }
                 },
                 {
-                    "parameter": "manaRecovery",
+                    "parameter": "ManaRecovery",
                     "modifierType": "flat",
                     "value": {
-                        "min": 160,
-                        "max": 240
+                        "min": 150,
+                        "max": 280
                     }
                 }
             ],
             "modifiers": [
                 {
-                    "parameter": "fireResistance",
+                    "parameter": "FireResistance",
                     "modifierType": "flat",
-                    "value": 45
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
                 },
                 {
-                    "parameter": "coldResistance",
+                    "parameter": "LightningResistance",
                     "modifierType": "flat",
-                    "value": 45
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
                 },
                 {
-                    "parameter": "lightningResistance",
+                    "parameter": "ColdResistance",
                     "modifierType": "flat",
-                    "value": 45
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.45
+                    }
                 }
             ],
             "grants": [

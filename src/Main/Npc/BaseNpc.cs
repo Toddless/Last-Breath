@@ -12,6 +12,7 @@ namespace LastBreath.Npc
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Battle;
+    using Core.Battle.DamageResolution;
     using Core.Context;
     using Core.Data;
     using Core.Data.NpcData;
@@ -49,7 +50,7 @@ namespace LastBreath.Npc
         private const float PostBattleContactGraceSeconds = 3f;
 
         private const string UndeadRisingModifierSource = "UndeadRising";
-        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
+        private readonly DamageResolutionChain _damageChain = DamageResolutionChain.CreateDefault();
         private const string UID = "uid://ww6a71b2bbov";
         [Export] private Area2D? _interactionArea;
         private Vector2 _lastPosition = Vector2.Zero;
@@ -73,7 +74,6 @@ namespace LastBreath.Npc
         private float _moveSpeed;
         private string _lastMoveAnimation = string.Empty;
 
-        private float _baseSpeed = 500;
         private readonly RandomNumberGenerator _rnd = new();
         [Export] private AnimationsComponent? _animationsComponent;
 
@@ -736,6 +736,8 @@ namespace LastBreath.Npc
 
         private void OnBattleEnd(BattleEndEvent obj)
         {
+            // Own bus first: per-battle passive/effect state resets before the cleanup below
+            CombatEvents.Publish(obj);
             Effects.RemoveAllEffects();
             CanMove = true;
             Position = _lastPosition;
@@ -918,6 +920,9 @@ namespace LastBreath.Npc
                         break;
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;
+                        break;
+                    case EntityParameter.MoveSpeed:
+                        value = 500;
                         break;
                     case EntityParameter.Damage:
                     case EntityParameter.SpellDamage:

@@ -1,4 +1,4 @@
-﻿{
+{
     "mods": [
         {
             "key": "scale",
@@ -103,9 +103,9 @@
                     "weight": 15,
                     "difficulty": 0.6,
                     "items": [
-                        "Body_Strength_Stoneheart",
-                        "Gloves_Strength_Stoneheart",
-                        "Boots_Strength_Stoneheart"
+                        "Body_Stoneheart",
+                        "Gloves_Stoneheart",
+                        "Boots_Stone_Tread"
                     ],
                     "isUnique": false
                 },
@@ -182,7 +182,7 @@
                     "npcBuffId": "Npc_Buff_Item_Effect_Execution",
                     "weight": 5,
                     "difficulty": 0.4,
-                    "effectId": "Passive_Skill_Execution",
+                    "effectId": "Passive_Skill_Execute",
                     "isUnique": false
                 },
                 {
@@ -198,7 +198,7 @@
                     "npcBuffId": "Npc_Buff_Item_Effect_Poisoned_Claw",
                     "weight": 50,
                     "difficulty": 0.25,
-                    "effectId": "Passive_Skill_Poisoned_Claw",
+                    "effectId": "Passive_Skill_Poisoned_Claws",
                     "isUnique": false
                 },
                 {

@@ -64,13 +64,21 @@
 
         public Costs CostType => (Costs)this[AbilityParameter.CostType];
         public Stance Stance { get; set; } = data.Stance;
+        public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
+        public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
+        public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
+        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
+        public IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades => _currentUpgrades;
+        private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
         public ITargetingStrategy Targeting { get; set; } = TargetingStrategyFactory.From(data);
         public int CostValue => (int)this[AbilityParameter.CostValue];
         public int MasteryLevel { get; set; } = data.MasteryLevel;
         public string Id { get; } = data.Id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
         public string[] Tags { get; } = data.Tags;
-
+        public float Cooldown => this[AbilityParameter.Cooldown];
+        public string Description => FormatDescription();
+        public string DisplayName => Localization.Localize(Id);
         public int CooldownLeft
         {
             get;
@@ -82,15 +90,6 @@
             }
         }
 
-        public Dictionary<string, IAbilityActivationModifier> ActivationEffect { get; } = [];
-        public Dictionary<string, IActivationRider> ActivationRiders { get; } = [];
-        public Dictionary<string, IImpactRider> ImpactRiders { get; } = [];
-        public Dictionary<int, List<IAbilityUpgrade>> Upgrades { get; private set; } = [];
-        public IReadOnlyDictionary<int, IAbilityUpgrade> CurrentUpgrades => _currentUpgrades;
-        private readonly Dictionary<int, IAbilityUpgrade> _currentUpgrades = [];
-        public float Cooldown => this[AbilityParameter.Cooldown];
-        public string Description => FormatDescription();
-        public string DisplayName => Localization.Localize(Id);
 
         public Texture2D? Icon
         {

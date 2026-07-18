@@ -113,16 +113,31 @@ namespace Core.Ai.World.Raids
         protected virtual Vector2? GetPlayerPosition() =>
             _playerAccessor.Player is Node2D node ? node.GlobalPosition : null;
 
+        public bool ForceRaid()
+        {
+            if (IsRaidActive) return false;
+            if (_playerAccessor.Player is not { IsAlive: true, IsFighting: false }) return false;
+            if (GetPlayerPosition() is not { } playerPosition) return false;
+
+            return TryLaunchRaid(playerPosition);
+        }
+
         private void TryStartRaid()
         {
             if (_playerAccessor.Player is not { IsAlive: true, IsFighting: false }) return;
             if (GetPlayerPosition() is not { } playerPosition) return;
             if (_rnd.RandFloat() >= _config.Chance) return;
 
+            TryLaunchRaid(playerPosition);
+        }
+
+        private bool TryLaunchRaid(Vector2 playerPosition)
+        {
             var site = PickNearestHatredSite(playerPosition);
-            if (site?.Fraction is not { } faction) return;
+            if (site?.Fraction is not { } faction) return false;
 
             SpawnSquad(site, faction);
+            return IsRaidActive;
         }
 
         private IRaidSpawnSite? PickNearestHatredSite(Vector2 playerPosition)

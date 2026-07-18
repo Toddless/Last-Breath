@@ -75,6 +75,7 @@ namespace LastBreath.Services
             services.AddSingleton<INpcPopulationService, NpcPopulationService>();
             services.AddSingleton<INpcSkirmishService, NpcSkirmishService>();
             services.AddSingleton<INpcWorldSpawner, BattleNpcWorldSpawner>();
+            services.AddSingleton<IBattleNpcSpawner, BattleSummonSpawner>();
             services.AddSingleton<IRaidSpawnRegistry, RaidSpawnRegistry>();
             services.AddGameDataParticipant<IRaidService, RaidService>();
             services.AddSingleton<ISaveGameService, SaveGameService>();

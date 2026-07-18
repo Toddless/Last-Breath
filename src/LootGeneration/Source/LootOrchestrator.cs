@@ -75,16 +75,23 @@ namespace LootGeneration.Source
         private async void OnBattleEnd(BattleEndEvent obj)
         {
             _battleActive = false;
+            // Snapshot-and-clear BEFORE the async drop loop: a battle that starts during the
+            // staggered animations writes its drops into the cache, and iterating the live list
+            // threw mid-loop, skipping Clear() — the poisoned cache (nodes already in the tree,
+            // later freed) then failed every subsequent drop and loot stopped falling entirely.
+            var pending = new List<ItemOnGround>(_itemOnGroundsCache);
+            _itemOnGroundsCache.Clear();
             try
             {
                 if (obj.Results is not BattleResults.PlayerWon)
                 {
-                    DropCache();
+                    FreeItems(pending);
                     return;
                 }
 
-                foreach (var item in _itemOnGroundsCache)
+                foreach (var item in pending)
                 {
+                    if (!GodotObject.IsInstanceValid(item)) continue;
                     _floor?.AddChild(item);
                     _itemsOnGround.Add(item);
                     // A drop can leave the tree without going through TryPickup (scene change,
@@ -93,7 +100,6 @@ namespace LootGeneration.Source
                     _gameEventBus.Publish(new ItemDroppedEvent(item));
                     await item.AnimateAsync();
                 }
-                _itemOnGroundsCache.Clear();
             }
             catch (Exception exception)
             {
@@ -186,11 +192,11 @@ namespace LootGeneration.Source
             && player.GlobalPosition.DistanceTo(item.GlobalPosition) <= PickupRange;
 
         /// <summary>A lost/fled battle leaves nothing behind; the cached nodes never reached the tree.</summary>
-        private void DropCache()
+        private static void FreeItems(List<ItemOnGround> items)
         {
-            foreach (var item in _itemOnGroundsCache)
-                item.QueueFree();
-            _itemOnGroundsCache.Clear();
+            foreach (var item in items)
+                if (GodotObject.IsInstanceValid(item))
+                    item.QueueFree();
         }
 
         private bool IsLoading() => _provider.GetServices<ILoadScope>().FirstOrDefault()?.IsLoading == true;

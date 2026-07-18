@@ -6,7 +6,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Events;
 
     public class VampireAttackPassiveSkill(float leachPercent)
-        : Skill(id: "Passive_Skill_Vampier")
+        : Skill(id: "Passive_Skill_Vampire")
     {
         public float LeachPercent { get; } = leachPercent;
 

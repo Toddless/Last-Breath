@@ -1,23 +1,17 @@
-﻿namespace Battle.Source.Effects
+namespace Battle.Source.Effects
 {
-    using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
+    using Core.Modifiers.Context;
 
-    public class CurseEffect(
-        int duration,
-        int maxStacks,
-        StatusEffects statusEffect = StatusEffects.None)
-        : Effect(id: "Effect_Curse", duration, maxStacks, statusEffect)
+    /// <summary>"Проклятье": every ability activation costs a flat <c>costIncrease</c> more per stack.</summary>
+    public class CurseEffect(int duration, int maxStacks, float costIncrease = 150)
+        : ActivationModifierEffect(id: "Effect_Curse",
+            duration,
+            maxStacks,
+            modifierFactory: () => new FlatCostActivationContextModifier(costIncrease),
+            statusEffect: StatusEffects.Cursed)
     {
-        public override Task Apply(EffectApplyingContext context)
-        {
-            return Task.CompletedTask;
-        }
-
-        public override IEffect Copy() => new CurseEffect
-        (
-            Duration, MaxStacks, Status
-        );
+        public override IEffect Copy() => new CurseEffect(Duration, MaxStacks, costIncrease);
     }
 }

@@ -23,6 +23,7 @@ namespace Battle.Source.UIElements
         {
             bus.Subscribe<TurnStartEvent>(OnTurnStart);
             bus.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
+            bus.Subscribe<AbilityStageActivatedEvent>(OnStageActivated);
             bus.Subscribe<DamageTakenEvent>(OnDamageTaken);
             bus.Subscribe<EntityHealedEvent>(OnHealed);
             bus.Subscribe<AttackEvadedEvent>(OnAttackEvaded);
@@ -47,6 +48,18 @@ namespace Battle.Source.UIElements
                 ["Caster"] = Name(evt.Caster),
                 ["Ability"] = TextPalette.Colorize($"«{evt.Ability.DisplayName}»", TextPalette.AbilityName),
             }));
+
+        /// <summary>Stage 1 is the default multicast roll — only the upgraded stages earn a line.</summary>
+        private void OnStageActivated(AbilityStageActivatedEvent evt)
+        {
+            if (evt.Stage < 2) return;
+            Emit(BattleLogCategory.Ability, Render("Log_AbilityStage", new()
+            {
+                ["Caster"] = Name(evt.Caster),
+                ["Ability"] = TextPalette.Colorize($"«{evt.Ability.DisplayName}»", TextPalette.AbilityName),
+                ["Stage"] = TextPalette.Colorize(evt.Stage.ToString(), TextPalette.Crit),
+            }));
+        }
 
         private void OnDamageTaken(DamageTakenEvent evt)
         {

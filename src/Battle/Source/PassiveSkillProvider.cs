@@ -48,6 +48,32 @@ namespace Battle.Source
                 => new IceMeteorPassiveSkill(properties.Get("damage")),
             ["Passive_Skill_Servant_Hell"] = properties
                 => new ServantHellPassiveSkill(properties.Get("chance")),
+            ["Passive_Skill_Execute"] = properties
+                => new ExecutePassiveSkill(properties.Get("threshold")),
+            ["Passive_Skill_Vampire"] = properties
+                => new VampireAttackPassiveSkill(properties.Get("percent")),
+            ["Passive_Skill_Poisoned_Claws"] = properties
+                => new PoisonedClaws(properties.Get("percentFromDamage"), properties.GetInt("duration")),
+            ["Passive_Skill_Armor_Piercing"] = _
+                => new ArmorPiercingPassiveSkill(),
+            ["Passive_Skill_True_Strike"] = _
+                => new TrueStrikePassiveSkill(),
+            ["Passive_Skill_Soulless"] = _
+                => new SoullessPassiveSkill(),
+            ["Passive_Skill_Accelerator"] = properties
+                => new AcceleratorPassiveSkill(properties.GetInt("amount")),
+            ["Passive_Skill_Decomposition"] = properties
+                => new DecompositionPassiveSkill(properties.GetInt("duration"), properties.GetInt("maxStacks"), properties.Get("reduceBy")),
+            ["Passive_Skill_Incineration"] = _
+                => new IncinerationPassiveSkill(),
+            ["Passive_Skill_First_Strike"] = properties
+                => new FirstStrikePassiveSkill(properties.Get("bonus")),
+            ["Passive_Skill_Bastion"] = properties
+                => new BastionPassiveSkill(properties.Get("reduce")),
+            ["Passive_Skill_Unshackled"] = _
+                => new UnshackledPassiveSkill(),
+            ["Passive_Skill_Mana_Resonance"] = properties
+                => new ManaResonancePassiveSkill(properties.Get("rate")),
         };
 
         public ISkill? CreateSkill(string id) => CreateSkill(id, SkillProperties.Empty);

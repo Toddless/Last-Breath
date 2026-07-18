@@ -44,7 +44,7 @@ namespace Battle.Source.Effects
         public override bool IsStronger(IEffect otherEffect) =>
             otherEffect is SacrificeChargeEffect other && bonusPercent > other.BonusPercent;
 
-        public override IEffect Copy() => new SacrificeChargeEffect(sourceAbilityId, charges, bonusPercent, healPercent);
+        public override IEffect Copy() => new SacrificeChargeEffect(sourceAbilityId, _chargesLeft, bonusPercent, healPercent);
 
         private void OnAbilityActivated(AbilityActivatedEvent evt)
         {

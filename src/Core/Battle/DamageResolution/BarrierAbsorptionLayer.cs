@@ -9,6 +9,7 @@ namespace Core.Battle.DamageResolution
     {
         public float Absorb(IDamageContext context, IFightable target, float remaining)
         {
+            if (context.IgnoreBarrier) return remaining;
             float absorbed = Math.Min(target.CurrentBarrier, remaining);
             if (absorbed <= 0) return remaining;
 

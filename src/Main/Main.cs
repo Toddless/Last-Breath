@@ -50,29 +50,26 @@
             _gameEventBus.Subscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus.Subscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _uiElementProvider.ChangeHud(typeof(PlayerHud));
-            AddTestItems();
+           AddTestItems();
         }
 
         private void AddTestItems()
         {
             var inventory = _provider.GetService<IInventory>();
             var itemCreation = _provider.GetService<IItemCreationService>();
-            inventory.TryAddItem(itemCreation.CreateItem("Gloves_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Boots_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Body_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Helmet_Dexterity_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Gloves_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Boots_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Body_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Helmet_Hunters_Dream", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Dagger", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Axe", [], Rarity.Legendary, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Bloodthirsty", [], Rarity.Unique, 0.3f, 1f));
             inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Uncommon, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Rare, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Epic, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Simple_Sword", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Amulet_Of_Recovery", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Belt_of_Strength", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
-            inventory.TryAddItem(itemCreation.CreateItem("Ring_Intelligence", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Amulet_Recovery_Source", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Belt_Leather", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Ring_of_Assasin", [], Rarity.Legendary, 0.3f, 1f));
+            inventory.TryAddItem(itemCreation.CreateItem("Ring_Archmage_Signet", [], Rarity.Legendary, 0.3f, 1f));
             var resources = _provider.GetService<IItemDataProvider>().GetAllResources();
             foreach (IItem item in resources.ToList())
                 inventory.TryAddItem(item.Copy<IItem>(), 999);

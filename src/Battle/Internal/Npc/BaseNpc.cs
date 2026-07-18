@@ -279,6 +279,8 @@ namespace Battle.Internal.Npc
             CanTalk = definition.CanTalk;
             _definitionParameters = definition.Parameters;
 
+            ApplyVisual(definition.NpcId);
+
             foreach ((EntityParameter parameter, float value) in definition.Parameters)
                 Parameters.SetBaseValueForParameter(parameter, value);
 
@@ -302,6 +304,14 @@ namespace Battle.Internal.Npc
 
             _lifecycle = new NpcLifecycle(definition.Lifecycle, new DefaultRandomNumberGenerator());
             _lifecycle.ResurrectionReady += OnResurrectionReady;
+        }
+
+        /// <summary>Per-NPC art from the shared visual library; no entry — the scene's placeholder frames stay.</summary>
+        private void ApplyVisual(string npcId)
+        {
+            var config = GameServiceProvider.Instance.GetService<Battle.Source.Presentation.INpcVisualProvider>()?.GetVisual(npcId);
+            if (config?.Frames == null) return;
+            _animationsComponent?.ApplyVisual(config.Frames, config.Scale);
         }
 
         /// <summary>Bosses and archons get diminishing returns on hard control (CombatRules.json);
@@ -718,6 +728,8 @@ namespace Battle.Internal.Npc
 
         private void OnBattleEnd(BattleEndEvent obj)
         {
+            // Own bus first: per-battle passive/effect state resets before the cleanup below
+            CombatEvents.Publish(obj);
             Effects.RemoveAllEffects();
             CanMove = true;
             Position = _lastPosition;
