@@ -467,7 +467,7 @@
             "masteryLevel": 25,
             "abilityProperties": {
                 "damageMultiplier": 0,
-                "executionThreshold": 42
+                "executionThreshold": 15
             },
             "upgrades": [
                 {

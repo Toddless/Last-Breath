@@ -72,9 +72,12 @@ namespace Crafting.Source
             // own group is exempt, so a reroll may honestly return the same stat with a fresh value.
             var groupMemberIds = GroupMemberIds(item, modifierInstanceId, targetGroupId);
             var occupied = item.OccupiedLineKeys(groupMemberIds);
+            // A reroll swaps one LINE for one line, so only line descriptors are candidates: an entry that
+            // materializes into something else (a rolled grant, the sharpening-levels operation) would take
+            // the old line away and put nothing back. Having a key IS being a line.
             var candidates = DescriptorOperations.Flatten(livePool)
                 .Where(descriptor => targetAffix == AffixKind.None || descriptor.Affix == targetAffix)
-                .Where(descriptor => !ModifierKey.TryFrom(descriptor, out var key) || !occupied.Contains(key))
+                .Where(descriptor => ModifierKey.TryFrom(descriptor, out var key) && !occupied.Contains(key))
                 .ToList();
             // Refuse for free (the handler spends nothing) when nothing of the required kind survived the
             // filters — or when what survived carries no weight at all: composite parts inherit weight 0
@@ -82,6 +85,12 @@ namespace Crafting.Source
             // atoms is unpickable, not a roll.
             (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
             if (totalWeight <= 0f) return null;
+
+            // The replaced line's slot, read BEFORE the removal: taking the group out shifts everything
+            // after its first member one step left, so that very index is where the replacement belongs.
+            // The fresh line keeps the row's place instead of falling to the bottom of the list.
+            int entitySlot = SlotOf(item.Modifiers.Select(modifier => modifier.InstanceId), groupMemberIds);
+            int contextSlot = SlotOf(item.ContextModifiers.Select(entry => entry.InstanceId), groupMemberIds);
 
             // A grouped line (parts of one composite roll, presented to the player as a SINGLE line)
             // rerolls as one unit: every part leaves the item and exactly one fresh candidate replaces
@@ -93,8 +102,8 @@ namespace Crafting.Source
             var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
             var sink = new CollectingSink();
             materializer.Materialize(picked, sink, item.InstanceId); // candidates are already power-scaled
-            foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
-            foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
+            foreach (var entity in sink.Entities) item.InsertAdditionalModifier(entitySlot++, entity);
+            foreach (var context in sink.Contexts) item.InsertAdditionalContextModifier(contextSlot++, context);
 
             // The reroll HAPPENED — only now does the growing-price counter move (refusals above are free).
             item.RecraftCount++;
@@ -148,6 +157,21 @@ namespace Crafting.Source
                     return (entry.Affix, entry.GroupId);
 
             return null;
+        }
+
+        /// <summary>Where the group sits in one channel — the index of its first member there. A group with
+        /// no member in that channel (the reroll crossed channels) reads as the end of the list, so the
+        /// replacement appends instead of stealing someone else's slot.</summary>
+        private static int SlotOf(IEnumerable<string> channelInstanceIds, IReadOnlyCollection<string> groupMemberIds)
+        {
+            int index = 0;
+            foreach (string instanceId in channelInstanceIds)
+            {
+                if (groupMemberIds.Contains(instanceId)) break;
+                index++;
+            }
+
+            return index;
         }
 
         /// <summary>Every rolled line sharing the target's GroupId, across both channels; just the target

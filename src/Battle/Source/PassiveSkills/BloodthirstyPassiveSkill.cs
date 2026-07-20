@@ -1,6 +1,7 @@
 namespace Battle.Source.PassiveSkills
 {
     using System.Linq;
+    using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
@@ -41,6 +42,9 @@ namespace Battle.Source.PassiveSkills
         {
             if (Owner == null || evt.Context.Result is not AttackResults.Succeed) return;
             var target = evt.Context.Target;
+            var bleedEffect = new DamageOverTurnEffect(3, StatusEffects.Bleed);
+            _ = bleedEffect.Apply(new EffectApplyingContext { Source = InstanceId, Caster = Owner, Damage = evt.Context.FinalDamage, Target = target });
+
             var bleeds = target.Effects
                 .GetBy(effect => (effect.Status & StatusEffects.Bleed) != 0)
                 .OfType<DamageOverTurnEffect>()

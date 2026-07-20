@@ -99,20 +99,16 @@ namespace Battle.Source.Effects
 
             var context = new DamageContext
             {
-                Source = owner,
-                Cause = DamageCause.Ability,
-                SourceAbilityId = settings.SourceAbilityId,
-                IgnoreResistances = settings.IgnoreResistances
+                Source = owner, Cause = DamageCause.Ability, SourceAbilityId = settings.SourceAbilityId, IgnoreResistances = settings.IgnoreResistances
             };
             context.Add(DamageType.Lightning, damage);
             _ = victim.TakeDamage(context);
 
-            if (settings.OverkillToRandom && !victim.IsAlive)
-            {
-                float overkill = context.TotalDamage - (healthBefore + barrierBefore);
-                IFightable? next = RandomEnemy(owner, except: victim);
-                if (overkill > 0 && next != null) DealDetonationDamage(owner, next, overkill);
-            }
+            if (!settings.OverkillToRandom || victim.IsAlive) return context.TotalDamage;
+
+            float overkill = context.TotalDamage - (healthBefore + barrierBefore);
+            IFightable? next = RandomEnemy(owner, except: victim);
+            if (overkill > 0 && next != null) DealDetonationDamage(owner, next, overkill);
 
             return context.TotalDamage;
         }

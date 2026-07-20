@@ -57,6 +57,8 @@ namespace LootGeneration.Internal
 
             foreach (var entity in sink.Entities) equip.AddAdditionalModifier(entity);
             foreach (var context in sink.Contexts) equip.AddAdditionalContextModifier(context);
+            // A pool may also hold a rolled grant (behaviour, not a line) — it lands in the item's effect list.
+            foreach (var grant in sink.Grants) equip.AddGrant(grant);
             TryRollGrant(equip, additionalItemEffects, equipEffectChance);
         }
 

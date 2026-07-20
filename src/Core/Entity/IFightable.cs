@@ -54,7 +54,7 @@ namespace Core.Entity
 
         // Combat loop
         IFightable ChoseTarget(List<IFightable> targets);
-        void Kill();
+        void Kill(bool isDebug = false);
         void SetupBattleEventBus(IBattleEventBus bus);
 
         /// <summary>Drops the battle-bus subscriptions taken by <see cref="SetupBattleEventBus"/>.

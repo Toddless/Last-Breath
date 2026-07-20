@@ -71,6 +71,55 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void RowsComeGroupedByAffixFamily_GiftLast()
+        {
+            var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
+            item.AddAdditionalModifier(Line(EntityParameter.Evade, AffixKind.Mythic));
+            item.AddAdditionalModifier(Line(EntityParameter.Intelligence, AffixKind.Suffix));
+            item.AddAdditionalModifier(Line(EntityParameter.Strength, AffixKind.None)); // legacy save, no family
+            item.AddAdditionalModifier(Line(EntityParameter.Evade, AffixKind.Prefix));
+
+            var rows = EquipItemLines.ComposeRolled(item);
+
+            CollectionAssert.AreEqual(
+                new[] { AffixKind.Prefix, AffixKind.Suffix, AffixKind.None, AffixKind.Mythic },
+                rows.Select(row => row.Affix).ToArray(),
+                "Blocks must read prefixes, suffixes, family-less leftovers, then the ascension gift.");
+        }
+
+        [TestMethod]
+        public void RowsKeepTheItemOrderInsideABlock()
+        {
+            // The sort is stable: a rerolled line put back into its slot must display in that slot,
+            // not at the bottom of its family.
+            var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
+            item.AddAdditionalModifier(Line(EntityParameter.Strength, AffixKind.Prefix));
+            item.AddAdditionalModifier(Line(EntityParameter.Intelligence, AffixKind.Prefix));
+            item.AddAdditionalModifier(Line(EntityParameter.Evade, AffixKind.Prefix));
+
+            var rows = EquipItemLines.ComposeRolled(item);
+
+            CollectionAssert.AreEqual(
+                new[] { "+5 Strength", "+5 Intelligence", "+5 Evade" },
+                rows.Select(row => row.Text).ToArray());
+        }
+
+        [TestMethod]
+        public void GroupedRowCarriesTheFamilyOfItsParts()
+        {
+            var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
+            var partA = new SimpleModifier(EntityParameter.Strength, ModifierValueType.Flat, 5f, "test") { GroupId = "g", Affix = AffixKind.Suffix };
+            var partB = new SimpleModifier(EntityParameter.Intelligence, ModifierValueType.Flat, 3f, "test") { GroupId = "g", Affix = AffixKind.Suffix };
+            item.AddAdditionalModifier(partA);
+            item.AddAdditionalModifier(partB);
+
+            var rows = EquipItemLines.ComposeRolled(item);
+
+            Assert.AreEqual(1, rows.Count);
+            Assert.AreEqual(AffixKind.Suffix, rows[0].Affix, "A composite row belongs to the family stamped on its parts.");
+        }
+
+        [TestMethod]
         public void RevealedTextAppendsTheSpreadOnlyToRolledParts()
         {
             var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
@@ -93,5 +142,8 @@ namespace LastBreathTest.BattleSystemTests
 
             Assert.IsNull(rows[0].RevealedText, "No range anywhere in the row — the caller falls back to Text.");
         }
+
+        private static SimpleModifier Line(EntityParameter parameter, AffixKind affix) =>
+            new(parameter, ModifierValueType.Flat, 5f, "test") { Affix = affix };
     }
 }

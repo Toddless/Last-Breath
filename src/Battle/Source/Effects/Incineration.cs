@@ -18,10 +18,10 @@ namespace Battle.Source.Effects
 
         public override IEffect Copy() => new Incineration(Duration);
 
-        private void OnDamageTaken(DamageTakenEvent obj)
+        private void OnDamageTaken(DamageTakenEvent evnt)
         {
-            if (Target is not { IsAlive: true } target || !target.IsSame(obj.Target.InstanceId)) return;
-            if (!obj.Context.IsCrit) return;
+            if (Target is not { IsAlive: true } target || !target.IsSame(evnt.Target.InstanceId)) return;
+            if (!evnt.Context.IsCrit) return;
             // The design kills the BURNING target: if the burning ran out before the crit, nothing happens.
             if ((target.StatusEffects & StatusEffects.Burning) == 0) return;
             target.Kill();

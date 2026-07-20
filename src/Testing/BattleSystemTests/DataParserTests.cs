@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Core.Crafting;
     using Core.Data;
-    using Core.Items;
     using Core.Modifiers;
     using LootGeneration.Internal;
 
@@ -336,6 +335,64 @@ namespace LastBreathTest.BattleSystemTests
 
             var resource = (ICraftingResource)CreateParser().ParseResources(json).Single();
             return resource.Material!.Modifiers;
+        }
+
+        [TestMethod]
+        public void ParsePool_FlagEntry_NeedsNoValueAndPinsItToOne()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            { "parameter": "HealingEfficiency", "modifierType": "flag", "weight": 40, "affix": "Suffix" },
+                            { "parameter": "Health", "modifierType": "flag", "weight": 40, "affix": "Prefix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // The entity-parameter flag is refused: a switch has no meaning in flat/increase math.
+            var flag = (ContextDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.ModifierValueType.Flag, flag.ValueType);
+            Assert.IsTrue(flag.Value.IsFixed, "A flag never rolls.");
+            Assert.AreEqual(1f, flag.Value.Min, 0.001f);
+        }
+
+        [TestMethod]
+        public void ParsePool_GrantEntry_ParsesIntoAGrantDescriptor()
+        {
+            const string json = """
+            {
+                "pools": [
+                    {
+                        "id": "Test_Pool",
+                        "modifiersPool": [
+                            {
+                                "grant": { "kind": "Passive", "id": "Passive_Skill_Regeneration", "properties": { "percent": 0.05 } },
+                                "weight": 60,
+                                "affix": "Prefix"
+                            },
+                            { "grant": { "kind": "NotAKind", "id": "Whatever" }, "weight": 10, "affix": "Prefix" },
+                            { "grant": { "kind": "Passive" }, "weight": 10, "affix": "Prefix" }
+                        ]
+                    }
+                ]
+            }
+            """;
+
+            var pool = CreateParser().ParseEquipItemModifierPools(json)["Test_Pool"];
+
+            // A bad kind and a missing id drop their entries; the good one carries its payload.
+            var grant = (GrantDescriptor)pool.Single();
+            Assert.AreEqual(Core.Enums.GrantKind.Passive, grant.Kind);
+            Assert.AreEqual("Passive_Skill_Regeneration", grant.GrantId);
+            Assert.AreEqual(0.05f, grant.Properties["percent"], 0.001f);
+            Assert.AreEqual(Core.Enums.AffixKind.Prefix, grant.Affix);
         }
 
         private static DataParser CreateParser() => new(new ItemGameDataFactory());

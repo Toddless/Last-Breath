@@ -28,7 +28,7 @@
             "id": "Passive_Skill_Mana_On_Attack",
             "kind": "Passive",
             "weight": 80,
-            "properties": { "amount": 15 }
+            "properties": { "amount": 50 }
         },
         {
             "id": "Passive_Skill_Bleeding",

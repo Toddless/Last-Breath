@@ -8,7 +8,6 @@ namespace LastBreath.Services
     using Core.Data;
     using Core.Data.GameData;
     using Core.Entity;
-    using Core.Events;
     using Core.Interfaces;
     using Core.Inventory;
     using Core.MessageBus;

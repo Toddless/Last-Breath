@@ -2,7 +2,6 @@ namespace Crafting.Source.RequestHandlers
 {
     using System.Threading.Tasks;
     using Core.Crafting;
-    using Core.Events;
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;

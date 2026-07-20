@@ -1,6 +1,5 @@
 namespace Battle.Internal.Npc
 {
-    using Core.Ai.World.Recovery;
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;

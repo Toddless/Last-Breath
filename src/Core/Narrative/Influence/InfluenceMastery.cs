@@ -4,7 +4,6 @@ namespace Core.Narrative.Influence
     using System.Collections.Generic;
     using Data.GameData;
     using Data.InfluenceData;
-    using Events;
     using Godot;
     using MessageBus;
     using MessageBus.Messages;

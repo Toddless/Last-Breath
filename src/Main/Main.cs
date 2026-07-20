@@ -75,6 +75,8 @@
             inventory.TryAddItem(itemCreation.CreateItem("Ring_of_Assassin", [], Rarity.Legendary, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Ring_Archmage_Signet", [], Rarity.Legendary, chance, multiplier));
             inventory.TryAddItem(itemCreation.CreateItem("Body_Mysterious_Bastion", [], Rarity.Legendary, chance, multiplier));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Righteous_Wrath", [], Rarity.Legendary, chance, multiplier));
+            inventory.TryAddItem(itemCreation.CreateItem("Weapon_Silent_Fury", [], Rarity.Legendary, chance, multiplier));
             var resources = _provider.GetService<IItemDataProvider>().GetAllResources();
             foreach (IItem item in resources.ToList())
                 inventory.TryAddItem(item.Copy<IItem>(), 999);

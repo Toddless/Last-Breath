@@ -63,6 +63,8 @@ namespace Crafting.Services
                     materializer.Materialize(descriptor, sink, item.InstanceId);
                 foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
                 foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
+                // A pool may also hold a rolled grant (behaviour, not a line) — it lands in the item's effect list.
+                foreach (var grant in sink.Grants) item.AddGrant(grant);
                 TryRollBonusEffect(item);
 
                 return item;

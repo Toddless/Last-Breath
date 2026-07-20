@@ -426,12 +426,118 @@ msgstr "Applies {min}–{max} additional burning stacks"
 msgid "Context_Modifier_BurningDamage_Range"
 msgstr "Increases burning damage by {min}–{max}"
 
+msgid "Context_Modifier_PoisonDamage"
+msgstr "Increases poison damage by {value}"
+
+msgid "Context_Modifier_PoisonDamage_Range"
+msgstr "Increases poison damage by {min}–{max}"
+
 msgid "Context_Modifier_ManaOnHit_Range"
 msgstr "Restores {min}–{max} mana on hit"
 
 msgid "Context_Modifier_HealthOnHit_Range"
 msgstr "Restores {min}–{max} health on hit"
 
+
+# Mythic marks (2026-07-20): one template per knob; the flag line carries no {value}
+msgid "Context_Modifier_PhysicalToFire"
+msgstr "Converts {value} of physical damage to fire"
+
+msgid "Context_Modifier_PhysicalToFire_Range"
+msgstr "Converts {min}–{max} of physical damage to fire"
+
+msgid "Context_Modifier_PhysicalToCold"
+msgstr "Converts {value} of physical damage to cold"
+
+msgid "Context_Modifier_PhysicalToCold_Range"
+msgstr "Converts {min}–{max} of physical damage to cold"
+
+msgid "Context_Modifier_PhysicalToLightning"
+msgstr "Converts {value} of physical damage to lightning"
+
+msgid "Context_Modifier_PhysicalToLightning_Range"
+msgstr "Converts {min}–{max} of physical damage to lightning"
+
+msgid "Context_Modifier_AttacksIgnoreResistances"
+msgstr "Attacks ignore elemental resistances"
+
+msgid "Context_Modifier_AddedFireDamage"
+msgstr "Adds {value} of attack damage as fire"
+
+msgid "Context_Modifier_AddedFireDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as fire"
+
+msgid "Context_Modifier_AddedColdDamage"
+msgstr "Adds {value} of attack damage as cold"
+
+msgid "Context_Modifier_AddedColdDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as cold"
+
+msgid "Context_Modifier_AddedLightningDamage"
+msgstr "Adds {value} of attack damage as lightning"
+
+msgid "Context_Modifier_AddedLightningDamage_Range"
+msgstr "Adds {min}–{max} of attack damage as lightning"
+
+msgid "Context_Modifier_AttackPureConversion"
+msgstr "Converts {value} of attack damage to pure"
+
+msgid "Context_Modifier_AttackPureConversion_Range"
+msgstr "Converts {min}–{max} of attack damage to pure"
+
+msgid "Context_Modifier_CooldownResetChance"
+msgstr "{value} chance to reset the cooldown of an activated ability"
+
+msgid "Context_Modifier_CooldownResetChance_Range"
+msgstr "{min}–{max} chance to reset the cooldown of an activated ability"
+
+msgid "Context_Modifier_FreeCastChance"
+msgstr "{value} chance to activate an ability for free"
+
+msgid "Context_Modifier_FreeCastChance_Range"
+msgstr "{min}–{max} chance to activate an ability for free"
+
+msgid "Context_Modifier_DotDamageBonus"
+msgstr "Increases the damage of applied bleed, poison and burning by {value}"
+
+msgid "Context_Modifier_DotDamageBonus_Range"
+msgstr "Increases the damage of applied bleed, poison and burning by {min}–{max}"
+
+msgid "Context_Modifier_EffectDurationScale"
+msgstr "Increases the duration of applied effects by {value}"
+
+msgid "Context_Modifier_EffectDurationScale_Range"
+msgstr "Increases the duration of applied effects by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack"
+msgstr "Reduces damage taken from attacks by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack_Range"
+msgstr "Reduces damage taken from attacks by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility"
+msgstr "Reduces damage taken from abilities by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility_Range"
+msgstr "Reduces damage taken from abilities by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect"
+msgstr "Reduces damage taken from effects by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect_Range"
+msgstr "Reduces damage taken from effects by {min}–{max}"
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive"
+msgstr "Reduces damage taken from passive skills by {value}"
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive_Range"
+msgstr "Reduces damage taken from passive skills by {min}–{max}"
+
+msgid "Context_Modifier_DotDamageTakenReduction"
+msgstr "Reduces bleed, poison and burning damage taken by {value}"
+
+msgid "Context_Modifier_DotDamageTakenReduction_Range"
+msgstr "Reduces bleed, poison and burning damage taken by {min}–{max}"
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
 # ------------------------------
@@ -655,6 +761,15 @@ msgstr "Implicits"
 
 msgid "UI_Item_Modifiers"
 msgstr "Modifiers"
+
+msgid "UI_Item_Prefixes"
+msgstr "Prefixes"
+
+msgid "UI_Item_Suffixes"
+msgstr "Suffixes"
+
+msgid "UI_Item_Mythic"
+msgstr "Mythic"
 
 msgid "UI_Item_Effect"
 msgstr "Effect"

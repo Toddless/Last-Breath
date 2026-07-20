@@ -12,7 +12,6 @@ namespace LastBreath.Services
     using Core.Items.Grants;
     using Core.Modifiers;
     using Core.Services;
-    using LootGeneration.Source;
 
     public class ItemCreationService(
         IRandomNumberGenerator rnd,
@@ -69,6 +68,8 @@ namespace LastBreath.Services
                     materializer.Materialize(descriptor, sink, item.InstanceId);
                 foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
                 foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
+                // A pool may also hold a rolled grant (behaviour, not a line) — it lands in the item's effect list.
+                foreach (var grant in sink.Grants) item.AddGrant(grant);
                 TryRollBonusEffect(item);
 
                 return item;
@@ -103,6 +104,8 @@ namespace LastBreath.Services
 
             foreach (var entity in sink.Entities) equip.AddAdditionalModifier(entity);
             foreach (var context in sink.Contexts) equip.AddAdditionalContextModifier(context);
+            // A pool may also hold a rolled grant (behaviour, not a line) — it lands in the item's effect list.
+            foreach (var grant in sink.Grants) equip.AddGrant(grant);
             TryRollLootGrant(equip, additionalItemEffects, equipEffectChance);
         }
 

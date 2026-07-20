@@ -3,6 +3,7 @@ namespace LastBreathTest.CraftingSystemTests
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Moq;
 
@@ -26,6 +27,35 @@ namespace LastBreathTest.CraftingSystemTests
             Assert.IsTrue(line.BaseValue is >= 10f and <= 20f, $"rolled {line.BaseValue} outside [10..20]");
             Assert.AreEqual(line.BaseValue, line.Value); // materialized instance starts unscaled
             Assert.AreEqual(range, line.RolledRange); // the source spread is kept for the Alt tooltip
+        }
+
+        [TestMethod]
+        public void Materialize_GrantDescriptor_MintsThroughTheFactoryIntoItsOwnBucket()
+        {
+            var descriptor = new GrantDescriptor(GrantKind.Passive, "Passive_Skill_Regeneration", new Dictionary<string, float> { ["percent"] = 0.05f });
+            var grant = Mock.Of<IItemGrant>();
+            var factory = new Mock<IGrantFactory>();
+            factory.Setup(mock => mock.Create(GrantKind.Passive, "Passive_Skill_Regeneration", It.IsAny<List<IModifier>>(), It.IsAny<IReadOnlyDictionary<string, float>>()))
+                .Returns(grant);
+            var sink = new CollectingSink();
+
+            new ModifierMaterializer(Mock.Of<IRandomNumberGenerator>(), factory.Object).Materialize(descriptor, sink, "test");
+
+            Assert.AreSame(grant, sink.Grants.Single(), "A rolled grant belongs in the grant bucket, not among the lines.");
+            Assert.AreEqual(0, sink.Entities.Count);
+            Assert.AreEqual(0, sink.Contexts.Count);
+        }
+
+        [TestMethod]
+        public void Materialize_GrantDescriptorWithoutAFactory_MintsNothing()
+        {
+            // A host with no grant factory (sandbox, tool) must not pretend the entry landed.
+            var descriptor = new GrantDescriptor(GrantKind.Passive, "Passive_Skill_Regeneration", new Dictionary<string, float>());
+            var sink = new CollectingSink();
+
+            new ModifierMaterializer(Mock.Of<IRandomNumberGenerator>()).Materialize(descriptor, sink, "test");
+
+            Assert.AreEqual(0, sink.Grants.Count);
         }
 
         [TestMethod]

@@ -3,7 +3,6 @@ namespace Battle.Internal.Save
     using System;
     using Core;
     using Core.Battle;
-    using Core.Events;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.Save;

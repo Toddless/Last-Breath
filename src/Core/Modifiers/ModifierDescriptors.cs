@@ -42,6 +42,17 @@ namespace Core.Modifiers
         public string? NameKey { get; init; }
     }
 
+    /// <summary>Rollable grant: behaviour no stat line can express ("ignores the first damage taken each turn")
+    /// enters a pool as the passive/effect it really is. The materializer mints it through the one grant factory
+    /// and drops it in the sink's grant bucket — it is NOT a line, so it never occupies an affix slot on reroll
+    /// and carries no <see cref="ModifierKey"/>.</summary>
+    public sealed record GrantDescriptor(GrantKind Kind, string GrantId, IReadOnlyDictionary<string, float> Properties) : IModifierDescriptor
+    {
+        public float Weight { get; set; }
+        public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
+    }
+
     /// <summary>A weighted bundle rolled as one unit at creation; flattened to its atomic parts for reroll (1-for-1).
     /// Affix lives on the root only — parts inherit it when materialized or flattened.</summary>
     public sealed record CompositeDescriptor(IReadOnlyList<IModifierDescriptor> Parts) : IModifierDescriptor

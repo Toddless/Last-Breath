@@ -2,7 +2,6 @@ namespace Battle.Source.Abilities.Armageddon
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle;
     using Core.Battle.Abilities;
@@ -12,7 +11,6 @@ namespace Battle.Source.Abilities.Armageddon
     using Core.Entity;
     using Core.Enums;
     using Effects;
-    using Godot;
     using HitDelivery;
 
     /// <summary>

@@ -1,7 +1,6 @@
 namespace Core.MessageBus.Messages
 {
     using System.Collections.Generic;
-    using Events;
 
     /// <summary>What kind of notification this is; the UI maps categories to overlay regions.</summary>
     public enum NotificationCategory

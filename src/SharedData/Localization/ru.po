@@ -414,11 +414,117 @@ msgstr ""
 msgid "Context_Modifier_BurningDamage_Range"
 msgstr ""
 
+msgid "Context_Modifier_PoisonDamage"
+msgstr ""
+
+msgid "Context_Modifier_PoisonDamage_Range"
+msgstr ""
+
 msgid "Context_Modifier_ManaOnHit_Range"
 msgstr ""
 
 msgid "Context_Modifier_HealthOnHit_Range"
 msgstr ""
+
+msgid "Context_Modifier_PhysicalToFire"
+msgstr ""
+
+msgid "Context_Modifier_PhysicalToFire_Range"
+msgstr ""
+
+msgid "Context_Modifier_PhysicalToCold"
+msgstr ""
+
+msgid "Context_Modifier_PhysicalToCold_Range"
+msgstr ""
+
+msgid "Context_Modifier_PhysicalToLightning"
+msgstr ""
+
+msgid "Context_Modifier_PhysicalToLightning_Range"
+msgstr ""
+
+msgid "Context_Modifier_AttacksIgnoreResistances"
+msgstr ""
+
+msgid "Context_Modifier_AddedFireDamage"
+msgstr ""
+
+msgid "Context_Modifier_AddedFireDamage_Range"
+msgstr ""
+
+msgid "Context_Modifier_AddedColdDamage"
+msgstr ""
+
+msgid "Context_Modifier_AddedColdDamage_Range"
+msgstr ""
+
+msgid "Context_Modifier_AddedLightningDamage"
+msgstr ""
+
+msgid "Context_Modifier_AddedLightningDamage_Range"
+msgstr ""
+
+msgid "Context_Modifier_AttackPureConversion"
+msgstr ""
+
+msgid "Context_Modifier_AttackPureConversion_Range"
+msgstr ""
+
+msgid "Context_Modifier_CooldownResetChance"
+msgstr ""
+
+msgid "Context_Modifier_CooldownResetChance_Range"
+msgstr ""
+
+msgid "Context_Modifier_FreeCastChance"
+msgstr ""
+
+msgid "Context_Modifier_FreeCastChance_Range"
+msgstr ""
+
+msgid "Context_Modifier_DotDamageBonus"
+msgstr ""
+
+msgid "Context_Modifier_DotDamageBonus_Range"
+msgstr ""
+
+msgid "Context_Modifier_EffectDurationScale"
+msgstr ""
+
+msgid "Context_Modifier_EffectDurationScale_Range"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromAttack_Range"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromAbility_Range"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromEffect_Range"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive"
+msgstr ""
+
+msgid "Context_Modifier_DamageTakenReductionFromPassive_Range"
+msgstr ""
+
+msgid "Context_Modifier_DotDamageTakenReduction"
+msgstr ""
+
+msgid "Context_Modifier_DotDamageTakenReduction_Range"
+msgstr ""
+
 
 msgid "UI_Craft_Recipes"
 msgstr ""
@@ -451,6 +557,15 @@ msgid "UI_Item_Implicits"
 msgstr ""
 
 msgid "UI_Item_Modifiers"
+msgstr ""
+
+msgid "UI_Item_Prefixes"
+msgstr ""
+
+msgid "UI_Item_Suffixes"
+msgstr ""
+
+msgid "UI_Item_Mythic"
 msgstr ""
 
 msgid "UI_Item_Effect"

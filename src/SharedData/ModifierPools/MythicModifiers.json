@@ -5,33 +5,121 @@
             "modifiersPool": [
                 {
                     "parameter": "Damage",
-                    "modifierType": "inc",
-                    "value": 0.4,
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.69,
+                        "max": 1.3
+                    },
                     "weight": 100,
                     "scope": "Global",
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "SpellDamage",
-                    "modifierType": "inc",
-                    "value": 0.4,
+                    "modifierType": "multi",
+                    "value": {
+                        "min": 0.69,
+                        "max": 1.3
+                    },
                     "weight": 100,
                     "scope": "Global",
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
-                    "value": 0.5,
+                    "value": {
+                        "min": 0.42,
+                        "max": 1.12
+                    },
                     "weight": 50,
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "HealthOnHit",
                     "modifierType": "flat",
-                    "value": 50,
+                    "value": {
+                        "min": 111,
+                        "max": 333
+                    },
                     "weight": 40,
-                    "affix": "Suffix"
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "PhysicalToFire",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "PhysicalToCold",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "PhysicalToLightning",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "AttacksIgnoreResistances",
+                    "modifierType": "flag",
+                    "weight": 40,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "AddedFireDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.42
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "AddedColdDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.42
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "AddedLightningDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.42
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "AttackPureConversion",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.3,
+                        "max": 0.42
+                    },
+                    "weight": 40,
+                    "affix": "Mythic"
                 },
                 {
                     "extraUpgradeLevels": {
@@ -39,7 +127,7 @@
                         "max": 69
                     },
                     "weight": 60,
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 }
             ]
         },
@@ -49,40 +137,87 @@
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
-                    "value": 0.1,
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.15
+                    },
                     "weight": 50,
                     "scope": "Global",
-                    "affix": "Suffix"
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "HealingEfficiency",
                     "modifierType": "inc",
                     "value": 1,
                     "weight": 40,
-                    "affix": "Suffix"
+                    "affix": "Mythic"
                 },
                 {
+                    "parameter": "BleedDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
                     "weight": 40,
-                    "affix": "Prefix",
-                    "parts": [
-                        {
-                            "parameter": "BleedDamage",
-                            "modifierType": "inc",
-                            "value": 0.69
-                        },
-                        {
-                            "parameter": "BurningDamage",
-                            "modifierType": "inc",
-                            "value": 0.69
-                        }
-                    ]
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "BurningDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
+                    "weight": 40,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "PoisonDamage",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.42,
+                        "max": 0.69
+                    },
+                    "weight": 40,
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "ManaOnHit",
                     "modifierType": "flat",
-                    "value": 25,
+                    "value": {
+                        "min": 111,
+                        "max": 222
+                    },
                     "weight": 40,
-                    "affix": "Suffix"
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "CooldownResetChance",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.05,
+                        "max": 0.07
+                    },
+                    "weight": 40,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "FreeCastChance",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.17
+                    },
+                    "weight": 40,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "EffectDurationScale",
+                    "modifierType": "inc",
+                    "value": 1,
+                    "weight": 40,
+                    "affix": "Mythic"
                 },
                 {
                     "extraUpgradeLevels": {
@@ -90,7 +225,7 @@
                         "max": 69
                     },
                     "weight": 60,
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 }
             ]
         },
@@ -100,33 +235,45 @@
                 {
                     "parameter": "Health",
                     "modifierType": "multi",
-                    "value": 0.3,
+                    "value": {
+                        "min": 0.42,
+                        "max": 1.28
+                    },
                     "weight": 30,
                     "scope": "Global",
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "multi",
-                    "value": 0.3,
+                    "value": {
+                        "min": 0.42,
+                        "max": 1.28
+                    },
                     "weight": 30,
                     "scope": "Global",
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 },
                 {
                     "weight": 30,
-                    "affix": "Prefix",
+                    "affix": "Mythic",
                     "parts": [
                         {
                             "parameter": "Armor",
                             "modifierType": "multi",
-                            "value": 0.25,
+                            "value": {
+                                "min": 0.42,
+                                "max": 1.28
+                            },
                             "scope": "Global"
                         },
                         {
                             "parameter": "Evade",
                             "modifierType": "multi",
-                            "value": 0.25,
+                            "value": {
+                                "min": 0.42,
+                                "max": 1.28
+                            },
                             "scope": "Global"
                         }
                     ]
@@ -134,9 +281,62 @@
                 {
                     "parameter": "HealingEfficiency",
                     "modifierType": "inc",
-                    "value": 0.5,
+                    "value": {
+                        "min": 0.42,
+                        "max": 1.11
+                    },
                     "weight": 30,
-                    "affix": "Suffix"
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "DamageTakenReductionFromAbility",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.25
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "DamageTakenReductionFromAttack",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.25
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "DamageTakenReductionFromEffect",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.25
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "DamageTakenReductionFromPassive",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.1,
+                        "max": 0.25
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
+                },
+                {
+                    "parameter": "DotDamageTakenReduction",
+                    "modifierType": "inc",
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.35
+                    },
+                    "weight": 30,
+                    "affix": "Mythic"
                 },
                 {
                     "extraUpgradeLevels": {
@@ -144,7 +344,7 @@
                         "max": 69
                     },
                     "weight": 60,
-                    "affix": "Prefix"
+                    "affix": "Mythic"
                 }
             ]
         }

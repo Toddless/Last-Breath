@@ -15,7 +15,7 @@
             if (target is IFightableNpc { EntityType: EntityType.Boss or EntityType.Archon })
                 threshold *= bossThresholdMultiplier;
 
-            return stacks > threshold;
+            return stacks >= threshold;
         }
     }
 }

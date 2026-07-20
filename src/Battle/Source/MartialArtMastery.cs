@@ -2,7 +2,6 @@
 {
     using System;
     using Core.Battle;
-    using Core.Events;
     using Core.Localization;
     using Core.MessageBus;
     using Core.MessageBus.Messages;

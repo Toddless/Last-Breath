@@ -279,50 +279,50 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
-        public void TryAscendItem_GiftHonorsTheRolledKind()
+        public void TryAscendItem_Gift_DrawsFromTheWholePoolOnWeightAlone()
         {
-            var item = CreateMaxedLegendary();
-            // First RandFloat = gift chance (0 -> gifted), second = kind (0.9 -> Suffix). The prefix
-            // bait would win on weight if the kind filter broke.
-            var rnd = new Mock<IRandomNumberGenerator>();
-            rnd.SetupSequence(mock => mock.RandFloat()).Returns(0f).Returns(0.9f);
-            rnd.Setup(mock => mock.RandFloatRange(It.IsAny<float>(), It.IsAny<float>())).Returns(0f);
-            var provider = new Mock<IItemDataProvider>();
-            provider.Setup(mock => mock.GetEquipItemModifierPool("Mythic_Armor")).Returns(
-            [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
-                new ParameterDescriptor(EntityParameter.CriticalChance, ModifierValueType.Flat, 0.1f, ModifierScope.Global) { Weight = 1f, Affix = AffixKind.Suffix },
-            ]);
-            var ascender = new ItemAscender(rnd.Object, provider.Object, new ModifierMaterializer(rnd.Object), UnlockedMastery());
+            // The mythic slot stands outside the rarity's prefix/suffix count, so no slot family is drawn:
+            // every entry of the pool competes and weight alone decides. The heavy entry must always win.
+            for (int seed = 0; seed < 30; seed++)
+            {
+                var item = CreateMaxedLegendary();
+                var rnd = new DefaultRandomNumberGenerator(seed);
+                var provider = new Mock<IItemDataProvider>();
+                provider.Setup(mock => mock.GetEquipItemModifierPool("Mythic_Armor")).Returns(
+                [
+                    new ParameterDescriptor(EntityParameter.CriticalChance, ModifierValueType.Flat, 0.1f, ModifierScope.Global) { Weight = 1f, Affix = AffixKind.Mythic },
+                    new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Mythic },
+                ]);
+                var ascender = new ItemAscender(rnd, provider.Object, new ModifierMaterializer(rnd), UnlockedMastery());
 
-            var result = ascender.TryAscendItem(item);
+                var result = ascender.TryAscendItem(item);
 
-            Assert.IsTrue(result.Succeeded);
-            var gift = (SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == result.GiftedModifierIds.Single());
-            Assert.AreEqual(AffixKind.Suffix, gift.Affix);
-            Assert.AreEqual(EntityParameter.CriticalChance, gift.EntityParameter);
+                Assert.IsTrue(result.Succeeded);
+                var gift = (SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == result.GiftedModifierIds.Single());
+                Assert.AreEqual(EntityParameter.Damage, gift.EntityParameter, $"seed {seed}: weight must decide the gift.");
+                Assert.AreEqual(AffixKind.Mythic, gift.Affix, $"seed {seed}: the gift wears the mythic slot's family.");
+            }
         }
 
         [TestMethod]
-        public void TryAscendItem_PoolMissingRolledKind_FallsBackToAvailable()
+        public void TryAscendItem_GiftEntryMarkedAsAnOrdinaryAffix_StillLandsInTheMythicSlot()
         {
+            // Data may forget the Mythic marker — everything drawn from a mythic pool belongs to that slot
+            // anyway, so the ascender stamps it rather than trusting the entry.
             var item = CreateMaxedLegendary();
-            // Kind roll asks for Suffix (0.9), but the pool only holds prefixes — the gift must still land.
-            var rnd = new Mock<IRandomNumberGenerator>();
-            rnd.SetupSequence(mock => mock.RandFloat()).Returns(0f).Returns(0.9f);
-            rnd.Setup(mock => mock.RandFloatRange(It.IsAny<float>(), It.IsAny<float>())).Returns(0f);
+            var rnd = new DefaultRandomNumberGenerator(seed: 3);
             var provider = new Mock<IItemDataProvider>();
             provider.Setup(mock => mock.GetEquipItemModifierPool("Mythic_Armor")).Returns(
             [
                 new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix },
             ]);
-            var ascender = new ItemAscender(rnd.Object, provider.Object, new ModifierMaterializer(rnd.Object), UnlockedMastery());
+            var ascender = new ItemAscender(rnd, provider.Object, new ModifierMaterializer(rnd), UnlockedMastery());
 
             var result = ascender.TryAscendItem(item);
 
             Assert.IsTrue(result.Succeeded);
             var gift = (SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == result.GiftedModifierIds.Single());
-            Assert.AreEqual(AffixKind.Prefix, gift.Affix);
+            Assert.AreEqual(AffixKind.Mythic, gift.Affix);
         }
 
         [TestMethod]

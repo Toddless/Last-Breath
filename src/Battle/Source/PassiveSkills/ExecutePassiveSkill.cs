@@ -2,6 +2,7 @@
 {
     using Core.Battle.Skills;
     using Core.Entity;
+    using Core.Enums;
     using Core.Events;
 
     public class ExecutePassiveSkill(float threshold)
@@ -16,8 +17,8 @@
 
         private void OnAfterAttack(AfterAttackEvent evnt)
         {
+            if (evnt.Context.Result is not AttackResults.Succeed) return;
             var context = evnt.Context;
-
             float healthLeftInPercent = context.Target.CurrentHealth / context.Target.Parameters.MaxHealth;
             if (healthLeftInPercent <= Threshold) context.Target.Kill();
         }

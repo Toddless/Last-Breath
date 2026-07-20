@@ -5,7 +5,6 @@ namespace Core.Narrative.Quests
     using System.Linq;
     using Ai.World.Skirmish;
     using Ai.World.Time;
-    using Data;
     using Entity;
     using Events;
     using Facts;

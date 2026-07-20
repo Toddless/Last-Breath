@@ -1,7 +1,6 @@
 ﻿namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
-    using Core.Events;
     using Core.Items;
     using Core.Localization;
     using Core.MessageBus;

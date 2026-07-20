@@ -21,7 +21,6 @@
         {
             float healAmount = Owner?.Parameters.MaxHealth * PercentFromMaxHealth ?? 0f;
             Owner?.Heal(new HealContext(Owner, Owner) { Amount = healAmount });
-            GD.Print($"Entity: {Owner?.DisplayName}, heal {healAmount}");
         }
 
         public override void Detach(IFightable owner)

@@ -4,7 +4,6 @@ namespace Crafting.Source.UIElements
     using Core.Crafting;
     using Core.Data;
     using Core.Enums;
-    using Core.Events;
     using Core.Inventory;
     using Core.Items;
     using Core.Localization;

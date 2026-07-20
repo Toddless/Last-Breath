@@ -20,10 +20,53 @@ namespace Core.Enums
         /// <summary>Scales the per-tick damage of burnings the owner applies ("+35% burning damage").</summary>
         BurningDamage,
 
+        /// <summary>Scales the per-tick damage of poisons the owner applies — the third of the per-status
+        /// DoT knobs (see <see cref="DotDamageBonus"/> for the one that covers all three at once).</summary>
+        PoisonDamage,
+
         /// <summary>        </summary>
         ManaOnHit,
 
         /// <summary>        </summary>
         HealthOnHit,
+
+        // ------------------------------------------------------------------ mythic marks (2026-07-20)
+        // One member per concrete meaning: the data entry carries only a number, so "which element",
+        // "which cause" and "which status" live in the binding.
+
+        /// <summary>Converts a share of the owner's PHYSICAL damage into fire/cold/lightning. Three members,
+        /// one element each — a pool offers all three and the item wears one.</summary>
+        PhysicalToFire,
+        PhysicalToCold,
+        PhysicalToLightning,
+
+        /// <summary>The owner's ATTACKS skip elemental resistances. A switch: written as a "flag" line.</summary>
+        AttacksIgnoreResistances,
+
+        /// <summary>Adds a share of the owner's attack damage back as fire/cold/lightning.</summary>
+        AddedFireDamage,
+        AddedColdDamage,
+        AddedLightningDamage,
+
+        /// <summary>Converts a share of the owner's ATTACK damage into Pure.</summary>
+        AttackPureConversion,
+
+        /// <summary>Chance that an activation leaves no cooldown behind.</summary>
+        CooldownResetChance,
+
+        /// <summary>Chance that an activation costs nothing, whatever the cost type.</summary>
+        FreeCastChance,
+
+        /// <summary>Scales the duration of every effect the owner applies ("doubles it").</summary>
+        EffectDurationScale,
+
+        /// <summary>Reduces damage the owner TAKES, split by what caused it.</summary>
+        DamageTakenReductionFromAttack,
+        DamageTakenReductionFromAbility,
+        DamageTakenReductionFromEffect,
+        DamageTakenReductionFromPassive,
+
+        /// <summary>Reduces the damage-over-turn components of hits the owner takes.</summary>
+        DotDamageTakenReduction,
     }
 }

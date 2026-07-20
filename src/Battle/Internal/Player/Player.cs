@@ -2,7 +2,6 @@ namespace Battle.Internal.Player
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Core;
     using Core.Ai.World;
@@ -105,6 +104,8 @@ namespace Battle.Internal.Player
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
         private bool _suppressDeathNotify;
+        // Who landed the last hit: the killer reported with the death (reputation, kill facts, loot).
+        private IFightable? _lastDamageSource;
 
         public float CurrentHealth
         {
@@ -305,7 +306,13 @@ namespace Battle.Internal.Player
 
         public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
-        public void Kill() => NotifyShouldDie();
+        /// <summary>Death by fiat (execute, tool). The killer keeps his credit — an execute is a kill —
+        /// unless the caller says this is a debug death, which frames nobody.</summary>
+        public void Kill(bool isDebug = false)
+        {
+            if (isDebug) _lastDamageSource = null;
+            CurrentHealth = 0; // the setter publishes the death: IsAlive is health-based everywhere
+        }
 
         public async Task ReceiveAttack(IAttackContext context)
         {
@@ -354,6 +361,7 @@ namespace Battle.Internal.Player
 
         public Task TakeDamage(IDamageContext context)
         {
+            _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
             // Apply modifiers like "Reduce all damage taken"
             ModifierHandler.Apply(context);
             // apply attackers modifiers like "increase all damage dealt"
@@ -551,9 +559,9 @@ namespace Battle.Internal.Player
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
-            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
-            CombatEvents.Publish<EntityDiedEvent>(new(this));
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            CombatEvents.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
             // The arena deliberately ignores the player's EntityDiedEvent: PlayerDiedEvent is
             // the battle-ending signal (PlayerLost). Without it the battle loop never exits.
             _gameEventBus?.Publish<PlayerDiedEvent>(new(this));

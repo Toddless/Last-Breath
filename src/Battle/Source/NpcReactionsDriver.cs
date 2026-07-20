@@ -2,7 +2,6 @@ namespace Battle.Source
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Core;
     using Core.Battle;
     using Core.Battle.Abilities;

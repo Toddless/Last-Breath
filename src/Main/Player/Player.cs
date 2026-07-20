@@ -321,10 +321,12 @@ namespace LastBreath.Player
 
         public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
-        public void Kill()
+        /// <summary>Death by fiat (execute, tool). The killer keeps his credit — an execute is a kill —
+        /// unless the caller says this is a debug death, which frames nobody.</summary>
+        public void Kill(bool isDebug = false)
         {
-            _lastDamageSource = null; // debug/tool death — nobody gets the credit
-            NotifyShouldDie();
+            if (isDebug) _lastDamageSource = null;
+            CurrentHealth = 0; // the setter publishes the death: IsAlive is health-based everywhere
         }
 
         public async Task ReceiveAttack(IAttackContext context)
@@ -356,6 +358,7 @@ namespace LastBreath.Player
                 }
 
                 // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
+                context.Attacker.ModifierHandler.Apply(context);
                 context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
             }
             catch (Exception e)

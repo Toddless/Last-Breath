@@ -19,8 +19,7 @@ namespace Battle.Source.PassiveSkills
 
         private void OnAfterAttack(AfterAttackEvent evt)
         {
-            if (Owner == null) return;
-            Owner.RestoreMana(new ManaRecoveryContext(Owner, Owner) { Amount = Amount });
+            Owner?.RestoreMana(new ManaRecoveryContext(Owner, Owner) { Amount = Amount });
         }
 
         public override void Detach(IFightable owner)

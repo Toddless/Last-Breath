@@ -1,7 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
     using Core.Battle.Skills;
-    using Core.Context;
     using Core.Entity;
     using Core.Enums;
     using Core.Events;

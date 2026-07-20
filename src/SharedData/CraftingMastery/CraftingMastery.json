@@ -13,7 +13,7 @@
   "baseResourceReturn": 0.3,
   "ascensionLevelGate": 1,
   "ascensionStatBonus": 0.15,
-  "mythicGiftBaseChance": 0.15,
+  "mythicGiftBaseChance": 1,
   "extraEffectBaseChance": 0.1,
   "rarityWeights": {
     "Legendary": 1,

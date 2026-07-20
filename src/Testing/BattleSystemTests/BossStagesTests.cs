@@ -2,7 +2,6 @@ namespace LastBreathTest.BattleSystemTests
 {
     using Battle.Source;
     using Core.Battle;
-    using Core.Battle.Abilities;
     using Core.Context;
     using Core.Data;
     using Core.Data.NpcData;
@@ -253,7 +252,9 @@ namespace LastBreathTest.BattleSystemTests
             harness.NextRoll = 0.1f; // below the chance
             harness.LandAttack(victim);
             var applied = victim.Effects.Effects.Single();
-            Assert.AreEqual("Effect_Damage_Over_Turn", applied.Id);
+            // Identity carries the damage kind: each DoT is its own slot, stack bucket and description.
+            Assert.AreEqual("Effect_Damage_Over_Turn_Poison", applied.Id);
+            Assert.AreEqual(StatusEffects.Poison, applied.Status);
         }
 
         [TestMethod]

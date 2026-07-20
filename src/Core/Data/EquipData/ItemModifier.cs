@@ -23,5 +23,10 @@ namespace Core.Data.EquipData
         /// item, not a stat line — only the ascension gift knows how to apply it. When set, the entry's
         /// parameter/type/value are ignored.</summary>
         [JsonProperty("extraUpgradeLevels")] public LevelRangeData? ExtraUpgradeLevels { get; init; }
+
+        /// <summary>Rollable grant entry: behaviour a stat line cannot express ("ignores the first damage
+        /// taken each turn") arrives as a passive/effect instead. When set, the entry's parameter/type/value
+        /// are ignored — only weight and affix still apply.</summary>
+        [JsonProperty("grant")] public GrantData? Grant { get; init; }
     }
 }

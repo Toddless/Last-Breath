@@ -9,7 +9,6 @@ namespace Core.Data
     using ItemData;
     using LootTable;
     using Enums;
-    using Interfaces;
     using Modifiers;
     using Crafting;
     using Items;
@@ -34,6 +33,7 @@ namespace Core.Data
             ["inc"] = ModifierValueType.Increase,
             ["mult"] = ModifierValueType.Multiplicative,
             ["multiplicative"] = ModifierValueType.Multiplicative,
+            ["flag"] = ModifierValueType.Flag,
             ["multi"] = ModifierValueType.Multiplicative
         };
 
@@ -272,6 +272,25 @@ namespace Core.Data
 
             }
 
+            // Rollable grant: behaviour a line cannot express (per-turn state, triggers) enters the pool as
+            // the passive/effect it really is. The kind is parsed strictly — a typo is an error, not a default.
+            if (modifier.Grant is { } grantData)
+            {
+                if (grantData.Id.Length == 0)
+                {
+                    Tracker.TrackError($"Skipping modifier of '{context}': a grant entry needs an id");
+                    return null;
+                }
+
+                if (!EnumParser.TryParseEnum<GrantKind>(grantData.Kind, out var grantKind))
+                {
+                    Tracker.TrackError($"Skipping modifier of '{context}': '{grantData.Kind}' is not a grant kind");
+                    return null;
+                }
+
+                return new GrantDescriptor(grantKind, grantData.Id, grantData.Properties) { Weight = modifier.Weight, Affix = affix };
+            }
+
             if (modifier.Parts.Count > 0)
             {
                 var parts = new List<IModifierDescriptor>();
@@ -286,8 +305,6 @@ namespace Core.Data
                 return new CompositeDescriptor(parts) { Weight = modifier.Weight, Affix = affix };
             }
 
-            if (!TryParseRange(modifier, context, out var range)) return null;
-
             ModifierValueType type;
             try
             {
@@ -299,8 +316,21 @@ namespace Core.Data
                 return null;
             }
 
+            // A flag line is a switch, not a number: the data writes no value at all and the pinned 1 never
+            // rolls and never scales. Every other type must bring its value (or spread) as usual.
+            ValueRange range = new(1f, 1f);
+            if (type != ModifierValueType.Flag && !TryParseRange(modifier, context, out range)) return null;
+
             if (EnumParser.TryParseEnum<EntityParameter>(modifier.Parameter, out var entityParameter))
+            {
+                if (type == ModifierValueType.Flag)
+                {
+                    Tracker.TrackError($"Skipping modifier of '{context}': '{modifier.Parameter}' is an entity parameter — a flag has no meaning in parameter math");
+                    return null;
+                }
+
                 return new ParameterDescriptor(entityParameter, type, range, EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope)) { Weight = modifier.Weight, Affix = affix };
+            }
 
             if (EnumParser.TryParseEnum<ContextParameter>(modifier.Parameter, out var contextParameter))
                 return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix };

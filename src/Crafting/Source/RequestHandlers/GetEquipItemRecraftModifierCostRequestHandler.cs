@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Crafting;
-    using Core.Enums;
     using Core.Interfaces;
     using Core.Inventory;
     using Core.Items;

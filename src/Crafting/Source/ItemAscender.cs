@@ -54,9 +54,9 @@ namespace Crafting.Source
 
         /// <summary>Rolls one weighted entry of the item category's mythic pool and mints fresh instances
         /// through the materializer — a composite entry lands as its atomic parts (same path as the recraft
-        /// roll). Chance = data base × (1 + mastery mythic channel). The gift's slot family rolls 50/50
-        /// prefix/suffix; a pool short on the chosen kind falls back to whatever it has.
-        /// The rarity slot cap is deliberately NOT checked — the gift is the only legal fifth line.</summary>
+        /// roll). Chance = data base × (1 + mastery mythic channel). The whole pool competes on weight alone:
+        /// the gift occupies the item's OWN mythic slot, which stands outside the rarity's prefix/suffix
+        /// count, so there is no slot family to draw for and no cap to check.</summary>
         private IReadOnlyList<string> TryRollGift(IEquipItem item)
         {
             if (rnd.RandFloat() > mastery.GetMythicGiftChance()) return [];
@@ -64,11 +64,7 @@ namespace Crafting.Source
             var pool = itemDataProvider.GetEquipItemModifierPool(s_mythicPoolByCategory[item.EquipmentPiece.ConvertEquipmentPartToCategory()]);
             if (pool.Count == 0) return [];
 
-            var kind = rnd.RandFloat() < 0.5f ? AffixKind.Prefix : AffixKind.Suffix;
-            var candidates = pool.Where(descriptor => descriptor.Affix == kind).ToList();
-            if (candidates.Count == 0) candidates = pool.ToList();
-
-            (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
+            (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
             var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
 
             // The "+Min..Max sharpening levels" entry (present in every mark's pool) is an operation,
@@ -82,10 +78,26 @@ namespace Crafting.Source
                 return [];
             }
 
+            // Mythic pool entries are marked Mythic in data; stamping it here too keeps the invariant even if
+            // an entry forgets the marker — everything born on this path belongs to the item's mythic slot.
+            // It rides the normal Affix channel, so the save round-trips it for free.
             var sink = new CollectingSink();
             materializer.Materialize(picked, sink, item.InstanceId);
-            foreach (var entity in sink.Entities) item.AddAdditionalModifier(entity);
-            foreach (var context in sink.Contexts) item.AddAdditionalContextModifier(context);
+            foreach (var entity in sink.Entities)
+            {
+                if (entity is SimpleModifier simple) simple.Affix = AffixKind.Mythic;
+                item.AddAdditionalModifier(entity);
+            }
+
+            foreach (var context in sink.Contexts)
+            {
+                context.Affix = AffixKind.Mythic;
+                item.AddAdditionalContextModifier(context);
+            }
+
+            // A gift can also be a grant (behaviour no line can express). It carries no affix stamp:
+            // grants are not lines and render in the item's effect section, not among the rolls.
+            foreach (var grant in sink.Grants) item.AddGrant(grant);
 
             return sink.Entities.Select(entity => entity.InstanceId)
                 .Concat(sink.Contexts.Select(entry => entry.InstanceId))

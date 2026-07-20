@@ -19,8 +19,9 @@ namespace Battle.Source.Effects
             await base.Apply(context);
             if (!IsApplied) return;
 
-            _modifier = new IncomingDamageReductionContextModifier( reduce);
-            Target?.ModifierHandler.Add(_modifier);
+            if (Target == null) return;
+            _modifier = new IncomingDamageReductionContextModifier(Target, reduce);
+            Target.ModifierHandler.Add(_modifier);
         }
 
         public override void Remove()

@@ -5,7 +5,6 @@ namespace Core.Ai.World
     using Entity.Components;
     using Godot;
     using Stateless;
-    using Time;
 
     /// <summary>
     /// World-mode mind of one NPC: the alertness FSM (Calm/Suspicious/Alert/Search) around

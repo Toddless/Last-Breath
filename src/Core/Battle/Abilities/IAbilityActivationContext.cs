@@ -3,6 +3,7 @@ namespace Core.Battle.Abilities
     using System.Collections.Generic;
     using Enums;
     using Entity;
+    using Godot;
 
     /// <summary>
     /// Mutable cast context. Built from the ability's current values, then passed through activation
@@ -16,6 +17,10 @@ namespace Core.Battle.Abilities
         IFightable Caster { get; }
         IBattleField Field { get; }
         List<IFightable> Targets { get; }
+
+        /// <summary>Rolls for mutators that fire by chance ("X% chance the cast costs nothing"). Lives on the
+        /// context like <see cref="IAttackContext.Rnd"/> so a mutator never has to reach for a generator.</summary>
+        RandomNumberGenerator Rnd { get; }
 
         float Cost { get; set; }
         Costs CostType { get; set; }

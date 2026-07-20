@@ -32,42 +32,6 @@ namespace Core
         public static T PickRandom<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, IRandomNumberGenerator rnd)
             where T : class => PickByRoll(elements, rnd.RandFloatRange(0, totalWeight));
 
-        public static HashSet<T> PickRandomMultipleWithoutDuplicate<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, RandomNumberGenerator rnd)
-            where T : class => PickMultiple(elements, requestedCount, () => rnd.RandfRange(0, totalWeight));
-
-        public static HashSet<T> PickRandomMultipleWithoutDuplicate<T>(IEnumerable<WeightedObject<T>> elements, float totalWeight, int requestedCount, IRandomNumberGenerator rnd)
-            where T : class => PickMultiple(elements, requestedCount, () => rnd.RandFloatRange(0, totalWeight));
-
-        private static HashSet<T> PickMultiple<T>(IEnumerable<WeightedObject<T>> elements, int requestedCount, Func<float> roll)
-            where T : class
-        {
-            HashSet<T> taken = [];
-            const int MaxAttempts = 15;
-            var toPickFrom = elements.Where(element => element.Weight > 0).ToList();
-            if (toPickFrom.Count == 0) return taken;
-
-            for (; requestedCount > 0; requestedCount--)
-                if (!TryTakeRandom(MaxAttempts))
-                    PickFirstNotTaken();
-
-            return taken;
-
-            bool TryTakeRandom(int attempts)
-            {
-                while (attempts-- > 0)
-                    if (taken.Add(PickByRoll(toPickFrom, roll())))
-                        return true;
-                return false;
-            }
-
-            void PickFirstNotTaken()
-            {
-                foreach (var element in toPickFrom)
-                    if (taken.Add(element.Obj))
-                        return;
-            }
-        }
-
         // Rolls sit in [0, totalWeight] with BOTH ends reachable, while every range is [From, To):
         // a roll equal to totalWeight belongs to the last pickable (weight > 0) entry.
         private static T PickByRoll<T>(IEnumerable<WeightedObject<T>> elements, float roll)

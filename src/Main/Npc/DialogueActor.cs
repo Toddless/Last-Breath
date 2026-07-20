@@ -3,7 +3,6 @@ namespace LastBreath.Npc
     using Core.Ai.World.Skirmish;
     using Core.Entity;
     using Core.Enums;
-    using Core.Events;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
     using Core.Services;

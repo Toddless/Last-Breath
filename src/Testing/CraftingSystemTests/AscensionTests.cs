@@ -10,6 +10,7 @@ namespace LastBreathTest.CraftingSystemTests
     using Core.MessageBus;
     using Core.MessageBus.Requests;
     using Core.Modifiers;
+    using Core.Save;
     using Crafting.Source;
     using Crafting.Source.RequestHandlers;
     using Moq;
@@ -148,6 +149,72 @@ namespace LastBreathTest.CraftingSystemTests
             // The lines rode the standard upgrade path: Base × (1 + levels × 5%) × the ascension 1.15.
             float expected = 10f * (1f + (item.UpdateLevel * 0.05f)) * 1.15f;
             Assert.AreEqual(expected, item.Modifiers.Single().Value, 0.01f);
+        }
+
+        [TestMethod]
+        public void FlagLine_IgnoresSharpeningAndAscension()
+        {
+            // "Attacks ignore elemental resistances" is a switch: there is no number to grow, so neither
+            // the sharpening scale nor the ascension +15% may touch its value channel.
+            var item = new EquipItem(EquipmentPiece.Helmet, "Crown", []) { Rarity = Rarity.Legendary };
+            var flag = new ContextModifierEntry(ContextParameter.HealingEfficiency, ModifierValueType.Flag, 1f);
+            var line = new SimpleModifier(EntityParameter.Intelligence, ModifierValueType.Flat, 10f, "test");
+            item.AddAdditionalContextModifier(flag);
+            item.AddAdditionalModifier(line);
+
+            item.Upgrade(item.MaxUpdateLevel);
+            item.AscensionMultiplier = 1.15f;
+
+            Assert.AreEqual(1f, flag.Value, 0.001f, "A flag line must stay exactly as data wrote it.");
+            Assert.AreEqual(10f * 1.6f * 1.15f, line.Value, 0.01f, "The ordinary line still rides the full formula.");
+        }
+
+        [TestMethod]
+        public void MythicGift_GrantEntry_LandsAsAGrantNotALine()
+        {
+            // The pool may hold behaviour no line can express ("ignores the first damage taken each turn").
+            var rnd = new DefaultRandomNumberGenerator(seed: 5);
+            var entry = new GrantDescriptor(GrantKind.Passive, "Passive_Skill_Regeneration", new Dictionary<string, float> { ["percent"] = 0.05f })
+                { Weight = 100f, Affix = AffixKind.Prefix };
+            var granted = Mock.Of<IItemGrant>(mock => mock.Id == "Passive_Skill_Regeneration");
+            var factory = new Mock<IGrantFactory>();
+            factory.Setup(mock => mock.Create(GrantKind.Passive, "Passive_Skill_Regeneration", It.IsAny<List<IModifier>>(), It.IsAny<IReadOnlyDictionary<string, float>>()))
+                .Returns(granted);
+            var ascender = new ItemAscender(rnd, ArmorPoolProvider(entry), new ModifierMaterializer(rnd, factory.Object), AlwaysGiftingMastery());
+            var item = MaxedLegendary();
+            int linesBefore = item.Modifiers.Count;
+
+            var result = ascender.TryAscendItem(item);
+
+            Assert.IsTrue(result.Succeeded);
+            Assert.AreSame(granted, item.Grants.Single());
+            Assert.AreEqual(linesBefore, item.Modifiers.Count, "A grant gift must not add a line.");
+            Assert.AreEqual(0, result.GiftedModifierIds.Count, "There is no line id to report for a grant gift.");
+        }
+
+        [TestMethod]
+        public void MythicGift_IsStampedWithItsOrigin_AndSurvivesTheSave()
+        {
+            // The gift entry rolled from the Prefix half of the pool, but what lands on the item is a
+            // MYTHIC line — that stamp is what earns it its own slot in the tooltip, and it rides the
+            // ordinary affix field, so the save must bring it back.
+            var rnd = new DefaultRandomNumberGenerator(seed: 5);
+            var entry = new ParameterDescriptor(EntityParameter.Health, ModifierValueType.Multiplicative, 0.3f, ModifierScope.Global)
+                { Weight = 100f, Affix = AffixKind.Prefix };
+            var ascender = new ItemAscender(rnd, ArmorPoolProvider(entry), new ModifierMaterializer(rnd), AlwaysGiftingMastery());
+            var item = MaxedLegendary();
+
+            var result = ascender.TryAscendItem(item);
+
+            Assert.IsTrue(result.Succeeded);
+            string giftId = result.GiftedModifierIds.Single();
+            Assert.AreEqual(AffixKind.Mythic, ((SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == giftId)).Affix);
+
+            var converter = new EquipItemSaveConverter(new GrantFactory(() => null, () => null, () => null));
+            var restored = converter.FromData(converter.ToData(item));
+
+            Assert.AreEqual(1, restored.Modifiers.Count(modifier => (modifier as SimpleModifier)?.Affix == AffixKind.Mythic),
+                "The gift must come back from the save still wearing its mythic stamp.");
         }
 
         [TestMethod]

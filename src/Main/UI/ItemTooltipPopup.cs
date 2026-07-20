@@ -1,7 +1,6 @@
 namespace LastBreath.UI
 {
     using Core.Constants;
-    using Core.Data;
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
@@ -30,6 +29,13 @@ namespace LastBreath.UI
         private const int HeaderLineWidth = 240;
         private const int FullLineWidth = 436;
         private const float CraftButtonsGap = 16f;
+
+        // The mythic card: the frame eats the row's width (padding on both sides plus the mark and its gap),
+        // so its label wraps narrower than a plain line.
+        private const string MythicMark = "◆";
+        private const int MythicCardPadding = 10;
+        private const int MythicCardGap = 10;
+        private const int MythicLineWidth = FullLineWidth - 60;
 
         private static readonly Color s_effectColor = new(0.9f, 0.81f, 0.58f);
         private static readonly Color s_baseStatColor = new(0.79f, 0.66f, 0.38f);
@@ -233,14 +239,74 @@ namespace LastBreath.UI
                 AddLine(_implicits, Pick(line), HeaderLineWidth, dim: true);
             _implicitsSection?.Visible = implicits.Count > 0;
 
-            var rolled = EquipItemLines.ComposeRolled(item);
-            foreach (var line in rolled)
-                AddLine(_mods, Pick(line), FullLineWidth);
-            _modsSection?.Visible = rolled.Count > 0;
+            RenderRolledLines(item);
 
             foreach (var grant in item.Grants)
                 AddLine(_effects, Localization.Localize(grant.Id), FullLineWidth, color: s_effectColor);
             _effectSection?.Visible = item.Grants.Count > 0;
+        }
+
+        /// <summary>The rolled block, split by slot family: a caption opens each family (the rows arrive
+        /// already ordered — prefixes, suffixes, leftovers, gift), and the ascension gift closes the section
+        /// as a framed card instead of a plain row. The card needs no caption: the frame IS the label.</summary>
+        private void RenderRolledLines(IEquipItem item)
+        {
+            var rolled = EquipItemLines.ComposeRolled(item);
+            AffixKind? block = null;
+            foreach (var line in rolled)
+            {
+                if (line.Affix != block)
+                {
+                    block = line.Affix;
+                    var header = line.Affix == AffixKind.Mythic ? null : ItemLineRows.AffixHeader(line.Affix);
+                    if (header != null) _mods?.AddChild(header);
+                }
+
+                if (line.Affix == AffixKind.Mythic) _mods?.AddChild(MythicCard(Pick(line)));
+                else AddLine(_mods, Pick(line), FullLineWidth);
+            }
+
+            _modsSection?.Visible = rolled.Count > 0;
+        }
+
+        /// <summary>The ascension gift wears the item's own mythic rarity colour as a framed card — the one
+        /// line that is neither prefix nor suffix reads as a thing apart at a glance.</summary>
+        private static Control MythicCard(string text)
+        {
+            var accent = Color.FromHtml(TextPalette.RarityColor(Rarity.Mythic));
+            var frame = new StyleBoxFlat
+            {
+                BgColor = accent with { A = 0.09f },
+                BorderColor = accent with { A = 0.32f },
+                ContentMarginLeft = MythicCardPadding,
+                ContentMarginRight = MythicCardPadding,
+                ContentMarginTop = MythicCardPadding,
+                ContentMarginBottom = MythicCardPadding,
+            };
+            frame.SetBorderWidthAll(1);
+            frame.SetCornerRadiusAll(2);
+
+            var card = new PanelContainer();
+            card.AddThemeStyleboxOverride("panel", frame);
+
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 8);
+            var mark = new Label { Text = MythicMark };
+            mark.AddThemeColorOverride("font_color", accent);
+            row.AddChild(mark);
+            row.AddChild(new Label
+            {
+                Text = text,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                CustomMinimumSize = new Vector2(MythicLineWidth, 0),
+            });
+            card.AddChild(row);
+
+            // The section's rows sit 2px apart — the card is a block, not a row, and needs air above it.
+            var spaced = new MarginContainer();
+            spaced.AddThemeConstantOverride("margin_top", MythicCardGap);
+            spaced.AddChild(card);
+            return spaced;
         }
 
         private string Pick(EquipItemLine line) => _revealRanges ? line.RevealedText ?? line.Text : line.Text;

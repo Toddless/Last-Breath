@@ -6,7 +6,6 @@ namespace Crafting.Source.EventHandlers
     using Core.Crafting;
     using Core.Data;
     using Core.Enums;
-    using Core.Events;
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
@@ -24,6 +23,9 @@ namespace Crafting.Source.EventHandlers
         IGameMessageBus gameMessageBus)
         : IMessageHandler<DestroyItemMessage>
     {
+        // TODO:
+        // Пыль по категории + редкости (упущено в первой итерации)
+
         // Category -> dust id: deliberately an explicit local mapping, NOT read from the UpgradeCosts
         // recraft section — a recraft price rebalance there must never silently change what shattering yields.
         private static readonly Dictionary<EquipmentCategory, string> s_dustByCategory = new()

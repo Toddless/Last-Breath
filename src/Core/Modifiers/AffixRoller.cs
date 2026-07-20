@@ -24,6 +24,9 @@ namespace Core.Modifiers
                 {
                     case AffixKind.Prefix: prefixBucket.Add(descriptor); break;
                     case AffixKind.Suffix: suffixBucket.Add(descriptor); break;
+                    // A mythic entry belongs to the item's own slot (ascension draws it) and never competes
+                    // for a prefix/suffix — passing through a generation pool is a data slip, not a crash.
+                    case AffixKind.Mythic: Tracker.TrackInfo($"Skipping mythic pool entry in an affix roll — it belongs to the mythic slot: {descriptor}"); break;
                     default: Tracker.TrackError($"Skipping pool entry without an affix — it can never occupy a slot: {descriptor}"); break;
                 }
             }

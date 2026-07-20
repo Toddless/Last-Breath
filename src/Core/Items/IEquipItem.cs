@@ -65,6 +65,12 @@
         void RemoveAdditionalModifier(string instanceId);
         void AddAdditionalModifier(IModifierInstance modifier);
         void AddAdditionalContextModifier(ContextModifierEntry entry);
+
+        /// <summary>Slot-preserving twins of the Add pair: the reroll puts the fresh line back at the index
+        /// the replaced one held, so a rerolled row keeps its place in the list instead of falling to the
+        /// bottom. An index past the end appends.</summary>
+        void InsertAdditionalModifier(int index, IModifierInstance modifier);
+        void InsertAdditionalContextModifier(int index, ContextModifierEntry entry);
         void AddGrant(IItemGrant grant);
 
         /// <summary>Ascension-only: scales every grant's numeric payload ONCE (passive skill properties,

@@ -102,6 +102,65 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
+        public void Reroll_PutsTheFreshLineBackIntoTheRerolledSlot()
+        {
+            // Middle line rerolled: the replacement must land in slot 1, not at the bottom of the list —
+            // the row the player clicked stays where they clicked it.
+            var item = ItemWith(Line(EntityParameter.Strength), Line(EntityParameter.Intelligence), Line(EntityParameter.Evade));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Descriptor(EntityParameter.Dexterity, weight: 10f)));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers[1].InstanceId);
+
+            Assert.IsNotNull(rolled);
+            Assert.AreEqual(rolled, item.Modifiers[1].InstanceId, "The fresh line took the slot of the one it replaced.");
+            CollectionAssert.AreEqual(
+                new[] { EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Evade },
+                item.Modifiers.Select(modifier => modifier.EntityParameter).ToArray());
+        }
+
+        [TestMethod]
+        public void Reroll_CompositeGroup_TakesTheSlotOfItsFirstPart()
+        {
+            // The whole group leaves and one atom replaces it — that atom inherits the group's slot.
+            var item = ItemWith(
+                Line(EntityParameter.Strength),
+                Line(EntityParameter.Intelligence, groupId: "composite"),
+                Line(EntityParameter.Evade, groupId: "composite"),
+                Line(EntityParameter.Accuracy));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Descriptor(EntityParameter.Dexterity, weight: 10f)));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers[1].InstanceId);
+
+            Assert.IsNotNull(rolled);
+            CollectionAssert.AreEqual(
+                new[] { EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Accuracy },
+                item.Modifiers.Select(modifier => modifier.EntityParameter).ToArray());
+        }
+
+        [TestMethod]
+        public void Reroll_NonLineCandidates_AreNotPickable()
+        {
+            // A reroll swaps a line for a line. A grant entry or the sharpening-levels operation would take
+            // the old line away and put no line back, so neither may enter the candidate list.
+            var item = ItemWith(Line(EntityParameter.Strength));
+            var provider = new Mock<IItemDataProvider>();
+            provider.Setup(mock => mock.GetEquipItemModifierPool("Band")).Returns(
+            [
+                new GrantDescriptor(GrantKind.Passive, "Passive_Skill_Regeneration", new Dictionary<string, float>()) { Weight = 100f, Affix = AffixKind.Suffix },
+                new UpgradeLevelsDescriptor(1, 69) { Weight = 100f, Affix = AffixKind.Suffix },
+            ]);
+            provider.Setup(mock => mock.GetEquipItemBaseModifierPool(It.IsAny<string>())).Returns([]);
+            provider.Setup(mock => mock.GetResourceDescriptors(It.IsAny<string>())).Returns([]);
+            var upgrader = CreateUpgrader(seed: 3, provider.Object);
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.Single().InstanceId);
+
+            Assert.IsNull(rolled, "Nothing rerollable in the pool — refuse instead of eating the line.");
+            Assert.AreEqual(1, item.Modifiers.Count);
+            Assert.AreEqual(0, item.RecraftCount);
+        }
+
+        [TestMethod]
         public void Reroll_CandidatesWithoutWeight_RefuseInsteadOfThrowing()
         {
             // Weight 0 means "never rolls" — composite parts inherit it by parse contract, so a candidate

@@ -3,7 +3,6 @@ namespace Core.Save
     using System;
     using Core;
     using Battle;
-    using Events;
     using MessageBus;
     using Services;
     using Godot;

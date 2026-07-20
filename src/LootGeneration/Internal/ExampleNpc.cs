@@ -173,7 +173,7 @@ namespace LootGeneration.Internal
 
         public IFightable ChoseTarget(List<IFightable> targets) => throw new NotImplementedException();
 
-        public void Kill() => throw new NotImplementedException();
+        public void Kill(bool isDebug = false) => throw new NotImplementedException();
 
         public void AddItemToInventory(IItem item) => throw new NotImplementedException();
 

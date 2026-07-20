@@ -3,6 +3,7 @@ namespace Battle.Source.Effects
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Context;
+    using Core.Enums;
     using Core.Events;
     using Core.Modifiers.Context;
 
@@ -48,7 +49,7 @@ namespace Battle.Source.Effects
             if (Target == null || _modifier != null) return;
             if (evt.Ability.Id == sourceAbilityId) return;
 
-            _modifier = new PureConversionContextModifier(Target, fraction);
+            _modifier = new DamageConversionContextModifier(Target, fraction, DamageCause.Ability);
             Target.ModifierHandler.Add(_modifier);
             _boostedCastId = evt.CastId;
         }

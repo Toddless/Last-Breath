@@ -1,6 +1,49 @@
 {
     "npcs": [
         {
+            "id": "Npc_Dummy",
+            "fraction": "Undead",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 1,
+            "levelScaling": 0.01,
+            "abilityCount": 0,
+            "baseParameters": {
+                "Health": 900000000,
+                "Barrier": 0,
+                "Mana": 0,
+                "Strength": 5,
+                "Dexterity": 5,
+                "Intelligence": 5,
+                "Armor": 2000,
+                "CriticalChance": 0.0,
+                "AdditionalHitChance": 0.0,
+                "CriticalDamage": 0.0,
+                "Damage": 1,
+                "SpellDamage": 1,
+                "Accuracy": 0,
+                "Evade": 2000
+            },
+            "world": {
+                "visionRadius": 0,
+                "hearingRadius": 0,
+                "leashRadius": 0,
+                "moveSpeed": 0,
+                "chaseSpeedMultiplier": 1,
+                "hostileToPlayer": true,
+                "activity": "Idle",
+                "wanderRadius": 220
+            },
+            "lifecycle": {
+                "resurrectMinSeconds": 20,
+                "resurrectMaxSeconds": 90,
+                "maxStrengthBonus": 1.0
+            }
+        },
+        {
             "id": "Npc_Bandit",
             "fraction": "Human",
             "entityType": "Regular",
@@ -1072,7 +1115,11 @@
                 "Ability_Summon_Bone_Wolves"
             ],
             "abilityBehaviors": [
-                { "id": "Ability_Summon_Bone_Wolves", "weight": 1.2, "role": "Utility" }
+                {
+                    "id": "Ability_Summon_Bone_Wolves",
+                    "weight": 1.2,
+                    "role": "Utility"
+                }
             ],
             "baseParameters": {
                 "Health": 3000,

@@ -464,7 +464,7 @@ namespace LastBreath.Helpers
 
         private void ExecuteKill()
         {
-            Service<IPlayerAccessor>().Player?.Kill();
+            Service<IPlayerAccessor>().Player?.Kill(isDebug: true); // console death frames nobody
             Print("Player killed");
         }
 

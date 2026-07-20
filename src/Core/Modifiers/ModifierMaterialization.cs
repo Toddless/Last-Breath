@@ -4,13 +4,19 @@ namespace Core.Modifiers
     using System.Collections.Generic;
     using Entity.Components;
     using Enums;
+    using Items;
+    using Items.Grants;
 
-    /// <summary>Where a materialized line lands. The item implements this for its rolled ("additional") bucket;
-    /// <see cref="CollectingSink"/> accumulates for template parse.</summary>
+    /// <summary>Where a materialized descriptor lands: lines in the entity/context buckets, rolled grants in
+    /// their own. <see cref="CollectingSink"/> accumulates for template parse and for the crafting rolls.</summary>
     public interface IModifierSink
     {
         void AddEntity(IModifierInstance modifier);
         void AddContext(ContextModifierEntry entry);
+
+        /// <summary>A rolled grant (passive/effect): behaviour that is not a line at all. Kept in its own
+        /// bucket so a caller that only knows how to place lines cannot silently swallow it.</summary>
+        void AddGrant(IItemGrant grant);
     }
 
     /// <summary>Accumulates materialized lines into entity/context buckets — used to build an item's authored
@@ -19,9 +25,11 @@ namespace Core.Modifiers
     {
         public List<IModifierInstance> Entities { get; } = [];
         public List<ContextModifierEntry> Contexts { get; } = [];
+        public List<IItemGrant> Grants { get; } = [];
 
         public void AddEntity(IModifierInstance modifier) => Entities.Add(modifier);
         public void AddContext(ContextModifierEntry entry) => Contexts.Add(entry);
+        public void AddGrant(IItemGrant grant) => Grants.Add(grant);
     }
 
     public interface IModifierMaterializer
@@ -34,7 +42,7 @@ namespace Core.Modifiers
     /// number: ranges roll on the injected RNG, fixed values pass through bit-identical and consume no roll
     /// (seeded sequences must not shift for legacy single-value content). Each line is stamped with its roll
     /// provenance: Affix, the source range, and — for composite parts — a shared GroupId.</summary>
-    public sealed class ModifierMaterializer(IRandomNumberGenerator rnd) : IModifierMaterializer
+    public sealed class ModifierMaterializer(IRandomNumberGenerator rnd, IGrantFactory? grantFactory = null) : IModifierMaterializer
     {
         // Group affix/id stamped onto every line of one composite roll; empty for atomic descriptors.
         private readonly record struct LineStamp(AffixKind? Affix, string? GroupId);
@@ -49,8 +57,24 @@ namespace Core.Modifiers
                 case ParameterDescriptor parameter: MaterializeParameter(parameter, sink, source, stamp); break;
                 case ContextDescriptor context: MaterializeContext(context, sink, stamp); break;
                 case CompositeDescriptor composite: MaterializeComposite(composite, sink, source, stamp); break;
+                case GrantDescriptor grant: MaterializeGrant(grant, sink); break;
                 default: Tracker.TrackError($"No materializer registered for descriptor {descriptor.GetType().Name}"); break;
             }
+        }
+
+        // Grants are minted by the one factory like every other grant (data, save, effect catalog). A host
+        // without the factory (sandbox, tool) says so out loud instead of dropping the entry in silence.
+        private void MaterializeGrant(GrantDescriptor descriptor, IModifierSink sink)
+        {
+            if (grantFactory == null)
+            {
+                Tracker.TrackError($"Cannot materialize grant '{descriptor.GrantId}': this host has no grant factory");
+                return;
+            }
+
+            var grant = grantFactory.Create(descriptor.Kind, descriptor.GrantId, [], descriptor.Properties);
+            if (grant == null) return; // the factory already reported the unknown kind/id
+            sink.AddGrant(grant);
         }
 
         private void MaterializeParameter(ParameterDescriptor descriptor, IModifierSink sink, string source, LineStamp stamp)

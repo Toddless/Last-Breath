@@ -565,6 +565,7 @@ namespace LastBreath.Npc
                 }
 
                 // Single post-attack channel: all reactions (effects, passives, upgrades) subscribe to this event
+                context.Attacker.ModifierHandler.Apply(context);
                 context.Attacker.CombatEvents.Publish(new AfterAttackEvent(context));
             }
             catch (Exception e)
@@ -699,13 +700,13 @@ namespace LastBreath.Npc
         /// transition instead of a death: the lethal blow routes through TakeDamage, where the
         /// stage-guard floor clamps it to the threshold (design: the floor guards executes too).
         /// Source = self keeps the Kill() "nobody's fault" reputation semantics.</summary>
-        public void Kill()
+        public void Kill(bool isDebug = false)
         {
             bool guarded = IsAlive && Effects.GetBy(e => e is Core.Battle.Abilities.IStageGuardEffect).Any();
             if (!guarded)
             {
-                _lastDamageSource = null; // debug/tool death — nobody gets the credit
-                NotifyShouldDie();
+                if (isDebug) _lastDamageSource = null; // debug/tool death — nobody gets the credit
+                CurrentHealth = 0; // the setter publishes the death: IsAlive is health-based everywhere
                 return;
             }
 

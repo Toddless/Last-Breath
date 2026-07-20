@@ -17,6 +17,10 @@
 
     public abstract class Ability(AbilityBaseData data) : IAbility
     {
+        // Rolls for cast mutators that fire by chance (item lines like "X% chance the cast is free").
+        // One shared, time-seeded generator instead of a fresh one per activation.
+        private static readonly RandomNumberGenerator s_castRnd = CreateCastRnd();
+
         protected IFightable? Owner;
 
         /// <summary>The data record the ability was built from — the single source of base values;
@@ -149,6 +153,7 @@
                 Ability = this,
                 Caster = Owner,
                 Field = field,
+                Rnd = s_castRnd,
                 Targets = targets,
                 Cost = CostValue,
                 CostType = CostType,
@@ -166,6 +171,13 @@
             foreach (var rider in ActivationRiders.Values.ToList())
                 await rider.Apply(context);
             Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
+        }
+
+        private static RandomNumberGenerator CreateCastRnd()
+        {
+            var rnd = new RandomNumberGenerator();
+            rnd.Randomize();
+            return rnd;
         }
 
         /// <summary>Delivery implementations (internal loops and execution strategies) call this on every

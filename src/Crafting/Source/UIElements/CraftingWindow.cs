@@ -136,8 +136,7 @@ namespace Crafting.Source.UIElements
         /// bench (tabs are disabled otherwise, this is the guard for hotkey/race paths).</summary>
         private void SwitchMode(CraftingMode mode)
         {
-            if (mode != CraftingMode.Create && _item == null) { RefreshModeTabs(); return; }
-            if (_mode == mode) { RefreshModeTabs(); return; }
+            if (mode != CraftingMode.Create && _item == null || _mode == mode) { RefreshModeTabs(); return; }
 
             _mode = mode;
             if (mode == CraftingMode.Create) _item = null;
@@ -326,14 +325,26 @@ namespace Crafting.Source.UIElements
         }
 
         /// <summary>Live item lines: parts of one composite roll present as a single row (the row's
-        /// id is the first part — the group-reroll target).</summary>
+        /// id is the first part — the group-reroll target). The rolled rows arrive grouped by slot family
+        /// (prefixes, suffixes, leftovers, the ascension gift) and each family announces itself — the bench
+        /// shows the same blocks as the tooltip, just without its framing.</summary>
         private void RenderItemModifiers(IEquipItem item)
         {
             foreach (var line in EquipItemLines.ComposeImplicits(item))
                 _mods?.AddChild(new Label { Text = line.Text, ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
+            AffixKind? block = null;
             foreach (var line in EquipItemLines.ComposeRolled(item))
+            {
+                if (line.Affix != block)
+                {
+                    block = line.Affix;
+                    var header = ItemLineRows.AffixHeader(line.Affix);
+                    if (header != null) _mods?.AddChild(header);
+                }
+
                 _mods?.AddChild(RerollableOrLabel(line.InstanceId, line.Text));
+            }
 
             foreach (var grant in item.Grants)
                 _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });

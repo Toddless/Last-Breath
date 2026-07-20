@@ -27,6 +27,9 @@ namespace Core.Items
         private Dictionary<EntityParameter, List<IModifierInstance>>? _resolvedModifiers;
         private IFightable? _owner;
 
+        // THE line-value formula: every stored line (both channels, implicit or rolled) is worth
+        // Base × sharpening scale × ascension scale. All five write paths go through this.
+        private float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
         protected float UpdateMultiplier { get; private set; } = 1f;
 
         public EquipmentPiece EquipmentPiece { get; }
@@ -167,27 +170,33 @@ namespace Core.Items
             SetContextModifiers(_contextModifiers, entries);
         }
 
-        public void AddAdditionalModifier(IModifierInstance modifier)
+        public void AddAdditionalModifier(IModifierInstance modifier) => InsertAdditionalModifier(_modifiers.Count, modifier);
+
+        // Rolled context line ("+35% burning damage"). Attaches to the owner on equip like any context line;
+        // crafting operates on inventory (unequipped) items, so there is no live owner to attach to here.
+        public void AddAdditionalContextModifier(ContextModifierEntry entry) => InsertAdditionalContextModifier(_contextModifiers.Count, entry);
+
+        // Position is display state the reroll must preserve (its replacement line takes the slot of the one
+        // it replaced), so the whole Add path routes through the insert — appending is just "at the end".
+        public void InsertAdditionalModifier(int index, IModifierInstance modifier)
         {
             if (IsSealed) return;
             if (modifier is CompositeModifier composite)
             {
-                foreach (var part in ExpandComposite(composite)) AddAdditionalModifier(part);
+                foreach (var part in ExpandComposite(composite)) InsertAdditionalModifier(index++, part);
                 return;
             }
 
-            modifier.Value = modifier.BaseValue * LineMultiplier;
-            _modifiers.Add(modifier);
+            modifier.Value = Scaled(modifier.BaseValue, modifier.ModifierValueType);
+            _modifiers.Insert(Math.Clamp(index, 0, _modifiers.Count), modifier);
             _resolvedModifiers = null;
         }
 
-        // Rolled context line ("+35% burning damage"). Attaches to the owner on equip like any context line;
-        // crafting operates on inventory (unequipped) items, so there is no live owner to attach to here.
-        public void AddAdditionalContextModifier(ContextModifierEntry entry)
+        public void InsertAdditionalContextModifier(int index, ContextModifierEntry entry)
         {
             if (IsSealed) return;
-            entry.Value = entry.BaseValue * LineMultiplier;
-            _contextModifiers.Add(entry);
+            entry.Value = Scaled(entry.BaseValue, entry.ValueType);
+            _contextModifiers.Insert(Math.Clamp(index, 0, _contextModifiers.Count), entry);
         }
 
         // Identity is InstanceId (variant B): duplicates of the same parameter+type may coexist across both
@@ -285,9 +294,11 @@ namespace Core.Items
 
         protected IEnumerable<IModifier> AllModifiers => _implicits.Concat(_modifiers);
 
-        // THE line-value formula: every stored line (both channels, implicit or rolled) is worth
-        // Base × sharpening scale × ascension scale. All five write paths go through this.
-        private float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
+
+        /// <summary>The scaled value of one line. A flag line ("attacks ignore elemental resistances") is a
+        /// switch, not a number: sharpening and ascension leave it exactly as data wrote it.</summary>
+        private float Scaled(float baseValue, ModifierValueType type) =>
+            type == ModifierValueType.Flag ? baseValue : baseValue * LineMultiplier;
 
         protected virtual EquipItem CreateCopy() => new(this);
 
@@ -311,7 +322,7 @@ namespace Core.Items
             itemEntries.Clear();
             foreach (var entry in newEntries)
             {
-                entry.Value = entry.BaseValue * LineMultiplier;
+                entry.Value = Scaled(entry.BaseValue, entry.ValueType);
                 itemEntries.Add(entry);
             }
         }
@@ -321,7 +332,7 @@ namespace Core.Items
             itemModifiers.Clear();
             foreach (var instance in newModifiers.SelectMany(ToInstances))
             {
-                instance.Value = instance.BaseValue * LineMultiplier;
+                instance.Value = Scaled(instance.BaseValue, instance.ModifierValueType);
                 itemModifiers.Add(instance);
             }
 
@@ -351,9 +362,9 @@ namespace Core.Items
         private void UpdateModifiersValue()
         {
             foreach (var modifier in _implicits.Concat(_modifiers))
-                modifier.Value = modifier.BaseValue * LineMultiplier;
+                modifier.Value = Scaled(modifier.BaseValue, modifier.ModifierValueType);
             foreach (var entry in AllContextModifiers)
-                entry.Value = entry.BaseValue * LineMultiplier;
+                entry.Value = Scaled(entry.BaseValue, entry.ValueType);
 
             _resolvedModifiers = null;
         }

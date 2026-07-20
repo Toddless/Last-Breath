@@ -1,6 +1,5 @@
 namespace Core.Narrative.Actions
 {
-    using Data;
     using Inventory;
     using Newtonsoft.Json.Linq;
 

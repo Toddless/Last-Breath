@@ -13,8 +13,10 @@
         StatusEffects statusEffect = StatusEffects.None,
         int maxStacks = 999,
         float percentFromDamage = 0.7f)
-        : Effect(id: "Effect_Damage_Over_Turn", duration, maxStacks, statusEffect), IDamageOverTurnEffect
+        : Effect(IdFor(statusEffect), duration, maxStacks, statusEffect), IDamageOverTurnEffect
     {
+        private const string BaseId = "Effect_Damage_Over_Turn";
+
         public float PercentFromBase { get; } = percentFromDamage;
 
         /// <summary>Settable so effect-application mutators ("+X% burning damage") can scale the tick.</summary>
@@ -57,5 +59,13 @@
         }
 
         public override IEffect Copy() => new DamageOverTurnEffect(Duration, Status, MaxStacks, PercentFromBase) { DamagePerTick = DamagePerTick };
+
+        /// <summary>One identity per damage kind: bleed, poison and burning are separate lines on the target.
+        /// Identity is what the whole chain groups by — the HUD slot (icon, stack counter, duration), the
+        /// summed damage in the description, and the MaxStacks bucket with its eviction — so sharing one Id
+        /// merged the three into a single lying slot and let a fresh burn evict a poison stack. A typeless
+        /// DoT keeps the shared identity. Names match the .po keys and the icon file names.</summary>
+        private static string IdFor(StatusEffects status) =>
+            status == StatusEffects.None ? BaseId : $"{BaseId}_{status}";
     }
 }

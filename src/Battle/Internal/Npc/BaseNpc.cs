@@ -151,6 +151,9 @@ namespace Battle.Internal.Npc
 
         // TakeDamage owns the event order (damage beat first, death after) — see its comment.
         private bool _suppressDeathNotify;
+        // Who landed the last hit: the killer reported with the death (reputation, kill facts, loot).
+        // Cleared by a world defeat and by a debug kill — neither has anyone to blame.
+        private IFightable? _lastDamageSource;
 
         public float CurrentHealth
         {
@@ -581,6 +584,7 @@ namespace Battle.Internal.Npc
 
         public Task TakeDamage(IDamageContext context)
         {
+            _lastDamageSource = context.Source; // killer attribution: whoever lands the lethal hit
             ModifierHandler.Apply(context);
             context.Source.ModifierHandler.Apply(context);
             CombatEvents.Publish(new BeforeDamageTakenEvent(context));
@@ -694,13 +698,15 @@ namespace Battle.Internal.Npc
         /// <summary>An execute on a staged boss with a pending transition converts into the
         /// transition instead of a death: the lethal blow routes through TakeDamage, where the
         /// stage-guard floor clamps it to the threshold (design: the floor guards executes too).
-        /// Source = self keeps the Kill() "nobody's fault" reputation semantics.</summary>
-        public void Kill()
+        /// A plain execute keeps the killer his credit (the last damage source — an execute follows
+        /// its own hit); only a debug/tool death frames nobody.</summary>
+        public void Kill(bool isDebug = false)
         {
             bool guarded = IsAlive && Effects.GetBy(e => e is Core.Battle.Abilities.IStageGuardEffect).Any();
             if (!guarded)
             {
-                NotifyShouldDie();
+                if (isDebug) _lastDamageSource = null;
+                CurrentHealth = 0; // the setter publishes the death: IsAlive is health-based everywhere
                 return;
             }
 
@@ -808,6 +814,8 @@ namespace Battle.Internal.Npc
         /// <summary>Dies outside a player battle (lost skirmish): the body lifecycle takes over.</summary>
         public void DefeatInWorld()
         {
+            // A stale source from an old player battle must not frame the player for a lost skirmish.
+            _lastDamageSource = null;
             CurrentHealth = 0;
             IsFighting = false;
             BecomeBody();
@@ -911,9 +919,9 @@ namespace Battle.Internal.Npc
 
         private void NotifyShouldDie()
         {
-            _gameEventBus?.Publish<EntityDiedEvent>(new(this));
-            _battleEventBus?.Publish<EntityDiedEvent>(new(this));
-            CombatEvents.Publish<EntityDiedEvent>(new(this));
+            _gameEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            _battleEventBus?.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
+            CombatEvents.Publish<EntityDiedEvent>(new(this, _lastDamageSource));
         }
 
         private void SetBaseValuesForParameters()

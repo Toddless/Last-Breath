@@ -36,6 +36,12 @@ height = 25
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fmhhv"]
 
+[sub_resource type="Gradient" id="Gradient_kwijy"]
+colors = PackedColorArray(0.81960785, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_m67ao"]
+gradient = SubResource("Gradient_kwijy")
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
@@ -149,3 +155,17 @@ metadata/_custom_type_script = "uid://n61b2xhyvvk8"
 [node name="SmartPoint" type="Node2D" parent="." unique_id=2099196387]
 script = ExtResource("10_kwijy")
 metadata/_custom_type_script = "uid://dhdmfoqlhrspe"
+
+[node name="Dummy" type="Node2D" parent="." unique_id=1845947532]
+position = Vector2(-57, 714)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Dummy")
+_maxCount = 1
+_spawnRadius = 50.0
+_pointId = "Dummy_Spawn_Point"
+_respawnDelayMinMinutes = 1.0
+_respawnDelayMaxMinutes = 2.0
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Sprite2D" type="Sprite2D" parent="Dummy" unique_id=1265279363]
+texture = SubResource("GradientTexture2D_m67ao")

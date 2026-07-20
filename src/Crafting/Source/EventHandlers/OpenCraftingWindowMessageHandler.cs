@@ -2,7 +2,6 @@ namespace Crafting.Source.EventHandlers
 {
     using System.Threading.Tasks;
     using Core.Enums;
-    using Core.Events;
     using Core.Inventory;
     using Core.Items;
     using Core.MessageBus;
