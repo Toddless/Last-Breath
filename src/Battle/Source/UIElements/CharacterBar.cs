@@ -139,6 +139,8 @@ namespace Battle.Source.UIElements
                 if (!string.IsNullOrEmpty(slot.EffectId))
                     slotsById[slot.EffectId] = slot;
 
+            // TODO:
+            // отображения бесконечных эффектов
             foreach (var view in effects)
             {
                 if (slotsById.TryGetValue(view.Id, out var slot))

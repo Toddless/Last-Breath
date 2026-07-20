@@ -46,6 +46,8 @@
 
         public void PlayAnimation(string animation) => _animatedSprite2D?.Play(animation);
 
+        public bool HasClip(string animation) => _animatedSprite2D?.SpriteFrames?.HasAnimation(animation) == true;
+
         /// <summary>
         /// Swaps the sprite's clip set (per-NPC art from the visual library) and restarts the
         /// current clip so the swap is seamless. Scale multiplies the scene's base sprite scale —

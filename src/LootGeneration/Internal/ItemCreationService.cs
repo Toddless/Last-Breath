@@ -3,19 +3,20 @@ namespace LootGeneration.Internal
     using System.Collections.Generic;
     using System.Linq;
     using Core;
+    using Core.Crafting;
     using Core.Data;
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Core.Services;
-    using Source;
 
     /// <summary>Loot-side item spawner: mints from <see cref="IItemMinter"/> and, for equip items, rolls
     /// prefix/suffix lines from the item+family descriptor pools scaled by the kill's difficulty multiplier.
     /// The runtime entry point <see cref="Source.LootGenerationService"/> calls to turn a rolled table id
     /// into a concrete drop.</summary>
-    public class ItemCreationService(IItemEffectProvider effectProvider, IItemDataProvider dataProvider, IRandomNumberGenerator rnd, IItemMinter itemMinter, IModifierMaterializer materializer) : IItemCreationService
+    public class ItemCreationService(IItemDataProvider dataProvider, IRandomNumberGenerator rnd, IItemMinter itemMinter, IModifierMaterializer materializer, ICraftingEffectProvider effectCatalog, IGrantFactory grantFactory) : IItemCreationService
     {
         public IItem CreateItem(string id)
         {
@@ -56,6 +57,36 @@ namespace LootGeneration.Internal
 
             foreach (var entity in sink.Entities) equip.AddAdditionalModifier(entity);
             foreach (var context in sink.Contexts) equip.AddAdditionalContextModifier(context);
+            TryRollGrant(equip, additionalItemEffects, equipEffectChance);
+        }
+
+        // The drop's bonus grant. Pool = the ItemEffects catalog (payload travels with the entry).
+        // A kill with ItemEffectsModifier(s) narrows the pool to the NPC's signature ids and the grant
+        // becomes GUARANTEED per equip item — that is the modifier's identity, difficulty already paid
+        // for it. Ordinary kills roll the configured chance against the whole catalog. Rolled AFTER
+        // the affix lines, so line sequences of a seeded run stay comparable.
+        private void TryRollGrant(IEquipItem equip, List<string> additionalItemEffects, float equipEffectChance)
+        {
+            if (effectCatalog.Effects.Count == 0) return;
+
+            List<CraftingEffectOption> pool;
+            if (additionalItemEffects.Count > 0)
+            {
+                pool = effectCatalog.Effects.Where(option => additionalItemEffects.Contains(option.Id)).ToList();
+                foreach (string unknown in additionalItemEffects.Distinct().Where(id => pool.All(option => option.Id != id)))
+                    Tracker.TrackNotFound($"ItemEffects catalog entry '{unknown}' (AdditionalItemEffects)", this);
+                if (pool.Count == 0) return;
+            }
+            else
+            {
+                if (equipEffectChance <= 0f || rnd.RandFloat() > equipEffectChance) return;
+                pool = effectCatalog.Effects.ToList();
+            }
+
+            (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
+            var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
+            var grant = grantFactory.Create(picked.Kind, picked.Id, [], picked.Properties);
+            if (grant != null) equip.AddGrant(grant);
         }
     }
 }

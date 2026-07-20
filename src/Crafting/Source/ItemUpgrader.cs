@@ -13,7 +13,12 @@ namespace Crafting.Source
     using Core.Results;
     using Godot;
 
-    public class ItemUpgrader(IRandomNumberGenerator rnd, ICraftingMastery mastery, IItemDataProvider itemDataProvider, ICraftingAdditiveProvider additives, IModifierMaterializer materializer) : IItemUpgrader
+    public class ItemUpgrader(
+        IRandomNumberGenerator rnd,
+        ICraftingMastery mastery,
+        IItemDataProvider itemDataProvider,
+        ICraftingAdditiveProvider additives,
+        IModifierMaterializer materializer) : IItemUpgrader
     {
         private const float P0 = 0.95f;
         private const float P5 = 0.70f;
@@ -49,30 +54,40 @@ namespace Crafting.Source
             var target = FindLine(item, modifierInstanceId);
             if (target == null) return null; // the line is not on the item
             (var targetAffix, string? targetGroupId) = target.Value;
-
             // LIVE pool, computed at reroll time (never stored on the item, so a json edit is visible on
-            // existing items): family pool ∪ the item's own pool ∪ the used resources' descriptors, plus the
+            // existing items): family pool + the item's own pool + the used resources' descriptors, plus the
             // operation's additive pools. The WHOLE union scales by the item's PowerMultiplier so a reroll
             // matches the magnitude the item was born with (loot difficulty or crafting quality) — additives
-            // included, deliberately. Variant B allows duplicate lines: no value exclusion. Composites flatten
-            // to atomic parts so a reroll is 1-for-1. A reroll preserves the slot family: candidates are
+            // included, deliberately.
+            // Composites flatten to atomic parts so a reroll is 1-for-1. A reroll preserves the slot family: candidates are
             // filtered to the target line's affix. A None line (legacy save / authored fodder predating the
             // affix markup) has no slot family to preserve, so it tolerantly rerolls from the FULL pool.
             var livePool = itemDataProvider.GetLiveRerollPool(item)
                 .Concat(AdditivePools(additiveResourceIds))
                 .Select(descriptor => DescriptorOperations.Scale(descriptor, item.PowerMultiplier));
+
+            // No duplicate lines: a candidate whose key (parameter + value type, NEVER the value) already
+            // sits on the item is out — "+35% damage" next to "+33% damage" is the same line twice. The keys
+            // are read BEFORE anything leaves the item, so a refusal below still mutates nothing; the target's
+            // own group is exempt, so a reroll may honestly return the same stat with a fresh value.
+            var groupMemberIds = GroupMemberIds(item, modifierInstanceId, targetGroupId);
+            var occupied = item.OccupiedLineKeys(groupMemberIds);
             var candidates = DescriptorOperations.Flatten(livePool)
                 .Where(descriptor => targetAffix == AffixKind.None || descriptor.Affix == targetAffix)
+                .Where(descriptor => !ModifierKey.TryFrom(descriptor, out var key) || !occupied.Contains(key))
                 .ToList();
-            if (candidates.Count == 0) return null; // nothing of the required kind — refuse (the handler spends nothing)
-
+            // Refuse for free (the handler spends nothing) when nothing of the required kind survived the
+            // filters — or when what survived carries no weight at all: composite parts inherit weight 0
+            // by parse contract (only the root is weighted), so a candidate list of nothing but flattened
+            // atoms is unpickable, not a roll.
             (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
+            if (totalWeight <= 0f) return null;
 
             // A grouped line (parts of one composite roll, presented to the player as a SINGLE line)
             // rerolls as one unit: every part leaves the item and exactly one fresh candidate replaces
             // the whole group — the pool is flattened, so candidates are always atoms. Group affix sits
             // on every part (stamped from the composite root), so the filter above already used it.
-            foreach (string memberId in GroupMemberIds(item, modifierInstanceId, targetGroupId))
+            foreach (string memberId in groupMemberIds)
                 item.RemoveAdditionalModifier(memberId);
 
             var picked = WeightedRandomPicker.PickRandom(weightedObjects, totalWeight, rnd);
@@ -122,7 +137,7 @@ namespace Crafting.Source
         /// <summary>The target line's slot family and group, from whichever channel holds it; null when the
         /// id is not on the item at all. Entity lines that predate the stamps (bare instances) read as
         /// (None, no group).</summary>
-        private static (AffixKind Affix, string? GroupId)? FindLine(IEquipItem item, string instanceId)
+        private static (AffixKind, string?)? FindLine(IEquipItem item, string instanceId)
         {
             foreach (var modifier in item.Modifiers)
                 if (modifier.InstanceId == instanceId)

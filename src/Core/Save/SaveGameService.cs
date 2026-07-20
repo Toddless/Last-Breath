@@ -72,13 +72,20 @@ namespace Core.Save
 
         public bool RequestLoad(int slot)
         {
+            if (_playerAccessor.Player is not Node playerNode || !StageLoad(slot)) return false;
+
+            playerNode.GetTree().CallDeferred(SceneTree.MethodName.ReloadCurrentScene);
+            return true;
+        }
+
+        public bool StageLoad(int slot)
+        {
             var file = _storage.Load(slot);
-            if (file == null || _playerAccessor.Player is not Node playerNode) return false;
+            if (file == null) return false;
 
             _pendingLoad = file;
-            _population.Reset(); // the reload frees NPC nodes without final-death events
+            _population.Reset(); // the scene change frees NPC nodes without final-death events
             Engine.TimeScale = 1; // loading from the game-over screen: the death fast-forward must not leak
-            playerNode.GetTree().CallDeferred(SceneTree.MethodName.ReloadCurrentScene);
             return true;
         }
 

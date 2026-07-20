@@ -6,6 +6,7 @@ namespace Battle.Internal.Player
     using System.Threading.Tasks;
     using Core;
     using Core.Ai.World;
+    using Core.Ai.World.Recovery;
     using Core.Ai.World.Time;
     using Core.Battle;
     using Core.Constants;
@@ -66,6 +67,7 @@ namespace Battle.Internal.Player
         private IBattleEventBus? _battleEventBus;
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
+        private IRestRecoveryService? _restRecovery;
 
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
@@ -154,6 +156,13 @@ namespace Battle.Internal.Player
                 Callable.From(OnReparented).CallDeferred();
         }
 
+        // The recovery service outlives scene reloads — a stale position delegate on a freed node
+        // would be a native call on a disposed object at the next world tick. Reparenting
+        // (world ↔ arena) fires _ExitTree too, so _EnterTree symmetrically re-registers.
+        public override void _ExitTree() => _restRecovery?.UnregisterParticipant(this);
+
+        public override void _EnterTree() => _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
+
         private void OnReparented()
         {
             // Parented also fires during scene instantiation, before the camera enters the tree —
@@ -172,6 +181,9 @@ namespace Battle.Internal.Player
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
+            // Rest at a campfire: the recovery zones heal any registered non-fighting participant.
+            _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
+            _restRecovery?.RegisterParticipant(this, () => GlobalPosition);
             // The player is a scene node, not a container-built service: self-register for UI/services
             GameServiceProvider.Instance.GetService<IPlayerAccessor>().Set(this);
             Parameters = new EntityParametersComponent();

@@ -8,7 +8,10 @@ namespace Battle.Internal.Npc
     using Core;
     using Core.Ai;
     using Core.Ai.World;
+    using Core.Ai.World.Activities;
+    using Core.Ai.World.Recovery;
     using Core.Ai.World.Skirmish;
+    using Core.Ai.World.SmartPoints;
     using Core.Ai.World.Time;
     using Core.Battle;
     using Core.Context;
@@ -22,6 +25,7 @@ namespace Battle.Internal.Npc
     using Core.Events;
     using Core.Items;
     using Core.Modifiers;
+    using Core.Narrative.Facts;
     using Core.Services;
     using Godot;
     using Source;
@@ -61,6 +65,10 @@ namespace Battle.Internal.Npc
         private IWorldClock? _worldClock;
         private IWorldBrain? _brain;
         private INpcLifecycle? _lifecycle;
+        private ISmartPointRegistry? _smartPoints;
+        private IWorldFactsService? _worldFacts;
+        private IRecoveryConfigProvider? _recoveryConfig;
+        private IRestRecoveryService? _recovery;
         private bool _hostileToPlayer;
         private float _skirmishScanCooldown;
         private float _corpseScanCooldown;
@@ -224,7 +232,12 @@ namespace Battle.Internal.Npc
             _npcRegistry = GameServiceProvider.Instance.GetService<INpcWorldRegistry>();
             _skirmishService = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
+            _smartPoints = GameServiceProvider.Instance.GetService<ISmartPointRegistry>();
+            _worldFacts = GameServiceProvider.Instance.GetService<IWorldFactsService>();
+            _recoveryConfig = GameServiceProvider.Instance.GetService<IRecoveryConfigProvider>();
+            _recovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
             _npcRegistry.Register(this);
+            _recovery?.RegisterParticipant(this, () => GlobalPosition);
             _gameEventBus.Subscribe<WorldStimulusEvent>(OnWorldStimulus);
         }
 
@@ -372,9 +385,35 @@ namespace Battle.Internal.Npc
             if (config == null) return;
 
             _hostileToPlayer = config.HostileToPlayer;
-            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), _patrolRoute, _worldClock);
+            var context = new WorldActivityContext
+            {
+                PatrolRoute = _patrolRoute,
+                Clock = _worldClock,
+                Npcs = _npcRegistry,
+                Relations = _factionRelations,
+                Points = _smartPoints,
+                Facts = _worldFacts,
+                Recovery = _recoveryConfig?.Config,
+                Self = this,
+            };
+            _brain = new WorldBrain(this, config, new DefaultRandomNumberGenerator(), context);
             CanMove = true;
         }
+
+        // ---- activity poses (world flavor; a missing clip degrades to Idle) ----
+        public void SetActivityPose(string clip)
+        {
+            _lastMoveAnimation = string.Empty; // the next movement must re-apply its directional clip
+            Animations.PlayAnimation(Animations.HasClip(clip) ? clip : "Idle_Down");
+        }
+
+        public void ClearActivityPose()
+        {
+            _lastMoveAnimation = string.Empty;
+            Animations.PlayAnimation("Idle_Down");
+        }
+
+        public float HealthPercent => Parameters.MaxHealth > 0 ? CurrentHealth / Parameters.MaxHealth : 1f;
 
         public void MoveTo(Vector2 destination, float speed)
         {
@@ -928,6 +967,8 @@ namespace Battle.Internal.Npc
             if (!disposing) return;
 
             _npcRegistry?.Unregister(this);
+            _recovery?.UnregisterParticipant(this);
+            _smartPoints?.Release(InstanceId);
             _gameEventBus?.Unsubscribe<WorldStimulusEvent>(OnWorldStimulus);
             _battleEventBus = null;
             _gameEventBus = null;

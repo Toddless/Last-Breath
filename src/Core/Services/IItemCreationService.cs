@@ -5,6 +5,9 @@ namespace Core.Services
     using Modifiers;
     using Items;
 
+    /// <summary>
+    ///
+    /// </summary>
     public interface IItemCreationService
     {
         IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier);

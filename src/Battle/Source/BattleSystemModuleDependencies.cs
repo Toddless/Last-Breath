@@ -19,6 +19,7 @@
     using Core.Views.UI;
     using Godot;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using RequestHandlers;
     using UIElements;
 
@@ -34,13 +35,39 @@
             services.AddGameDataParticipant<ICombatRulesProvider, CombatRules.CombatRulesProvider>();
 
             services.AddSingleton<ISkillProvider, PassiveSkillProvider>();
+            services.AddSingleton<IGrantEffectProvider, GrantEffectProvider>();
+            // TryAdd: Main registers both module extensions — whichever runs first wins, the lambdas
+            // resolve the providers lazily from the FINAL container, so registration order is irrelevant.
+            services.TryAddSingleton<Core.Items.Grants.IGrantFactory>(sp => new Core.Items.Grants.GrantFactory(
+                sp.GetService<ISkillProvider>,
+                sp.GetService<IGrantEffectProvider>,
+                sp.GetService<Core.Events.IGameEventBus>));
             // Shared on purpose: NPC looks resolve by NpcId for every spawn path in every project.
             services.AddSingleton<Presentation.INpcVisualProvider, Presentation.NpcVisualProvider>();
             services.AddSingleton<ISpawnPointRegistry, SpawnPointRegistry>();
+
+            // Out-of-combat rest: zones (campfires, spawn points) + participants, ticked by
+            // NpcWorldDirector. Shared on purpose — both projects fight and rest.
+            services.AddGameDataParticipant<Core.Ai.World.Recovery.IRecoveryConfigProvider, World.RecoveryConfigProvider>();
+            services.AddSingleton<Core.Ai.World.Recovery.IRestRecoveryService>(sp =>
+                new Core.Ai.World.Recovery.RestRecoveryService(
+                    sp.GetRequiredService<Core.Ai.World.Recovery.IRecoveryConfigProvider>(),
+                    sp.GetService<Core.Ai.World.Time.IWorldClock>()));
+
+            // Smart points: claims die with the claimant — Exit never runs for the dead, so the
+            // registry is released by the death events instead.
+            services.AddSingleton<Core.Ai.World.SmartPoints.ISmartPointRegistry>(sp =>
+            {
+                var registry = new Core.Ai.World.SmartPoints.SmartPointRegistry();
+                var bus = sp.GetService<Core.Events.IGameEventBus>();
+                bus?.Subscribe<Core.Events.EntityDiedEvent>(evnt => registry.Release(evnt.Entity.InstanceId));
+                bus?.Subscribe<Core.Events.NpcFinalDeathEvent>(evnt => registry.Release(evnt.InstanceId));
+                return registry;
+            });
             services.AddSingleton<LoadScope>();
             services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
             services.AddSingleton<ISaveStorage>(_ => new SaveStorage(ProjectSettings.GlobalizePath("user://saves")));
-            services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetService<ISkillProvider>));
+            services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetRequiredService<Core.Items.Grants.IGrantFactory>()));
             services.AddSingleton<ISaveManager>(sp =>
             {
                 var manager = new SaveManager(sp.GetRequiredService<LoadScope>());

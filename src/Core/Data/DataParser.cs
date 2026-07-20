@@ -262,13 +262,14 @@ namespace Core.Data
             // "+Min..Max sharpening levels" — an item operation only the ascension gift applies.
             if (modifier.ExtraUpgradeLevels is { } levels)
             {
-                if (levels.IsMalformed || levels.Min < 1 || levels.Max < levels.Min)
+                if (levels is { IsMalformed: false, Min: >= 1 } && levels.Max >= levels.Min)
                 {
-                    Tracker.TrackError($"Skipping modifier of '{context}': invalid extraUpgradeLevels range");
-                    return null;
+                    return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix };
                 }
 
-                return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix };
+                Tracker.TrackError($"Skipping modifier of '{context}': invalid extraUpgradeLevels range");
+                return null;
+
             }
 
             if (modifier.Parts.Count > 0)

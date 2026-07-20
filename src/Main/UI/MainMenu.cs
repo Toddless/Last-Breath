@@ -45,6 +45,9 @@
             ArgumentNullException.ThrowIfNull(_uIElementProvider);
             var saveLoad = SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>();
             saveLoad.InjectServices(_provider);
+            // Menu mode: no live world to reload — the staged load rides into a fresh world scene,
+            // where the SaveDirector applies it (same pipeline as the in-game load).
+            saveLoad.SetMenuLoadHandler(() => GetTree().ChangeSceneToPacked(Main.Initialize()));
             CallDeferred(Node.MethodName.AddChild, saveLoad);
         }
 

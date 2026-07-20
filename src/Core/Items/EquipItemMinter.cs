@@ -20,6 +20,7 @@ namespace Core.Items
     public sealed class EquipItemMinter(
         IEquipBlueprintProvider blueprints,
         IItemGameDataFactory factory,
+        Grants.IGrantFactory grants,
         IModifierMaterializer materializer,
         IRandomNumberGenerator rnd) : IEquipItemMinter
     {
@@ -87,7 +88,7 @@ namespace Core.Items
         {
             foreach (var grant in blueprint.Grants)
             {
-                var created = factory.CreateGrant(grant.Kind, grant.Id, grant.Modifiers, grant.Properties);
+                var created = grants.Create(grant.Kind, grant.Id, grant.Modifiers, grant.Properties);
                 if (created != null) item.AddGrant(created);
             }
         }

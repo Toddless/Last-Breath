@@ -30,6 +30,8 @@ namespace Core.Modifiers
         public string? NameKey { get; init; }
     }
 
+    // TODO:
+    // Это ДОЛЖНО быть строчкой в предмете, разница с обычным модификатором в том, что она применяется к предмету
     /// <summary>Mythic-pool entry "+Min..Max sharpening levels" — an operation on the item, not a line.
     /// Only the ascension gift path applies it; the materializer refuses it loudly, so a stray entry in
     /// a regular roll pool is a no-op with an error, never a silent mis-line.</summary>
@@ -37,6 +39,7 @@ namespace Core.Modifiers
     {
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
+        public string? NameKey { get; init; }
     }
 
     /// <summary>A weighted bundle rolled as one unit at creation; flattened to its atomic parts for reroll (1-for-1).

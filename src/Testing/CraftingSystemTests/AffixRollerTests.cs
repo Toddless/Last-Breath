@@ -5,8 +5,9 @@ namespace LastBreathTest.CraftingSystemTests
     using Core.Modifiers;
 
     /// <summary>The roller's contracts: each slot family draws only from its own bucket, a bucket short
-    /// on entries honestly leaves slots empty (no exception, no cross-family bleed), and a stray None
-    /// entry is skipped instead of ever occupying a slot.</summary>
+    /// on entries honestly leaves slots empty (no exception, no cross-family bleed), a stray None
+    /// entry is skipped instead of ever occupying a slot, and no item is born wearing the same line
+    /// (parameter + value type) twice — composites excepted.</summary>
     [TestClass]
     public class AffixRollerTests
     {
@@ -77,7 +78,7 @@ namespace LastBreathTest.CraftingSystemTests
                 Entry(EntityParameter.Strength, AffixKind.Suffix),
             };
 
-            // Legendary asks 2+2 but each family only holds one entry (dedup is by entry, variant B).
+            // Legendary asks 2+2 but each family only holds one entry.
             var picked = AffixRoller.Roll(pool, 2, 2, new DefaultRandomNumberGenerator(seed: 5));
 
             Assert.AreEqual(1, picked.Count(descriptor => descriptor.Affix == AffixKind.Prefix));
@@ -99,6 +100,47 @@ namespace LastBreathTest.CraftingSystemTests
             {
                 var picked = AffixRoller.Roll(pool, 2, 2, new DefaultRandomNumberGenerator(seed));
                 Assert.IsFalse(picked.Contains(stray), $"seed {seed}: a None entry occupied a slot.");
+            }
+        }
+
+        [TestMethod]
+        public void Roll_TwoEntriesOfTheSameLine_NeverBothOccupySlots()
+        {
+            // The same (parameter, type) from two sources — family pool and the base's own pool speak about
+            // Damage with different bounds. They are one line for the player: only one may land.
+            var pool = new List<IModifierDescriptor>
+            {
+                Entry(EntityParameter.Damage, AffixKind.Prefix, weight: 100f),
+                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(50f, 90f), ModifierScope.Global)
+                    { Weight = 100f, Affix = AffixKind.Prefix },
+                Entry(EntityParameter.Health, AffixKind.Prefix, weight: 1f),
+            };
+
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var picked = AffixRoller.Roll(pool, 2, 0, new DefaultRandomNumberGenerator(seed));
+
+                Assert.AreEqual(2, picked.Count, $"seed {seed}");
+                Assert.AreEqual(1, picked.Count(descriptor => descriptor is ParameterDescriptor { Parameter: EntityParameter.Damage }), $"seed {seed}: the same line landed twice.");
+            }
+        }
+
+        [TestMethod]
+        public void Roll_CompositeEntry_IsExemptFromLineDedup()
+        {
+            // A composite renders as ONE line, so its Damage part neither blocks nor is blocked by the
+            // standalone Damage entry — both may sit on the same item.
+            var composite = new CompositeDescriptor(
+                [new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 10f, ModifierScope.Global)])
+                { Weight = 100f, Affix = AffixKind.Prefix };
+            var pool = new List<IModifierDescriptor> { composite, Entry(EntityParameter.Damage, AffixKind.Prefix, weight: 100f) };
+
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var picked = AffixRoller.Roll(pool, 2, 0, new DefaultRandomNumberGenerator(seed));
+
+                Assert.AreEqual(2, picked.Count, $"seed {seed}: the composite and the atom must both be pickable.");
+                Assert.IsTrue(picked.Contains(composite), $"seed {seed}");
             }
         }
 

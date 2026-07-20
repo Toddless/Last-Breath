@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://qirsbn0o2qjt" path="res://World/CheckpointNode.cs" id="8_1etib"]
 [ext_resource type="Script" uid="uid://ctta8cas4isp7" path="res://World/NpcSpawnPoint.cs" id="8_hv00y"]
 [ext_resource type="Script" uid="uid://cpwjet55i0mhp" path="res://World/BossSpawnPoint.cs" id="9_hv00y"]
+[ext_resource type="Script" uid="uid://n61b2xhyvvk8" path="res://World/CampfireNode.cs" id="9_kwijy"]
+[ext_resource type="Script" uid="uid://dhdmfoqlhrspe" path="res://World/SmartPoint.cs" id="10_kwijy"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fx85w"]
 radius = 100.0
@@ -138,3 +140,12 @@ metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 
 [node name="Sprite2D" type="Sprite2D" parent="Zigri" unique_id=1479148786]
 texture = SubResource("NoiseTexture2D_fmhhv")
+
+[node name="CampfireNode" type="Node2D" parent="." unique_id=2137723099]
+position = Vector2(333, 491)
+script = ExtResource("9_kwijy")
+metadata/_custom_type_script = "uid://n61b2xhyvvk8"
+
+[node name="SmartPoint" type="Node2D" parent="." unique_id=2099196387]
+script = ExtResource("10_kwijy")
+metadata/_custom_type_script = "uid://dhdmfoqlhrspe"

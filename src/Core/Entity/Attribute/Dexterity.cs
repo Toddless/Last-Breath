@@ -35,7 +35,7 @@
 
             yield return new Modifier(ModifierValueType.Increase, EntityParameter.AdditionalHitChance, 0.01f);
 
-            yield return new Modifier(ModifierValueType.Increase, EntityParameter.Evade, 0.01f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Evade, 1f);
         }
     }
 }

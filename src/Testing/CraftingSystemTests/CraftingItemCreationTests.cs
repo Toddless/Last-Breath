@@ -5,6 +5,7 @@ namespace LastBreathTest.CraftingSystemTests
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Moq;
 
@@ -203,13 +204,14 @@ namespace LastBreathTest.CraftingSystemTests
             var materializer = new ModifierMaterializer(rnd);
             var blueprints = new BlueprintProvider(
                 new DataParser(new LootGeneration.Internal.ItemGameDataFactory()).ParseEquipItems(BlueprintJson));
-            var minter = new EquipItemMinter(blueprints, new LootGeneration.Internal.ItemGameDataFactory(), materializer, rnd);
+            var minter = new EquipItemMinter(blueprints, new LootGeneration.Internal.ItemGameDataFactory(),
+                new GrantFactory(() => null, () => null, () => null), materializer, rnd);
 
             var effects = new Mock<ICraftingEffectProvider>();
             effects.SetupGet(mock => mock.Effects).Returns(effectCatalog ?? []);
 
             return new Crafting.Services.ItemCreationService(mastery.Object, rnd, provider.Object, materializer, minter,
-                effects.Object, new LootGeneration.Internal.ItemGameDataFactory());
+                effects.Object, new GrantFactory(() => null, () => null, () => null));
         }
 
         private sealed class BlueprintProvider(IEnumerable<EquipItemBlueprint> blueprints) : IEquipBlueprintProvider

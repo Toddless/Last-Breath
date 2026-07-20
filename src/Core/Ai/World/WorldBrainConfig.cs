@@ -6,7 +6,11 @@ namespace Core.Ai.World
     {
         Idle,
         Wander,
-        Patrol
+        Patrol,
+        Rest,
+        Sleep,
+        Hunt,
+        Harvest
     }
 
     /// <summary>World behavior tuning of one NPC (the "world" section of Npc.json).</summary>
@@ -45,10 +49,12 @@ namespace Core.Ai.World
         /// <summary>Keeps fleeing this long after the threat was last seen/heard, then calms down.</summary>
         public float FleeSeconds { get; init; } = 5f;
 
-        // TODO:
-        // Расширить список активностей.
-        // Нпс могут: Охотится, искать сражения с кем то, выполнять квест (простые), добывать ресурсы, отдыхать (условно сидим у костра в лагере), спать
         public WorldActivityType Activity { get; init; } = WorldActivityType.Idle;
+
+        /// <summary>Sleeping senses: vision/hearing radii are scaled down while the Sleep pose holds.</summary>
+        public float SleepVisionMultiplier { get; init; } = 0.3f;
+
+        public float SleepHearingMultiplier { get; init; } = 0.6f;
 
         /// <summary>Wander destinations are rolled within this radius around home.</summary>
         public float WanderRadius { get; init; } = 250f;
@@ -61,8 +67,17 @@ namespace Core.Ai.World
         /// Empty = the single <see cref="Activity"/> runs all day. Gaps fall back to it too.
         /// </summary>
         public IReadOnlyList<ScheduleSlotConfig> Schedule { get; init; } = [];
+
+        /// <summary>
+        /// Duration-driven routine (the "routine" section): timed steps cycled in order — the
+        /// alternative to clock windows. Non-empty routine wins over the schedule.
+        /// </summary>
+        public IReadOnlyList<RoutineStepConfig> Routine { get; init; } = [];
     }
 
     /// <summary>One schedule window in minutes of day (wrap through midnight allowed).</summary>
-    public record ScheduleSlotConfig(int FromMinuteOfDay, int ToMinuteOfDay, WorldActivityType Activity, float? WanderRadius = null);
+    public record ScheduleSlotConfig(int FromMinuteOfDay, int ToMinuteOfDay, WorldActivityType Activity, float? WanderRadius = null, string? PointTag = null);
+
+    /// <summary>One routine step: the activity runs for the budget of game minutes, then the cycle advances.</summary>
+    public record RoutineStepConfig(WorldActivityType Activity, float Minutes, float? WanderRadius = null, string? PointTag = null);
 }

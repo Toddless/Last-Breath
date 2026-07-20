@@ -3,6 +3,7 @@
 /android/
 ./temp
 *.uid
+.claude/
 
 # User-specific files
 *.rsuser

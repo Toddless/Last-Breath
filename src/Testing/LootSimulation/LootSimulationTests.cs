@@ -174,8 +174,13 @@
         }
 
         private static LootGeneration.Internal.ItemCreationService CreateItemCreation() => new(
-            new LootGeneration.Services.ItemEffectProvider(), s_pipeline.ItemProvider, s_pipeline.Rnd,
-            s_pipeline.Minter, new ModifierMaterializer(s_pipeline.Rnd));
+            s_pipeline.ItemProvider, s_pipeline.Rnd, s_pipeline.Minter, new ModifierMaterializer(s_pipeline.Rnd),
+            new EmptyEffectCatalog(), new Core.Items.Grants.GrantFactory(() => null, () => null, () => null));
+
+        private sealed class EmptyEffectCatalog : Core.Crafting.ICraftingEffectProvider
+        {
+            public IReadOnlyList<Core.Crafting.CraftingEffectOption> Effects => [];
+        }
 
         private static async Task<List<string>> GetRollableEquipIdsAsync()
         {

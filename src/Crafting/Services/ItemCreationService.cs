@@ -9,6 +9,7 @@ namespace Crafting.Services
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Core.Services;
 
@@ -21,7 +22,7 @@ namespace Crafting.Services
         IModifierMaterializer materializer,
         IEquipItemMinter equipMinter,
         ICraftingEffectProvider effectCatalog,
-        IItemGameDataFactory grantFactory)
+        IGrantFactory grantFactory)
         : IItemCreationService
     {
         public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier) =>
@@ -82,7 +83,7 @@ namespace Crafting.Services
 
             (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(effectCatalog.Effects);
             var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
-            var grant = grantFactory.CreateGrant(picked.Kind, picked.Id, [], picked.Properties);
+            var grant = grantFactory.Create(picked.Kind, picked.Id, [], picked.Properties);
             if (grant != null) item.AddGrant(grant);
         }
 

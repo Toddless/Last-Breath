@@ -81,7 +81,6 @@ namespace LastBreath.Services
             services.AddSingleton<ISaveGameService, SaveGameService>();
             services.AddGameData("res://Data/", "res://Data/Shared/");
             services.AddSingleton<IInventory, Inventory>();
-            services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddCraftingSystemModuleDependencies();

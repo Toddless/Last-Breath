@@ -92,8 +92,27 @@ namespace Core.Data.NpcData
         [JsonProperty("wanderRadius")] public float WanderRadius { get; init; } = 250f;
         [JsonProperty("activityPauseSeconds")] public float ActivityPauseSeconds { get; init; } = 2f;
 
+        /// <summary>Sleeping senses: vision/hearing radii scaled down while the Sleep pose holds.</summary>
+        [JsonProperty("sleepVisionMultiplier")] public float SleepVisionMultiplier { get; init; } = 0.3f;
+
+        [JsonProperty("sleepHearingMultiplier")] public float SleepHearingMultiplier { get; init; } = 0.6f;
+
         /// <summary>Daily routine: "HH:MM" windows switching the Calm activity; gaps fall back to "activity".</summary>
         [JsonProperty("schedule")] public List<NpcScheduleSlotData> Schedule { get; init; } = [];
+
+        /// <summary>Duration-driven routine: timed steps cycled in order. Non-empty wins over "schedule".</summary>
+        [JsonProperty("routine")] public List<NpcRoutineStepData> Routine { get; init; } = [];
+    }
+
+    /// <summary>One routine step: the activity runs for a budget of game minutes, then the cycle advances.</summary>
+    public record NpcRoutineStepData
+    {
+        [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
+        [JsonProperty("minutes")] public float Minutes { get; init; } = 60f;
+        [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
+
+        /// <summary>Smart point tag the activity anchors to (Campfire/Tent/OreVein/...); null = the type's default.</summary>
+        [JsonProperty("point")] public string? Point { get; init; }
     }
 
     /// <summary>One schedule window; 22:00–06:00 style entries wrap through midnight.</summary>
@@ -103,6 +122,9 @@ namespace Core.Data.NpcData
         [JsonProperty("to")] public string To { get; init; } = "00:00";
         [JsonProperty("activity")] public string Activity { get; init; } = "Idle";
         [JsonProperty("wanderRadius")] public float? WanderRadius { get; init; }
+
+        /// <summary>Smart point tag the activity anchors to (Campfire/Tent/OreVein/...); null = the type's default.</summary>
+        [JsonProperty("point")] public string? Point { get; init; }
     }
 
     /// <summary>One "reactions" entry — parsed strictly into NpcReactionConfig by NpcReactionParser.</summary>

@@ -19,8 +19,15 @@ namespace LastBreath.UI
         [Export] private Button? _closeButton;
 
         private ISaveGameService? _saveGame;
+        private System.Action? _menuLoad;
 
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
+
+        /// <summary>
+        /// Menu mode: there is no live world to reload, so a successful load stages the pending
+        /// file and hands the scene switch to the host (the main menu owns the world scene).
+        /// </summary>
+        public void SetMenuLoadHandler(System.Action switchToWorld) => _menuLoad = switchToWorld;
 
         public override void _Ready()
         {
@@ -65,13 +72,24 @@ namespace LastBreath.UI
                 _saveGame.SaveToSlot(slot);
                 Rebuild();
             }));
-            row.AddChild(SlotButton(TranslationServer.Translate("UI_Load"), metadata == null, () => _saveGame.RequestLoad(slot)));
+            row.AddChild(SlotButton(TranslationServer.Translate("UI_Load"), metadata == null, () => LoadSlot(slot)));
             row.AddChild(SlotButton("X", metadata == null, () =>
             {
                 _saveGame.DeleteSlot(slot);
                 Rebuild();
             }));
             return row;
+        }
+
+        private void LoadSlot(int slot)
+        {
+            if (_menuLoad != null)
+            {
+                if (_saveGame!.StageLoad(slot)) _menuLoad();
+                return;
+            }
+
+            _saveGame!.RequestLoad(slot); // in-game: the scene reloads, the SaveDirector applies
         }
 
         private static string DescribeSlot(int slot, SaveMetadata? metadata) =>

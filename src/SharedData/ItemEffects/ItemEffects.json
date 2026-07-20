@@ -35,6 +35,30 @@
             "kind": "Passive",
             "weight": 60,
             "properties": { "percentFromDamage": 0.15, "duration": 2, "maxStacks": 3 }
+        },
+        {
+            "id": "Passive_Skill_Burning",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": { "percentFromDamage": 0.15, "duration": 2, "maxStacks": 3 }
+        },
+        {
+            "id": "Passive_Skill_Poisoned_Claws",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": { "percentFromDamage": 0.15, "duration": 2 }
+        },
+        {
+            "id": "Passive_Skill_Vampire",
+            "kind": "Passive",
+            "weight": 60,
+            "properties": { "percent": 0.05 }
+        },
+        {
+            "id": "Passive_Skill_Execute",
+            "kind": "Passive",
+            "weight": 20,
+            "properties": { "threshold": 0.1 }
         }
     ]
 }

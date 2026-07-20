@@ -40,18 +40,21 @@ namespace Core.Ai.World
         public IWorldAgent Agent { get; }
         public WorldBrainConfig Config { get; }
         public IRandomNumberGenerator Rnd { get; }
-        // TODO:
-        // По необходимости расширить стейт машину.
-        // Ввести иерархию (Если нпс добывает ресурс и в этот появляется противник, нпс переключает внимание на битву. ПОсле битвы нпс возвращается к добыче ресурсов, если он выживает)
         public AlertnessState State => _fsm.State;
 
+        /// <summary>Calm-perception dampeners (sleep): activities set them while a pose holds,
+        /// and reset on any interruption. Alert chases and flees stay at full senses.</summary>
+        public float VisionMultiplier { get; set; } = 1f;
+
+        public float HearingMultiplier { get; set; } = 1f;
+
         public WorldBrain(IWorldAgent agent, WorldBrainConfig config, IRandomNumberGenerator rnd,
-            IReadOnlyList<Vector2>? patrolRoute = null, IWorldClock? clock = null)
+            WorldActivityContext? context = null)
         {
             Agent = agent;
             Config = config;
             Rnd = rnd;
-            _activity = CreateActivity(config, patrolRoute, clock);
+            _activity = CreateActivity(config, context ?? new WorldActivityContext());
             _fsm = new StateMachine<AlertnessState, Trigger>(AlertnessState.Calm);
             ConfigureFsm();
             _activity.Enter(this);
@@ -91,7 +94,7 @@ namespace Core.Ai.World
         public void OnStimulus(Stimulus stimulus)
         {
             if (Agent.IsFighting) return;
-            if (Agent.Position.DistanceTo(stimulus.Position) > Config.HearingRadius) return;
+            if (Agent.Position.DistanceTo(stimulus.Position) > Config.HearingRadius * HearingMultiplier) return;
 
             if (!Config.Aggressive)
             {
@@ -237,7 +240,7 @@ namespace Core.Ai.World
         {
             if (_graceLeft > 0) return false;
 
-            var sighting = Agent.GetSighting(Config.VisionRadius);
+            var sighting = Agent.GetSighting(Config.VisionRadius * VisionMultiplier);
             if (sighting == null) return false;
 
             if (!Config.Aggressive)
@@ -252,18 +255,38 @@ namespace Core.Ai.World
             return true;
         }
 
-        /// <summary>A schedule (when authored and a clock exists) wraps the base activity as its fallback.</summary>
-        private static IWorldActivity CreateActivity(WorldBrainConfig config, IReadOnlyList<Vector2>? patrolRoute, IWorldClock? clock)
+        /// <summary>
+        /// The calm routine, layered: base activity → routine cycle (timed steps) or schedule
+        /// (clock windows) → the recovery gate on top (a wounded NPC abandons anything to rest).
+        /// </summary>
+        private static IWorldActivity CreateActivity(WorldBrainConfig config, WorldActivityContext context)
         {
-            var baseActivity = WorldActivityFactory.Create(config.Activity, patrolRoute);
-            if (clock == null || config.Schedule.Count == 0) return baseActivity;
+            var routine = BuildRoutine(config, context);
+            return context.Recovery == null ? routine : new RecoveryGateActivity(routine, context);
+        }
+
+        private static IWorldActivity BuildRoutine(WorldBrainConfig config, WorldActivityContext context)
+        {
+            var baseActivity = WorldActivityFactory.Create(config.Activity, context);
+
+            if (config.Routine.Count > 0)
+            {
+                var steps = new List<IWorldActivity>();
+                foreach (var step in config.Routine)
+                    steps.Add(new TimedTask(
+                        WorldActivityFactory.Create(step.Activity, context, step.WanderRadius, step.PointTag),
+                        step.Minutes, context.Clock));
+                return new CycleActivity(steps);
+            }
+
+            if (context.Clock == null || config.Schedule.Count == 0) return baseActivity;
 
             var slots = new List<ScheduleSlot>();
             foreach (var slot in config.Schedule)
                 slots.Add(new ScheduleSlot(slot.FromMinuteOfDay, slot.ToMinuteOfDay,
-                    WorldActivityFactory.Create(slot.Activity, patrolRoute, slot.WanderRadius)));
+                    WorldActivityFactory.Create(slot.Activity, context, slot.WanderRadius, slot.PointTag)));
 
-            return new ScheduledActivity(clock, slots, baseActivity);
+            return new ScheduledActivity(context.Clock, slots, baseActivity);
         }
     }
 }

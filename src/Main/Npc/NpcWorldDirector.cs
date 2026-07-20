@@ -1,6 +1,7 @@
 namespace LastBreath.Npc
 {
     using Core.Ai.World.Raids;
+    using Core.Ai.World.Recovery;
     using Core.Ai.World.Skirmish;
     using Core.Ai.World.Time;
     using Core.Events;
@@ -17,6 +18,7 @@ namespace LastBreath.Npc
     {
         private INpcSkirmishService? _skirmishes;
         private IRaidService? _raids;
+        private IRestRecoveryService? _restRecovery;
         private IWorldClock? _clock;
         private IGameEventBus? _gameEventBus;
 
@@ -24,6 +26,7 @@ namespace LastBreath.Npc
         {
             _skirmishes = GameServiceProvider.Instance.GetService<INpcSkirmishService>();
             _raids = GameServiceProvider.Instance.GetService<IRaidService>();
+            _restRecovery = GameServiceProvider.Instance.GetService<IRestRecoveryService>();
             _clock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
 
@@ -44,6 +47,7 @@ namespace LastBreath.Npc
             _clock?.Tick((float)delta);
             _skirmishes?.Tick((float)delta);
             _raids?.Tick((float)delta);
+            _restRecovery?.Tick((float)delta);
         }
 
         private void OnHourPassed(int hour) =>

@@ -3,7 +3,6 @@ namespace Core.Save
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Battle.Skills;
     using Data.SaveData;
     using Enums;
     using Items;
@@ -15,7 +14,7 @@ namespace Core.Save
     /// through the normal mutation API (Set*/Upgrade/TryAscend) so every invariant — value
     /// recomputation from the update multiplier, seal rules — is enforced by the item itself.
     /// </summary>
-    public class EquipItemSaveConverter(Func<ISkillProvider?> skillProviderAccessor)
+    public class EquipItemSaveConverter(IGrantFactory grantFactory)
     {
         public EquipItemSaveData ToData(IEquipItem item) => new()
         {
@@ -154,14 +153,22 @@ namespace Core.Save
                 SkillId = skillGrant.SkillId,
                 Properties = new Dictionary<string, float>(skillGrant.Properties)
             },
+            EffectGrant effectGrant => new GrantSaveData
+            {
+                Kind = GrantSaveData.EffectKind,
+                Id = grant.Id,
+                EffectId = effectGrant.EffectId,
+                Properties = new Dictionary<string, float>(effectGrant.Properties)
+            },
             // A silently dropped grant is a corrupted item: fail the capture, the old save survives.
             _ => throw new NotSupportedException($"Grant type {grant.GetType().Name} has no save representation.")
         };
 
         private IItemGrant FromGrantData(GrantSaveData data, string source) => data.Kind switch
         {
-            GrantSaveData.PassiveSkillKind => new PassiveSkillGrant(data.Id, data.SkillId ?? string.Empty, data.Properties, skillProviderAccessor),
-            _ => new ModifierGrant(data.Id, data.Modifiers.Select(modifier => ToModifier(modifier, source)).ToList())
+            GrantSaveData.PassiveSkillKind => grantFactory.CreatePassiveGrant(data.Id, data.SkillId ?? data.Id, data.Properties),
+            GrantSaveData.EffectKind => grantFactory.CreateEffectGrant(data.Id, data.EffectId ?? data.Id, data.Properties),
+            _ => grantFactory.CreateModifierGrant(data.Id, data.Modifiers.Select(modifier => ToModifier(modifier, source)).ToList())
         };
     }
 }

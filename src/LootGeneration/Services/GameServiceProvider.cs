@@ -28,10 +28,16 @@ namespace LootGeneration.Services
             // (mirrors CraftingSystemModuleDependencies).
             services.AddSingleton<Core.Modifiers.IModifierMaterializer, Core.Modifiers.ModifierMaterializer>();
             services.AddSingleton<IEquipBlueprintProvider>(provider => provider.GetRequiredService<IItemDataProvider>());
+            // Sandbox has no skill/effect registries: null accessors mint inert grants (display works).
+            services.AddSingleton<Core.Items.Grants.IGrantFactory>(sp => new Core.Items.Grants.GrantFactory(
+                sp.GetService<Core.Battle.Skills.ISkillProvider>,
+                sp.GetService<Core.Battle.Abilities.IGrantEffectProvider>,
+                sp.GetService<Core.Events.IGameEventBus>));
             services.AddSingleton<Core.Items.IEquipItemMinter, Core.Items.EquipItemMinter>();
             services.AddSingleton<Core.Items.IItemMinter, Core.Items.ItemMinter>();
             services.AddGameDataParticipant<INpcModifierProvider, NpcModifierProvider>();
-            services.AddSingleton<IItemEffectProvider, ItemEffectProvider>();
+            // The ItemEffects catalog feeds the drop's bonus-grant roll (payload travels with the entry).
+            services.AddGameDataParticipant<Core.Crafting.ICraftingEffectProvider, Core.Crafting.CraftingEffectProvider>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddLootGenerationServices();
             services.AddGameData("res://Data/", "res://Data/Shared/");

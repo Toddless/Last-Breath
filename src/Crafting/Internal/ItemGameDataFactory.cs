@@ -7,7 +7,6 @@ namespace Crafting.Internal
     using Core.Enums;
     using Core.Interfaces;
     using Core.Items;
-    using Core.Items.Grants;
     using Core.Modifiers;
 
     /// <summary>Crafting-side <see cref="IItemGameDataFactory"/>: the one place that news up domain objects
@@ -23,13 +22,6 @@ namespace Crafting.Internal
 
         public IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags) =>
             new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
-
-        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
-        {
-            GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
-            GrantKind.Passive => new PassiveSkillGrant(id, id, properties, static () => PassiveSkillProvider.Instance),
-            _ => null
-        };
 
         public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
             new Requirement(type, id, amount);

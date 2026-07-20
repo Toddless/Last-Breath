@@ -6,7 +6,6 @@ namespace LastBreath.Services
     using Core.Enums;
     using Core.Interfaces;
     using Core.Items;
-    using Core.Items.Grants;
     using Core.Modifiers;
     using Items;
 
@@ -20,14 +19,6 @@ namespace LastBreath.Services
 
         public IWeaponItem CreateWeaponItem(WeaponType weaponType, Handedness handedness, float baseDamage, float criticalChance, float criticalDamage, string id, string[] tags) =>
             new WeaponItem(weaponType, handedness, baseDamage, criticalChance, criticalDamage, id, tags);
-
-        // TODO: Main has no ISkillProvider yet — passive grants resolve to nothing until one is registered.
-        public IItemGrant? CreateGrant(GrantKind kind, string id, List<IModifier> modifiers, IReadOnlyDictionary<string, float> properties) => kind switch
-        {
-            GrantKind.Modifier => new ModifierGrant(id, ModifiersCreator.CreateModifierInstances(modifiers, id)),
-            GrantKind.Passive => new PassiveSkillGrant(id, id, properties, static () => null),
-            _ => null
-        };
 
         public IRequirement CreateRequirement(RequirementType type, string id, int amount) =>
             new Requirement(type, id, amount);

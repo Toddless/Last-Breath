@@ -21,6 +21,7 @@ namespace Core.Data.GameData
         public const string Dialogues = "Dialogues";
         public const string Formatting = "Formatting";
         public const string World = "World";
+        public const string Recovery = "Recovery";
         public const string Player = "Player";
         public const string LootTables = "LootTables";
         public const string LootConfiguration = "LootConfiguration";

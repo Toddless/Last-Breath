@@ -74,6 +74,26 @@ namespace Battle.Source
                 => new UnshackledPassiveSkill(),
             ["Passive_Skill_Mana_Resonance"] = properties
                 => new ManaResonancePassiveSkill(properties.Get("rate")),
+            ["Passive_Skill_Chain_Attack"] = _
+                => new ChainAttackPassiveSkill(),
+            ["Passive_Skill_Counter_Attack"] = properties
+                => new CounterAttackPassiveSkill(properties.Get("chance")),
+            ["Passive_Skill_Echo"] = properties
+                => new EchoPassiveSkill(properties.Get("delayedDamagePercent"), properties.GetInt("turns")),
+            ["Passive_Skill_LuckyCriticalChance"] = _
+                => new LuckyCriticalChancePassiveSkill(),
+            ["Passive_Skill_Soul_Devouring"] = properties
+                => new SoulDevouringPassiveSkill(properties.Get("barrierRecoveryAmount")),
+            ["Passive_Skill_Trapped_Beast"] = properties
+                => new TrappedBeastPassiveSkill(properties.Get("healthPercent"), properties.Get("damageBonus")),
+            ["Passive_Skill_Mana_Burn"] = properties
+                => new ManaBurnPassiveSkill(properties.Get("percentToBurn")),
+            ["Passive_Skill_Burning"] = properties
+                => new BurningPassiveSkill(properties.Get("percentFromDamage"), properties.GetInt("duration"), properties.GetInt("maxStacks")),
+            ["Passive_Skill_Gift_From_The_Goddess"] = properties
+                => new GiftFromTheGoddessPassiveSkill(properties.Get("chance")),
+            ["Passive_Skill_Resonance"] = properties
+                => new ResonancePassiveSkill(properties.Get("spellDamagePerStack"), properties.Get("multicastPerStack")),
         };
 
         public ISkill? CreateSkill(string id) => CreateSkill(id, SkillProperties.Empty);

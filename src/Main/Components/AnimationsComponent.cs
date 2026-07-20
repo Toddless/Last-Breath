@@ -46,6 +46,8 @@
 
         public void PlayAnimation(string animation) => _animatedSprite2D?.Play(animation);
 
+        public bool HasClip(string animation) => _animatedSprite2D?.SpriteFrames?.HasAnimation(animation) == true;
+
         public float GetClipSeconds(string animation) =>
             _animatedSprite2D?.SpriteFrames is { } sf && sf.HasAnimation(animation)
                 ? GetClipDuration(sf, animation)

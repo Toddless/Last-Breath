@@ -4,6 +4,7 @@ namespace LastBreathTest.BattleSystemTests
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Moq;
 
@@ -206,7 +207,8 @@ namespace LastBreathTest.BattleSystemTests
         private static IEquipItemMinter CreateMinter(BlueprintProvider blueprints, int seed)
         {
             var rnd = new DefaultRandomNumberGenerator(seed);
-            return new EquipItemMinter(blueprints, new LootGeneration.Internal.ItemGameDataFactory(), new ModifierMaterializer(rnd), rnd);
+            return new EquipItemMinter(blueprints, new LootGeneration.Internal.ItemGameDataFactory(),
+                new GrantFactory(() => null, () => null, () => null), new ModifierMaterializer(rnd), rnd);
         }
 
         private sealed class BlueprintProvider(IEnumerable<EquipItemBlueprint> blueprints) : IEquipBlueprintProvider

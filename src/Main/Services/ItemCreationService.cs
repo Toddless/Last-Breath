@@ -9,12 +9,12 @@ namespace LastBreath.Services
     using Core.Entity.Components;
     using Core.Enums;
     using Core.Items;
+    using Core.Items.Grants;
     using Core.Modifiers;
     using Core.Services;
     using LootGeneration.Source;
 
     public class ItemCreationService(
-        IItemEffectProvider effectProvider,
         IRandomNumberGenerator rnd,
         IItemDataProvider dataProvider,
         ICraftingMastery craftingMastery,
@@ -22,7 +22,7 @@ namespace LastBreath.Services
         IItemMinter itemMinter,
         IEquipItemMinter equipMinter,
         ICraftingEffectProvider effectCatalog,
-        IItemGameDataFactory grantFactory) : IItemCreationService
+        IGrantFactory grantFactory) : IItemCreationService
     {
         public IItem CreateItem(string id, List<string> additionalItemEffects, Rarity rarity, float equipEffectChance, float modifierMultiplier)
         {
@@ -103,6 +103,37 @@ namespace LastBreath.Services
 
             foreach (var entity in sink.Entities) equip.AddAdditionalModifier(entity);
             foreach (var context in sink.Contexts) equip.AddAdditionalContextModifier(context);
+            TryRollLootGrant(equip, additionalItemEffects, equipEffectChance);
+        }
+
+        // The drop's bonus grant (loot channel; the crafting channel is TryRollBonusEffect below).
+        // Pool = the ItemEffects catalog (payload travels with the entry). A kill with
+        // ItemEffectsModifier(s) narrows the pool to the NPC's signature ids and the grant becomes
+        // GUARANTEED per equip item — that is the modifier's identity, difficulty already paid for it.
+        // Ordinary kills roll the configured chance against the whole catalog. Rolled AFTER the affix
+        // lines, so line sequences of a seeded run stay comparable.
+        private void TryRollLootGrant(IEquipItem equip, List<string> additionalItemEffects, float equipEffectChance)
+        {
+            if (effectCatalog.Effects.Count == 0) return;
+
+            List<CraftingEffectOption> pool;
+            if (additionalItemEffects.Count > 0)
+            {
+                pool = effectCatalog.Effects.Where(option => additionalItemEffects.Contains(option.Id)).ToList();
+                foreach (string unknown in additionalItemEffects.Distinct().Where(id => pool.All(option => option.Id != id)))
+                    Tracker.TrackNotFound($"ItemEffects catalog entry '{unknown}' (AdditionalItemEffects)", this);
+                if (pool.Count == 0) return;
+            }
+            else
+            {
+                if (equipEffectChance <= 0f || rnd.RandFloat() > equipEffectChance) return;
+                pool = effectCatalog.Effects.ToList();
+            }
+
+            (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(pool);
+            var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
+            var grant = grantFactory.Create(picked.Kind, picked.Id, [], picked.Properties);
+            if (grant != null) equip.AddGrant(grant);
         }
 
         // Mastery channel 4: a crafted item may roll ONE bonus effect (grant) from the ItemEffects
@@ -115,7 +146,7 @@ namespace LastBreath.Services
 
             (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(effectCatalog.Effects);
             var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
-            var grant = grantFactory.CreateGrant(picked.Kind, picked.Id, [], picked.Properties);
+            var grant = grantFactory.Create(picked.Kind, picked.Id, [], picked.Properties);
             if (grant != null) item.AddGrant(grant);
         }
 

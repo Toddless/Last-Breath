@@ -28,13 +28,13 @@
 
         private static IEnumerable<IModifier> GetEffects()
         {
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Barrier, 10);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Barrier, 5);
 
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.SpellDamage, 10f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.SpellDamage, 5f);
 
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.ManaRecovery, 0.1f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.ManaRecovery, 1f);
 
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Mana, 0.1f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Mana, 1f);
         }
     }
 }

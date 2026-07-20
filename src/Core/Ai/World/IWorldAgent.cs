@@ -19,6 +19,10 @@ namespace Core.Ai.World
 
         bool IsFighting { get; }
 
+        /// <summary>Current health as a 0..1 share of the maximum — the recovery gate's trigger.
+        /// Default full: a body without vitals never retreats to rest.</summary>
+        float HealthPercent => 1f;
+
         /// <summary>Sets the current movement intent; safe to call every tick with the same destination.</summary>
         void MoveTo(Vector2 destination, float speed);
 
@@ -26,5 +30,15 @@ namespace Core.Ai.World
 
         /// <summary>The hostile currently visible within the radius, if any (LoS is the adapter's concern).</summary>
         TargetSighting? GetSighting(float visionRadius);
+
+        /// <summary>Holds an activity pose clip (Activity_*); a missing clip = the body stays in Idle.
+        /// Poses are flavor — activities work identically without the art (default no-op).</summary>
+        void SetActivityPose(string clip)
+        {
+        }
+
+        void ClearActivityPose()
+        {
+        }
     }
 }

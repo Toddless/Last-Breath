@@ -9,7 +9,7 @@ namespace LastBreathTest.BattleSystemTests
     [TestClass]
     public class EquipItemSaveConverterTests
     {
-        private readonly EquipItemSaveConverter _converter = new(() => null);
+        private readonly EquipItemSaveConverter _converter = new(new GrantFactory(() => null, () => null, () => null));
 
         [TestMethod]
         public void PlainItemRoundTripsRolledState()

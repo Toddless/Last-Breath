@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="NpcVisualLibrary" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="NpcVisualLibrary" format=3 uid="uid://o1q0orjcm4p4"]
 
-[ext_resource type="Script" path="res://Addons/Battle/Presentation/NpcVisualConfig.cs" id="1_cfg"]
-[ext_resource type="Script" path="res://Addons/Battle/Presentation/NpcVisualLibrary.cs" id="2_lib"]
+[ext_resource type="Script" uid="uid://bkuxk2pq820dy" path="res://Addons/Battle/Presentation/NpcVisualConfig.cs" id="1_cfg"]
+[ext_resource type="Script" uid="uid://pqu2nd75843f" path="res://Addons/Battle/Presentation/NpcVisualLibrary.cs" id="2_lib"]
 [ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Robber.tres" id="3"]
 [ext_resource type="SpriteFrames" path="res://Data/Shared/Assets/Npc/Animations/Assasin.tres" id="4"]
 
@@ -9,14 +9,12 @@
 script = ExtResource("1_cfg")
 NpcId = "Npc_Bandit"
 Frames = ExtResource("3")
-Scale = 1.0
 
 [sub_resource type="Resource" id="Resource_Assasin"]
 script = ExtResource("1_cfg")
 NpcId = "Npc_Bandit_Veteran"
 Frames = ExtResource("4")
-Scale = 1.0
 
 [resource]
 script = ExtResource("2_lib")
-Configs = [SubResource("Resource_Robber"), SubResource("Resource_Assasin")]
+Configs = Array[ExtResource("1_cfg")]([SubResource("Resource_Robber"), SubResource("Resource_Assasin")])

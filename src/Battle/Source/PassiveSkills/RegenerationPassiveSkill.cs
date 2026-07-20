@@ -6,7 +6,7 @@
     using Core.Events;
     using Godot;
 
-    public class RegenerationPassiveSkill(float percentFromMaxHealth)
+    public class RegenerationPassiveSkill(float percentFromMaxHealth = 0.05f)
         : Skill(id: "Passive_Skill_Regeneration")
     {
         private float PercentFromMaxHealth { get; } = percentFromMaxHealth;

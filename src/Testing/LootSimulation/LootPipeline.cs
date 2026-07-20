@@ -34,10 +34,11 @@ namespace LastBreathTest.LootSimulation
             var modifierProvider = new NpcModifierProvider();
             var tableProvider = new LootTableProvider(parser);
             var configurationProvider = new LootConfigurationProvider(parser);
+            var effectCatalog = new Core.Crafting.CraftingEffectProvider();
 
             var dataService = new GameDataService(
                 new FileSystemDataSource(dataRoot),
-                [itemProvider, modifierProvider, tableProvider, configurationProvider]);
+                [itemProvider, modifierProvider, tableProvider, configurationProvider, effectCatalog]);
             var loadFailures = new List<string>();
             dataService.LoadFailed += (context, exception) => loadFailures.Add($"{context}: {exception.Message}");
             dataService.LoadAll();
@@ -50,9 +51,11 @@ namespace LastBreathTest.LootSimulation
 
             // The same minting seam production DI wires: blueprints -> minter -> facade.
             var materializer = new Core.Modifiers.ModifierMaterializer(rnd);
-            var equipMinter = new Core.Items.EquipItemMinter(itemProvider, factory, materializer, rnd);
+            var equipMinter = new Core.Items.EquipItemMinter(itemProvider, factory,
+                new Core.Items.Grants.GrantFactory(() => null, () => null, () => null), materializer, rnd);
             var itemMinter = new Core.Items.ItemMinter(itemProvider, equipMinter, itemProvider);
-            var itemCreation = new ItemCreationService(new ItemEffectProvider(), itemProvider, rnd, itemMinter, materializer);
+            var itemCreation = new ItemCreationService(itemProvider, rnd, itemMinter, materializer, effectCatalog,
+                new Core.Items.Grants.GrantFactory(() => null, () => null, () => null));
             var lootService = new LootGenerationService(rnd, events, messages, itemCreation, configurationProvider);
 
             return new LootPipeline

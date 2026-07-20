@@ -111,14 +111,24 @@ namespace Battle.Internal.Npc
             Activity = EnumParser.ParseEnum<WorldActivityType>(data.Activity),
             WanderRadius = data.WanderRadius,
             ActivityPauseSeconds = data.ActivityPauseSeconds,
+            SleepVisionMultiplier = data.SleepVisionMultiplier,
+            SleepHearingMultiplier = data.SleepHearingMultiplier,
             Schedule = data.Schedule.Select(BuildScheduleSlot).ToList(),
+            Routine = data.Routine.Select(BuildRoutineStep).ToList(),
         };
 
         private static ScheduleSlotConfig BuildScheduleSlot(NpcScheduleSlotData data) => new(
             ParseMinuteOfDay(data.From),
             ParseMinuteOfDay(data.To),
             EnumParser.ParseEnum<WorldActivityType>(data.Activity),
-            data.WanderRadius);
+            data.WanderRadius,
+            data.Point);
+
+        private static RoutineStepConfig BuildRoutineStep(NpcRoutineStepData data) => new(
+            EnumParser.ParseEnum<WorldActivityType>(data.Activity),
+            data.Minutes,
+            data.WanderRadius,
+            data.Point);
 
         /// <summary>"HH:MM" → minutes since midnight.</summary>
         private static int ParseMinuteOfDay(string time)

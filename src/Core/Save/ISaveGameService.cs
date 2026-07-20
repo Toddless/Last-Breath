@@ -21,6 +21,11 @@
         /// schedules a scene reload. False when the slot is empty/corrupt or no player exists.</summary>
         bool RequestLoad(int slot);
 
+        /// <summary>Menu path: stages the pending load (slot read, population reset, timescale)
+        /// WITHOUT touching the scene — the caller owns the switch into the world scene, where
+        /// the SaveDirector applies the pending file. False when the slot is empty/corrupt.</summary>
+        bool StageLoad(int slot);
+
         /// <summary>Applies the pending file. The SaveDirector in the fresh scene calls this
         /// once every node's _Ready (and the deferred spawn fills) have run.</summary>
         void ApplyPendingLoad();

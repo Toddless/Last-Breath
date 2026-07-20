@@ -1,13 +1,15 @@
 namespace Core.Modifiers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Entity.Components;
     using Enums;
 
     /// <summary>Draws pool entries into prefix/suffix slots: the pool splits into two weighted buckets
-    /// by <see cref="IModifierDescriptor.Affix"/> and each bucket rolls its slot count independently
-    /// (duplicates by entry are excluded, duplicate (parameter, type) across entries stay legal — variant B).
-    /// A bucket short on entries honestly leaves the remaining slots empty (the item is born thinner) —
+    /// by <see cref="IModifierDescriptor.Affix"/> and each bucket rolls its slot count, both sharing ONE
+    /// set of taken identities — an item never wears the same <see cref="ModifierKey"/> twice, whichever
+    /// family it came from (composites are exempt: only a literal repeat of the same entry is refused).
+    /// A bucket short on legal entries honestly leaves the remaining slots empty (the item is born thinner) —
     /// reported as info, never an error. None entries must not reach a roll (strict parse guards it);
     /// one slipping through is skipped with an error.</summary>
     public static class AffixRoller
@@ -27,21 +29,37 @@ namespace Core.Modifiers
             }
 
             var result = new List<IModifierDescriptor>();
-            RollBucket(prefixBucket, AffixKind.Prefix, prefixes, rnd, result);
-            RollBucket(suffixBucket, AffixKind.Suffix, suffixes, rnd, result);
+            var taken = new HashSet<object>();
+            RollBucket(prefixBucket, AffixKind.Prefix, prefixes, rnd, result, taken);
+            RollBucket(suffixBucket, AffixKind.Suffix, suffixes, rnd, result, taken);
             return result;
         }
 
-        private static void RollBucket(List<IModifierDescriptor> bucket, AffixKind kind, int slots, IRandomNumberGenerator rnd, List<IModifierDescriptor> result)
+        // One slot at a time: entries whose identity is already taken drop out and the weights are recomputed
+        // over what is still legal, so the odds stay proportional among the remaining entries and a rejected
+        // entry never burns a slot.
+        private static void RollBucket(List<IModifierDescriptor> bucket, AffixKind kind, int slots, IRandomNumberGenerator rnd, List<IModifierDescriptor> result, HashSet<object> taken)
         {
-            if (slots <= 0) return;
+            for (int slot = 0; slot < slots; slot++)
+            {
+                var legal = bucket.Where(descriptor => !taken.Contains(RollIdentity(descriptor))).ToList();
+                (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(legal);
+                if (totalWeight <= 0f)
+                {
+                    Tracker.TrackInfo($"{kind} bucket has only {slot} of {slots} pickable entries — the remaining slots stay empty");
+                    return;
+                }
 
-            (var weighted, float totalWeight) = WeightedRandomPicker.CalculateWeights(bucket);
-            var picked = WeightedRandomPicker.PickRandomMultipleWithoutDuplicate(weighted, totalWeight, slots, rnd);
-            if (picked.Count < slots)
-                Tracker.TrackInfo($"{kind} bucket has only {picked.Count} of {slots} requested entries — the remaining slots stay empty");
-
-            result.AddRange(picked);
+                var picked = WeightedRandomPicker.PickRandom(weighted, totalWeight, rnd);
+                taken.Add(RollIdentity(picked));
+                result.Add(picked);
+            }
         }
+
+        /// <summary>What makes two picks "the same line" for slot purposes: the line key when the entry has
+        /// one, the entry itself otherwise — a composite is a bundle exempt from key dedup, so only a literal
+        /// repeat of it is refused (descriptors are records: equality is structural, as before).</summary>
+        private static object RollIdentity(IModifierDescriptor descriptor) =>
+            ModifierKey.TryFrom(descriptor, out var key) ? key : descriptor;
     }
 }

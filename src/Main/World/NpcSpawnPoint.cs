@@ -5,6 +5,7 @@ namespace LastBreath.World
     using System.Linq;
     using Battle.Source;
     using Core.Ai.World.Raids;
+    using Core.Ai.World.Recovery;
     using Core.Ai.World.Time;
     using Core.Data;
     using Core.Data.SaveData;
@@ -49,6 +50,13 @@ namespace LastBreath.World
         [Export] private float _dayDelayMultiplier = 1f;
         [Export] private float _eveningDelayMultiplier = 1f;
 
+        // Home doubles as a rest spot: wounded residents come back and heal inside (the Recovery
+        // activity gate), and so does anyone else non-fighting who wanders in — one rule for all zones.
+        [Export] private bool _recoveryZone = true;
+
+        /// <summary>The zone must cover the whole spawn spread: NPC homes are rolled within _spawnRadius.</summary>
+        private const float RecoveryZoneMargin = 100f;
+
         private readonly HashSet<string> _ownedInstanceIds = [];
         private readonly List<double> _pendingDueMinutes = [];
         private readonly RandomNumberGenerator _rnd = new();
@@ -59,6 +67,7 @@ namespace LastBreath.World
         private IRaidSpawnRegistry? _raidRegistry;
         private ISpawnPointRegistry? _spawnRegistry;
         private IWorldClock? _worldClock;
+        private IRestRecoveryService? _recovery;
         private EntityGroup? _group;
         private double _fallbackMinutes;
 
@@ -85,6 +94,8 @@ namespace LastBreath.World
             _raidRegistry = _gameServiceProvider.GetService<IRaidSpawnRegistry>();
             _spawnRegistry = _gameServiceProvider.GetService<ISpawnPointRegistry>();
             _worldClock = _gameServiceProvider.GetService<IWorldClock>();
+            _recovery = _gameServiceProvider.GetService<IRestRecoveryService>();
+            if (_recoveryZone) _recovery?.RegisterZone(this, () => GlobalPosition, _spawnRadius + RecoveryZoneMargin);
             _raidRegistry?.Register(this);
             _spawnRegistry?.Register(this);
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
@@ -99,6 +110,7 @@ namespace LastBreath.World
 
         public override void _ExitTree()
         {
+            _recovery?.UnregisterZone(this);
             _raidRegistry?.Unregister(this);
             _spawnRegistry?.Unregister(this);
             _gameEventBus?.Unsubscribe<NpcFinalDeathEvent>(OnFinalDeath);
