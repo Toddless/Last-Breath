@@ -31,6 +31,8 @@
             await base.Apply(context);
         }
 
+        // TODO:
+        // Развести типы урона: Горение наносит урон от огня, кровотечение и яд физический
         public override void TurnEnd()
         {
             // InstanceId, not Id: removing one stack must not cancel pending ticks of the other stacks

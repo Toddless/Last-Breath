@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -12,6 +13,22 @@ namespace Battle.Source.PassiveSkills
     public class DecompositionPassiveSkill(int duration, int maxStacks, float reduceBy)
         : Skill(id: "Passive_Skill_Decomposition")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(ReduceBy)] = ReduceBy,
+                    [nameof(MaxStacks)] = MaxStacks,
+                };
+                return field;
+            }
+        }
+
+        public int MaxStacks { get; } = maxStacks;
+
         public float ReduceBy { get; } = reduceBy;
 
         public override void Attach(IFightable owner)
@@ -23,7 +40,7 @@ namespace Battle.Source.PassiveSkills
         private void OnAfterAttack(AfterAttackEvent evt)
         {
             if (Owner == null || evt.Context.Result is not AttackResults.Succeed) return;
-            _ = new ArmorReductionEffect(duration, maxStacks, ReduceBy)
+            _ = new ArmorReductionEffect(duration, MaxStacks, ReduceBy)
                 .Apply(new EffectApplyingContext { Caster = Owner, Target = evt.Context.Target, Source = InstanceId });
         }
 
@@ -33,7 +50,7 @@ namespace Battle.Source.PassiveSkills
             Owner = null;
         }
 
-        public override ISkill Copy() => new DecompositionPassiveSkill(duration, maxStacks, ReduceBy);
+        public override ISkill Copy() => new DecompositionPassiveSkill(duration, MaxStacks, ReduceBy);
 
         public override bool IsStronger(ISkill skill) =>
             skill is DecompositionPassiveSkill decomposition && decomposition.ReduceBy > ReduceBy;

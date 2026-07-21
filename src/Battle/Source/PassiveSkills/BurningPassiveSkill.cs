@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -11,12 +12,25 @@
     {
         private readonly DamageOverTurnEffect _damageOverTurnEffect;
 
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentFromDamage)] = PercentFromDamage, [nameof(BurningStacks)] = BurningStacks, [nameof(BurningDuration)] = BurningDuration,
+                };
+                return field;
+            }
+        }
+
         public BurningPassiveSkill(float percentFromDamage, int burningDuration, int burningStacks) : base(id: "Passive_Skill_Burning")
         {
             PercentFromDamage = percentFromDamage;
             BurningDuration = burningDuration;
             BurningStacks = burningStacks;
-            _damageOverTurnEffect = new DamageOverTurnEffect(BurningDuration, StatusEffects.Burning,BurningStacks, PercentFromDamage);
+            _damageOverTurnEffect = new DamageOverTurnEffect(BurningDuration, StatusEffects.Burning, BurningStacks, PercentFromDamage);
         }
 
         public float PercentFromDamage { get; }

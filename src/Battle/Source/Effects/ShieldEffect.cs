@@ -1,6 +1,7 @@
 namespace Battle.Source.Effects
 {
     using System;
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Context;
     using Core.Enums;
@@ -11,8 +12,19 @@ namespace Battle.Source.Effects
     /// the bearer's turn end. Effectively permanent — the shield lives until shattered.
     /// </summary>
     public class ShieldEffect(float strength, float healthRegenPercent = 0f, int duration = 999)
-        : Effect(id: "Effect_Shield", duration, maxStacks: 1, StatusEffects.None), IShieldEffect
+        : Effect(id: "Effect_Shield", duration, maxStacks: 1), IShieldEffect
     {
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(Strength)] = Strength;
+                if (healthRegenPercent != 0) values[nameof(healthRegenPercent)] = healthRegenPercent * 100f;
+                return values;
+            }
+        }
+
         public float Strength { get; private set; } = strength;
 
         public float Absorb(float damage)
@@ -26,25 +38,10 @@ namespace Battle.Source.Effects
         public override void TurnEnd()
         {
             if (Target != null && healthRegenPercent > 0)
-                Target.Heal(new HealContext(Target, Target)
-                {
-                    Amount = Target.Parameters.MaxHealth * healthRegenPercent,
-                    Cause = HealCause.Regen
-                });
+                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healthRegenPercent, Cause = HealCause.Regen });
             base.TurnEnd();
         }
 
         public override IEffect Copy() => new ShieldEffect(Strength, healthRegenPercent, Duration);
-
-        protected override System.Collections.Generic.Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                values["Strength"] = Strength;
-                values["HealthRegenPercent"] = healthRegenPercent * 100f;
-                return values;
-            }
-        }
     }
 }

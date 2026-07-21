@@ -1,11 +1,24 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Events;
 
     public class ServantHellPassiveSkill(float chance) : Skill(id: "Passive_Skill_Servant_Hell")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Chance)] = Chance
+                };
+                return field;
+            }
+        }
         private float Chance { get; } = chance;
 
         public override void Attach(IFightable owner)

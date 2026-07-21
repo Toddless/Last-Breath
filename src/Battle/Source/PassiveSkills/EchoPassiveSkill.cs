@@ -9,7 +9,7 @@
     using Core.Events;
 
     public class EchoPassiveSkill(
-        float delayedDamagePercent,
+        float delayedDamage,
         int turns)
         : Skill(id: "Passive_Skill_Echo")
     {
@@ -20,7 +20,22 @@
         }
 
         private readonly List<DamageEntry> _delayedDamage = [];
-        public float DelayedDamagePercent { get; } = delayedDamagePercent;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(DelayedDamage)] = DelayedDamage,
+                    [nameof(Turns)] = Turns
+                };
+                return field;
+            }
+        }
+
+        public float DelayedDamage { get; } = delayedDamage;
         public int Turns { get; } = turns;
 
         public override void Attach(IFightable owner)
@@ -37,13 +52,13 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new EchoPassiveSkill(DelayedDamagePercent, Turns);
+        public override ISkill Copy() => new EchoPassiveSkill(DelayedDamage, Turns);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not EchoPassiveSkill later) return false;
 
-            return later.DelayedDamagePercent > DelayedDamagePercent;
+            return later.DelayedDamage > DelayedDamage;
         }
 
         private void OnBeforeDamageTaken(BeforeDamageTakenEvent evnt)
@@ -57,7 +72,7 @@
             float toDealLater = 0;
             foreach ((DamageType type, float damage) in context.DamageComponents.ToArray())
             {
-                float deferred = damage * DelayedDamagePercent;
+                float deferred = damage * DelayedDamage;
                 toDealLater += deferred;
                 context.Set(type, damage - deferred);
             }

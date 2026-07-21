@@ -16,6 +16,15 @@ namespace Core.Items.Grants
 
         public string Id => id;
 
+        public string Description
+        {
+            get
+            {
+                field = providerAccessor()?.CreateSkill(SkillId, new SkillProperties(SkillId, Properties))?.Description ?? string.Empty;
+                return field;
+            }
+        }
+
         /// <summary>Read access for serialization (save system round-trips the grant).</summary>
         public string SkillId => skillId;
 

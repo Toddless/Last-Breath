@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Events;
@@ -9,6 +10,19 @@ namespace Battle.Source.PassiveSkills
     public class FirstStrikePassiveSkill(float bonus) : Skill(id: "Passive_Skill_First_Strike")
     {
         private bool _ready = true;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Bonus)] = Bonus
+                };
+                return field;
+            }
+        }
 
         public float Bonus { get; } = bonus;
 

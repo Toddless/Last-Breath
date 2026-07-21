@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -10,6 +11,18 @@
     public class SilentFuryPassive(float chance)
         : Skill(id: "Passive_Skill_Silent_Fury")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(SilenceSealChance)] = SilenceSealChance,
+                };
+                return field;
+            }
+        }
         public float SilenceSealChance { get; } = chance;
 
         public override void Attach(IFightable owner)

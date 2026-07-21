@@ -1,5 +1,6 @@
 namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Entity.Components.Decorator;
@@ -25,6 +26,17 @@ namespace Battle.Source.Effects
             OperationType.Add,
             EntityParameter.CriticalDamage,
             Priority.Weak);
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(critDamageBonus)] = critDamageBonus;
+                values[nameof(critDamagePerHit)] = critDamagePerHit;
+                return values;
+            }
+        }
 
         public override async Task Apply(EffectApplyingContext context)
         {

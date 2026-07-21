@@ -1,5 +1,6 @@
 namespace LastBreath.UI
 {
+    using Core;
     using Core.Constants;
     using Core.Enums;
     using Core.Inventory;
@@ -39,6 +40,10 @@ namespace LastBreath.UI
 
         private static readonly Color s_effectColor = new(0.9f, 0.81f, 0.58f);
         private static readonly Color s_baseStatColor = new(0.79f, 0.66f, 0.38f);
+
+        // RichTextLabel ignores the DimLabel variation (it targets Label), so the grant description
+        // gets its dim tone from a default_color override that mirrors DimLabel's colour.
+        private static readonly Color s_effectDescColor = new(0.55f, 0.51f, 0.44f);
 
         [Export] private PanelContainer? _panel;
         [Export] private ColorRect? _accent;
@@ -240,10 +245,7 @@ namespace LastBreath.UI
             _implicitsSection?.Visible = implicits.Count > 0;
 
             RenderRolledLines(item);
-
-            foreach (var grant in item.Grants)
-                AddLine(_effects, Localization.Localize(grant.Id), FullLineWidth, color: s_effectColor);
-            _effectSection?.Visible = item.Grants.Count > 0;
+            RenderGrants(item);
         }
 
         /// <summary>The rolled block, split by slot family: a caption opens each family (the rows arrive
@@ -267,6 +269,43 @@ namespace LastBreath.UI
             }
 
             _modsSection?.Visible = rolled.Count > 0;
+        }
+
+        /// <summary>Each grant is a titled block in the Effect section: the name in the effect accent, then
+        /// its rendered description beneath (rich text — numbers coloured, {@keyword} links). Modifier grants
+        /// carry no description, so the name stands alone exactly as before.</summary>
+        private void RenderGrants(IEquipItem item)
+        {
+            foreach (var grant in item.Grants) AddGrant(grant);
+            _effectSection?.Visible = item.Grants.Count > 0;
+        }
+
+        private void AddGrant(IItemGrant grant)
+        {
+            var block = new VBoxContainer();
+            block.AddThemeConstantOverride("separation", 2);
+            AddLine(block, Localization.Localize(grant.Id), FullLineWidth, color: s_effectColor);
+            if (!string.IsNullOrEmpty(grant.Description)) AddGrantDescription(block, grant.Description);
+            _effects?.AddChild(block);
+        }
+
+        /// <summary>A grant description is BBCode, so it needs a RichTextLabel — a plain Label would print the
+        /// raw tags. The width is pinned like every other line so the autowrap measures at the real content
+        /// width instead of ballooning the panel; keyword links open the reference card when the popup is pinned.</summary>
+        private static void AddGrantDescription(VBoxContainer container, string description)
+        {
+            var label = new RichTextLabel
+            {
+                BbcodeEnabled = true,
+                Text = description,
+                FitContent = true,
+                ScrollActive = false,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                CustomMinimumSize = new Vector2(FullLineWidth, 0),
+            };
+            label.AddThemeColorOverride("default_color", s_effectDescColor);
+            KeywordLinks.Attach(label);
+            container.AddChild(label);
         }
 
         /// <summary>The ascension gift wears the item's own mythic rarity colour as a framed card — the one

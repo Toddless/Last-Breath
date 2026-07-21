@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Enums;
@@ -17,6 +18,23 @@ namespace Battle.Source.PassiveSkills
         private readonly IModifierInstance _multicastModifier;
         private int _stacks;
 
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(SpellDamagePerStack)] = SpellDamagePerStack,
+                    [nameof(MulticastPerStack)] = MulticastPerStack
+                };
+                return field;
+            }
+        }
+
+        public float SpellDamagePerStack { get; }
+        public float MulticastPerStack { get; }
+
         public ResonancePassiveSkill(float spellDamagePerStack = 0.04f, float multicastPerStack = 0.10f)
             : base(id: "Passive_Skill_Resonance")
         {
@@ -25,9 +43,6 @@ namespace Battle.Source.PassiveSkills
             _spellDamageModifier = new SimpleModifier(EntityParameter.SpellDamage, ModifierValueType.Increase, 0f, InstanceId);
             _multicastModifier = new SimpleModifier(EntityParameter.MulticastChance, ModifierValueType.Flat, 0f, InstanceId);
         }
-
-        public float SpellDamagePerStack { get; }
-        public float MulticastPerStack { get; }
 
         public override void Attach(IFightable owner)
         {

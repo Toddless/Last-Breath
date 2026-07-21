@@ -18,8 +18,7 @@ namespace Battle.Source.PassiveSkills
 
         private void OnManaRestored(ManaRestoredEvent evt)
         {
-            if (Owner == null) return;
-            Owner.CurrentBarrier += evt.Amount * Percent;
+            Owner?.CurrentBarrier += evt.Amount * Percent;
         }
 
         public override void Detach(IFightable owner)

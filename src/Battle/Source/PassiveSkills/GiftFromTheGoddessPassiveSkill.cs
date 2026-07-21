@@ -13,7 +13,7 @@
         private readonly List<IEffect> _effects =
         [
             new RegenerationEffect(150, 3, 5),
-            new ExecutionEffect(3, 1, 0.15f),
+            new ExecutionEffect(3, 1, 0.30f),
             new LuckyCritChanceEffect(3, 1)
         ];
 

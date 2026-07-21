@@ -1,14 +1,28 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
     using Core.Events;
-    using Godot;
 
     public class RegenerationPassiveSkill(float percentFromMaxHealth = 0.05f)
         : Skill(id: "Passive_Skill_Regeneration")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentFromMaxHealth)] = PercentFromMaxHealth
+                };
+                return field;
+            }
+        }
+
+
         private float PercentFromMaxHealth { get; } = percentFromMaxHealth;
 
         public override void Attach(IFightable owner)

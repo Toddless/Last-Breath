@@ -5,7 +5,7 @@ namespace Battle.Source.PassiveSkills
     using Core.Entity;
     using Core.Modifiers.Context;
 
-    /// <summary>"Бездушный": the owner's attacks and ability hits bypass the target's barrier.</summary>
+    /// <summary>"Soulless": the owner's attacks and ability hits bypass the target's barrier.</summary>
     public class SoullessPassiveSkill() : Skill(id: "Passive_Skill_Soulless")
     {
         private IDamageModifier? _modifier;

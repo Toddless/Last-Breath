@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
@@ -13,6 +14,22 @@
     {
         private IHealModifier? _healthRecovery;
         private IManaRecoveryModifier? _manaRecovery;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(ManaRecovery)] = ManaRecovery,
+                    [nameof(HealthRecovery)] = HealthRecovery,
+                    [nameof(RecoveryEfficiency)] = RecoveryEfficiency
+                };
+                return field;
+            }
+        }
+
         public float ManaRecovery { get; } = manaRecovery;
         public float HealthRecovery { get; } = healthRecovery;
         public float RecoveryEfficiency { get; } = recoveryEfficiency;

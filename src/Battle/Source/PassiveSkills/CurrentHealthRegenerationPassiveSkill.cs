@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
@@ -11,6 +12,19 @@ namespace Battle.Source.PassiveSkills
     public class CurrentHealthRegenerationPassiveSkill(float percentFromCurrentHealth)
         : Skill(id: "Passive_Skill_Current_Health_Regeneration")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentFromCurrentHealth)] = PercentFromCurrentHealth
+                };
+                return field;
+            }
+        }
+
         public float PercentFromCurrentHealth { get; } = percentFromCurrentHealth;
 
         public override void Attach(IFightable owner)

@@ -26,6 +26,15 @@ namespace Core.Items.Grants
 
         public string Id => id;
 
+        public string Description
+        {
+            get
+            {
+                field = providerAccessor()?.CreateEffect(EffectId, new SkillProperties(effectId, properties))?.Description ?? string.Empty;
+                return field;
+            }
+        }
+
         /// <summary>Read access for serialization (save system round-trips the grant).</summary>
         public string EffectId => effectId;
 

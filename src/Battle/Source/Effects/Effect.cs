@@ -144,7 +144,7 @@
         /// (usable as {Duration|turn|turns}) and {MaxStacks}; descendants extend the dictionary
         /// with their own values ({Damage}, {Stacks}...) on top of base.DescriptionValues.
         /// </summary>
-        protected virtual Dictionary<string, object?> DescriptionValues => new() { ["Duration"] = Duration, ["MaxStacks"] = MaxStacks, };
+        protected virtual Dictionary<string, object?> DescriptionValues => new() { [nameof(Duration)] = Duration, [nameof(MaxStacks)] = MaxStacks, };
 
         protected virtual string FormatDescription() => Localization.RenderDescription(Id, DescriptionValues, TextFormat.Rich);
 

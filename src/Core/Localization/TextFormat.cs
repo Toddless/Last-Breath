@@ -4,6 +4,6 @@ namespace Core.Localization
     public enum TextFormat
     {
         Plain,
-        Rich,
+        Rich
     }
 }

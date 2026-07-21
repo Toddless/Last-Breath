@@ -12,6 +12,19 @@ namespace Battle.Source.PassiveSkills
     /// cooling-down ability by <c>amount</c>.</summary>
     public class AcceleratorPassiveSkill(int amount = 1) : Skill(id: "Passive_Skill_Accelerator")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Amount)] = Amount,
+                };
+                return field;
+            }
+        }
+
         public int Amount { get; } = amount;
 
         public override void Attach(IFightable owner)

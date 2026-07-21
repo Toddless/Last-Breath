@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
@@ -10,6 +11,18 @@ namespace Battle.Source.PassiveSkills
     public class CriticalLeechPassiveSkill(float percent)
         : Skill(id: "Passive_Skill_Critical_Leech")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Percent)] = Percent,
+                };
+                return field;
+            }
+        }
         public float Percent { get; } = percent;
 
         public override void Attach(IFightable owner)

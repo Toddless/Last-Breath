@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Skills;
     using Core.Context;
@@ -21,13 +22,27 @@ namespace Battle.Source.PassiveSkills
         private float _spentThisTurn;
         private string? _lastBoostedCastId;
 
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Rate)] = Rate,
+                };
+                return field;
+            }
+        }
+
+        public float Rate { get; }
+
         public ManaResonancePassiveSkill(float rate) : base(id: "Passive_Skill_Mana_Resonance")
         {
             Rate = rate;
             _modifier = new ResonanceBonus(this);
         }
 
-        public float Rate { get; }
 
         public override void Attach(IFightable owner)
         {

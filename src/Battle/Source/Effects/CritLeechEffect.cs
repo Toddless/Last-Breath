@@ -1,5 +1,6 @@
 namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Context;
@@ -9,6 +10,16 @@ namespace Battle.Source.Effects
     public class CritLeechEffect(int duration, int maxStacks, float amount)
         : Effect(id: "Effect_Crit_Leech", duration, maxStacks)
     {
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(amount)] = amount;
+                return values;
+            }
+        }
+
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);

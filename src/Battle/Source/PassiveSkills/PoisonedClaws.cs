@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -11,16 +12,30 @@
     {
         private readonly DamageOverTurnEffect _damageOverTurnEffect;
 
-        public PoisonedClaws(float percentFormDamageToDealAsPoison, int poisonDuration)
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PoisonDuration)] = PoisonDuration,
+                    [nameof(PercentFromDamage)] = PercentFromDamage,
+                };
+                return field;
+            }
+        }
+
+        public PoisonedClaws(float percentFormDamageFromDamage, int poisonDuration)
             : base(id: "Passive_Skill_Poisoned_Claws")
         {
-            PercentToDealAsPoison = percentFormDamageToDealAsPoison;
+            PercentFromDamage = percentFormDamageFromDamage;
             PoisonDuration = poisonDuration;
-            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison, 999,PercentToDealAsPoison);
+            _damageOverTurnEffect = new DamageOverTurnEffect(PoisonDuration, StatusEffects.Poison, 999,PercentFromDamage);
         }
 
         public int PoisonDuration { get; }
-        public float PercentToDealAsPoison { get; }
+        public float PercentFromDamage { get; }
 
         public override void Attach(IFightable owner)
         {
@@ -44,13 +59,13 @@
             Owner = null;
         }
 
-        public override ISkill Copy() => new PoisonedClaws(PercentToDealAsPoison, PoisonDuration);
+        public override ISkill Copy() => new PoisonedClaws(PercentFromDamage, PoisonDuration);
 
         public override bool IsStronger(ISkill skill)
         {
             if (skill is not PoisonedClaws claws) return false;
 
-            return claws.PercentToDealAsPoison > PercentToDealAsPoison;
+            return claws.PercentFromDamage > PercentFromDamage;
         }
     }
 }

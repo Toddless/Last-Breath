@@ -7,6 +7,7 @@ namespace Core.Items
     public interface IItemGrant
     {
         string Id { get; }
+        string Description { get; }
 
         void Attach(IFightable owner);
         void Detach(IFightable owner);

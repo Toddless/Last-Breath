@@ -9,6 +9,11 @@ namespace Core.Items.Grants
     {
         public string Id => id;
 
+        public string Description
+        {
+            get;
+        } = string.Empty;
+
         /// <summary>Read access for serialization (save system round-trips the grant).</summary>
         public IReadOnlyList<IModifierInstance> Modifiers => modifiers;
 

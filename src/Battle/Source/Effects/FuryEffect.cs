@@ -17,6 +17,16 @@ namespace Battle.Source.Effects
         : Effect(id, duration, maxStacks, statusEffect)
     {
         protected float HealthBurned;
+
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(HealthPercent)] = HealthPercent * 100f;
+                return values;
+            }
+        }
         public float HealthPercent { get; } = healthPercent;
 
         public override async Task Apply(EffectApplyingContext context)
@@ -42,16 +52,6 @@ namespace Battle.Source.Effects
 
         protected virtual void OnAfterAttack(AfterAttackEvent evt)
         {
-        }
-
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                values["HealthPercent"] = HealthPercent * 100f;
-                return values;
-            }
         }
 
         public override IEffect Copy() => new FuryEffect(Duration, MaxStacks, HealthPercent, Status);

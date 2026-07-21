@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Context;
     using Core.Entity;
@@ -9,6 +10,18 @@ namespace Battle.Source.PassiveSkills
     public class ManaOnAttackPassiveSkill(float amount)
         : Skill(id: "Passive_Skill_Mana_On_Attack")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Amount)] = Amount,
+                };
+                return field;
+            }
+        }
         public float Amount { get; } = amount;
 
         public override void Attach(IFightable owner)

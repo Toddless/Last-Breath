@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
@@ -14,6 +15,23 @@ namespace Battle.Source.PassiveSkills
     public class RighteousWrathPassiveSkill(float percentFromDamage, int duration, int stackThreshold, int incinerationDuration)
         : Skill(id: "Passive_Skill_Righteous_Wrath")
     {
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentFromDamage)] = PercentFromDamage,
+                    [nameof(Duration)] = Duration,
+                    [nameof(StackThreshold)] = StackThreshold,
+                    [nameof(IncinerationDuration)] = IncinerationDuration
+                };
+                return field;
+            }
+        }
+
         public float PercentFromDamage { get; } = percentFromDamage;
         public int Duration { get; } = duration;
         public int StackThreshold { get; } = stackThreshold;

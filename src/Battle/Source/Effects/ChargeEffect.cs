@@ -1,19 +1,32 @@
 namespace Battle.Source.Effects
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Entity;
 
     /// <summary>
-    /// "Заряд" (Static Armor): a stacking mark. When the target reaches <c>detonationStacks</c> stacks,
+    /// "Charge" (Static Armor): a stacking mark. When the target reaches <c>detonationStacks</c> stacks,
     /// ALL stacks are consumed and <c>onDetonate(target)</c> fires — the detonation payload (damage,
     /// barrier restore, splash) lives with whoever applied the mark, the effect only counts and pops.
     /// </summary>
     public class ChargeEffect(int duration, int maxStacks, int detonationStacks, Action<IFightable>? onDetonate)
         : Effect(id: "Effect_Charge", duration, maxStacks)
     {
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(DetonationStacks)] = DetonationStacks;
+                return values;
+            }
+        }
+
+        public int DetonationStacks => detonationStacks;
+
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);

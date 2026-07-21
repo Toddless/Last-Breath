@@ -12,7 +12,17 @@
         StatusEffects statusEffect = StatusEffects.Fury)
         : FuryEffect(duration, maxStacks, healthPercent, statusEffect, id: "Effect_Burning_Fury")
     {
-        public float HealthAsDamageMultiplier { get; set; }
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(BurnDamage)] = BurnDamage * 100f;
+                return values;
+            }
+        }
+
+        public float BurnDamage { get; set; }
         public int BurningMaxStacks { get; set; }
         public int BurningDuration { get; set; }
 
@@ -23,9 +33,9 @@
                 BurningDuration,
                 StatusEffects.Burning,
                 BurningMaxStacks,
-                HealthAsDamageMultiplier);
+                BurnDamage);
 
-            burnEffect.Apply(new EffectApplyingContext
+            _ = burnEffect.Apply(new EffectApplyingContext
             {
                 Target = evt.Context.Target,
                 Caster = Target,
@@ -38,22 +48,13 @@
         public override bool IsStronger(IEffect otherEffect)
         {
             if (otherEffect is not BurningFuryEffect fury) return false;
-            return HealthAsDamageMultiplier > fury.HealthAsDamageMultiplier;
+            return BurnDamage > fury.BurnDamage;
         }
 
-        protected override Dictionary<string, object?> DescriptionValues
-        {
-            get
-            {
-                var values = base.DescriptionValues;
-                values["BurnPercent"] = HealthAsDamageMultiplier * 100f;
-                return values;
-            }
-        }
 
         public override IEffect Copy() => new BurningFuryEffect(Duration, MaxStacks, HealthPercent, Status)
         {
-            HealthAsDamageMultiplier = HealthAsDamageMultiplier, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
+            BurnDamage = BurnDamage, BurningMaxStacks = BurningMaxStacks, BurningDuration = BurningDuration
         };
     }
 }

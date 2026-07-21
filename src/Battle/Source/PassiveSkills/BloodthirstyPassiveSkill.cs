@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
@@ -15,6 +16,21 @@ namespace Battle.Source.PassiveSkills
     public class BloodthirstyPassiveSkill(int stackThreshold, float healPercent)
         : Skill(id: "Passive_Skill_Bloodthirsty")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(StackThreshold)] = StackThreshold,
+                    [nameof(HealPercent)] = HealPercent,
+                };
+                return field;
+            }
+        }
+
+
         public int StackThreshold { get; } = stackThreshold;
         public float HealPercent { get; } = healPercent;
 

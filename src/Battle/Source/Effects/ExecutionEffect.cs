@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.Effects
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core.Battle.Abilities;
     using Core.Enums;
@@ -12,6 +13,16 @@
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Execution", duration, maxStacks, statusEffect)
     {
+        protected override Dictionary<string, object?> DescriptionValues
+        {
+            get
+            {
+                var values = base.DescriptionValues;
+                values[nameof(Percentage)] = Percentage;
+                return values;
+            }
+        }
+
         public float Percentage { get; } = percentage;
 
         public override async Task Apply(EffectApplyingContext context)

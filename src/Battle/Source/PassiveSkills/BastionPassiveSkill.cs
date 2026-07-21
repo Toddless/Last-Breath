@@ -1,5 +1,6 @@
 namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core.Battle.Skills;
     using Core.Context;
@@ -14,13 +15,27 @@ namespace Battle.Source.PassiveSkills
     {
         private readonly FirstHitTakenReduction _modifier;
 
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(Reduce)] = Reduce
+                };
+                return field;
+            }
+        }
+
+        public float Reduce { get; }
+
         public BastionPassiveSkill(float reduce) : base(id: "Passive_Skill_Bastion")
         {
             Reduce = reduce;
             _modifier = new FirstHitTakenReduction(this);
         }
 
-        public float Reduce { get; }
 
         public override void Attach(IFightable owner)
         {

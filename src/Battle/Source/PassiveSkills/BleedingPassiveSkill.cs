@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Abilities;
     using Core.Battle.Skills;
     using Core.Entity;
@@ -10,6 +11,21 @@
     public class BleedingPassiveSkill : Skill
     {
         private readonly DamageOverTurnEffect _damageOverTurnEffect;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentFromDamage)] = PercentFromDamage,
+                    [nameof(MaxStack)] = MaxStack,
+                    [nameof(BleedDuration)] = BleedDuration,
+                };
+                return field;
+            }
+        }
 
         public BleedingPassiveSkill(float percentFromDamage,
             int bleedDuration,

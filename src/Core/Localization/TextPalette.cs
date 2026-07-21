@@ -44,7 +44,7 @@ namespace Core.Localization
             [Rarity.Epic] = "#8845BF",
             [Rarity.Legendary] = "#E86A3F",
             [Rarity.Unique] = "#DE791D",
-            [Rarity.Mythic] = "#D62424",
+            [Rarity.Mythic] = "#F056D6",
         };
 
         public static string DamageColor(DamageType type) => s_damageColors.GetValueOrDefault(type, "#ffffff");

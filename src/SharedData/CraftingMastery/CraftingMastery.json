@@ -14,7 +14,7 @@
   "ascensionLevelGate": 1,
   "ascensionStatBonus": 0.15,
   "mythicGiftBaseChance": 1,
-  "extraEffectBaseChance": 0.1,
+  "extraEffectBaseChance": 1,
   "rarityWeights": {
     "Legendary": 1,
     "Epic": 10,

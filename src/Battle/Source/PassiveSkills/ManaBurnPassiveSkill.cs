@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Events;
@@ -7,6 +8,18 @@
     public class ManaBurnPassiveSkill(float percentToBurn)
         : Skill(id: "Passive_Skill_Mana_Burn")
     {
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(PercentToBurn)] = PercentToBurn,
+                };
+                return field;
+            }
+        }
         public float PercentToBurn { get; } = percentToBurn;
 
         public override void Attach(IFightable owner)

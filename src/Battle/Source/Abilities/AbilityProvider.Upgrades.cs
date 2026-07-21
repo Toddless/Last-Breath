@@ -580,7 +580,7 @@
                     data.Tier,
                     (duration, healthPercent) => new BurningFuryEffect(duration, maxStacks: 1, healthPercent)
                     {
-                        HealthAsDamageMultiplier = data.UpgradeProperties.GetValueOrDefault("healthAsDamageMultiplier", 1f),
+                        BurnDamage = data.UpgradeProperties.GetValueOrDefault("healthAsDamageMultiplier", 1f),
                         BurningDuration = (int)data.UpgradeProperties.GetValueOrDefault("burningDuration", 3),
                         BurningMaxStacks = (int)data.UpgradeProperties.GetValueOrDefault("burningMaxStacks", 3)
                     }),

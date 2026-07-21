@@ -1,5 +1,6 @@
 ﻿namespace Battle.Source.PassiveSkills
 {
+    using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
     using Core.Enums;
@@ -8,6 +9,20 @@
     public class TrappedBeastPassiveSkill : Skill
     {
         private IModifierInstance _increaseDamageModifier;
+
+        protected override IReadOnlyDictionary<string, object?>? DescriptionValues
+        {
+            get
+            {
+                if (field != null) return field;
+                field = new Dictionary<string, object?>
+                {
+                    [nameof(HealthPercent)] = HealthPercent,
+                    [nameof(DamageBonus)] = DamageBonus,
+                };
+                return field;
+            }
+        }
 
         public TrappedBeastPassiveSkill(float healthPercent, float damageBonus) : base(id: "Passive_Skill_Trapped_Beast")
         {
