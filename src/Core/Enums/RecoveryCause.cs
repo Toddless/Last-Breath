@@ -1,6 +1,6 @@
 namespace Core.Enums
 {
-    public enum HealCause
+    public enum RecoveryCause
     {
         Direct,
         Regen,

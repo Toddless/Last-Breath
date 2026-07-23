@@ -16,7 +16,7 @@
         public void Apply(IAttackContext context)
         {
             if (context.Result is not AttackResults.Succeed) return;
-            context.Attacker.Heal(new HealContext(context.Attacker, context.Attacker) { Amount = amount(), Cause = HealCause.Direct });
+            context.Attacker.Heal(new HealContext(context.Attacker, context.Attacker) { Amount = amount(), Cause = RecoveryCause.Direct });
         }
     }
 }

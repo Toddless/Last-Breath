@@ -56,6 +56,8 @@
                 context.Set(type, MitigateComponent(type, damage, context, target));
         }
 
+        // TODO:
+        // Подавление (Suppress) пока что мертвый стат. Необходимо брать в расчет значение DamageCause и для всех способностей рассчитывать вероятность снижения урона
         private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
             if (!context.IgnoreResistances && s_resistanceByType.TryGetValue(type, out EntityParameter resistance))

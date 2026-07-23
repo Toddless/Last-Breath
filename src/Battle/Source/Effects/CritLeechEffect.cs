@@ -31,7 +31,7 @@ namespace Battle.Source.Effects
         {
             if (!evt.Context.IsCritical) return;
             var attacker = evt.Context.Attacker;
-            attacker.Heal(new HealContext(attacker, attacker) { Amount = evt.Context.FinalDamage * amount, Cause = HealCause.Leech });
+            attacker.Heal(new HealContext(attacker, attacker) { Amount = evt.Context.FinalDamage * amount, Cause = RecoveryCause.Leech });
         }
 
         public override IEffect Copy() => new CritLeechEffect(Duration, MaxStacks, amount);

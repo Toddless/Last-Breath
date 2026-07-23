@@ -133,7 +133,7 @@ namespace LastBreath.Inventory
 
         private Inventory? Bag => _inventory as Inventory;
 
-        private IEquipmentComponent? Equipment => _playerAccessor?.Player?.EquipmentComponent;
+        private IEquipmentComponent? Equipment => _playerAccessor?.Player?.Equipment;
 
         private IEnumerable<EquipmentSlot> DollSlots => _doll?.GetChildren().OfType<EquipmentSlot>() ?? [];
 

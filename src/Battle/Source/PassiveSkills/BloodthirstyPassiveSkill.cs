@@ -75,7 +75,7 @@ namespace Battle.Source.PassiveSkills
             damage.Add(DamageType.Bleed, total);
             _ = target.TakeDamage(damage);
 
-            Owner.Heal(new HealContext(Owner, Owner) { Amount = total * HealPercent, Cause = HealCause.Leech });
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = total * HealPercent, Cause = RecoveryCause.Leech });
         }
     }
 }

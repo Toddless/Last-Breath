@@ -125,7 +125,7 @@ namespace Battle.Source.Abilities.DoubleStrike
         private void RestoreHealth(IFightable owner)
         {
             if (HealthRestore <= 0) return;
-            owner.Heal(new HealContext(owner, owner) { Amount = owner.Parameters.MaxHealth * HealthRestore, Cause = HealCause.Direct });
+            owner.Heal(new HealContext(owner, owner) { Amount = owner.Parameters.MaxHealth * HealthRestore, Cause = RecoveryCause.Direct });
         }
 
         private void RestoreMana(IFightable owner)

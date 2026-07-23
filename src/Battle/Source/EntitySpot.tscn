@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://chwl8e6atuhnk"]
 
-[ext_resource type="Script" uid="uid://borfi3kktmwih" path="res://Source/EntitySpot.cs" id="1_ejhmn"]
+[ext_resource type="Script" uid="uid://borfi3kktmwih" path="res://Addons/Battle/EntitySpot.cs" id="1_ejhmn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ejhmn"]
-radius = 125.0
+radius = 87.76
 
-[node name="EntitySpot" type="Node2D" node_paths=PackedStringArray("_spotArea")]
+[node name="EntitySpot" type="Node2D" unique_id=1681293184 node_paths=PackedStringArray("_spotArea")]
 script = ExtResource("1_ejhmn")
 _spotArea = NodePath("Area2D")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=974882516]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=92851393]
 shape = SubResource("CircleShape2D_ejhmn")

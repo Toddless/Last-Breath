@@ -1,6 +1,7 @@
 namespace Core.Save
 {
     using System;
+    using Ai.World.Raids;
     using Core;
     using Battle;
     using MessageBus;
@@ -19,7 +20,7 @@ namespace Core.Save
         private readonly IMartialArtMastery _mastery;
         private readonly INpcPopulationService _population;
         private readonly IGameMessageBus _messageBus;
-        private readonly Ai.World.Raids.IRaidService? _raids;
+        private readonly IRaidService? _raids;
         private SaveFile? _pendingLoad;
 
         public SaveGameService(
@@ -29,7 +30,7 @@ namespace Core.Save
             IMartialArtMastery mastery,
             INpcPopulationService population,
             IGameMessageBus messageBus,
-            Ai.World.Raids.IRaidService? raids = null)
+            IRaidService? raids = null)
         {
             _manager = manager;
             _storage = storage;

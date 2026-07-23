@@ -38,7 +38,7 @@ namespace Battle.Source.Effects
         public override void TurnEnd()
         {
             if (Target != null && healthRegenPercent > 0)
-                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healthRegenPercent, Cause = HealCause.Regen });
+                Target.Heal(new HealContext(Target, Target) { Amount = Target.Parameters.MaxHealth * healthRegenPercent, Cause = RecoveryCause.Regen });
             base.TurnEnd();
         }
 

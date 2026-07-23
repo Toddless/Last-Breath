@@ -25,7 +25,10 @@
                 "Damage": 1,
                 "SpellDamage": 1,
                 "Accuracy": 0,
-                "Evade": 2000
+                "Evade": 2000,
+                "LightningResistance": 0.25,
+                "ColdResistance": 0.25,
+                "FireResistance": 0.25
             },
             "world": {
                 "visionRadius": 0,

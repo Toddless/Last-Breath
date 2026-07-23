@@ -1,5 +1,6 @@
 namespace Core.Save.Participants
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Data.SaveData;
     using Newtonsoft.Json.Linq;
@@ -25,7 +26,7 @@ namespace Core.Save.Participants
         public void Restore(JToken data, int savedVersion)
         {
             var equipment = playerAccessor.Player?.Equipment;
-            var saved = data.ToObject<System.Collections.Generic.List<EquipItemSaveData>>();
+            var saved = data.ToObject<List<EquipItemSaveData>>();
             if (equipment == null || saved == null) return;
 
             foreach (var piece in equipment.Equipped.Keys.ToList())

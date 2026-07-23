@@ -84,7 +84,6 @@ namespace Battle.Internal.Player
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IAbilityBookComponent AbilityBook { get; private set; }
-        public IEquipmentComponent EquipmentComponent { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -214,7 +213,6 @@ namespace Battle.Internal.Player
             // The barrier pool starts full like the other vitals: a Barrier stat that never
             // filled itself read as "barrier does not work" (damage went straight to health).
             CurrentBarrier = Parameters.MaxBarrier;
-            EquipmentComponent = new EquipmentComponent(this);
             _stances.Add(Stance.Intelligence, new IntelligenceStance(this));
             _stances.Add(Stance.Strength, new StrengthStance(this));
             _stances.Add(Stance.Dexterity, new DexterityStance(this));

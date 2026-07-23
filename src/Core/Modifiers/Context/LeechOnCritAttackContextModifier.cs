@@ -11,7 +11,7 @@
         {
             if (!context.IsCritical) return;
             var attacker = context.Attacker;
-            attacker.Heal(new HealContext(attacker, attacker) { Amount = context.FinalDamage * leechPercent, Cause = HealCause.Leech });
+            attacker.Heal(new HealContext(attacker, attacker) { Amount = context.FinalDamage * leechPercent, Cause = RecoveryCause.Leech });
         }
     }
 }

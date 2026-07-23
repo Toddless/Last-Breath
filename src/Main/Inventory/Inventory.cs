@@ -181,25 +181,6 @@
             return true;
         }
 
-        /// <summary>
-        /// Use to return item instance in inventory.
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <param name="amount"></param>
-        /// <returns><see langword="true"/> if item was successfully returned, <see langword="false"/> if amount < 0, instance is null, instance id null or empty, or item do not exist in inventory. </returns>
-        public bool TryReturnItemInstanceToInventory(ItemInstance? instance, int amount = 1)
-        {
-            if (amount <= 0 || instance == null || string.IsNullOrWhiteSpace(instance.InstanceId)) return false;
-            if (!_itemInstances.TryGetValue(instance.InstanceId, out var value))
-            {
-                Tracker.TrackNotFound($"Trying to return unknown item. Instance: {instance.InstanceId}, ItemId: {instance.ItemId}", this);
-                return false;
-            }
-
-            FitItemsInSlots(instance.ItemId, instance.InstanceId, amount, value.MaxStackSize);
-            return true;
-        }
-
         public void RemoveItemById(string itemId, int amount = 1)
         {
             if (amount <= 0 || string.IsNullOrWhiteSpace(itemId)) return;
@@ -207,12 +188,6 @@
             int remainToDelete = amount;
 
             var slotsWithItem = Slots.Where(x => x.CurrentItem?.ItemId == itemId).OrderBy(x => x.Quantity);
-
-            if (slotsWithItem == null)
-            {
-                Tracker.TrackError($"Trying to remove non existent item from inventory: {itemId}", this);
-                return;
-            }
 
             foreach (var slot in slotsWithItem)
             {
@@ -233,12 +208,8 @@
             if (string.IsNullOrWhiteSpace(instanceId)) return;
 
             var slots = Slots.Where(x => x.CurrentItem?.InstanceId == instanceId);
-            if (slots != null)
-                foreach (var slot in slots)
-                    slot.ClearSlot(isDeleted: true);
-            else
-                if (_itemInstances.ContainsKey(instanceId))
-                _itemInstances.Remove(instanceId);
+            foreach (var slot in slots)
+                slot.ClearSlot(isDeleted: true);
         }
 
         public void Clear()
@@ -258,19 +229,20 @@
                 Tracker.TrackNotFound($"Item with id: {itemId}", this);
                 return;
             }
-            if (!Slots.Any(x => x.CurrentItem?.InstanceId == itemId))
-            {
-                _itemInstances.Remove(toRemove.InstanceId);
-                ItemAmountChanges?.Invoke(toRemove.Id, GetTotalItemAmount(itemId));
-            }
+
+            if (Slots.Any(x => x.CurrentItem?.InstanceId == itemId))
+                return;
+
+            _itemInstances.Remove(toRemove.InstanceId);
+            ItemAmountChanges?.Invoke(toRemove.Id, GetTotalItemAmount(itemId));
         }
 
-        private Texture2D? GetItemIcon(string instacnceId) => _itemInstances[instacnceId].Icon;
+        private Texture2D? GetItemIcon(string instanceId) => _itemInstances[instanceId].Icon;
 
         private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
         {
             EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
-            var remaining = amount;
+            int remaining = amount;
             // Top-up matches by item id, not instance: every pickup of a resource is a fresh
             // instance, matching by instance would fragment the bag into per-pickup stacks.
             // Per-roll items (equip) are safe — their stack size of 1 never merges.

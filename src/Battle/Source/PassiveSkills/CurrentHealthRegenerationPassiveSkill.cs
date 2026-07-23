@@ -37,7 +37,7 @@ namespace Battle.Source.PassiveSkills
         {
             if (Owner == null) return;
             float amount = Owner.CurrentHealth * PercentFromCurrentHealth;
-            Owner.Heal(new HealContext(Owner, Owner) { Amount = amount, Cause = HealCause.Regen });
+            Owner.Heal(new HealContext(Owner, Owner) { Amount = amount, Cause = RecoveryCause.Regen });
         }
 
         public override void Detach(IFightable owner)

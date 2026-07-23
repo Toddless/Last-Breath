@@ -10,10 +10,10 @@ namespace Core.Entity
         public static void Apply(IFightable entity)
         {
             float health = entity.Parameters.HealthRecovery;
-            if (health > 0) entity.Heal(new HealContext(entity, entity) { Amount = health, Cause = HealCause.Regen });
+            if (health > 0) entity.Heal(new HealContext(entity, entity) { Amount = health, Cause = RecoveryCause.Regen });
 
             float mana = entity.Parameters.ManaRecovery;
-            if (mana > 0) entity.RestoreMana(new ManaRecoveryContext(entity, entity) { Amount = mana });
+            if (mana > 0) entity.RestoreMana(new ManaRecoveryContext(entity, entity) { Amount = mana, Cause = RecoveryCause.Regen });
         }
     }
 }

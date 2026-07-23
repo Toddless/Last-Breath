@@ -7,6 +7,6 @@
     {
         public float Amount { get; set; }
         public bool ConvertToDamage { get; set; }
-        public HealCause Cause { get; set; }
+        public RecoveryCause Cause { get; set; }
     }
 }

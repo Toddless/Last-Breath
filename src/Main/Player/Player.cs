@@ -11,6 +11,7 @@ namespace LastBreath.Player
     using Core.Ai.World.Recovery;
     using Core.Ai.World.Time;
     using Core.Battle;
+    using Core.Battle.DamageResolution;
     using Core.Constants;
     using Core.Context;
     using Core.Data;
@@ -55,7 +56,7 @@ namespace LastBreath.Player
         private readonly StateMachine<State, Trigger> _stateMachine = new(State.Idle);
         private readonly Dictionary<Stance, IStance> _stances = [];
         private readonly RandomNumberGenerator _rnd = new();
-        private readonly Core.Battle.DamageResolution.DamageResolutionChain _damageChain = Core.Battle.DamageResolution.DamageResolutionChain.CreateDefault();
+        private readonly DamageResolutionChain _damageChain = DamageResolutionChain.CreateDefault();
         private Vector2 _lastPosition = Vector2.Zero;
         private Direction _direction;
         [Export] private AnimationsComponent? _animationsComponent;
@@ -88,7 +89,7 @@ namespace LastBreath.Player
         public IAnimationsComponent Animations => _animationsComponent;
         public IModifierHandlerComponent ModifierHandler { get; private set; }
         public IAbilityBookComponent AbilityBook { get; private set; }
-        public IEquipmentComponent EquipmentComponent { get; private set; }
+        public IEquipmentComponent Equipment { get; private set; }
         public IEntityAttribute Dexterity { get; private set; }
         public IEntityAttribute Strength { get; private set; }
         public IEntityAttribute Intelligence { get; private set; }
@@ -187,9 +188,9 @@ namespace LastBreath.Player
             Parameters = new EntityParametersComponent();
             ParameterModifiers = new ParameterModifiersComponent();
             Parameters.Initialize(ParameterModifiers.GetModifiers);
-            EquipmentComponent = new EquipmentComponent(this);
-            ParameterModifiers.RegisterSource(EquipmentComponent);
-            EquipmentComponent.EquipmentChanged += OnEquipmentChanged;
+            Equipment = new EquipmentComponent(this);
+            ParameterModifiers.RegisterSource(Equipment);
+            Equipment.EquipmentChanged += OnEquipmentChanged;
             Effects = new EffectsComponent(this);
             PassiveSkills = new PassiveSkillsComponent(this);
             Dexterity = new Dexterity(ParameterModifiers);
@@ -648,7 +649,7 @@ namespace LastBreath.Player
         private void OnEquipmentChanged(EquipmentPiece piece, IEquipItem? item)
         {
             if (piece != EquipmentPiece.Weapon) return;
-            var weapon = EquipmentComponent.Weapon;
+            var weapon = Equipment.Weapon;
             Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));

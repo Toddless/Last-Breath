@@ -182,23 +182,6 @@
             }
         },
         {
-            "id": "Passive_Skill_Resonance",
-            "kind": "Passive",
-            "weight": 20,
-            "properties": {
-                "spellDamagePerStack": 0.1,
-                "multicastPerStack": 0.05
-            }
-        },
-        {
-            "id": "Passive_Skill_Servant_Hell",
-            "kind": "Passive",
-            "weight": 20,
-            "properties": {
-                "chance": 0.1
-            }
-        },
-        {
             "id": "Passive_Skill_Soul_Devouring",
             "kind": "Passive",
             "weight": 20,
@@ -211,15 +194,6 @@
             "kind": "Passive",
             "weight": 20,
             "properties": {}
-        },
-        {
-            "id": "Passive_Skill_Trapped_Beast",
-            "kind": "Passive",
-            "weight": 20,
-            "properties": {
-                "healthPercent": 0.05,
-                "damageBonus": 0.03
-            }
         },
         {
             "id": "Passive_Skill_True_Strike",

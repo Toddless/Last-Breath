@@ -2986,13 +2986,13 @@ msgid "Passive_Skill_Critical_Leech_Description"
 msgstr "Recover {Percent:%} of health on critical attack."
 
 msgid "Passive_Skill_Mana_Regeneration"
-msgstr "Health leech"
+msgstr "Mana Regeneration"
 
 msgid "Passive_Skill_Mana_Regeneration_Description"
 msgstr "Recover {PercentFromMaxMana:%} of maximum mana at the turn`s end."
 
 msgid "Passive_Skill_Mana_On_Attack"
-msgstr "Health leech"
+msgstr "Mana on Attack"
 
 msgid "Passive_Skill_Mana_On_Attack_Description"
 msgstr "Recover {Amount} on attack."

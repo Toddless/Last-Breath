@@ -45,7 +45,7 @@ namespace Battle.Source.Presentation
 
         // Auto-boost: a backed-up queue (big multi-sided fights) plays faster on top of the
         // player-chosen speed and drains back to normal pace as the queue empties.
-        private const int AutoBoostQueueLength = 24;
+        private const int AutoBoostQueueLength = 12;
         private const float MaxAutoBoost = 2f;
 
         private readonly Queue<TimelineEntry> _pending = new();

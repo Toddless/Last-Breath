@@ -4,7 +4,7 @@
     using Enums;
     using Items;
 
-    public interface IInventorySlot : IMouseExitable
+    public interface IInventorySlot 
     {
         int Quantity { get; set; }
         ItemInstance? CurrentItem { get; }

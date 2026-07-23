@@ -13,7 +13,7 @@ namespace Battle.Source
     {
         // Safety fuses, not gameplay limits: evade/extra-hit chances are clamped below 100%,
         // so legitimate chains stay short — only a broken loop can reach these.
-        private const int MaxReactionDepth = 24;
+        private const int MaxReactionDepth = 128;
         private const int MaxAttacksPerDrain = 256;
 
         private readonly Queue<IAttackContext> _attackQueue = [];

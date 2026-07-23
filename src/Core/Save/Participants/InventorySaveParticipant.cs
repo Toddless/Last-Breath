@@ -21,7 +21,7 @@ namespace Core.Save.Participants
         public JToken Capture()
         {
             var data = new InventorySaveData();
-            foreach (var (item, amount) in inventory.GetContents())
+            foreach ((IItem item, int amount) in inventory.GetContents())
                 data.Items.Add(item is IEquipItem equip
                     ? new InventoryItemSaveData { Amount = amount, Equip = converter.ToData(equip) }
                     : new InventoryItemSaveData { Amount = amount, ResourceId = item.Id });
