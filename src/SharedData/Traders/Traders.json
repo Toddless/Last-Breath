@@ -1,0 +1,30 @@
+{
+    "traders": [
+        {
+            "id": "Trader_Human_Merchant",
+            "fraction": "Human",
+            "restockGameMinutes": 1440,
+            "catalog": [
+                { "itemId": "Crafting_Resource_Copper_Ore", "count": 20 },
+                { "itemId": "Crafting_Resource_Iron_Ore", "count": 12 },
+                { "itemId": "Crafting_Resource_Linen_Fabric", "count": 15 },
+                { "itemId": "Crafting_Resource_Wolf_Leather", "count": 15 },
+                { "itemId": "Upgrade_Resource_Weapon_Rune", "count": 6, "chance": 0.8 },
+                { "itemId": "Upgrade_Resource_Blacksmith_Rune", "count": 6, "chance": 0.8 },
+                { "itemId": "Upgrade_Resource_Jeweler_Rune", "count": 4, "chance": 0.6 },
+                { "itemId": "Weapon_Simple_Sword", "count": 1 },
+                { "itemId": "Weapon_Simple_Dagger", "count": 1 }
+            ],
+            "randomEquip": {
+                "count": 3,
+                "rarityWeights": {
+                    "Common": 45,
+                    "Uncommon": 30,
+                    "Rare": 18,
+                    "Epic": 6,
+                    "Legendary": 1
+                }
+            }
+        }
+    ]
+}

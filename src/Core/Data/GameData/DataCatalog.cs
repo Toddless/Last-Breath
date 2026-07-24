@@ -33,6 +33,8 @@ namespace Core.Data.GameData
         public const string CraftingMastery = "CraftingMastery";
         public const string ItemEffects = "ItemEffects";
         public const string Resources = "Resources";
+        public const string Trade = "Trade";
+        public const string Traders = "Traders";
         public const string ModifierPools = "ModifierPools";
         public const string UpgradeCosts = "UpgradeCosts";
     }

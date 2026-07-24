@@ -5,5 +5,6 @@ namespace Core.Data.CraftingData
         string[] Tags,
         string Rarity,
         string? Category,
-        int MaxStackSize);
+        int MaxStackSize,
+        int BasePrice = 0);
 }

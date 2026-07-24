@@ -52,7 +52,19 @@ namespace LootGeneration.Source
 
         public bool TryPickup(ItemOnGround item, IInventory inventory)
         {
-            if (item.Item == null || !inventory.TryAddItem(item.Item, item.Quantity)) return false;
+            if (item.Item == null) return false;
+
+            // Currency never enters the bag: the pile credits the wallet (owner decision 2026-07-24).
+            // A sandbox without an economy simply leaves the pile lying.
+            if (item.Item is Core.Items.ICurrencyItem)
+            {
+                if (_provider.GetService<Core.Trade.IWalletService>() is not { } wallet) return false;
+                wallet.Add(item.Quantity);
+            }
+            else if (!inventory.TryAddItem(item.Item, item.Quantity))
+            {
+                return false;
+            }
 
             _itemsOnGround.Remove(item);
             _gameEventBus.Publish(new ItemPickedUpEvent(item.Item, item.Quantity));

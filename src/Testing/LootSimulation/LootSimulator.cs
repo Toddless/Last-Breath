@@ -50,9 +50,13 @@ namespace LastBreathTest.LootSimulation
                         tierByItem.GetValueOrDefault(stack.Item.Id, -1),
                         priceByItem.GetValueOrDefault(stack.Item.Id, 0f),
                         guaranteedIds.Contains(stack.Item.Id),
-                        stack.Item is IEquipItem);
+                        stack.Item is IEquipItem,
+                        stack.Item is Core.Items.ICurrencyItem);
                     drops.Add(drop);
 
+                    // The gold pile stays out of the item aggregates: a 20-coin stack would drown
+                    // the Common share and the drop frequencies while not being an item at all.
+                    if (drop.IsCurrency) continue;
                     rarityDistribution[drop.Rarity] = rarityDistribution.GetValueOrDefault(drop.Rarity) + drop.Stack;
                     dropFrequency[drop.ItemId] = dropFrequency.GetValueOrDefault(drop.ItemId) + drop.Stack;
                 }

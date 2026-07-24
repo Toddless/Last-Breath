@@ -67,10 +67,12 @@ namespace LootGeneration.Source
             float[] actualTierChances = Calculations.CalculateChances<ITierMultiplierModifier>(npcModifiers, CopyBaseChances(_configuration.BaseTierChances));
             float[] actualRarityChances = Calculations.CalculateChances<IRarityUpgradeModifier>(npcModifiers, CopyBaseChances(_configuration.BaseRarityChances));
 
-            var chosenItemsIds = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable);
+            var chosenItemsIds = SpendBudget(budget, _configuration.TierPrices, actualTierChances, context.TryUpgradeTier, finalLootTable, out float leftoverBudget);
             chosenItemsIds.AddRange(context.GuaranteedItems);
             _diedEntities.Add(diedEntity.InstanceId);
-            return GenerateChosenItems(actualRarityChances, context, chosenItemsIds);
+            var items = GenerateChosenItems(actualRarityChances, context, chosenItemsIds);
+            AppendGoldPile(items, leftoverBudget);
+            return items;
         }
 
         private Dictionary<int, List<TableRecord>> CreateFinalLootTable(Dictionary<int, List<TableRecord>> baseTable, Dictionary<int, List<TableRecord>> additionalItems)
@@ -89,12 +91,23 @@ namespace LootGeneration.Source
 
         private const int MaxWastedRolls = 100;
 
+        /// <summary>The FINAL leftover (after the quality swap) converts to a gold pile: weak kills
+        /// whose whole budget affords no item still pay something (owner design 2026-07-24).</summary>
+        private void AppendGoldPile(List<ItemStack> items, float leftoverBudget)
+        {
+            int gold = (int)MathF.Round(leftoverBudget * _configuration.GoldPerBudgetUnit);
+            if (_configuration.MaxGoldPerKill > 0) gold = Math.Min(gold, _configuration.MaxGoldPerKill);
+            if (gold <= 0) return;
+            items.Add(new ItemStack(new GoldItem()) { Stack = gold });
+        }
+
         private List<string> SpendBudget(
             float budget,
             int[] tierPrices,
             float[] actualTierChances,
             Func<int, float, int> tryUpgradeTier,
-            Dictionary<int, List<TableRecord>> modifiedTable)
+            Dictionary<int, List<TableRecord>> modifiedTable,
+            out float leftoverBudget)
         {
             Dictionary<int, int> tiersAmount = Enumerable.Range(0, tierPrices.Length).ToDictionary(tier => tier, _ => 0);
             List<(TableRecord Record, int Tier)> chosen = [];
@@ -160,7 +173,7 @@ namespace LootGeneration.Source
                 chosen.Add((randomItem, chosenTier));
             }
 
-            ConvertLeftoverBudgetToQuality(budget, maxItems, chosen, tiersAmount, modifiedTable);
+            leftoverBudget = ConvertLeftoverBudgetToQuality(budget, maxItems, chosen, tiersAmount, modifiedTable);
 
             _gameEventBus.Publish<ItemTierChosenEvent>(new(tiersAmount));
 
@@ -168,15 +181,16 @@ namespace LootGeneration.Source
         }
 
         /// <summary>The item cap must not flatten the reward curve: when the cap stopped the spending,
-        /// the leftover budget repeatedly swaps the cheapest chosen item for a better-tier one.</summary>
-        private void ConvertLeftoverBudgetToQuality(
+        /// the leftover budget repeatedly swaps the cheapest chosen item for a better-tier one.
+        /// Returns the FINAL leftover — the gold conversion's input.</summary>
+        private float ConvertLeftoverBudgetToQuality(
             float budget,
             int maxItems,
             List<(TableRecord Record, int Tier)> chosen,
             Dictionary<int, int> tiersAmount,
             Dictionary<int, List<TableRecord>> modifiedTable)
         {
-            if (chosen.Count < maxItems || chosen.Count == 0) return;
+            if (chosen.Count < maxItems || chosen.Count == 0) return budget;
 
             int guard = 0;
             while (budget > 0 && guard++ < MaxWastedRolls)
@@ -197,7 +211,7 @@ namespace LootGeneration.Source
                         .Select(record => (record, betterTier)));
                 }
 
-                if (candidates.Count == 0) return;
+                if (candidates.Count == 0) return budget;
 
                 var (replacement, replacementTier) = candidates[_rnd.RandIntRange(0, candidates.Count - 1)];
                 budget -= replacement.Price - cheapest.Price;
@@ -205,6 +219,8 @@ namespace LootGeneration.Source
                 tiersAmount[replacementTier]++;
                 chosen[cheapestIndex] = (replacement, replacementTier);
             }
+
+            return budget;
         }
 
         private List<ItemStack> GenerateChosenItems(float[] actualRarityChances, IModifierApplyingContext context, List<string> chosenItemsIds)

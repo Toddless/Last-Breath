@@ -1,0 +1,15 @@
+{
+    "rarityMultipliers": {
+        "Common": 1,
+        "Uncommon": 1.5,
+        "Rare": 2.5,
+        "Epic": 4,
+        "Legendary": 7,
+        "Unique": 10,
+        "Mythic": 15
+    },
+    "upgradeLevelBonus": 0.1,
+    "ascensionMultiplier": 1.5,
+    "buybackFactor": 0.4,
+    "startingGold": 100
+}

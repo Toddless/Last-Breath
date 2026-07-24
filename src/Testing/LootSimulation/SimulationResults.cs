@@ -2,16 +2,20 @@ namespace LastBreathTest.LootSimulation
 {
     using Core.Enums;
 
-    internal sealed record DropRecord(string ItemId, Rarity Rarity, int Stack, int Tier, float Price, bool IsGuaranteed, bool IsEquip);
+    internal sealed record DropRecord(string ItemId, Rarity Rarity, int Stack, int Tier, float Price, bool IsGuaranteed, bool IsEquip, bool IsCurrency = false);
 
     internal sealed record KillRecord(float ExpectedBudget, float Difficulty, IReadOnlyList<DropRecord> Drops)
     {
-        public int ItemCount => Drops.Sum(drop => drop.Stack);
+        /// <summary>Real items only — the gold pile is budget leftover, not an item.</summary>
+        public int ItemCount => Drops.Where(drop => !drop.IsCurrency).Sum(drop => drop.Stack);
 
-        public float TotalValue => Drops.Sum(drop => drop.Price * drop.Stack);
+        public float TotalValue => Drops.Where(drop => !drop.IsCurrency).Sum(drop => drop.Price * drop.Stack);
 
         /// <summary>Value bought with the budget — guaranteed items are free extras on top.</summary>
-        public float SpentValue => Drops.Where(drop => !drop.IsGuaranteed).Sum(drop => drop.Price * drop.Stack);
+        public float SpentValue => Drops.Where(drop => drop is { IsGuaranteed: false, IsCurrency: false }).Sum(drop => drop.Price * drop.Stack);
+
+        /// <summary>Gold minted from the kill's leftover budget (the coefficient's tuning input).</summary>
+        public int GoldDropped => Drops.Where(drop => drop.IsCurrency).Sum(drop => drop.Stack);
     }
 
     internal sealed record ScenarioResult(
@@ -30,6 +34,9 @@ namespace LastBreathTest.LootSimulation
         public float MeanExpectedBudget => KillRecords.Average(kill => kill.ExpectedBudget);
 
         public float MeanDifficulty => KillRecords.Average(kill => kill.Difficulty);
+
+        /// <summary>Average gold per kill — the goldPerBudgetUnit coefficient is tuned against this.</summary>
+        public float MeanGoldPerKill => (float)KillRecords.Average(kill => kill.GoldDropped);
 
         /// <summary>Value gained per point of NPC difficulty — the reward-inflation curve input.</summary>
         public float ValuePerDifficultyPoint => MeanDifficulty > 0 ? MeanValuePerKill / MeanDifficulty : MeanValuePerKill;

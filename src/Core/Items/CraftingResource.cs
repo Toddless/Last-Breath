@@ -26,6 +26,7 @@ namespace Core.Items
             Tags = [.. source.Tags];
             Material = source.Material;
             Rarity = source.Rarity;
+            BasePrice = source.BasePrice;
             // Icon is intentionally NOT copied: it lazy-loads from AssetPaths.ResourceIcon(Id), so the copy
             // resolves its own texture on first access. Reading source.Icon here would force a ResourceLoader
             // call on every copy — and hard-crash hosts without the Godot runtime (tests, loot simulation).
@@ -33,6 +34,10 @@ namespace Core.Items
 
         public string Id { get; }
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+
+        /// <summary>Authored base gold price from the data ("basePrice"); set by the parser.</summary>
+        public int BasePrice { get; set; }
+
         public int MaxStackSize { get; }
         public string[] Tags { get; }
         public Texture2D? Icon

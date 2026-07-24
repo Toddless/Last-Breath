@@ -3537,3 +3537,9 @@ msgstr "Critical damage taken is reduced by {amount:%} while the shield holds."
 # New effects
 # ------------------------------
 
+
+msgid "Item_Gold"
+msgstr "Gold"
+
+msgid "Item_Gold_Description"
+msgstr "Coins of the realm. They never take up bag space - picking a pile up fills your purse."

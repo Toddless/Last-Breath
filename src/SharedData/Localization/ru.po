@@ -3002,3 +3002,9 @@ msgstr "Безмолвная ярость"
 
 msgid "Weapon_Silent_Fury_Description"
 msgstr ""
+
+msgid "Item_Gold"
+msgstr "Золото"
+
+msgid "Item_Gold_Description"
+msgstr ""

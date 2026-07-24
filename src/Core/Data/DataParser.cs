@@ -78,7 +78,9 @@ namespace Core.Data
                 data.ItemModifierMultiplier,
                 data.MaxItemsPerKill,
                 data.BaseBudget.ToDictionary(kvp => EnumParser.ParseEnum<EntityType>(kvp.Key), kvp => kvp.Value),
-                data.RarityMultipliers.ToDictionary(kvp => EnumParser.ParseEnum<Rarity>(kvp.Key), kvp => kvp.Value));
+                data.RarityMultipliers.ToDictionary(kvp => EnumParser.ParseEnum<Rarity>(kvp.Key), kvp => kvp.Value),
+                data.GoldPerBudgetUnit,
+                data.MaxGoldPerKill);
         }
 
         public Dictionary<string, Dictionary<string, int>> ParseEquipItemResources(string json)
@@ -133,6 +135,7 @@ namespace Core.Data
                     Weapon = piece == EquipmentPiece.Weapon ? ParseWeaponBlock(item) : null,
                     Rarity = EnumParser.ParseEnum<Rarity>(item.Rarity),
                     Tags = item.Tags,
+                    BasePrice = item.BasePrice,
                     UpdateLevel = item.UpdateLevel,
                     MaxUpdateLevel = item.MaxUpdateLevel,
                     // Authored lines never carry an affix — they are implicit by definition, not rolled slots.
@@ -480,7 +483,10 @@ namespace Core.Data
                 EquipmentCategory? category = string.IsNullOrEmpty(upgradeResource.Category)
                     ? null
                     : EnumParser.ParseEnum<EquipmentCategory>(upgradeResource.Category);
-                return factory.CreateUpgradeResource(upgradeResource.Id, upgradeResource.Tags, rarity, category, upgradeResource.MaxStackSize);
+                var resource = factory.CreateUpgradeResource(upgradeResource.Id, upgradeResource.Tags, rarity, category, upgradeResource.MaxStackSize);
+                // The factory signature predates pricing; the parser stamps the authored base directly.
+                if (resource is UpgradeResource priced) priced.BasePrice = upgradeResource.BasePrice;
+                return resource;
             }).ToList();
 
         private List<ICraftingResource> LoadCraftingResources(
@@ -499,7 +505,10 @@ namespace Core.Data
                 var materialDescriptors = LoadCategorizedDescriptors(craftingData.Material.Modifiers, craftingData.Material.ByCategory, craftingData.Id, AffixPolicy.Required);
                 var rarity = EnumParser.ParseEnum<Rarity>(craftingData.Rarity);
                 var material = factory.CreateMaterial(materialDescriptors, category);
-                items.Add(factory.CreateCraftingResource(craftingData.Id, craftingData.MaxStackSize, craftingData.Tags, material, rarity));
+                var resource = factory.CreateCraftingResource(craftingData.Id, craftingData.MaxStackSize, craftingData.Tags, material, rarity);
+                // The factory signature predates pricing; the parser stamps the authored base directly.
+                if (resource is CraftingResource priced) priced.BasePrice = craftingData.BasePrice;
+                items.Add(resource);
             }
 
             return items;

@@ -10,6 +10,9 @@ namespace Core.Save
         /// <summary>World clock, faction relations — depend on nothing.</summary>
         public const int World = 0;
 
+        /// <summary>Gold wallet — one number, depends on nothing.</summary>
+        public const int Wallet = 5;
+
         public const int Mastery = 10;
 
         /// <summary>Inventory + equipment: the parameter modifier sources.</summary>

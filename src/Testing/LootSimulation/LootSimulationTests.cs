@@ -233,9 +233,37 @@
             Assert.IsTrue(cap > 0, "MaxItemsPerKill is not configured.");
             foreach (var kill in result.KillRecords)
             {
-                int rolled = kill.Drops.Where(drop => !drop.IsGuaranteed).Sum(drop => drop.Stack);
+                // The gold pile is leftover budget riding on top of the cap, not a rolled item.
+                int rolled = kill.Drops.Where(drop => drop is { IsGuaranteed: false, IsCurrency: false }).Sum(drop => drop.Stack);
                 Assert.IsTrue(rolled <= cap, $"Rolled {rolled} items, cap is {cap}.");
             }
+        }
+
+        [TestMethod]
+        public async Task GoldDrop_RespectsCapAndPaysWeakKills()
+        {
+            // The anti-jackpot fuse: uncapped, an overfed archon minted ~46k gold in one kill
+            // (sim 2026-07-24) against a ~500-gold trader restock — the cap must hold.
+            var overfed = new NpcArchetype("Test_Gold_Cap", EntityType.Archon, Rarity.Mythic, 150, Fractions.Demon)
+            {
+                ModifierIds =
+                [
+                    "Npc_Modifier_Scale_Double_Health",
+                    "Npc_Modifier_Scale_Double_Damage",
+                    "Npc_Modifier_Scale_Double_Defence",
+                ],
+            };
+            var capped = await s_simulator.RunAsync(overfed, kills: 50);
+
+            int cap = s_pipeline.Configuration.MaxGoldPerKill;
+            Assert.IsTrue(cap > 0, "MaxGoldPerKill is not configured.");
+            foreach (var kill in capped.KillRecords)
+                Assert.IsTrue(kill.GoldDropped <= cap, $"Minted {kill.GoldDropped} gold, cap is {cap}.");
+
+            // The other end of the design: a weak kill whose budget affords no item still pays SOMETHING.
+            var weak = new NpcArchetype("Test_Gold_Weak", EntityType.Regular, Rarity.Common, 1, Fractions.Undead);
+            var weakResult = await s_simulator.RunAsync(weak, kills: 200);
+            Assert.IsTrue(weakResult.MeanGoldPerKill > 0f, "weak kills must convert their budget into gold");
         }
 
         [TestMethod]

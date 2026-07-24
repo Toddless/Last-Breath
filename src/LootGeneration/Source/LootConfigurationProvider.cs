@@ -21,6 +21,8 @@ namespace LootGeneration.Source
         public float EquipItemEffectChance => Configuration.EquipItemEffectChance;
         public float ItemModifierMultiplier => Configuration.ItemModifierMultiplier;
         public int MaxItemsPerKill => Configuration.MaxItemsPerKill;
+        public float GoldPerBudgetUnit => Configuration.GoldPerBudgetUnit;
+        public int MaxGoldPerKill => Configuration.MaxGoldPerKill;
         public Dictionary<EntityType, float> BaseBudget => Configuration.BaseBudget;
         public Dictionary<Rarity, float> RarityMultipliers => Configuration.RarityMultipliers;
 
@@ -39,7 +41,9 @@ namespace LootGeneration.Source
                 parsed.ItemModifierMultiplier,
                 parsed.MaxItemsPerKill,
                 parsed.BaseBudget,
-                parsed.RarityMultipliers);
+                parsed.RarityMultipliers,
+                parsed.GoldPerBudgetUnit,
+                parsed.MaxGoldPerKill);
         }
     }
 }

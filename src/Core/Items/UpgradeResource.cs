@@ -20,10 +20,14 @@ namespace Core.Items
         // call on every copy — and hard-crash hosts without the Godot runtime (tests, loot simulation).
         private UpgradeResource(UpgradeResource source) : this(source.Id, [.. source.Tags], source.Rarity, source.Category, source.MaxStackSize)
         {
+            BasePrice = source.BasePrice;
         }
 
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
+
+        /// <summary>Authored base gold price from the data ("basePrice"); set by the parser.</summary>
+        public int BasePrice { get; set; }
         public string[] Tags { get; } = tags;
         public Texture2D? Icon
         {

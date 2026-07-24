@@ -12,7 +12,9 @@ namespace LootGeneration.Source
         float baseItemModifierMultiplier,
         int maxItemsPerKill,
         Dictionary<EntityType, float> baseBudget,
-        Dictionary<Rarity, float> rarityMultipliers) : ILootConfiguration
+        Dictionary<Rarity, float> rarityMultipliers,
+        float goldPerBudgetUnit = 0f,
+        int maxGoldPerKill = 0) : ILootConfiguration
     {
         public int[] TierPrices { get; } = tierPrices;
         public float[] BaseTierChances { get; } = baseTierChances;
@@ -21,6 +23,8 @@ namespace LootGeneration.Source
         public float EquipItemEffectChance { get; } = equipItemEffectChance;
         public float ItemModifierMultiplier { get; } = baseItemModifierMultiplier;
         public int MaxItemsPerKill { get; } = maxItemsPerKill;
+        public float GoldPerBudgetUnit { get; } = goldPerBudgetUnit;
+        public int MaxGoldPerKill { get; } = maxGoldPerKill;
 
         public Dictionary<EntityType, float> BaseBudget { get; } = baseBudget;
 

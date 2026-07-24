@@ -6,6 +6,8 @@
     "equipItemEffectChance": 0.15,
     "itemModifierMultiplier": 0.10,
     "maxItemsPerKill": 25,
+    "goldPerBudgetUnit": 4,
+    "maxGoldPerKill": 300,
     "baseBudget": {
         "Regular": 5,
         "Special": 10,

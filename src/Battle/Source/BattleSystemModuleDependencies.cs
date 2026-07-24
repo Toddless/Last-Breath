@@ -28,6 +28,7 @@
     using Core.Save.Participants;
     using Core.Services;
     using Core.Session;
+    using Core.Trade;
     using Core.Views;
     using Core.Views.UI;
     using Godot;
@@ -79,72 +80,10 @@
                 bus?.Subscribe<NpcFinalDeathEvent>(evnt => registry.Release(evnt.InstanceId));
                 return registry;
             });
-            services.AddSingleton<LoadScope>();
-            services.AddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
-            services.AddSingleton<ISaveStorage>(_ => new SaveStorage(ProjectSettings.GlobalizePath("user://saves")));
-            services.AddSingleton(sp => new EquipItemSaveConverter(sp.GetRequiredService<IGrantFactory>()));
-            services.AddSingleton<ISaveManager>(sp =>
-            {
-                var manager = new SaveManager(sp.GetRequiredService<LoadScope>());
-                manager.Register(new WorldClockSaveParticipant(sp.GetRequiredService<IWorldClock>()));
-                manager.Register(new FactionRelationsSaveParticipant(sp.GetRequiredService<IFactionRelationService>()));
-                // Optional like the npcWorld section: a project without the personal layer doesn't write it.
-                if (sp.GetService<IPersonalReputationService>() is { } personalReputation)
-                    manager.Register(new PersonalReputationSaveParticipant(personalReputation));
-                if (sp.GetService<IRaidService>() is { } raidService)
-                    manager.Register(new RaidsSaveParticipant(raidService));
-                manager.Register(new MasterySaveParticipant(sp.GetRequiredService<IMartialArtMastery>()));
-                manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
-                // The bag lives only in projects that have both an inventory and item data (Main);
-                // a sandbox without them simply doesn't write the section.
-                if (sp.GetService<IInventory>() is { } inventory && sp.GetService<IItemDataProvider>() is { } itemData)
-                    manager.Register(new InventorySaveParticipant(inventory, itemData, sp.GetRequiredService<EquipItemSaveConverter>()));
-                manager.Register(new AbilityBookSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<IAbilityProvider>()));
-                manager.Register(new PlayerVitalsSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
-                manager.Register(new PlayerPlacementSaveParticipant(sp.GetRequiredService<IPlayerAccessor>()));
-
-                // The npcWorld section needs a project-side NPC factory; a project without one
-                // (no world NPCs) simply doesn't write the section.
-                if (sp.GetService<INpcWorldSpawner>() is { } spawner)
-                    manager.Register(new NpcWorldSaveParticipant(
-                        sp.GetRequiredService<INpcWorldRegistry>(),
-                        sp.GetRequiredService<INpcProvider>(),
-                        sp.GetRequiredService<INpcPopulationService>(),
-                        spawner));
-                manager.Register(new SpawnPointsSaveParticipant(sp.GetRequiredService<ISpawnPointRegistry>()));
-                return manager;
-            });
-
-            // TODO:
-            // Это НЕ зависимость Battle
-            services.AddSingleton<ISessionResetService>(sp =>
-            {
-                var session = new SessionResetService(sp.GetRequiredService<LoadScope>());
-                // Registration order = reset order; every entry is optional — a sandbox project
-                // without the service simply skips it.
-                Add<ISaveGameService>(); // a pending load must not leak into the new game
-                Add<IQuestLogService>(); // before the facts they evaluate against
-                Add<IWorldFactsService>();
-                Add<IInfluenceMastery>();
-                Add<IMartialArtMastery>();
-                Add<ICraftingMastery>();
-                Add<IInventory>();
-                Add<IFactionRelationService>();
-                Add<IPersonalReputationService>();
-                Add<IReputationDeedProcessor>();
-                Add<IRaidService>();
-                Add<IWorldClock>();
-                Add<INpcPopulationService>();
-                Add<INpcSkirmishService>(); // ghost skirmishes must not outlive the scene's NPCs
-                Add<IUiContextService>();
-                return session;
-
-                void Add<T>()
-                    where T : class
-                {
-                    if (sp.GetService<T>() is ISessionResettable resettable) session.Register(resettable);
-                }
-            });
+            // TryAdd: the save system (project-level, AddSaveSystem) also offers the scope — the
+            // battle services only CONSUME ILoadScope; whichever registration runs first wins.
+            services.TryAddSingleton<LoadScope>();
+            services.TryAddSingleton<ILoadScope>(sp => sp.GetRequiredService<LoadScope>());
 
             services.AddTransient<IRequestHandler<GetStanceAbilityRequest, IReadOnlyList<AbilitySlotView>>, GetStanceAbilityRequestHandler>();
             services.AddTransient<IRequestHandler<GetAbilityUpgradeViewRequest, AbilityUpgradeView>, GetAbilityUpgradeViewRequestHandler>();

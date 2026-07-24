@@ -12,12 +12,16 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 15 },
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_Scout_Sash",
@@ -31,12 +35,16 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 15 },
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_Cloth",
@@ -50,12 +58,16 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 15 },
+                    "value": {
+                        "min": 5,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_of_Hunter",
@@ -69,18 +81,25 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": { "min": 100, "max": 250 },
+                    "value": {
+                        "min": 100,
+                        "max": 250
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 100, "max": 250 },
+                    "value": {
+                        "min": 100,
+                        "max": 250
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_of_Knight",
@@ -94,18 +113,25 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 200, "max": 370 },
+                    "value": {
+                        "min": 200,
+                        "max": 370
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "BlockChance",
                     "modifierType": "flat",
-                    "value": { "min": 0.01, "max": 0.05 },
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_of_Inquisitor",
@@ -119,18 +145,25 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 120, "max": 200 },
+                    "value": {
+                        "min": 120,
+                        "max": 200
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": { "min": 75, "max": 155 },
+                    "value": {
+                        "min": 75,
+                        "max": 155
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_Of_Life",
@@ -144,12 +177,16 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 150, "max": 270 },
+                    "value": {
+                        "min": 150,
+                        "max": 270
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         },
         {
             "id": "Belt_Life_Flow",
@@ -178,7 +215,8 @@
                         "percent": 0.05
                     }
                 }
-            ]
+            ],
+            "basePrice": 50
         },
         {
             "id": "Belt_Mana_Flow",
@@ -207,7 +245,8 @@
                         "percent": 0.05
                     }
                 }
-            ]
+            ],
+            "basePrice": 50
         },
         {
             "id": "Belt_Ether_Flow",
@@ -236,7 +275,8 @@
                         "percent": 0.15
                     }
                 }
-            ]
+            ],
+            "basePrice": 50
         },
         {
             "id": "Belt_Creators_Core",
@@ -274,7 +314,8 @@
                     }
                 }
             ],
-            "grants": []
+            "grants": [],
+            "basePrice": 50
         }
     ]
 }

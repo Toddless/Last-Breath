@@ -15,7 +15,8 @@
             "maxUpdateLevel": 12,
             "implicits": [],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Simple_Axe",
@@ -31,7 +32,8 @@
             "updateLevel": 0,
             "maxUpdateLevel": 12,
             "implicits": [],
-            "modifiers": []
+            "modifiers": [],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Simple_Sword",
@@ -48,7 +50,8 @@
             "maxUpdateLevel": 12,
             "implicits": [],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Simple_Wand",
@@ -65,7 +68,8 @@
             "maxUpdateLevel": 12,
             "implicits": [],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Bloodthirsty",
@@ -132,7 +136,8 @@
                         "healPercent": 0.25
                     }
                 }
-            ]
+            ],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Righteous_Wrath",
@@ -184,7 +189,8 @@
                         "incinerationDuration": 2
                     }
                 }
-            ]
+            ],
+            "basePrice": 100
         },
         {
             "id": "Weapon_Silent_Fury",
@@ -241,7 +247,8 @@
                         "chance": 0.3
                     }
                 }
-            ]
+            ],
+            "basePrice": 100
         },
         {
             "id": "Weapon_All_Cutting",
@@ -261,7 +268,8 @@
             "maxUpdateLevel": 69,
             "implicits": [],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 100
         }
     ]
 }

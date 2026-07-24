@@ -37,6 +37,10 @@ namespace Core.Items
         public Rarity Rarity { get; init; }
         public string[] Tags { get; init; } = [];
 
+        /// <summary>Authored base gold price; the instance's gold value is computed by ItemValuation
+        /// on top of it (rarity/sharpening/ascension). 0 = unpriced (untradable).</summary>
+        public int BasePrice { get; init; }
+
         /// <summary>Starting level spec: fixed (Min == Max) or a range the minter rolls.</summary>
         public LevelRangeData UpdateLevel { get; init; }
 

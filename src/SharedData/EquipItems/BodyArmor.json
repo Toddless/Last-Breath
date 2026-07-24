@@ -14,18 +14,25 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 180, "max": 350 },
+                    "value": {
+                        "min": 180,
+                        "max": 350
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 300, "max": 750 },
+                    "value": {
+                        "min": 300,
+                        "max": 750
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Steel_Bastion",
@@ -41,18 +48,25 @@
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 500, "max": 900 },
+                    "value": {
+                        "min": 500,
+                        "max": 900
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "inc",
-                    "value": { "min": 0.25, "max": 0.6 },
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.6
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Vital_Core",
@@ -68,18 +82,25 @@
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 300, "max": 500 },
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "inc",
-                    "value": { "min": 0.2, "max": 0.35 },
+                    "value": {
+                        "min": 0.2,
+                        "max": 0.35
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Hunter_Chestplate",
@@ -95,18 +116,25 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": { "min": 500, "max": 900 },
+                    "value": {
+                        "min": 500,
+                        "max": 900
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "inc",
-                    "value": { "min": 0.25, "max": 0.6 },
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.6
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Hunters_Dream",
@@ -122,18 +150,25 @@
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": { "min": 280, "max": 420 },
+                    "value": {
+                        "min": 280,
+                        "max": 420
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 200, "max": 350 },
+                    "value": {
+                        "min": 200,
+                        "max": 350
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Feral_Instinct",
@@ -149,18 +184,25 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 220, "max": 440 },
+                    "value": {
+                        "min": 220,
+                        "max": 440
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 200, "max": 400 },
+                    "value": {
+                        "min": 200,
+                        "max": 400
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Archmage_Mantle",
@@ -176,18 +218,25 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 400, "max": 900 },
+                    "value": {
+                        "min": 400,
+                        "max": 900
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "inc",
-                    "value": { "min": 0.25, "max": 0.6 },
+                    "value": {
+                        "min": 0.25,
+                        "max": 0.6
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Mysterious_Bastion",
@@ -203,18 +252,25 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 180, "max": 280 },
+                    "value": {
+                        "min": 180,
+                        "max": 280
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 300, "max": 500 },
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Aegis",
@@ -230,18 +286,25 @@
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 180, "max": 280 },
+                    "value": {
+                        "min": 180,
+                        "max": 280
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Evade",
                     "modifierType": "flat",
-                    "value": { "min": 300, "max": 500 },
+                    "value": {
+                        "min": 300,
+                        "max": 500
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Porcupine",
@@ -283,7 +346,8 @@
                         "armorPercent": 0.25
                     }
                 }
-            ]
+            ],
+            "basePrice": 80
         },
         {
             "id": "Body_Carapace",
@@ -316,7 +380,8 @@
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Strong_Spirit",
@@ -349,7 +414,8 @@
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         },
         {
             "id": "Body_Ice_Mage",
@@ -389,7 +455,8 @@
                         "damage": 300
                     }
                 }
-            ]
+            ],
+            "basePrice": 80
         },
         {
             "id": "Body_Disaster_Herald",
@@ -428,7 +495,8 @@
                         "damage": 300
                     }
                 }
-            ]
+            ],
+            "basePrice": 80
         },
         {
             "id": "Body_Creators_Vestment",
@@ -484,7 +552,8 @@
                     }
                 }
             ],
-            "grants": []
+            "grants": [],
+            "basePrice": 80
         }
     ]
 }

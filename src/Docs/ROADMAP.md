@@ -42,13 +42,16 @@ Current crafting resources are broken against the new affix model (prefix/suffix
 - [ ] Deferred to #151: new resource ids from the draft + non-line essence effects (DoT stack duration, mastery perks, max-sharpening ops).
 - [ ] Finish the empty draft sections (Todd): Fabric-Weapon, Leather-Jewellery/Weapon, Bone-Armor.
 
-## Stage 3 — Trade (~1–2 weeks)
+## Stage 3 — Trade (~1–2 weeks) ← CURRENT
 
-Closes the economy loop (loot → gold → purchases) and activates already-built hooks: reputation perks await a consumer, `StartTrade` dialogue action is promised in the enum, prices-from-RelationLevel are designed.
+Closes the economy loop (loot → gold → purchases) and activates already-built hooks. Design locked with Todd 2026-07-24: gold is a WALLET counter (not a bag item); price is an INSTANCE VALUATION (`basePrice(blueprint) × rarityMult × (1 + k × upgradeLevel) × ascension`), authored basePrice on blueprints/items + multipliers in `SharedData/Trade/TradeConfiguration.json`; loot-table prices are generator budget units, NOT gold — untouched; trader stock is a HYBRID (authored json catalog id+count+chance + a few random equip slots from the loot pipeline), restocked on game time; entry via the `StartTrade` dialogue action.
 
-- [ ] Trader window + trader inventory (JSON data like everything else).
-- [ ] Item gold price (decide storage: in item data — recommended).
-- [ ] Prices × RelationLevel + `Perk_Price_Change` — first consumer of `ReputationPerkProvider`.
+- [x] Core (2026-07-24): `IWalletService` (events, save section v1, session reset) + `ItemValuation` + `TradeConfiguration.json`; `basePrice` plumbed through blueprints and resources.
+- [x] basePrice placeholder pass (2026-07-24, Todd's call — balance later): 105 blueprints by piece (Weapon 100 … Belt 50), 46 resources by rarity target (final shelf price 5…400).
+- [x] Trader service (2026-07-24): `TraderProvider` (`SharedData/Traders/Traders.json`) + `TraderService` — catalog chance rolls, purchases decrement, lazy game-time restock, random equip slots minted through `IItemCreationService` (uniques/mythics never roll on shelves), session reset. First trader authored: `Trader_Human_Merchant`. KNOWN GAP: stock is NOT saved yet (a reload restocks — revisit with the anti-savescam pass).
+- [x] Buy/Sell via the bus (2026-07-24): `BuyItemRequest`/`SellItemRequest` handlers (all-or-nothing: wallet check-then-spend, full bag refunds); `TradePricing` — buy = valuation × (1 + `Perk_Price_Change`), sell = valuation × buyback × (1 − perk) — first consumer of `ReputationPerkProvider`; unpriced items refuse instead of guessing.
+- [ ] TradeWindow UI + wallet display (scene by Todd, code + spec by Claude); `StartTrade` dialogue action wiring; first trader NPC + dialogue content.
+- [x] Gold entry (design Todd + sim-tuned 2026-07-24): the kill's FINAL budget leftover (after the quality swap) mints a `GoldItem` pile on the floor (normal drop channel; pickup credits the wallet, never the bag). `goldPerBudgetUnit: 4` → 10.7 gold per regular kill, 3.7 for a lvl-1, 5.8 for a boss (its budget buys items instead); `maxGoldPerKill: 300` anti-jackpot fuse (uncapped, an overfed archon minted 46.5k). Curve with the cap: Stack_3 62 → Stack_7 130 → Extreme_Archon 291. Invariant pins both ends. Still open: quest gold rewards (narrative action), pile icon art.
 
 ## Stage 4 — Demo content & balance (~2 weeks, parallel with Stage 5)
 

@@ -15,12 +15,16 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": { "min": 10, "max": 15 },
+                    "value": {
+                        "min": 10,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Dexterity",
@@ -37,12 +41,16 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": { "min": 10, "max": 15 },
+                    "value": {
+                        "min": 10,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Intelligence",
@@ -59,12 +67,16 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": { "min": 10, "max": 15 },
+                    "value": {
+                        "min": 10,
+                        "max": 15
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Of_Limitless_Magic",
@@ -81,18 +93,25 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Mana",
                     "modifierType": "flat",
-                    "value": { "min": 100, "max": 200 },
+                    "value": {
+                        "min": 100,
+                        "max": 200
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Minor_Barrier",
@@ -109,18 +128,25 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Barrier",
                     "modifierType": "flat",
-                    "value": { "min": 120, "max": 200 },
+                    "value": {
+                        "min": 120,
+                        "max": 200
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Archmage_Signet",
@@ -137,18 +163,25 @@
                 {
                     "parameter": "Intelligence",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "MulticastChance",
                     "modifierType": "flat",
-                    "value": { "min": 0.01, "max": 0.05 },
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Hunter",
@@ -165,18 +198,25 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Accuracy",
                     "modifierType": "flat",
-                    "value": { "min": 250, "max": 380 },
+                    "value": {
+                        "min": 250,
+                        "max": 380
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Assassin",
@@ -193,18 +233,25 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "CriticalChance",
                     "modifierType": "flat",
-                    "value": { "min": 0.01, "max": 0.05 },
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Trickster",
@@ -221,18 +268,25 @@
                 {
                     "parameter": "Dexterity",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "AdditionalHitChance",
                     "modifierType": "flat",
-                    "value": { "min": 0.01, "max": 0.05 },
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Knight",
@@ -249,18 +303,25 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "BlockChance",
                     "modifierType": "flat",
-                    "value": { "min": 0.01, "max": 0.05 },
+                    "value": {
+                        "min": 0.01,
+                        "max": 0.05
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Of_Legionnaire",
@@ -277,18 +338,25 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Armor",
                     "modifierType": "flat",
-                    "value": { "min": 150, "max": 280 },
+                    "value": {
+                        "min": 150,
+                        "max": 280
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Giant",
@@ -305,18 +373,25 @@
                 {
                     "parameter": "Strength",
                     "modifierType": "flat",
-                    "value": { "min": 5, "max": 10 },
+                    "value": {
+                        "min": 5,
+                        "max": 10
+                    },
                     "scope": "Local"
                 },
                 {
                     "parameter": "Health",
                     "modifierType": "flat",
-                    "value": { "min": 100, "max": 190 },
+                    "value": {
+                        "min": 100,
+                        "max": 190
+                    },
                     "scope": "Local"
                 }
             ],
             "modifiers": [],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Of_Fire_Demon",
@@ -373,7 +448,8 @@
                     }
                 }
             ],
-            "grants": []
+            "grants": [],
+            "basePrice": 70
         },
         {
             "id": "Ring_Hell_Servant",
@@ -446,7 +522,8 @@
                         "chance": 0.1
                     }
                 }
-            ]
+            ],
+            "basePrice": 70
         },
         {
             "id": "Ring_Submittion_Mark",
@@ -485,7 +562,8 @@
                     "kind": "Passive",
                     "properties": {}
                 }
-            ]
+            ],
+            "basePrice": 70
         },
         {
             "id": "Ring_of_Creators",
@@ -503,7 +581,7 @@
                     "parameter": "CriticalDamage",
                     "modifierType": "flat",
                     "value": {
-                        "min": 1.0,
+                        "min": 1,
                         "max": 1.5
                     }
                 },
@@ -554,7 +632,8 @@
                         "percent": 0.07
                     }
                 }
-            ]
+            ],
+            "basePrice": 70
         }
     ]
 }

@@ -498,7 +498,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Armor",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Jewellery_Dust",
@@ -510,7 +511,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Jewellery",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Weapon_Dust",
@@ -522,7 +524,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Weapon",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Blacksmith_Rune",
@@ -534,7 +537,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Armor",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Jeweler_Rune",
@@ -546,7 +550,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Jewellery",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Weapon_Rune",
@@ -558,7 +563,8 @@
             ],
             "rarity": "Uncommon",
             "category": "Weapon",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Simple_Flux",
@@ -569,7 +575,8 @@
                 "Flux"
             ],
             "rarity": "Uncommon",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Fine_Flux",
@@ -580,7 +587,8 @@
                 "Flux"
             ],
             "rarity": "Rare",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 12
         },
         {
             "id": "Upgrade_Resource_Quality_Flux",
@@ -591,7 +599,8 @@
                 "Flux"
             ],
             "rarity": "Epic",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 19
         },
         {
             "id": "Upgrade_Resource_Perfect_Flux",
@@ -602,7 +611,8 @@
                 "Flux"
             ],
             "rarity": "Legendary",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 26
         },
         {
             "id": "Upgrade_Resource_Apprentice_Rune",
@@ -613,7 +623,8 @@
                 "Rune"
             ],
             "rarity": "Uncommon",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Journeyman_Rune",
@@ -624,7 +635,8 @@
                 "Rune"
             ],
             "rarity": "Rare",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 12
         },
         {
             "id": "Upgrade_Resource_Master_Rune",
@@ -635,7 +647,8 @@
                 "Rune"
             ],
             "rarity": "Epic",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 19
         },
         {
             "id": "Upgrade_Resource_Grandmaster_Rune",
@@ -646,7 +659,8 @@
                 "Rune"
             ],
             "rarity": "Legendary",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 26
         },
         {
             "id": "Upgrade_Resource_Weaponsmith_Mark",
@@ -659,7 +673,8 @@
             ],
             "rarity": "Mythic",
             "category": "Weapon",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 27
         },
         {
             "id": "Upgrade_Resource_Jeweler_Mark",
@@ -672,7 +687,8 @@
             ],
             "rarity": "Mythic",
             "category": "Jewellery",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 27
         },
         {
             "id": "Upgrade_Resource_Armorsmith_Mark",
@@ -685,7 +701,8 @@
             ],
             "rarity": "Mythic",
             "category": "Armor",
-            "maxStackSize": 999
+            "maxStackSize": 999,
+            "basePrice": 27
         }
     ],
     "craftingResources": [
@@ -771,7 +788,8 @@
                 "Metal",
                 "Copper"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Gold_Ore",
@@ -802,7 +820,8 @@
                 "Metal",
                 "Gold"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Iron_Ore",
@@ -839,7 +858,8 @@
                 "Metal",
                 "Iron"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Deer_Leather",
@@ -870,7 +890,8 @@
                 "Leather",
                 "Deer"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Wild_Boar_Leather",
@@ -901,7 +922,8 @@
                 "Leather",
                 "WildBoar"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Diamond_Gem",
@@ -939,7 +961,8 @@
                 "Gem",
                 "Diamond"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Emerald_Gem",
@@ -984,7 +1007,8 @@
                 "Gem",
                 "Emerald"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Ruby_Gem",
@@ -1029,7 +1053,8 @@
                 "Gem",
                 "Ruby"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Linen_Fabric",
@@ -1060,7 +1085,8 @@
                 "Fabric",
                 "Linen"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Silk_Fabric",
@@ -1098,7 +1124,8 @@
                 "Fabric",
                 "Silk"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Critical_Chance",
@@ -1129,7 +1156,8 @@
                 "Essence",
                 "Critical"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Damage",
@@ -1160,7 +1188,8 @@
                 "Essence",
                 "Damage"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Health",
@@ -1191,7 +1220,8 @@
                 "Essence",
                 "Health"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Armor",
@@ -1222,7 +1252,8 @@
                 "Essence",
                 "Armor"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Evade",
@@ -1253,7 +1284,8 @@
                 "Essence",
                 "Evade"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Essence_Barrier",
@@ -1284,7 +1316,8 @@
                 "Essence",
                 "Barrier"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Silver_Ore",
@@ -1315,7 +1348,8 @@
                 "Metal",
                 "Silver"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Mithril_Ore",
@@ -1346,7 +1380,8 @@
                 "Metal",
                 "Mithril"
             ],
-            "rarity": "Rare"
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Adamantite_Ore",
@@ -1384,7 +1419,8 @@
                 "Metal",
                 "Adamantite"
             ],
-            "rarity": "Legendary"
+            "rarity": "Legendary",
+            "basePrice": 26
         },
         {
             "id": "Crafting_Resource_Sapphire_Gem",
@@ -1429,7 +1465,8 @@
                 "Gem",
                 "Sapphire"
             ],
-            "rarity": "Rare"
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Amethyst_Gem",
@@ -1467,7 +1504,8 @@
                 "Gem",
                 "Amethyst"
             ],
-            "rarity": "Rare"
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Topaz_Gem",
@@ -1512,7 +1550,8 @@
                 "Gem",
                 "Topaz"
             ],
-            "rarity": "Epic"
+            "rarity": "Epic",
+            "basePrice": 19
         },
         {
             "id": "Crafting_Resource_Wolf_Leather",
@@ -1543,7 +1582,8 @@
                 "Leather",
                 "Wolf"
             ],
-            "rarity": "Common"
+            "rarity": "Common",
+            "basePrice": 5
         },
         {
             "id": "Crafting_Resource_Bear_Leather",
@@ -1581,7 +1621,8 @@
                 "Leather",
                 "Bear"
             ],
-            "rarity": "Rare"
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Direwolf_Leather",
@@ -1619,7 +1660,8 @@
                 "Leather",
                 "Direwolf"
             ],
-            "rarity": "Epic"
+            "rarity": "Epic",
+            "basePrice": 19
         },
         {
             "id": "Crafting_Resource_Wolf_Fang",
@@ -1650,7 +1692,8 @@
                 "Bone",
                 "Wolf"
             ],
-            "rarity": "Common"
+            "rarity": "Common",
+            "basePrice": 5
         },
         {
             "id": "Crafting_Resource_Boar_Tusk",
@@ -1681,7 +1724,8 @@
                 "Bone",
                 "Boar"
             ],
-            "rarity": "Uncommon"
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Bear_Claw",
@@ -1719,7 +1763,8 @@
                 "Bone",
                 "Bear"
             ],
-            "rarity": "Rare"
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Ancient_Fang",
@@ -1757,7 +1802,8 @@
                 "Bone",
                 "Ancient"
             ],
-            "rarity": "Legendary"
+            "rarity": "Legendary",
+            "basePrice": 26
         }
     ]
 }

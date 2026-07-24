@@ -1,28 +1,28 @@
 # Loot simulation report
 
-Seed: `20260710`, date: 2026-07-24 11:13
+Seed: `20260710`, date: 2026-07-24 12:31
 
 ## Summary
 
-| Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty |
-|---|---|---|---|---|---|---|---|
-| Baseline_Regular | 10000 | 0 | 1.92 | 6.32 | 8 | 8.91 | 6.32 |
-| Baseline_Boss | 10000 | 0 | 12.71 | 471.76 | 712 | 344.54 | 471.76 |
-| Axis_Npc_Modifier_Scale_Double_Health | 10000 | 1.9 | 23.87 | 1256.81 | 1574 | 999.17 | 661.48 |
-| Axis_Npc_Modifier_Tier_Upgrade_To_Maximum | 10000 | 0.9 | 19.76 | 2598.95 | 4286 | 654.63 | 2887.72 |
-| Axis_Npc_Modifier_Tier_Upgrade_By_One | 10000 | 0.5 | 16.93 | 1397.47 | 2013 | 516.81 | 2794.93 |
-| Axis_Npc_Modifier_Guaranteed_Items_Crafting_Resource | 10000 | 0.4 | 20.07 | 657.79 | 924 | 482.36 | 1644.48 |
-| Axis_Npc_Modifier_Tier_Multiplier_Huge | 10000 | 0.3 | 15.05 | 597.81 | 855 | 447.9 | 1992.7 |
-| Axis_Npc_Modifier_Item_Effect_Vampire | 10000 | 0.3 | 15.23 | 603.02 | 872 | 447.9 | 2010.08 |
-| Axis_Npc_Modifier_Rarity_Upgrade_Huge | 10000 | 0.3 | 15.16 | 599.95 | 858 | 447.9 | 1999.83 |
-| Axis_Npc_Modifier_Min_Rarity_Epic | 10000 | 0.3 | 15.23 | 601.02 | 871 | 447.9 | 2003.4 |
-| Stack_1_mods | 10000 | 0.59 | 25.21 | 1900.5 | 3155 | 1660.08 | 3238.19 |
-| Stack_3_mods | 10000 | 1.74 | 26.5 | 3538.38 | 6066 | 2870.73 | 2028.68 |
-| Stack_5_mods | 10000 | 2.91 | 27.58 | 5434.67 | 9476 | 4087.78 | 1869.15 |
-| Stack_7_mods | 10000 | 4.09 | 28.56 | 7505.35 | 12121 | 5327.19 | 1834 |
-| Stack_11_mods | 10000 | 6.4 | 30.69 | 10832.74 | 13100 | 7744.37 | 1691.83 |
-| Extreme_Archon | 10000 | 6.42 | 30.61 | 11529.55 | 12664 | 14720.07 | 1796.42 |
-| Extreme_Lvl1 | 10000 | 0 | 1.91 | 5.81 | 6 | 6.75 | 5.81 |
+| Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty | Gold/kill |
+|---|---|---|---|---|---|---|---|---|
+| Baseline_Regular | 10000 | 0 | 1.92 | 6.32 | 8 | 8.91 | 6.32 | 10.71 |
+| Baseline_Boss | 10000 | 0 | 12.71 | 471.76 | 712 | 344.54 | 471.76 | 5.79 |
+| Axis_Npc_Modifier_Scale_Double_Health | 10000 | 1.9 | 23.87 | 1256.81 | 1574 | 999.17 | 661.48 | 37.9 |
+| Axis_Npc_Modifier_Tier_Upgrade_To_Maximum | 10000 | 0.9 | 19.76 | 2598.95 | 4286 | 654.63 | 2887.72 | 15.01 |
+| Axis_Npc_Modifier_Tier_Upgrade_By_One | 10000 | 0.5 | 16.93 | 1397.47 | 2013 | 516.81 | 2794.93 | 9.17 |
+| Axis_Npc_Modifier_Guaranteed_Items_Crafting_Resource | 10000 | 0.4 | 20.07 | 657.79 | 924 | 482.36 | 1644.48 | 6.16 |
+| Axis_Npc_Modifier_Tier_Multiplier_Huge | 10000 | 0.3 | 15.05 | 597.81 | 855 | 447.9 | 1992.7 | 8.61 |
+| Axis_Npc_Modifier_Item_Effect_Vampire | 10000 | 0.3 | 15.23 | 603.02 | 872 | 447.9 | 2010.08 | 8.57 |
+| Axis_Npc_Modifier_Rarity_Upgrade_Huge | 10000 | 0.3 | 15.16 | 599.95 | 858 | 447.9 | 1999.83 | 8.64 |
+| Axis_Npc_Modifier_Min_Rarity_Epic | 10000 | 0.3 | 15.23 | 601.02 | 871 | 447.9 | 2003.4 | 8.57 |
+| Stack_1_mods | 10000 | 0.59 | 25.21 | 1900.5 | 3155 | 1660.08 | 3238.19 | 45.96 |
+| Stack_3_mods | 10000 | 1.74 | 26.5 | 3538.38 | 6066 | 2870.73 | 2028.68 | 61.9 |
+| Stack_5_mods | 10000 | 2.91 | 27.58 | 5434.67 | 9476 | 4087.78 | 1869.15 | 94.94 |
+| Stack_7_mods | 10000 | 4.09 | 28.56 | 7505.35 | 12121 | 5327.19 | 1834 | 129.58 |
+| Stack_11_mods | 10000 | 6.4 | 30.69 | 10832.74 | 13100 | 7744.37 | 1691.83 | 222.24 |
+| Extreme_Archon | 10000 | 6.42 | 30.61 | 11529.55 | 12664 | 14720.07 | 1796.42 | 291.23 |
+| Extreme_Lvl1 | 10000 | 0 | 1.91 | 5.81 | 6 | 6.75 | 5.81 | 3.74 |
 
 ## Baseline_Regular
 

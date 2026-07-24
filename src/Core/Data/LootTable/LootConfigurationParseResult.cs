@@ -12,5 +12,7 @@ namespace Core.Data.LootTable
         float ItemModifierMultiplier,
         int MaxItemsPerKill,
         Dictionary<EntityType, float> BaseBudget,
-        Dictionary<Rarity, float> RarityMultipliers);
+        Dictionary<Rarity, float> RarityMultipliers,
+        float GoldPerBudgetUnit = 0f,
+        int MaxGoldPerKill = 0);
 }

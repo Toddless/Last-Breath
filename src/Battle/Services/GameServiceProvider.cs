@@ -7,6 +7,7 @@ namespace Battle.Services
     using Core.Reputation;
     using Core.Save;
     using Core.Services;
+    using Core.Session;
     using Internal.Npc;
     using Internal.World;
     using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +43,11 @@ namespace Battle.Services
                 // World facts: the boss-gate reads them ("the twin is finally dead"); the tracker writes them.
                 .AddSingleton<Core.Narrative.Facts.IWorldFactsService, Core.Narrative.Facts.WorldFactsService>()
                 .AddSingleton<Core.Narrative.Facts.NpcFinalDeathFactTracker>()
-                .AddSingleton<ISaveGameService, SaveGameService>());
+                .AddSingleton<ISaveGameService, SaveGameService>()
+                // Project infrastructure (module discipline): the sandbox composes its own save
+                // stack and session reset — they no longer ride in the battle module.
+                .AddSaveSystem()
+                .AddSessionReset());
             provider.AddBattleUiElementsFactory();
 
             provider.GetService<IGameDataService>().LoadAll();

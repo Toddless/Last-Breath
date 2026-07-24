@@ -5,5 +5,6 @@ namespace Core.Data.CraftingData
         MaterialData Material,
         int MaxStackSize,
         string[] Tags,
-        string Rarity);
+        string Rarity,
+        int BasePrice = 0);
 }

@@ -12,6 +12,7 @@ namespace LastBreath.Services
     using Core.Inventory;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
+    using Core.MessageBus.Requests;
     using Core.Narrative.Actions;
     using Core.Narrative.Conditions;
     using Core.Narrative.Dialogues;
@@ -22,6 +23,8 @@ namespace LastBreath.Services
     using Core.Save;
     using Core.Save.Participants;
     using Core.Services;
+    using Core.Session;
+    using Core.Trade;
     using Core.Views;
     using Core.Views.UI;
     using Crafting.Source;
@@ -29,6 +32,7 @@ namespace LastBreath.Services
     using LootGeneration.Source;
     using Microsoft.Extensions.DependencyInjection;
     using Npc;
+    using Trade;
     using UI;
     using World;
 
@@ -78,14 +82,44 @@ namespace LastBreath.Services
             services.AddSingleton<IRaidSpawnRegistry, RaidSpawnRegistry>();
             services.AddGameDataParticipant<IRaidService, RaidService>();
             services.AddSingleton<ISaveGameService, SaveGameService>();
+            // Project infrastructure (module discipline): the save stack and session reset are
+            // composed by the PROJECT, not by the battle module.
+            services.AddSaveSystem();
+            services.AddSessionReset();
             services.AddGameData("res://Data/", "res://Data/Shared/");
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<ISettingsHandler, SettingsHandler>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
+            RegisterTradeServices(services);
             services.AddCraftingSystemModuleDependencies();
             services.AddBattleSystemModuleDependencies();
             services.AddLootGenerationServices();
             RegisterNarrativeServices(services);
+        }
+
+        /// <summary>Trade is Main-owned (module discipline): wallet, the single gold-valuation
+        /// point, traders and the buy/sell gates live only in the world project. The shared
+        /// session-reset list picks the wallet/traders up through its optional GetService pattern.</summary>
+        private static void RegisterTradeServices(IServiceCollection services)
+        {
+            services.AddGameDataParticipant<ITradeConfigProvider, TradeConfigProvider>();
+            services.AddSingleton<IWalletService, WalletService>();
+            services.AddSingleton<IItemValuation>(sp => new ItemValuation(
+                sp.GetRequiredService<ITradeConfigProvider>(),
+                sp.GetService<IItemDataProvider>()));
+            services.AddGameDataParticipant<ITraderProvider, TraderProvider>();
+            services.AddSingleton<ITraderService>(sp => new TraderService(
+                sp.GetRequiredService<ITraderProvider>(),
+                sp.GetRequiredService<ITradeConfigProvider>(),
+                sp.GetService<IItemDataProvider>(),
+                sp.GetService<IItemCreationService>(),
+                sp.GetService<IWorldClock>()));
+            services.AddSingleton(sp => new TradePricing(
+                sp.GetRequiredService<IItemValuation>(),
+                sp.GetRequiredService<ITradeConfigProvider>(),
+                sp.GetService<IReputationPerkProvider>()));
+            services.AddTransient<IRequestHandler<BuyItemRequest, int>, BuyItemRequestHandler>();
+            services.AddTransient<IRequestHandler<SellItemRequest, int>, SellItemRequestHandler>();
         }
 
         /// <summary>Narrative foundation: world facts + the condition/action vocabulary shared by
@@ -146,6 +180,7 @@ namespace LastBreath.Services
             saveManager.Register(new WorldFactsSaveParticipant(provider.GetService<IWorldFactsService>()));
             saveManager.Register(new InfluenceMasterySaveParticipant(provider.GetService<IInfluenceMastery>()));
             saveManager.Register(new QuestLogSaveParticipant(provider.GetService<IQuestLogService>()));
+            saveManager.Register(new WalletSaveParticipant(provider.GetService<IWalletService>())); // trade is Main-owned
         }
 
         private static void RegisterUiFactories(IGameServiceProvider provider)

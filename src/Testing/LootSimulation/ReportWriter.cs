@@ -16,14 +16,14 @@ namespace LastBreathTest.LootSimulation
 
             sb.AppendLine("## Summary");
             sb.AppendLine();
-            sb.AppendLine("| Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty |");
-            sb.AppendLine("|---|---|---|---|---|---|---|---|");
+            sb.AppendLine("| Scenario | Kills | Difficulty | Items/kill | Value/kill | p95 value | Budget | Value/difficulty | Gold/kill |");
+            sb.AppendLine("|---|---|---|---|---|---|---|---|---|");
             foreach (var result in results)
             {
                 sb.AppendLine(
                     $"| {result.Archetype.Name} | {result.Kills} | {F(result.MeanDifficulty)} | {F(result.MeanItemsPerKill)} " +
                     $"| {F(result.MeanValuePerKill)} | {F(result.Percentile(kill => kill.TotalValue, 95))} " +
-                    $"| {F(result.MeanExpectedBudget)} | {F(result.ValuePerDifficultyPoint)} |");
+                    $"| {F(result.MeanExpectedBudget)} | {F(result.ValuePerDifficultyPoint)} | {F(result.MeanGoldPerKill)} |");
             }
 
             foreach (var result in results) AppendScenario(sb, result);

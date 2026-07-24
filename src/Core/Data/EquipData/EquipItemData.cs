@@ -13,6 +13,7 @@ namespace Core.Data.EquipData
         [JsonProperty("criticalChance")] public float CritChance { get; init; }
         [JsonProperty("criticalDamage")] public float CritDamage { get; init; }
         [JsonProperty("maxStackSize")] public int MaxStackSize { get; init; } = 1;
+        [JsonProperty("basePrice")] public int BasePrice { get; init; }
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];
         [JsonProperty("updateLevel")] public LevelRangeData UpdateLevel { get; init; }
