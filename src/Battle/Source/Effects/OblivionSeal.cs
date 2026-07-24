@@ -13,6 +13,8 @@ namespace Battle.Source.Effects
     public class OblivionSeal(int duration, int maxStacks = 1)
         : Effect(id: "Effect_Seal_Of_Oblivion", duration, maxStacks, StatusEffects.Cursed)
     {
+        public override bool IsHarmful => true;
+
         public override async Task Apply(EffectApplyingContext context)
         {
             await base.Apply(context);

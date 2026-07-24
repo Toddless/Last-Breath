@@ -27,7 +27,7 @@
         public IReadOnlyList<EffectView> GetEffectViews() =>
             _orderedEffects
                 .GroupBy(effect => effect.Id)
-                .Select(group => new EffectView(group.Key, group.First().Icon, group.Count(), group.Max(effect => effect.Duration), group.First().Description))
+                .Select(group => new EffectView(group.Key, group.First().Icon, group.Count(), group.Max(effect => effect.Duration), group.First().Description, group.First().IsHarmful))
                 .ToList();
 
         public IEnumerable<IEffect> GetBy(Func<IEffect, bool> predicate) => _effectsBySource.Values.ToList().SelectMany(list => list.Where(predicate));

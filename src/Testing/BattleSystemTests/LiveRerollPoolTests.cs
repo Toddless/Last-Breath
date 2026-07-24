@@ -184,6 +184,35 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(seenParameters.Contains(EntityParameter.Damage), "a Weapon-only entry must never land on a Jewellery item");
         }
 
+        [TestMethod]
+        public void EssenceInTheOptionalSlot_FeedsTheRerollPool_CategoryGated()
+        {
+            // Stage-4 UI fix companion: a plain essence passed as the operation's additive joins
+            // the reroll union with its own descriptors — while its Weapon-only entry still never
+            // lands on a Jewellery item.
+            var provider = EmptyPoolProvider();
+            provider.Setup(mock => mock.GetResourceDescriptors("Essence")).Returns(
+            [
+                new ParameterDescriptor(EntityParameter.Barrier, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
+            ]);
+
+            var seenParameters = new HashSet<EntityParameter>();
+            for (int seed = 0; seed < 30; seed++)
+            {
+                var item = new EquipItem(EquipmentPiece.Amulet, LootItemId, []);
+                var line = new SimpleModifier(EntityParameter.Health, ModifierValueType.Flat, 5f, "test") { Affix = AffixKind.Prefix };
+                item.AddAdditionalModifier(line);
+
+                string? rerolledId = CreateUpgrader(seed, provider.Object).TryRecraftModifier(item, line.InstanceId, ["Essence"]);
+                Assert.IsNotNull(rerolledId, $"seed {seed}: the essence descriptors must make the reroll possible");
+                seenParameters.Add(((SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == rerolledId)).EntityParameter);
+            }
+
+            Assert.IsTrue(seenParameters.Contains(EntityParameter.Barrier), "the essence's entry must be rollable");
+            Assert.IsFalse(seenParameters.Contains(EntityParameter.Damage), "a Weapon-only essence entry must never land on a Jewellery item");
+        }
+
         private static ItemUpgrader CreateUpgrader(int seed, IItemDataProvider provider)
         {
             var rnd = new DefaultRandomNumberGenerator(seed);

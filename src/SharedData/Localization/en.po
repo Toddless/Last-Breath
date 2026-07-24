@@ -1706,6 +1706,42 @@ msgstr "Ascension is irreversible: the ascended item is sealed and can never be 
 msgid "UI_Craft_Success_Chance"
 msgstr "Success chance: {Chance:%}"
 
+msgid "UI_Craft_Mastery"
+msgstr "Crafting Mastery"
+
+msgid "UI_Mastery_Max"
+msgstr "MAX"
+
+msgid "UI_Mastery_Channel_Upgrade"
+msgstr "Upgrade success"
+
+msgid "UI_Mastery_Channel_Values"
+msgstr "Modifier values"
+
+msgid "UI_Mastery_Channel_Rarity"
+msgstr "Rarity chance"
+
+msgid "UI_Mastery_Channel_Effect"
+msgstr "Extra effect"
+
+msgid "UI_Mastery_Channel_Mythic"
+msgstr "Mythic modifier"
+
+msgid "UI_Mastery_Channel_Salvage"
+msgstr "Salvage return"
+
+msgid "UI_Craft_Forecast"
+msgstr "Craft forecast"
+
+msgid "UI_Craft_Forecast_Hint"
+msgstr "mastery included"
+
+msgid "UI_Forecast_Extra_Level"
+msgstr "Extra level on success"
+
+msgid "UI_Forecast_Min_Rarity"
+msgstr "Minimum rarity"
+
 msgid "UI_Item_Implicits"
 msgstr "Implicits"
 
@@ -1762,6 +1798,9 @@ msgstr "Effects"
 
 msgid "UI_Bar_Modifiers"
 msgstr "Modifiers"
+
+msgid "UI_Effect_Duration"
+msgstr "Lasts {Duration|turn|turns}"
 
 msgid "WeaponType_Dagger"
 msgstr "Dagger"
@@ -3570,3 +3609,9 @@ msgstr "Ah, a customer with a pulse. Rare thing on this road. Take a look - ever
 
 msgid "Dlg_Merchant_Opt_Trade"
 msgstr "Show me your goods."
+
+msgid "UI_Inspect_Modifiers"
+msgstr "Modifiers"
+
+msgid "UI_Inspect_Effects"
+msgstr "Effects"

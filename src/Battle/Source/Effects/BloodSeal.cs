@@ -12,6 +12,8 @@ namespace Battle.Source.Effects
             modifierFactory: () => new CostTypeActivationContextModifier(Costs.Health),
             statusEffect: StatusEffects.Cursed)
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new BloodSeal(Duration, MaxStacks);
     }
 }

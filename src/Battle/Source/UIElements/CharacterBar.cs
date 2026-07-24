@@ -105,20 +105,20 @@ namespace Battle.Source.UIElements
             _factionBadge?.Visible = !string.IsNullOrEmpty(faction);
         }
 
-        /// <summary>The NPC difficulty modifiers as "name · description" rows; empty list collapses the section.</summary>
-        public void SetModifiers(IReadOnlyList<INpcModifier> modifiers)
+        /// <summary>The NPC difficulty modifier rows; empty list collapses the section.</summary>
+        public void SetModifiers(IReadOnlyList<INpcModifier> modifiers) =>
+            SetModifiers(modifiers.Select(modifier => modifier.DisplayName).ToList());
+
+        /// <summary>Snapshot flavour: the NPC inspect card carries only the display names.</summary>
+        public void SetModifiers(IReadOnlyList<string> modifierNames)
         {
             if (_mods == null || _modsSection == null) return;
 
             foreach (var child in _mods.GetChildren())
                 child.QueueFree();
 
-            foreach (var modifier in modifiers)
+            foreach (string text in modifierNames)
             {
-                string text = modifier.DisplayName;
-                // string text = string.IsNullOrEmpty(modifier.Description)
-                //     ? modifier.DisplayName
-                //     : $"{modifier.DisplayName} · {modifier.Description}";
                 _mods.AddChild(new Label
                 {
                     Text = text,
@@ -128,7 +128,7 @@ namespace Battle.Source.UIElements
                 });
             }
 
-            _modsSection.Visible = modifiers.Count > 0;
+            _modsSection.Visible = modifierNames.Count > 0;
         }
 
         /// <summary>Reconciles the effect icons with the aggregated snapshot: one slot per effect id.</summary>

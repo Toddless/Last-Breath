@@ -64,6 +64,7 @@ namespace Crafting.Source
             // affix markup) has no slot family to preserve, so it tolerantly rerolls from the FULL pool.
             var livePool = itemDataProvider.GetLiveRerollPool(item)
                 .Concat(AdditivePools(additiveResourceIds))
+                .Concat(AdditiveResourceDescriptors(additiveResourceIds, item))
                 .Select(descriptor => DescriptorOperations.Scale(descriptor, item.PowerMultiplier));
 
             // No duplicate lines: a candidate whose key (parameter + value type, NEVER the value) already
@@ -117,6 +118,8 @@ namespace Crafting.Source
         // so the chance bar can never drift from what TryUpgradeItem actually rolls against.
         public float GetUpgradeChance(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null) =>
             ComputeUpgradeChance(item.UpdateLevel, AdditiveEffects(additiveResourceIds));
+
+        public float GetBaseUpgradeChance(IEquipItem item) => Mathf.Clamp(GetChance(item.UpdateLevel), 0f, 1f);
 
         public ItemUpgradeResult TryUpgradeItem(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null)
         {
@@ -199,6 +202,13 @@ namespace Crafting.Source
             AdditiveEffects(resourceIds)
                 .Where(effects => !string.IsNullOrEmpty(effects.RecraftPoolId))
                 .SelectMany(effects => itemDataProvider.GetEquipItemModifierPool(effects.RecraftPoolId!));
+
+        /// <summary>Essences ride the optional slots as PLAIN resources: their own descriptors join
+        /// the operation's pool exactly like creation (where every used resource feeds the roll).
+        /// Entries restricted to another equipment category are gated out.</summary>
+        private IEnumerable<IModifierDescriptor> AdditiveResourceDescriptors(IReadOnlyCollection<string>? resourceIds, IEquipItem item) =>
+            (resourceIds ?? []).SelectMany(itemDataProvider.GetResourceDescriptors)
+                .ForCategory(item.EquipmentPiece.ConvertEquipmentPartToCategory());
 
         private float GetChance(int level)
         {

@@ -10,6 +10,8 @@ namespace Battle.Source.Effects
             maxStacks,
             modifierFactory: () => new CooldownIncreaseActivationContextModifier(amount))
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new SlownessSeal(Duration, MaxStacks, amount);
     }
 }

@@ -120,6 +120,9 @@ namespace Crafting.Source
         public float GetExtraEffectChance() => _config.ExtraEffectBaseChance * (1f + GetExtraEffectChanceBonus());
         public float GetMythicModifierChanceBonus() => LerpBonus(_config.Bonuses.MythicModifier);
 
+        // Channel 3, raw: the mastery panel shows the bonus itself next to the reweighted probabilities.
+        public float GetRarityChanceBonus() => LerpBonus(_config.Bonuses.RarerItem);
+
         // Ascension tuning straight from data; the gate counts bonus levels exactly like the channels do.
         public bool IsAscensionUnlocked => CurrentLevel + BonusLevel >= _config.AscensionLevelGate;
         public float AscensionStatBonus => _config.AscensionStatBonus;

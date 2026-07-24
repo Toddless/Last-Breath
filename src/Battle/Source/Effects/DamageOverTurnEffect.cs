@@ -15,6 +15,8 @@
         float percentFromDamage = 0.7f)
         : Effect(IdFor(statusEffect), duration, maxStacks, statusEffect), IDamageOverTurnEffect
     {
+        public override bool IsHarmful => true;
+
         private const string BaseId = "Effect_Damage_Over_Turn";
 
         public float PercentFromBase { get; } = percentFromDamage;

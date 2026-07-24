@@ -20,7 +20,13 @@
         private static readonly Color s_queueWaitingColor = new(1f, 1f, 1f, 0.45f);
         private IBattleEventBus? _battleEventBus;
         private IUiElementsManager? _uiElementProvider;
-        private Dictionary<string, CharacterBar> _characterBars = [];
+        private Dictionary<string, NpcBattleBar> _characterBars = [];
+
+        // Over-head bars: HUD children projected over the fighters'
+        // MODELS every frame — they follow melee approaches and camera zoom for free.
+        private readonly Dictionary<string, Node2D> _barBodies = [];
+        private Control? _npcBarsOverlay;
+        private const float BarOverheadOffset = 96f;
         private readonly Dictionary<string, Label> _queueLabels = [];
         private AbilityButton[] _abilitySlotsInstances = new AbilityButton[BattleConstants.AbilitySlotsPerStance];
         private static readonly float[] s_playbackSpeeds = [1f, 2f, 3f];
@@ -130,6 +136,7 @@
             _abilityBook = null;
             _battleEventBus = null;
             _characterBars.Clear();
+            _barBodies.Clear();
             _queueLabels.Clear();
             _playerBars?.ClearEffects();
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
@@ -192,19 +199,59 @@
             }
         }
 
-        /// <summary>The card reads everything off the entity itself: vitals for the bars, the
-        /// display name, the faction badge (NPCs only) and the difficulty modifier list.</summary>
+        /// <summary>The mini bar reads the entity once at creation (identity + initial vitals);
+        /// everything after arrives as replayed snapshots. The bar lives on the projection overlay
+        /// and is glued over the fighter's model in _Process; hover opens the detailed card.</summary>
         public void CreateEntityBarsWithInitialValues(IFightable entity)
         {
-            var bar = CharacterBar.Initialize().Instantiate<CharacterBar>();
+            var bar = new NpcBattleBar();
+            _characterBars.Add(entity.InstanceId, bar);
+            EnsureBarsOverlay().AddChild(bar);
+            if (entity is Node2D body) _barBodies[entity.InstanceId] = body;
+
             bar.SetInitialValues(entity.Parameters.MaxMana, entity.CurrentMana, entity.Parameters.MaxHealth, entity.CurrentHealth,
                 entity.Parameters.MaxBarrier, entity.CurrentBarrier);
             bar.SetIdentity(entity.DisplayName, entity is INpc npc ? Core.Localization.Localization.Localize($"Fraction_{npc.Fraction}") : null);
             bar.SetModifiers((entity as IFightableNpc)?.NpcModifiers.AllModifiers ?? []);
-            bar.FlipH = true;
             if (entity is IFightableNpc fightableNpc) bar.SetLevel(fightableNpc.Level);
-            _characterBars.Add(entity.InstanceId, bar);
-            _entityBars?.AddChild(bar);
+
+            HoverTooltip.Attach(bar, () => ShowInspectCard(bar));
+        }
+
+        /// <summary>Full-rect transparent host under the HUD panels: bars position themselves
+        /// absolutely, so the host must be a plain Control, never a container.</summary>
+        private Control EnsureBarsOverlay()
+        {
+            if (_npcBarsOverlay != null) return _npcBarsOverlay;
+            _npcBarsOverlay = new Control { MouseFilter = MouseFilterEnum.Ignore };
+            _npcBarsOverlay.SetAnchorsPreset(LayoutPreset.FullRect);
+            AddChild(_npcBarsOverlay);
+            MoveChild(_npcBarsOverlay, 0); // behind the HUD panels, above the arena view
+            return _npcBarsOverlay;
+        }
+
+        public override void _Process(double delta)
+        {
+            foreach ((string id, var bar) in _characterBars)
+            {
+                if (!_barBodies.TryGetValue(id, out var body) || !IsInstanceValid(body) || !body.IsInsideTree())
+                {
+                    bar.Visible = false;
+                    continue;
+                }
+
+                // Canvas transform already carries the arena camera (position + zoom).
+                var screen = body.GetGlobalTransformWithCanvas().Origin;
+                bar.Visible = true;
+                bar.Position = screen - new Vector2(bar.Size.X / 2f, BarOverheadOffset);
+            }
+        }
+
+        private IPopup? ShowInspectCard(NpcBattleBar bar)
+        {
+            if (_uiElementProvider?.ShowPopup(typeof(NpcInspectPopup)) is not NpcInspectPopup popup) return null;
+            popup.ShowFor(bar);
+            return popup;
         }
 
         public void SetPlayerStance(Stance stance) => _stanceButtons?.GetChildren().Cast<StanceSlot>().FirstOrDefault(slot => slot.Stance == stance)?.InitializeStance();
@@ -225,7 +272,7 @@
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
-        private CharacterBar? GetCharacterBar(string id) => _characterBars.GetValueOrDefault(id);
+        private NpcBattleBar? GetCharacterBar(string id) => _characterBars.GetValueOrDefault(id);
 
         private void OnPlayerMaxManaChanges(PlayerMaxManaChangesEvent obj)
         {
@@ -246,7 +293,18 @@
         /// <summary>Bars always show the snapshot, never live state — live state is "from the future" during replay.</summary>
         private void UpdateVitals(IFightable entity, VitalsSnapshot vitals)
         {
-            var bar = entity is IPlayer ? _playerBars : GetCharacterBar(entity.InstanceId);
+            if (entity is IPlayer)
+            {
+                _playerBars?.UpdateHealth(vitals.Health);
+                _playerBars?.UpdateMaxHealth(vitals.MaxHealth);
+                _playerBars?.UpdateMana(vitals.Mana);
+                _playerBars?.UpdateMaxMana(vitals.MaxMana);
+                _playerBars?.UpdateBarrier(vitals.Barrier, vitals.MaxBarrier);
+                if (vitals.IsDead) _playerBars?.SetDead();
+                return;
+            }
+
+            var bar = GetCharacterBar(entity.InstanceId);
             if (bar == null) return;
 
             bar.UpdateHealth(vitals.Health);
@@ -269,8 +327,8 @@
 
         private void OnEffectsChanged(EffectsChangedEvent obj)
         {
-            var bar = obj.Target is IPlayer ? _playerBars : GetCharacterBar(obj.Target.InstanceId);
-            bar?.SetEffects(obj.Effects);
+            if (obj.Target is IPlayer) _playerBars?.SetEffects(obj.Effects);
+            else GetCharacterBar(obj.Target.InstanceId)?.SetEffects(obj.Effects);
         }
 
         /// <summary>Round order as grey labels: the acting fighter is lit, the rest are dimmed.</summary>

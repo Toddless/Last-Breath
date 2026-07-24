@@ -553,6 +553,42 @@ msgstr ""
 msgid "UI_Craft_Success_Chance"
 msgstr ""
 
+msgid "UI_Craft_Mastery"
+msgstr ""
+
+msgid "UI_Mastery_Max"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Upgrade"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Values"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Rarity"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Effect"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Mythic"
+msgstr ""
+
+msgid "UI_Mastery_Channel_Salvage"
+msgstr ""
+
+msgid "UI_Craft_Forecast"
+msgstr ""
+
+msgid "UI_Craft_Forecast_Hint"
+msgstr ""
+
+msgid "UI_Forecast_Extra_Level"
+msgstr ""
+
+msgid "UI_Forecast_Min_Rarity"
+msgstr ""
+
 msgid "UI_Item_Implicits"
 msgstr ""
 
@@ -608,6 +644,9 @@ msgid "UI_Bar_Effects"
 msgstr ""
 
 msgid "UI_Bar_Modifiers"
+msgstr ""
+
+msgid "UI_Effect_Duration"
 msgstr ""
 
 msgid "WeaponType_Dagger"
@@ -3035,3 +3074,9 @@ msgstr "О, живой покупатель! Редкость на этой до
 
 msgid "Dlg_Merchant_Opt_Trade"
 msgstr "Показывай товар."
+
+msgid "UI_Inspect_Modifiers"
+msgstr "Модификаторы"
+
+msgid "UI_Inspect_Effects"
+msgstr "Эффекты"

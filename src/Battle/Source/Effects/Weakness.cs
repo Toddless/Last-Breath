@@ -13,6 +13,8 @@ namespace Battle.Source.Effects
     public class Weakness(int duration, int maxStacks, float value)
         : Effect(id: "Effect_Weakness", duration, maxStacks)
     {
+        public override bool IsHarmful => true;
+
         private IDamageModifier? _modifier;
 
         public override async Task Apply(EffectApplyingContext context)

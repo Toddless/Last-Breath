@@ -21,6 +21,9 @@ namespace Core.Crafting
         Dictionary<Rarity, float> GetRarityProbabilities(float rarityBonus = 0);
         Rarity RollRarity(float rarityBonus = 0);
 
+        /// <summary>Channel 3, RAW: the lerped rarity bonus itself (for the mastery panel).</summary>
+        float GetRarityChanceBonus();
+
         /// <summary>Channel 4 — extra effect chance, RAW bonus. Applied form is <see cref="GetExtraEffectChance"/>.</summary>
         float GetExtraEffectChanceBonus();
 

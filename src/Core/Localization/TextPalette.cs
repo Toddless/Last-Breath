@@ -15,6 +15,10 @@ namespace Core.Localization
         /// <summary>Clickable keywords in descriptions ({@Effect_X} links).</summary>
         public const string Keyword = "#8fd4e8";
 
+        // Buff/debuff tint: over-head bar counters and effect tooltip titles.
+        public const string Buff = "#8cbf73";
+        public const string Debuff = "#d9735a";
+
         // Battle log accents
         public const string Crit = "#ffd75e";
         public const string System = "#909090";

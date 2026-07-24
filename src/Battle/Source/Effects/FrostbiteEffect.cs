@@ -13,6 +13,8 @@ namespace Battle.Source.Effects
     public class FrostbiteEffect(int duration, int maxStacks, float coldDamageAmp)
         : Effect(id: "Effect_Frostbite", duration, maxStacks)
     {
+        public override bool IsHarmful => true;
+
         private IDamageModifier? _modifier;
 
         public override async Task Apply(EffectApplyingContext context)

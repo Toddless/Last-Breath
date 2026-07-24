@@ -13,6 +13,8 @@
         StatusEffects statusEffect = StatusEffects.None)
         : Effect(id: "Effect_Execution", duration, maxStacks, statusEffect)
     {
+        public override bool IsHarmful => true;
+
         protected override Dictionary<string, object?> DescriptionValues
         {
             get

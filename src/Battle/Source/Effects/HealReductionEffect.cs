@@ -9,6 +9,8 @@ namespace Battle.Source.Effects
     public class HealReductionEffect(int duration, int maxStacks, float reduceBy)
         : Effect(id: "Effect_Heal_Reduction", duration, maxStacks)
     {
+        public override bool IsHarmful => true;
+
         private IHealModifier? _modifier;
 
         public override async Task Apply(EffectApplyingContext context)

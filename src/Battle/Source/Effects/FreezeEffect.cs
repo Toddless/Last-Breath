@@ -9,6 +9,8 @@ namespace Battle.Source.Effects
     /// </summary>
     public class FreezeEffect(int duration) : Effect(id: "Effect_Freeze", duration, maxStacks: 1, StatusEffects.Freeze)
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new FreezeEffect(Duration);
     }
 }

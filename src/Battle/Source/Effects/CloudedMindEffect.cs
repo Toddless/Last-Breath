@@ -10,6 +10,8 @@ namespace Battle.Source.Effects
             maxStacks,
             modifierFactory: () => new CostScaleActivationContextModifier(1 + value))
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new CloudedMindEffect(Duration, MaxStacks, value);
     }
 }

@@ -14,6 +14,8 @@ namespace Battle.Source.Effects
                 new ParameterChange(EntityParameter.ManaRecovery, 1 - value, OperationType.Multiply, Priority.Weak)
             ])
     {
+        public override bool IsHarmful => true;
+
         // Copy takes the primary-ctor value, not the transformed changes — re-inverting would flip them.
         public override IEffect Copy() => new DecayEffect(Duration, MaxStacks, value);
     }

@@ -30,5 +30,9 @@ namespace Core.Crafting
         /// against with the same resources. Non-additive ids in the collection are ignored, so callers
         /// may pass the full operation cost. Purely informational (the UI chance bar) — no state changes.</summary>
         float GetUpgradeChance(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null);
+
+        /// <summary>The bare level-curve chance of the next attempt — no mastery, no fluxes. The
+        /// forecast shows it struck through next to <see cref="GetUpgradeChance"/>.</summary>
+        float GetBaseUpgradeChance(IEquipItem item);
     }
 }

@@ -17,6 +17,8 @@ namespace Battle.Source.Effects
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new ArmorReductionEffect(Duration, MaxStacks, reduceBy);
     }
 }

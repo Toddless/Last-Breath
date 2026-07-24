@@ -43,6 +43,11 @@ namespace Crafting.Source.UIElements
         [Export] private Control? _chanceBox;
         [Export] private ProgressBar? _chanceBar;
         [Export] private Label? _chanceLabel;
+        [Export] private Label? _masteryLevel, _masteryXpLabel, _masteryTitle, _forecastHeader, _forecastHint;
+        [Export] private ProgressBar? _masteryXpBar;
+        [Export] private GridContainer? _masteryChips;
+        [Export] private Control? _forecastBox;
+        [Export] private VBoxContainer? _forecastRows;
 
         private readonly Dictionary<string, string> _categoryChoices = [];
         private readonly string?[] _additiveChoices = new string?[AdditiveSlots];
@@ -128,6 +133,9 @@ namespace Crafting.Source.UIElements
             _modeUpgrade?.Text = Localization.Localize("UI_Crafting_Upgrade");
             _modeRecraft?.Text = Localization.Localize("UI_Crafting_Recraft");
             _modeAscend?.Text = Localization.Localize("UI_Crafting_Ascend");
+            _masteryTitle?.Text = Localization.Localize("UI_Craft_Mastery").ToUpper();
+            _forecastHeader?.Text = Localization.Localize("UI_Craft_Forecast").ToUpper();
+            _forecastHint?.Text = Localization.Localize("UI_Craft_Forecast_Hint");
         }
 
         // ---------------------------------------------------------------- mode tabs
@@ -249,10 +257,12 @@ namespace Crafting.Source.UIElements
         {
             ClosePicker();
             RefreshModeTabs();
+            RenderMasteryRail();
             RenderItemHeader();
             RenderModifiers();
             RenderRequirements();
             RenderAdditives();
+            RenderForecast();
             RenderUpgradeChance();
             RenderAction();
         }
@@ -273,6 +283,185 @@ namespace Crafting.Source.UIElements
             _chanceLabel?.Text = Localization.Render("UI_Craft_Success_Chance",
                 new Dictionary<string, object?> { ["Chance"] = chance });
         }
+
+        // ---------------------------------------------------------------- mastery rail and forecast
+
+        /// <summary>The always-visible mastery strip over the mode tabs (kit's mastery rail):
+        /// level with the XP progress to the next one, then the six bonus channels as chips.
+        /// Every channel lerps on the same level factor, so each chip's mini bar IS that factor.</summary>
+        private void RenderMasteryRail()
+        {
+            if (_mastery == null || _masteryChips == null) return;
+
+            _masteryLevel?.Text = _mastery.BonusLevel > 0
+                ? $"{_mastery.CurrentLevel}+{_mastery.BonusLevel} / {_mastery.MaximumLevel}"
+                : $"{_mastery.CurrentLevel} / {_mastery.MaximumLevel}";
+
+            int expTotal = _mastery.ExpToNextLevelTotal();
+            _masteryXpBar?.Value = expTotal > 0 ? _mastery.CurrentExperience / (float)expTotal : 1f;
+            _masteryXpLabel?.Text = expTotal > 0
+                ? $"{_mastery.CurrentExperience} / {expTotal}"
+                : Localization.Localize("UI_Mastery_Max");
+
+            foreach (var child in _masteryChips.GetChildren())
+                child.QueueFree();
+
+            float progress = _mastery.MaximumLevel <= 0
+                ? 0f
+                : Mathf.Clamp((_mastery.CurrentLevel + _mastery.BonusLevel) / (float)_mastery.MaximumLevel, 0f, 1f);
+            foreach ((string key, float bonus) in MasteryChannels())
+                _masteryChips.AddChild(MasteryChip(Localization.Localize(key), bonus, progress));
+        }
+
+        private IEnumerable<(string Key, float Bonus)> MasteryChannels() =>
+        [
+            ("UI_Mastery_Channel_Upgrade", _mastery!.GetUpgradeChanceBonus()),
+            ("UI_Mastery_Channel_Values", _mastery.GetCurrentValueMultiplier() - 1f),
+            ("UI_Mastery_Channel_Rarity", _mastery.GetRarityChanceBonus()),
+            ("UI_Mastery_Channel_Effect", _mastery.GetExtraEffectChanceBonus()),
+            ("UI_Mastery_Channel_Mythic", _mastery.GetMythicModifierChanceBonus()),
+            ("UI_Mastery_Channel_Salvage", _mastery.GetResourceReturnBonus()),
+        ];
+
+        private static Control MasteryChip(string name, float bonus, float progress)
+        {
+            var chip = new PanelContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            var margin = new MarginContainer();
+            margin.AddThemeConstantOverride("margin_left", 8);
+            margin.AddThemeConstantOverride("margin_top", 6);
+            margin.AddThemeConstantOverride("margin_right", 8);
+            margin.AddThemeConstantOverride("margin_bottom", 6);
+            chip.AddChild(margin);
+
+            var content = new VBoxContainer();
+            content.AddThemeConstantOverride("separation", 2);
+            margin.AddChild(content);
+
+            var title = new Label
+            {
+                Text = name,
+                ThemeTypeVariation = "DimLabel",
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsVertical = SizeFlags.ExpandFill,
+            };
+            title.AddThemeFontSizeOverride("font_size", 10);
+            content.AddChild(title);
+
+            var value = new Label { Text = $"+{PercentText(bonus)}" };
+            value.AddThemeFontSizeOverride("font_size", 16);
+            content.AddChild(value);
+
+            content.AddChild(new ProgressBar
+            {
+                CustomMinimumSize = new Vector2(0, 3),
+                MaxValue = 1.0,
+                Step = 0.001,
+                Value = progress,
+                ShowPercentage = false,
+            });
+            return chip;
+        }
+
+        /// <summary>The kit's craft forecast under the resource slots: for the current operation the
+        /// abstract mastery channels turn into concrete odds — data base struck through, the real
+        /// chance (mastery + chosen additives, the exact numbers the handlers roll) next to it.
+        /// Only lines the mode actually rolls are shown; a reroll is deterministic — no box.</summary>
+        private void RenderForecast()
+        {
+            if (_forecastBox == null || _forecastRows == null) return;
+            foreach (var child in _forecastRows.GetChildren())
+                child.QueueFree();
+
+            var lines = ForecastLines();
+            _forecastBox.Visible = lines.Count > 0;
+            foreach ((string key, string value) in lines)
+                _forecastRows.AddChild(ForecastRow(Localization.Localize(key), value));
+        }
+
+        private List<(string Key, string Value)> ForecastLines()
+        {
+            if (_mastery == null) return [];
+            return _mode switch
+            {
+                CraftingMode.Upgrade when _item is { } item && item.UpdateLevel < item.MaxUpdateLevel && _upgrader != null =>
+                    UpgradeForecast(item),
+                CraftingMode.Create when _recipeId != null => CreateForecast(),
+                CraftingMode.Ascend when _item != null && _ascender?.CanAscend(_item) == true => AscendForecast(),
+                _ => [],
+            };
+        }
+
+        private List<(string, string)> UpgradeForecast(IEquipItem item)
+        {
+            var lines = new List<(string, string)>
+            {
+                ("UI_Mastery_Channel_Upgrade",
+                    WasNow(_upgrader!.GetBaseUpgradeChance(item), _upgrader.GetUpgradeChance(item, BuildCost().Keys))),
+            };
+
+            float extraLevel = _additiveChoices.Where(id => id != null)
+                .Sum(id => _additiveProvider?.GetEffects(id!)?.ExtraUpgradeLevelChance ?? 0f);
+            if (extraLevel > 0f)
+                lines.Add(("UI_Forecast_Extra_Level", Highlight(PercentText(extraLevel))));
+            return lines;
+        }
+
+        private List<(string, string)> CreateForecast()
+        {
+            float effectNow = _mastery!.GetExtraEffectChance();
+            float effectBase = effectNow / (1f + _mastery.GetExtraEffectChanceBonus());
+            var lines = new List<(string, string)>
+            {
+                ("UI_Mastery_Channel_Values", Highlight($"×{_mastery.GetCurrentValueMultiplier():0.00}")),
+                ("UI_Mastery_Channel_Effect", WasNow(effectBase, effectNow)),
+            };
+
+            var floorRarity = _additiveChoices.Where(id => id != null)
+                .Select(id => _additiveProvider?.GetEffects(id!)?.MinRarity)
+                .Where(rarity => rarity != null)
+                .OrderBy(rarity => rarity!.Value) // lower enum value = rarer; the best floor wins
+                .FirstOrDefault();
+            if (floorRarity != null)
+                lines.Add(("UI_Forecast_Min_Rarity",
+                    $"[color={TextPalette.RarityColor(floorRarity.Value)}]{Localization.Localize(floorRarity.Value.ToString())}[/color]"));
+            return lines;
+        }
+
+        private List<(string, string)> AscendForecast() =>
+            [("UI_Mastery_Channel_Mythic",
+                WasNow(_mastery!.GetMythicGiftChance() / (1f + _mastery.GetMythicModifierChanceBonus()), _mastery.GetMythicGiftChance()))];
+
+        private static Control ForecastRow(string name, string valueBbcode)
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 8);
+            row.AddChild(new Label
+            {
+                Text = name,
+                ThemeTypeVariation = "DimLabel",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            });
+            row.AddChild(new RichTextLabel
+            {
+                Text = valueBbcode,
+                BbcodeEnabled = true,
+                FitContent = true,
+                AutowrapMode = TextServer.AutowrapMode.Off,
+                CustomMinimumSize = new Vector2(130, 0),
+                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            });
+            return row;
+        }
+
+        private static string WasNow(float before, float now) =>
+            $"[s][color={TextPalette.Muted}]{PercentText(before)}[/color][/s] → {Highlight(PercentText(now))}";
+
+        private static string Highlight(string text) => $"[color={TextPalette.Number}]{text}[/color]";
+
+        /// <summary>Sub-10% chances keep one decimal, so early mastery does not round to a flat lie.</summary>
+        private static string PercentText(float value) =>
+            (value * 100f).ToString(value < 0.095f ? "0.#" : "0", System.Globalization.CultureInfo.InvariantCulture) + "%";
 
         private EquipItemBlueprint? SelectedBlueprint()
         {
@@ -547,10 +736,42 @@ namespace Crafting.Source.UIElements
             return content;
         }
 
+        /// <summary>Catalog additives that actually DO something in the current mode, plus plain
+        /// essences (resources with own descriptors) where the operation's pool consumes them
+        /// (creation and reroll). A rarity-floor rune in a reroll used to show up and silently eat
+        /// resources for nothing — the picker now mirrors the domain's honest scope.</summary>
         private List<string> AvailableAdditiveIds() =>
-            (_additiveProvider?.KnownAdditiveIds ?? [])
+            (_additiveProvider?.KnownAdditiveIds ?? []).Where(AdditiveServesMode)
+            .Concat(_mode is CraftingMode.Create or CraftingMode.Recraft ? EssenceResourceIds() : [])
+            .Distinct()
             .Where(id => (_inventory?.GetTotalItemAmount(id) ?? 0) > 0 && !_additiveChoices.Contains(id))
             .ToList();
+
+        /// <summary>Which catalog effects matter where: sharpening bonuses in Upgrade, rarity
+        /// floors in Create, per-operation pools in Recraft. Ascension takes no additives.</summary>
+        private bool AdditiveServesMode(string id)
+        {
+            var effects = _additiveProvider?.GetEffects(id);
+            if (effects == null) return false;
+            return _mode switch
+            {
+                CraftingMode.Upgrade => effects.UpgradeChanceBonus > 0f || effects.ExtraUpgradeLevelChance > 0f,
+                CraftingMode.Create => effects.MinRarity != null,
+                CraftingMode.Recraft => !string.IsNullOrEmpty(effects.RecraftPoolId),
+                _ => false,
+            };
+        }
+
+        private const string EssenceCategoryId = "Category_Essence";
+
+        /// <summary>Essences: resources of the essence category carrying their own descriptors.
+        /// Ores/hides also feed pools, but they live in the RECIPE slots — offering them here too
+        /// would flood the picker without adding a choice the recipe doesn't already give.</summary>
+        private IEnumerable<string> EssenceResourceIds() =>
+            (_dataProvider?.GetAllResources() ?? [])
+                .OfType<Core.Crafting.ICraftingResource>()
+                .Where(resource => resource.Material?.MaterialCategory?.Id == EssenceCategoryId && resource.Material.Modifiers.Count > 0)
+                .Select(resource => resource.Id);
 
         private void RenderAction()
         {

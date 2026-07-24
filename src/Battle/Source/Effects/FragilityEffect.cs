@@ -12,6 +12,8 @@ namespace Battle.Source.Effects
     public class FragilityEffect(int duration, int maxStacks, float critDamageAmp)
         : Effect(id: "Effect_Fragility", duration, maxStacks)
     {
+        public override bool IsHarmful => true;
+
         private IDamageModifier? _modifier;
 
         public override async Task Apply(EffectApplyingContext context)

@@ -11,6 +11,8 @@ namespace Battle.Source.Effects
     /// </summary>
     public class StunEffect(int duration) : Effect(id: "Effect_Stun", duration, maxStacks: 1, StatusEffects.Stun)
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new StunEffect(Duration);
     }
 }

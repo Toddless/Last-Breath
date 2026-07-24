@@ -14,6 +14,10 @@
         int MaxStacks { get; set; }
         string Source { get; }
 
+        /// <summary>Buff/debuff split for the UI counters. Default false (a buff); debuff classes
+        /// override. Unclassified effects count as buffs until the design pass says otherwise.</summary>
+        bool IsHarmful => false;
+
         event Action<int>? DurationChanged;
 
         Task Apply(EffectApplyingContext context);

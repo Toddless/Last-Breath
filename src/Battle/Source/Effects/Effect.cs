@@ -29,6 +29,9 @@
         public string Id { get; } = id;
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
+        /// <summary>Buff/debuff split for the UI counters; debuff classes override to true.</summary>
+        public virtual bool IsHarmful => false;
+
         public Texture2D? Icon
         {
             get

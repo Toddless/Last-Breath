@@ -250,16 +250,26 @@
         {
             _combatTextPresenter = new CombatTextPresenter();
             AddChild(_combatTextPresenter);
-            _combatTextPresenter.Setup(battleEventBus, FindSpotFor);
+            _combatTextPresenter.Setup(battleEventBus, ResolveBodyAnchor);
         }
 
-        /// <summary>Anchor for floating combat text and melee approach: the spot currently holding
-        /// the entity, or the parked corpse node itself (its spot was freed for a latecomer).</summary>
+        /// <summary>Anchor for melee approach and return: the spot currently holding the entity,
+        /// or the parked corpse node itself (its spot was freed for a latecomer).</summary>
         private Node2D? FindSpotFor(string instanceId)
         {
             var spot = _allSpots.FirstOrDefault(s => s.Entity?.IsSame(instanceId) == true);
             if (spot != null) return spot;
             return _parkedCorpses.GetValueOrDefault(instanceId);
+        }
+
+        /// <summary>Presentation anchor (tracker #95): numbers and VFX play where the MODEL actually
+        /// stands — after a melee approach that is the opponent's face, not the home spot 700px away.
+        /// Falls back to the spot/corpse lookup when the fighter's node is gone.</summary>
+        private Node2D? ResolveBodyAnchor(string instanceId)
+        {
+            var fighter = _fighters.FirstOrDefault(entry => entry.InstanceId == instanceId);
+            if (fighter is Node2D body && GodotObject.IsInstanceValid(body) && body.IsInsideTree()) return body;
+            return FindSpotFor(instanceId);
         }
 
         /// <summary>
@@ -378,8 +388,6 @@
                 spot.SetBattleEventBus(_battleEventBus);
             }
 
-            // TODO:
-            // Сейчас на арене создан только спот для игрока. НЕобходимы споты для союзников
             _playerSpot?.SetBattleEventBus(_battleEventBus);
             if (_camera is { Enabled: true } && _camera.IsInsideTree()) _camera.MakeCurrent();
             SetupTargetSelectionController();
@@ -661,7 +669,8 @@
 
             var presenter = new AbilityVfxPresenter();
             AddChild(presenter);
-            presenter.Setup(FindSpotFor, _visualLibrary);
+            // Body anchor (tracker #95): casts/impacts/travel follow the models, not the home spots.
+            presenter.Setup(ResolveBodyAnchor, _visualLibrary);
             return presenter;
         }
 

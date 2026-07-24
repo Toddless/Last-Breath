@@ -13,6 +13,8 @@ namespace Battle.Source.Effects
             modifierFactory: () => new FlatCostActivationContextModifier(costIncrease),
             statusEffect: StatusEffects.Cursed)
     {
+        public override bool IsHarmful => true;
+
         protected override Dictionary<string, object?> DescriptionValues
         {
             get

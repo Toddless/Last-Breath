@@ -11,6 +11,8 @@ namespace Battle.Source.Effects
     public class SilenceSeal(int duration = 3)
         : Effect(id: "Effect_Seal_Of_Silence", duration, maxStacks: 1, StatusEffects.Paralysis)
     {
+        public override bool IsHarmful => true;
+
         public override IEffect Copy() => new SilenceSeal(Duration);
     }
 }

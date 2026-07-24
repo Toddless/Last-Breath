@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d3hl0n4arn8et" path="res://Addons/Crafting/UIElements/CraftingWindow.cs" id="1_1mud6"]
 
-[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_title", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_chanceBox", "_chanceBar", "_chanceLabel")]
+[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_title", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_chanceBox", "_chanceBar", "_chanceLabel", "_masteryLevel", "_masteryXpBar", "_masteryXpLabel", "_masteryTitle", "_masteryChips", "_forecastBox", "_forecastHeader", "_forecastHint", "_forecastRows")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,6 +34,15 @@ _additives = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/Rig
 _chanceBox = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox")
 _chanceBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox/ChanceBar")
 _chanceLabel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox/ChanceLabel")
+_masteryLevel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/LevelValue")
+_masteryXpBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/MasteryXpBar")
+_masteryXpLabel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/MasteryXpLabel")
+_masteryTitle = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/MasteryTitle")
+_masteryChips = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/MasteryChips")
+_forecastBox = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox")
+_forecastHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow/ForecastHeader")
+_forecastHint = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow/ForecastHint")
+_forecastRows = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastRows")
 
 [node name="Center" type="CenterContainer" parent="." unique_id=145418391]
 layout_mode = 1
@@ -124,6 +133,46 @@ theme_override_constants/margin_bottom = 12
 [node name="RightLayout" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin" unique_id=411326286]
 layout_mode = 2
 theme_override_constants/separation = 10
+
+[node name="MasteryRail" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="LevelBox" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="MasteryTitle" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="LevelValue" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+theme_override_font_sizes/font_size = 24
+
+[node name="MasteryXpBar" type="ProgressBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+max_value = 1.0
+step = 0.001
+show_percentage = false
+
+[node name="MasteryXpLabel" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 10
+
+[node name="MasteryChips" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+columns = 6
+
+[node name="RailSeparator" type="HSeparator" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout"]
+layout_mode = 2
 
 [node name="ModeTabs" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=515420033]
 layout_mode = 2
@@ -247,6 +296,39 @@ layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 3
+
+[node name="ForecastBox" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent"]
+visible = false
+layout_mode = 2
+
+[node name="ForecastMargin" type="MarginContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ForecastLayout" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ForecastHeaderRow" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout"]
+layout_mode = 2
+
+[node name="ForecastHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="ForecastHint" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout/ForecastHeaderRow"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="ForecastRows" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/ForecastBox/ForecastMargin/ForecastLayout"]
+layout_mode = 2
+theme_override_constants/separation = 5
 
 [node name="AscendWarning" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=2096155472]
 visible = false
