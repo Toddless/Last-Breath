@@ -11,20 +11,20 @@ Tracking: GitHub board #3 (Toddless/Last-Breath). This file is the stage-level v
 - **Assets follow mechanics, never lead**: commission art only for frozen mechanics.
 - **Every stage ends with a Godot pass** of its area (compile-check by Claude, in-engine testing by Todd). Bugs from a stage do not carry into the next one.
 
-## Stage 0 — Stabilization (~1–2 weeks) ← CURRENT
+## Stage 0 — Stabilization ✅ (closed 2026-07-24)
 
 Goal: the core loop never breaks in any normal scenario. Playtesters forgive placeholders, not crashes.
 
-- [x] Land the current uncommitted tail (`projects-clean-up` branch) — committed `ecb13026` (2026-07-24). Godot-test of mythic mark handles (2026-07-20) and beat coalescing (#86 in "Доработать") still pending.
+- [x] Land the current uncommitted tail (`projects-clean-up` branch) — committed `ecb13026` (2026-07-24). Mythic mark handles and beat coalescing (#86 in "Доработать") Godot-confirmed 2026-07-24.
 - [x] #147 — defeat on an NPC spawn point breaks the battle-exit cycle. Presumed fixed indirectly by #146 (recovery-zone regen broke the stasis transition); retest on occasion. Residual edge: a FRIENDLY camp/campfire still heals the player — if it reproduces there, gate recovery by the defeated state, not just IsAlive/IsFighting.
 - [x] #146 — player regenerates while standing on an NPC spawn point. Fixed 2026-07-24 (zone eligibility filter by faction standing), confirmed by Todd.
 - [x] #145 — first-level abilities not shown on the battle panel until the mastery window is opened. Fixed 2026-07-24 (ctor catch-up in AbilityUnlockService), confirmed by Todd.
-- [ ] #132 — IceShards stage 2 ignores SecondStage numbers. Fixed 2026-07-24 (stage 2 now reads the SecondStage* parameters, as the ability description promises) — awaiting Godot test.
+- [x] #132 — IceShards stage 2 ignores SecondStage numbers. Fixed and Godot-confirmed 2026-07-24.
 - [x] #130 — crash 0xC0000005 when closing the app via the window X. Clean quit path implemented and CONFIRMED by Todd 2026-07-24 (`BattleArena.AbortBattle` → `BattleContext.Abort` → `Main.QuitGracefully`; in-game quit buttons routed through the close request; sandbox mirrored). The underlying crash (#66) stays under observation.
-- [ ] #142 / #143 — gchandle / Handle-not-initialized errors on battle start (possibly same family as #130).
+- [x] #142 / #143 — gchandle / Handle-not-initialized errors on battle start: not reproducible after the freed-node era fixes; closed 2026-07-24, reopen with a fresh stack if they return.
 - [x] #149 — scheduler reaction depth fuse: real off-by-one (`>` instead of `>=`) masked by a test depth value (128 → reverted to 25 by Todd); fixed 2026-07-24, full fast suite green. Leftover test values found in `CraftingMastery.json`: mythicGiftBaseChance restored to 0.15; `extraEffectBaseChance: 1` (reference 0.1) and `ascensionLevelGate: 1` (design 35) left for Todd's call.
 
-## Stage 1 — Bosses (~2–3 weeks)
+## Stage 1 — Bosses (~2–3 weeks) ← CURRENT
 
 Biggest gameplay payoff; the demo's climax. Pipeline already proven on RatKing (stages, StageGuard, CC resist, BossSpawnPoint).
 
