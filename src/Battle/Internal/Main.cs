@@ -25,6 +25,9 @@
 
         public override void _Ready()
         {
+            // Mirror of Main: the window X routes through QuitGracefully so an active battle
+            // winds down before the tree goes (tracker #66/#130).
+            GetTree().AutoAcceptQuit = false;
             _uiElementProvider = _provider.GetService<IUiElementsManager>();
             if (_layerManager != null)
             {
@@ -54,6 +57,34 @@
             // keep calling handlers on a freed node.
             _gameEventBus?.Unsubscribe<BattleInitializedEvent>(OnBattleInitialized);
             _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
+            GetTree().AutoAcceptQuit = true;
+        }
+
+        public override void _Notification(int what)
+        {
+            if (what == NotificationWMCloseRequest) QuitGracefully();
+        }
+
+        /// <summary>The safety net against a hung battle: quitting late is still better than never.</summary>
+        private const ulong QuitTimeoutMsec = 5000;
+        private bool _quitting;
+
+        /// <summary>Winds an active battle down before quitting (tracker #66/#130) — mirror of Main.</summary>
+        private async void QuitGracefully()
+        {
+            if (_quitting) return;
+            _quitting = true;
+            GetTree().Paused = false;
+
+            if (_activeContext != null)
+            {
+                _activeContext.Abort();
+                ulong deadline = Time.GetTicksMsec() + QuitTimeoutMsec;
+                while (_activeContext != null && Time.GetTicksMsec() < deadline)
+                    await ToSignal(GetTree(), "process_frame");
+            }
+
+            GetTree().Quit();
         }
 
         /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.

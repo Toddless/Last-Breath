@@ -19,10 +19,10 @@ Goal: the core loop never breaks in any normal scenario. Playtesters forgive pla
 - [x] #147 — defeat on an NPC spawn point breaks the battle-exit cycle. Presumed fixed indirectly by #146 (recovery-zone regen broke the stasis transition); retest on occasion. Residual edge: a FRIENDLY camp/campfire still heals the player — if it reproduces there, gate recovery by the defeated state, not just IsAlive/IsFighting.
 - [x] #146 — player regenerates while standing on an NPC spawn point. Fixed 2026-07-24 (zone eligibility filter by faction standing), confirmed by Todd.
 - [x] #145 — first-level abilities not shown on the battle panel until the mastery window is opened. Fixed 2026-07-24 (ctor catch-up in AbilityUnlockService), confirmed by Todd.
-- [ ] #132 — IceShards stage 2 ignores SecondStage numbers.
-- [ ] #130 — crash 0xC0000005 when CLOSING THE APP via the window X button (clarified 2026-07-24; auto_accept_quit tears the tree down mid-battle). Fix: intercept `NOTIFICATION_WM_CLOSE_REQUEST` (auto_accept_quit = false), wind the battle/subscriptions down, then `Quit()`; route the menu quit buttons through the same path.
+- [ ] #132 — IceShards stage 2 ignores SecondStage numbers. Fixed 2026-07-24 (stage 2 now reads the SecondStage* parameters, as the ability description promises) — awaiting Godot test.
+- [x] #130 — crash 0xC0000005 when closing the app via the window X. Clean quit path implemented and CONFIRMED by Todd 2026-07-24 (`BattleArena.AbortBattle` → `BattleContext.Abort` → `Main.QuitGracefully`; in-game quit buttons routed through the close request; sandbox mirrored). The underlying crash (#66) stays under observation.
 - [ ] #142 / #143 — gchandle / Handle-not-initialized errors on battle start (possibly same family as #130).
-- [ ] Scheduler reaction depth-fuse regression: 3 failures in `AttackContextSchedulerTests` on clean HEAD (ping-pong fuse expected 25 attacks, got 129) — the fuse against infinite reaction chains is effectively broken (found 2026-07-24).
+- [x] #149 — scheduler reaction depth fuse: real off-by-one (`>` instead of `>=`) masked by a test depth value (128 → reverted to 25 by Todd); fixed 2026-07-24, full fast suite green. Leftover test values found in `CraftingMastery.json`: mythicGiftBaseChance restored to 0.15; `extraEffectBaseChance: 1` (reference 0.1) and `ascensionLevelGate: 1` (design 35) left for Todd's call.
 
 ## Stage 1 — Bosses (~2–3 weeks)
 

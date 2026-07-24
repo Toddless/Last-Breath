@@ -703,6 +703,20 @@
                 _playerTargetTcs.SetResult(null);
         }
 
+        /// <summary>Playback speed for an external shutdown: the remaining beats flash by instead
+        /// of holding the quit for seconds.</summary>
+        private const float AbortFastForwardSpeed = 8f;
+
+        /// <summary>External shutdown (app quit, tracker #66/#130): locks the outcome so the round
+        /// loop exits at its next gate and fast-forwards the remaining presentation. The battle then
+        /// finishes through its NORMAL path — flags, BattleEndEvent, teardown — the caller only has
+        /// to await the loop's completion before pulling the tree down.</summary>
+        public void AbortBattle()
+        {
+            _battleEventBus?.Publish(new PlaybackSpeedChangedEvent(AbortFastForwardSpeed));
+            EndBattle(new BattleOutcome(BattleResults.BattleAbandoned));
+        }
+
         private async Task<IFightable?> ResolveTargetAsync(IFightable fighter)
         {
             if (fighter is not IPlayer)

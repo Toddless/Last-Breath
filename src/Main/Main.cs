@@ -37,6 +37,10 @@
 
         public override void _Ready()
         {
+            // Closing the app mid-battle used to tear the tree down under the battle's async
+            // continuations — native AV on exit (tracker #66/#130). The window X now routes
+            // through QuitGracefully; _ExitTree restores stock behavior for the menu scene.
+            GetTree().AutoAcceptQuit = false;
             _uiElementProvider = _provider.GetService<IUiElementsManager>();
             _uiElementProvider.Subscribe(_layerManager);
             // Wire the notification pipeline: the layer manager is the sink, the factory builds the
@@ -92,6 +96,39 @@
             _gameEventBus?.Unsubscribe<PlayerFinalDeathEvent>(OnPlayerFinalDeath);
             _gameEventBus?.Unsubscribe<BattleJoinRequestEvent>(OnBattleJoinRequest);
             _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(null);
+            GetTree().AutoAcceptQuit = true; // menu scene has no battles — stock quit is fine there
+        }
+
+        public override void _Notification(int what)
+        {
+            if (what == NotificationWMCloseRequest) QuitGracefully();
+        }
+
+        /// <summary>The safety net against a hung battle: quitting late is still better than never.</summary>
+        private const ulong QuitTimeoutMsec = 5000;
+        private bool _quitting;
+
+        /// <summary>Winds an active battle down before quitting (tracker #66/#130): the abort locks
+        /// the outcome, the battle task finishes through its normal teardown (BattleEndEvent,
+        /// Dispose), and only then the tree goes down. Also serves the in-game quit buttons —
+        /// they propagate NotificationWMCloseRequest instead of calling Quit() directly.</summary>
+        private async void QuitGracefully()
+        {
+            if (_quitting) return;
+            _quitting = true;
+
+            // The pause menu freezes the tree; a frozen battle would never wind down.
+            GetTree().Paused = false;
+
+            if (_activeContext != null)
+            {
+                _activeContext.Abort();
+                ulong deadline = Time.GetTicksMsec() + QuitTimeoutMsec;
+                while (_activeContext != null && Time.GetTicksMsec() < deadline)
+                    await ToSignal(GetTree(), "process_frame");
+            }
+
+            GetTree().Quit();
         }
 
 

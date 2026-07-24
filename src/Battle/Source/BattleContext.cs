@@ -103,6 +103,15 @@
             return true;
         }
 
+        /// <summary>App-quit path (tracker #66/#130): asks the arena to wind the battle down;
+        /// RunBattleAsync then completes through its normal finally (flags, BattleEndEvent),
+        /// and the host's battle task performs the usual teardown.</summary>
+        public void Abort()
+        {
+            if (!_battleRunning) return;
+            _battleArena.AbortBattle();
+        }
+
         public void Dispose()
         {
             ReturnParticipantsToWorld();

@@ -26,7 +26,9 @@ namespace LastBreath.UI
         public override void _Ready()
         {
             if (_loadButton != null) _loadButton.Pressed += OpenSaveLoad;
-            if (_quitButton != null) _quitButton.Pressed += () => GetTree().Quit();
+            // Through the close-request pipeline, not Quit(): Main winds an active battle down
+            // first (tracker #66/#130) — game over can't have one, but one path serves all buttons.
+            if (_quitButton != null) _quitButton.Pressed += () => GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
         }
 
         public void InjectServices(IGameServiceProvider provider)

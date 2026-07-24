@@ -13,7 +13,7 @@ namespace Battle.Source
     {
         // Safety fuses, not gameplay limits: evade/extra-hit chances are clamped below 100%,
         // so legitimate chains stay short — only a broken loop can reach these.
-        private const int MaxReactionDepth = 128;
+        private const int MaxReactionDepth = 25;
         private const int MaxAttacksPerDrain = 256;
 
         private readonly Queue<IAttackContext> _attackQueue = [];
@@ -21,7 +21,8 @@ namespace Battle.Source
 
         public void Schedule(IAttackContext context)
         {
-            if (context.ReactionDepth > MaxReactionDepth)
+            // >=: MaxReactionDepth is the first REFUSED depth (0..Max-1 resolve) — the tests pin it.
+            if (context.ReactionDepth >= MaxReactionDepth)
             {
                 _reportFuse($"Reaction chain broke the depth fuse ({MaxReactionDepth}): {context.Attacker.InstanceId} -> {context.Target.InstanceId}. Attack dropped.");
                 return;

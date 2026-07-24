@@ -18,7 +18,9 @@
             _saveLoadBtn?.Pressed += OnSaveLoadBtnPressed;
             _optionsBtn?.Pressed += OnOptionsBtnPressed;
             _mainMenuBtn?.Pressed += OnMainMenuBtnPressed;
-            _exitBtn?.Pressed += () => GetTree().Quit();
+            // Through the close-request pipeline, not Quit(): Main winds an active battle down
+            // first (tracker #66/#130 — quitting mid-battle crashed with a native AV).
+            _exitBtn?.Pressed += () => GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
         }
 
 

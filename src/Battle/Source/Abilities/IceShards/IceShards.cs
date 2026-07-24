@@ -78,9 +78,9 @@ namespace Battle.Source.Abilities.IceShards
             switch (stage)
             {
                 case EmpoweredShardsStage:
-                    plan.Damage = Damage;
-                    plan.WeaponDamageScale = WeaponDamageScale;
-                    plan.SpellDamageScale = SpellDamageScale;
+                    plan.Damage = this[Parameters.SecondStageDamage];
+                    plan.WeaponDamageScale = this[Parameters.SecondStageWeaponDamageScale];
+                    plan.SpellDamageScale = this[Parameters.SecondStageSpellDamageScale];
                     break;
                 case AllTargetsStage:
                     plan.Targets = field.GetEnemies(owner).ToList();
