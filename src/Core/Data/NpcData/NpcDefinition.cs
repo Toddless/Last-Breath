@@ -27,6 +27,10 @@ namespace Core.Data.NpcData
         /// <summary>Combat reactions (hidden triggered casts, e.g. the twin's assist). Empty for most NPCs.</summary>
         public IReadOnlyList<NpcReactionConfig> Reactions { get; init; } = [];
 
+        /// <summary>Authored passive skills (boss kits, e.g. Deep Wounds): raw id + properties;
+        /// the entity resolves them through the skill registry at apply time.</summary>
+        public IReadOnlyList<NpcPassiveData> Passives { get; init; } = [];
+
         /// <summary>Boss stages (weakened opening act → transformation). Empty for most NPCs;
         /// when present, <see cref="Abilities"/> is empty — each stage owns its ability set.</summary>
         public IReadOnlyList<NpcStageConfig> Stages { get; init; } = [];

@@ -30,11 +30,23 @@ height = 25
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_5f5v3"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_fx85w"]
+font_size = 80
+
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fx85w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fmhhv"]
+font_size = 79
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_s1n7v"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_5f5v3"]
+font_size = 100
+
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fmhhv"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kwijy"]
+font_size = 106
 
 [sub_resource type="Gradient" id="Gradient_kwijy"]
 colors = PackedColorArray(0.81960785, 0, 0, 1, 0, 0, 0, 1)
@@ -114,6 +126,14 @@ metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 [node name="Sprite2D" type="Sprite2D" parent="RatKing" unique_id=1489057577]
 texture = SubResource("NoiseTexture2D_5f5v3")
 
+[node name="Label" type="Label" parent="RatKing" unique_id=1053434461]
+offset_left = -152.0
+offset_top = 36.0
+offset_right = 161.0
+offset_bottom = 146.0
+text = "Rat king"
+label_settings = SubResource("LabelSettings_fx85w")
+
 [node name="BossSpawnPoint2" type="Node2D" parent="." unique_id=359407581]
 position = Vector2(-1188, 613)
 script = ExtResource("9_hv00y")
@@ -124,6 +144,14 @@ metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 
 [node name="Sprite2D" type="Sprite2D" parent="BossSpawnPoint2" unique_id=741400143]
 texture = SubResource("NoiseTexture2D_fx85w")
+
+[node name="Label" type="Label" parent="BossSpawnPoint2" unique_id=1177965193]
+offset_left = -214.0
+offset_top = 43.0
+offset_right = 228.0
+offset_bottom = 152.0
+text = "Pack leader"
+label_settings = SubResource("LabelSettings_fmhhv")
 
 [node name="Digri" type="Node2D" parent="." unique_id=1321080777]
 position = Vector2(-127, -1643)
@@ -136,6 +164,14 @@ metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 [node name="Sprite2D" type="Sprite2D" parent="Digri" unique_id=1059919439]
 texture = SubResource("NoiseTexture2D_s1n7v")
 
+[node name="Label" type="Label" parent="Digri" unique_id=1520704558]
+offset_left = -106.0
+offset_top = -11.0
+offset_right = 122.0
+offset_bottom = 126.0
+text = "Digri"
+label_settings = SubResource("LabelSettings_5f5v3")
+
 [node name="Zigri" type="Node2D" parent="." unique_id=1681300777]
 position = Vector2(-1237, -954)
 script = ExtResource("9_hv00y")
@@ -146,6 +182,14 @@ metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 
 [node name="Sprite2D" type="Sprite2D" parent="Zigri" unique_id=1479148786]
 texture = SubResource("NoiseTexture2D_fmhhv")
+
+[node name="Label" type="Label" parent="Zigri" unique_id=1153758471]
+offset_left = -94.0
+offset_top = 7.0
+offset_right = 131.0
+offset_bottom = 153.0
+text = "Zigri"
+label_settings = SubResource("LabelSettings_kwijy")
 
 [node name="CampfireNode" type="Node2D" parent="." unique_id=2137723099]
 position = Vector2(333, 491)

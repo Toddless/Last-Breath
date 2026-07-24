@@ -1117,6 +1117,16 @@
                 "Ability_Critical_Calculation",
                 "Ability_Summon_Bone_Wolves"
             ],
+            "passives": [
+                {
+                    "id": "Passive_Skill_Bleeding",
+                    "properties": {
+                        "percentFromDamage": 1.2,
+                        "duration": 3,
+                        "maxStacks": 999
+                    }
+                }
+            ],
             "abilityBehaviors": [
                 {
                     "id": "Ability_Summon_Bone_Wolves",

@@ -131,6 +131,22 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(2, stages[1].AttackEffects.Count);
         }
 
+        [TestMethod]
+        public void Parse_RealNpcJson_BonePackLeaderCarriesDeepWoundsPassive()
+        {
+            string json = File.ReadAllText(Path.Combine(FindSharedData(), "Npc", "Npc.json"));
+            var npcs = Newtonsoft.Json.JsonConvert.DeserializeObject<NpcsData>(json)!.Npcs;
+
+            var leader = npcs.Single(npc => npc.Id == "Npc_Boss_Bone_Pack_Leader");
+            var passive = leader.Passives.Single();
+
+            // Deep Wounds = the generic Bleeding passive at the boss's numbers (120% / 3 turns).
+            Assert.AreEqual("Passive_Skill_Bleeding", passive.Id);
+            Assert.AreEqual(1.2f, passive.Properties["percentFromDamage"]);
+            Assert.AreEqual(3f, passive.Properties["duration"]);
+            Assert.AreEqual(999f, passive.Properties["maxStacks"]);
+        }
+
         // ---------- the controller: transition ----------
 
         [TestMethod]

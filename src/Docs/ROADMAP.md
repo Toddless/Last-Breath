@@ -24,15 +24,16 @@ Goal: the core loop never breaks in any normal scenario. Playtesters forgive pla
 - [x] #142 / #143 — gchandle / Handle-not-initialized errors on battle start: not reproducible after the freed-node era fixes; closed 2026-07-24, reopen with a fresh stack if they return.
 - [x] #149 — scheduler reaction depth fuse: real off-by-one (`>` instead of `>=`) masked by a test depth value (128 → reverted to 25 by Todd); fixed 2026-07-24, full fast suite green. Leftover test values found in `CraftingMastery.json`: mythicGiftBaseChance restored to 0.15; `extraEffectBaseChance: 1` (reference 0.1) and `ascensionLevelGate: 1` (design 35) left for Todd's call.
 
-## Stage 1 — Bosses (~2–3 weeks) ← CURRENT
+## Stage 1 — Bosses ✅ (closed 2026-07-24)
 
-Biggest gameplay payoff; the demo's climax. Pipeline already proven on RatKing (stages, StageGuard, CC resist, BossSpawnPoint).
+Biggest gameplay payoff; the demo's climax. Status audit 2026-07-24: FAR more is done than assumed — RatKing (stages/StageGuard/rage/attack effects) tested in Block 0; Bone Pack Leader + wolf summons coded and summon path tested; Twins fully coded (TwinAssist reactions with maxPerTurn / blockedByFinalDeathOf, ShieldEffect layer); BossSpawnPoint with both respawn modes placed in the world; CC diminishing done. Remaining:
 
-- [ ] "Доработать" #67: decide manual placement vs BossSpawnPoint; finish the NPC class for unique mechanics.
-- [ ] Three bosses, one of them two-stage (design drafts in Obsidian `07_Нпс/Боссы.md`).
-- [ ] "Доработать" #66: BattleDirector arena-wide ability presentation (global casts, boss stage transitions) — bosses look poor without it.
+- [x] Deep Wounds for the Bone Pack Leader — done and Godot-confirmed 2026-07-24: generic `passives` channel in Npc.json (id + properties → skill registry, both BaseNpc copies); the Leader carries Bleeding 120% / 3 turns / 999 stacks.
+- [x] Godot pass 2026-07-24: all bosses confirmed working by Todd (Twins assists, Bone Pack Leader, RatKing).
+- Moved to Stage 5 (polish): boss presentation iteration — stage-transition beat, "Immune!" beat + log (EffectResistedEvent), StageGuard "N prevented", shield bar over the barrier, arena-wide cast presentation ("Доработать" #66).
+- Deferred by decision: boss intro lines (silent aggro for now), world-boss spawn from bones idea.
 
-## Stage 2 — Crafting resources rework (~1–2 weeks)
+## Stage 2 — Crafting resources rework (~1–2 weeks) ← CURRENT
 
 Current crafting resources are broken against the new affix model (prefix/suffix + global/local split). Design drafts: Obsidian `06_Крафт/Список ресурсов для крафта.md` and `03_Предметы/Список пулов по категориям.md` (WIP — several category sections still empty).
 
@@ -60,6 +61,8 @@ Closes the economy loop (loot → gold → purchases) and activates already-buil
 ## Stage 5 — First-impression UX polish (~1–2 weeks)
 
 Only what a new player sees in the first hour:
+
+- [ ] Boss presentation iteration (moved from Stage 1; absorbs "Доработать" #66): stage-transition beat, "Immune!" beat + log line, StageGuard "N prevented" display, shield bar over the barrier + log, arena-wide cast presentation.
 
 - [ ] Loading screen ("Доработать" #18) and ally/enemy join-battle notification (#19).
 - [ ] Destroy-mode confirmation (#22) — a misclicked legendary ruins a playtest.

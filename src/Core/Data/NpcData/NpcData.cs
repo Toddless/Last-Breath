@@ -45,6 +45,10 @@ namespace Core.Data.NpcData
         /// <summary>Combat reactions (hidden triggered casts); a broken entry is reported and skipped.</summary>
         [JsonProperty("reactions")] public List<NpcReactionData> Reactions { get; init; } = [];
 
+        /// <summary>Authored passive skills (boss kits): registry id + the numbers its factory needs.
+        /// An unknown id or a missing property is reported and skipped at spawn.</summary>
+        [JsonProperty("passives")] public List<NpcPassiveData> Passives { get; init; } = [];
+
         /// <summary>Boss stages; a broken entry drops the whole section (see NpcStageParser).</summary>
         [JsonProperty("stages")] public List<NpcStageData> Stages { get; init; } = [];
 
@@ -58,6 +62,14 @@ namespace Core.Data.NpcData
 
         /// <summary>Species capabilities (talking, later trading). Null = can do none of it.</summary>
         [JsonProperty("interaction")] public NpcInteractionData? Interaction { get; init; }
+    }
+
+    /// <summary>The "passives" section entry: a skill id from the passive registry plus its numbers
+    /// (same property names the item-grant channel feeds to the skill factory).</summary>
+    public record NpcPassiveData
+    {
+        [JsonProperty("id")] public string Id { get; init; } = string.Empty;
+        [JsonProperty("properties")] public Dictionary<string, float> Properties { get; init; } = [];
     }
 
     /// <summary>The "interaction" section: what the SPECIES is capable of. Hostility is state

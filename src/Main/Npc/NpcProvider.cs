@@ -77,6 +77,7 @@ namespace LastBreath.Npc
                 Lifecycle = BuildLifecycleConfig(data.Lifecycle),
                 CanTalk = data.Interaction?.CanTalk ?? false,
                 Reactions = NpcReactionParser.Parse(data.Id, data.Reactions),
+                Passives = data.Passives,
                 Stages = stages,
             };
         }

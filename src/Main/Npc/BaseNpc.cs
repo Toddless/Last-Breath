@@ -311,6 +311,7 @@ namespace LastBreath.Npc
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance();
+            AttachAuthoredPassives(definition.Passives);
 
             CurrentHealth = Parameters.MaxHealth;
             CurrentMana = Parameters.MaxMana;
@@ -331,6 +332,22 @@ namespace LastBreath.Npc
             var resistance = new Core.Modifiers.Context.ControlResistanceModifier(rules);
             ModifierHandler.Add(resistance);
             CombatEvents.Subscribe<TurnEndEvent>(_ => resistance.DecayTick());
+        }
+
+        /// <summary>Authored passives of the kit (Deep Wounds etc.): resolved through the skill
+        /// registry — an unknown id or a missing property is reported by the provider and skipped;
+        /// a sandbox without the registry simply attaches nothing.</summary>
+        private void AttachAuthoredPassives(IReadOnlyList<NpcPassiveData> passives)
+        {
+            if (passives.Count == 0) return;
+            var provider = GameServiceProvider.Instance.GetService<Core.Battle.Skills.ISkillProvider>();
+            if (provider == null) return;
+
+            foreach (var entry in passives)
+            {
+                var skill = provider.CreateSkill(entry.Id, new Core.Battle.Skills.SkillProperties(entry.Id, entry.Properties));
+                if (skill != null) PassiveSkills.AddSkill(skill);
+            }
         }
 
         /// <summary>
