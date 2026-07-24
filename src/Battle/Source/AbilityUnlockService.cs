@@ -45,6 +45,10 @@ namespace Battle.Source
 
             _mastery.CurrentLevelChange += OnLevelChanged;
             _playerAccessor.PlayerChanged += OnPlayerChanged;
+
+            // Children run _Ready before their parent: the player registers with the accessor
+            // before Main._Ready first resolves this service, so PlayerChanged has already fired.
+            if (_playerAccessor.Player != null) Reconcile(notify: false);
         }
 
         public void Dispose()

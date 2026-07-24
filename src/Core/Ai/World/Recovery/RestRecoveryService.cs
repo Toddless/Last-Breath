@@ -8,7 +8,7 @@ namespace Core.Ai.World.Recovery
 
     public class RestRecoveryService(IRecoveryConfigProvider configProvider, IWorldClock? clock = null) : IRestRecoveryService
     {
-        private readonly record struct Zone(object Owner, Func<Vector2> Position, float Radius);
+        private readonly record struct Zone(object Owner, Func<Vector2> Position, float Radius, Func<IFightable, bool>? CanRest);
 
         private readonly record struct Participant(IFightable Entity, Func<Vector2> Position);
 
@@ -21,10 +21,10 @@ namespace Core.Ai.World.Recovery
         /// approximates one game minute — the spawn points' convention.</summary>
         private double NowMinutes => clock != null ? clock.Day * 1440 + clock.MinuteOfDay : _fallbackMinutes;
 
-        public void RegisterZone(object owner, Func<Vector2> position, float radius)
+        public void RegisterZone(object owner, Func<Vector2> position, float radius, Func<IFightable, bool>? canRest = null)
         {
             UnregisterZone(owner);
-            _zones.Add(new Zone(owner, position, radius));
+            _zones.Add(new Zone(owner, position, radius, canRest));
         }
 
         public void UnregisterZone(object owner) => _zones.RemoveAll(zone => ReferenceEquals(zone.Owner, owner));
@@ -51,15 +51,15 @@ namespace Core.Ai.World.Recovery
             {
                 var entity = participant.Entity;
                 if (!entity.IsAlive || entity.IsFighting) continue;
-                if (!InsideAnyZone(participant.Position())) continue;
+                if (!InsideAnyZone(entity, participant.Position())) continue;
                 Restore(entity, (float)minutes);
             }
         }
 
-        private bool InsideAnyZone(Vector2 position)
+        private bool InsideAnyZone(IFightable entity, Vector2 position)
         {
             foreach (var zone in _zones)
-                if (position.DistanceTo(zone.Position()) <= zone.Radius)
+                if (position.DistanceTo(zone.Position()) <= zone.Radius && zone.CanRest?.Invoke(entity) != false)
                     return true;
             return false;
         }

@@ -2,6 +2,7 @@ namespace Battle.Internal.Npc
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Core.Ai.World.Recovery;
     using Core.Ai.World.Time;
     using Core.Data;
@@ -48,7 +49,8 @@ namespace Battle.Internal.Npc
         [Export] private float _eveningDelayMultiplier = 1f;
 
         // Home doubles as a rest spot: wounded residents come back and heal inside (the Recovery
-        // activity gate), and so does anyone else non-fighting who wanders in — one rule for all zones.
+        // activity gate), and so does any non-fighting guest the owners don't consider an enemy —
+        // a friendly player rests in a friendly camp, a hostile one gets nothing (tracker #146).
         [Export] private bool _recoveryZone = true;
 
         /// <summary>The zone must cover the whole spawn spread: NPC homes are rolled within _spawnRadius.</summary>
@@ -64,8 +66,12 @@ namespace Battle.Internal.Npc
         private ISpawnPointRegistry? _spawnRegistry;
         private IWorldClock? _worldClock;
         private IRestRecoveryService? _recovery;
+        private IFactionRelationService? _factionRelations;
         private EntityGroup? _group;
         private double _fallbackMinutes;
+
+        /// <summary>Faction of the first known id — a point houses one faction; null until the data loads.</summary>
+        private Core.Enums.Fractions? Fraction => field ??= ResolveFraction();
 
         public string PointId => string.IsNullOrEmpty(_pointId) ? GetPath().ToString() : _pointId;
 
@@ -83,7 +89,8 @@ namespace Battle.Internal.Npc
             _spawnRegistry = _gameServiceProvider.GetService<ISpawnPointRegistry>();
             _worldClock = _gameServiceProvider.GetService<IWorldClock>();
             _recovery = _gameServiceProvider.GetService<IRestRecoveryService>();
-            if (_recoveryZone) _recovery?.RegisterZone(this, () => GlobalPosition, _spawnRadius + RecoveryZoneMargin);
+            _factionRelations = _gameServiceProvider.GetService<IFactionRelationService>();
+            if (_recoveryZone) _recovery?.RegisterZone(this, () => GlobalPosition, _spawnRadius + RecoveryZoneMargin, CanRestHere);
             _spawnRegistry?.Register(this);
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
             _gameEventBus?.Subscribe<NpcFactionChangedEvent>(OnFactionChanged);
@@ -215,5 +222,24 @@ namespace Battle.Internal.Npc
             DayPhase.Day => _dayDelayMultiplier,
             _ => 1f, // no clock (sandbox): the plain roll
         };
+
+        private Core.Enums.Fractions? ResolveFraction()
+        {
+            if (_provider == null) return null;
+
+            foreach (string npcId in _npcIds.Where(id => _provider.KnownNpcIds.Contains(id)))
+                return _provider.CreateDefinition(npcId).Fraction;
+            return null;
+        }
+
+        /// <summary>An enemy of the house does not heal in its camp: the player by faction standing,
+        /// NPCs by the static matrix. No relation service or unresolved faction = open door.</summary>
+        private bool CanRestHere(IFightable guest)
+        {
+            if (_factionRelations == null || Fraction is not { } faction) return true;
+            if (guest is IPlayer) return !_factionRelations.IsHostileToPlayer(faction);
+            if (guest is INpc npc) return !_factionRelations.IsHostile(faction, npc.Fraction);
+            return true;
+        }
     }
 }

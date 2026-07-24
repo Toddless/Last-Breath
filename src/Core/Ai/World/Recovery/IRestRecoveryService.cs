@@ -13,8 +13,10 @@ namespace Core.Ai.World.Recovery
     public interface IRestRecoveryService
     {
         /// <summary>Position is a delegate: the owner node moves rarely, but freed nodes must not
-        /// be dereferenced — owners are OBLIGED to unregister on _ExitTree.</summary>
-        void RegisterZone(object owner, Func<Vector2> position, float radius);
+        /// be dereferenced — owners are OBLIGED to unregister on _ExitTree.
+        /// <paramref name="canRest"/> gates who the zone heals (an NPC camp only rests those its
+        /// owners don't consider an enemy); null = everyone (campfires).</summary>
+        void RegisterZone(object owner, Func<Vector2> position, float radius, Func<IFightable, bool>? canRest = null);
 
         void UnregisterZone(object owner);
 

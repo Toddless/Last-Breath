@@ -51,7 +51,8 @@ namespace LastBreath.World
         [Export] private float _eveningDelayMultiplier = 1f;
 
         // Home doubles as a rest spot: wounded residents come back and heal inside (the Recovery
-        // activity gate), and so does anyone else non-fighting who wanders in — one rule for all zones.
+        // activity gate), and so does any non-fighting guest the owners don't consider an enemy —
+        // a friendly player rests in a friendly camp, a hostile one gets nothing (tracker #146).
         [Export] private bool _recoveryZone = true;
 
         /// <summary>The zone must cover the whole spawn spread: NPC homes are rolled within _spawnRadius.</summary>
@@ -68,6 +69,7 @@ namespace LastBreath.World
         private ISpawnPointRegistry? _spawnRegistry;
         private IWorldClock? _worldClock;
         private IRestRecoveryService? _recovery;
+        private IFactionRelationService? _factionRelations;
         private EntityGroup? _group;
         private double _fallbackMinutes;
 
@@ -95,7 +97,8 @@ namespace LastBreath.World
             _spawnRegistry = _gameServiceProvider.GetService<ISpawnPointRegistry>();
             _worldClock = _gameServiceProvider.GetService<IWorldClock>();
             _recovery = _gameServiceProvider.GetService<IRestRecoveryService>();
-            if (_recoveryZone) _recovery?.RegisterZone(this, () => GlobalPosition, _spawnRadius + RecoveryZoneMargin);
+            _factionRelations = _gameServiceProvider.GetService<IFactionRelationService>();
+            if (_recoveryZone) _recovery?.RegisterZone(this, () => GlobalPosition, _spawnRadius + RecoveryZoneMargin, CanRestHere);
             _raidRegistry?.Register(this);
             _spawnRegistry?.Register(this);
             _gameEventBus?.Subscribe<NpcFinalDeathEvent>(OnFinalDeath);
@@ -237,6 +240,16 @@ namespace LastBreath.World
             foreach (string npcId in _npcIds.Where(id => _provider.KnownNpcIds.Contains(id)))
                 return _provider.CreateDefinition(npcId).Fraction;
             return null;
+        }
+
+        /// <summary>An enemy of the house does not heal in its camp: the player by faction standing,
+        /// NPCs by the static matrix. No relation service or unresolved faction = open door.</summary>
+        private bool CanRestHere(IFightable guest)
+        {
+            if (_factionRelations == null || Fraction is not { } faction) return true;
+            if (guest is IPlayer) return !_factionRelations.IsHostileToPlayer(faction);
+            if (guest is INpc npc) return !_factionRelations.IsHostile(faction, npc.Fraction);
+            return true;
         }
     }
 }

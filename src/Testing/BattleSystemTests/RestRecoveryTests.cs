@@ -74,6 +74,26 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
+        public void ZoneEligibilityFilterBlocksUnwelcomeGuests()
+        {
+            var (service, clock) = CreateService();
+            var welcome = CreateEntity(health: 100f);
+            var unwelcome = CreateEntity(health: 100f);
+            // Tracker #146: an NPC camp only rests those its owners don't consider an enemy.
+            service.RegisterZone(this, () => Vector2.Zero, radius: 100f,
+                canRest: guest => ReferenceEquals(guest, welcome.Object));
+            service.RegisterParticipant(welcome.Object, () => Vector2.Zero);
+            service.RegisterParticipant(unwelcome.Object, () => Vector2.Zero);
+
+            service.Tick(0.1f);
+            clock.MinuteOfDay = 2;
+            service.Tick(0.1f);
+
+            Assert.IsTrue(welcome.Object.CurrentHealth > 100f, "welcome guest heals");
+            Assert.AreEqual(100f, unwelcome.Object.CurrentHealth, 0.01f, "unwelcome guest does not heal");
+        }
+
+        [TestMethod]
         public void UnregisteredZoneStopsHealing()
         {
             var (service, clock) = CreateService();

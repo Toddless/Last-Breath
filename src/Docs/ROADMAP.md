@@ -1,6 +1,6 @@
 # LastBreath — Demo Roadmap
 
-*Created 2026-07-24. Target: a playable public demo (1–2 hours of gameplay). Asset strategy: AI-generated placeholders continuously, key art (hero, bosses, UI) commissioned/hand-made after mechanics freeze. Rough estimate: ~10–14 weeks.*
+*Created 2026-07-24. Target: a playable public demo (1–2 hours of gameplay). Asset strategy: AI-generated placeholders continuously, key art (hero, bosses, UI) commissioned/hand-made after mechanics freeze. Rough estimate: ~11–16 weeks.*
 
 Tracking: GitHub board #3 (Toddless/Last-Breath). This file is the stage-level view; individual items live as issues.
 
@@ -15,12 +15,12 @@ Tracking: GitHub board #3 (Toddless/Last-Breath). This file is the stage-level v
 
 Goal: the core loop never breaks in any normal scenario. Playtesters forgive placeholders, not crashes.
 
-- [ ] Land the current uncommitted tail (`projects-clean-up` branch); Godot-test mythic mark handles (2026-07-20) and beat coalescing (#86 in "Доработать").
-- [ ] #147 — defeat on an NPC spawn point breaks the battle-exit cycle.
-- [ ] #146 — player regenerates while standing on an NPC spawn point.
-- [ ] #145 — first-level abilities not shown on the battle panel until the mastery window is opened (first-impression bug).
+- [x] Land the current uncommitted tail (`projects-clean-up` branch) — committed `ecb13026` (2026-07-24). Godot-test of mythic mark handles (2026-07-20) and beat coalescing (#86 in "Доработать") still pending.
+- [x] #147 — defeat on an NPC spawn point breaks the battle-exit cycle. Presumed fixed indirectly by #146 (recovery-zone regen broke the stasis transition); retest on occasion. Residual edge: a FRIENDLY camp/campfire still heals the player — if it reproduces there, gate recovery by the defeated state, not just IsAlive/IsFighting.
+- [x] #146 — player regenerates while standing on an NPC spawn point. Fixed 2026-07-24 (zone eligibility filter by faction standing), confirmed by Todd.
+- [x] #145 — first-level abilities not shown on the battle panel until the mastery window is opened. Fixed 2026-07-24 (ctor catch-up in AbilityUnlockService), confirmed by Todd.
 - [ ] #132 — IceShards stage 2 ignores SecondStage numbers.
-- [ ] #130 — crash 0xC0000005 on quit mid-battle: build a clean quit path (wind down the battle before `Quit()`) instead of waiting for repro.
+- [ ] #130 — crash 0xC0000005 when CLOSING THE APP via the window X button (clarified 2026-07-24; auto_accept_quit tears the tree down mid-battle). Fix: intercept `NOTIFICATION_WM_CLOSE_REQUEST` (auto_accept_quit = false), wind the battle/subscriptions down, then `Quit()`; route the menu quit buttons through the same path.
 - [ ] #142 / #143 — gchandle / Handle-not-initialized errors on battle start (possibly same family as #130).
 - [ ] Scheduler reaction depth-fuse regression: 3 failures in `AttackContextSchedulerTests` on clean HEAD (ping-pong fuse expected 25 attacks, got 129) — the fuse against infinite reaction chains is effectively broken (found 2026-07-24).
 
@@ -32,7 +32,17 @@ Biggest gameplay payoff; the demo's climax. Pipeline already proven on RatKing (
 - [ ] Three bosses, one of them two-stage (design drafts in Obsidian `07_Нпс/Боссы.md`).
 - [ ] "Доработать" #66: BattleDirector arena-wide ability presentation (global casts, boss stage transitions) — bosses look poor without it.
 
-## Stage 2 — Trade (~1–2 weeks)
+## Stage 2 — Crafting resources rework (~1–2 weeks)
+
+Current crafting resources are broken against the new affix model (prefix/suffix + global/local split). Design drafts: Obsidian `06_Крафт/Список ресурсов для крафта.md` and `03_Предметы/Список пулов по категориям.md` (WIP — several category sections still empty).
+
+- [ ] Data schema: material-category base pools split per EQUIPMENT category (Armor/Weapon/Jewellery sections inside Metal/Fabric/Hide/Gem/Bone), same split for per-resource modifier lists — a resource contributes different modifiers depending on what is being crafted (closes "Доработать" #94).
+- [ ] `scope` field on pool entries (global vs local) — parse into `ModifierScope` (the local bucket already exists on `EquipItem`); draft marks locals with «(локальный)».
+- [ ] Roll ranges on resource-descriptor entries (draft values are min–max, current data is single-value).
+- [ ] Pool assembly (`EquipItemPoolExtensions`) picks the resource sub-pool by the target item's category; affix dedup invariants (ModifierKey) must keep holding.
+- [ ] Finish the Obsidian lists (Todd) → translate into `SharedData/Resources/CraftingResources.json`.
+
+## Stage 3 — Trade (~1–2 weeks)
 
 Closes the economy loop (loot → gold → purchases) and activates already-built hooks: reputation perks await a consumer, `StartTrade` dialogue action is promised in the enum, prices-from-RelationLevel are designed.
 
@@ -40,14 +50,14 @@ Closes the economy loop (loot → gold → purchases) and activates already-buil
 - [ ] Item gold price (decide storage: in item data — recommended).
 - [ ] Prices × RelationLevel + `Perk_Price_Change` — first consumer of `ReputationPerkProvider`.
 
-## Stage 3 — Demo content & balance (~2 weeks, parallel with Stage 4)
+## Stage 4 — Demo content & balance (~2 weeks, parallel with Stage 5)
 
 - [ ] Define the demo arc: starting zone → quest thread → boss finale. Map stays small.
 - [ ] Quests/dialogues for the demo arc (system is ready; this is content).
 - [ ] Balance pass via existing simulations (loot Monte-Carlo, reputation invariants) + manual: #75 (unarmed barrier 10000), elemental damage weights ("Доработать" #87).
 - [ ] #61 — English text debt (EquipmentPiece literals, "Day" in HUD, etc.).
 
-## Stage 4 — First-impression UX polish (~1–2 weeks)
+## Stage 5 — First-impression UX polish (~1–2 weeks)
 
 Only what a new player sees in the first hour:
 
@@ -57,13 +67,13 @@ Only what a new player sees in the first hour:
 - [ ] Crafting mastery level display (#72), craft forecast with resource effects (#90).
 - [ ] Damage numbers above the spot (#95), NPC modifier fonts with 3+ enemies (#71).
 
-## Stage 5 — Assets & audio (~3–4 weeks, starts alongside Stage 3)
+## Stage 6 — Assets & audio (~3–4 weeks, starts alongside Stage 4)
 
 - [ ] **AI batch continuously** (godot-asset-generator pipeline is ready): item/ability icons, regular NPC sprites, ability VFX clips (data-driven: clip in VfxFrames + config, no code), zone tiles. Each boss gets at least AI art immediately.
 - [ ] **Key art commissioned/hand-made near the end**: hero, three bosses, UI frame. Order only after boss mechanics freeze.
 - [ ] **Audio — do not leave for last** (nothing exists yet; half the feel of combat): minimal pass (hits, casts, UI clicks, death, 1–2 music loops — library/CC0 acceptable) before the first external playtests; polish after.
 
-## Stage 6 — Demo finalization (~1–2 weeks)
+## Stage 7 — Demo finalization (~1–2 weeks)
 
 - [ ] First export: SharedData symlinks in pack (#57), dead `Main/export_presets.cfg` ("Доработать" #25), isolated project startup (#24).
 - [ ] Full Godot pass (Block-0 style) + new game → save/load → session reset cycle.

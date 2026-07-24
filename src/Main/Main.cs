@@ -6,6 +6,7 @@
     using Battle.Source;
     using Battle.Source.UIElements;
     using Core;
+    using Core.Constants;
     using Core.Data;
     using Core.Entity;
     using Core.Enums;
@@ -15,6 +16,7 @@
     using Core.Services;
     using Core.Views.UI;
     using Godot;
+    using Inventory;
     using LootGeneration.Source;
     using Services;
     using UI;
@@ -92,26 +94,6 @@
             _provider.GetService<ILootOrchestrator>().SetFloorToSpawnItems(null);
         }
 
-        /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.
-        /// Deferred: the request comes from a physics callback, and joining reparents a physics
-        /// body (world → spot) — doing that mid-flush silently fails and strands the node in the world.</summary>
-        private void OnBattleJoinRequest(BattleJoinRequestEvent evnt) =>
-            // Statement lambda on purpose: an expression lambda would return bool? and Callable
-            // has no Variant conversion for Nullable — crashes at invoke time.
-            Callable.From(() => { _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer); }).CallDeferred();
-
-        private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
-            _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
-
-        // Window hotkeys route through InputMap actions (Core.Constants.Settings names them) —
-        // availability per game situation is the UiContext map's job, not checks here.
-        private static readonly System.Collections.Generic.Dictionary<string, Type> s_windowHotkeys = new()
-        {
-            [Core.Constants.Settings.Inventory] = typeof(Inventory.InventoryWindow),
-            [Core.Constants.Settings.Quests] = typeof(QuestJournalWindow),
-            [Core.Constants.Settings.Character] = typeof(CharacterWindow),
-            [Core.Constants.Settings.Mastery] = typeof(MartialArtMasteryWindow),
-        };
 
         public override void _Input(InputEvent @event)
         {
@@ -126,6 +108,27 @@
                 return;
             }
         }
+
+        /// <summary>Refusal (no free spot / battle over) simply leaves the NPC in the world.
+        /// Deferred: the request comes from a physics callback, and joining reparents a physics
+        /// body (world → spot) — doing that mid-flush silently fails and strands the node in the world.</summary>
+        private void OnBattleJoinRequest(BattleJoinRequestEvent evnt) =>
+            // Statement lambda on purpose: an expression lambda would return bool? and Callable
+            // has no Variant conversion for Nullable — crashes at invoke time.
+            Callable.From(() => { _activeContext?.TryJoinBattle(evnt.Fighter, evnt.AlliedWithPlayer); }).CallDeferred();
+
+        private void OnPlayerFinalDeath(PlayerFinalDeathEvent evnt) =>
+            _uiElementProvider?.OpenWindow(typeof(GameOverWindow));
+
+        // Window hotkeys route through InputMap actions (Core.Constants.Settings names them) —
+        // availability per game situation is the UiContext map's job, not checks here.
+        private static readonly Dictionary<string, Type> s_windowHotkeys = new()
+        {
+            [Settings.Inventory] = typeof(InventoryWindow),
+            [Settings.Quests] = typeof(QuestJournalWindow),
+            [Settings.Character] = typeof(CharacterWindow),
+            [Settings.Mastery] = typeof(MartialArtMasteryWindow),
+        };
 
         private static Control? CreateNotificationPopup()
         {
