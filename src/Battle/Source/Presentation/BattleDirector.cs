@@ -34,9 +34,6 @@ namespace Battle.Source.Presentation
 
         private const float ReturnSeconds = 0.20f;
 
-        // How far into the swing clip the hit lands: the target's reaction overlaps the strike
-        // point instead of waiting for the full swing to finish.
-        private const float SwingImpactFraction = 0.6f;
         private const string AttackAnimation = "Fight_Attack";
         private const string HurtAnimation = "Fight_Hurt";
         private const string DeadAnimation = "Dead";
@@ -57,6 +54,16 @@ namespace Battle.Source.Presentation
         private Func<string, Node2D?>? _findSpot;
         private Task _playback = Task.CompletedTask;
         private float _baseSpeed = 1f;
+
+        // Phrase coalescing: within one visual phrase, repeated effect applications dedupe to one log
+        // line each (first kept) and recoveries sum per target (last event kept — its vitals are final);
+        // buffered here, emitted once at phrase end by FlushPhrase. Damage is never buffered.
+        private readonly Dictionary<string, EffectAppliedEvent> _phraseEffects = [];
+        private readonly Dictionary<string, (float Total, EntityHealedEvent Last)> _phraseHeals = [];
+        // Latest vitals per entity in the phrase (damage or heal, whichever touched it last): the summed
+        // recovery flushes the TRUE final health, so damage after the last heal isn't undone by a stale snapshot.
+        private readonly Dictionary<string, VitalsSnapshot> _phraseVitals = [];
+        private bool _coalescing;
 
         private float CurrentSpeed => _baseSpeed * Mathf.Clamp(_pending.Count / (float)AutoBoostQueueLength, 1f, MaxAutoBoost);
 
@@ -116,9 +123,19 @@ namespace Battle.Source.Presentation
                 while (_pending.Count > 0 && IsInsideTree())
                 {
                     _vfx?.SpeedScale = CurrentSpeed;
-                    if (TryCollectCastChord(out var cast, out var chord)) await PlayCastChord(cast, chord);
-                    else if (TryCollectMeleeExchange(out var opener, out var steps)) await PlayMeleeExchange(opener, steps);
-                    else await PlayBeat(_pending.Dequeue());
+                    // Each phrase coalesces its own effect/heal republishes; the finally flushes them
+                    // even if the phrase throws, and deactivates so the next phrase starts clean.
+                    BeginPhrase();
+                    try
+                    {
+                        if (TryCollectCastChord(out var cast, out var chord)) await PlayCastChord(cast, chord);
+                        else if (TryCollectMeleeExchange(out var opener, out var window)) await PlayMeleeExchange(opener, window);
+                        else await PlayBeat(_pending.Dequeue());
+                    }
+                    finally
+                    {
+                        FlushPhrase();
+                    }
                 }
             }
             finally
@@ -159,6 +176,7 @@ namespace Battle.Source.Presentation
         private static string? GetCastId(object evnt) => evnt switch
         {
             AbilityActivatedEvent ability => ability.CastId,
+            AbilityExecutedEvent executed => executed.CastId, // closing bracket: extends the window past hits that carry no CastId (attack series)
             DamageTakenEvent damage => damage.Context.CastId,
             _ => null,
         };
@@ -184,105 +202,47 @@ namespace Battle.Source.Presentation
             await handler(evnt);
         }
 
-        /// <summary>One step of a melee exchange: an attack with its resolution (hurt/evade/block),
-        /// or an instant rider event (heal/effect) that fired between the blows and replays in order.</summary>
-        private readonly record struct ExchangeStep(BeforeAttackEvent? Attack, object? Resolution, object? Instant);
-
         /// <summary>
-        /// A melee exchange is the run of consecutive basic attacks between the same two fighters —
-        /// the planned attack plus its extra attacks and counterattacks: one approach by the opener,
-        /// every blow lands at melee range, one return at the end. Without the batching every
-        /// reaction made its own lunge across the arena to the opponent's (empty) spot.
-        /// Attack resolution writes the entries strictly in order, so the resolution is always
-        /// the entry right after its BeforeAttackEvent.
+        /// A melee exchange is the ordered run of one basic attack and everything it triggers between
+        /// the same two fighters — self-burns, on-damage passives/effects, evade/block, extra blows and
+        /// counterattacks, deaths — collected in recorded order and bounded by the next action. The
+        /// window ends at the first non-same-pair blow (another pair's action) or an AbilityActivatedEvent
+        /// (a nested reaction cast, peeled off as its own chord next pump). Silent entries are kept in
+        /// place — playback no-ops them — so nothing is reordered.
         /// </summary>
-        private bool TryCollectMeleeExchange(out BeforeAttackEvent opener, out List<ExchangeStep> steps)
+        private bool TryCollectMeleeExchange(out BeforeAttackEvent opener, out List<object> window)
         {
             opener = null!;
-            steps = [];
+            window = [];
             if (_pending.Peek().Event is not BeforeAttackEvent head) return false;
             opener = head;
+            window.Add(_pending.Dequeue().Event); // the opening blow itself — its swing opens the phrase
 
             while (_pending.Count > 0)
             {
-                // Logic-phase records (BeforeDamageTaken, AfterAttack, ...) sit between a blow and
-                // its resolution in the catch-all timeline; playback skips them silently anyway,
-                // but left in place they broke the batching — every attack became its own lunge.
-                DiscardSilentEntries();
-                if (_pending.Count == 0) break;
-
                 object evnt = _pending.Peek().Event;
-                if (evnt is BeforeAttackEvent attack && IsSamePair(opener, attack))
-                {
-                    _pending.Dequeue();
-                    DiscardSilentEntries();
-                    object? resolution = null;
-                    if (_pending.Count > 0 && IsResolutionOf(attack, _pending.Peek().Event))
-                        resolution = _pending.Dequeue().Event;
-                    steps.Add(new ExchangeStep(attack, resolution, null));
-                }
-                else if (evnt is EntityHealedEvent or EffectAppliedEvent && NextAttackContinuesExchange(opener))
-                    steps.Add(new ExchangeStep(null, null, _pending.Dequeue().Event));
-                else break;
+                if (evnt is BeforeAttackEvent blow && !IsSamePair(opener, blow)) break;
+                if (evnt is AbilityActivatedEvent) break;
+                window.Add(_pending.Dequeue().Event);
             }
 
             return true;
-        }
-
-        /// <summary>An event without a beat handler is invisible to playback (PlayBeat skips it
-        /// silently) — phrase collectors treat such entries as transparent.</summary>
-        private bool IsSilent(object evnt) => !_beatHandlers.ContainsKey(evnt.GetType());
-
-        private void DiscardSilentEntries()
-        {
-            while (_pending.Count > 0 && IsSilent(_pending.Peek().Event))
-                _pending.Dequeue();
         }
 
         private static bool IsSamePair(BeforeAttackEvent first, BeforeAttackEvent next) =>
             (next.Context.Attacker.IsSame(first.Context.Attacker.InstanceId) && next.Context.Target.IsSame(first.Context.Target.InstanceId))
             || (next.Context.Attacker.IsSame(first.Context.Target.InstanceId) && next.Context.Target.IsSame(first.Context.Attacker.InstanceId));
 
-        /// <summary>Instant rider events (on-hit heals/effects) sit between the blows of one exchange;
-        /// they join the phrase only when another attack of the same pair follows them.</summary>
-        private bool NextAttackContinuesExchange(BeforeAttackEvent opener)
-        {
-            foreach (var entry in _pending)
-            {
-                switch (entry.Event)
-                {
-                    case EntityHealedEvent or EffectAppliedEvent: continue;
-                    case BeforeAttackEvent attack: return IsSamePair(opener, attack);
-                    case var silent when IsSilent(silent): continue;
-                    default: return false;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsResolutionOf(BeforeAttackEvent attack, object evnt) => evnt switch
-        {
-            DamageTakenEvent damage => ReferenceEquals(damage.Context.Source, attack.Context.Attacker) && damage.Target.IsSame(attack.Context.Target.InstanceId),
-            AttackEvadedEvent evaded => ReferenceEquals(evaded.Context, attack.Context),
-            AttackBlockedEvent blocked => ReferenceEquals(blocked.Context, attack.Context),
-            _ => false
-        };
-
-        private async Task PlayMeleeExchange(BeforeAttackEvent opener, List<ExchangeStep> steps)
+        /// <summary>
+        /// Replays a basic-attack exchange as one phrase: the opener approaches its target once, the
+        /// whole ordered window plays in recorded order (blows, triggers, riders, deaths), one return.
+        /// Same shape as <see cref="PlayMeleeSeries"/> — both delegate to <see cref="PlayApproachedMelee"/>.
+        /// </summary>
+        private async Task PlayMeleeExchange(BeforeAttackEvent opener, List<object> window)
         {
             try
             {
-                var mover = opener.Context.Attacker;
-                if (!IsShownDead(mover)) await MoveToMeleeRangeAsync(mover, opener.Context.Target);
-                foreach (var step in steps)
-                {
-                    if (step.Instant != null) await PlayEvent(step.Instant);
-                    else await PlayExchangeBlow(step.Attack!, step.Resolution);
-                }
-
-                // Re-checked after the blows: a counterattack may have killed the opener mid-exchange.
-                if (!IsShownDead(mover)) await ReturnToSpotAsync(mover);
+                await PlayApproachedMelee(opener.Context.Attacker, opener.Context.Target, window, visual: null);
                 await WaitAsync(DelayBetweenBeats);
             }
             catch (Exception e)
@@ -291,16 +251,27 @@ namespace Battle.Source.Presentation
             }
         }
 
-        /// <summary>The swing and its outcome overlap: the resolution shows at the strike point of the
-        /// clip, and the next blow starts only after the swing has fully played out.</summary>
-        private async Task PlayExchangeBlow(BeforeAttackEvent attack, object? resolution)
+        /// <summary>
+        /// The shared melee body: <paramref name="mover"/> lunges to <paramref name="approachTarget"/>
+        /// once (when there is one and the mover is still standing), the ordered <paramref name="window"/>
+        /// replays in place — each live-target hit at arm's reach, every other beat through the normal
+        /// beat map — then one return home. Both the ability series and the basic-attack exchange use it.
+        /// </summary>
+        private async Task PlayApproachedMelee(IFightable mover, IFightable? approachTarget, IReadOnlyList<object> window, AbilityVisualConfig? visual)
         {
-            bool showAttacker = !IsShownDead(attack.Context.Attacker);
-            Task swing = showAttacker ? PlayAttack(attack) : Task.CompletedTask;
-            if (showAttacker) await WaitAsync(attack.Context.Attacker.Animations.GetClipSeconds(AttackAnimation) * SwingImpactFraction);
-            if (resolution != null) await PlayEvent(resolution);
-            await swing;
-            await WaitAsync(DelayBetweenBeats);
+            if (approachTarget != null && !IsShownDead(mover))
+                await MoveToMeleeRangeAsync(mover, approachTarget);
+
+            foreach (object entry in window)
+            {
+                if (entry is DamageTakenEvent hit && !IsShownDead(hit.Target))
+                    await PlayHitGroup([hit], visual, mover.InstanceId);
+                else
+                    await PlayEvent(entry);
+            }
+
+            if (!IsShownDead(mover))
+                await ReturnToSpotAsync(mover);
         }
 
         /// <summary>Runs the attacker's node from its spot to arm's reach of the target's spot.
@@ -413,8 +384,9 @@ namespace Battle.Source.Presentation
 
         /// <summary>
         /// One ability activation as a single visual phrase: cast animation, the ability's own VFX
-        /// (flight/appearance per its visual config), then the hits — Chain plays them sequentially in
-        /// recorded order, everything else parallel across targets with staggered numbers within one.
+        /// (flight/appearance per its visual config), then the hits — a melee series approaches once
+        /// and replays its window in recorded order, Chain plays sequentially in recorded order,
+        /// everything else parallel across targets with staggered numbers within one.
         /// The cast animation is named after the ability id, matching the pre-replay convention.
         /// </summary>
         private async Task PlayCastChord(AbilityActivatedEvent cast, List<object> chord)
@@ -431,40 +403,33 @@ namespace Battle.Source.Presentation
                 await castVfx;
 
                 var hits = chord.OfType<DamageTakenEvent>().Where(hit => !IsShownDead(hit.Target)).ToList();
-                foreach (object rider in chord.Where(evnt => evnt is not DamageTakenEvent))
-                    ReplayInstant(rider);
-
-                if (hits.Count == 0)
+                // A melee series consumes the whole ordered chord itself (one approach, hits in place,
+                // one return); the up-front rider strip below would reorder its interleaved beats.
+                if (hits.Count > 0 && visual is { MeleeApproach: true })
                 {
-                    if (visual != null && _vfx != null) await PlayHitlessCast(cast, chord, visual);
+                    await PlayMeleeSeries(cast, chord, visual);
                 }
-                else switch (visual)
+                else
                 {
-                    case { Delivery: VfxDeliveryKind.Chain } when _vfx != null:
-                        await PlayChain(cast, hits, visual);
-                        break;
-                    case { MeleeApproach: true }:
-                        {
-                            // TODO:
-                            // работает не совсем корректно. Атакующий для проведения каждой атаки бегает туда сюда
+                    foreach (object rider in chord.Where(evnt => evnt is not DamageTakenEvent))
+                        ReplayInstant(rider);
 
-                            // Melee series: the caster runs up to each target in turn, the hits land at
-                            // arm's reach, one return home at the end of the whole cast.
-                            foreach (var group in hits.GroupBy(hit => hit.Target.InstanceId))
+                    if (hits.Count == 0)
+                    {
+                        if (visual != null && _vfx != null) await PlayHitlessCast(cast, chord, visual);
+                    }
+                    else switch (visual)
+                    {
+                        case { Delivery: VfxDeliveryKind.Chain } when _vfx != null:
+                            await PlayChain(cast, hits, visual);
+                            break;
+                        default:
                             {
-                                await MoveToMeleeRangeAsync(cast.Caster, group.First().Target);
-                                await PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId);
+                                var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
+                                await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId)));
+                                break;
                             }
-
-                            await ReturnToSpotAsync(cast.Caster);
-                            break;
-                        }
-                    default:
-                        {
-                            var hitGroups = hits.GroupBy(hit => hit.Target.InstanceId);
-                            await Task.WhenAll(hitGroups.Select(group => PlayHitGroup(group.ToList(), visual, cast.Caster.InstanceId)));
-                            break;
-                        }
+                    }
                 }
 
                 await WaitAsync(DelayBetweenBeats);
@@ -473,6 +438,21 @@ namespace Battle.Source.Presentation
             {
                 Tracker.TrackException($"Cast chord playback failed for {cast.Ability.Id}", e, this);
             }
+        }
+
+        /// <summary>
+        /// A melee attack-series cast played as one phrase: the caster approaches the enemy target
+        /// ONCE, then the whole cast window replays in recorded order — each hit lands at arm's reach,
+        /// every other beat plays through the normal beat map (per-blow swing, evade/block, mid-series
+        /// deaths, riders) — and one return home. A self-inflicted hit (e.g. the fury burn on the
+        /// caster) never picks an approach and is shown where it lands.
+        /// </summary>
+        private async Task PlayMeleeSeries(AbilityActivatedEvent cast, List<object> chord, AbilityVisualConfig visual)
+        {
+            var approachTarget = chord.OfType<DamageTakenEvent>()
+                .Select(hit => hit.Target)
+                .FirstOrDefault(target => !target.IsSame(cast.Caster.InstanceId));
+            await PlayApproachedMelee(cast.Caster, approachTarget, chord, visual);
         }
 
         /// <summary>
@@ -581,7 +561,74 @@ namespace Battle.Source.Presentation
         }
 
         private void Republish<T>(T evnt)
-            where T : IBattleEvent => _battleEventBus?.Publish(evnt);
+            where T : IBattleEvent
+        {
+            if (_coalescing)
+            {
+                // Record vitals BEFORE buffering so damage (which passes through) still updates the snapshot.
+                RecordPhraseVitals(evnt);
+                if (TryCoalesce(evnt)) return;
+            }
+
+            _battleEventBus?.Publish(evnt);
+        }
+
+        /// <summary>Latest vitals per entity in the phrase → the summed recovery emits the TRUE final
+        /// health; damage landing after the last heal must not be undone by a stale flush snapshot.</summary>
+        private void RecordPhraseVitals<T>(T evnt)
+            where T : IBattleEvent
+        {
+            switch (evnt)
+            {
+                case DamageTakenEvent damage: _phraseVitals[damage.Target.InstanceId] = damage.Vitals; break;
+                case EntityHealedEvent healed: _phraseVitals[healed.Healed.InstanceId] = healed.Vitals; break;
+            }
+        }
+
+        /// <summary>Buffers the two coalescible events for the current phrase and reports it handled:
+        /// effect applications dedupe by (id, target) keeping the first; recoveries sum per target
+        /// keeping the last event (its vitals are the final health). Damage and everything else — false.</summary>
+        private bool TryCoalesce<T>(T evnt)
+            where T : IBattleEvent
+        {
+            switch (evnt)
+            {
+                case EffectAppliedEvent applied:
+                    _phraseEffects.TryAdd(EffectKey(applied), applied);
+                    return true;
+                case EntityHealedEvent healed:
+                    var accumulated = _phraseHeals.GetValueOrDefault(healed.Healed.InstanceId);
+                    _phraseHeals[healed.Healed.InstanceId] = (accumulated.Total + healed.Amount, healed);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static string EffectKey(EffectAppliedEvent applied) => $"{applied.Effect.Id}|{applied.Target.InstanceId}";
+
+        /// <summary>Opens a coalescing phrase: buffered effect/heal republishes are held until FlushPhrase.</summary>
+        private void BeginPhrase()
+        {
+            _phraseEffects.Clear();
+            _phraseHeals.Clear();
+            _phraseVitals.Clear();
+            _coalescing = true;
+        }
+
+        /// <summary>Closes the phrase: deactivate FIRST (so the flushed republishes go straight through),
+        /// then emit one representative event per effect key and one summed recovery per target.</summary>
+        private void FlushPhrase()
+        {
+            _coalescing = false;
+            foreach (EffectAppliedEvent applied in _phraseEffects.Values)
+                Republish(applied);
+            foreach (var (id, (total, last)) in _phraseHeals)
+                Republish(new EntityHealedEvent(last.Healed, total, _phraseVitals.GetValueOrDefault(id, last.Vitals)));
+            _phraseEffects.Clear();
+            _phraseHeals.Clear();
+            _phraseVitals.Clear();
+        }
 
         private async Task WaitAsync(float seconds)
         {

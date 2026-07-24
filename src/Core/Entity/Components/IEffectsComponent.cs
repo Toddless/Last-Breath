@@ -25,7 +25,9 @@
         void RemoveEffect(IEffect effect);
         void TriggerTurnEnd();
         void TriggerTurnStart();
-        void AddEffect(IEffect newEffect);
+        /// <summary>Returns whether the stacking rules accepted THIS instance (a rejected single-stack
+        /// re-application only refreshes the existing effect and returns false).</summary>
+        bool AddEffect(IEffect newEffect);
         void RemoveEffectByStatus(StatusEffects status);
         void RemoveAllEffects();
         void RemoveEffectBySource(string source);

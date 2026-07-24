@@ -35,17 +35,17 @@
 
         public void RegisterDotTick(DotTick tick) => _dotTicks.Add(tick);
 
-        public void AddEffect(IEffect newEffect)
+        public bool AddEffect(IEffect newEffect)
         {
             string source = newEffect.Source;
-            if (string.IsNullOrWhiteSpace(source)) return;
+            if (string.IsNullOrWhiteSpace(source)) return false;
 
             var effectsBySource = GetEffectsForSource(source);
 
             // MaxStacks is a per-target limit: count same-id effects across ALL sources
             var globalOnTarget = FindSameEffects(newEffect.Id, _orderedEffects);
 
-            ProcessEffectStacking(effectsBySource, globalOnTarget, newEffect);
+            return ProcessEffectStacking(effectsBySource, globalOnTarget, newEffect);
         }
 
         public void RemoveEffect(IEffect effect)
@@ -127,47 +127,54 @@
             _dotTicks.Clear();
         }
 
-        private void ProcessEffectStacking(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
+        private bool ProcessEffectStacking(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
         {
             bool isSingleStack = newEffect.MaxStacks <= 1;
 
-            if (isSingleStack) HandleSingleStack(sourceEffects, globalOnTarget, newEffect);
-            else HandleMultipleStacks(sourceEffects, globalOnTarget, newEffect);
+            return isSingleStack
+                ? HandleSingleStack(sourceEffects, globalOnTarget, newEffect)
+                : HandleMultipleStacks(sourceEffects, globalOnTarget, newEffect);
         }
 
-        private void HandleMultipleStacks(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
+        private bool HandleMultipleStacks(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
         {
             bool hasReachedMaxStacks = globalOnTarget.Count >= newEffect.MaxStacks;
 
             if (!hasReachedMaxStacks)
             {
                 AddNewEffectAndNotify(sourceEffects, newEffect);
-                return;
+                return true;
             }
 
             // Evict the globally oldest stack, regardless of which source applied it
             var oldEffect = _orderedEffects.FirstOrDefault(effect => effect.Id == newEffect.Id);
-            if (oldEffect == null) return;
+            if (oldEffect == null) return false;
 
             oldEffect.Remove();
             AddNewEffectAndNotify(sourceEffects, newEffect);
+            return true;
         }
 
-        private void HandleSingleStack(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
+        private bool HandleSingleStack(List<IEffect> sourceEffects, List<IEffect> globalOnTarget, IEffect newEffect)
         {
-            if (globalOnTarget.Count == 0) AddNewEffectAndNotify(sourceEffects, newEffect);
-            else
+            if (globalOnTarget.Count == 0)
             {
-                // oldest effect
-                IEffect existingEffect = globalOnTarget[0];
-
-                if (newEffect.IsStronger(existingEffect))
-                {
-                    existingEffect.Remove();
-                    AddNewEffectAndNotify(sourceEffects, newEffect);
-                }
-                else existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
+                AddNewEffectAndNotify(sourceEffects, newEffect);
+                return true;
             }
+
+            // oldest effect
+            IEffect existingEffect = globalOnTarget[0];
+
+            if (newEffect.IsStronger(existingEffect))
+            {
+                existingEffect.Remove();
+                AddNewEffectAndNotify(sourceEffects, newEffect);
+                return true;
+            }
+
+            existingEffect.Duration = Math.Max(existingEffect.Duration, newEffect.Duration);
+            return false;
         }
 
         private void AddNewEffectAndNotify(List<IEffect> sourceEffects, IEffect newEffect)
