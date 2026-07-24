@@ -19,9 +19,9 @@
                 "Dexterity": 5,
                 "Intelligence": 5,
                 "Armor": 2000,
-                "CriticalChance": 0.0,
-                "AdditionalHitChance": 0.0,
-                "CriticalDamage": 0.0,
+                "CriticalChance": 0,
+                "AdditionalHitChance": 0,
+                "CriticalDamage": 0,
                 "Damage": 1,
                 "SpellDamage": 1,
                 "Accuracy": 0,
@@ -43,7 +43,7 @@
             "lifecycle": {
                 "resurrectMinSeconds": 20,
                 "resurrectMaxSeconds": 90,
-                "maxStrengthBonus": 1.0
+                "maxStrengthBonus": 1
             }
         },
         {
@@ -100,7 +100,7 @@
             "lifecycle": {
                 "resurrectMinSeconds": 20,
                 "resurrectMaxSeconds": 90,
-                "maxStrengthBonus": 1.0
+                "maxStrengthBonus": 1
             }
         },
         {
@@ -927,7 +927,7 @@
             ],
             "levelMin": 30,
             "levelMax": 30,
-            "levelScaling": 0.0,
+            "levelScaling": 0,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Dark_Shroud",
@@ -952,7 +952,7 @@
                 "Armor": 2500,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.35,
-                "CriticalDamage": 2.0,
+                "CriticalDamage": 2,
                 "Damage": 500,
                 "SpellDamage": 300,
                 "Accuracy": 4200,
@@ -979,7 +979,7 @@
             ],
             "levelMin": 30,
             "levelMax": 30,
-            "levelScaling": 0.0,
+            "levelScaling": 0,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Ares_Blessing",
@@ -1031,7 +1031,7 @@
             ],
             "levelMin": 15,
             "levelMax": 15,
-            "levelScaling": 0.0,
+            "levelScaling": 0,
             "fleeHealthThreshold": 0,
             "stages": [
                 {
@@ -1049,7 +1049,7 @@
                     "nextStageAtHealthPercent": 0.35
                 },
                 {
-                    "parameterMultiplier": 1.0,
+                    "parameterMultiplier": 1,
                     "abilities": [
                         "Ability_Increasing_Pressure",
                         "Ability_Poison_Explosion"
@@ -1057,7 +1057,7 @@
                     "attackEffects": [
                         {
                             "effect": "Poison",
-                            "chance": 1.0,
+                            "chance": 1,
                             "damagePercent": 0.75,
                             "duration": 3,
                             "maxStacks": 999
@@ -1111,7 +1111,7 @@
             ],
             "levelMin": 10,
             "levelMax": 10,
-            "levelScaling": 0.0,
+            "levelScaling": 0,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Critical_Calculation",
@@ -1144,7 +1144,7 @@
                 "Armor": 300,
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.35,
-                "CriticalDamage": 2.0,
+                "CriticalDamage": 2,
                 "Damage": 200,
                 "SpellDamage": 50,
                 "Accuracy": 700,
@@ -1170,7 +1170,7 @@
             ],
             "levelMin": 1,
             "levelMax": 1,
-            "levelScaling": 0.0,
+            "levelScaling": 0,
             "abilityCount": 1,
             "baseParameters": {
                 "Health": 500,
@@ -1187,6 +1187,47 @@
                 "SpellDamage": 15,
                 "Accuracy": 175,
                 "Evade": 375
+            }
+        },
+        {
+            "id": "Npc_Human_Merchant",
+            "fraction": "Human",
+            "entityType": "Regular",
+            "aiIntellect": "Simple",
+            "stances": [
+                "Strength"
+            ],
+            "levelMin": 5,
+            "levelMax": 8,
+            "levelScaling": 0,
+            "abilityCount": 2,
+            "baseParameters": {
+                "Health": 900,
+                "Barrier": 100,
+                "Mana": 200,
+                "Strength": 5,
+                "Dexterity": 3,
+                "Intelligence": 3,
+                "Armor": 200,
+                "CriticalChance": 0.05,
+                "AdditionalHitChance": 0.05,
+                "CriticalDamage": 1.5,
+                "Damage": 120,
+                "SpellDamage": 40,
+                "Accuracy": 350,
+                "Evade": 250
+            },
+            "world": {
+                "visionRadius": 350,
+                "hearingRadius": 500,
+                "leashRadius": 400,
+                "moveSpeed": 90,
+                "chaseSpeedMultiplier": 1.2,
+                "searchSeconds": 4,
+                "activity": "Idle"
+            },
+            "interaction": {
+                "canTalk": true
             }
         }
     ]

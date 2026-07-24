@@ -3543,3 +3543,30 @@ msgstr "Gold"
 
 msgid "Item_Gold_Description"
 msgstr "Coins of the realm. They never take up bag space - picking a pile up fills your purse."
+
+msgid "Trader_Human_Merchant"
+msgstr "Wandering Merchant"
+
+msgid "UI_Trade_Stock"
+msgstr "Goods"
+
+msgid "UI_Trade_Buyback"
+msgstr "Buyback"
+
+msgid "UI_Trade_Buy"
+msgstr "Buy"
+
+msgid "UI_Trade_Price"
+msgstr "{Amount} g"
+
+msgid "UI_Trade_Gold"
+msgstr "Gold: {Amount}"
+
+msgid "Npc_Human_Merchant"
+msgstr "Wandering Merchant"
+
+msgid "Dlg_Merchant_Greeting_1"
+msgstr "Ah, a customer with a pulse. Rare thing on this road. Take a look - everything is honestly priced, more or less."
+
+msgid "Dlg_Merchant_Opt_Trade"
+msgstr "Show me your goods."

@@ -22,9 +22,9 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(1, stock.Count);
             Assert.AreEqual(2, stock[0].Remaining);
 
-            Assert.IsNotNull(service.TakeOne(TraderId, stock[0].OfferId));
-            Assert.IsNotNull(service.TakeOne(TraderId, stock[0].OfferId));
-            Assert.IsNull(service.TakeOne(TraderId, stock[0].OfferId), "an emptied offer must refuse");
+            Assert.IsNotNull(service.TakeMany(TraderId, stock[0].OfferId, 1));
+            Assert.IsNotNull(service.TakeMany(TraderId, stock[0].OfferId, 1));
+            Assert.IsNull(service.TakeMany(TraderId, stock[0].OfferId, 1), "an emptied offer must refuse");
             Assert.AreEqual(0, service.GetStock(TraderId).Count, "sold out = an empty shelf until restock");
         }
 
@@ -34,8 +34,8 @@ namespace LastBreathTest.BattleSystemTests
             var service = Service(Definition(catalogCount: 2));
             var offer = service.GetStock(TraderId)[0];
 
-            var first = service.TakeOne(TraderId, offer.OfferId);
-            var second = service.TakeOne(TraderId, offer.OfferId);
+            var first = service.TakeMany(TraderId, offer.OfferId, 1);
+            var second = service.TakeMany(TraderId, offer.OfferId, 1);
 
             Assert.AreNotSame(first, second, "every purchase must mint its own copy");
             Assert.AreNotEqual(first!.InstanceId, second!.InstanceId);
@@ -53,12 +53,39 @@ namespace LastBreathTest.BattleSystemTests
         {
             var service = Service(Definition(catalogCount: 1));
             var offer = service.GetStock(TraderId)[0];
-            Assert.IsNotNull(service.TakeOne(TraderId, offer.OfferId));
+            Assert.IsNotNull(service.TakeMany(TraderId, offer.OfferId, 1));
             Assert.AreEqual(0, service.GetStock(TraderId).Count);
 
             service.ResetSession();
 
             Assert.AreEqual(1, service.GetStock(TraderId).Count, "a new game restocks from scratch");
+        }
+
+        [TestMethod]
+        public void PartialAmount_IsAllOrNothing()
+        {
+            var service = Service(Definition(catalogCount: 3));
+            var offer = service.GetStock(TraderId)[0];
+
+            Assert.IsNull(service.TakeMany(TraderId, offer.OfferId, 5), "an amount over the shelf must refuse whole");
+            Assert.AreEqual(3, service.GetStock(TraderId)[0].Remaining, "the refused take must not touch the shelf");
+            Assert.IsNotNull(service.TakeMany(TraderId, offer.OfferId, 3));
+        }
+
+        [TestMethod]
+        public void SoldItem_WaitsOnTheBuybackShelf_AtTheEarnedPrice()
+        {
+            var service = Service(Definition(catalogCount: 1));
+            var sold = new CraftingResource("Crafting_Resource_Sold", 999, [], Mock.Of<Core.Crafting.IMaterial>(), Rarity.Rare);
+
+            service.AddBuyback(TraderId, sold, amount: 4, unitPrice: 12);
+
+            var buyback = service.GetStock(TraderId).Single(offer => offer.IsBuyback);
+            Assert.AreEqual(4, buyback.Remaining);
+            Assert.AreEqual(12, buyback.BuybackUnitPrice, "undoing a sale must cost exactly what it earned");
+
+            Assert.IsNotNull(service.TakeMany(TraderId, buyback.OfferId, 4));
+            Assert.IsFalse(service.GetStock(TraderId).Any(offer => offer.IsBuyback), "an emptied buyback offer leaves the shelf");
         }
 
         private static TraderService Service(TraderDefinition definition)

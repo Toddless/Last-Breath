@@ -117,6 +117,7 @@ namespace LastBreath.Helpers
                 case "item": ExecuteItem(args); break;
                 case "stats": ExecutePlayerStats(args); break;
                 case "heal": ExecuteHeal(args); break;
+                case "trade": ExecuteTrade(args); break;
                 case "restore": ExecuteRestore(args); break;
                 case "cd": ExecuteCooldowns(args); break;
                 case "effect": ExecuteEffect(args); break;
@@ -132,6 +133,14 @@ namespace LastBreath.Helpers
                 case "load": ExecuteLoad(args); break;
                 default: Print("Unknown command, try: help"); break;
             }
+        }
+
+        /// <summary>trade [traderId] — opens the trade window (test path until an NPC carries it).</summary>
+        private void ExecuteTrade(string[] args)
+        {
+            string traderId = args.Length > 1 ? args[1] : "Trader_Human_Merchant";
+            Service<Core.MessageBus.IGameMessageBus>().PublishMessageAsync(new Core.MessageBus.Messages.OpenTradeWindowMessage(traderId));
+            Print($"trade window requested: {traderId}");
         }
 
         private void ExecuteHeal(string[] args)

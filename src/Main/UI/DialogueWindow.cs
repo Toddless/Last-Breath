@@ -26,7 +26,6 @@ namespace LastBreath.UI
 
         public void InjectServices(IGameServiceProvider provider)
         {
-            GD.Print("Injected services to DialogueWindow");
             _dialogue = provider.GetService<IDialogueService>();
             _dialogue.Changed += Render;
             _dialogue.Ended += OnConversationEnded;

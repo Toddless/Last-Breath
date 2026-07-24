@@ -54,6 +54,9 @@ colors = PackedColorArray(0.81960785, 0, 0, 1, 0, 0, 0, 1)
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_m67ao"]
 gradient = SubResource("Gradient_kwijy")
 
+[sub_resource type="LabelSettings" id="LabelSettings_s1n7v"]
+font_size = 69
+
 [node name="MainWorld" type="Node2D" unique_id=1612394780]
 script = ExtResource("1_4xxmu")
 
@@ -134,7 +137,7 @@ offset_bottom = 146.0
 text = "Rat king"
 label_settings = SubResource("LabelSettings_fx85w")
 
-[node name="BossSpawnPoint2" type="Node2D" parent="." unique_id=359407581]
+[node name="PackLeader" type="Node2D" parent="." unique_id=359407581]
 position = Vector2(-1188, 613)
 script = ExtResource("9_hv00y")
 _bossId = "Npc_Boss_Bone_Pack_Leader"
@@ -142,10 +145,10 @@ _factionDeathsPerRespawn = 0
 _pointId = "Boss_Spawn_Pack_Leader"
 metadata/_custom_type_script = "uid://cpwjet55i0mhp"
 
-[node name="Sprite2D" type="Sprite2D" parent="BossSpawnPoint2" unique_id=741400143]
+[node name="Sprite2D" type="Sprite2D" parent="PackLeader" unique_id=741400143]
 texture = SubResource("NoiseTexture2D_fx85w")
 
-[node name="Label" type="Label" parent="BossSpawnPoint2" unique_id=1177965193]
+[node name="Label" type="Label" parent="PackLeader" unique_id=1177965193]
 offset_left = -214.0
 offset_top = 43.0
 offset_right = 228.0
@@ -213,3 +216,22 @@ metadata/_custom_type_script = "uid://ctta8cas4isp7"
 
 [node name="Sprite2D" type="Sprite2D" parent="Dummy" unique_id=1265279363]
 texture = SubResource("GradientTexture2D_m67ao")
+
+[node name="Merchant" type="Node2D" parent="." unique_id=2140579029]
+position = Vector2(-304, -235)
+script = ExtResource("8_hv00y")
+_npcIds = PackedStringArray("Npc_Human_Merchant")
+_maxCount = 1
+_spawnRadius = 50.0
+_pointId = "Spawn_Point_Human_Merchant"
+_respawnDelayMinMinutes = 20.0
+_respawnDelayMaxMinutes = 40.0
+metadata/_custom_type_script = "uid://ctta8cas4isp7"
+
+[node name="Label" type="Label" parent="Merchant" unique_id=1878426754]
+offset_left = -167.0
+offset_top = 8.0
+offset_right = 155.0
+offset_bottom = 103.0
+text = "Merchant"
+label_settings = SubResource("LabelSettings_s1n7v")

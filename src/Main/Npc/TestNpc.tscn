@@ -742,7 +742,6 @@ shape = SubResource("CircleShape2D_fx85w")
 
 [node name="DialogueActor" type="Area2D" parent="." unique_id=1792907842]
 script = ExtResource("10_r5eee")
-_npcId = "Npc_Bandit_Veteran"
 metadata/_custom_type_script = "uid://bqc3et70qq3ua"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DialogueActor" unique_id=92195266]

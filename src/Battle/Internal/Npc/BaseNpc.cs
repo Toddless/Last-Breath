@@ -747,6 +747,9 @@ namespace Battle.Internal.Npc
             // frame must not publish a second BattleInitializedEvent. A dead player is a corpse,
             // not a battle target.
             if (body is not IPlayer player || player.IsFighting || !player.IsAlive) return;
+            // Contact is not a war declaration: a neutral local (merchant, future villagers) bumped
+            // into is no battle. Hostility comes from the standing/personal layers, not the touch.
+            if (!ConsidersPlayerAnEnemy()) return;
             try
             {
                 List<IFightable> fighters = [];

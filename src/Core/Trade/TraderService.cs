@@ -12,18 +12,23 @@ namespace Core.Trade
     using Session;
 
     /// <summary>One shelf slot: plain goods keep a counter and mint a copy per purchase; a random
-    /// equip slot holds its concrete rolled instance (what you see is what you buy).</summary>
-    public record TraderOffer(string OfferId, IItem Item, int Remaining, bool IsRandomEquip);
+    /// equip slot holds its concrete rolled instance (what you see is what you buy). A buyback offer
+    /// remembers the unit price the trader paid — undoing a sale costs exactly what it earned.</summary>
+    public record TraderOffer(string OfferId, IItem Item, int Remaining, bool IsRandomEquip, bool IsBuyback = false, int BuybackUnitPrice = 0);
 
     public interface ITraderService
     {
-        /// <summary>The trader's current shelf; restocks lazily when its game-time is due.
-        /// Unknown trader id = empty (reported once by the provider at load).</summary>
+        /// <summary>The trader's current shelf (buyback offers included); restocks lazily when its
+        /// game-time is due. Unknown trader id = empty (reported once by the provider at load).</summary>
         IReadOnlyList<TraderOffer> GetStock(string traderId);
 
-        /// <summary>Takes one unit off the shelf: a fresh copy for plain goods, the rolled instance
-        /// itself for random equips. Null when the offer is gone. The caller owns payment.</summary>
-        IItem? TakeOne(string traderId, string offerId);
+        /// <summary>Takes units off the shelf all-or-nothing: a fresh copy for plain goods (the
+        /// caller adds it with the amount), the stored instance for equips/buyback. Null when the
+        /// offer can't cover the amount. The caller owns payment.</summary>
+        IItem? TakeMany(string traderId, string offerId, int amount);
+
+        /// <summary>A sold item lands on the trader's buyback shelf at the price it earned.</summary>
+        void AddBuyback(string traderId, IItem item, int amount, int unitPrice);
 
         TraderDefinition? GetTrader(string traderId);
     }
@@ -42,11 +47,15 @@ namespace Core.Trade
         IWorldClock? clock = null,
         IRandomNumberGenerator? rnd = null) : ITraderService, ISessionResettable
     {
-        private sealed class Offer(string offerId, IItem item, bool isRandomEquip)
+        private const int BuybackCapacity = 12;
+
+        private sealed class Offer(string offerId, IItem item, bool isRandomEquip, bool isBuyback = false, int buybackUnitPrice = 0)
         {
             public string OfferId { get; } = offerId;
             public IItem Item { get; } = item;
             public bool IsRandomEquip { get; } = isRandomEquip;
+            public bool IsBuyback { get; } = isBuyback;
+            public int BuybackUnitPrice { get; } = buybackUnitPrice;
             public int Remaining { get; set; } = 1;
         }
 
@@ -54,6 +63,9 @@ namespace Core.Trade
         {
             public double NextRestockMinutes = double.MinValue; // first access always stocks
             public List<Offer> Offers = [];
+
+            /// <summary>Survives restocks on purpose: the shelf refreshes, a mistake stays fixable.</summary>
+            public List<Offer> Buyback = [];
         }
 
         private readonly Dictionary<string, TraderState> _states = [];
@@ -69,20 +81,36 @@ namespace Core.Trade
             var state = EnsureFreshState(traderId);
             return state == null
                 ? []
-                : state.Offers.Where(offer => offer.Remaining > 0)
-                    .Select(offer => new TraderOffer(offer.OfferId, offer.Item, offer.Remaining, offer.IsRandomEquip))
+                : state.Offers.Concat(state.Buyback).Where(offer => offer.Remaining > 0)
+                    .Select(offer => new TraderOffer(offer.OfferId, offer.Item, offer.Remaining, offer.IsRandomEquip, offer.IsBuyback, offer.BuybackUnitPrice))
                     .ToList();
         }
 
-        public IItem? TakeOne(string traderId, string offerId)
+        public IItem? TakeMany(string traderId, string offerId, int amount)
         {
+            if (amount < 1) return null;
             var state = EnsureFreshState(traderId);
-            var offer = state?.Offers.FirstOrDefault(entry => entry.OfferId == offerId && entry.Remaining > 0);
+            var offer = state?.Offers.Concat(state.Buyback).FirstOrDefault(entry => entry.OfferId == offerId && entry.Remaining >= amount);
             if (offer == null) return null;
 
-            offer.Remaining--;
-            // A random equip is the instance on the shelf; plain goods hand out fresh copies.
-            return offer.IsRandomEquip ? offer.Item : offer.Item.Copy<IItem>();
+            offer.Remaining -= amount;
+            if (offer.IsBuyback && offer.Remaining == 0) state!.Buyback.Remove(offer);
+
+            // Rolled instances (random equips, buyback gear) leave the shelf themselves;
+            // plain goods hand out one fresh copy the caller adds with the amount.
+            return offer.IsRandomEquip || (offer.IsBuyback && offer.Item.MaxStackSize <= 1)
+                ? offer.Item
+                : offer.Item.Copy<IItem>();
+        }
+
+        public void AddBuyback(string traderId, IItem item, int amount, int unitPrice)
+        {
+            if (traders.GetTrader(traderId) == null || amount < 1) return;
+            if (!_states.TryGetValue(traderId, out var state))
+                _states[traderId] = state = new TraderState();
+
+            state.Buyback.Add(new Offer(NextOfferId(), item, isRandomEquip: false, isBuyback: true, buybackUnitPrice: unitPrice) { Remaining = amount });
+            while (state.Buyback.Count > BuybackCapacity) state.Buyback.RemoveAt(0); // oldest mistake expires first
         }
 
         public void ResetSession()

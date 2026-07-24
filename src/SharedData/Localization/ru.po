@@ -3008,3 +3008,30 @@ msgstr "Золото"
 
 msgid "Item_Gold_Description"
 msgstr ""
+
+msgid "Trader_Human_Merchant"
+msgstr "Странствующий торговец"
+
+msgid "UI_Trade_Stock"
+msgstr "Товары"
+
+msgid "UI_Trade_Buyback"
+msgstr "Выкуп"
+
+msgid "UI_Trade_Buy"
+msgstr "Купить"
+
+msgid "UI_Trade_Price"
+msgstr "{Amount} з."
+
+msgid "UI_Trade_Gold"
+msgstr "Золото: {Amount}"
+
+msgid "Npc_Human_Merchant"
+msgstr "Странствующий торговец"
+
+msgid "Dlg_Merchant_Greeting_1"
+msgstr "О, живой покупатель! Редкость на этой дороге. Взгляни — цены честные, ну... почти."
+
+msgid "Dlg_Merchant_Opt_Trade"
+msgstr "Показывай товар."

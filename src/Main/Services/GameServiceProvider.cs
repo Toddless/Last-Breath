@@ -120,6 +120,7 @@ namespace LastBreath.Services
                 sp.GetService<IReputationPerkProvider>()));
             services.AddTransient<IRequestHandler<BuyItemRequest, int>, BuyItemRequestHandler>();
             services.AddTransient<IRequestHandler<SellItemRequest, int>, SellItemRequestHandler>();
+            services.AddTransient<IMessageHandler<OpenTradeWindowMessage>, OpenTradeWindowMessageHandler>();
         }
 
         /// <summary>Narrative foundation: world facts + the condition/action vocabulary shared by
@@ -168,6 +169,7 @@ namespace LastBreath.Services
             services.AddSingleton<INarrativeActionFactory, PublishDeedActionFactory>();
             services.AddSingleton<INarrativeActionFactory, AddReputationActionFactory>();
             services.AddSingleton<INarrativeActionFactory, AddInfluenceExpActionFactory>();
+            services.AddSingleton<INarrativeActionFactory, StartTradeActionFactory>();
             foreach (var kind in System.Enum.GetValues<QuestActionKind>())
                 services.AddSingleton<INarrativeActionFactory>(sp => new QuestActionFactory(sp.GetRequiredService<IQuestLogService>, kind));
         }
@@ -193,6 +195,9 @@ namespace LastBreath.Services
             uiElements.RegisterWindowFactory(typeof(DialogueWindow), () => DialogueWindow.Initialize().Instantiate<DialogueWindow>(), UiContext.World | UiContext.Dialogue);
             uiElements.RegisterWindowFactory(typeof(QuestJournalWindow), () => QuestJournalWindow.Initialize().Instantiate<QuestJournalWindow>(), UiContext.World);
             uiElements.RegisterWindowFactory(typeof(SaveLoadWindow), () => SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>(), UiContext.World | UiContext.GameOver);
+            // Dialogue allowed by design EXCEPTION: trading starts from a dialogue node, and the
+            // window must survive the Dialogue->World context flip of the closing conversation.
+            uiElements.RegisterWindowFactory(typeof(TradeWindow), () => TradeWindow.Initialize().Instantiate<TradeWindow>(), UiContext.World | UiContext.Dialogue);
             uiElements.RegisterWindowFactory(typeof(CharacterWindow), () => CharacterWindow.Initialize().Instantiate<CharacterWindow>(), UiContext.World | UiContext.Battle);
             uiElements.RegisterWindowFactory(typeof(OptionsWindow), () => OptionsWindow.Initialize().Instantiate<OptionsWindow>());
             uiElements.RegisterWindowFactory(typeof(GameOverWindow), () => GameOverWindow.Initialize().Instantiate<GameOverWindow>());
