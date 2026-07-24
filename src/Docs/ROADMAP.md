@@ -37,11 +37,10 @@ Biggest gameplay payoff; the demo's climax. Status audit 2026-07-24: FAR more is
 
 Current crafting resources are broken against the new affix model (prefix/suffix + global/local split). Design drafts: Obsidian `06_Крафт/Список ресурсов для крафта.md` and `03_Предметы/Список пулов по категориям.md` (WIP — several category sections still empty).
 
-- [ ] Data schema: material-category base pools split per EQUIPMENT category (Armor/Weapon/Jewellery sections inside Metal/Fabric/Hide/Gem/Bone), same split for per-resource modifier lists — a resource contributes different modifiers depending on what is being crafted (closes "Доработать" #94).
-- [ ] `scope` field on pool entries (global vs local) — parse into `ModifierScope` (the local bucket already exists on `EquipItem`); draft marks locals with «(локальный)».
-- [ ] Roll ranges on resource-descriptor entries (draft values are min–max, current data is single-value).
-- [ ] Pool assembly (`EquipItemPoolExtensions`) picks the resource sub-pool by the target item's category; affix dedup invariants (ModifierKey) must keep holding.
-- [ ] Finish the Obsidian lists (Todd) → translate into `SharedData/Resources/CraftingResources.json`.
+- [x] Code layer (2026-07-24): `byCategory` sections in CraftingResources.json (flat list = every category, section entries stamped `OnlyFor`), `ForCategory` gate in `EquipItemPoolExtensions` (reroll) and the creation handler; scope/ranges already existed in the DTO. Test: `ResourceEntriesOfAnotherEquipmentCategory_NeverEnterTheRerollPool`.
+- [x] Data migration (2026-07-24, awaiting Godot test): category base pools (Metal/Fabric/Leather/Gem/Bone per the draft, essence shared pool emptied) + 27 existing resources updated (ranges, affixes, locals). Weights are a uniform placeholder (100) — balance pass later.
+- [ ] Deferred to #151: new resource ids from the draft + non-line essence effects (DoT stack duration, mastery perks, max-sharpening ops).
+- [ ] Finish the empty draft sections (Todd): Fabric-Weapon, Leather-Jewellery/Weapon, Bone-Armor.
 
 ## Stage 3 — Trade (~1–2 weeks)
 

@@ -175,7 +175,7 @@ namespace Core.Data
 
             foreach (var categoryData in data?.MaterialCategories ?? [])
             {
-                var descriptors = LoadDescriptors(categoryData.Modifiers, categoryData.Id, AffixPolicy.Required);
+                var descriptors = LoadCategorizedDescriptors(categoryData.Modifiers, categoryData.ByCategory, categoryData.Id, AffixPolicy.Required);
                 categoryDic[categoryData.Id] = factory.CreateMaterialCategory(descriptors, categoryData.Id);
             }
 
@@ -243,19 +243,45 @@ namespace Core.Data
         /// <see cref="EntityParameter"/> first, then as <see cref="ContextParameter"/> (pipeline knobs).
         /// Unknown in both → the entry is reported and dropped, per the usual tolerance rules. One parser feeds
         /// both authored item lines and resource/pool fodder — the difference is only the affix policy.</summary>
-        private List<IModifierDescriptor> LoadDescriptors(List<ItemModifier> modifiers, string context, AffixPolicy policy)
+        private List<IModifierDescriptor> LoadDescriptors(List<ItemModifier> modifiers, string context, AffixPolicy policy, EquipmentCategory? onlyFor = null)
         {
             var result = new List<IModifierDescriptor>();
             foreach (var modifier in modifiers)
             {
-                var descriptor = ToDescriptor(modifier, context, policy);
+                var descriptor = ToDescriptor(modifier, context, policy, onlyFor);
                 if (descriptor != null) result.Add(descriptor);
             }
 
             return result;
         }
 
-        private IModifierDescriptor? ToDescriptor(ItemModifier modifier, string context, AffixPolicy policy)
+        /// <summary>The flat list serves every equipment category; each byCategory section stamps its
+        /// entries with the section's category (the same ore gives armor to a cuirass and damage to a
+        /// blade). A section under an unknown category key is dropped loudly, the rest still load.</summary>
+        private List<IModifierDescriptor> LoadCategorizedDescriptors(
+            List<ItemModifier> flat,
+            Dictionary<string, List<ItemModifier>>? byCategory,
+            string context,
+            AffixPolicy policy)
+        {
+            var result = LoadDescriptors(flat, context, policy);
+            if (byCategory == null) return result;
+
+            foreach ((string key, var entries) in byCategory)
+            {
+                if (!EnumParser.TryParseEnum<EquipmentCategory>(key, out var category))
+                {
+                    Tracker.TrackError($"Skipping byCategory section '{key}' of '{context}': not an {nameof(EquipmentCategory)}");
+                    continue;
+                }
+
+                result.AddRange(LoadDescriptors(entries, context, policy, category));
+            }
+
+            return result;
+        }
+
+        private IModifierDescriptor? ToDescriptor(ItemModifier modifier, string context, AffixPolicy policy, EquipmentCategory? onlyFor = null)
         {
             if (!TryParseAffix(modifier, context, policy, out var affix)) return null;
 
@@ -264,7 +290,7 @@ namespace Core.Data
             {
                 if (levels is { IsMalformed: false, Min: >= 1 } && levels.Max >= levels.Min)
                 {
-                    return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix };
+                    return new UpgradeLevelsDescriptor(levels.Min, levels.Max) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
                 }
 
                 Tracker.TrackError($"Skipping modifier of '{context}': invalid extraUpgradeLevels range");
@@ -288,7 +314,7 @@ namespace Core.Data
                     return null;
                 }
 
-                return new GrantDescriptor(grantKind, grantData.Id, grantData.Properties) { Weight = modifier.Weight, Affix = affix };
+                return new GrantDescriptor(grantKind, grantData.Id, grantData.Properties) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
             }
 
             if (modifier.Parts.Count > 0)
@@ -302,7 +328,7 @@ namespace Core.Data
                     parts.Add(partDescriptor);
                 }
 
-                return new CompositeDescriptor(parts) { Weight = modifier.Weight, Affix = affix };
+                return new CompositeDescriptor(parts) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
             }
 
             ModifierValueType type;
@@ -329,11 +355,11 @@ namespace Core.Data
                     return null;
                 }
 
-                return new ParameterDescriptor(entityParameter, type, range, EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope)) { Weight = modifier.Weight, Affix = affix };
+                return new ParameterDescriptor(entityParameter, type, range, EnumParser.ParseEnumOrDefault<ModifierScope>(modifier.Scope)) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
             }
 
             if (EnumParser.TryParseEnum<ContextParameter>(modifier.Parameter, out var contextParameter))
-                return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix };
+                return new ContextDescriptor(contextParameter, type, range) { Weight = modifier.Weight, Affix = affix, OnlyFor = onlyFor };
 
             Tracker.TrackError($"Skipping modifier of '{context}': '{modifier.Parameter}' is neither an EntityParameter nor a ContextParameter");
             return null;
@@ -470,7 +496,7 @@ namespace Core.Data
                     continue;
                 }
 
-                var materialDescriptors = LoadDescriptors(craftingData.Material.Modifiers, craftingData.Id, AffixPolicy.Required);
+                var materialDescriptors = LoadCategorizedDescriptors(craftingData.Material.Modifiers, craftingData.Material.ByCategory, craftingData.Id, AffixPolicy.Required);
                 var rarity = EnumParser.ParseEnum<Rarity>(craftingData.Rarity);
                 var material = factory.CreateMaterial(materialDescriptors, category);
                 items.Add(factory.CreateCraftingResource(craftingData.Id, craftingData.MaxStackSize, craftingData.Tags, material, rarity));

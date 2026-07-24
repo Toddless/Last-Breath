@@ -2,6 +2,7 @@ namespace Core.Data
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Enums;
     using Items;
     using Modifiers;
 
@@ -18,12 +19,19 @@ namespace Core.Data
 
         /// <summary>The live reroll pool of an existing item: the generation union + the descriptors of
         /// every resource the item was crafted from — required AND optional parts alike (loot items
-        /// have neither). Per-operation additions (additive essences) are the caller's business.</summary>
+        /// have neither). Resource entries restricted to another equipment category are gated out.
+        /// Per-operation additions (additive essences) are the caller's business.</summary>
         public static IEnumerable<IModifierDescriptor> GetLiveRerollPool(this IItemDataProvider data, IEquipItem item) =>
             data.GetGenerationPool(item.Id)
                 .Concat(item.UsedRequiredResources.Keys
                     .Concat(item.UsedOptionalResources.Keys)
                     .Distinct()
-                    .SelectMany(data.GetResourceDescriptors));
+                    .SelectMany(data.GetResourceDescriptors)
+                    .ForCategory(item.EquipmentPiece.ConvertEquipmentPartToCategory()));
+
+        /// <summary>Category gate for resource-fed pools: an entry from a byCategory section only
+        /// serves its own equipment category; unrestricted entries serve all.</summary>
+        public static IEnumerable<IModifierDescriptor> ForCategory(this IEnumerable<IModifierDescriptor> pool, EquipmentCategory category) =>
+            pool.Where(descriptor => descriptor.OnlyFor is null || descriptor.OnlyFor == category);
     }
 }

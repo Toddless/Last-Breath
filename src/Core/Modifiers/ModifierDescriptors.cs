@@ -14,6 +14,11 @@ namespace Core.Modifiers
         /// <summary>Which slot family this entry competes for. None only on authored item lines —
         /// rollable pool entries are parsed strictly and never carry None.</summary>
         AffixKind Affix { get; }
+
+        /// <summary>Restricts the entry to one equipment category (a resource's byCategory section:
+        /// the same ore gives armor to a cuirass and damage to a blade). Null = serves any category.
+        /// Enforced at pool assembly (<c>ForCategory</c>), not at parse.</summary>
+        EquipmentCategory? OnlyFor { get; }
     }
 
     public sealed record ParameterDescriptor(EntityParameter Parameter, ModifierValueType ValueType, ValueRange Value, ModifierScope Scope) : IModifierDescriptor
@@ -21,6 +26,7 @@ namespace Core.Modifiers
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
     }
 
     public sealed record ContextDescriptor(ContextParameter Parameter, ModifierValueType ValueType, ValueRange Value) : IModifierDescriptor
@@ -28,6 +34,7 @@ namespace Core.Modifiers
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
     }
 
     // TODO:
@@ -40,6 +47,7 @@ namespace Core.Modifiers
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
     }
 
     /// <summary>Rollable grant: behaviour no stat line can express ("ignores the first damage taken each turn")
@@ -51,6 +59,7 @@ namespace Core.Modifiers
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
     }
 
     /// <summary>A weighted bundle rolled as one unit at creation; flattened to its atomic parts for reroll (1-for-1).
@@ -60,5 +69,6 @@ namespace Core.Modifiers
         public float Weight { get; set; }
         public AffixKind Affix { get; init; }
         public string? NameKey { get; init; }
+        public EquipmentCategory? OnlyFor { get; init; }
     }
 }

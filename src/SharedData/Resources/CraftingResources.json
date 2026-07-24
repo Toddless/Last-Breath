@@ -2,98 +2,485 @@
     "materialCategories": [
         {
             "id": "Category_Metal",
-            "modifiers": [
-                {
-                    "parameter": "Armor",
-                    "modifierType": "flat",
-                    "value": 300,
-                    "weight": 200,
-                    "affix": "Prefix"
-                },
-                {
-                    "parameter": "Armor",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 150,
-                    "affix": "Prefix"
-                }
-            ]
+            "modifiers": [],
+            "byCategory": {
+                "Armor": [
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 180
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.25
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Armor",
+                        "modifierType": "multi",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "FireResistance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.08,
+                            "max": 0.18
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ],
+                "Weapon": [
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 35,
+                            "max": 80
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "multi",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "CriticalDamage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.15,
+                            "max": 0.35
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.01,
+                            "max": 0.03
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "AdditionalHitChance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.01,
+                            "max": 0.03
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    }
+                ],
+                "Jewellery": [
+                    {
+                        "parameter": "BlockChance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.01,
+                            "max": 0.03
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "BlockChance",
+                        "modifierType": "multi",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "BlockChance",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.1,
+                            "max": 0.15
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Accuracy",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 130,
+                            "max": 420
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    }
+                ]
+            }
         },
         {
             "id": "Category_Fabric",
-            "modifiers": [
-                {
-                    "parameter": "Barrier",
-                    "modifierType": "flat",
-                    "value": 200,
-                    "weight": 200,
-                    "affix": "Prefix"
-                },
-                {
-                    "parameter": "Barrier",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 150,
-                    "affix": "Prefix"
-                }
-            ]
+            "modifiers": [],
+            "byCategory": {
+                "Armor": [
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 50,
+                            "max": 120
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.1,
+                            "max": 0.25
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Barrier",
+                        "modifierType": "multi",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "ColdResistance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.08,
+                            "max": 0.18
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ],
+                "Jewellery": [
+                    {
+                        "parameter": "Mana",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 120
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 40,
+                            "max": 90
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "ManaRecovery",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 15,
+                            "max": 30
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "HealthRecovery",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 15,
+                            "max": 30
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    }
+                ]
+            }
         },
         {
             "id": "Category_Leather",
-            "modifiers": [
-                {
-                    "parameter": "Evade",
-                    "modifierType": "flat",
-                    "value": 250,
-                    "weight": 200,
-                    "affix": "Prefix"
-                },
-                {
-                    "parameter": "Evade",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 150,
-                    "affix": "Prefix"
-                }
-            ]
+            "modifiers": [],
+            "byCategory": {
+                "Armor": [
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 180
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Evade",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.1,
+                            "max": 0.3
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Suppress",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.02,
+                            "max": 0.05
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    },
+                    {
+                        "parameter": "LightningResistance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.08,
+                            "max": 0.18
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ]
+            }
         },
         {
             "id": "Category_Gem",
-            "modifiers": [
-                {
-                    "parameter": "AllAttribute",
-                    "modifierType": "flat",
-                    "value": 5,
-                    "weight": 200,
-                    "affix": "Suffix"
-                },
-                {
-                    "parameter": "AllAttribute",
-                    "modifierType": "inc",
-                    "value": 0.1,
-                    "weight": 150,
-                    "affix": "Suffix"
-                }
-            ]
+            "modifiers": [],
+            "byCategory": {
+                "Armor": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 110
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Health",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "AllResistance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.05,
+                            "max": 0.1
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ],
+                "Weapon": [
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 50,
+                            "max": 160
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.02,
+                            "max": 0.05
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ],
+                "Jewellery": [
+                    {
+                        "parameter": "AllAttribute",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 5,
+                            "max": 10
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    },
+                    {
+                        "parameter": "AllAttribute",
+                        "modifierType": "inc",
+                        "value": {
+                            "min": 0.1,
+                            "max": 0.15
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ]
+            }
         },
         {
             "id": "Category_Bone",
-            "modifiers": [
-                {
-                    "parameter": "CriticalChance",
-                    "modifierType": "flat",
-                    "value": 0.03,
-                    "weight": 200,
-                    "affix": "Suffix"
-                },
-                {
-                    "parameter": "CriticalDamage",
-                    "modifierType": "flat",
-                    "value": 0.2,
-                    "weight": 150,
-                    "affix": "Prefix"
-                }
-            ]
+            "modifiers": [],
+            "byCategory": {
+                "Jewellery": [
+                    {
+                        "parameter": "Health",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 180
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "Mana",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 150
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "ManaRecovery",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 15,
+                            "max": 30
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "HealthRecovery",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 15,
+                            "max": 30
+                        },
+                        "weight": 100,
+                        "affix": "Suffix",
+                        "scope": "Local"
+                    }
+                ],
+                "Weapon": [
+                    {
+                        "parameter": "Damage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 70,
+                            "max": 200
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "SpellDamage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 40,
+                            "max": 150
+                        },
+                        "weight": 100,
+                        "affix": "Prefix",
+                        "scope": "Local"
+                    },
+                    {
+                        "parameter": "CriticalChance",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.01,
+                            "max": 0.05
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    },
+                    {
+                        "parameter": "CriticalDamage",
+                        "modifierType": "flat",
+                        "value": {
+                            "min": 0.4,
+                            "max": 0.55
+                        },
+                        "weight": 100,
+                        "affix": "Suffix"
+                    }
+                ]
+            }
         },
         {
             "id": "Category_Essence",
@@ -307,22 +694,75 @@
             "material": {
                 "id": "Material_Copper_Ore",
                 "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 250,
-                        "weight": 50,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": 0.15,
-                        "weight": 75,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        {
+                            "parameter": "Health",
+                            "modifierType": "flat",
+                            "value": {
+                                "min": 70,
+                                "max": 100
+                            },
+                            "weight": 100,
+                            "affix": "Prefix",
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Health",
+                            "modifierType": "inc",
+                            "value": {
+                                "min": 0.05,
+                                "max": 0.1
+                            },
+                            "weight": 100,
+                            "affix": "Prefix"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "flat",
+                            "value": {
+                                "min": 50,
+                                "max": 120
+                            },
+                            "weight": 100,
+                            "affix": "Prefix",
+                            "scope": "Local"
+                        },
+                        {
+                            "parameter": "Armor",
+                            "modifierType": "inc",
+                            "value": {
+                                "min": 0.05,
+                                "max": 0.15
+                            },
+                            "weight": 100,
+                            "affix": "Prefix"
+                        }
+                    ],
+                    "Weapon": [
+                        {
+                            "parameter": "Damage",
+                            "modifierType": "flat",
+                            "value": {
+                                "min": 35,
+                                "max": 50
+                            },
+                            "weight": 100,
+                            "affix": "Prefix"
+                        },
+                        {
+                            "parameter": "Damage",
+                            "modifierType": "inc",
+                            "value": {
+                                "min": 0.05,
+                                "max": 0.1
+                            },
+                            "weight": 100,
+                            "affix": "Prefix"
+                        }
+                    ]
+                }
             },
             "maxStackSize": 999,
             "tags": [
@@ -343,14 +783,14 @@
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 50,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 75,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -373,15 +813,21 @@
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
-                        "value": 70,
+                        "value": {
+                            "min": 70,
+                            "max": 120
+                        },
                         "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
-                        "value": 0.15,
-                        "weight": 80,
+                        "value": {
+                            "min": 0.1,
+                            "max": 0.2
+                        },
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -402,18 +848,18 @@
                 "categoryId": "Category_Leather",
                 "modifiers": [
                     {
-                        "parameter": "Movespeed",
+                        "parameter": "MoveSpeed",
                         "modifierType": "flat",
                         "value": 15,
-                        "weight": 150,
-                        "affix": "Suffix"
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
-                        "parameter": "Movespeed",
+                        "parameter": "MoveSpeed",
                         "modifierType": "inc",
                         "value": 0.15,
                         "weight": 100,
-                        "affix": "Suffix"
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -435,7 +881,7 @@
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "value": 350,
+                        "value": 250,
                         "weight": 100,
                         "affix": "Prefix"
                     },
@@ -443,7 +889,7 @@
                         "parameter": "Health",
                         "modifierType": "multi",
                         "value": 0.15,
-                        "weight": 50,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -464,32 +910,25 @@
                 "categoryId": "Category_Gem",
                 "modifiers": [
                     {
-                        "parameter": "Armor",
+                        "parameter": "Mana",
                         "modifierType": "multi",
                         "value": 0.25,
-                        "weight": 55,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
-                        "parameter": "Armor",
+                        "parameter": "Mana",
                         "modifierType": "inc",
                         "value": 0.25,
                         "weight": 100,
                         "affix": "Prefix"
                     },
                     {
-                        "parameter": "Intelligence",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 50,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Intelligence",
+                        "parameter": "Mana",
                         "modifierType": "flat",
-                        "value": 10,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 650,
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -509,32 +948,32 @@
                 "categoryId": "Category_Gem",
                 "modifiers": [
                     {
-                        "parameter": "Evade",
+                        "parameter": "Accuracy",
                         "modifierType": "multi",
                         "value": 0.25,
-                        "weight": 55,
-                        "affix": "Prefix"
+                        "weight": 100,
+                        "affix": "Suffix"
                     },
                     {
-                        "parameter": "Evade",
+                        "parameter": "Accuracy",
                         "modifierType": "inc",
                         "value": 0.25,
+                        "weight": 100,
+                        "affix": "Suffix"
+                    },
+                    {
+                        "parameter": "Dexterity",
+                        "modifierType": "flat",
+                        "value": 35,
                         "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Dexterity",
-                        "modifierType": "flat",
-                        "value": 10,
-                        "weight": 50,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Dexterity",
                         "modifierType": "inc",
-                        "value": 0.3,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 0.35,
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -556,30 +995,30 @@
                     {
                         "parameter": "Health",
                         "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 55,
+                        "value": 0.35,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
-                        "value": 0.25,
+                        "value": 0.35,
                         "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "flat",
-                        "value": 10,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 35,
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
                         "parameter": "Strength",
                         "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 0.35,
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -601,22 +1040,15 @@
                     {
                         "parameter": "Mana",
                         "modifierType": "flat",
-                        "value": 5,
+                        "value": 200,
                         "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "inc",
-                        "value": 0.1,
-                        "weight": 80,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "ManaRecovery",
                         "modifierType": "flat",
-                        "value": 5,
-                        "weight": 150,
+                        "value": 15,
+                        "weight": 100,
                         "affix": "Suffix"
                     }
                 ]
@@ -637,25 +1069,25 @@
                 "categoryId": "Category_Fabric",
                 "modifiers": [
                     {
-                        "parameter": "Barrier",
-                        "modifierType": "multi",
-                        "value": 0.2,
-                        "weight": 55,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "SpellDamage",
+                        "parameter": "Mana",
                         "modifierType": "flat",
-                        "value": 200,
-                        "weight": 50,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "SpellDamage",
-                        "modifierType": "inc",
-                        "value": 0.2,
+                        "value": 350,
                         "weight": 100,
                         "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "Mana",
+                        "modifierType": "inc",
+                        "value": 0.35,
+                        "weight": 100,
+                        "affix": "Prefix"
+                    },
+                    {
+                        "parameter": "ManaRecovery",
+                        "modifierType": "flat",
+                        "value": 25,
+                        "weight": 100,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -678,14 +1110,14 @@
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
                         "value": 0.3,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "value": 0.03,
-                        "weight": 30,
+                        "value": 0.05,
+                        "weight": 100,
                         "affix": "Suffix"
                     }
                 ]
@@ -709,14 +1141,14 @@
                         "parameter": "Damage",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 30,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -740,14 +1172,14 @@
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -771,14 +1203,14 @@
                         "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -802,14 +1234,14 @@
                         "parameter": "Evade",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -833,14 +1265,14 @@
                         "parameter": "Barrier",
                         "modifierType": "inc",
                         "value": 0.5,
-                        "weight": 15,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Barrier",
                         "modifierType": "flat",
                         "value": 500,
-                        "weight": 30,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -861,24 +1293,17 @@
                 "categoryId": "Category_Metal",
                 "modifiers": [
                     {
-                        "parameter": "Barrier",
+                        "parameter": "Armor",
                         "modifierType": "flat",
-                        "value": 250,
+                        "value": 200,
                         "weight": 100,
                         "affix": "Prefix"
                     },
                     {
-                        "parameter": "Barrier",
+                        "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.15,
-                        "weight": 75,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "SpellDamage",
-                        "modifierType": "flat",
-                        "value": 60,
-                        "weight": 50,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -902,21 +1327,14 @@
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 450,
-                        "weight": 80,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 80,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "flat",
-                        "value": 200,
-                        "weight": 40,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -940,21 +1358,21 @@
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 800,
-                        "weight": 60,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Armor",
                         "modifierType": "multi",
-                        "value": 0.2,
-                        "weight": 40,
+                        "value": 0.45,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "flat",
-                        "value": 400,
-                        "weight": 50,
+                        "value": 800,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -978,7 +1396,7 @@
                         "parameter": "Mana",
                         "modifierType": "multi",
                         "value": 0.25,
-                        "weight": 55,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
@@ -989,18 +1407,18 @@
                         "affix": "Prefix"
                     },
                     {
-                        "parameter": "ManaRecovery",
+                        "parameter": "Intelligence",
                         "modifierType": "flat",
-                        "value": 100,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 35,
+                        "weight": 100,
+                        "affix": "Prefix"
                     },
                     {
-                        "parameter": "ManaRecovery",
+                        "parameter": "Intelligence",
                         "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 50,
-                        "affix": "Suffix"
+                        "value": 0.35,
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -1106,14 +1524,14 @@
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 150,
-                        "weight": 120,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "inc",
                         "value": 0.1,
-                        "weight": 80,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -1144,14 +1562,14 @@
                         "parameter": "Armor",
                         "modifierType": "flat",
                         "value": 250,
-                        "weight": 70,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Health",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 60,
+                        "weight": 100,
                         "affix": "Prefix"
                     }
                 ]
@@ -1175,22 +1593,22 @@
                         "parameter": "Evade",
                         "modifierType": "flat",
                         "value": 400,
-                        "weight": 80,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "Evade",
                         "modifierType": "multi",
-                        "value": 0.2,
-                        "weight": 40,
+                        "value": 0.35,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "MoveSpeed",
                         "modifierType": "flat",
-                        "value": 20,
-                        "weight": 60,
-                        "affix": "Suffix"
+                        "value": 50,
+                        "weight": 100,
+                        "affix": "Prefix"
                     }
                 ]
             },
@@ -1213,14 +1631,14 @@
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
                         "value": 0.02,
-                        "weight": 120,
+                        "weight": 100,
                         "affix": "Suffix"
                     },
                     {
                         "parameter": "Accuracy",
                         "modifierType": "flat",
                         "value": 100,
-                        "weight": 60,
+                        "weight": 100,
                         "affix": "Suffix"
                     }
                 ]
@@ -1251,8 +1669,8 @@
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
                         "value": 0.15,
-                        "weight": 60,
-                        "affix": "Prefix"
+                        "weight": 100,
+                        "affix": "Suffix"
                     }
                 ]
             },
@@ -1275,21 +1693,21 @@
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
                         "value": 0.25,
-                        "weight": 80,
-                        "affix": "Prefix"
+                        "weight": 100,
+                        "affix": "Suffix"
                     },
                     {
                         "parameter": "Damage",
                         "modifierType": "inc",
                         "value": 0.2,
-                        "weight": 70,
+                        "weight": 100,
                         "affix": "Prefix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "value": 0.03,
-                        "weight": 40,
+                        "value": 0.05,
+                        "weight": 100,
                         "affix": "Suffix"
                     }
                 ]
@@ -1312,23 +1730,23 @@
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "flat",
-                        "value": 0.05,
-                        "weight": 60,
+                        "value": 0.09,
+                        "weight": 100,
                         "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalChance",
                         "modifierType": "inc",
                         "value": 0.3,
-                        "weight": 50,
+                        "weight": 100,
                         "affix": "Suffix"
                     },
                     {
                         "parameter": "CriticalDamage",
                         "modifierType": "flat",
-                        "value": 0.4,
-                        "weight": 40,
-                        "affix": "Prefix"
+                        "value": 0.9,
+                        "weight": 100,
+                        "affix": "Suffix"
                     }
                 ]
             },

@@ -42,8 +42,12 @@ namespace Crafting.Source.RequestHandlers
                 if (!MasteryAllows(request.RecipeId) || !resources.HasAll(allResources))
                     return Task.FromResult<IEquipItem?>(null);
 
-                // Required and optional resources both feed the creation pool by design.
+                // Required and optional resources both feed the creation pool by design; entries from
+                // byCategory sections only serve the crafted item's own equipment category.
                 var descriptors = allResources.Keys.SelectMany(itemDataProvider.GetResourceDescriptors);
+                string resultItemId = itemDataProvider.GetRecipeResultItemId(request.RecipeId);
+                if (itemDataProvider.GetBlueprint(resultItemId)?.Piece is { } piece)
+                    descriptors = descriptors.ForCategory(piece.ConvertEquipmentPartToCategory());
                 // Creation runes ride the optional slots: the best floor among them guarantees the rarity.
                 var item = (IEquipItem)creationService.CreateItemByRecipe(request.RecipeId, descriptors, BestMinRarity(request.OptionalResources.Keys));
                 item.SaveUsedResources(request.RequiredResources, request.OptionalResources);

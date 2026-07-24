@@ -153,6 +153,37 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(EntityParameter.CriticalChance, item.Modifiers.Single(modifier => modifier.InstanceId == secondId).EntityParameter);
         }
 
+        [TestMethod]
+        public void ResourceEntriesOfAnotherEquipmentCategory_NeverEnterTheRerollPool()
+        {
+            // Stage 2 rework: the amulet was crafted from an ore whose descriptors split by equipment
+            // category — the Weapon-only damage entry (huge weight on purpose) must be gated out of a
+            // Jewellery reroll, while the unrestricted mana entry from the same ore stays reachable.
+            var provider = EmptyPoolProvider();
+            provider.Setup(mock => mock.GetResourceDescriptors("Ore")).Returns(
+            [
+                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
+                new ParameterDescriptor(EntityParameter.Mana, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Prefix },
+            ]);
+
+            var seenParameters = new HashSet<EntityParameter>();
+            for (int seed = 0; seed < 40; seed++)
+            {
+                var item = new EquipItem(EquipmentPiece.Amulet, LootItemId, []);
+                item.SaveUsedResources(new Dictionary<string, int> { ["Ore"] = 1 }, new Dictionary<string, int>());
+                var line = new SimpleModifier(EntityParameter.Health, ModifierValueType.Flat, 5f, "test") { Affix = AffixKind.Prefix };
+                item.AddAdditionalModifier(line);
+
+                string? rerolledId = CreateUpgrader(seed, provider.Object).TryRecraftModifier(item, line.InstanceId);
+
+                Assert.IsNotNull(rerolledId, $"seed {seed}");
+                seenParameters.Add(((SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == rerolledId)).EntityParameter);
+            }
+
+            Assert.IsTrue(seenParameters.Contains(EntityParameter.Mana), "the unrestricted entry of the used resource must stay reachable");
+            Assert.IsFalse(seenParameters.Contains(EntityParameter.Damage), "a Weapon-only entry must never land on a Jewellery item");
+        }
+
         private static ItemUpgrader CreateUpgrader(int seed, IItemDataProvider provider)
         {
             var rnd = new DefaultRandomNumberGenerator(seed);
