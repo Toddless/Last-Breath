@@ -32,6 +32,8 @@ namespace Crafting.Source.UIElements
         private const int AdditiveSlots = 3;
         private static readonly Vector2 s_cardIconSize = new(28, 28);
         private static readonly Vector2 s_cardMinSize = new(0, 44);
+        private const int ForecastValueWidth = 130;
+        private const int GrantDescriptionMinWidth = 320;
 
         [Export] private Tree? _tree;
         [Export] private LineEdit? _search;
@@ -56,7 +58,6 @@ namespace Crafting.Source.UIElements
 
         private IItemDataProvider? _dataProvider;
         private ModifierFormatter? _modifierFormatter;
-        private ContextModifierFormatter? _contextFormatter;
         private IInventory? _inventory;
         private ICraftingMastery? _mastery;
         private IItemUpgrader? _upgrader;
@@ -70,7 +71,6 @@ namespace Crafting.Source.UIElements
         private IEquipItem? _item;
         private string? _selectedModifierInstanceId;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {
@@ -99,7 +99,6 @@ namespace Crafting.Source.UIElements
         {
             _dataProvider = provider.GetService<IItemDataProvider>();
             _modifierFormatter = provider.GetService<ModifierFormatter>();
-            _contextFormatter = provider.GetService<ContextModifierFormatter>();
             _inventory = provider.GetService<IInventory>();
             _mastery = provider.GetService<ICraftingMastery>();
             _upgrader = provider.GetService<IItemUpgrader>();
@@ -167,10 +166,10 @@ namespace Crafting.Source.UIElements
 
         private void RefreshModeTabs()
         {
-            SyncTab(_modeCreate, CraftingMode.Create, enabled: true);
-            SyncTab(_modeUpgrade, CraftingMode.Upgrade, enabled: true);
-            SyncTab(_modeRecraft, CraftingMode.Recraft, enabled: true);
-            SyncTab(_modeAscend, CraftingMode.Ascend, enabled: true);
+            SyncTab(_modeCreate, CraftingMode.Create);
+            SyncTab(_modeUpgrade, CraftingMode.Upgrade);
+            SyncTab(_modeRecraft, CraftingMode.Recraft);
+            SyncTab(_modeAscend, CraftingMode.Ascend);
         }
 
         /// <summary>The bench item header doubles as a "change item" button in the item modes.</summary>
@@ -223,12 +222,11 @@ namespace Crafting.Source.UIElements
             return string.Join("\n", lines);
         }
 
-        private void SyncTab(Button? tab, CraftingMode mode, bool enabled)
-        {
-            if (tab == null) return;
-            tab.Disabled = !enabled;
-            tab.SetPressedNoSignal(_mode == mode);
-        }
+        /// <summary>Shared BBCode label defaults; callers add size flags/minimums on top.</summary>
+        private static RichTextLabel RichText(string text, TextServer.AutowrapMode autowrap = TextServer.AutowrapMode.WordSmart) =>
+            new() { Text = text, BbcodeEnabled = true, FitContent = true, AutowrapMode = autowrap };
+
+        private void SyncTab(Button? tab, CraftingMode mode) => tab?.SetPressedNoSignal(_mode == mode);
 
         // ---------------------------------------------------------------- tree
 
@@ -348,8 +346,7 @@ namespace Crafting.Source.UIElements
                 ? $"{_mastery.CurrentExperience} / {expTotal}"
                 : Localization.Localize("UI_Mastery_Max");
 
-            foreach (var child in _masteryChips.GetChildren())
-                child.QueueFree();
+            _masteryChips.QueueFreeChildren();
 
             float progress = _mastery.MaximumLevel <= 0
                 ? 0f
@@ -414,8 +411,7 @@ namespace Crafting.Source.UIElements
         private void RenderPool()
         {
             if (_poolBox == null || _poolList == null) return;
-            foreach (var child in _poolList.GetChildren())
-                child.QueueFree();
+            _poolList.QueueFreeChildren();
 
             int entryCount = 0;
             var rows = _mode switch
@@ -550,8 +546,7 @@ namespace Crafting.Source.UIElements
         private void RenderForecast()
         {
             if (_forecastBox == null || _forecastRows == null) return;
-            foreach (var child in _forecastRows.GetChildren())
-                child.QueueFree();
+            _forecastRows.QueueFreeChildren();
 
             var lines = ForecastLines();
             _forecastBox.Visible = lines.Count > 0;
@@ -623,15 +618,10 @@ namespace Crafting.Source.UIElements
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
             });
-            row.AddChild(new RichTextLabel
-            {
-                Text = valueBbcode,
-                BbcodeEnabled = true,
-                FitContent = true,
-                AutowrapMode = TextServer.AutowrapMode.Off,
-                CustomMinimumSize = new Vector2(130, 0),
-                SizeFlagsVertical = SizeFlags.ShrinkCenter,
-            });
+            var value = RichText(valueBbcode, TextServer.AutowrapMode.Off);
+            value.CustomMinimumSize = new Vector2(ForecastValueWidth, 0);
+            value.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+            row.AddChild(value);
             return row;
         }
 
@@ -688,8 +678,7 @@ namespace Crafting.Source.UIElements
         private void RenderModifiers()
         {
             if (_mods == null) return;
-            foreach (var child in _mods.GetChildren())
-                child.QueueFree();
+            _mods.QueueFreeChildren();
 
             var blueprint = _item == null ? SelectedBlueprint() : null;
             bool visible = _item != null || blueprint != null;
@@ -751,14 +740,8 @@ namespace Crafting.Source.UIElements
             if (!rich)
                 return new Label { Text = text, ThemeTypeVariation = dim ? "DimLabel" : null, AutowrapMode = TextServer.AutowrapMode.WordSmart };
 
-            var row = new RichTextLabel
-            {
-                Text = text,
-                BbcodeEnabled = true,
-                FitContent = true,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            };
+            var row = RichText(text);
+            row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             if (dim) row.AddThemeColorOverride("default_color", Color.FromHtml(TextPalette.Muted));
             return row;
         }
@@ -769,15 +752,10 @@ namespace Crafting.Source.UIElements
         {
             _mods?.AddChild(new Label { Text = Localization.Localize(grant.Id), AutowrapMode = TextServer.AutowrapMode.WordSmart });
             if (string.IsNullOrEmpty(grant.Description)) return;
-            _mods?.AddChild(new RichTextLabel
-            {
-                Text = grant.Description,
-                BbcodeEnabled = true,
-                FitContent = true,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                CustomMinimumSize = new Vector2(320, 0),
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            });
+            var description = RichText(grant.Description);
+            description.CustomMinimumSize = new Vector2(GrantDescriptionMinWidth, 0);
+            description.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _mods?.AddChild(description);
         }
 
         /// <summary>Recipe result preview straight from the blueprint: a weapon opens with its base
@@ -859,8 +837,7 @@ namespace Crafting.Source.UIElements
         private void RenderRequirements()
         {
             if (_requirements == null) return;
-            foreach (var child in _requirements.GetChildren())
-                child.QueueFree();
+            _requirements.QueueFreeChildren();
 
             foreach (var requirement in CurrentRequirements())
             {
@@ -924,8 +901,7 @@ namespace Crafting.Source.UIElements
         private void RenderAdditives()
         {
             if (_additives == null) return;
-            foreach (var child in _additives.GetChildren())
-                child.QueueFree();
+            _additives.QueueFreeChildren();
 
             // Nothing to offer while the CraftingAdditives catalog is empty — hide the block entirely.
             bool visible = (_additiveProvider?.KnownAdditiveIds.Count ?? 0) > 0 && (_item != null || _recipeId != null);
@@ -1222,8 +1198,7 @@ namespace Crafting.Source.UIElements
         private string ResourceTooltip(string id)
         {
             var lines = new List<string>();
-            string description = Localization.LocalizeDescription(id);
-            if (!string.IsNullOrEmpty(description) && description != $"{id}_Description") lines.Add(description);
+            if (Localization.TryLocalizeDescription(id, out string description)) lines.Add(description);
 
             foreach (var descriptor in _dataProvider?.GetResourceDescriptors(id) ?? [])
             {

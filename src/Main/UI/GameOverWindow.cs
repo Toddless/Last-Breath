@@ -18,7 +18,6 @@ namespace LastBreath.UI
 
         private IUiElementsManager? _uiElements;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         /// <summary>A dead end by design: Esc must not dismiss the game-over screen.</summary>
         public bool IsDismissable => false;

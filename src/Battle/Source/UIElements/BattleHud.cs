@@ -57,10 +57,10 @@
 
                 var buttonGroup = new ButtonGroup { AllowUnpress = false };
 
-                for (int i = 0; i < 3; i++)
+                foreach (Stance stance in Enum.GetValues<Stance>())
                 {
                     var slot = StanceSlot.Initialize().Instantiate<StanceSlot>();
-                    slot.SetStance((Stance)i);
+                    slot.SetStance(stance);
                     slot.ButtonGroup = buttonGroup;
                     _stanceButtons?.AddChild(slot);
                     HoverTooltip.Attach(slot, () => ShowStanceTooltip(slot.Stance));
@@ -134,20 +134,20 @@
         {
             if (_abilityBook != null) _abilityBook.ActiveAbilitiesChanged -= RefreshAbilitySlots;
             _abilityBook = null;
-            _battleEventBus = null;
+            DetachEventBus();
             _characterBars.Clear();
             _barBodies.Clear();
             _queueLabels.Clear();
             _playerBars?.ClearEffects();
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.RemoveBattleEventBus();
-            foreach (var node in _entityBars?.GetChildren() ?? [])
-                node.QueueFree();
+            _entityBars?.QueueFreeChildren();
         }
 
         public async Task SetupEventBus(IBattleEventBus battleEventBus)
         {
             if (!IsNodeReady()) await ToSignal(this, Node.SignalName.Ready);
+            DetachEventBus(); // a hud reused for the next battle must not stay on the previous bus
             _battleEventBus = battleEventBus;
             // Bar values are replay-driven: the BattleDirector republishes these events at the
             // moment the corresponding beat is shown, and the Vitals snapshot carries the numbers.
@@ -178,6 +178,28 @@
             foreach (StanceSlot stanceSlot in _stanceButtons?.GetChildren().Cast<StanceSlot>() ?? [])
                 stanceSlot.SetBattleEventBus(_battleEventBus);
             _battleLog?.SetBattleEventBus(_battleEventBus);
+        }
+
+        /// <summary>Symmetric to <see cref="SetupEventBus"/>: a bus outliving this node (teardown
+        /// without a battle end) must not keep handlers on a removed hud.</summary>
+        private void DetachEventBus()
+        {
+            if (_battleEventBus == null) return;
+            _battleEventBus.Unsubscribe<DamageTakenEvent>(OnDamageTakenReplayed);
+            _battleEventBus.Unsubscribe<EntityHealedEvent>(OnHealedReplayed);
+            _battleEventBus.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivatedReplayed);
+            _battleEventBus.Unsubscribe<PlayerMaxManaChangesEvent>(OnPlayerMaxManaChanges);
+            _battleEventBus.Unsubscribe<PlayerMaxHealthChanges>(OnPlayerMaxHealthChanges);
+            _battleEventBus.Unsubscribe<EntityMaxHealthChangesEvent>(OnEntityMaxHealthChanges);
+            _battleEventBus.Unsubscribe<EntityMaxManaChangesEvent>(OnEntityMaxManaChanges);
+            _battleEventBus.Unsubscribe<EffectsChangedEvent>(OnEffectsChanged);
+            _battleEventBus.Unsubscribe<TurnStartEvent>(OnTurnStart);
+            _battleEventBus.Unsubscribe<TurnEndEvent>(OnTurnEnd);
+            _battleEventBus.Unsubscribe<PresentationStateChangedEvent>(OnPresentationStateChanged);
+            _battleEventBus.Unsubscribe<BattleQueueDefinedEvent>(OnQueueDefined);
+            _battleEventBus.Unsubscribe<PlayerSelectingTargetForAbilityEvent>(OnTargetSelectionStarted);
+            _battleEventBus.Unsubscribe<TargetSelectionResolvedEvent>(OnTargetSelectionResolved);
+            _battleEventBus = null;
         }
 
         public void SetAbilityBook(IAbilityBookComponent abilityBook)
@@ -336,8 +358,7 @@
         {
             if (_queueContainer == null) return;
             _queueLabels.Clear();
-            foreach (var child in _queueContainer.GetChildren())
-                child.QueueFree();
+            _queueContainer.QueueFreeChildren();
 
             foreach (var fighter in obj.Entities)
             {

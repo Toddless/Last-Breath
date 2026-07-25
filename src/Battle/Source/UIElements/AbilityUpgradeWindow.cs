@@ -21,14 +21,12 @@ namespace Battle.Source.UIElements
 
         [Export] private AbilityUpgrades? _abilityUpgrades;
         [Export] private Label? _abilityName, _cost, _cooldown;
-        [Export] private TextureRect? _abilityIcon;
         [Export] private RichTextLabel? _abilityDescription;
         [Export] private Button? _close;
 
         private IGameMessageBus? _messageBus;
         private AbilityUpgradeView? _view;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {

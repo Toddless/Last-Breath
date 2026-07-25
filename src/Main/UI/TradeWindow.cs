@@ -43,11 +43,14 @@ namespace LastBreath.UI
 
         private Bag? BagService => _inventory as Bag;
 
-        /// <summary>The open shop, if any: the item tooltip asks it for a sell quote and the player's
-        /// movement poll treats it like an open conversation. Fresh-instance policy keeps it single.</summary>
+        /// <summary>The open shop, if any: the item tooltip asks it for a sell quote.
+        /// Fresh-instance policy keeps it single.</summary>
         public static TradeWindow? Active { get; private set; }
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
+        /// <summary>Shopping freezes walking exactly like a conversation (the window outlives
+        /// the dialogue that opened it, so the Dialogue context can't cover it).</summary>
+        public bool BlocksMovement => true;
+
 
         public override void _Ready()
         {
@@ -109,7 +112,7 @@ namespace LastBreath.UI
         private void RefreshStock()
         {
             if (_offersContainer == null || _traderService == null) return;
-            foreach (var child in _offersContainer.GetChildren()) child.QueueFree();
+            _offersContainer.QueueFreeChildren();
 
             var trader = _traderService.GetTrader(_traderId);
             if (trader == null) return;

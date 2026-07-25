@@ -16,11 +16,9 @@
         [Export] private HSlider? _music, _sfx, _master;
         [Export] private OptionButton? _language, _windowMode, _windowResolution;
         [Export] private Button? _returnButton;
-        [Export] private Label[] _labels = [];
 
         private ISettingsHandler? _settings;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {

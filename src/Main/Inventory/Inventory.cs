@@ -7,12 +7,14 @@
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
+    using Core.MessageBus;
+    using Core.MessageBus.Messages;
     using Core.Session;
     using Core.Views.UI;
     using Godot;
     using UI;
 
-    public class Inventory(IUiElementsManager uiElements) : IInventory, ISessionResettable
+    public class Inventory(IUiElementsManager uiElements, IGameMessageBus messageBus) : IInventory, ISessionResettable
     {
         private const int BagSlots = 220;
 
@@ -21,8 +23,6 @@
 
         public int InventoryCapacity => BagSlots;
 
-        public event Action<string, string, int, int>? InventoryFull;
-        public event Action<string>? NotEnoughItems;
         public event Action<string, int>? ItemAmountChanges;
         public event Action<IItem, MouseInteractions>? ItemInteraction;
 
@@ -196,9 +196,9 @@
                 if (slot.TryRemoveItemStacks(canRemove))
                     remainToDelete -= canRemove;
                 else
-                    Tracker.TrackError("");
+                    Tracker.TrackError($"Failed to remove {canRemove} x '{itemId}' from an inventory slot");
             }
-            if (remainToDelete > 0) NotEnoughItems?.Invoke(itemId);
+            if (remainToDelete > 0) NotifyToast("UI_Inventory_Missing_Items", itemId);
 
             ItemAmountChanges?.Invoke(itemId, GetTotalItemAmount(itemId));
         }
@@ -239,6 +239,13 @@
 
         private Texture2D? GetItemIcon(string instanceId) => _itemInstances[instanceId].Icon;
 
+        private void NotifyToast(string key, string itemId)
+        {
+            string name = _itemInstances.Values.FirstOrDefault(x => x.Id == itemId)?.DisplayName ?? itemId;
+            _ = messageBus.PublishMessageAsync(new SendNotificationMessageMessage(key, NotificationCategory.System,
+                new Dictionary<string, object?> { ["Item"] = name }));
+        }
+
         private void FitItemsInSlots(string itemId, string instanceId, int amount, int maxStackSize)
         {
             EnsureSlots(); // items arrive (loot, quests) long before any window shows the bag
@@ -260,8 +267,8 @@
                 var emptySlot = Slots.FirstOrDefault(x => x.CurrentItem == null);
                 if (emptySlot == null)
                 {
-                    // send info about item
-                    InventoryFull?.Invoke(itemId, instanceId, amount, maxStackSize);
+                    // The overflow is dropped; without the toast the loss would be silent.
+                    NotifyToast("UI_Inventory_Full", itemId);
                     return;
                 }
 

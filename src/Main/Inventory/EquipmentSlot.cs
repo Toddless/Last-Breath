@@ -2,6 +2,7 @@ namespace LastBreath.Inventory
 {
     using System;
     using Core.Enums;
+    using Core.Inventory;
     using Core.Items;
     using Core.Localization;
     using Godot;
@@ -60,19 +61,19 @@ namespace LastBreath.Inventory
                 CustomMinimumSize = new Vector2(60, 60),
             };
             SetDragPreview(preview);
-            return new Dictionary { ["EquipmentPiece"] = (int)Piece };
+            return new Dictionary { [DragPayload.EquipmentPiece] = (int)Piece };
         }
 
         public override bool _CanDropData(Vector2 atPosition, Variant data)
         {
             if (data.VariantType != Variant.Type.Dictionary) return false;
             var payload = data.AsGodotDictionary();
-            if (!payload.ContainsKey("Instance")) return false;
-            return _canAcceptInstance?.Invoke(payload["Instance"].AsString()) ?? false;
+            if (!payload.ContainsKey(DragPayload.Instance)) return false;
+            return _canAcceptInstance?.Invoke(payload[DragPayload.Instance].AsString()) ?? false;
         }
 
         public override void _DropData(Vector2 atPosition, Variant data) =>
-            _acceptInstance?.Invoke(data.AsGodotDictionary()["Instance"].AsString());
+            _acceptInstance?.Invoke(data.AsGodotDictionary()[DragPayload.Instance].AsString());
 
         /// <summary>A filled slot borrows the rarity for its frame and a faint tint of its fill;
         /// an empty one falls back to the scene's neutral stylebox.</summary>

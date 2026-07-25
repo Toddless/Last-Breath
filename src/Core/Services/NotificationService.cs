@@ -98,6 +98,7 @@ namespace Core.Services
             notification.SetNotification(content, region);
             popup.TreeExiting += () => ShowNext(region);
             _layers?.ShowOverlay(notification);
+            _ = notification.PlayLifecycleAsync(); // Timed lifetime dispatch: the shower drives it
         }
 
         private void ShowNext(OverlayRegion region)

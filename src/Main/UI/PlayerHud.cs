@@ -82,8 +82,8 @@
             UnbindPlayer();
             _boundPlayer = player;
             player.Parameters.ParameterChanged += OnParameterChanged;
-            _playerBar?.SetInitialValues(_boundPlayer.CurrentMana, _boundPlayer.Parameters.MaxMana, _boundPlayer.CurrentHealth, _boundPlayer.Parameters.MaxHealth,
-                _boundPlayer.CurrentBarrier, _boundPlayer.Parameters.MaxBarrier);
+            _playerBar?.SetInitialValues(_boundPlayer.Parameters.MaxMana, _boundPlayer.CurrentMana, _boundPlayer.Parameters.MaxHealth, _boundPlayer.CurrentHealth,
+                _boundPlayer.Parameters.MaxBarrier, _boundPlayer.CurrentBarrier);
             _playerBar?.SetIdentity(player.PlayerName, Localization.Localize(player.Fractions.ToString()));
             RefreshVitals();
         }

@@ -127,7 +127,6 @@
             to.SetItem(itemFrom!, quantityFrom);
         }
 
-        public virtual bool HaveThisItem(ItemInstance instance) => CurrentItem != null && CurrentItem.Equals(instance);
 
         public virtual bool TryAddStacks(int amount, out int leftover)
         {

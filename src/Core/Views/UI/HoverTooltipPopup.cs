@@ -34,8 +34,23 @@ namespace Core.Views.UI
             UiPlacement.PlaceClamped(panel, root.GetGlobalMousePosition(), new Vector2(CursorOffset, CursorOffset));
         }
 
-        /// <summary>_Process part: the panel follows the cursor, clamped to the viewport.</summary>
-        public static bool TogglePin(InputEvent @event, bool pinned) =>
+        /// <summary>_UnhandledKeyInput part: Alt toggles the pin; returns the new pinned state.
+        /// Un-pinning DISMISSES the popup — once the pointer has left the source a pinned popup is
+        /// orphaned (<see cref="HoverTooltip.Attach"/> dropped its handle on MouseExited), so resuming
+        /// cursor-follow would make it chase the mouse forever with nothing left to close it.</summary>
+        public static bool HandlePinInput(IPopup popup, InputEvent @event, bool pinned)
+        {
+            bool next = TogglePin(@event, pinned);
+            if (pinned && !next)
+            {
+                popup.Close();
+                return false;
+            }
+
+            return next;
+        }
+
+        private static bool TogglePin(InputEvent @event, bool pinned) =>
             @event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.Alt } ? !pinned : pinned;
     }
 }

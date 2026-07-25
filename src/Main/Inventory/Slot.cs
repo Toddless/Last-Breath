@@ -3,6 +3,7 @@
     using System;
     using Core;
     using Core.Enums;
+    using Core.Inventory;
     using Core.Items;
     using Godot;
     using Godot.Collections;
@@ -47,11 +48,11 @@
 
             var payload = new Dictionary
             {
-                ["Item"] = CurrentItem.ItemId,
-                ["Instance"] = CurrentItem.InstanceId,
-                ["Quantity"] = Quantity,
-                ["MaxStackSize"] = CurrentItem.MaxStackSize,
-                ["Source"] = GetPath()
+                [DragPayload.Item] = CurrentItem.ItemId,
+                [DragPayload.Instance] = CurrentItem.InstanceId,
+                [DragPayload.Quantity] = Quantity,
+                [DragPayload.MaxStackSize] = CurrentItem.MaxStackSize,
+                [DragPayload.Source] = GetPath()
             };
 
 
@@ -72,21 +73,21 @@
         {
             if (data.VariantType != Variant.Type.Dictionary) return false;
             var payload = data.AsGodotDictionary();
-            return payload.ContainsKey("Item") || payload.ContainsKey("EquipmentPiece");
+            return payload.ContainsKey(DragPayload.Item) || payload.ContainsKey(DragPayload.EquipmentPiece);
         }
 
         public override void _DropData(Vector2 atPosition, Variant data)
         {
             var payload = data.AsGodotDictionary();
-            if (payload.ContainsKey("EquipmentPiece"))
+            if (payload.ContainsKey(DragPayload.EquipmentPiece))
             {
-                OnEquipmentDropped((EquipmentPiece)payload["EquipmentPiece"].AsInt32());
+                OnEquipmentDropped((EquipmentPiece)payload[DragPayload.EquipmentPiece].AsInt32());
                 return;
             }
 
-            var itemId = payload["Item"].AsString();
-            var sourcePath = payload["Source"].AsNodePath();
-            var stackSize = payload["MaxStackSize"].AsInt32();
+            var itemId = payload[DragPayload.Item].AsString();
+            var sourcePath = payload[DragPayload.Source].AsNodePath();
+            var stackSize = payload[DragPayload.MaxStackSize].AsInt32();
 
             var source = GetNodeOrNull<Slot>(sourcePath);
             if (source == null)
@@ -148,7 +149,6 @@
             to.SetItem(itemFrom!, quantityFrom);
         }
 
-        public virtual bool HaveThisItem(ItemInstance instance) => CurrentItem != null && CurrentItem.Equals(instance);
 
         public virtual bool TryAddStacks(int amount, out int leftover)
         {

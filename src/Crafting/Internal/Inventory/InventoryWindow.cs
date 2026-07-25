@@ -22,7 +22,6 @@ namespace Crafting.Internal.Inventory
         private IItemDataProvider? _dataProvider;
         private IGameMessageBus? _messageBus;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {

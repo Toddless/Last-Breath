@@ -91,18 +91,13 @@ namespace LastBreath.UI
         // Input arrives through overrides (no bus/event subscriptions), so the fresh-instance
         // policy needs no _ExitTree unhook — the callbacks die with the node.
         // Two independent keys share this handler: ui_reveal_ranges (default Ctrl) toggles the
-        // spreads, the pin toggle listens for its own key (Alt) inside TogglePin.
+        // spreads, the pin toggle listens for its own key (Alt) inside HandlePinInput.
         public override void _UnhandledKeyInput(InputEvent @event)
         {
             if (@event.IsActionPressed(Settings.RevealRanges)) SetRevealRanges(true);
             else if (@event.IsActionReleased(Settings.RevealRanges)) SetRevealRanges(false);
 
-            bool pinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
-            // Un-pinning dismisses the tooltip: once the pointer has left its source a pinned popup is
-            // orphaned (HoverTooltip.Attach dropped its handle on MouseExited), so resuming cursor-follow
-            // would make it chase the mouse forever with nothing left to close it.
-            if (IsPinned && !pinned) { Close(); return; }
-            IsPinned = pinned;
+            IsPinned = HoverTooltipMotion.HandlePinInput(this, @event, IsPinned);
             if (IsPinned) AttachCraftButtons();
         }
 
@@ -171,8 +166,6 @@ namespace LastBreath.UI
                 ? $" · {Localization.Render("UI_Trade_SellQuote", new Dictionary<string, object?> { ["Amount"] = price })}"
                 : string.Empty;
 
-        /// <summary>Re-renders the line lists only — header and geometry stay put, so toggling the
-        /// reveal mid-hover doesn't make the tooltip jump.</summary>
         /// <summary>The weapon subtitle names the actual weapon (type + grip) instead of the generic
         /// "Weapon" piece; everything else keeps its equipment piece or the bare rarity.</summary>
         private static string Subtitle(IItem item) => item switch
@@ -238,9 +231,7 @@ namespace LastBreath.UI
         private string FormatParameter(EntityParameter parameter, float value)
         {
             _formats ??= GameServiceProvider.Instance.GetService<IParameterFormatProvider>();
-            return _formats?.GetUnit(parameter) == ParameterUnit.Percent
-                ? $"{(value * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)}%"
-                : value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+            return ParameterValueText.Format(_formats, parameter, value);
         }
 
         private static void ClearRows(VBoxContainer? container)

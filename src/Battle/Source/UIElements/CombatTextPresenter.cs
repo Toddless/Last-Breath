@@ -69,6 +69,9 @@ namespace Battle.Source.UIElements
 
         private void OnBattleEnd(BattleEndEvent obj) => Teardown();
 
+        // An arena torn down without a battle end (app quit, scene reload) must not leave handlers on the bus.
+        public override void _ExitTree() => Teardown();
+
         private void Teardown()
         {
             if (_eventBus != null)

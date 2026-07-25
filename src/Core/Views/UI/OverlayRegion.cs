@@ -13,10 +13,10 @@ namespace Core.Views.UI
         /// <summary>Prominent announcements: entering a location, boss encounters.</summary>
         TopCenter,
 
-        /// <summary>System feed: saved, level up, ability unlocked.</summary>
+        /// <summary>Reserved: no producer yet (see NotificationService for the category map).</summary>
         TopRight,
 
-        /// <summary>Reserved for hints/prompts above the hotbar.</summary>
+        /// <summary>System feed: saved, level up, ability unlocked, reputation.</summary>
         BottomRight,
     }
 }

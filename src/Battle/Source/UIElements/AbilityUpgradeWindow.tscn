@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://40loqjxv6xr0" path="res://Source/UIElements/AbilityUpgradeWindow.cs" id="1_iw8cd"]
 [ext_resource type="PackedScene" uid="uid://cfjcrk0kkryi8" path="res://Source/UIElements/AbilityUpgrades.tscn" id="2_441g7"]
 
-[node name="AbilityUpgradeWindow" type="MarginContainer" unique_id=1479837103 node_paths=PackedStringArray("_abilityUpgrades", "_abilityName", "_cost", "_cooldown", "_abilityIcon", "_abilityDescription", "_close")]
+[node name="AbilityUpgradeWindow" type="MarginContainer" unique_id=1479837103 node_paths=PackedStringArray("_abilityUpgrades", "_abilityName", "_cost", "_cooldown", "_abilityDescription", "_close")]
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
@@ -19,7 +19,6 @@ _abilityUpgrades = NodePath("MainContainer/ScrollContainer/Upgrades/AbilityUpgra
 _abilityName = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Name")
 _cost = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cost")
 _cooldown = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Properties/Cooldown")
-_abilityIcon = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer/Icon")
 _abilityDescription = NodePath("MainContainer/Panel/MarginContainer/VBoxContainer/MarginContainer/Description")
 _close = NodePath("MainContainer/Panel/MarginContainer/Button")
 
@@ -51,11 +50,6 @@ theme_override_constants/separation = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer" unique_id=1852709718]
 layout_mode = 2
-
-[node name="Icon" type="TextureRect" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1785913081]
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
-expand_mode = 1
 
 [node name="Properties" type="VBoxContainer" parent="MainContainer/Panel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=650728701]
 layout_mode = 2

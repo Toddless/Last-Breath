@@ -25,7 +25,6 @@ namespace Battle.Source.UIElements
 
         private IMartialArtMastery? _mastery;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {

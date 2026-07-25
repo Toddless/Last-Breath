@@ -20,7 +20,6 @@ namespace Battle.Internal.Save
 
         private ISaveGameService? _saveGame;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {
@@ -41,8 +40,7 @@ namespace Battle.Internal.Save
         {
             if (_slotsContainer == null || _saveGame == null) return;
 
-            foreach (var child in _slotsContainer.GetChildren())
-                child.QueueFree();
+            _slotsContainer.QueueFreeChildren();
 
             for (int slot = 1; slot <= _saveGame.SlotCount; slot++)
                 _slotsContainer.AddChild(BuildRow(slot));
@@ -58,12 +56,12 @@ namespace Battle.Internal.Save
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 VerticalAlignment = VerticalAlignment.Center
             });
-            row.AddChild(SlotButton(TranslationServer.Translate("UI_Save"), !_saveGame.CanSave, () =>
+            row.AddChild(SlotButton(Core.Localization.Localization.Localize("UI_Save"), !_saveGame.CanSave, () =>
             {
                 _saveGame.SaveToSlot(slot);
                 Rebuild();
             }));
-            row.AddChild(SlotButton(TranslationServer.Translate("UI_Load"), metadata == null, () => _saveGame.RequestLoad(slot)));
+            row.AddChild(SlotButton(Core.Localization.Localization.Localize("UI_Load"), metadata == null, () => _saveGame.RequestLoad(slot)));
             row.AddChild(SlotButton("X", metadata == null, () =>
             {
                 _saveGame.DeleteSlot(slot);

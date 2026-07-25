@@ -20,8 +20,6 @@ namespace Battle.Source.UIElements
         private const string UID = "uid://cv5svhrugien6";
         private const int ModifierLineWidth = 300;
         private static readonly Color s_deadTint = new(0.45f, 0.45f, 0.45f, 0.8f);
-        private Tween? _tween;
-        [Export] private Control? MainContainer { get; set; }
         [Export] private ProgressBar? ManaBar { get; set; }
         [Export] private ProgressBar? HealthBar { get; set; }
         [Export] private ProgressBar? BarrierBar { get; set; }
@@ -105,17 +103,12 @@ namespace Battle.Source.UIElements
             _factionBadge?.Visible = !string.IsNullOrEmpty(faction);
         }
 
-        /// <summary>The NPC difficulty modifier rows; empty list collapses the section.</summary>
-        public void SetModifiers(IReadOnlyList<INpcModifier> modifiers) =>
-            SetModifiers(modifiers.Select(modifier => modifier.DisplayName).ToList());
-
-        /// <summary>Snapshot flavour: the NPC inspect card carries only the display names.</summary>
+        /// <summary>The NPC difficulty modifier rows (display names only); empty list collapses the section.</summary>
         public void SetModifiers(IReadOnlyList<string> modifierNames)
         {
             if (_mods == null || _modsSection == null) return;
 
-            foreach (var child in _mods.GetChildren())
-                child.QueueFree();
+            _mods.QueueFreeChildren();
 
             foreach (string text in modifierNames)
             {
@@ -170,7 +163,7 @@ namespace Battle.Source.UIElements
             _effectsSection?.Visible = false;
         }
 
-        public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, float maxBarrier = 0f, float currentBarrier = 0f, Texture2D? icon = null)
+        public void SetInitialValues(float maxMana, float currentMana, float maxHealth, float currentHealth, float maxBarrier = 0f, float currentBarrier = 0f)
         {
             ManaBar?.MaxValue = maxMana;
             ManaBar?.Value = currentMana;
@@ -180,8 +173,6 @@ namespace Battle.Source.UIElements
             // receive a vitals snapshot for a whole round.
             UpdateBarrier(currentBarrier, maxBarrier);
             RefreshVitalTexts();
-            if (icon != null) Icon?.Texture = icon;
-            //_tween = CreateTween();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
@@ -194,12 +185,6 @@ namespace Battle.Source.UIElements
                 _hpText.Text = $"{Mathf.CeilToInt(HealthBar.Value)} / {Mathf.CeilToInt(HealthBar.MaxValue)}";
             if (_manaText != null && ManaBar != null)
                 _manaText.Text = $"{Mathf.CeilToInt(ManaBar.Value)} / {Mathf.CeilToInt(ManaBar.MaxValue)}";
-        }
-
-        private void AnimateValueChange(ProgressBar progressBar, float newValue, bool isMaxValue = false)
-        {
-            string propertyName = isMaxValue ? "max_value" : "value";
-            _tween?.TweenProperty(progressBar, propertyName, isMaxValue ? progressBar.MaxValue : progressBar.Value, newValue);
         }
 
         private void FlipElements()

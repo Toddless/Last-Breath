@@ -65,7 +65,7 @@ namespace LastBreath.Player
 
         private IGameEventBus? _gameEventBus;
         private IBattleEventBus? _battleEventBus;
-        private IUiContextService? _uiContext;
+        private IUiElementsManager? _uiElements;
         private IWorldClock? _worldClock;
         private IPlayerLifecycleConfigProvider? _lifecycleConfigProvider;
         private IRestRecoveryService? _restRecovery;
@@ -74,7 +74,8 @@ namespace LastBreath.Player
         /// <summary>Body state after a defeat; non-null only while lying dead (NPC burn scans read it).</summary>
         public PlayerLifecycle? Lifecycle { get; private set; }
 
-        public string Id { get; }
+        // Base id doubles as the localization key (see DisplayName); a never-assigned Id was null everywhere.
+        public string Id { get; } = "Player";
         public string InstanceId { get; } = Guid.NewGuid().ToString();
 
         public Texture2D? Icon { get; }
@@ -176,8 +177,8 @@ namespace LastBreath.Player
             _rnd.Randomize();
             if (_camera is { Enabled: true }) _camera.MakeCurrent();
             _gameEventBus = GameServiceProvider.Instance.GetService<IGameEventBus>();
-            // Optional service (fail-open): drives the dialogue movement gate below.
-            _uiContext = GameServiceProvider.Instance.GetServices<IUiContextService>().FirstOrDefault();
+            // Optional service (fail-open): drives the movement gate in _PhysicsProcess.
+            _uiElements = GameServiceProvider.Instance.GetServices<IUiElementsManager>().FirstOrDefault();
             _worldClock = GameServiceProvider.Instance.GetService<IWorldClock>();
             _lifecycleConfigProvider = GameServiceProvider.Instance.GetService<IPlayerLifecycleConfigProvider>();
             // Rest at a campfire: the recovery zones heal any registered non-fighting participant.
@@ -233,15 +234,11 @@ namespace LastBreath.Player
             }
 
             if (!CanMove) return;
-            // TODO:
-            // Почему класс игрока что то знает о UI? Необходимо найти иной путь
-
-            // A conversation freezes walking: movement is polled here, so without this gate the
-            // player strolls away mid-dialogue. Fail-open — a project without the context tracker
-            // (Battle sandbox) isn't gated, and Dialogue only ever fires in the world.
-            // An open shop freezes exactly the same way (it outlives the dialogue that opened it).
-            if (_uiContext != null && (_uiContext.Current & UiContext.Dialogue) != 0
-                || LastBreath.UI.TradeWindow.Active != null)
+            // Blocking windows (dialogue, trade) freeze walking: movement is polled here, so
+            // without this gate the player strolls away mid-conversation. The windows declare
+            // IWindow.BlocksMovement; the player only asks the manager. Fail-open — a project
+            // without the manager (sandboxes) isn't gated.
+            if (_uiElements?.HasMovementBlockingWindow == true)
             {
                 Velocity = Vector2.Zero;
                 return;

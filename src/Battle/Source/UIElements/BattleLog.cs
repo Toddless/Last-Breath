@@ -29,18 +29,23 @@ namespace Battle.Source.UIElements
             WireFilter(_effectFilter, BattleLogCategory.Effect);
         }
 
-        public override void _ExitTree()
-        {
-            if (_presenter != null) _presenter.EntryAdded -= OnEntryAdded;
-            _presenter = null;
-        }
+        public override void _ExitTree() => DetachPresenter();
 
         public void SetBattleEventBus(IBattleEventBus battleEventBus)
         {
+            DetachPresenter(); // the next battle's presenter replaces the previous one entirely
             _entries.Clear();
             _text?.Clear();
             _presenter = new BattleLogPresenter(battleEventBus);
             _presenter.EntryAdded += OnEntryAdded;
+        }
+
+        private void DetachPresenter()
+        {
+            if (_presenter == null) return;
+            _presenter.EntryAdded -= OnEntryAdded;
+            _presenter.Detach();
+            _presenter = null;
         }
 
         private void OnEntryAdded(BattleLogEntry entry)

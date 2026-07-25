@@ -69,7 +69,6 @@ namespace LastBreath.Inventory
         private readonly Dictionary<Rarity, Button> _chipButtons = [];
         private int _typeIndex;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public override void _Ready()
         {
@@ -304,8 +303,7 @@ namespace LastBreath.Inventory
         {
             if (_stats == null || _playerAccessor?.Player is not { } player) return;
 
-            foreach (var child in _stats.GetChildren())
-                child.QueueFree();
+            _stats.QueueFreeChildren();
 
             AddStatRow(Localization.Localize("Health"), $"{Mathf.CeilToInt(player.CurrentHealth)} / {Mathf.CeilToInt(player.Parameters.MaxHealth)}");
             foreach (var parameter in s_statParameters)
@@ -325,8 +323,7 @@ namespace LastBreath.Inventory
         private void RenderResists(IPlayer player)
         {
             if (_resists == null) return;
-            foreach (var child in _resists.GetChildren())
-                child.QueueFree();
+            _resists.QueueFreeChildren();
 
             foreach (var parameter in s_resistParameters)
             {
@@ -340,13 +337,8 @@ namespace LastBreath.Inventory
             }
         }
 
-        private string FormatValue(EntityParameter parameter, IPlayer player)
-        {
-            float value = player.Parameters.GetValueForParameter(parameter);
-            return _formats?.GetUnit(parameter) == ParameterUnit.Percent
-                ? $"{(value * 100).ToString("0.#", CultureInfo.InvariantCulture)}%"
-                : value.ToString("0.#", CultureInfo.InvariantCulture);
-        }
+        private string FormatValue(EntityParameter parameter, IPlayer player) =>
+            ParameterValueText.Format(_formats, parameter, player.Parameters.GetValueForParameter(parameter));
 
         /// <summary>Dims the bag slots that fall out of the current search/rarity/type filter.
         /// The slots stay in place (the grid IS the bag) — filtered-out items just fade.</summary>

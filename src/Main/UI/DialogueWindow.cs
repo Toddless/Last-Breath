@@ -20,7 +20,10 @@ namespace LastBreath.UI
         private IDialogueService? _dialogue;
         private bool _closing;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
+
+        /// <summary>A conversation freezes walking — movement is polled, so without the flag the
+        /// player would stroll away mid-dialogue.</summary>
+        public bool BlocksMovement => true;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -74,8 +77,7 @@ namespace LastBreath.UI
         {
             if (_options == null) return;
 
-            foreach (var child in _options.GetChildren())
-                child.QueueFree();
+            _options.QueueFreeChildren();
 
             foreach (var option in node.Options)
             {

@@ -1,6 +1,5 @@
 ﻿namespace LastBreath.UI
 {
-    using System;
     using Battle.Source;
     using Core.Data;
     using Core.Interfaces;
@@ -15,11 +14,8 @@
         private readonly IGameServiceProvider _provider = GameServiceProvider.Instance;
         [Export] private Button? _newGameButton, _optionsButton, _quitButton, _loadGameButton;
 
-        private IUiElementsManager? _uIElementProvider;
-
         public override void _Ready()
         {
-            _uIElementProvider = _provider.GetService<IUiElementsManager>();
             _provider.GetService<ISettingsHandler>().ApplySavedSettings();
             _provider.AddCraftingWindowFactories();
             _provider.AddBattleUiElementsFactory();
@@ -42,7 +38,6 @@
 
         private void LoadGamePressed()
         {
-            ArgumentNullException.ThrowIfNull(_uIElementProvider);
             var saveLoad = SaveLoadWindow.Initialize().Instantiate<SaveLoadWindow>();
             saveLoad.InjectServices(_provider);
             // Menu mode: no live world to reload — the staged load rides into a fresh world scene,
@@ -53,7 +48,6 @@
 
         private void OptionsButtonPressed()
         {
-            ArgumentNullException.ThrowIfNull(_uIElementProvider);
             var options = OptionsWindow.Initialize().Instantiate<OptionsWindow>();
             options.InjectServices(_provider);
             CallDeferred(Node.MethodName.AddChild, options);

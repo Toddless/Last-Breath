@@ -13,40 +13,28 @@
 
         public void PlayDamageNumbers(int value, DamageType type, bool isCritical = false)
         {
-            _label?.Text = value.ToString();
-            _label?.Modulate = DefineColor(type, isCritical);
-
-            if (isCritical)
-                Scale = Vector2.One * 1.2f;
-
-            var tween = CreateTween();
-            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
-            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
-            tween.Finished += QueueFree;
+            if (isCritical) Scale = Vector2.One * 1.2f;
+            PlayFloat(value.ToString(), DefineColor(type, isCritical));
         }
 
-        public void PlayHealNumbers(int value)
-        {
-            _label?.Text = value.ToString();
-            _label?.Modulate = Colors.LawnGreen;
-
-            var tween = CreateTween();
-            tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
-            tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
-            tween.Parallel().TweenProperty(this, "scale", Vector2.One * 1.3f, _duration);
-            tween.Finished += QueueFree;
-        }
+        public void PlayHealNumbers(int value) =>
+            PlayFloat(value.ToString(), Colors.LawnGreen)
+                .Parallel().TweenProperty(this, "scale", Vector2.One * 1.3f, _duration);
 
         /// <summary>Floating status text (e.g. the skip-turn reason) instead of a number.</summary>
-        public void PlayStatusText(string text)
+        public void PlayStatusText(string text) => PlayFloat(text, Colors.LightGray);
+
+        /// <summary>The shared rise-and-fade; returned so a caller can append parallel steps.</summary>
+        private Tween PlayFloat(string text, Color color)
         {
             _label?.Text = text;
-            _label?.Modulate = Colors.LightGray;
+            _label?.Modulate = color;
 
             var tween = CreateTween();
             tween.TweenProperty(this, "position:y", Position.Y - _rise, _duration);
             tween.Parallel().TweenProperty(this, "modulate:a", 0f, _duration);
             tween.Finished += QueueFree;
+            return tween;
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

@@ -62,6 +62,9 @@ namespace Core.Services
             popup?.ShowKeyword(view, globalPosition);
         }
 
+        public bool HasMovementBlockingWindow =>
+            _openWindows.ToList().Any(pair => TryGetOpenWindow(pair.Key, out var window) && window.BlocksMovement);
+
         public bool HandleEscape()
         {
             if (CloseOverlayLayer()) return true;

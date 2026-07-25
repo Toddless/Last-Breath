@@ -21,7 +21,6 @@ namespace LastBreath.UI
         private ISaveGameService? _saveGame;
         private System.Action? _menuLoad;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         /// <summary>
         /// Menu mode: there is no live world to reload, so a successful load stages the pending
@@ -50,8 +49,7 @@ namespace LastBreath.UI
         {
             if (_slotsContainer == null || _saveGame == null) return;
 
-            foreach (var child in _slotsContainer.GetChildren())
-                child.QueueFree();
+            _slotsContainer.QueueFreeChildren();
 
             for (int slot = 1; slot <= _saveGame.SlotCount; slot++)
                 _slotsContainer.AddChild(BuildRow(slot));
@@ -67,12 +65,12 @@ namespace LastBreath.UI
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 VerticalAlignment = VerticalAlignment.Center
             });
-            row.AddChild(SlotButton(TranslationServer.Translate("UI_Save"), !_saveGame.CanSave, () =>
+            row.AddChild(SlotButton(Core.Localization.Localization.Localize("UI_Save"), !_saveGame.CanSave, () =>
             {
                 _saveGame.SaveToSlot(slot);
                 Rebuild();
             }));
-            row.AddChild(SlotButton(TranslationServer.Translate("UI_Load"), metadata == null, () => LoadSlot(slot)));
+            row.AddChild(SlotButton(Core.Localization.Localization.Localize("UI_Load"), metadata == null, () => LoadSlot(slot)));
             row.AddChild(SlotButton("X", metadata == null, () =>
             {
                 _saveGame.DeleteSlot(slot);

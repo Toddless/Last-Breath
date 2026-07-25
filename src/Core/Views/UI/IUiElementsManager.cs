@@ -38,6 +38,10 @@ namespace Core.Views.UI
         /// </summary>
         bool HandleEscape();
 
+        /// <summary>An open window with <see cref="IWindow.BlocksMovement"/> is on screen.
+        /// Polled by the player's movement, so it must stay cheap.</summary>
+        bool HasMovementBlockingWindow { get; }
+
         bool RegisterHudFactory(Type hudType, Func<IHud> factory);
 
         /// <summary>The window is openable only in <paramref name="allowedIn"/> contexts; a context

@@ -47,7 +47,6 @@ namespace LastBreath.UI
         {
             _label?.Text = _text;
             _close?.Pressed += Close;
-            _ = PlayLifecycleAsync();
         }
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);

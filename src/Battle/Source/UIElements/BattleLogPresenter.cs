@@ -19,8 +19,11 @@ namespace Battle.Source.UIElements
     {
         public event Action<BattleLogEntry>? EntryAdded;
 
+        private IBattleEventBus? _bus;
+
         public BattleLogPresenter(IBattleEventBus bus)
         {
+            _bus = bus;
             bus.Subscribe<TurnStartEvent>(OnTurnStart);
             bus.Subscribe<AbilityActivatedEvent>(OnAbilityActivated);
             bus.Subscribe<AbilityStageActivatedEvent>(OnStageActivated);
@@ -31,6 +34,24 @@ namespace Battle.Source.UIElements
             bus.Subscribe<EffectAppliedEvent>(OnEffectApplied);
             bus.Subscribe<TurnSkippedEvent>(OnTurnSkipped);
             bus.Subscribe<PlayerFleeResolvedEvent>(OnFleeResolved);
+        }
+
+        /// <summary>Symmetric to the constructor: the log control detaches its presenter on death
+        /// and on bus replacement, otherwise the bus keeps feeding an abandoned presenter.</summary>
+        public void Detach()
+        {
+            if (_bus == null) return;
+            _bus.Unsubscribe<TurnStartEvent>(OnTurnStart);
+            _bus.Unsubscribe<AbilityActivatedEvent>(OnAbilityActivated);
+            _bus.Unsubscribe<AbilityStageActivatedEvent>(OnStageActivated);
+            _bus.Unsubscribe<DamageTakenEvent>(OnDamageTaken);
+            _bus.Unsubscribe<EntityHealedEvent>(OnHealed);
+            _bus.Unsubscribe<AttackEvadedEvent>(OnAttackEvaded);
+            _bus.Unsubscribe<AttackBlockedEvent>(OnAttackBlocked);
+            _bus.Unsubscribe<EffectAppliedEvent>(OnEffectApplied);
+            _bus.Unsubscribe<TurnSkippedEvent>(OnTurnSkipped);
+            _bus.Unsubscribe<PlayerFleeResolvedEvent>(OnFleeResolved);
+            _bus = null;
         }
 
         private void OnFleeResolved(PlayerFleeResolvedEvent evt) =>

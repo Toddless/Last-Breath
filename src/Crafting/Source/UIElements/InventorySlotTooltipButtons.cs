@@ -12,7 +12,7 @@ namespace Crafting.Source.UIElements
     using Core.Views.UI;
     using Godot;
 
-    public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices, IClosable
+    public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices
     {
         private const string UID = "uid://dor0kden4oc1j";
         [Export] private Button? _equip, _update, _recraft, _ascend, _destroy, _favorite;

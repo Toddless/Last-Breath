@@ -5,6 +5,7 @@ namespace LastBreath.UI
     using Core.Localization;
     using Core.Narrative.Facts;
     using Core.Narrative.Quests;
+    using Core.Views.UI;
     using Godot;
 
     /// <summary>
@@ -50,8 +51,7 @@ namespace LastBreath.UI
 
         private void Render()
         {
-            foreach (var child in GetChildren())
-                child.QueueFree();
+            this.QueueFreeChildren();
 
             var tracked = _questLog?.States
                 .Where(state => state.Status is QuestStatus.Active or QuestStatus.ReadyToTurnIn)

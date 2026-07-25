@@ -38,12 +38,7 @@ namespace Battle.Source.UIElements
 
         public override void _UnhandledKeyInput(InputEvent @event)
         {
-            bool pinned = HoverTooltipMotion.TogglePin(@event, IsPinned);
-            // Un-pinning dismisses the card: once the pointer has left the mini bar a pinned popup
-            // is orphaned (HoverTooltip.Attach dropped its handle on MouseExited), so resuming
-            // cursor-follow would make it chase the mouse forever with nothing left to close it.
-            if (IsPinned && !pinned) { Close(); return; }
-            IsPinned = pinned;
+            IsPinned = HoverTooltipMotion.HandlePinInput(this, @event, IsPinned);
             if (IsPinned) OpenMouseFilters();
         }
 

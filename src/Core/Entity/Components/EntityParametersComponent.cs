@@ -25,6 +25,7 @@
             [EntityParameter.LightningResistance] = (0f, 0.8f),
             [EntityParameter.FireResistance] = (0f, 0.8f),
             [EntityParameter.ColdResistance] = (0f, 0.8f),
+            [EntityParameter.SuppressChance] = (0f, 1f)
         };
 
         private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));
@@ -50,6 +51,7 @@
         public float MaxMana => this[EntityParameter.Mana];
         public float ManaRecovery => this[EntityParameter.ManaRecovery];
         public float MoveSpeed => this[EntityParameter.MoveSpeed];
+        public float SuppressChance => this[EntityParameter.SuppressChance];
         public float CriticalDamageMitigation => this[EntityParameter.CriticalDamageMitigation];
         public float LightningResistance => this[EntityParameter.LightningResistance];
         public float FireResistance => this[EntityParameter.FireResistance];

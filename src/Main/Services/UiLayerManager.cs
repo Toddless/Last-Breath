@@ -25,53 +25,17 @@ namespace LastBreath.Services
             if (_uiElements?.HandleEscape() == true) GetViewport().SetInputAsHandled();
         }
 
-        public void ShowHud(IHud hud)
-        {
-            if (hud is Control cHud)
-                _mainLayer?.CallDeferred(Node.MethodName.AddChild, cHud);
-        }
+        public void ShowHud(IHud hud) => LayerBehavior.Show(_mainLayer, hud);
 
-        public void ShowWindow(IWindow window)
-        {
-            if (window is Control cWindow)
-                _windowLayer?.CallDeferred(Node.MethodName.AddChild, cWindow);
-        }
+        public void ShowWindow(IWindow window) => LayerBehavior.Show(_windowLayer, window);
 
-        public void ShowOverlay(IPopup overlay)
-        {
-            if (overlay is not Control cOverlay) return;
-            // An unassigned region container degrades to free placement on the layer
-            Node target = RegionContainer(overlay.Region) ?? (Node?)_overlayLayer ?? this;
-            target.CallDeferred(Node.MethodName.AddChild, cOverlay);
-        }
-
-        public void CloseAllWindows()
-        {
-            foreach (var child in _windowLayer?.GetChildren() ?? [])
-                child.QueueFree();
-        }
+        // An unassigned region container degrades to free placement on the layer
+        public void ShowOverlay(IPopup overlay) =>
+            LayerBehavior.Show(RegionContainer(overlay.Region) ?? (Node?)_overlayLayer ?? this, overlay);
 
         public bool CloseOverlays()
         {
-            bool closedAny = false;
-            foreach (var child in _overlayLayer?.GetChildren() ?? [])
-            {
-                // Region containers are scene furniture: clear their content, keep the container
-                if (child == _topCenterRegion || child == _topRightRegion || child == _bottomRightRegion)
-                {
-                    foreach (var popup in child.GetChildren())
-                    {
-                        popup.QueueFree();
-                        closedAny = true;
-                    }
-
-                    continue;
-                }
-
-                child.QueueFree();
-                closedAny = true;
-            }
-
+            bool closedAny = LayerBehavior.CloseOverlays(_overlayLayer, _topCenterRegion, _topRightRegion, _bottomRightRegion);
             if (closedAny) OverlaysCleared?.Invoke();
             return closedAny;
         }

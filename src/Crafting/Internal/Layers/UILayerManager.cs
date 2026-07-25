@@ -40,16 +40,6 @@ namespace Crafting.Internal.Layers
                 _notificationLayer?.CallDeferred(Node.MethodName.AddChild, cOverlay);
         }
 
-        public void RemoveMainElement(Control hud) => _mainLayer?.CallDeferred(Node.MethodName.RemoveChild, hud);
-
-        public void RemoveWindowElement(Control window) => _windowLayer?.CallDeferred(Node.MethodName.RemoveChild, window);
-
-        public void CloseAllWindows()
-        {
-            foreach (var child in _windowLayer?.GetChildren() ?? [])
-                child.QueueFree();
-        }
-
         public bool CloseOverlays()
         {
             bool closedAny = false;

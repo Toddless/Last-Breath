@@ -107,9 +107,25 @@ namespace Battle.Source.UIElements
 
         public void SetBattleEventBus(IBattleEventBus battleEventBus)
         {
+            DetachEventBus();
             _battleEventBus = battleEventBus;
             _battleEventBus.Subscribe<BattleEndEvent>(OnBattleEnd);
             _battleEventBus.Subscribe<TargetSelectionResolvedEvent>(OnSelectionResolved);
+        }
+
+        // Symmetric to SetBattleEventBus: a bus outliving the button (teardown without a battle
+        // end) must not keep handlers on a removed node.
+        private void DetachEventBus()
+        {
+            _battleEventBus?.Unsubscribe<BattleEndEvent>(OnBattleEnd);
+            _battleEventBus?.Unsubscribe<TargetSelectionResolvedEvent>(OnSelectionResolved);
+            _battleEventBus = null;
+        }
+
+        public override void _ExitTree()
+        {
+            DetachEventBus();
+            DetachCurrentAbility();
         }
 
         public void SetAbility(IAbility ability)
@@ -249,7 +265,7 @@ namespace Battle.Source.UIElements
 
             _stateMachine.Configure(State.NotAvailable)
                 .OnEntry(() => { _icon?.SetModulate(new Color(1, 1, 1, 0.7f)); })
-                .OnExit(() => { _icon?.SetModulate(new Color(1, 1, 1, 0)); })
+                .OnExit(() => { _icon?.SetModulate(Colors.White); })
                 .Permit(Trigger.Ready, State.Ready);
         }
 
@@ -311,10 +327,8 @@ namespace Battle.Source.UIElements
 
         private void OnBattleEnd(BattleEndEvent obj)
         {
-            _ability?.AbilityResourceChanges -= OnAbilityResourceChanges;
-            _ability?.CooldownLeftChanges -= OnCooldownChanges;
-            _ability = null;
-            _battleEventBus = null;
+            DetachCurrentAbility();
+            DetachEventBus();
         }
 
         private void OnCooldownChanges(IAbility abi, int cooldown)

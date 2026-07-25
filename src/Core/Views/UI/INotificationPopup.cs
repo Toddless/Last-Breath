@@ -11,5 +11,9 @@ namespace Core.Views.UI
     public interface INotificationPopup : IPopup
     {
         void SetNotification(NotificationContent content, OverlayRegion region);
+
+        /// <summary>The Timed lifetime (fade in → hold → fade out → free). The SERVICE starts it
+        /// right after ShowOverlay — the popup itself only implements the animation.</summary>
+        System.Threading.Tasks.Task PlayLifecycleAsync();
     }
 }

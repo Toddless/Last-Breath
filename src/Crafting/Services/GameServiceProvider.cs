@@ -28,7 +28,6 @@ namespace Crafting.Services
         {
             services.AddSingleton<IItemGameDataFactory, ItemGameDataFactory>();
             services.AddSingleton<IDataParser, DataParser>();
-            services.AddSingleton<IUIResourcesProvider, UIResourcesProvider>();
             services.AddSingleton<IInventory, Inventory>();
             services.AddSingleton<IItemCreationService, ItemCreationService>();
             services.AddGameDataParticipant<IItemDataProvider, ItemDataProvider>();

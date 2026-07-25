@@ -43,7 +43,6 @@ namespace LastBreath.UI
         private IParameterFormatProvider? _formats;
         private IPlayerAccessor? _playerAccessor;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 
@@ -76,8 +75,7 @@ namespace LastBreath.UI
         {
             if (_stats == null || _playerAccessor?.Player is not { } player) return;
 
-            foreach (var child in _stats.GetChildren())
-                child.QueueFree();
+            _stats.QueueFreeChildren();
 
             RenderVitals(player);
             foreach ((string titleKey, EntityParameter[] parameters) in s_sections)
@@ -113,20 +111,14 @@ namespace LastBreath.UI
             grid.AddChild(new Label { Text = value, HorizontalAlignment = HorizontalAlignment.Right });
         }
 
-        private string FormatValue(EntityParameter parameter, IPlayer player)
-        {
-            float value = player.Parameters.GetValueForParameter(parameter);
-            return _formats?.GetUnit(parameter) == ParameterUnit.Percent
-                ? $"{(value * 100).ToString("0.#", CultureInfo.InvariantCulture)}%"
-                : value.ToString("0.#", CultureInfo.InvariantCulture);
-        }
+        private string FormatValue(EntityParameter parameter, IPlayer player) =>
+            ParameterValueText.Format(_formats, parameter, player.Parameters.GetValueForParameter(parameter));
 
         private void RenderReputation()
         {
             if (_ranks == null || _relations == null) return;
 
-            foreach (var child in _ranks.GetChildren())
-                child.QueueFree();
+            _ranks.QueueFreeChildren();
 
             foreach (Fractions faction in Enum.GetValues<Fractions>())
             {

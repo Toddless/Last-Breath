@@ -23,6 +23,14 @@ namespace Core.Localization
 
         public static string LocalizeDescription(string id) => Service.LocalizeDescription(id);
 
+        /// <summary>False when the catalog has no <c>&lt;Id&gt;_Description</c> entry. The provider
+        /// echoes the key back on a miss — this is the ONE place that knows that convention.</summary>
+        public static bool TryLocalizeDescription(string id, out string description)
+        {
+            description = Service.LocalizeDescription(id);
+            return !string.IsNullOrEmpty(description) && description != $"{id}_Description";
+        }
+
         public static string RenderDescription(string id, IReadOnlyDictionary<string, object?> values, TextFormat format = TextFormat.Plain) =>
             Service.RenderDescription(id, values, format);
 

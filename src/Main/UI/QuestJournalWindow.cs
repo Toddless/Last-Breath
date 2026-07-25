@@ -36,7 +36,6 @@ namespace LastBreath.UI
         private IWorldFactsService? _facts;
         private string? _selectedQuestId;
 
-        public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
         public static PackedScene Initialize() => ResourceLoader.Load<PackedScene>(UID);
 

@@ -135,7 +135,6 @@ namespace LastBreathTest.BattleSystemTests
         private class FakeWindow : IWindow
         {
             public bool Closed { get; private set; }
-            public bool IsAlreadyVisible => false;
             public void Close() => Closed = true;
             public void InjectServices(IGameServiceProvider provider)
             {

@@ -3639,3 +3639,9 @@ msgstr "Modifiers"
 
 msgid "UI_Inspect_Effects"
 msgstr "Effects"
+
+msgid "UI_Inventory_Full"
+msgstr "Backpack is full — {Item} is lost"
+
+msgid "UI_Inventory_Missing_Items"
+msgstr "Not enough {Item}"

@@ -3104,3 +3104,9 @@ msgstr "Модификаторы"
 
 msgid "UI_Inspect_Effects"
 msgstr "Эффекты"
+
+msgid "UI_Inventory_Full"
+msgstr ""
+
+msgid "UI_Inventory_Missing_Items"
+msgstr ""

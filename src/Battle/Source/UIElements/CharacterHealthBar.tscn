@@ -34,14 +34,13 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.23, 0.2, 0.16, 1)
 
-[node name="CharacterHealthBar" type="PanelContainer" unique_id=912470484 node_paths=PackedStringArray("MainContainer", "ManaBar", "HealthBar", "BarrierBar", "Icon", "CharacterEffects", "_name", "_factionBadge", "_factionLabel", "_hpText", "_manaText", "_level", "_effectsSection", "_effectsHeaderLabel", "_modsSection", "_modsHeaderLabel", "_mods")]
+[node name="CharacterHealthBar" type="PanelContainer" unique_id=912470484 node_paths=PackedStringArray("ManaBar", "HealthBar", "BarrierBar", "Icon", "CharacterEffects", "_name", "_factionBadge", "_factionLabel", "_hpText", "_manaText", "_level", "_effectsSection", "_effectsHeaderLabel", "_modsSection", "_modsHeaderLabel", "_mods")]
 custom_minimum_size = Vector2(340, 0)
 offset_right = 340.0
 offset_bottom = 120.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("card_frame")
 script = ExtResource("1_a8sqt")
-MainContainer = NodePath("Body/Margin/Layout")
 ManaBar = NodePath("Body/Margin/Layout/Header/Info/ManaArea/Mana")
 HealthBar = NodePath("Body/Margin/Layout/Header/Info/HpArea/Health")
 BarrierBar = NodePath("Body/Margin/Layout/Header/Info/HpArea/Barrier")

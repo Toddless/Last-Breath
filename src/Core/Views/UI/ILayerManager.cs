@@ -14,7 +14,6 @@ namespace Core.Views.UI
         void ShowHud(IHud hud);
         void ShowWindow(IWindow window);
         void ShowOverlay(IPopup overlay);
-        void CloseAllWindows();
 
         /// <summary>Frees everything on the Overlay layer; true when something was actually closed.</summary>
         bool CloseOverlays();

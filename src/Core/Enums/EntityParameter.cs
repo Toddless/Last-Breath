@@ -21,6 +21,7 @@
         ManaRecovery,
         MoveSpeed,
         Suppress,
+        SuppressChance,
         Health,
         HealthRecovery,
         CriticalDamageMitigation,

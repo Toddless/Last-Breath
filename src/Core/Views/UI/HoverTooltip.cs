@@ -39,6 +39,9 @@ namespace Core.Views.UI
                 var popup = current;
                 current = null;
                 if (popup is not Node node || !GodotObject.IsInstanceValid(node)) return;
+                // Lifetime dispatch: only WhileHovered popups die with the pointer. A pinned one
+                // temporarily behaves as Pinned and survives until unpin, Esc or an overlay clear.
+                if (popup.Lifetime != PopupLifetime.WhileHovered) return;
                 if (popup is IHoverTooltipPopup { IsPinned: true }) return;
                 popup.Close();
             }

@@ -9,8 +9,6 @@
         int InventoryCapacity { get; }
 
         event Action<string, int>? ItemAmountChanges;
-        event Action<string, string, int, int>? InventoryFull;
-        event Action<string>? NotEnoughItems;
 
         List<string> GetAllItemIdsWithTag(string tag);
         T? GetItem<T>(string instanceId) where T : class, IItem;
