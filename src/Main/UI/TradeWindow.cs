@@ -43,18 +43,37 @@ namespace LastBreath.UI
 
         private Bag? BagService => _inventory as Bag;
 
+        /// <summary>The open shop, if any: the item tooltip asks it for a sell quote and the player's
+        /// movement poll treats it like an open conversation. Fresh-instance policy keeps it single.</summary>
+        public static TradeWindow? Active { get; private set; }
+
         public bool IsAlreadyVisible => IsInsideTree() && Visible;
 
-        public override void _Ready() => _closeButton?.Pressed += Close;
+        public override void _Ready()
+        {
+            _closeButton?.Pressed += Close;
+            Active = this;
+        }
 
         public override void _ExitTree()
         {
+            if (Active == this) Active = null;
             if (_wallet != null) _wallet.GoldChanged -= OnGoldChanged;
             if (BagService is { } bag)
             {
                 bag.DetachSlots();
                 bag.ItemInteraction -= OnBagItemInteraction;
             }
+        }
+
+        /// <summary>What THIS trader pays for the item right now (perk included); null when the item
+        /// is untradable — the tooltip shows no price line then.</summary>
+        public int? QuoteSellPrice(IItem item)
+        {
+            var trader = _traderService?.GetTrader(_traderId);
+            if (trader == null || _pricing == null) return null;
+            int price = _pricing.SellPrice(item, trader.Fraction);
+            return price > 0 ? price : null;
         }
 
         public void InjectServices(IGameServiceProvider provider)

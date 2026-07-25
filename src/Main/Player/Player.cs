@@ -239,7 +239,9 @@ namespace LastBreath.Player
             // A conversation freezes walking: movement is polled here, so without this gate the
             // player strolls away mid-dialogue. Fail-open — a project without the context tracker
             // (Battle sandbox) isn't gated, and Dialogue only ever fires in the world.
-            if (_uiContext != null && (_uiContext.Current & UiContext.Dialogue) != 0)
+            // An open shop freezes exactly the same way (it outlives the dialogue that opened it).
+            if (_uiContext != null && (_uiContext.Current & UiContext.Dialogue) != 0
+                || LastBreath.UI.TradeWindow.Active != null)
             {
                 Velocity = Vector2.Zero;
                 return;

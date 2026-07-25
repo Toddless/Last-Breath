@@ -28,6 +28,10 @@ namespace Core.Localization
         /// null when the line rolled no range (or the type carries no roll provenance).</summary>
         string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain);
 
+        /// <summary>The sharpening preview tail of an item line: "→ 203.2 (+9.7)" — the projected
+        /// value (gold in rich text) and the gain (green). Null for flags and unknown types.</summary>
+        string? FormatUpgradePreview(object line, float valueScale, TextFormat format = TextFormat.Plain);
+
         /// <summary>One ParameterChange as a display value, unit-aware ("+5%", "-50", "+20%").</summary>
         string FormatParameterChange(EntityParameter parameter, float value, OperationType operation, TextFormat format = TextFormat.Plain);
     }

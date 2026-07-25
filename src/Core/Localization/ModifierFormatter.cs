@@ -60,6 +60,26 @@ namespace Core.Localization
             return format == TextFormat.Rich ? TextPalette.ColorizeNumber(text) : text;
         }
 
+        /// <summary>A bare display value ("45.7%", "130.8") for tabular previews — the same unit
+        /// logic the line templates use, without sign or template wording.</summary>
+        public string FormatValue(ModifierValueType valueType, EntityParameter parameter, float value)
+        {
+            bool isPercent = IsPercentDisplay(valueType, parameter);
+            return Number(value * (isPercent ? 100f : 1f)) + (isPercent ? "%" : string.Empty);
+        }
+
+        /// <summary>A descriptor's roll bounds as a bare interval ("98.1 – 228.9", "5.5 – 16.4%")
+        /// for pool tables; a fixed value renders as the single number.</summary>
+        public string FormatDescriptorRange(ParameterDescriptor descriptor)
+        {
+            bool isPercent = IsPercentDisplay(descriptor.ValueType, descriptor.Parameter);
+            float scale = isPercent ? 100f : 1f;
+            string unit = isPercent ? "%" : string.Empty;
+            return descriptor.Value.IsFixed
+                ? Number(descriptor.Value.Min * scale) + unit
+                : $"{Number(descriptor.Value.Min * scale)} – {Number(descriptor.Value.Max * scale)}{unit}";
+        }
+
         private string RenderLine(ModifierValueType valueType, EntityParameter parameter, float min, float max, TextFormat format)
         {
             // Multiplicative modifier Value is a DELTA, not a full multiplier: the engine folds it as

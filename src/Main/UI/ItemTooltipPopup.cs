@@ -1,5 +1,6 @@
 namespace LastBreath.UI
 {
+    using System.Collections.Generic;
     using Core;
     using Core.Constants;
     using Core.Enums;
@@ -39,7 +40,7 @@ namespace LastBreath.UI
         private const int MythicLineWidth = FullLineWidth - 60;
 
         private static readonly Color s_effectColor = new(0.9f, 0.81f, 0.58f);
-        private static readonly Color s_baseStatColor = new(0.79f, 0.66f, 0.38f);
+        private static readonly Color s_baseStatColor = Color.FromHtml(TextPalette.BaseStat);
 
         // RichTextLabel ignores the DimLabel variation (it targets Label), so the grant description
         // gets its dim tone from a default_color override that mirrors DimLabel's colour.
@@ -129,10 +130,16 @@ namespace LastBreath.UI
             _panel.MouseFilter = MouseFilterEnum.Stop;
         }
 
+        /// <summary>The action strip prefers the space BELOW the panel; a tooltip pinned at the
+        /// bottom of the screen (last bag rows) flips it above instead of pushing it off-screen.</summary>
         private void PlaceCraftButtons()
         {
             if (_craftButtons == null || _panel == null) return;
-            _craftButtons.Position = _panel.Position + new Vector2(0, _panel.Size.Y + CraftButtonsGap);
+            float below = _panel.Position.Y + _panel.Size.Y + CraftButtonsGap;
+            bool fitsBelow = below + _craftButtons.Size.Y <= GetViewportRect().Size.Y;
+            _craftButtons.Position = fitsBelow
+                ? _panel.Position + new Vector2(0, _panel.Size.Y + CraftButtonsGap)
+                : _panel.Position - new Vector2(0, _craftButtons.Size.Y + CraftButtonsGap);
         }
 
         public void Close() => QueueFree();
@@ -153,9 +160,16 @@ namespace LastBreath.UI
             _accent?.Color = rarityColor;
             _icon?.Texture = item.Icon;
 
-            _subtitle?.Text = Subtitle(item);
+            _subtitle?.Text = Subtitle(item) + SellQuoteSuffix(item);
             RenderLines();
         }
+
+        /// <summary>With a shop open the subtitle carries what THIS trader pays (perk included);
+        /// closed shop or an untradable item add nothing.</summary>
+        private static string SellQuoteSuffix(IItem item) =>
+            TradeWindow.Active?.QuoteSellPrice(item) is { } price
+                ? $" · {Localization.Render("UI_Trade_SellQuote", new Dictionary<string, object?> { ["Amount"] = price })}"
+                : string.Empty;
 
         /// <summary>Re-renders the line lists only — header and geometry stay put, so toggling the
         /// reveal mid-hover doesn't make the tooltip jump.</summary>
@@ -183,20 +197,28 @@ namespace LastBreath.UI
             RenderDescription(_item);
         }
 
-        /// <summary>The weapon's own base stats (effective damage — upgrade-scaled and locally
-        /// modified — plus the crit pair that replaces the owner's base values while equipped).</summary>
+        /// <summary>The weapon's own base stats: effective values with the item's LOCAL lines folded
+        /// in. A locally modified stat glows brighter, and the Ctrl reveal splits it into
+        /// "base + local contribution" ("6% + 4%") instead of the folded total.</summary>
         private void RenderWeaponStats(IWeaponItem? weapon)
         {
             _baseStats?.Visible = weapon != null;
             if (weapon == null) return;
 
-            AddBaseStatRow(EntityParameter.Damage, weapon.Damage);
-            AddBaseStatRow(EntityParameter.CriticalChance, weapon.CriticalChance);
-            AddBaseStatRow(EntityParameter.CriticalDamage, weapon.CriticalDamage);
+            AddBaseStatRow(EntityParameter.Damage, weapon);
+            AddBaseStatRow(EntityParameter.CriticalChance, weapon);
+            AddBaseStatRow(EntityParameter.CriticalDamage, weapon);
         }
 
-        private void AddBaseStatRow(EntityParameter parameter, float value)
+        private void AddBaseStatRow(EntityParameter parameter, IWeaponItem weapon)
         {
+            (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
+            bool locallyModified = System.MathF.Abs(localBonus) > 0.0001f;
+
+            string text = locallyModified && _revealRanges
+                ? $"{FormatParameter(parameter, baseValue)} {(localBonus >= 0 ? "+" : "−")} {FormatParameter(parameter, System.MathF.Abs(localBonus))}"
+                : FormatParameter(parameter, baseValue + localBonus);
+
             var row = new HBoxContainer();
             row.AddChild(new Label
             {
@@ -204,8 +226,9 @@ namespace LastBreath.UI
                 ThemeTypeVariation = "DimLabel",
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
             });
-            var valueLabel = new Label { Text = FormatParameter(parameter, value), HorizontalAlignment = HorizontalAlignment.Right };
-            valueLabel.AddThemeColorOverride("font_color", s_baseStatColor);
+            var valueLabel = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Right };
+            valueLabel.AddThemeColorOverride("font_color",
+                locallyModified ? Color.FromHtml(TextPalette.Number) : s_baseStatColor);
             row.AddChild(valueLabel);
             _baseStats?.AddChild(row);
         }

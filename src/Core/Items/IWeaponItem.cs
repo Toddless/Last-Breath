@@ -16,5 +16,10 @@
 
         /// <summary>Replaces the owner's base critical damage while equipped. Not scaled by upgrades.</summary>
         float CriticalDamage { get; }
+
+        /// <summary>The stat-block view of one base stat: the bare base (sharpening-scaled where it
+        /// applies) and the LOCAL lines' contribution, folded exactly as the domain applies them —
+        /// effective = Base + LocalBonus. LocalBonus 0 = the stat is untouched by the item's lines.</summary>
+        (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter);
     }
 }

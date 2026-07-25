@@ -41,5 +41,23 @@ namespace Core.Localization
 
         public string FormatParameterChange(EntityParameter parameter, float value, OperationType operation, TextFormat format = TextFormat.Plain) =>
             modifierFormatter.FormatParameterChange(parameter, value, operation, format);
+
+        public string? FormatUpgradePreview(object line, float valueScale, TextFormat format = TextFormat.Plain) => line switch
+        {
+            IModifier modifier => PreviewSuffix(
+                modifierFormatter.FormatValue(modifier.ModifierValueType, modifier.EntityParameter, modifier.Value * valueScale),
+                modifierFormatter.FormatValue(modifier.ModifierValueType, modifier.EntityParameter, modifier.Value * (valueScale - 1f)),
+                format),
+            ContextModifierEntry { ValueType: not ModifierValueType.Flag } entry => PreviewSuffix(
+                contextModifierFormatter.FormatValueOnly(entry, valueScale),
+                contextModifierFormatter.FormatValueOnly(entry, valueScale - 1f),
+                format),
+            _ => null,
+        };
+
+        private static string PreviewSuffix(string after, string delta, TextFormat format) =>
+            format == TextFormat.Rich
+                ? $"→ {TextPalette.Colorize(after, TextPalette.Number)} {TextPalette.Colorize($"(+{delta})", TextPalette.Heal)}"
+                : $"→ {after} (+{delta})";
     }
 }

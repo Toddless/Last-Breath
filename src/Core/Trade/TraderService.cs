@@ -109,6 +109,17 @@ namespace Core.Trade
             if (!_states.TryGetValue(traderId, out var state))
                 _states[traderId] = state = new TraderState();
 
+            // Piecemeal sales of the same stackable merge into one shelf row (same goods, same
+            // earned price); a price moved by a perk change opens a new row — the shelf never lies.
+            var existing = item.MaxStackSize > 1
+                ? state.Buyback.FirstOrDefault(offer => offer.Item.Id == item.Id && offer.BuybackUnitPrice == unitPrice)
+                : null;
+            if (existing != null)
+            {
+                existing.Remaining += amount;
+                return;
+            }
+
             state.Buyback.Add(new Offer(NextOfferId(), item, isRandomEquip: false, isBuyback: true, buybackUnitPrice: unitPrice) { Remaining = amount });
             while (state.Buyback.Count > BuybackCapacity) state.Buyback.RemoveAt(0); // oldest mistake expires first
         }

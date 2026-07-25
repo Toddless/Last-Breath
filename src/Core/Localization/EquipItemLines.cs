@@ -19,14 +19,16 @@ namespace Core.Localization
     /// stamps directly and both panels show the same lines in the same order.</summary>
     public static class EquipItemLines
     {
-        public static List<EquipItemLine> ComposeImplicits(IEquipItem item, TextFormat format = TextFormat.Plain) =>
-            Compose(item.Implicits, item.ContextImplicits, format);
+        public static List<EquipItemLine> ComposeImplicits(IEquipItem item, TextFormat format = TextFormat.Plain, float? previewValueScale = null) =>
+            Compose(item.Implicits, item.ContextImplicits, format, previewValueScale);
 
         /// <summary>Rolled rows in DISPLAY order: prefixes, suffixes, the family-less leftovers (legacy saves,
         /// authored fodder), then the ascension gift last. The sort is stable, so inside a block the rows keep
-        /// the item's own order — a rerolled line reappears in the slot it was rerolled from.</summary>
-        public static List<EquipItemLine> ComposeRolled(IEquipItem item, TextFormat format = TextFormat.Plain) =>
-            Compose(item.Modifiers, item.ContextModifiers, format)
+        /// the item's own order — a rerolled line reappears in the slot it was rerolled from.
+        /// <paramref name="previewValueScale"/> appends the sharpening preview to every scaling part
+        /// ("+193.5 Evade → 203.2 (+9.7)"); flags stay bare.</summary>
+        public static List<EquipItemLine> ComposeRolled(IEquipItem item, TextFormat format = TextFormat.Plain, float? previewValueScale = null) =>
+            Compose(item.Modifiers, item.ContextModifiers, format, previewValueScale)
                 .OrderBy(line => DisplayRank(line.Affix))
                 .ToList();
 
@@ -43,7 +45,8 @@ namespace Core.Localization
         private static List<EquipItemLine> Compose(
             IReadOnlyList<IModifierInstance> modifiers,
             IReadOnlyList<ContextModifierEntry> entries,
-            TextFormat format)
+            TextFormat format,
+            float? previewValueScale = null)
         {
             // A composite may mix entity and context parts, so both channels flatten into one ordered
             // list before grouping; a group's row sits where its first part appears.
@@ -52,13 +55,13 @@ namespace Core.Localization
                     modifier.InstanceId,
                     GroupId: (modifier as SimpleModifier)?.GroupId,
                     Affix: (modifier as SimpleModifier)?.Affix ?? AffixKind.None,
-                    Text: Localization.Format(modifier, format),
+                    Text: WithPreview(Localization.Format(modifier, format), modifier, previewValueScale, format),
                     Range: Localization.FormatRolledRange(modifier, format)))
                 .Concat(entries.Select(entry => (
                     entry.InstanceId,
                     entry.GroupId,
                     entry.Affix,
-                    Text: Localization.Format(entry, format),
+                    Text: WithPreview(Localization.Format(entry, format), entry, previewValueScale, format),
                     Range: Localization.FormatRolledRange(entry, format))))
                 .ToList();
 
@@ -78,6 +81,13 @@ namespace Core.Localization
 
             return lines;
         }
+
+        /// <summary>Each scaling part carries its own preview tail, so a composite row stays readable:
+        /// "+16.1% incr. Health → 17% (+0.9%), +12.1% incr. Evade → 12.7% (+0.6%)".</summary>
+        private static string WithPreview(string text, object part, float? previewValueScale, TextFormat format) =>
+            previewValueScale is { } scale && Localization.FormatUpgradePreview(part, scale, format) is { } suffix
+                ? $"{text} {suffix}"
+                : text;
 
         private static EquipItemLine BuildLine(List<(string InstanceId, string? GroupId, AffixKind Affix, string Text, string? Range)> parts)
         {

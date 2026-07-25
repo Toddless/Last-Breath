@@ -33,6 +33,9 @@ namespace Crafting.Source
         public List<IRequirement> GetAscendResourceCost(EquipmentCategory itemCategory) =>
             itemDataProvider.GetAscendCost(itemCategory).ToList();
 
+        public IReadOnlyList<IModifierDescriptor> GetGiftPool(EquipmentCategory itemCategory) =>
+            itemDataProvider.GetEquipItemModifierPool(s_mythicPoolByCategory[itemCategory]);
+
         public AscensionResult TryAscendItem(IEquipItem item)
         {
             if (!CanAscend(item) || item is not IAscendable ascendable) return new AscensionResult(false, []);

@@ -22,6 +22,10 @@
         int UpdateLevel { get; }
         int MaxUpdateLevel { get; set; }
 
+        /// <summary>Value scale of the NEXT sharpening level relative to now — the UI "before → after"
+        /// preview multiplies current line values by this (ascension cancels out of the ratio).</summary>
+        float NextUpgradeValueScale { get; }
+
         /// <summary>Sealed items (ascended to Mythic) can never be modified again: no upgrades, rerolls or new grants.</summary>
         bool IsSealed { get; }
 

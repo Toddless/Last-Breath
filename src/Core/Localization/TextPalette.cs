@@ -19,6 +19,9 @@ namespace Core.Localization
         public const string Buff = "#8cbf73";
         public const string Debuff = "#d9735a";
 
+        /// <summary>Weapon base-stat values (item tooltip, crafting bench preview).</summary>
+        public const string BaseStat = "#c9a861";
+
         // Battle log accents
         public const string Crit = "#ffd75e";
         public const string System = "#909090";

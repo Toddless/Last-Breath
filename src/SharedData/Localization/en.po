@@ -1742,6 +1742,27 @@ msgstr "Extra level on success"
 msgid "UI_Forecast_Min_Rarity"
 msgstr "Minimum rarity"
 
+msgid "UI_Craft_Pool"
+msgstr "Possible modifiers"
+
+msgid "UI_Craft_PickItem"
+msgstr "Pick an item"
+
+msgid "UI_Pool_Extra_Levels"
+msgstr "+{Min}–{Max} upgrade levels"
+
+msgid "UI_Pool_Counter"
+msgstr "{Count|roll|rolls}"
+
+msgid "UI_Mod_Kind_Flat"
+msgstr "+"
+
+msgid "UI_Mod_Kind_Increase"
+msgstr "+% incr."
+
+msgid "UI_Mod_Kind_Multiplicative"
+msgstr "+% more"
+
 msgid "UI_Item_Implicits"
 msgstr "Implicits"
 
@@ -3600,6 +3621,9 @@ msgstr "{Amount} g"
 
 msgid "UI_Trade_Gold"
 msgstr "Gold: {Amount}"
+
+msgid "UI_Trade_SellQuote"
+msgstr "Sells for {Amount} g"
 
 msgid "Npc_Human_Merchant"
 msgstr "Wandering Merchant"

@@ -40,6 +40,10 @@ namespace Core.Localization
         public static string? FormatRolledRange(object line, TextFormat format = TextFormat.Plain) =>
             Service.FormatRolledRange(line, format);
 
+        /// <summary>The sharpening preview tail of an item line ("→ 203.2 (+9.7)"); null for flags and unknown types.</summary>
+        public static string? FormatUpgradePreview(object line, float valueScale, TextFormat format = TextFormat.Plain) =>
+            Service.FormatUpgradePreview(line, valueScale, format);
+
         public static string Format<T>(T obj, float minValueMultiplier, float maxValueMultiplier) =>
             obj is IModifier modifier
                 ? Service.FormatModifier(modifier, minValueMultiplier, maxValueMultiplier)

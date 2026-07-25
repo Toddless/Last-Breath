@@ -589,6 +589,27 @@ msgstr ""
 msgid "UI_Forecast_Min_Rarity"
 msgstr ""
 
+msgid "UI_Craft_Pool"
+msgstr ""
+
+msgid "UI_Craft_PickItem"
+msgstr ""
+
+msgid "UI_Pool_Extra_Levels"
+msgstr ""
+
+msgid "UI_Pool_Counter"
+msgstr ""
+
+msgid "UI_Mod_Kind_Flat"
+msgstr ""
+
+msgid "UI_Mod_Kind_Increase"
+msgstr ""
+
+msgid "UI_Mod_Kind_Multiplicative"
+msgstr ""
+
 msgid "UI_Item_Implicits"
 msgstr ""
 
@@ -3065,6 +3086,9 @@ msgstr "{Amount} з."
 
 msgid "UI_Trade_Gold"
 msgstr "Золото: {Amount}"
+
+msgid "UI_Trade_SellQuote"
+msgstr ""
 
 msgid "Npc_Human_Merchant"
 msgstr "Странствующий торговец"

@@ -27,7 +27,7 @@ namespace Crafting.Source.UIElements
         private readonly List<string> _ids = [];
         private Action<string>? _onPicked;
 
-        public readonly record struct PickerEntry(string Id, string Label, Texture2D? Icon);
+        public readonly record struct PickerEntry(string Id, string Label, Texture2D? Icon, string? Tooltip = null, Color? LabelColor = null);
 
         public PopupLifetime Lifetime => PopupLifetime.Pinned;
 
@@ -59,7 +59,10 @@ namespace Crafting.Source.UIElements
             foreach (var entry in entries)
             {
                 _ids.Add(entry.Id);
-                _list?.AddItem(entry.Label, entry.Icon);
+                if (_list == null) continue;
+                int index = _list.AddItem(entry.Label, entry.Icon);
+                if (!string.IsNullOrEmpty(entry.Tooltip)) _list.SetItemTooltip(index, entry.Tooltip);
+                if (entry.LabelColor is { } color) _list.SetItemCustomFgColor(index, color);
             }
         }
 

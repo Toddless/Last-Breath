@@ -33,21 +33,20 @@ namespace Core.Items
         {
             get
             {
-                float flat = 0f, increase = 0f, multiplier = 0f;
-                foreach (var modifier in AllModifiers)
-                {
-                    if (modifier.Scope != ModifierScope.Local || modifier.EntityParameter != EntityParameter.Damage) continue;
-                    switch (modifier.ModifierValueType)
-                    {
-                        case ModifierValueType.Flat: flat += modifier.Value; break;
-                        case ModifierValueType.Increase: increase += modifier.Value; break;
-                        case ModifierValueType.Multiplicative: multiplier += modifier.Value; break;
-                    }
-                }
-
+                (float flat, float increase, float multiplier) = LocalBucket(EntityParameter.Damage);
                 return ((BaseDamage * UpdateMultiplier) + flat) * (1f + increase) * (1f + multiplier);
             }
         }
+
+        /// <summary>Damage folds its whole local bucket around the sharpened base (see <see cref="Damage"/>);
+        /// the crit pair receives exactly the resolved flat the owner would get from the item's lines.</summary>
+        public (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter) => parameter switch
+        {
+            EntityParameter.Damage => (BaseDamage * UpdateMultiplier, Damage - (BaseDamage * UpdateMultiplier)),
+            EntityParameter.CriticalChance => (CriticalChance, ResolvedLocalFlat(parameter)),
+            EntityParameter.CriticalDamage => (CriticalDamage, ResolvedLocalFlat(parameter)),
+            _ => (0f, 0f),
+        };
 
         protected override EquipItem CreateCopy() => new WeaponItem(this);
 

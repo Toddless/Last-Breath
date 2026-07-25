@@ -16,12 +16,17 @@ namespace Core.Localization
         public string Format(ContextModifierEntry entry, TextFormat format = TextFormat.Plain)
         {
             // Templates are full sentences ("Increases ... by {value}"), so positive values carry no sign.
-            string value = entry.ValueType == ModifierValueType.Flat
-                ? Number(entry.WholeValue)
-                : Number(entry.Value * 100f) + "%";
+            string value = FormatValueOnly(entry);
             string styledValue = format == TextFormat.Rich ? TextPalette.ColorizeNumber(value) : value;
             return localization.Translate($"Context_Modifier_{entry.Parameter}").Replace("{value}", styledValue);
         }
+
+        /// <summary>The entry's bare display value at an optional projected scale ("35%", "3") —
+        /// the sharpening preview shows it next to the full sentence.</summary>
+        public string FormatValueOnly(ContextModifierEntry entry, float valueScale = 1f) =>
+            entry.ValueType == ModifierValueType.Flat
+                ? Number((int)(entry.Value * valueScale))
+                : Number(entry.Value * valueScale * 100f) + "%";
 
         /// <summary>An unmaterialized pool/blueprint line: a fixed value renders like a live entry,
         /// a spread renders through Context_Modifier_&lt;Parameter&gt;_Range with {min} and {max}.</summary>

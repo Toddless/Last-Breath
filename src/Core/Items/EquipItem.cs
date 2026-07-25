@@ -98,6 +98,8 @@ namespace Core.Items
         }
         public bool IsAscendable => Rarity == Rarity.Legendary && UpdateLevel >= MaxUpdateLevel;
 
+        public float NextUpgradeValueScale => (UpdateMultiplier + UpgradeBonusPerLevel) / UpdateMultiplier;
+
         public EquipItem(EquipmentPiece piece, string id, string[] tags)
         {
             EquipmentPiece = piece;
@@ -294,6 +296,34 @@ namespace Core.Items
 
         protected IEnumerable<IModifier> AllModifiers => _implicits.Concat(_modifiers);
 
+        /// <summary>Sums the LOCAL lines of one parameter into the flat/increase/multiplier buckets —
+        /// THE one place local contributions are gathered (resolve, weapon stats, tooltip views).</summary>
+        protected (float Flat, float Increase, float Multiplier) LocalBucket(EntityParameter parameter)
+        {
+            float flat = 0f, increase = 0f, multiplier = 0f;
+            foreach (var modifier in AllModifiers)
+            {
+                if (modifier.Scope != ModifierScope.Local || modifier.EntityParameter != parameter) continue;
+                switch (modifier.ModifierValueType)
+                {
+                    case ModifierValueType.Flat: flat += modifier.Value; break;
+                    case ModifierValueType.Increase: increase += modifier.Value; break;
+                    case ModifierValueType.Multiplicative: multiplier += modifier.Value; break;
+                }
+            }
+
+            return (flat, increase, multiplier);
+        }
+
+        /// <summary>The local bucket collapsed into the single flat value the resolve path hands the
+        /// owner: flat × (1 + increase) × (1 + multiplier). An increase-only bucket yields 0 —
+        /// percent locals amplify a flat local, they have no base of their own here.</summary>
+        protected float ResolvedLocalFlat(EntityParameter parameter)
+        {
+            (float flat, float increase, float multiplier) = LocalBucket(parameter);
+            return flat * (1f + increase) * (1f + multiplier);
+        }
+
 
         /// <summary>The scaled value of one line. A flag line ("attacks ignore elemental resistances") is a
         /// switch, not a number: sharpening and ascension leave it exactly as data wrote it.</summary>
@@ -377,30 +407,15 @@ namespace Core.Items
             foreach (var group in _implicits.Concat(_modifiers).GroupBy(modifier => modifier.EntityParameter))
             {
                 var modifiers = new List<IModifierInstance>();
-                bool localsExternal = IsLocalBucketExternal(group.Key);
-                float localFlat = 0f, localIncrease = 0f, localMultiplier = 0f;
                 foreach (var modifier in group)
-                {
                     if (modifier.Scope == ModifierScope.Global)
-                    {
                         modifiers.Add(AsInstance(modifier));
-                        continue;
-                    }
 
-                    if (localsExternal) continue;
-
-                    switch (modifier.ModifierValueType)
-                    {
-                        case ModifierValueType.Flat: localFlat += modifier.Value; break;
-                        case ModifierValueType.Increase: localIncrease += modifier.Value; break;
-                        case ModifierValueType.Multiplicative: localMultiplier += modifier.Value; break;
-                    }
-                }
-
-                if (localFlat != 0f)
+                if (!IsLocalBucketExternal(group.Key))
                 {
-                    float resolvedFlat = localFlat * (1f + localIncrease) * (1f + localMultiplier);
-                    modifiers.Add(ModifiersCreator.CreateModifierInstance(group.Key, ModifierValueType.Flat, resolvedFlat, InstanceId));
+                    float resolvedFlat = ResolvedLocalFlat(group.Key);
+                    if (resolvedFlat != 0f)
+                        modifiers.Add(ModifiersCreator.CreateModifierInstance(group.Key, ModifierValueType.Flat, resolvedFlat, InstanceId));
                 }
 
                 if (modifiers.Count > 0) resolved[group.Key] = modifiers;

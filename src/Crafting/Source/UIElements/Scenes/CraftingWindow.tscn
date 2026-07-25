@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d3hl0n4arn8et" path="res://Addons/Crafting/UIElements/CraftingWindow.cs" id="1_1mud6"]
 
-[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_title", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_chanceBox", "_chanceBar", "_chanceLabel", "_masteryLevel", "_masteryXpBar", "_masteryXpLabel", "_masteryTitle", "_masteryChips", "_forecastBox", "_forecastHeader", "_forecastHint", "_forecastRows")]
+[node name="CraftingWindow" type="Control" unique_id=1206026266 node_paths=PackedStringArray("_tree", "_search", "_close", "_actionButton", "_modeCreate", "_modeUpgrade", "_modeRecraft", "_modeAscend", "_itemIcon", "_title", "_listTitle", "_itemName", "_itemSubtitle", "_previewTag", "_requirementsHeader", "_additivesHeader", "_ascendWarning", "_mods", "_requirements", "_additives", "_masteryLevel", "_masteryXpBar", "_masteryXpLabel", "_masteryTitle", "_masteryChips", "_forecastBox", "_forecastHeader", "_forecastHint", "_forecastRows", "_itemHeader", "_poolBox", "_poolHeader", "_poolCounter", "_poolList")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,9 +31,11 @@ _ascendWarning = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin
 _mods = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Preview/PreviewScroll/Mods")
 _requirements = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/Requirements")
 _additives = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent/Additives")
-_chanceBox = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox")
-_chanceBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox/ChanceBar")
-_chanceLabel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox/ChanceLabel")
+_itemHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Preview/ItemHeader")
+_poolBox = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn")
+_poolHeader = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow/PoolHeader")
+_poolCounter = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow/PoolCounter")
+_poolList = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolScroll/PoolList")
 _masteryLevel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/LevelValue")
 _masteryXpBar = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/MasteryXpBar")
 _masteryXpLabel = NodePath("Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/MasteryRail/LevelBox/MasteryXpLabel")
@@ -261,8 +263,8 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
 [node name="Reqs" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench" unique_id=7032669]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="ReqsHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs" unique_id=167244499]
@@ -280,22 +282,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="Requirements" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=1518359685]
+[node name="Requirements" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=1518359685]
 layout_mode = 2
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 3
+theme_override_constants/separation = 6
 
 [node name="AdditivesHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=1516474351]
 layout_mode = 2
 theme_type_variation = &"DimLabel"
 text = "Additives"
 
-[node name="Additives" type="GridContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=1608584393]
+[node name="Additives" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent" unique_id=1608584393]
 layout_mode = 2
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 3
+theme_override_constants/separation = 6
 
 [node name="ForecastBox" type="PanelContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/Reqs/ReqsScroll/ReqsContent"]
 visible = false
@@ -334,6 +332,37 @@ theme_override_constants/separation = 5
 visible = false
 layout_mode = 2
 theme_type_variation = &"DimLabel"
+autowrap_mode = 3
+
+[node name="PoolColumn" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PoolHeaderRow" type="HBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn"]
+layout_mode = 2
+
+[node name="PoolHeader" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.5, 0.27, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="PoolCounter" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolHeaderRow"]
+layout_mode = 2
+theme_type_variation = &"DimLabel"
+theme_override_font_sizes/font_size = 11
+
+[node name="PoolScroll" type="ScrollContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PoolList" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/Bench/PoolColumn/PoolScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
 
 [node name="ActionSeparator" type="HSeparator" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout" unique_id=1565296213]
 layout_mode = 2
@@ -345,24 +374,6 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-
-[node name="ChanceBox" type="VBoxContainer" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar"]
-visible = false
-custom_minimum_size = Vector2(240, 0)
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 4
-
-[node name="ChanceBar" type="ProgressBar" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox"]
-custom_minimum_size = Vector2(0, 10)
-layout_mode = 2
-max_value = 1.0
-step = 0.001
-show_percentage = false
-
-[node name="ChanceLabel" type="Label" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar/ChanceBox"]
-layout_mode = 2
-theme_type_variation = &"DimLabel"
 
 [node name="ActionBtn" type="Button" parent="Center/Panel/Margin/Layout/Body/RightPane/RightMargin/RightLayout/ActionBar" unique_id=543796935]
 custom_minimum_size = Vector2(220, 46)
