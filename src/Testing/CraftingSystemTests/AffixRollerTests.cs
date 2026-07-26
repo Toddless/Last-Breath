@@ -6,8 +6,9 @@ namespace LastBreathTest.CraftingSystemTests
 
     /// <summary>The roller's contracts: each slot family draws only from its own bucket, a bucket short
     /// on entries honestly leaves slots empty (no exception, no cross-family bleed), a stray None
-    /// entry is skipped instead of ever occupying a slot, and no item is born wearing the same line
-    /// (parameter + value type) twice — composites excepted.</summary>
+    /// entry is skipped instead of ever occupying a slot, and no item is born wearing the same LINE
+    /// twice — atoms by (parameter + value type), composites by their whole part set; a multi-part
+    /// bundle still neither blocks nor is blocked by its parts' standalone atoms.</summary>
     [TestClass]
     public class AffixRollerTests
     {
@@ -126,13 +127,11 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
-        public void Roll_CompositeEntry_IsExemptFromLineDedup()
+        public void Roll_MultiPartComposite_DoesNotBlockItsPartsAtom()
         {
-            // A composite renders as ONE line, so its Damage part neither blocks nor is blocked by the
-            // standalone Damage entry — both may sit on the same item.
-            var composite = new CompositeDescriptor(
-                [new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 10f, ModifierScope.Global)])
-                { Weight = 100f, Affix = AffixKind.Prefix };
+            // A multi-part bundle renders as ONE line whose identity is the whole set: its Damage part
+            // neither blocks nor is blocked by the standalone Damage entry — both may sit on one item.
+            var composite = Composite(AffixKind.Prefix, Part(EntityParameter.PhysicalDamage), Part(EntityParameter.Health));
             var pool = new List<IModifierDescriptor> { composite, Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix, weight: 100f) };
 
             for (int seed = 0; seed < 50; seed++)
@@ -144,7 +143,54 @@ namespace LastBreathTest.CraftingSystemTests
             }
         }
 
+        [TestMethod]
+        public void Roll_SameShapeComposites_NeverBothLand()
+        {
+            // Two entries with the SAME part set but different bounds (tiers from two sources) are one
+            // line for the player — like same-key atoms, only one may occupy a slot.
+            var familyTier = Composite(AffixKind.Prefix, Part(EntityParameter.PhysicalDamage, 10f), Part(EntityParameter.Health, 10f));
+            var richTier = Composite(AffixKind.Prefix, Part(EntityParameter.PhysicalDamage, 50f), Part(EntityParameter.Health, 50f));
+            var pool = new List<IModifierDescriptor> { familyTier, richTier, Entry(EntityParameter.Armor, AffixKind.Prefix, weight: 1f) };
+
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var picked = AffixRoller.Roll(pool, 2, 0, new DefaultRandomNumberGenerator(seed));
+
+                Assert.AreEqual(2, picked.Count, $"seed {seed}");
+                Assert.AreEqual(1, picked.Count(descriptor => descriptor is CompositeDescriptor), $"seed {seed}: the same composite line landed twice.");
+            }
+        }
+
+        [TestMethod]
+        public void Roll_SinglePartComposite_SharesTheAtomsIdentity()
+        {
+            // A one-part composite reads exactly like the atom, so the two compete for one identity —
+            // an item is never born with "+50 Mana" twice through the bundle back door.
+            var composite = Composite(AffixKind.Prefix, Part(EntityParameter.PhysicalDamage));
+            var pool = new List<IModifierDescriptor>
+            {
+                composite,
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix, weight: 100f),
+                Entry(EntityParameter.Health, AffixKind.Prefix, weight: 1f),
+            };
+
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var picked = AffixRoller.Roll(pool, 2, 0, new DefaultRandomNumberGenerator(seed));
+
+                Assert.AreEqual(2, picked.Count, $"seed {seed}");
+                int damageLines = picked.Count(descriptor => descriptor == composite || descriptor is ParameterDescriptor { Parameter: EntityParameter.PhysicalDamage });
+                Assert.AreEqual(1, damageLines, $"seed {seed}: the atom and the one-part composite are the same line.");
+            }
+        }
+
         private static ParameterDescriptor Entry(EntityParameter parameter, AffixKind affix, float weight = 10f) =>
             new(parameter, ModifierValueType.Flat, 10f, ModifierScope.Global) { Weight = weight, Affix = affix };
+
+        private static ParameterDescriptor Part(EntityParameter parameter, float value = 10f) =>
+            new(parameter, ModifierValueType.Flat, value, ModifierScope.Global);
+
+        private static CompositeDescriptor Composite(AffixKind affix, params IModifierDescriptor[] parts) =>
+            new([.. parts]) { Weight = 100f, Affix = affix };
     }
 }

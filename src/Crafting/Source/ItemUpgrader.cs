@@ -54,28 +54,26 @@ namespace Crafting.Source
             var target = FindLine(item, modifierInstanceId);
             if (target == null) return null; // the line is not on the item
             (var targetAffix, string? targetGroupId) = target.Value;
-            // Composites flatten to atomic parts so a reroll is 1-for-1. A reroll preserves the slot family: candidates are
-            // filtered to the target line's affix. A None line (legacy save / authored fodder predating the
-            // affix markup) has no slot family to preserve, so it tolerantly rerolls from the FULL pool.
+            // A reroll preserves the slot family: candidates are filtered to the target line's affix.
+            // A None line (legacy save / authored fodder predating the affix markup) has no slot family
+            // to preserve, so it tolerantly rerolls from the FULL pool.
             var livePool = GetRerollPreviewPool(item, additiveResourceIds);
 
-            // No duplicate lines: a candidate whose key (parameter + value type, NEVER the value) already
-            // sits on the item is out — "+35% damage" next to "+33% damage" is the same line twice. The keys
-            // are read BEFORE anything leaves the item, so a refusal below still mutates nothing; the target's
-            // own group is exempt, so a reroll may honestly return the same stat with a fresh value.
+            // No duplicate lines: a candidate whose IDENTITY (what the line is about, NEVER the values —
+            // atoms by key, composites by their whole part set) already sits on the item is out. The
+            // identities are read BEFORE anything leaves the item, so a refusal below still mutates
+            // nothing; the target's own line/group is lifted, so a reroll may honestly return the same
+            // stat (or the same composite) with fresh values. Entries that materialize into something
+            // else (a rolled grant, the sharpening-levels operation — even hidden among composite parts)
+            // would take the old line away and put no line back, so they carry no identity and never qualify.
             var groupMemberIds = GroupMemberIds(item, modifierInstanceId, targetGroupId);
-            var occupied = item.OccupiedLineKeys(groupMemberIds);
-            // A reroll swaps one LINE for one line, so only line descriptors are candidates: an entry that
-            // materializes into something else (a rolled grant, the sharpening-levels operation) would take
-            // the old line away and put nothing back. Having a key IS being a line.
-            var candidates = DescriptorOperations.Flatten(livePool)
+            var occupied = item.OccupiedLineIdentities(groupMemberIds);
+            var candidates = livePool
                 .Where(descriptor => targetAffix == AffixKind.None || descriptor.Affix == targetAffix)
-                .Where(descriptor => ModifierKey.TryFrom(descriptor, out var key) && !occupied.Contains(key))
+                .Where(descriptor => LineIdentity.TryFrom(descriptor, out var identity) && !occupied.Contains(identity))
                 .ToList();
             // Refuse for free (the handler spends nothing) when nothing of the required kind survived the
-            // filters — or when what survived carries no weight at all: composite parts inherit weight 0
-            // by parse contract (only the root is weighted), so a candidate list of nothing but flattened
-            // atoms is unpickable, not a roll.
+            // filters — or when what survived carries no weight at all (weight 0 = "never rolls").
             (var weightedObjects, float totalWeight) = WeightedRandomPicker.CalculateWeights(candidates);
             if (totalWeight <= 0f) return null;
 
@@ -87,8 +85,9 @@ namespace Crafting.Source
 
             // A grouped line (parts of one composite roll, presented to the player as a SINGLE line)
             // rerolls as one unit: every part leaves the item and exactly one fresh candidate replaces
-            // the whole group — the pool is flattened, so candidates are always atoms. Group affix sits
-            // on every part (stamped from the composite root), so the filter above already used it.
+            // the whole group — an atom, or another composite (the materializer stamps its parts with
+            // a fresh GroupId, so they land as one line again). Group affix sits on every part
+            // (stamped from the composite root), so the filter above already used it.
             foreach (string memberId in groupMemberIds)
                 item.RemoveAdditionalModifier(memberId);
 

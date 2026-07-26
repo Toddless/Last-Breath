@@ -7,11 +7,12 @@ namespace Core.Modifiers
 
     /// <summary>Draws pool entries into prefix/suffix slots: the pool splits into two weighted buckets
     /// by <see cref="IModifierDescriptor.Affix"/> and each bucket rolls its slot count, both sharing ONE
-    /// set of taken identities — an item never wears the same <see cref="ModifierKey"/> twice, whichever
-    /// family it came from (composites are exempt: only a literal repeat of the same entry is refused).
-    /// A bucket short on legal entries honestly leaves the remaining slots empty (the item is born thinner) —
-    /// reported as info, never an error. None entries must not reach a roll (strict parse guards it);
-    /// one slipping through is skipped with an error.</summary>
+    /// set of taken identities — an item never wears the same <see cref="LineIdentity"/> twice, whichever
+    /// family it came from. Composites carry a whole-set identity: same part set = same line (tier entries
+    /// from different sources compete like atoms), while a multi-part bundle still neither blocks nor is
+    /// blocked by its parts' standalone atoms. A bucket short on legal entries honestly leaves the
+    /// remaining slots empty (the item is born thinner) — reported as info, never an error. None entries
+    /// must not reach a roll (strict parse guards it); one slipping through is skipped with an error.</summary>
     public static class AffixRoller
     {
         public static List<IModifierDescriptor> Roll(IReadOnlyCollection<IModifierDescriptor> pool, int prefixes, int suffixes, IRandomNumberGenerator rnd)
@@ -59,10 +60,10 @@ namespace Core.Modifiers
             }
         }
 
-        /// <summary>What makes two picks "the same line" for slot purposes: the line key when the entry has
-        /// one, the entry itself otherwise — a composite is a bundle exempt from key dedup, so only a literal
-        /// repeat of it is refused (descriptors are records: equality is structural, as before).</summary>
+        /// <summary>What makes two picks "the same line" for slot purposes: the line identity when the entry
+        /// has one (atoms and composites alike — see <see cref="LineIdentity"/>), the entry itself otherwise
+        /// (grant/operation entries dedup only as literal repeats; they are not lines).</summary>
         private static object RollIdentity(IModifierDescriptor descriptor) =>
-            ModifierKey.TryFrom(descriptor, out var key) ? key : descriptor;
+            LineIdentity.TryFrom(descriptor, out var identity) ? identity : descriptor;
     }
 }

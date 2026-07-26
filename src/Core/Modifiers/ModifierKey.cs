@@ -19,9 +19,9 @@ namespace Core.Modifiers
 
         public static ModifierKey From(ContextModifierEntry entry) => From(entry.Parameter, entry.ValueType);
 
-        /// <summary>Atomic descriptors have a key; a composite deliberately has none — it is a BUNDLE that
-        /// renders as a single line, so it neither blocks another line nor is blocked by one. Same for
-        /// operation entries (<see cref="UpgradeLevelsDescriptor"/>), which are not lines at all.</summary>
+        /// <summary>Atomic descriptors have a key; a composite has none HERE — its duplicate identity is the
+        /// whole set of its parts' keys (see <see cref="LineIdentity"/>). Operation entries
+        /// (<see cref="UpgradeLevelsDescriptor"/>) and grants are not lines at all.</summary>
         public static bool TryFrom(IModifierDescriptor descriptor, out ModifierKey key)
         {
             switch (descriptor)

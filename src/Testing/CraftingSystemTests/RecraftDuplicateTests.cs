@@ -9,10 +9,11 @@ namespace LastBreathTest.CraftingSystemTests
     using Crafting.Source;
     using Moq;
 
-    /// <summary>The reroll never hands the item a line it already wears: identity is (parameter, value type),
-    /// the value plays no part ("+35% damage" and "+33% damage" are the same line). Exempt by design: the
-    /// rerolled line itself (it may come back as the same stat with a fresh value) and composite groups
-    /// (they render as a single line, so their parts neither block nor are blocked).</summary>
+    /// <summary>The reroll never hands the item a line it already wears: identity is what the line is ABOUT,
+    /// never the values ("+35% damage" and "+33% damage" are the same line) — atoms by (parameter, value
+    /// type), composites by their whole part set. A multi-part bundle neither blocks nor is blocked by its
+    /// parts' standalone atoms (only a full set match is a duplicate); the rerolled line/group itself is
+    /// lifted and may come back as the same stat or composite with fresh values.</summary>
     [TestClass]
     public class RecraftDuplicateTests
     {
@@ -138,6 +139,106 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
+        public void Reroll_CompositeCandidate_LandsAsOneGroupedLine()
+        {
+            // Bug 85: a composite pool entry must be pickable by the reroll and land as a whole group —
+            // several stamped lines sharing a fresh GroupId, sitting in the rerolled slot.
+            var item = ItemWith(Line(EntityParameter.Intelligence), Line(EntityParameter.Accuracy));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Strength), Part(EntityParameter.Evade))));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.First().InstanceId);
+
+            Assert.IsNotNull(rolled);
+            CollectionAssert.AreEqual(
+                new[] { EntityParameter.Strength, EntityParameter.Evade, EntityParameter.Accuracy },
+                item.Modifiers.Select(modifier => modifier.EntityParameter).ToArray(),
+                "The group replaces the rerolled line in place.");
+            var group = item.Modifiers.Take(2).Cast<SimpleModifier>().ToList();
+            Assert.IsNotNull(group[0].GroupId, "Composite parts must land grouped — one line for the player.");
+            Assert.AreEqual(group[0].GroupId, group[1].GroupId);
+            Assert.IsTrue(group.All(part => part.Affix == AffixKind.Suffix), "Parts inherit the root affix.");
+            Assert.AreEqual(rolled, group[0].InstanceId);
+            Assert.AreEqual(1, item.RecraftCount);
+        }
+
+        [TestMethod]
+        public void Reroll_CompositeWithPartialOverlap_StaysLegal()
+        {
+            // The item already wears Strength as a standalone line; a composite carrying a Strength part
+            // stays legal — a bundle's identity is the WHOLE set, partial overlap is not a duplicate.
+            var item = ItemWith(Line(EntityParameter.Strength), Line(EntityParameter.Intelligence));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Strength), Part(EntityParameter.Evade))));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.Last().InstanceId);
+
+            Assert.IsNotNull(rolled, "A composite bundle must not be locked out by its parts' keys.");
+            Assert.AreEqual(3, item.Modifiers.Count);
+        }
+
+        [TestMethod]
+        public void Reroll_SameShapeCompositeAlreadyWorn_IsRefused()
+        {
+            // The item wears a {Strength, Evade} group; a candidate with the SAME part set (whatever its
+            // bounds) is the same line for the player — refuse without touching the item.
+            var item = ItemWith(
+                Line(EntityParameter.Strength, groupId: "composite"),
+                Line(EntityParameter.Evade, groupId: "composite"),
+                Line(EntityParameter.Intelligence));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Strength), Part(EntityParameter.Evade))));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.Last().InstanceId);
+
+            Assert.IsNull(rolled, "The item already wears this composite line.");
+            Assert.AreEqual(3, item.Modifiers.Count);
+            Assert.AreEqual(0, item.RecraftCount);
+        }
+
+        [TestMethod]
+        public void Reroll_TargetGroup_MayComeBackAsTheSameComposite()
+        {
+            // Rerolling the group itself lifts its identity: a pool holding nothing but the same-shape
+            // composite still serves — the player is buying fresh values for the same line.
+            var item = ItemWith(Line(EntityParameter.Strength, groupId: "composite"), Line(EntityParameter.Evade, groupId: "composite"));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Strength), Part(EntityParameter.Evade))));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.First().InstanceId);
+
+            Assert.IsNotNull(rolled);
+            Assert.AreEqual(2, item.Modifiers.Count);
+            Assert.AreEqual(1, item.RecraftCount);
+        }
+
+        [TestMethod]
+        public void Reroll_SinglePartComposite_IsBlockedByTheAtom()
+        {
+            // A one-part composite reads exactly like the atom — the worn "+X Strength" line blocks it.
+            var item = ItemWith(Line(EntityParameter.Strength), Line(EntityParameter.Intelligence));
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Strength))));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.Last().InstanceId);
+
+            Assert.IsNull(rolled);
+            Assert.AreEqual(2, item.Modifiers.Count);
+            Assert.AreEqual(0, item.RecraftCount);
+        }
+
+        [TestMethod]
+        public void Reroll_CompositeWithAGrantPart_IsNotPickable()
+        {
+            // A grant hiding among composite parts would materialize outside the line channels —
+            // the whole bundle fails the line-for-line contract and never enters the candidates.
+            var item = ItemWith(Line(EntityParameter.Strength));
+            var grantPart = new GrantDescriptor(GrantKind.Passive, "Passive_Skill_Regeneration", new Dictionary<string, float>());
+            var upgrader = CreateUpgrader(seed: 3, PoolOf(Composite(10f, Part(EntityParameter.Evade), grantPart)));
+
+            string? rolled = upgrader.TryRecraftModifier(item, item.Modifiers.Single().InstanceId);
+
+            Assert.IsNull(rolled);
+            Assert.AreEqual(1, item.Modifiers.Count, "A refusal must not remove the target line.");
+            Assert.AreEqual(0, item.RecraftCount);
+        }
+
+        [TestMethod]
         public void Reroll_NonLineCandidates_AreNotPickable()
         {
             // A reroll swaps a line for a line. A grant entry or the sharpening-levels operation would take
@@ -163,8 +264,8 @@ namespace LastBreathTest.CraftingSystemTests
         [TestMethod]
         public void Reroll_CandidatesWithoutWeight_RefuseInsteadOfThrowing()
         {
-            // Weight 0 means "never rolls" — composite parts inherit it by parse contract, so a candidate
-            // list of nothing but flattened atoms must refuse like an empty one, not blow up the picker.
+            // Weight 0 means "never rolls" — a candidate list carrying no weight at all must refuse
+            // like an empty one, not blow up the picker.
             var item = ItemWith(Line(EntityParameter.Intelligence));
             var upgrader = CreateUpgrader(seed: 3, PoolOf(Descriptor(EntityParameter.Strength, weight: 0f)));
 
@@ -188,8 +289,15 @@ namespace LastBreathTest.CraftingSystemTests
         private static ParameterDescriptor Descriptor(EntityParameter parameter, float weight, float min = 10f, float max = 10f) =>
             new(parameter, ModifierValueType.Flat, new ValueRange(min, max), ModifierScope.Global) { Weight = weight, Affix = AffixKind.Suffix };
 
+        /// <summary>A part carries no affix and no weight — both live on the composite root (parse contract).</summary>
+        private static ParameterDescriptor Part(EntityParameter parameter) =>
+            new(parameter, ModifierValueType.Flat, new ValueRange(10f, 10f), ModifierScope.Global);
+
+        private static CompositeDescriptor Composite(float weight, params IModifierDescriptor[] parts) =>
+            new([.. parts]) { Weight = weight, Affix = AffixKind.Suffix };
+
         /// <summary>Provider whose item pool holds the given entries and whose other pool sources are empty.</summary>
-        private static IItemDataProvider PoolOf(params ParameterDescriptor[] entries)
+        private static IItemDataProvider PoolOf(params IModifierDescriptor[] entries)
         {
             var provider = new Mock<IItemDataProvider>();
             provider.Setup(mock => mock.GetEquipItemModifierPool("Band")).Returns(entries);

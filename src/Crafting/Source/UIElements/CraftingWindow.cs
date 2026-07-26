@@ -498,20 +498,21 @@ namespace Crafting.Source.UIElements
 
         private List<string> ChosenAdditiveIds() => _additiveChoices.OfType<string>().ToList();
 
-        /// <summary>Mirror of TryRecraftModifier's refusal rules for the muted rendering: an entry
-        /// that is not a line at all (grant/operation/composite root — the latter's parts inherit
-        /// weight 0 and never win a roll), a stat already occupying a line (the picked line's own
-        /// stat stays legal), or — once a line is picked — the other slot family.</summary>
+        /// <summary>Mirror of TryRecraftModifier's refusal rules for the muted rendering: an entry with no
+        /// line identity (grant/operation, a composite hiding one), an identity already occupying a line —
+        /// atoms by key, composites by their whole part set (the picked line's own identity stays legal) —
+        /// or, once a line is picked, the other slot family.</summary>
         private Func<Core.Modifiers.IModifierDescriptor, bool>? RecraftIneligible()
         {
             if (_item == null) return null;
 
-            var occupied = _item.OccupiedLineKeys(_selectedModifierInstanceId == null ? [] : [_selectedModifierInstanceId]);
+            var occupied = _item.OccupiedLineIdentities(_selectedModifierInstanceId == null ? [] : [_selectedModifierInstanceId]);
             var targetAffix = SelectedLineAffix();
             return descriptor =>
-                !Core.Modifiers.ModifierKey.TryFrom(descriptor, out var key)
-                || occupied.Contains(key)
-                || (targetAffix is { } affix && affix != AffixKind.None && descriptor.Affix != affix);
+            {
+                if (targetAffix is { } affix && affix != AffixKind.None && descriptor.Affix != affix) return true;
+                return !Core.Modifiers.LineIdentity.TryFrom(descriptor, out var identity) || occupied.Contains(identity);
+            };
         }
 
         private AffixKind? SelectedLineAffix() =>

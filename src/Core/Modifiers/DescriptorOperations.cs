@@ -18,7 +18,7 @@ namespace Core.Modifiers
             _ => descriptor,
         };
 
-        /// <summary>Expands composites into their atomic parts — the reroll pool is flat so a reroll is 1-for-1.
+        /// <summary>Expands composites into their atomic parts (statistics/reports view of a pool).
         /// The root's affix survives on every atom (parts carry none by parse contract).</summary>
         public static IEnumerable<IModifierDescriptor> Flatten(IEnumerable<IModifierDescriptor> descriptors) =>
             descriptors.SelectMany(descriptor => descriptor is CompositeDescriptor composite
