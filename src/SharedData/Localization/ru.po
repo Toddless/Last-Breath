@@ -576,6 +576,24 @@ msgstr ""
 msgid "Context_Modifier_DotDamageTakenReduction_Range"
 msgstr ""
 
+msgid "Context_Modifier_BurningDamageTakenReduction"
+msgstr ""
+
+msgid "Context_Modifier_BurningDamageTakenReduction_Range"
+msgstr ""
+
+msgid "Context_Modifier_PoisonDamageTakenReduction"
+msgstr ""
+
+msgid "Context_Modifier_PoisonDamageTakenReduction_Range"
+msgstr ""
+
+msgid "Context_Modifier_BleedDamageTakenReduction"
+msgstr ""
+
+msgid "Context_Modifier_BleedDamageTakenReduction_Range"
+msgstr ""
+
 
 msgid "UI_Craft_Recipes"
 msgstr ""
@@ -1178,6 +1196,18 @@ msgid "LightningResistance"
 msgstr ""
 
 msgid "AllResistance"
+msgstr ""
+
+msgid "FireResistancePenetration"
+msgstr ""
+
+msgid "ColdResistancePenetration"
+msgstr ""
+
+msgid "LightningResistancePenetration"
+msgstr ""
+
+msgid "AllResistancePenetration"
 msgstr ""
 
 msgid "AllAttribute"

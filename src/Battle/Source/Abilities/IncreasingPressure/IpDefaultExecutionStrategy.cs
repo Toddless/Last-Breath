@@ -28,11 +28,11 @@
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
-                        AdditionalDamage = additionalDamage,
                         Index = i,
                         TotalCount = (int)ability.Attacks,
                         SourceAbilityId = ability.Id
                     };
+                    context.AddDamage(DamageType.Physical, additionalDamage);
 
                     ability.AttackModifiers.ApplyAll(context);
 

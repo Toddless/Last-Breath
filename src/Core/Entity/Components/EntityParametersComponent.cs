@@ -25,7 +25,10 @@
             [EntityParameter.LightningResistance] = (0f, 0.8f),
             [EntityParameter.FireResistance] = (0f, 0.8f),
             [EntityParameter.ColdResistance] = (0f, 0.8f),
-            [EntityParameter.SuppressChance] = (0f, 1f)
+            [EntityParameter.SuppressChance] = (0f, 1f),
+            [EntityParameter.FireResistancePenetration] = (0f, 1f),
+            [EntityParameter.ColdResistancePenetration] = (0f, 1f),
+            [EntityParameter.LightningResistancePenetration] = (0f, 1f)
         };
 
         private readonly Dictionary<EntityParameter, (float Base, float Current)> _parameterValues = Enum.GetValues<EntityParameter>().ToDictionary(key => key, key => (0f, 0f));

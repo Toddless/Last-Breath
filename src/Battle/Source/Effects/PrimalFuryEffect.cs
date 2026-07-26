@@ -16,7 +16,9 @@
 
         protected override void OnBeforeAttack(BeforeAttackEvent evt)
         {
-            evt.Context.AdditionalDamage *= DamageMultiplier;
+            // Scales the whole attack (×{damageMultiplier} per the upgrade description). The old code
+            // multiplied only the ability-bonus part, which made the buff a no-op on basic attacks.
+            evt.Context.ScaleDamage(DamageMultiplier);
             base.OnBeforeAttack(evt);
         }
 

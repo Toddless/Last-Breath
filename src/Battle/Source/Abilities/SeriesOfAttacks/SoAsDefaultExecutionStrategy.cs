@@ -32,11 +32,11 @@ namespace Battle.Source.Abilities.SeriesOfAttacks
                     var context = new AttackContext(owner, target, owner.Parameters.Damage, rnd, window.Scheduler)
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
-                        AdditionalDamage = additionalDamage,
                         Index = i,
                         TotalCount = attacks, // the rolled series length — "last hit" logic keys off it
                         SourceAbilityId = ability.Id
                     };
+                    context.AddDamage(DamageType.Physical, additionalDamage);
                     // Pre-attack mutators run BEFORE the attack is scheduled so they shape the roll.
                     ability.AttackModifiers.ApplyAll(context);
 

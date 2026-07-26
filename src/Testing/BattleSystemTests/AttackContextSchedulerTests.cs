@@ -127,16 +127,18 @@ namespace LastBreathTest.BattleSystemTests
         /// <summary>Pure-C# stand-in for AttackContext (the real one drags Godot's rng into the ctor).</summary>
         private sealed class FakeAttackContext : IAttackContext
         {
+            private readonly Dictionary<DamageType, float> _damageComponents = [];
             public RandomNumberGenerator Rnd => null!;
             public required IFightable Attacker { get; init; }
             public required IFightable Target { get; init; }
             public required IAttackContextScheduler AttackContextScheduler { get; init; }
             public AttackResults Result { get; set; }
             public float BaseDamage { get; init; }
+            public IReadOnlyDictionary<DamageType, float> DamageComponents => _damageComponents;
+            public float TotalDamage => _damageComponents.Values.Sum();
             public float RawCriticalChance { get; set; }
             public float RawCriticalDamage { get; set; }
             public float RawAccuracy { get; set; }
-            public float AdditionalDamage { get; set; }
             public float FinalDamage { get; set; }
             public bool IsCritical { get; set; }
             public bool ForceCriticalAttack { get; set; }
@@ -149,6 +151,16 @@ namespace LastBreathTest.BattleSystemTests
             public bool IsFirst => Index == 0;
             public bool IsLast => Index == TotalCount - 1;
             public int ReactionDepth { get; init; }
+
+            public void AddDamage(DamageType type, float amount) => _damageComponents[type] = _damageComponents.GetValueOrDefault(type, 0f) + amount;
+
+            public void SetDamage(DamageType type, float amount) => _damageComponents[type] = amount;
+
+            public void ScaleDamage(float factor)
+            {
+                foreach (DamageType type in _damageComponents.Keys.ToArray())
+                    _damageComponents[type] *= factor;
+            }
 
             public IAttackContext CreateReaction(IFightable attacker, IFightable target, float baseDamage) =>
                 new FakeAttackContext

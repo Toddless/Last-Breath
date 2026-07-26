@@ -68,5 +68,11 @@ namespace Core.Enums
 
         /// <summary>Reduces the damage-over-turn components of hits the owner takes.</summary>
         DotDamageTakenReduction,
+
+        /// <summary>Per-status siblings of <see cref="DotDamageTakenReduction"/>: reduce only the matching
+        /// DoT component of hits the owner takes ("burning damage taken −20%").</summary>
+        BurningDamageTakenReduction,
+        PoisonDamageTakenReduction,
+        BleedDamageTakenReduction,
     }
 }

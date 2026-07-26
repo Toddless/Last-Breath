@@ -8,6 +8,7 @@ namespace Battle.Source.Abilities.BerserkFury
     using Core.Context;
     using Core.Data.AbilityData;
     using Core.Entity;
+    using Core.Enums;
     using Effects;
     using Godot;
 
@@ -67,10 +68,10 @@ namespace Battle.Source.Abilities.BerserkFury
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
-                        AdditionalDamage = additionalDamage,
                         Index = attackIndex++,
                         SourceAbilityId = Id
                     };
+                    context.AddDamage(DamageType.Physical, additionalDamage);
                     AttackModifiers.ApplyAll(context);
 
                     if (!await window.ResolveAsync(context)) break;

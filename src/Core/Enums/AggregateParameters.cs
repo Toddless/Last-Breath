@@ -16,6 +16,7 @@ namespace Core.Enums
                 [EntityParameter.AllResistance] = [EntityParameter.FireResistance, EntityParameter.ColdResistance, EntityParameter.LightningResistance],
                 [EntityParameter.AllAttribute] = [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence],
                 [EntityParameter.AllDefence] = [EntityParameter.Evade, EntityParameter.Armor],
+                [EntityParameter.AllResistancePenetration] = [EntityParameter.FireResistancePenetration, EntityParameter.ColdResistancePenetration, EntityParameter.LightningResistancePenetration],
             };
 
         // Reverse index (concrete member -> aggregates that include it), built once for the resolution-time fold.

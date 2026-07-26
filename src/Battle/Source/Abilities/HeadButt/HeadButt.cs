@@ -51,11 +51,11 @@ namespace Battle.Source.Abilities.HeadButt
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
-                        AdditionalDamage = additionalDamage,
                         Index = i,
                         TotalCount = Attacks,
                         SourceAbilityId = Id
                     };
+                    context.AddDamage(DamageType.Physical, additionalDamage);
 
                     // Every successful owner lunge stuns its target (extra attacks from reactions included).
                     bool resolved = await window.ResolveAsync(context, async processed =>

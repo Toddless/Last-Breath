@@ -51,6 +51,9 @@
             ContextParameter.DamageTakenReductionFromPassive => DamageTakenReduction(entry, DamageCause.Passive),
             ContextParameter.DotDamageTakenReduction =>
                 new DamageBinding(owner => new DotDamageTakenReductionContextModifier(owner, () => entry.Value)),
+            ContextParameter.BurningDamageTakenReduction => DotTakenReduction(entry, DamageType.Burning),
+            ContextParameter.PoisonDamageTakenReduction => DotTakenReduction(entry, DamageType.Poison),
+            ContextParameter.BleedDamageTakenReduction => DotTakenReduction(entry, DamageType.Bleed),
             _ => throw new NotSupportedException($"No binding for context parameter '{entry.Parameter}'")
         };
 
@@ -62,6 +65,9 @@
 
         private static IContextModifierBinding DamageTakenReduction(ContextModifierEntry entry, DamageCause cause) =>
             new DamageBinding(owner => new IncomingDamageReductionContextModifier(owner, entry.Value, cause));
+
+        private static IContextModifierBinding DotTakenReduction(ContextModifierEntry entry, DamageType status) =>
+            new DamageBinding(owner => new DotDamageTakenReductionContextModifier(owner, () => entry.Value, status));
 
         private sealed class HealBinding(IHealModifier modifier) : IContextModifierBinding
         {

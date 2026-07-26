@@ -40,8 +40,7 @@ namespace Battle.Source.PassiveSkills
         {
             if (!_ready) return;
             _ready = false;
-            var context = evt.Context;
-            context.AdditionalDamage += Bonus * (context.BaseDamage + context.AdditionalDamage);
+            evt.Context.ScaleDamage(1 + Bonus);
         }
 
         public override void Detach(IFightable owner)

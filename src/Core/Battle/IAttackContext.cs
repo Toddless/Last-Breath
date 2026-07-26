@@ -1,5 +1,6 @@
-﻿namespace Core.Battle
+namespace Core.Battle
 {
+    using System.Collections.Generic;
     using Enums;
     using Entity;
     using Godot;
@@ -11,13 +12,23 @@
         IFightable Target { get; }
         IAttackContextScheduler AttackContextScheduler { get; }
         AttackResults Result { get; set; }
+
+        /// <summary>Weapon-side scalar the attack was created with (the Physical seed), before bonuses and crits.</summary>
         float BaseDamage { get; }
+
+        /// <summary>Damage of THIS attack split by type. Seeded at creation with Physical = <see cref="BaseDamage"/>
+        /// plus the attacker's flat elemental damage parameters; mutators reshape it via
+        /// <see cref="AddDamage"/>/<see cref="SetDamage"/>/<see cref="ScaleDamage"/>. The crit roll scales every component.</summary>
+        IReadOnlyDictionary<DamageType, float> DamageComponents { get; }
+
+        /// <summary>Sum of all damage components.</summary>
+        float TotalDamage { get; }
+
         float RawCriticalChance { get; set; }
         float RawCriticalDamage { get; set; }
 
         /// <summary>Accuracy of THIS attack, initialized from the attacker's parameter; pre-attack modifiers may boost it.</summary>
         float RawAccuracy { get; set; }
-        float AdditionalDamage { get; set; }
 
         /// <summary>
         ///  <c>TakeDamage</c>: overwritten with the damage actually dealt to the target
@@ -52,6 +63,13 @@
         /// refuses over-deep chains, so mutual reactions can never hang the battle.</summary>
         int ReactionDepth { get; }
         bool IsReaction => ReactionDepth > 0;
+
+        void AddDamage(DamageType type, float amount);
+        void SetDamage(DamageType type, float amount);
+
+        /// <summary>Scales every damage component by <paramref name="factor"/> — the way "+X% to this attack"
+        /// bonuses and the crit multiplier apply, so elemental components are boosted alongside Physical.</summary>
+        void ScaleDamage(float factor);
 
         /// <summary>The one way to spawn a reaction attack: inherits the scheduler and rng of the
         /// triggering attack, deepens the chain by one, rolls crit from the reactor's parameter.</summary>

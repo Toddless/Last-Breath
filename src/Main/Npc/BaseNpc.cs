@@ -562,14 +562,7 @@ namespace LastBreath.Npc
                 {
                     case AttackResults.Succeed:
                         Calculations.CalculateInitialAttackDamage(context);
-                        var damageContext = new DamageContext
-                        {
-                            Source = context.Attacker,
-                            Cause = DamageCause.Attack,
-                            IsCrit = context.ForceCriticalAttack || context.IsCritical,
-                            SourceAbilityId = context.SourceAbilityId
-                        };
-                        damageContext.Add(DamageType.Physical, context.FinalDamage);
+                        var damageContext = Calculations.ComposeAttackDamage(context);
                         await TakeDamage(damageContext);
                         context.FinalDamage = damageContext.TotalDamage; // actual damage dealt to target (barrier-absorbed included)
                         break;

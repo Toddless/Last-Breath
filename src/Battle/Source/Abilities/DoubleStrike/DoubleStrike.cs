@@ -82,11 +82,11 @@ namespace Battle.Source.Abilities.DoubleStrike
                     {
                         RawCriticalChance = owner.Parameters.CriticalChance,
                         RawCriticalDamage = owner.Parameters.CriticalDamage,
-                        AdditionalDamage = StrikeDamage(strike, owner),
                         Index = strike,
                         TotalCount = 2,
                         SourceAbilityId = Id
                     };
+                    context.AddDamage(DamageType.Physical, StrikeDamage(strike, owner));
                     AttackModifiers.ApplyAll(context);
 
                     if (!await window.ResolveAsync(context)) break;

@@ -1557,6 +1557,24 @@ msgstr "Reduces bleed, poison and burning damage taken by {value}"
 
 msgid "Context_Modifier_DotDamageTakenReduction_Range"
 msgstr "Reduces bleed, poison and burning damage taken by {min}–{max}"
+
+msgid "Context_Modifier_BurningDamageTakenReduction"
+msgstr "Reduces burning damage taken by {value}"
+
+msgid "Context_Modifier_BurningDamageTakenReduction_Range"
+msgstr "Reduces burning damage taken by {min}–{max}"
+
+msgid "Context_Modifier_PoisonDamageTakenReduction"
+msgstr "Reduces poison damage taken by {value}"
+
+msgid "Context_Modifier_PoisonDamageTakenReduction_Range"
+msgstr "Reduces poison damage taken by {min}–{max}"
+
+msgid "Context_Modifier_BleedDamageTakenReduction"
+msgstr "Reduces bleed damage taken by {value}"
+
+msgid "Context_Modifier_BleedDamageTakenReduction_Range"
+msgstr "Reduces bleed damage taken by {min}–{max}"
 # ------------------------------
 # Modifier templates: {value} = formatted number, {parameter} = localized parameter name
 # ------------------------------
@@ -2230,6 +2248,18 @@ msgstr "Lightning Resistance"
 
 msgid "AllResistance"
 msgstr "All Resistances"
+
+msgid "FireResistancePenetration"
+msgstr "Fire Resistance Penetration"
+
+msgid "ColdResistancePenetration"
+msgstr "Cold Resistance Penetration"
+
+msgid "LightningResistancePenetration"
+msgstr "Lightning Resistance Penetration"
+
+msgid "AllResistancePenetration"
+msgstr "All Resistance Penetration"
 
 msgid "AllAttribute"
 msgstr "All Attributes"

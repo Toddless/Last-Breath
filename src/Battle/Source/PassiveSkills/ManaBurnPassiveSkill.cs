@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Core.Battle.Skills;
     using Core.Entity;
+    using Core.Enums;
     using Core.Events;
 
     public class ManaBurnPassiveSkill(float percentToBurn)
@@ -33,7 +34,7 @@
             var target = obj.Context.Target;
             float toBurn = target.CurrentMana * PercentToBurn;
             target.CurrentMana -= toBurn;
-            obj.Context.AdditionalDamage += toBurn;
+            obj.Context.AddDamage(DamageType.Physical, toBurn);
         }
 
         public override void Detach(IFightable owner)

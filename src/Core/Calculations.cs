@@ -18,11 +18,11 @@
         private const float EvasionScalingFactor = 10000f;
         private const float ArmorScalingFactor = 10000f;
 
-        private static readonly Dictionary<DamageType, EntityParameter> s_resistanceByType = new()
+        private static readonly Dictionary<DamageType, (EntityParameter Resistance, EntityParameter Penetration)> s_resistanceByType = new()
         {
-            [DamageType.Fire] = EntityParameter.FireResistance,
-            [DamageType.Cold] = EntityParameter.ColdResistance,
-            [DamageType.Lightning] = EntityParameter.LightningResistance,
+            [DamageType.Fire] = (EntityParameter.FireResistance, EntityParameter.FireResistancePenetration),
+            [DamageType.Cold] = (EntityParameter.ColdResistance, EntityParameter.ColdResistancePenetration),
+            [DamageType.Lightning] = (EntityParameter.LightningResistance, EntityParameter.LightningResistancePenetration),
         };
 
         public static float CalculateFloatValue(IReadOnlyList<IModifier> modifiers, float baseValue = 0)
@@ -30,22 +30,37 @@
 
         public static void CalculateInitialAttackDamage(IAttackContext context)
         {
-            // TODO:
-            // for now all attacks are physical. Later if we have modifiers like "deal 30% attack damage as cold"
-            // where we calculate it damage?
-            context.FinalDamage = context.BaseDamage + context.AdditionalDamage;
             if (context is { IsCritical: false, ForceCriticalAttack: false }) return;
 
             // Mitigation is 0 for most targets -> factor is 1 (no-op). Bounds (0..1) live in EntityParametersComponent.
             float critMitigation = context.Target.Parameters.GetValueForParameter(EntityParameter.CriticalDamageMitigation);
-            context.FinalDamage *= context.RawCriticalDamage * (1 - critMitigation);
+            // The crit multiplies the whole dictionary — elemental components crit alongside Physical.
+            context.ScaleDamage(context.RawCriticalDamage * (1 - critMitigation));
+        }
+
+        /// <summary>The one place a resolved attack becomes a damage context: every component
+        /// (physical + weapon elementals + whatever mutators reshaped) crosses over as-is.</summary>
+        public static DamageContext ComposeAttackDamage(IAttackContext context)
+        {
+            var damageContext = new DamageContext
+            {
+                Source = context.Attacker,
+                Cause = DamageCause.Attack,
+                IsCrit = context.ForceCriticalAttack || context.IsCritical,
+                SourceAbilityId = context.SourceAbilityId
+            };
+            foreach ((DamageType type, float damage) in context.DamageComponents)
+                damageContext.Add(type, damage);
+            return damageContext;
         }
 
         /// <summary>
         /// Defender-side mitigation — the single place that knows how each damage type is reduced.
         /// Pipeline order: outgoing modifiers (source) -> incoming modifiers (target) -> mitigation per component -> barrier -> health.
-        /// Rules: Physical/Normal — armor scaled by the source's armor penetration; Fire/Cold/Lightning — the matching
-        /// resistance (fraction 0..1); Pure and DoT types (Poison/Burning/Bleed) pass through untouched.
+        /// Rules: Physical and Bleed — armor scaled by the source's armor penetration; Fire/Cold/Lightning —
+        /// the matching resistance (fraction 0..1) scaled by the source's resistance penetration; Burning — fire
+        /// resistance the same way (but the "attacks ignore resistances" flag never covers it — that mark is
+        /// attack-side); Pure and Poison pass through untouched.
         /// Mitigated values are written back per component (<see cref="IDamageContext.Set"/>),
         /// so UI and statistics see the real post-mitigation damage split.
         /// </summary>
@@ -60,16 +75,21 @@
         // Подавление (Suppress) пока что мертвый стат. Необходимо брать в расчет значение DamageCause и для всех способностей рассчитывать вероятность снижения урона
         private static float MitigateComponent(DamageType type, float damage, IDamageContext context, IFightable target)
         {
-            if (!context.IgnoreResistances && s_resistanceByType.TryGetValue(type, out EntityParameter resistance))
-                return ApplyResistance(damage, target, resistance);
-            return type is DamageType.Physical ? ApplyArmor(damage, context.Source, target) : damage;
-            // Pure and DoT statuses (Poison/Burning/Bleed) are unmitigated; their rules land here if defined
+            if (s_resistanceByType.TryGetValue(type, out (EntityParameter Resistance, EntityParameter Penetration) elemental))
+                return context.IgnoreResistances ? damage : ApplyResistance(damage, context.Source, target, elemental);
+
+            return type switch
+            {
+                DamageType.Burning => ApplyResistance(damage, context.Source, target, s_resistanceByType[DamageType.Fire]),
+                DamageType.Physical or DamageType.Bleed => ApplyArmor(damage, context.Source, target),
+                _ => damage // Pure and Poison are unmitigated by design
+            };
         }
 
-        private static float ApplyResistance(float damage, IFightable target, EntityParameter resistance)
+        private static float ApplyResistance(float damage, IFightable source, IFightable target, (EntityParameter Resistance, EntityParameter Penetration) elemental)
         {
-            // The 0..0.8 resistance cap lives in EntityParametersComponent's bounds table.
-            float resist = target.Parameters.GetValueForParameter(resistance);
+            // The 0..0.8 resistance cap lives in EntityParametersComponent's bounds table; penetration is capped 0..1 there too.
+            float resist = target.Parameters.GetValueForParameter(elemental.Resistance) * (1 - source.Parameters.GetValueForParameter(elemental.Penetration));
             return damage * (1 - resist);
         }
 

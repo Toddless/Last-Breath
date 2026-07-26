@@ -32,11 +32,18 @@
         ColdDamage,
         LightningDamage,
 
+        /// <summary>Fraction (0..1) of the target's matching resistance the owner's damage ignores —
+        /// the elemental mirror of <see cref="ArmorPenetration"/>.</summary>
+        FireResistancePenetration,
+        ColdResistancePenetration,
+        LightningResistancePenetration,
+
         // Aggregate ("all X") parameters: bucket-only members standing for a whole family. Never read as a
         // value — ParameterModifiersComponent folds their modifiers into each family member and fans change
         // events out to the members (see AggregateParameters for the membership map).
         AllResistance,
         AllAttribute,
         AllDefence,
+        AllResistancePenetration,
     }
 }
