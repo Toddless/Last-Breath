@@ -208,12 +208,13 @@ namespace LastBreathTest.CraftingSystemTests
         {
             var costs = LoadSharedCosts();
 
-            // The design examples verbatim: a Legendary weapon/armor asks for Adamantite ore,
-            // an Epic jewellery piece asks for Topaz.
-            AssertRecraft(costs, EquipmentCategory.Weapon, Rarity.Legendary, "Upgrade_Resource_Weapon_Dust", "Crafting_Resource_Adamantite_Ore");
-            AssertRecraft(costs, EquipmentCategory.Armor, Rarity.Legendary, "Upgrade_Resource_Armor_Dust", "Crafting_Resource_Adamantite_Ore");
-            AssertRecraft(costs, EquipmentCategory.Jewellery, Rarity.Epic, "Upgrade_Resource_Jewellery_Dust", "Crafting_Resource_Topaz_Gem");
-            AssertRecraft(costs, EquipmentCategory.Weapon, Rarity.Common, "Upgrade_Resource_Weapon_Dust", "Crafting_Resource_Copper_Ore");
+            // The design examples verbatim: dust matches the item's rarity tier (Common pays the
+            // Uncommon tier), a Legendary weapon/armor asks for Adamantite ore, an Epic jewellery
+            // piece asks for Diamond.
+            AssertRecraft(costs, EquipmentCategory.Weapon, Rarity.Legendary, "Upgrade_Resource_Weapon_Dust_Legendary", "Crafting_Resource_Adamantite_Ore");
+            AssertRecraft(costs, EquipmentCategory.Armor, Rarity.Legendary, "Upgrade_Resource_Armor_Dust_Legendary", "Crafting_Resource_Adamantite_Ore");
+            AssertRecraft(costs, EquipmentCategory.Jewellery, Rarity.Epic, "Upgrade_Resource_Jewellery_Dust_Epic", "Crafting_Resource_Diamond_Gem");
+            AssertRecraft(costs, EquipmentCategory.Weapon, Rarity.Common, "Upgrade_Resource_Weapon_Dust_Uncommon", "Crafting_Resource_Copper_Ore");
         }
 
         [TestMethod]

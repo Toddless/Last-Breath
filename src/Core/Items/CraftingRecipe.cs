@@ -12,7 +12,7 @@ namespace Core.Items
     public class CraftingRecipe : ICraftingRecipe, IItem
     {
         public CraftingRecipe(string id, string resultItemId, string[] tags, Rarity rarity, List<IRequirement> requirements, ItemType itemType,
-            string[] optionalResourceCategories, bool isOpened = false)
+            string[] optionalResourceCategories, int? unlockAtMastery = null, int basePrice = 0)
         {
             Id = id;
             ResultItemId = resultItemId;
@@ -21,7 +21,8 @@ namespace Core.Items
             Requirements = requirements;
             ItemType = itemType;
             OptionalResourceCategories = optionalResourceCategories;
-            IsOpened = isOpened;
+            UnlockAtMastery = unlockAtMastery;
+            BasePrice = basePrice;
         }
 
         private CraftingRecipe(CraftingRecipe source)
@@ -33,7 +34,8 @@ namespace Core.Items
             Requirements = source.Requirements;
             ItemType = source.ItemType;
             OptionalResourceCategories = [.. source.OptionalResourceCategories];
-            IsOpened = source.IsOpened;
+            UnlockAtMastery = source.UnlockAtMastery;
+            BasePrice = source.BasePrice;
             // Icon is intentionally NOT copied: it lazy-loads the shared recipe scroll on first access.
             // Reading source.Icon here would force a ResourceLoader call on every copy — and hard-crash
             // hosts without the Godot runtime (tests, loot simulation).
@@ -53,7 +55,8 @@ namespace Core.Items
             }
         }
         public Rarity Rarity { get; set; }
-        public bool IsOpened { get; }
+        public int? UnlockAtMastery { get; }
+        public int BasePrice { get; }
         public int MaxStackSize => 1;
         public ItemType ItemType { get; }
         public string[] OptionalResourceCategories { get; }

@@ -5,156 +5,19 @@
             "modifiers": [],
             "byCategory": {
                 "Armor": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 180
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.25
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "multi",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "FireResistance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.08,
-                            "max": 0.18
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "Armor", "modifierType": "flat", "value": { "min": 70, "max": 180 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.05, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "FireResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Weapon": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 35,
-                            "max": 80
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "multi",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "CriticalDamage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.15,
-                            "max": 0.35
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.01,
-                            "max": 0.03
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "AdditionalHitChance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.01,
-                            "max": 0.03
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    }
+                    { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 35, "max": 80 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.3, "max": 0.75 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                    { "parameter": "CriticalChance", "modifierType": "inc", "value": { "min": 0.05, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Jewellery": [
-                    {
-                        "parameter": "BlockChance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.01,
-                            "max": 0.03
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "BlockChance",
-                        "modifierType": "multi",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "BlockChance",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.1,
-                            "max": 0.15
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 130,
-                            "max": 420
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    }
+                    { "parameter": "Health", "modifierType": "flat", "value": { "min": 60, "max": 110 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "Strength", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
                 ]
             }
         },
@@ -163,93 +26,19 @@
             "modifiers": [],
             "byCategory": {
                 "Armor": [
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 50,
-                            "max": 120
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.1,
-                            "max": 0.25
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "multi",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "ColdResistance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.08,
-                            "max": 0.18
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 50, "max": 120 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.1, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "LightningResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                ],
+                "Weapon": [
+                    { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 35, "max": 100 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "SpellDamage", "modifierType": "inc", "value": { "min": 0.2, "max": 0.4 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "MulticastChance", "modifierType": "flat", "value": { "min": 0.04, "max": 0.09 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "MulticastChance", "modifierType": "inc", "value": { "min": 0.2, "max": 0.5 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Jewellery": [
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 120
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 40,
-                            "max": 90
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "ManaRecovery",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 15,
-                            "max": 30
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "HealthRecovery",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 15,
-                            "max": 30
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    }
+                    { "parameter": "Mana", "modifierType": "flat", "value": { "min": 60, "max": 90 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
                 ]
             }
         },
@@ -258,47 +47,17 @@
             "modifiers": [],
             "byCategory": {
                 "Armor": [
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 180
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.1,
-                            "max": 0.3
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Suppress",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.02,
-                            "max": 0.05
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "LightningResistance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.08,
-                            "max": 0.18
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "Evade", "modifierType": "flat", "value": { "min": 70, "max": 180 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Evade", "modifierType": "inc", "value": { "min": 0.05, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "ColdResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                ],
+                "Weapon": [
+                    { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": { "min": 0.04, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                    { "parameter": "AdditionalHitChance", "modifierType": "inc", "value": { "min": 0.2, "max": 0.5 }, "weight": 100, "affix": "Suffix" }
+                ],
+                "Jewellery": [
+                    { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 250, "max": 650 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
                 ]
             }
         },
@@ -307,82 +66,26 @@
             "modifiers": [],
             "byCategory": {
                 "Armor": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 110
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "AllResistance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.05,
-                            "max": 0.1
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 110 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Mana", "modifierType": "flat", "value": { "min": 35, "max": 90 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.2, "max": 0.25 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 10, "max": 15 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Weapon": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 50,
-                            "max": 160
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.02,
-                            "max": 0.05
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "FireDamage", "modifierType": "flat", "value": { "min": 25, "max": 60 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "ColdDamage", "modifierType": "flat", "value": { "min": 25, "max": 60 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "LightningDamage", "modifierType": "flat", "value": { "min": 25, "max": 60 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 35, "max": 85 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 20, "max": 60 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Jewellery": [
-                    {
-                        "parameter": "AllAttribute",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 5,
-                            "max": 10
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "AllAttribute",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.1,
-                            "max": 0.15
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "Health", "modifierType": "flat", "value": { "min": 35, "max": 110 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Mana", "modifierType": "flat", "value": { "min": 25, "max": 90 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 180, "max": 590 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 5, "max": 10 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "AllAttribute", "modifierType": "inc", "value": { "min": 0.1, "max": 0.15 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 5, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                    { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 10, "max": 20 }, "weight": 100, "affix": "Suffix" }
                 ]
             }
         },
@@ -390,95 +93,21 @@
             "id": "Category_Bone",
             "modifiers": [],
             "byCategory": {
-                "Jewellery": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 180
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 150
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "ManaRecovery",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 15,
-                            "max": 30
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "HealthRecovery",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 15,
-                            "max": 30
-                        },
-                        "weight": 100,
-                        "affix": "Suffix",
-                        "scope": "Local"
-                    }
+                "Armor": [
+                    { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 150, "max": 400 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 110, "max": 340 }, "weight": 100, "affix": "Prefix" },
+                    { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.75, "max": 1.2 }, "weight": 100, "affix": "Suffix" }
                 ],
                 "Weapon": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 200
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "SpellDamage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 40,
-                            "max": 150
-                        },
-                        "weight": 100,
-                        "affix": "Prefix",
-                        "scope": "Local"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.01,
-                            "max": 0.05
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalDamage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 0.4,
-                            "max": 0.55
-                        },
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
+                    { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 90, "max": 240 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 60, "max": 200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.4, "max": 0.55 }, "weight": 100, "affix": "Suffix" }
+                ],
+                "Jewellery": [
+                    { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 180 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "Mana", "modifierType": "flat", "value": { "min": 70, "max": 150 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                    { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 15, "max": 30 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                    { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 15, "max": 30 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
                 ]
             }
         },
@@ -489,52 +118,104 @@
     ],
     "upgradeResources": [
         {
-            "id": "Upgrade_Resource_Armor_Dust",
-            "tags": [
-                "Crafting",
-                "Recraft",
-                "Resource",
-                "Armor"
-            ],
+            "id": "Upgrade_Resource_Armor_Dust_Uncommon",
+            "tags": [ "Crafting", "Recraft", "Resource", "Armor" ],
             "rarity": "Uncommon",
             "category": "Armor",
             "maxStackSize": 999,
             "basePrice": 8
         },
         {
-            "id": "Upgrade_Resource_Jewellery_Dust",
-            "tags": [
-                "Crafting",
-                "Recraft",
-                "Resource",
-                "Jewellery"
-            ],
+            "id": "Upgrade_Resource_Armor_Dust_Rare",
+            "tags": [ "Crafting", "Recraft", "Resource", "Armor" ],
+            "rarity": "Rare",
+            "category": "Armor",
+            "maxStackSize": 999,
+            "basePrice": 12
+        },
+        {
+            "id": "Upgrade_Resource_Armor_Dust_Epic",
+            "tags": [ "Crafting", "Recraft", "Resource", "Armor" ],
+            "rarity": "Epic",
+            "category": "Armor",
+            "maxStackSize": 999,
+            "basePrice": 19
+        },
+        {
+            "id": "Upgrade_Resource_Armor_Dust_Legendary",
+            "tags": [ "Crafting", "Recraft", "Resource", "Armor" ],
+            "rarity": "Legendary",
+            "category": "Armor",
+            "maxStackSize": 999,
+            "basePrice": 26
+        },
+        {
+            "id": "Upgrade_Resource_Jewellery_Dust_Uncommon",
+            "tags": [ "Crafting", "Recraft", "Resource", "Jewellery" ],
             "rarity": "Uncommon",
             "category": "Jewellery",
             "maxStackSize": 999,
             "basePrice": 8
         },
         {
-            "id": "Upgrade_Resource_Weapon_Dust",
-            "tags": [
-                "Crafting",
-                "Recraft",
-                "Resource",
-                "Weapon"
-            ],
+            "id": "Upgrade_Resource_Jewellery_Dust_Rare",
+            "tags": [ "Crafting", "Recraft", "Resource", "Jewellery" ],
+            "rarity": "Rare",
+            "category": "Jewellery",
+            "maxStackSize": 999,
+            "basePrice": 12
+        },
+        {
+            "id": "Upgrade_Resource_Jewellery_Dust_Epic",
+            "tags": [ "Crafting", "Recraft", "Resource", "Jewellery" ],
+            "rarity": "Epic",
+            "category": "Jewellery",
+            "maxStackSize": 999,
+            "basePrice": 19
+        },
+        {
+            "id": "Upgrade_Resource_Jewellery_Dust_Legendary",
+            "tags": [ "Crafting", "Recraft", "Resource", "Jewellery" ],
+            "rarity": "Legendary",
+            "category": "Jewellery",
+            "maxStackSize": 999,
+            "basePrice": 26
+        },
+        {
+            "id": "Upgrade_Resource_Weapon_Dust_Uncommon",
+            "tags": [ "Crafting", "Recraft", "Resource", "Weapon" ],
             "rarity": "Uncommon",
             "category": "Weapon",
             "maxStackSize": 999,
             "basePrice": 8
         },
         {
+            "id": "Upgrade_Resource_Weapon_Dust_Rare",
+            "tags": [ "Crafting", "Recraft", "Resource", "Weapon" ],
+            "rarity": "Rare",
+            "category": "Weapon",
+            "maxStackSize": 999,
+            "basePrice": 12
+        },
+        {
+            "id": "Upgrade_Resource_Weapon_Dust_Epic",
+            "tags": [ "Crafting", "Recraft", "Resource", "Weapon" ],
+            "rarity": "Epic",
+            "category": "Weapon",
+            "maxStackSize": 999,
+            "basePrice": 19
+        },
+        {
+            "id": "Upgrade_Resource_Weapon_Dust_Legendary",
+            "tags": [ "Crafting", "Recraft", "Resource", "Weapon" ],
+            "rarity": "Legendary",
+            "category": "Weapon",
+            "maxStackSize": 999,
+            "basePrice": 26
+        },
+        {
             "id": "Upgrade_Resource_Blacksmith_Rune",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Armor"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Armor" ],
             "rarity": "Uncommon",
             "category": "Armor",
             "maxStackSize": 999,
@@ -542,12 +223,7 @@
         },
         {
             "id": "Upgrade_Resource_Jeweler_Rune",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Jewellery"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Jewellery" ],
             "rarity": "Uncommon",
             "category": "Jewellery",
             "maxStackSize": 999,
@@ -555,12 +231,7 @@
         },
         {
             "id": "Upgrade_Resource_Weapon_Rune",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Weapon"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Weapon" ],
             "rarity": "Uncommon",
             "category": "Weapon",
             "maxStackSize": 999,
@@ -568,109 +239,63 @@
         },
         {
             "id": "Upgrade_Resource_Simple_Flux",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Flux"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Flux" ],
             "rarity": "Uncommon",
             "maxStackSize": 999,
             "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Fine_Flux",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Flux"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Flux" ],
             "rarity": "Rare",
             "maxStackSize": 999,
             "basePrice": 12
         },
         {
             "id": "Upgrade_Resource_Quality_Flux",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Flux"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Flux" ],
             "rarity": "Epic",
             "maxStackSize": 999,
             "basePrice": 19
         },
         {
             "id": "Upgrade_Resource_Perfect_Flux",
-            "tags": [
-                "Crafting",
-                "Upgrade",
-                "Resource",
-                "Flux"
-            ],
+            "tags": [ "Crafting", "Upgrade", "Resource", "Flux" ],
             "rarity": "Legendary",
             "maxStackSize": 999,
             "basePrice": 26
         },
         {
             "id": "Upgrade_Resource_Apprentice_Rune",
-            "tags": [
-                "Crafting",
-                "Create",
-                "Resource",
-                "Rune"
-            ],
+            "tags": [ "Crafting", "Create", "Resource", "Rune" ],
             "rarity": "Uncommon",
             "maxStackSize": 999,
             "basePrice": 8
         },
         {
             "id": "Upgrade_Resource_Journeyman_Rune",
-            "tags": [
-                "Crafting",
-                "Create",
-                "Resource",
-                "Rune"
-            ],
+            "tags": [ "Crafting", "Create", "Resource", "Rune" ],
             "rarity": "Rare",
             "maxStackSize": 999,
             "basePrice": 12
         },
         {
             "id": "Upgrade_Resource_Master_Rune",
-            "tags": [
-                "Crafting",
-                "Create",
-                "Resource",
-                "Rune"
-            ],
+            "tags": [ "Crafting", "Create", "Resource", "Rune" ],
             "rarity": "Epic",
             "maxStackSize": 999,
             "basePrice": 19
         },
         {
             "id": "Upgrade_Resource_Grandmaster_Rune",
-            "tags": [
-                "Crafting",
-                "Create",
-                "Resource",
-                "Rune"
-            ],
+            "tags": [ "Crafting", "Create", "Resource", "Rune" ],
             "rarity": "Legendary",
             "maxStackSize": 999,
             "basePrice": 26
         },
         {
             "id": "Upgrade_Resource_Weaponsmith_Mark",
-            "tags": [
-                "Crafting",
-                "Ascend",
-                "Resource",
-                "Mark",
-                "Weapon"
-            ],
+            "tags": [ "Crafting", "Ascend", "Resource", "Mark", "Weapon" ],
             "rarity": "Mythic",
             "category": "Weapon",
             "maxStackSize": 999,
@@ -678,13 +303,7 @@
         },
         {
             "id": "Upgrade_Resource_Jeweler_Mark",
-            "tags": [
-                "Crafting",
-                "Ascend",
-                "Resource",
-                "Mark",
-                "Jewellery"
-            ],
+            "tags": [ "Crafting", "Ascend", "Resource", "Mark", "Jewellery" ],
             "rarity": "Mythic",
             "category": "Jewellery",
             "maxStackSize": 999,
@@ -692,13 +311,7 @@
         },
         {
             "id": "Upgrade_Resource_Armorsmith_Mark",
-            "tags": [
-                "Crafting",
-                "Ascend",
-                "Resource",
-                "Mark",
-                "Armor"
-            ],
+            "tags": [ "Crafting", "Ascend", "Resource", "Mark", "Armor" ],
             "rarity": "Mythic",
             "category": "Armor",
             "maxStackSize": 999,
@@ -714,608 +327,43 @@
                 "modifiers": [],
                 "byCategory": {
                     "Armor": [
-                        {
-                            "parameter": "Health",
-                            "modifierType": "flat",
-                            "value": {
-                                "min": 70,
-                                "max": 100
-                            },
-                            "weight": 100,
-                            "affix": "Prefix",
-                            "scope": "Local"
-                        },
-                        {
-                            "parameter": "Health",
-                            "modifierType": "inc",
-                            "value": {
-                                "min": 0.05,
-                                "max": 0.1
-                            },
-                            "weight": 100,
-                            "affix": "Prefix"
-                        },
-                        {
-                            "parameter": "Armor",
-                            "modifierType": "flat",
-                            "value": {
-                                "min": 50,
-                                "max": 120
-                            },
-                            "weight": 100,
-                            "affix": "Prefix",
-                            "scope": "Local"
-                        },
-                        {
-                            "parameter": "Armor",
-                            "modifierType": "inc",
-                            "value": {
-                                "min": 0.05,
-                                "max": 0.15
-                            },
-                            "weight": 100,
-                            "affix": "Prefix"
-                        }
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 50, "max": 120 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.05, "max": 0.15 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 70, "max": 100 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.05, "max": 0.1 }, "weight": 100, "affix": "Prefix" }
                     ],
                     "Weapon": [
-                        {
-                            "parameter": "Damage",
-                            "modifierType": "flat",
-                            "value": {
-                                "min": 35,
-                                "max": 50
-                            },
-                            "weight": 100,
-                            "affix": "Prefix"
-                        },
-                        {
-                            "parameter": "Damage",
-                            "modifierType": "inc",
-                            "value": {
-                                "min": 0.05,
-                                "max": 0.1
-                            },
-                            "weight": 100,
-                            "affix": "Prefix"
-                        }
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 35, "max": 60 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.15, "max": 0.4 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
                     ]
                 }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Copper"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Gold_Ore",
-            "material": {
-                "id": "Material_Gold_Ore",
-                "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 250,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": 0.15,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Gold"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
+            "tags": [ "Crafting", "Resource", "Metal", "Copper" ],
+            "rarity": "Common",
+            "basePrice": 5
         },
         {
             "id": "Crafting_Resource_Iron_Ore",
             "material": {
                 "id": "Material_Iron_Ore",
                 "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": {
-                            "min": 70,
-                            "max": 120
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "inc",
-                        "value": {
-                            "min": 0.1,
-                            "max": 0.2
-                        },
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.05, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "BlockChance", "modifierType": "flat", "value": { "min": 0.02, "max": 0.03 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 55, "max": 130 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.3, "max": 0.75 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ArmorPenetration", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Iron"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Deer_Leather",
-            "material": {
-                "id": "Material_Deer_Leather",
-                "categoryId": "Category_Leather",
-                "modifiers": [
-                    {
-                        "parameter": "MoveSpeed",
-                        "modifierType": "flat",
-                        "value": 15,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "MoveSpeed",
-                        "modifierType": "inc",
-                        "value": 0.15,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Leather",
-                "Deer"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Wild_Boar_Leather",
-            "material": {
-                "id": "Material_Wild_Boar_Leather",
-                "categoryId": "Category_Leather",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 250,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "multi",
-                        "value": 0.15,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Leather",
-                "WildBoar"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Diamond_Gem",
-            "material": {
-                "id": "Material_Diamond",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "flat",
-                        "value": 650,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Diamond"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Emerald_Gem",
-            "material": {
-                "id": "Material_Emerald",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Dexterity",
-                        "modifierType": "flat",
-                        "value": 35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Dexterity",
-                        "modifierType": "inc",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Emerald"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Ruby_Gem",
-            "material": {
-                "id": "Material_Ruby",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "multi",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Strength",
-                        "modifierType": "flat",
-                        "value": 35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Strength",
-                        "modifierType": "inc",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Ruby"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Linen_Fabric",
-            "material": {
-                "id": "Material_Linen",
-                "categoryId": "Category_Fabric",
-                "modifiers": [
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "flat",
-                        "value": 200,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "ManaRecovery",
-                        "modifierType": "flat",
-                        "value": 15,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Fabric",
-                "Linen"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Silk_Fabric",
-            "material": {
-                "id": "Material_Silk",
-                "categoryId": "Category_Fabric",
-                "modifiers": [
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "flat",
-                        "value": 350,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "inc",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "ManaRecovery",
-                        "modifierType": "flat",
-                        "value": 25,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Fabric",
-                "Silk"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Critical_Chance",
-            "material": {
-                "id": "Material_Essence_Critical_Chance",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "inc",
-                        "value": 0.3,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.05,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Critical"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Damage",
-            "material": {
-                "id": "Material_Essence_Damage",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "inc",
-                        "value": 0.5,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": 250,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Damage"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Health",
-            "material": {
-                "id": "Material_Essence_Health",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": 0.5,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 500,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Health"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Armor",
-            "material": {
-                "id": "Material_Essence_Armor",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "inc",
-                        "value": 0.5,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 500,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Armor"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Evade",
-            "material": {
-                "id": "Material_Essence_Evade",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "inc",
-                        "value": 0.5,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "flat",
-                        "value": 500,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Evade"
-            ],
-            "rarity": "Uncommon",
-            "basePrice": 8
-        },
-        {
-            "id": "Crafting_Resource_Essence_Barrier",
-            "material": {
-                "id": "Material_Essence_Barrier",
-                "categoryId": "Category_Essence",
-                "modifiers": [
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "inc",
-                        "value": 0.5,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "flat",
-                        "value": 500,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Essence",
-                "Barrier"
-            ],
+            "tags": [ "Crafting", "Resource", "Metal", "Iron" ],
             "rarity": "Uncommon",
             "basePrice": 8
         },
@@ -1324,303 +372,208 @@
             "material": {
                 "id": "Material_Silver_Ore",
                 "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 200,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "inc",
-                        "value": 0.15,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.05, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 95, "max": 175 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Silver"
-            ],
+            "tags": [ "Crafting", "Resource", "Metal", "Silver" ],
             "rarity": "Uncommon",
             "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Gold_Ore",
+            "material": {
+                "id": "Material_Gold_Ore",
+                "categoryId": "Category_Metal",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 210, "max": 330 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.08, "max": 0.22 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 180, "max": 330 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 180, "max": 270 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllAttribute", "modifierType": "inc", "value": { "min": 0.15, "max": 0.22 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Metal", "Gold" ],
+            "rarity": "Rare",
+            "basePrice": 12
         },
         {
             "id": "Crafting_Resource_Mithril_Ore",
             "material": {
                 "id": "Material_Mithril_Ore",
                 "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 450,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 600, "max": 1200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.3, "max": 0.55 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 350, "max": 600 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 300, "max": 720 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.22, "max": 0.3 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 210, "max": 480 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.65, "max": 1.65 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Mithril"
-            ],
-            "rarity": "Rare",
-            "basePrice": 12
+            "tags": [ "Crafting", "Resource", "Metal", "Mithril" ],
+            "rarity": "Epic",
+            "basePrice": 19
         },
         {
             "id": "Crafting_Resource_Adamantite_Ore",
             "material": {
                 "id": "Material_Adamantite_Ore",
                 "categoryId": "Category_Metal",
-                "modifiers": [
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 800,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "multi",
-                        "value": 0.45,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 800,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 900, "max": 1600 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.45, "max": 0.65 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 500, "max": 850 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "BlockChance", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.3, "max": 0.4 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 320, "max": 720 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.9, "max": 2.25 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ArmorPenetration", "modifierType": "flat", "value": { "min": 0.12, "max": 0.18 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.8, "max": 1.15 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 540, "max": 990 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 40, "max": 60 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "BlockChance", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Metal",
-                "Adamantite"
-            ],
+            "tags": [ "Crafting", "Resource", "Metal", "Adamantite" ],
             "rarity": "Legendary",
             "basePrice": 26
-        },
-        {
-            "id": "Crafting_Resource_Sapphire_Gem",
-            "material": {
-                "id": "Material_Sapphire",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Mana",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Intelligence",
-                        "modifierType": "flat",
-                        "value": 35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Intelligence",
-                        "modifierType": "inc",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Sapphire"
-            ],
-            "rarity": "Rare",
-            "basePrice": 12
-        },
-        {
-            "id": "Crafting_Resource_Amethyst_Gem",
-            "material": {
-                "id": "Material_Amethyst",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "SpellDamage",
-                        "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 55,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "SpellDamage",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Barrier",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 50,
-                        "affix": "Prefix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Amethyst"
-            ],
-            "rarity": "Rare",
-            "basePrice": 12
-        },
-        {
-            "id": "Crafting_Resource_Topaz_Gem",
-            "material": {
-                "id": "Material_Topaz",
-                "categoryId": "Category_Gem",
-                "modifiers": [
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "multi",
-                        "value": 0.25,
-                        "weight": 55,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "inc",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.04,
-                        "weight": 50,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "AdditionalHitChance",
-                        "modifierType": "flat",
-                        "value": 0.03,
-                        "weight": 40,
-                        "affix": "Suffix"
-                    }
-                ]
-            },
-            "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Gem",
-                "Topaz"
-            ],
-            "rarity": "Epic",
-            "basePrice": 19
         },
         {
             "id": "Crafting_Resource_Wolf_Leather",
             "material": {
                 "id": "Material_Wolf_Leather",
                 "categoryId": "Category_Leather",
-                "modifiers": [
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "flat",
-                        "value": 150,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "inc",
-                        "value": 0.1,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 50, "max": 125 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Evade", "modifierType": "inc", "value": { "min": 0.05, "max": 0.12 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 10, "max": 18 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 100, "max": 250 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Leather",
-                "Wolf"
-            ],
+            "tags": [ "Crafting", "Resource", "Leather", "Wolf" ],
             "rarity": "Common",
             "basePrice": 5
+        },
+        {
+            "id": "Crafting_Resource_Deer_Leather",
+            "material": {
+                "id": "Material_Deer_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 20, "max": 35 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "MoveSpeed", "modifierType": "inc", "value": { "min": 0.15, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 250, "max": 500 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "MoveSpeed", "modifierType": "inc", "value": { "min": 0.1, "max": 0.2 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Leather", "Deer" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Wild_Boar_Leather",
+            "material": {
+                "id": "Material_Wild_Boar_Leather",
+                "categoryId": "Category_Leather",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 180, "max": 330 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.1, "max": 0.2 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ColdResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 130, "max": 240 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Leather", "WildBoar" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
         },
         {
             "id": "Crafting_Resource_Bear_Leather",
             "material": {
                 "id": "Material_Bear_Leather",
                 "categoryId": "Category_Leather",
-                "modifiers": [
-                    {
-                        "parameter": "Health",
-                        "modifierType": "flat",
-                        "value": 450,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Armor",
-                        "modifierType": "flat",
-                        "value": 250,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Health",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 330, "max": 600 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.12, "max": 0.3 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "ColdResistance", "modifierType": "flat", "value": { "min": 0.15, "max": 0.22 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 230, "max": 420 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Leather",
-                "Bear"
-            ],
+            "tags": [ "Crafting", "Resource", "Leather", "Bear" ],
             "rarity": "Rare",
             "basePrice": 12
         },
@@ -1629,69 +582,521 @@
             "material": {
                 "id": "Material_Direwolf_Leather",
                 "categoryId": "Category_Leather",
-                "modifiers": [
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "flat",
-                        "value": 400,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "Evade",
-                        "modifierType": "multi",
-                        "value": 0.35,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "MoveSpeed",
-                        "modifierType": "flat",
-                        "value": 50,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 420, "max": 1080 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Evade", "modifierType": "inc", "value": { "min": 0.2, "max": 0.45 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "MoveSpeed", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "MoveSpeed", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ColdResistance", "modifierType": "flat", "value": { "min": 0.22, "max": 0.3 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 700, "max": 1200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "AdditionalHitChance", "modifierType": "inc", "value": { "min": 0.45, "max": 1.1 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 700, "max": 1200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Leather",
-                "Direwolf"
-            ],
+            "tags": [ "Crafting", "Resource", "Leather", "Direwolf" ],
             "rarity": "Epic",
             "basePrice": 19
+        },
+        {
+            "id": "Crafting_Resource_Coarse_Wool_Fabric",
+            "material": {
+                "id": "Material_Coarse_Wool",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 35, "max": 85 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.05, "max": 0.12 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 50, "max": 100 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Wool" ],
+            "rarity": "Common",
+            "basePrice": 5
+        },
+        {
+            "id": "Crafting_Resource_Linen_Fabric",
+            "material": {
+                "id": "Material_Linen",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 80, "max": 190 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 130, "max": 250 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 95, "max": 145 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Linen" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Broadcloth_Fabric",
+            "material": {
+                "id": "Material_Broadcloth",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 80, "max": 190 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.1, "max": 0.25 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.02, "max": 0.03 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "LightningResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 95, "max": 145 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 80, "max": 160 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Broadcloth" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Fine_Linen_Fabric",
+            "material": {
+                "id": "Material_Fine_Linen",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 150, "max": 360 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "ManaRecovery", "modifierType": "inc", "value": { "min": 0.15, "max": 0.3 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 180, "max": 270 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "ManaRecovery", "modifierType": "inc", "value": { "min": 0.15, "max": 0.3 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "FineLinen" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Serge_Fabric",
+            "material": {
+                "id": "Material_Serge",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 150, "max": 360 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.15, "max": 0.35 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 150, "max": 300 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 180, "max": 270 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 150, "max": 300 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Serge" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Velvet_Fabric",
+            "material": {
+                "id": "Material_Velvet",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 300, "max": 720 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.2, "max": 0.45 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 150, "max": 250 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 210, "max": 600 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "SpellDamage", "modifierType": "inc", "value": { "min": 0.45, "max": 0.9 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "MulticastChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 380, "max": 580 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Velvet" ],
+            "rarity": "Epic",
+            "basePrice": 19
+        },
+        {
+            "id": "Crafting_Resource_Silk_Fabric",
+            "material": {
+                "id": "Material_Silk",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 300, "max": 720 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 300, "max": 560 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Mana", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 250, "max": 500 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 380, "max": 580 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Mana", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Silk" ],
+            "rarity": "Epic",
+            "basePrice": 19
+        },
+        {
+            "id": "Crafting_Resource_Purple_Fabric",
+            "material": {
+                "id": "Material_Purple",
+                "categoryId": "Category_Fabric",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 450, "max": 1080 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.3, "max": 0.75 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 450, "max": 840 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "LightningResistance", "modifierType": "flat", "value": { "min": 0.3, "max": 0.4 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Weapon": [
+                        { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 320, "max": 900 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "SpellDamage", "modifierType": "inc", "value": { "min": 0.6, "max": 1.2 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "MulticastChance", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "MulticastChance", "modifierType": "inc", "value": { "min": 0.6, "max": 1.5 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 560, "max": 870 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 40, "max": 60 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Intelligence", "modifierType": "inc", "value": { "min": 0.3, "max": 0.45 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Fabric", "Purple" ],
+            "rarity": "Legendary",
+            "basePrice": 26
+        },
+        {
+            "id": "Crafting_Resource_Malachite_Gem",
+            "material": {
+                "id": "Material_Malachite",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 250, "max": 500 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Dexterity", "modifierType": "inc", "value": { "min": 0.12, "max": 0.2 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Malachite" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Lazurite_Gem",
+            "material": {
+                "id": "Material_Lazurite",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 55, "max": 145 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Intelligence", "modifierType": "inc", "value": { "min": 0.12, "max": 0.2 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 80, "max": 190 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Lazurite" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Garnet_Gem",
+            "material": {
+                "id": "Material_Garnet",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 55, "max": 175 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Strength", "modifierType": "inc", "value": { "min": 0.12, "max": 0.2 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.08, "max": 0.15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Garnet" ],
+            "rarity": "Uncommon",
+            "basePrice": 8
+        },
+        {
+            "id": "Crafting_Resource_Ruby_Gem",
+            "material": {
+                "id": "Material_Ruby",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 105, "max": 330 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Strength", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 210, "max": 330 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.15, "max": 0.38 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "FireResistance", "modifierType": "flat", "value": { "min": 0.25, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Ruby" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Sapphire_Gem",
+            "material": {
+                "id": "Material_Sapphire",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 75, "max": 270 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Intelligence", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Intelligence", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 105, "max": 270 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 150, "max": 360 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "ColdResistance", "modifierType": "flat", "value": { "min": 0.25, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Sapphire" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Emerald_Gem",
+            "material": {
+                "id": "Material_Emerald",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 450, "max": 800 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "inc", "value": { "min": 0.15, "max": 0.38 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Dexterity", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 15, "max": 25 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "LightningResistance", "modifierType": "flat", "value": { "min": 0.25, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Emerald" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Diamond_Gem",
+            "material": {
+                "id": "Material_Diamond",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 150, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Mana", "modifierType": "inc", "value": { "min": 0.22, "max": 0.55 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ManaRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.22, "max": 0.3 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "BlockChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Diamond" ],
+            "rarity": "Epic",
+            "basePrice": 19
+        },
+        {
+            "id": "Crafting_Resource_Beryl_Gem",
+            "material": {
+                "id": "Material_Beryl",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 210, "max": 660 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.22, "max": 0.55 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 420, "max": 660 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.22, "max": 0.3 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Beryl" ],
+            "rarity": "Epic",
+            "basePrice": 19
+        },
+        {
+            "id": "Crafting_Resource_Alexandrite_Gem",
+            "material": {
+                "id": "Material_Alexandrite",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        {
+                            "parts": [
+                                { "parameter": "Health", "modifierType": "flat", "value": { "min": 250, "max": 450 }, "scope": "Local" },
+                                { "parameter": "Mana", "modifierType": "flat", "value": { "min": 250, "max": 450 }, "scope": "Local" }
+                            ],
+                            "weight": 100,
+                            "affix": "Prefix"
+                        },
+                        {
+                            "parts": [
+                                { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.25, "max": 0.35 } },
+                                { "parameter": "Mana", "modifierType": "inc", "value": { "min": 0.25, "max": 0.35 } }
+                            ],
+                            "weight": 100,
+                            "affix": "Prefix"
+                        },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 40, "max": 60 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AllAttribute", "modifierType": "inc", "value": { "min": 0.3, "max": 0.45 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        {
+                            "parts": [
+                                { "parameter": "Health", "modifierType": "flat", "value": { "min": 350, "max": 600 }, "scope": "Local" },
+                                { "parameter": "Mana", "modifierType": "flat", "value": { "min": 350, "max": 600 }, "scope": "Local" }
+                            ],
+                            "weight": 100,
+                            "affix": "Prefix"
+                        },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.3, "max": 0.4 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Alexandrite" ],
+            "rarity": "Legendary",
+            "basePrice": 26
+        },
+        {
+            "id": "Crafting_Resource_Taaffeite_Gem",
+            "material": {
+                "id": "Material_Taaffeite",
+                "categoryId": "Category_Gem",
+                "modifiers": [],
+                "byCategory": {
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 1400, "max": 2100 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "inc", "value": { "min": 0.25, "max": 0.4 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.04, "max": 0.06 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "AllAttribute", "modifierType": "flat", "value": { "min": 60, "max": 85 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 840, "max": 2160 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "AllResistance", "modifierType": "flat", "value": { "min": 0.4, "max": 0.5 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "Suppress", "modifierType": "flat", "value": { "min": 0.09, "max": 0.11 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Gem", "Taaffeite" ],
+            "rarity": "Mythic",
+            "basePrice": 27
         },
         {
             "id": "Crafting_Resource_Wolf_Fang",
             "material": {
                 "id": "Material_Wolf_Fang",
                 "categoryId": "Category_Bone",
-                "modifiers": [
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.02,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Accuracy",
-                        "modifierType": "flat",
-                        "value": 100,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 65, "max": 170 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 100, "max": 250 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.01, "max": 0.02 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 50, "max": 125 }, "weight": 100, "affix": "Prefix", "scope": "Local" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Bone",
-                "Wolf"
-            ],
+            "tags": [ "Crafting", "Resource", "Bone", "Wolf" ],
             "rarity": "Common",
             "basePrice": 5
         },
@@ -1700,30 +1105,21 @@
             "material": {
                 "id": "Material_Boar_Tusk",
                 "categoryId": "Category_Bone",
-                "modifiers": [
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "flat",
-                        "value": 60,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "CriticalDamage",
-                        "modifierType": "flat",
-                        "value": 0.15,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 145, "max": 380 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.2, "max": 0.35 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ArmorPenetration", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 110, "max": 290 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Strength", "modifierType": "flat", "value": { "min": 8, "max": 15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Bone",
-                "Boar"
-            ],
+            "tags": [ "Crafting", "Resource", "Bone", "Boar" ],
             "rarity": "Uncommon",
             "basePrice": 8
         },
@@ -1732,78 +1128,229 @@
             "material": {
                 "id": "Material_Bear_Claw",
                 "categoryId": "Category_Bone",
-                "modifiers": [
-                    {
-                        "parameter": "CriticalDamage",
-                        "modifierType": "flat",
-                        "value": 0.25,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "Damage",
-                        "modifierType": "inc",
-                        "value": 0.2,
-                        "weight": 100,
-                        "affix": "Prefix"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.05,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 270, "max": 720 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.15, "max": 0.3 }, "weight": 100, "affix": "Prefix" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.35, "max": 0.55 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "inc", "value": { "min": 0.2, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 210, "max": 540 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.35, "max": 0.55 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Bone",
-                "Bear"
-            ],
+            "tags": [ "Crafting", "Resource", "Bone", "Bear" ],
             "rarity": "Rare",
             "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Direwolf_Claw",
+            "material": {
+                "id": "Material_Direwolf_Claw",
+                "categoryId": "Category_Bone",
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 540, "max": 1440 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 360, "max": 1200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 700, "max": 1200 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.55, "max": 0.8 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "AdditionalHitChance", "modifierType": "flat", "value": { "min": 0.05, "max": 0.07 }, "weight": 100, "affix": "Suffix", "scope": "Local" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 420, "max": 900 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 40, "max": 65 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "Dexterity", "modifierType": "flat", "value": { "min": 25, "max": 40 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Bone", "Direwolf" ],
+            "rarity": "Epic",
+            "basePrice": 19
         },
         {
             "id": "Crafting_Resource_Ancient_Fang",
             "material": {
                 "id": "Material_Ancient_Fang",
                 "categoryId": "Category_Bone",
-                "modifiers": [
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "flat",
-                        "value": 0.09,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalChance",
-                        "modifierType": "inc",
-                        "value": 0.3,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    },
-                    {
-                        "parameter": "CriticalDamage",
-                        "modifierType": "flat",
-                        "value": 0.9,
-                        "weight": 100,
-                        "affix": "Suffix"
-                    }
-                ]
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 810, "max": 2160 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "SpellDamage", "modifierType": "flat", "value": { "min": 540, "max": 1800 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.8, "max": 1.15 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.07, "max": 0.09 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "inc", "value": { "min": 0.45, "max": 0.75 }, "weight": 100, "affix": "Suffix" },
+                        { "parameter": "ArmorPenetration", "modifierType": "flat", "value": { "min": 0.12, "max": 0.18 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 630, "max": 1620 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Mana", "modifierType": "flat", "value": { "min": 630, "max": 1350 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "HealthRecovery", "modifierType": "flat", "value": { "min": 65, "max": 95 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "CriticalDamage", "modifierType": "flat", "value": { "min": 0.8, "max": 1.15 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
             },
             "maxStackSize": 999,
-            "tags": [
-                "Crafting",
-                "Resource",
-                "Bone",
-                "Ancient"
-            ],
+            "tags": [ "Crafting", "Resource", "Bone", "Ancient" ],
             "rarity": "Legendary",
             "basePrice": 26
+        },
+        {
+            "id": "Crafting_Resource_Essence_Critical_Chance",
+            "material": {
+                "id": "Material_Essence_Critical_Chance",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "inc", "value": { "min": 0.2, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "CriticalChance", "modifierType": "flat", "value": { "min": 0.03, "max": 0.05 }, "weight": 100, "affix": "Suffix", "scope": "Local" },
+                        { "parameter": "CriticalChance", "modifierType": "inc", "value": { "min": 0.2, "max": 0.35 }, "weight": 100, "affix": "Suffix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Critical" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Accuracy",
+            "material": {
+                "id": "Material_Essence_Accuracy",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 450, "max": 800 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 450, "max": 800 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "Accuracy", "modifierType": "flat", "value": { "min": 450, "max": 800 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Accuracy", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Accuracy" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Damage",
+            "material": {
+                "id": "Material_Essence_Damage",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Weapon": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 250, "max": 400 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Armor": [
+                        { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 250, "max": 400 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "PhysicalDamage", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Damage" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Health",
+            "material": {
+                "id": "Material_Essence_Health",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Health", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Health", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Health" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Armor",
+            "material": {
+                "id": "Material_Essence_Armor",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Armor", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Armor", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Armor" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Evade",
+            "material": {
+                "id": "Material_Essence_Evade",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Evade", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Evade", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Evade" ],
+            "rarity": "Rare",
+            "basePrice": 12
+        },
+        {
+            "id": "Crafting_Resource_Essence_Barrier",
+            "material": {
+                "id": "Material_Essence_Barrier",
+                "categoryId": "Category_Essence",
+                "modifiers": [],
+                "byCategory": {
+                    "Armor": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ],
+                    "Jewellery": [
+                        { "parameter": "Barrier", "modifierType": "flat", "value": { "min": 350, "max": 550 }, "weight": 100, "affix": "Prefix", "scope": "Local" },
+                        { "parameter": "Barrier", "modifierType": "inc", "value": { "min": 0.3, "max": 0.5 }, "weight": 100, "affix": "Prefix" }
+                    ]
+                }
+            },
+            "maxStackSize": 999,
+            "tags": [ "Crafting", "Resource", "Essence", "Barrier" ],
+            "rarity": "Rare",
+            "basePrice": 12
         }
     ]
 }

@@ -44,6 +44,13 @@ namespace Core.Save
                 if (sp.GetService<IRaidService>() is { } raidService)
                     manager.Register(new RaidsSaveParticipant(raidService));
                 manager.Register(new MasterySaveParticipant(sp.GetRequiredService<IMartialArtMastery>()));
+                // Optional: only projects with the crafting module write the crafting-mastery section
+                // (recipe knowledge derives base-recipe availability from this level).
+                if (sp.GetService<Crafting.ICraftingMastery>() is { } craftingMastery)
+                    manager.Register(new CraftingMasterySaveParticipant(craftingMastery));
+                // Optional: only projects with the crafting module write the learned-recipes section.
+                if (sp.GetService<Crafting.IRecipeKnowledge>() is { } recipeKnowledge)
+                    manager.Register(new RecipeKnowledgeSaveParticipant(recipeKnowledge));
                 manager.Register(new EquipmentSaveParticipant(sp.GetRequiredService<IPlayerAccessor>(), sp.GetRequiredService<EquipItemSaveConverter>()));
                 // The bag lives only in projects that have both an inventory and item data (Main);
                 // a sandbox without them simply doesn't write the section.

@@ -60,6 +60,7 @@ namespace Crafting.Source.UIElements
         private ModifierFormatter? _modifierFormatter;
         private IInventory? _inventory;
         private ICraftingMastery? _mastery;
+        private IRecipeKnowledge? _knowledge;
         private IItemUpgrader? _upgrader;
         private IItemAscender? _ascender;
         private ICraftingAdditiveProvider? _additiveProvider;
@@ -93,6 +94,12 @@ namespace Crafting.Source.UIElements
             // The picker lives in the Overlay layer — a window closed by hotkey must not orphan it.
             ClosePicker();
             if (_inventory != null) _inventory.ItemAmountChanges -= OnItemAmountChanged;
+            if (_knowledge != null) _knowledge.RecipeLearned -= OnRecipeLearned;
+            if (_mastery != null)
+            {
+                _mastery.CurrentLevelChange -= OnMasteryLevelChanged;
+                _mastery.BonusLevelChange -= OnMasteryLevelChanged;
+            }
         }
 
         public void InjectServices(IGameServiceProvider provider)
@@ -106,11 +113,24 @@ namespace Crafting.Source.UIElements
             _additiveProvider = provider.GetService<ICraftingAdditiveProvider>();
             _messageBus = provider.GetService<IGameMessageBus>();
             _uiElements = provider.GetService<IUiElementsManager>();
+            _knowledge = provider.GetService<IRecipeKnowledge>();
 
             _inventory.ItemAmountChanges += OnItemAmountChanged;
+            // Knowledge is live: scroll learns and mastery levels both unlock tree entries in place.
+            if (_knowledge != null) _knowledge.RecipeLearned += OnRecipeLearned;
+            if (_mastery != null)
+            {
+                _mastery.CurrentLevelChange += OnMasteryLevelChanged;
+                _mastery.BonusLevelChange += OnMasteryLevelChanged;
+            }
+
             BuildTree();
             RefreshDetails();
         }
+
+        private void OnRecipeLearned(string recipeId) => BuildTree();
+
+        private void OnMasteryLevelChanged(int level) => BuildTree();
 
         public void Close() => QueueFree();
 
@@ -260,7 +280,15 @@ namespace Crafting.Source.UIElements
                     int amount = CraftableAmount(recipe.Id);
                     entry.SetText(0, amount > 0 ? $"{Localization.Localize(recipe.Id)} ({amount})" : Localization.Localize(recipe.Id));
                     entry.SetMetadata(0, recipe.Id);
-                    entry.SetSelectable(0, recipe.IsOpened);
+
+                    // Unknown recipes stay visible but locked — the hint says how to get them.
+                    bool known = _knowledge?.IsKnown(recipe.Id) ?? true;
+                    entry.SetSelectable(0, known);
+                    if (known) continue;
+                    entry.SetCustomColor(0, Color.FromHtml(TextPalette.System));
+                    entry.SetTooltipText(0, recipe.UnlockAtMastery is { } gate
+                        ? Localization.Render("UI_Recipe_Locked_Mastery", new Dictionary<string, object?> { ["Level"] = gate })
+                        : Localization.Localize("UI_Recipe_Locked_Scroll"));
                 }
             }
 
@@ -464,7 +492,7 @@ namespace Crafting.Source.UIElements
             {
                 var familyRows = new List<Control>();
                 var seen = new HashSet<string>();
-                foreach (var descriptor in family)
+                foreach (var descriptor in OrderForDisplay(family))
                 {
                     var row = DescriptorRow(descriptor, tint, splitRows, seen);
                     if (row != null) familyRows.Add(row);
@@ -487,6 +515,35 @@ namespace Crafting.Source.UIElements
             AffixKind.Suffix => 1,
             AffixKind.Mythic => 3,
             _ => 2,
+        };
+
+        /// <summary>Inside a family block the rollable lines group by their stat (shown name), flats
+        /// before increases before multipliers, each run high to low — "+ PhysicalDamage" entries sit
+        /// together from the biggest roll down. Sentence-shaped entries follow in authored order.</summary>
+        private static IEnumerable<Core.Modifiers.IModifierDescriptor> OrderForDisplay(IEnumerable<Core.Modifiers.IModifierDescriptor> family)
+        {
+            var parameters = new List<Core.Modifiers.ParameterDescriptor>();
+            var sentences = new List<Core.Modifiers.IModifierDescriptor>();
+            foreach (var descriptor in family)
+            {
+                if (descriptor is Core.Modifiers.ParameterDescriptor parameter) parameters.Add(parameter);
+                else sentences.Add(descriptor);
+            }
+
+            return parameters
+                .OrderBy(parameter => Localization.Localize(parameter.Parameter.ToString()))
+                .ThenBy(parameter => KindRank(parameter.ValueType))
+                .ThenByDescending(parameter => parameter.Value.Max)
+                .ThenByDescending(parameter => parameter.Value.Min)
+                .Cast<Core.Modifiers.IModifierDescriptor>()
+                .Concat(sentences);
+        }
+
+        private static int KindRank(Core.Enums.ModifierValueType valueType) => valueType switch
+        {
+            Core.Enums.ModifierValueType.Increase => 1,
+            Core.Enums.ModifierValueType.Multiplicative => 2,
+            _ => 0,
         };
 
         private Control? DescriptorRow(Core.Modifiers.IModifierDescriptor descriptor, Color? tint, bool splitRows, HashSet<string> seen)
@@ -700,7 +757,7 @@ namespace Crafting.Source.UIElements
         {
             if (item is IWeaponItem weapon)
             {
-                AddWeaponStatRow(EntityParameter.Damage, weapon);
+                AddWeaponStatRow(EntityParameter.PhysicalDamage, weapon);
                 AddWeaponStatRow(EntityParameter.CriticalChance, weapon);
                 AddWeaponStatRow(EntityParameter.CriticalDamage, weapon);
             }
@@ -765,7 +822,7 @@ namespace Crafting.Source.UIElements
         {
             if (blueprint.Weapon is { } weapon)
             {
-                AddBaseStatRow(EntityParameter.Damage, weapon.Damage);
+                AddBaseStatRow(EntityParameter.PhysicalDamage, weapon.Damage);
                 AddBaseStatRow(EntityParameter.CriticalChance, weapon.CriticalChance);
                 AddBaseStatRow(EntityParameter.CriticalDamage, weapon.CriticalDamage);
             }
@@ -1202,8 +1259,10 @@ namespace Crafting.Source.UIElements
 
             foreach (var descriptor in _dataProvider?.GetResourceDescriptors(id) ?? [])
             {
+                // The tooltip describes the resource in general, across every byCategory section —
+                // an essence authoring identical lines per category must not repeat them here.
                 string text = Localization.Format(descriptor);
-                if (!string.IsNullOrEmpty(text)) lines.Add(text);
+                if (!string.IsNullOrEmpty(text) && !lines.Contains(text)) lines.Add(text);
             }
 
             return string.Join("\n", lines);

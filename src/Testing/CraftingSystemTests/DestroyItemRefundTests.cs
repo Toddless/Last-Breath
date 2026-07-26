@@ -12,15 +12,16 @@ namespace LastBreathTest.CraftingSystemTests
 
     /// <summary>Shattering refunds from BOTH used-resource parts — the recipe's required resources
     /// and the optional additives — scaled by the mastery refund fraction alike. EVERY shattered
-    /// equip additionally yields the dust of its category: flat 1 regardless of rarity, grown only
-    /// by the raw resource-return channel — floor(1 × (1 + bonus)).</summary>
+    /// equip additionally yields the dust of its category AND rarity tier (Common falls into the
+    /// Uncommon tier, Unique into Legendary): flat 1 pile, grown only by the raw resource-return
+    /// channel — floor(1 × (1 + bonus)).</summary>
     [TestClass]
     public class DestroyItemRefundTests
     {
         [TestMethod]
         public async Task Shatter_RefundsRequiredAndOptionalParts_ScaledByMastery_PlusDust()
         {
-            var item = new EquipItem(EquipmentPiece.Ring, "Band", []);
+            var item = new EquipItem(EquipmentPiece.Ring, "Band", []) { Rarity = Rarity.Common };
             item.SaveUsedResources(
                 new Dictionary<string, int> { ["Iron"] = 4 },
                 new Dictionary<string, int> { ["Essence"] = 2 });
@@ -33,7 +34,7 @@ namespace LastBreathTest.CraftingSystemTests
 
             inventory.Verify(mock => mock.TryAddItemStacks("Iron", 2), Times.Once);    // required part, halved
             inventory.Verify(mock => mock.TryAddItemStacks("Essence", 1), Times.Once); // optional part, halved
-            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Jewellery_Dust", 1), Times.Once); // crafted items dust too
+            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Jewellery_Dust_Uncommon", 1), Times.Once); // crafted items dust too; Common shatters into the Uncommon tier
             inventory.Verify(mock => mock.RemoveItemByInstanceId(item.InstanceId), Times.Once);
         }
 
@@ -47,7 +48,7 @@ namespace LastBreathTest.CraftingSystemTests
 
             await Handle(inventory, new Mock<ICraftingMastery>(), item);
 
-            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Jewellery_Dust", 1), Times.Once);
+            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Jewellery_Dust_Legendary", 1), Times.Once); // legendary gear pays legendary dust
             inventory.Verify(mock => mock.TryAddItemStacks(It.IsAny<string>(), It.IsAny<int>()), Times.Once, "Nothing but the dust may come back from loot.");
             inventory.Verify(mock => mock.RemoveItemByInstanceId(item.InstanceId), Times.Once);
         }
@@ -56,14 +57,14 @@ namespace LastBreathTest.CraftingSystemTests
         public async Task Shatter_DustGrowsWithTheRawReturnChannel_Floored()
         {
             // floor(1 × (1 + 1.6)) = 2 — the raw channel bonus, NOT the refund fraction, drives dust.
-            var item = new EquipItem(EquipmentPiece.Weapon, "Loot_Blade", []);
+            var item = new EquipItem(EquipmentPiece.Weapon, "Loot_Blade", []) { Rarity = Rarity.Rare };
             var inventory = InventoryWith(item);
             var mastery = new Mock<ICraftingMastery>();
             mastery.Setup(mock => mock.GetResourceReturnBonus()).Returns(1.6f);
 
             await Handle(inventory, mastery, item);
 
-            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Weapon_Dust", 2), Times.Once);
+            inventory.Verify(mock => mock.TryAddItemStacks("Upgrade_Resource_Weapon_Dust_Rare", 2), Times.Once);
         }
 
         private static Mock<IInventory> InventoryWith(EquipItem item)

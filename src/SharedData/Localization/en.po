@@ -675,14 +675,41 @@ msgstr "Jeweler`s Rune"
 msgid "Upgrade_Resource_Weapon_Rune"
 msgstr "Weapon`s Rune"
 
-msgid "Upgrade_Resource_Armor_Dust"
-msgstr "Armor Dust"
+msgid "Upgrade_Resource_Armor_Dust_Uncommon"
+msgstr "Pulverized Armor"
 
-msgid "Upgrade_Resource_Jewellery_Dust"
-msgstr "Jewellery Dust"
+msgid "Upgrade_Resource_Armor_Dust_Rare"
+msgstr "Pulverized Armor"
 
-msgid "Upgrade_Resource_Weapon_Dust"
-msgstr "Weapon Dust"
+msgid "Upgrade_Resource_Armor_Dust_Epic"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Armor_Dust_Legendary"
+msgstr "Pulverized Armor"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Uncommon"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Rare"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Epic"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Jewellery_Dust_Legendary"
+msgstr "Pulverized Jewellery"
+
+msgid "Upgrade_Resource_Weapon_Dust_Uncommon"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Rare"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Epic"
+msgstr "Pulverized Weapon"
+
+msgid "Upgrade_Resource_Weapon_Dust_Legendary"
+msgstr "Pulverized Weapon"
 
 msgid "Upgrade_Resource_Simple_Flux"
 msgstr "Simple Flux"
@@ -783,7 +810,49 @@ msgid "Crafting_Resource_Silk_Fabric"
 msgstr "Silk"
 
 msgid "Crafting_Resource_Linen_Fabric"
-msgstr "Linen"
+msgstr "Unbleached Linen"
+
+msgid "Crafting_Resource_Coarse_Wool_Fabric"
+msgstr "Coarse Wool"
+
+msgid "Crafting_Resource_Broadcloth_Fabric"
+msgstr "Broadcloth"
+
+msgid "Crafting_Resource_Fine_Linen_Fabric"
+msgstr "Fine Linen"
+
+msgid "Crafting_Resource_Serge_Fabric"
+msgstr "Serge"
+
+msgid "Crafting_Resource_Velvet_Fabric"
+msgstr "Velvet"
+
+msgid "Crafting_Resource_Purple_Fabric"
+msgstr "Purple Cloth"
+
+msgid "Crafting_Resource_Malachite_Gem"
+msgstr "Malachite"
+
+msgid "Crafting_Resource_Lazurite_Gem"
+msgstr "Lapis Lazuli"
+
+msgid "Crafting_Resource_Garnet_Gem"
+msgstr "Garnet"
+
+msgid "Crafting_Resource_Beryl_Gem"
+msgstr "Beryl"
+
+msgid "Crafting_Resource_Alexandrite_Gem"
+msgstr "Alexandrite"
+
+msgid "Crafting_Resource_Taaffeite_Gem"
+msgstr "Taaffeite"
+
+msgid "Crafting_Resource_Direwolf_Claw"
+msgstr "Direwolf Claw"
+
+msgid "Crafting_Resource_Essence_Accuracy"
+msgstr "Essence of Accuracy"
 
 # -----------------------
 # Essences
@@ -1700,6 +1769,21 @@ msgstr "Requirements"
 msgid "UI_Crafting_Recraft"
 msgstr "Reroll"
 
+msgid "UI_Recipe_Learn"
+msgstr "Learn"
+
+msgid "UI_Recipe_Learned"
+msgstr "Recipe learned: {Recipe}"
+
+msgid "UI_Recipe_Already_Known"
+msgstr "{Recipe} is already known"
+
+msgid "UI_Recipe_Locked_Mastery"
+msgstr "Unlocks at crafting mastery {Level}"
+
+msgid "UI_Recipe_Locked_Scroll"
+msgstr "Requires a recipe scroll"
+
 msgid "UI_Craft_AscendWarning"
 msgstr "Ascension is irreversible: the ascended item is sealed and can never be modified again."
 
@@ -2066,8 +2150,17 @@ msgstr "Bleed"
 # Parameters (EntityParameter enum — держать в синхроне)
 # ------------------------------
 
-msgid "Damage"
-msgstr "Damage"
+msgid "PhysicalDamage"
+msgstr "Physical Damage"
+
+msgid "FireDamage"
+msgstr "Fire Damage"
+
+msgid "ColdDamage"
+msgstr "Cold Damage"
+
+msgid "LightningDamage"
+msgstr "Lightning Damage"
 
 msgid "Intelligence"
 msgstr "Intelligence"
@@ -2926,7 +3019,7 @@ msgid "Passive_Skill_Resonance_Description"
 msgstr "Every ability used this turn grants {SpellDamagePerStack:%} spell damage and {MulticastPerStack:%} multicast chance until the end of the turn."
 
 msgid "Passive_Skill_Mana_Resonance"
-msgstr "Mana Resonance"
+msgstr "Mana Resonance"ы
 
 msgid "Passive_Skill_Mana_Resonance_Description"
 msgstr "Abilities deal extra damage equal to a {Rate:%} of the mana spent this turn."
@@ -3156,12 +3249,6 @@ msgstr "Adamantite Ore"
 
 msgid "Crafting_Resource_Sapphire_Gem"
 msgstr "Sapphire"
-
-msgid "Crafting_Resource_Amethyst_Gem"
-msgstr "Amethyst"
-
-msgid "Crafting_Resource_Topaz_Gem"
-msgstr "Topaz"
 
 msgid "Crafting_Resource_Pine_Wood"
 msgstr "Pine Wood"

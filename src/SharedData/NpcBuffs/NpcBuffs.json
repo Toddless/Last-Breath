@@ -9,7 +9,7 @@
         {
             "id": "Npc_Buff_Double_Damage",
             "modifiers": [
-                { "parameter": "Damage", "type": "Increase", "value": 1.0 },
+                { "parameter": "PhysicalDamage", "type": "Increase", "value": 1.0 },
                 { "parameter": "SpellDamage", "type": "Increase", "value": 1.0 }
             ]
         },

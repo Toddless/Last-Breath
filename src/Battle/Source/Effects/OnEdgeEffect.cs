@@ -29,7 +29,7 @@ namespace Battle.Source.Effects
             if (Target != null)
             {
                 Target.CurrentHealthChanged -= OnHealthChanged;
-                Target.Parameters.RemoveModuleDecorator(DecoratorId, EntityParameter.Damage);
+                Target.Parameters.RemoveModuleDecorator(DecoratorId, EntityParameter.PhysicalDamage);
             }
 
             base.Remove();
@@ -42,14 +42,14 @@ namespace Battle.Source.Effects
         private void RebuildDecorator(float currentHealth)
         {
             if (Target == null) return;
-            Target.Parameters.RemoveModuleDecorator(DecoratorId, EntityParameter.Damage);
+            Target.Parameters.RemoveModuleDecorator(DecoratorId, EntityParameter.PhysicalDamage);
 
             float percentLost = 1 - (currentHealth / Target.Parameters.MaxHealth);
             int steps = (int)MathF.Floor(percentLost * 100);
             if (steps <= 0) return;
 
             Target.Parameters.AddModuleDecorator(new EntityParameterDecorator(
-                DecoratorId, 1 + (steps * bonusPerPercent), OperationType.Multiply, EntityParameter.Damage, Priority.Weak));
+                DecoratorId, 1 + (steps * bonusPerPercent), OperationType.Multiply, EntityParameter.PhysicalDamage, Priority.Weak));
         }
     }
 }

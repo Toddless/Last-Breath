@@ -2103,7 +2103,7 @@
                     "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "flat",
                     "value": { "min": 80, "max": 150 },
                     "weight": 50,
@@ -2111,7 +2111,7 @@
                     "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": { "min": 0.15, "max": 0.35 },
                     "weight": 15,
@@ -3752,7 +3752,7 @@
             "id": "Weapon",
             "modifiersPool": [
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "flat",
                     "value": { "min": 80, "max": 220 },
                     "weight": 50,
@@ -3760,7 +3760,7 @@
                     "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "inc",
                     "value": { "min": 0.25, "max": 0.65 },
                     "weight": 100,
@@ -3768,7 +3768,7 @@
                     "affix": "Prefix"
                 },
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": { "min": 0.15, "max": 0.45 },
                     "weight": 15,

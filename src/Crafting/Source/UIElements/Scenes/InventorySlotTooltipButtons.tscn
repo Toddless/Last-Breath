@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://csshnkve8sglv" path="res://Addons/Crafting/UIElements/InventorySlotTooltipButtons.cs" id="1_3hkcc"]
 
-[node name="InventorySlotTooltipButtons" type="MarginContainer" unique_id=531659697 node_paths=PackedStringArray("_equip", "_update", "_recraft", "_ascend", "_destroy", "_favorite")]
+[node name="InventorySlotTooltipButtons" type="MarginContainer" unique_id=531659697 node_paths=PackedStringArray("_equip", "_update", "_recraft", "_ascend", "_destroy", "_favorite", "_use")]
 offset_right = 398.0
 offset_bottom = 69.0
 script = ExtResource("1_3hkcc")
@@ -12,6 +12,7 @@ _recraft = NodePath("GridContainer/Recraft")
 _ascend = NodePath("GridContainer/Ascend")
 _destroy = NodePath("GridContainer/Destroy")
 _favorite = NodePath("GridContainer/Favorite")
+_use = NodePath("GridContainer/Use")
 
 [node name="GridContainer" type="GridContainer" parent="." unique_id=1420976068]
 layout_mode = 2
@@ -48,3 +49,9 @@ text = "Favorite"
 layout_mode = 2
 focus_mode = 0
 text = "Destroy"
+
+[node name="Use" type="Button" parent="GridContainer" unique_id=1712834056]
+layout_mode = 2
+focus_mode = 0
+visible = false
+text = "Use"

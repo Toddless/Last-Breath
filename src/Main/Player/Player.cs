@@ -638,7 +638,7 @@ namespace LastBreath.Player
             EntityParameter.AdditionalHitChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 0f,
-            EntityParameter.Damage => 100,
+            EntityParameter.PhysicalDamage => 100,
             EntityParameter.SpellDamage => 50,
             EntityParameter.MoveSpeed => 500,
             _ => 0f
@@ -649,7 +649,7 @@ namespace LastBreath.Player
         {
             if (piece != EquipmentPiece.Weapon) return;
             var weapon = Equipment.Weapon;
-            Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
+            Parameters.SetBaseValueForParameter(EntityParameter.PhysicalDamage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.PhysicalDamage));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));
         }

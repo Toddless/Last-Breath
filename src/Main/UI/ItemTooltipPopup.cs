@@ -101,16 +101,19 @@ namespace LastBreath.UI
             if (IsPinned) AttachCraftButtons();
         }
 
-        /// <summary>Pinned state grows the craft action row (upgrade/recraft/ascend/destroy) for bag
-        /// items — the popup ignores the mouse while it follows the cursor, so the filters open up
-        /// only here. Equipped items resolve through the bag inventory as null → no buttons (unequip
-        /// first, by design). The row dies with the popup; its actions close the tooltip themselves.</summary>
+        /// <summary>Pinned state grows the craft action row (upgrade/recraft/ascend/destroy for
+        /// equips, the use button for anything an IItemUseBehavior claims) for bag items — the
+        /// popup ignores the mouse while it follows the cursor, so the filters open up only here.
+        /// Equipped items resolve through the bag inventory as null → no buttons (unequip first,
+        /// by design). The row dies with the popup; its actions close the tooltip themselves.</summary>
         private void AttachCraftButtons()
         {
             if (_craftButtons != null || _item == null || _panel == null) return;
 
             var services = GameServiceProvider.Instance;
-            if (services.GetService<IInventory>()?.GetItem<IEquipItem>(_item.InstanceId) == null) return;
+            var bagItem = services.GetService<IInventory>()?.GetItem<IItem>(_item.InstanceId);
+            if (bagItem == null) return;
+            if (bagItem is not IEquipItem && services.GetService<Core.Items.Use.IItemUseService>()?.BehaviorFor(bagItem) == null) return;
 
             _craftButtons = InventorySlotTooltipButtons.Initialize().Instantiate<InventorySlotTooltipButtons>();
             _craftButtons.InjectServices(services);
@@ -198,7 +201,7 @@ namespace LastBreath.UI
             _baseStats?.Visible = weapon != null;
             if (weapon == null) return;
 
-            AddBaseStatRow(EntityParameter.Damage, weapon);
+            AddBaseStatRow(EntityParameter.PhysicalDamage, weapon);
             AddBaseStatRow(EntityParameter.CriticalChance, weapon);
             AddBaseStatRow(EntityParameter.CriticalDamage, weapon);
         }

@@ -594,14 +594,14 @@
                     }
                 },
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "flat",
                     "value": 500
                 }
             ],
             "modifiers": [
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": {
                         "min": 0.25,

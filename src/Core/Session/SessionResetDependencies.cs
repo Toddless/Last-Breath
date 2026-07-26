@@ -36,6 +36,7 @@ namespace Core.Session
                 Add<IInfluenceMastery>();
                 Add<IMartialArtMastery>();
                 Add<ICraftingMastery>();
+                Add<IRecipeKnowledge>(); // scroll-learned recipes are per-playthrough
                 Add<IInventory>();
                 Add<IWalletService>(); // gold must not leak between playthroughs
                 Add<ITraderService>(); // shelves and restock timers are per-playthrough

@@ -96,6 +96,12 @@ namespace Crafting.Source
 
         public void RemoveBonusLevel() => BonusLevel--;
 
+        public void RestoreState(int baseLevel, int experience)
+        {
+            CurrentLevel = Mathf.Clamp(baseLevel, 0, MaximumLevel);
+            CurrentExperience = Mathf.Max(0, experience);
+        }
+
         /// <summary>Back to the fresh-process values (this mastery starts at base level 0); bonus levels zero with the lost equipment.</summary>
         public void ResetSession()
         {

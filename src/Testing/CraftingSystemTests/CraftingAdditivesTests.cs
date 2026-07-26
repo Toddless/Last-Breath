@@ -107,7 +107,8 @@ namespace LastBreathTest.CraftingSystemTests
             inventory.Setup(mock => mock.GetTotalItemAmount(It.IsAny<string>())).Returns(99);
             var handler = new CreateEquipItemRequestHandler(
                 creation.Object, Mock.Of<IGameMessageBus>(), provider.Object, Mock.Of<ICraftingMastery>(),
-                new CraftingResources(inventory.Object), s_additives, inventory.Object);
+                new CraftingResources(inventory.Object), s_additives, inventory.Object,
+                Mock.Of<Core.Crafting.IRecipeKnowledge>(knowledge => knowledge.IsKnown(It.IsAny<string>()) == true));
 
             await handler.HandleRequest(new CreateEquipItemRequest("Recipe_Test",
                 RequiredResources: [],
@@ -133,7 +134,8 @@ namespace LastBreathTest.CraftingSystemTests
             inventory.Setup(mock => mock.GetTotalItemAmount(It.IsAny<string>())).Returns(99);
             var handler = new CreateEquipItemRequestHandler(
                 creation.Object, Mock.Of<IGameMessageBus>(), provider.Object, Mock.Of<ICraftingMastery>(),
-                new CraftingResources(inventory.Object), s_additives, inventory.Object);
+                new CraftingResources(inventory.Object), s_additives, inventory.Object,
+                Mock.Of<Core.Crafting.IRecipeKnowledge>(knowledge => knowledge.IsKnown(It.IsAny<string>()) == true));
 
             // A flux in the optional slot is a legal (if pointless) choice — it must not fabricate a floor.
             await handler.HandleRequest(new CreateEquipItemRequest("Recipe_Test",

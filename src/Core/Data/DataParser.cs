@@ -164,7 +164,8 @@ namespace Core.Data
                     EnumParser.ParseEnum<Rarity>(recipeData.Rarity),
                     requirements,
                     EnumParser.ParseEnum<ItemType>(recipeData.ItemType),
-                    recipeData.IsOpened,
+                    recipeData.UnlockAtMastery,
+                    recipeData.BasePrice,
                     recipeData.OptionalResourceCategories);
 
                 return (IItem)recipe;

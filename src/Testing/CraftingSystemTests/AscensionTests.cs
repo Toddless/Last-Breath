@@ -237,7 +237,7 @@ namespace LastBreathTest.CraftingSystemTests
                 Assert.IsTrue(result.Succeeded);
                 Assert.IsTrue(result.GiftedModifierIds.Count > 0, $"seed {seed}: chance 1 must always gift.");
                 foreach (string giftId in result.GiftedModifierIds)
-                    Assert.AreEqual(EntityParameter.Damage, weapon.Modifiers.First(modifier => modifier.InstanceId == giftId).EntityParameter,
+                    Assert.AreEqual(EntityParameter.PhysicalDamage, weapon.Modifiers.First(modifier => modifier.InstanceId == giftId).EntityParameter,
                         $"seed {seed}: a weapon drew a line from a foreign category pool.");
             }
 
@@ -396,7 +396,7 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         private static ParameterDescriptor DamagePoolEntry() =>
-            new(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix };
+            new(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix };
 
         private static EquipItem MaxedLegendary(EquipmentPiece piece = EquipmentPiece.Helmet)
         {

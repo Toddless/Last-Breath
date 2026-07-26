@@ -9,7 +9,8 @@ namespace Core.Data.CraftingData
         [JsonProperty("resultItemId")] public string ResultItemId { get; init; } = string.Empty;
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];
         [JsonProperty("rarity")] public string Rarity { get; init; } = string.Empty;
-        [JsonProperty("isOpened")] public bool IsOpened { get; init; }
+        [JsonProperty("unlockAtMastery")] public int? UnlockAtMastery { get; init; }
+        [JsonProperty("basePrice")] public int BasePrice { get; init; }
         [JsonProperty("itemType")] public string ItemType { get; init; } = string.Empty;
         [JsonProperty("requirements")] public List<RecipeRequirementsData> Requirements { get; init; } = [];
         [JsonProperty("optionalResourceCategories")] public string[] OptionalResourceCategories { get; init; } = [];

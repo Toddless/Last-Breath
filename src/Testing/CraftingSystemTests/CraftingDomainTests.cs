@@ -111,7 +111,7 @@ namespace LastBreathTest.CraftingSystemTests
             int linesBefore = item.Modifiers.Count;
             var ascender = CreateAscender(
             [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix },
             ]);
 
             var result = ascender.TryAscendItem(item);
@@ -125,7 +125,7 @@ namespace LastBreathTest.CraftingSystemTests
             // rolled the gift after the seal, so Add* silently dropped it.
             var gift = item.Modifiers.FirstOrDefault(modifier => modifier.InstanceId == result.GiftedModifierIds[0]);
             Assert.IsNotNull(gift);
-            Assert.AreEqual(EntityParameter.Damage, gift.EntityParameter);
+            Assert.AreEqual(EntityParameter.PhysicalDamage, gift.EntityParameter);
             Assert.AreEqual(0.4f, gift.BaseValue, 0.001f);
         }
 
@@ -165,7 +165,7 @@ namespace LastBreathTest.CraftingSystemTests
         {
             // The prefix candidate carries an overwhelming weight: if the affix filter broke,
             // it would win virtually every seed.
-            var prefixBait = new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix };
+            var prefixBait = new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix };
             var suffixHome = new ParameterDescriptor(EntityParameter.Strength, ModifierValueType.Flat, 10f, ModifierScope.Global) { Weight = 1f, Affix = AffixKind.Suffix };
             for (int seed = 0; seed < 20; seed++)
             {
@@ -189,7 +189,7 @@ namespace LastBreathTest.CraftingSystemTests
             var entry = new ContextModifierEntry(ContextParameter.HealingEfficiency, ModifierValueType.Increase, 0.2f) { Affix = AffixKind.Suffix };
             item.AddAdditionalContextModifier(entry);
             var provider = PoolProvider("Band",
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
                 new ContextDescriptor(ContextParameter.HealingEfficiency, ModifierValueType.Increase, 0.35f) { Weight = 1f, Affix = AffixKind.Suffix });
 
             string? rerolledId = CreateRecraftUpgrader(seed: 42, provider).TryRecraftModifier(item, entry.InstanceId);
@@ -208,7 +208,7 @@ namespace LastBreathTest.CraftingSystemTests
             var line = new SimpleModifier(EntityParameter.Intelligence, ModifierValueType.Flat, 5f, "test") { Affix = AffixKind.Suffix };
             item.AddAdditionalModifier(line);
             var provider = PoolProvider("Band",
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
 
             string? rerolledId = CreateRecraftUpgrader(seed: 42, provider).TryRecraftModifier(item, line.InstanceId);
 
@@ -226,7 +226,7 @@ namespace LastBreathTest.CraftingSystemTests
             var line = new SimpleModifier(EntityParameter.Intelligence, ModifierValueType.Flat, 5f, "test"); // Affix defaults to None
             item.AddAdditionalModifier(line);
             var provider = PoolProvider("Band",
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
 
             string? rerolledId = CreateRecraftUpgrader(seed: 42, provider).TryRecraftModifier(item, line.InstanceId);
 
@@ -248,7 +248,7 @@ namespace LastBreathTest.CraftingSystemTests
             item.AddAdditionalModifier(partB);
             item.AddAdditionalModifier(keeper);
             var provider = PoolProvider("Band",
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix });
 
             string? rerolledId = CreateRecraftUpgrader(seed: 42, provider).TryRecraftModifier(item, partA.InstanceId);
 
@@ -257,7 +257,7 @@ namespace LastBreathTest.CraftingSystemTests
             Assert.IsFalse(item.Modifiers.Any(modifier => modifier.InstanceId == partA.InstanceId || modifier.InstanceId == partB.InstanceId),
                 "Every part of the group must leave the item.");
             Assert.IsTrue(item.Modifiers.Any(modifier => modifier.InstanceId == keeper.InstanceId), "Lines outside the group must survive.");
-            Assert.AreEqual(EntityParameter.Damage, item.Modifiers.Single(modifier => modifier.InstanceId == rerolledId).EntityParameter);
+            Assert.AreEqual(EntityParameter.PhysicalDamage, item.Modifiers.Single(modifier => modifier.InstanceId == rerolledId).EntityParameter);
         }
 
         [TestMethod]
@@ -269,7 +269,7 @@ namespace LastBreathTest.CraftingSystemTests
             item.AddAdditionalModifier(entityPart);
             item.AddAdditionalContextModifier(contextPart);
             var provider = PoolProvider("Band",
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Suffix });
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Suffix });
 
             string? rerolledId = CreateRecraftUpgrader(seed: 7, provider).TryRecraftModifier(item, entityPart.InstanceId);
 
@@ -291,7 +291,7 @@ namespace LastBreathTest.CraftingSystemTests
                 provider.Setup(mock => mock.GetEquipItemModifierPool("Mythic_Armor")).Returns(
                 [
                     new ParameterDescriptor(EntityParameter.CriticalChance, ModifierValueType.Flat, 0.1f, ModifierScope.Global) { Weight = 1f, Affix = AffixKind.Mythic },
-                    new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Mythic },
+                    new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Mythic },
                 ]);
                 var ascender = new ItemAscender(rnd, provider.Object, new ModifierMaterializer(rnd), UnlockedMastery());
 
@@ -299,7 +299,7 @@ namespace LastBreathTest.CraftingSystemTests
 
                 Assert.IsTrue(result.Succeeded);
                 var gift = (SimpleModifier)item.Modifiers.Single(modifier => modifier.InstanceId == result.GiftedModifierIds.Single());
-                Assert.AreEqual(EntityParameter.Damage, gift.EntityParameter, $"seed {seed}: weight must decide the gift.");
+                Assert.AreEqual(EntityParameter.PhysicalDamage, gift.EntityParameter, $"seed {seed}: weight must decide the gift.");
                 Assert.AreEqual(AffixKind.Mythic, gift.Affix, $"seed {seed}: the gift wears the mythic slot's family.");
             }
         }
@@ -314,7 +314,7 @@ namespace LastBreathTest.CraftingSystemTests
             var provider = new Mock<IItemDataProvider>();
             provider.Setup(mock => mock.GetEquipItemModifierPool("Mythic_Armor")).Returns(
             [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0.4f, ModifierScope.Global) { Weight = 100f, Affix = AffixKind.Prefix },
             ]);
             var ascender = new ItemAscender(rnd, provider.Object, new ModifierMaterializer(rnd), UnlockedMastery());
 

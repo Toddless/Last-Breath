@@ -58,7 +58,7 @@ namespace Core.Data.NpcData
             EntityParameter.Health,
             EntityParameter.Barrier,
             EntityParameter.Mana,
-            EntityParameter.Damage,
+            EntityParameter.PhysicalDamage,
             EntityParameter.SpellDamage,
             EntityParameter.Armor,
             EntityParameter.Accuracy,

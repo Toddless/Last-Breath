@@ -9,8 +9,17 @@ msgstr ""
 # ------------------------------
 
 #. Player damage stat
-msgid "Damage"
+msgid "PhysicalDamage"
 msgstr "Урон"
+
+msgid "FireDamage"
+msgstr "Урон огнём"
+
+msgid "ColdDamage"
+msgstr "Урон холодом"
+
+msgid "LightningDamage"
+msgstr "Урон молнией"
 
 #. Player health stat
 msgid "Health"
@@ -285,6 +294,48 @@ msgstr ""
 msgid "Crafting_Resource_Linen_Fabric"
 msgstr ""
 
+msgid "Crafting_Resource_Coarse_Wool_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Broadcloth_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Fine_Linen_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Serge_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Velvet_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Purple_Fabric"
+msgstr ""
+
+msgid "Crafting_Resource_Malachite_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Lazurite_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Garnet_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Beryl_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Alexandrite_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Taaffeite_Gem"
+msgstr ""
+
+msgid "Crafting_Resource_Direwolf_Claw"
+msgstr ""
+
+msgid "Crafting_Resource_Essence_Accuracy"
+msgstr ""
+
 msgid "Crafting_Resource_Ruby_Gem"
 msgstr ""
 
@@ -542,6 +593,21 @@ msgid "UI_Crafting_Upgrade"
 msgstr ""
 
 msgid "UI_Crafting_Recraft"
+msgstr ""
+
+msgid "UI_Recipe_Learn"
+msgstr ""
+
+msgid "UI_Recipe_Learned"
+msgstr ""
+
+msgid "UI_Recipe_Already_Known"
+msgstr ""
+
+msgid "UI_Recipe_Locked_Mastery"
+msgstr ""
+
+msgid "UI_Recipe_Locked_Scroll"
 msgstr ""
 
 msgid "UI_Crafting_Ascend"
@@ -889,7 +955,16 @@ msgstr ""
 msgid "Upgrade_Resource_Apprentice_Rune_Description"
 msgstr ""
 
-msgid "Upgrade_Resource_Armor_Dust"
+msgid "Upgrade_Resource_Armor_Dust_Uncommon"
+msgstr ""
+
+msgid "Upgrade_Resource_Armor_Dust_Rare"
+msgstr ""
+
+msgid "Upgrade_Resource_Armor_Dust_Epic"
+msgstr ""
+
+msgid "Upgrade_Resource_Armor_Dust_Legendary"
 msgstr ""
 
 msgid "Upgrade_Resource_Blacksmith_Rune"
@@ -928,7 +1003,16 @@ msgstr ""
 msgid "Upgrade_Resource_Jeweler_Rune"
 msgstr ""
 
-msgid "Upgrade_Resource_Jewellery_Dust"
+msgid "Upgrade_Resource_Jewellery_Dust_Uncommon"
+msgstr ""
+
+msgid "Upgrade_Resource_Jewellery_Dust_Rare"
+msgstr ""
+
+msgid "Upgrade_Resource_Jewellery_Dust_Epic"
+msgstr ""
+
+msgid "Upgrade_Resource_Jewellery_Dust_Legendary"
 msgstr ""
 
 msgid "Upgrade_Resource_Journeyman_Rune"
@@ -961,7 +1045,16 @@ msgstr ""
 msgid "Upgrade_Resource_Simple_Flux_Description"
 msgstr ""
 
-msgid "Upgrade_Resource_Weapon_Dust"
+msgid "Upgrade_Resource_Weapon_Dust_Uncommon"
+msgstr ""
+
+msgid "Upgrade_Resource_Weapon_Dust_Rare"
+msgstr ""
+
+msgid "Upgrade_Resource_Weapon_Dust_Epic"
+msgstr ""
+
+msgid "Upgrade_Resource_Weapon_Dust_Legendary"
 msgstr ""
 
 msgid "Upgrade_Resource_Weapon_Rune"
@@ -2282,12 +2375,6 @@ msgid "Crafting_Resource_Adamantite_Ore"
 msgstr ""
 
 msgid "Crafting_Resource_Sapphire_Gem"
-msgstr ""
-
-msgid "Crafting_Resource_Amethyst_Gem"
-msgstr ""
-
-msgid "Crafting_Resource_Topaz_Gem"
 msgstr ""
 
 msgid "Crafting_Resource_Pine_Wood"

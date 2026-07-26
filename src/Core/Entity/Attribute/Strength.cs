@@ -27,7 +27,7 @@
 
         private static IEnumerable<IModifier> GetEffects()
         {
-            yield return new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 5f);
+            yield return new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 5f);
 
             yield return new Modifier(ModifierValueType.Flat, EntityParameter.Armor, 50f);
 

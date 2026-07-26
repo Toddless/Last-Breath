@@ -10,7 +10,7 @@
 				"Equipment"
 			],
 			"rarity": "Rare",
-			"isOpened": false,
+			"basePrice": 90,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -48,7 +48,7 @@
 				"Equipment"
 			],
 			"rarity": "Rare",
-			"isOpened": false,
+			"basePrice": 90,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -87,7 +87,8 @@
 				"Generic"
 			],
 			"rarity": "Rare",
-			"isOpened": true,
+			"unlockAtMastery": 8,
+			"basePrice": 45,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -116,7 +117,7 @@
 				"Generic"
 			],
 			"rarity": "Rare",
-			"isOpened": true,
+			"basePrice": 90,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -139,7 +140,8 @@
 				"Equipment"
 			],
 			"rarity": "Uncommon",
-			"isOpened": true,
+			"unlockAtMastery": 0,
+			"basePrice": 30,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -162,7 +164,8 @@
 				"Equipment"
 			],
 			"rarity": "Uncommon",
-			"isOpened": true,
+			"unlockAtMastery": 0,
+			"basePrice": 30,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -185,7 +188,8 @@
 				"Equipment"
 			],
 			"rarity": "Uncommon",
-			"isOpened": true,
+			"unlockAtMastery": 0,
+			"basePrice": 30,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -208,7 +212,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 2,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -236,7 +241,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 4,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -264,7 +270,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 6,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -292,7 +299,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 2,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -320,7 +328,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 4,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -348,7 +357,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 6,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -376,7 +386,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 2,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -404,7 +415,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 4,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -432,7 +444,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 6,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -460,7 +473,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 2,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -488,7 +502,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 4,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{
@@ -516,7 +531,8 @@
 				"Equipment"
 			],
 			"rarity": "Epic",
-			"isOpened": true,
+			"unlockAtMastery": 6,
+			"basePrice": 60,
 			"itemType": "Equipment",
 			"requirements": [
 				{

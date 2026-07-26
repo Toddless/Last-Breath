@@ -82,7 +82,7 @@ namespace LastBreathTest.CraftingSystemTests
             // Resources offer ONLY prefixes; the result item's family and own pools offer ONLY suffixes.
             // A Rare roll (1 prefix + 1 suffix) can fill its suffix slot from the data pools alone —
             // proof the creation roll unions all three sources, not just the used resources.
-            List<IModifierDescriptor> resourcePool = [Entry(EntityParameter.Damage, 100f, AffixKind.Prefix)];
+            List<IModifierDescriptor> resourcePool = [Entry(EntityParameter.PhysicalDamage, 100f, AffixKind.Prefix)];
             var familyEntry = Entry(EntityParameter.Strength, 10f, AffixKind.Suffix);
             var itemPoolEntry = Entry(EntityParameter.Accuracy, 30f, AffixKind.Suffix);
 
@@ -94,7 +94,7 @@ namespace LastBreathTest.CraftingSystemTests
                     .CreateItemByRecipe("Recipe_Test", resourcePool);
 
                 var lines = item.Modifiers.OfType<SimpleModifier>().ToList();
-                Assert.AreEqual(EntityParameter.Damage, lines.Single(line => line.Affix == AffixKind.Prefix).EntityParameter);
+                Assert.AreEqual(EntityParameter.PhysicalDamage, lines.Single(line => line.Affix == AffixKind.Prefix).EntityParameter);
                 suffixes.Add(lines.Single(line => line.Affix == AffixKind.Suffix).EntityParameter);
             }
 
@@ -172,7 +172,7 @@ namespace LastBreathTest.CraftingSystemTests
 
         private static List<IModifierDescriptor> RichResourcePool() =>
         [
-            Entry(EntityParameter.Damage, 100f, AffixKind.Prefix),
+            Entry(EntityParameter.PhysicalDamage, 100f, AffixKind.Prefix),
             Entry(EntityParameter.Health, 50f, AffixKind.Prefix),
             Entry(EntityParameter.Armor, 40f, AffixKind.Prefix),
             Entry(EntityParameter.Strength, 10f, AffixKind.Suffix),

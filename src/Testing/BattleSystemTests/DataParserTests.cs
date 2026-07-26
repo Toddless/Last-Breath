@@ -174,7 +174,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             var descriptors = ParseMaterialDescriptors("""
                 { "parameter": "Health", "modifierType": "flat", "value": 100, "weight": 10, "affix": "Prefix" },
-                { "parameter": "Damage", "modifierType": "flat", "value": { "min": 10, "max": 20 }, "weight": 10, "affix": "Prefix" }
+                { "parameter": "PhysicalDamage", "modifierType": "flat", "value": { "min": 10, "max": 20 }, "weight": 10, "affix": "Prefix" }
             """);
 
             Assert.AreEqual(2, descriptors.Count);

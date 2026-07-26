@@ -6,6 +6,7 @@ namespace Crafting.Source.UIElements
     using Core.Enums;
     using Core.Inventory;
     using Core.Items;
+    using Core.Items.Use;
     using Core.Localization;
     using Core.MessageBus;
     using Core.MessageBus.Messages;
@@ -15,9 +16,10 @@ namespace Crafting.Source.UIElements
     public partial class InventorySlotTooltipButtons : Control, IInitializable, IRequireServices
     {
         private const string UID = "uid://dor0kden4oc1j";
-        [Export] private Button? _equip, _update, _recraft, _ascend, _destroy, _favorite;
+        [Export] private Button? _equip, _update, _recraft, _ascend, _destroy, _favorite, _use;
         private IGameMessageBus? _mediator;
         private IInventory? _inventory;
+        private IItemUseService? _useService;
         private string _itemInstance = string.Empty;
 
         public event Action? Close;
@@ -30,6 +32,7 @@ namespace Crafting.Source.UIElements
             _ascend?.Pressed += () => OpenCrafting(CraftingMode.Ascend);
             _destroy?.Pressed += OnDestroyPressed;
             _favorite?.Pressed += OnFavoritePressed;
+            _use?.Pressed += OnUsePressed;
 
             _update?.Text = Localization.Localize("UI_Crafting_Upgrade");
             _recraft?.Text = Localization.Localize("UI_Crafting_Recraft");
@@ -46,6 +49,7 @@ namespace Crafting.Source.UIElements
         {
             _mediator = provider.GetService<IGameMessageBus>();
             _inventory = provider.GetService<IInventory>();
+            _useService = provider.GetService<IItemUseService>();
             RefreshCraftButtons();
         }
 
@@ -59,15 +63,31 @@ namespace Crafting.Source.UIElements
 
         /// <summary>The tooltip mirrors only the obvious (EquipItemCraftActions): recraft on any
         /// unsealed equip, ascend on legendaries — the deep CanAscend check stays with the window.
-        /// Runs on both entry points because the id and the services arrive in either order.</summary>
+        /// A usable item (recipe scroll, future consumables) swaps the craft row for its use
+        /// button — caption and enabled-state come from the behavior, whose Use stays the real
+        /// gate. Runs on both entry points because the id and the services arrive in either order.</summary>
         private void RefreshCraftButtons()
         {
-            var item = _inventory?.GetItem<IEquipItem>(_itemInstance);
-            if (item == null) return; // no verdict without the item — leave the scene defaults
+            _use?.Visible = false;
+            if (_inventory?.GetItem<IEquipItem>(_itemInstance) is { } item)
+            {
+                _update?.Visible = EquipItemCraftActions.CanShowUpgrade(item);
+                _recraft?.Visible = EquipItemCraftActions.CanShowRecraft(item);
+                _ascend?.Visible = EquipItemCraftActions.CanShowAscend(item);
+                return;
+            }
 
-            _update?.Visible = EquipItemCraftActions.CanShowUpgrade(item);
-            _recraft?.Visible = EquipItemCraftActions.CanShowRecraft(item);
-            _ascend?.Visible = EquipItemCraftActions.CanShowAscend(item);
+            if (_inventory?.GetItem<IItem>(_itemInstance) is not { } usable
+                || _useService?.BehaviorFor(usable) is not { } behavior) return; // leave the scene defaults
+
+            _equip?.Visible = false;
+            _update?.Visible = false;
+            _recraft?.Visible = false;
+            _ascend?.Visible = false;
+            _favorite?.Visible = false;
+            _use?.Visible = true;
+            _use?.Text = Localization.Localize(behavior.LabelKey);
+            _use?.Disabled = !behavior.CanUse(usable);
         }
 
         private void OpenCrafting(CraftingMode mode)
@@ -83,6 +103,12 @@ namespace Crafting.Source.UIElements
         private void OnDestroyPressed()
         {
             _mediator?.PublishMessageAsync(new DestroyItemMessage(_itemInstance));
+            Close?.Invoke();
+        }
+
+        private void OnUsePressed()
+        {
+            _mediator?.PublishMessageAsync(new UseItemMessage(_itemInstance));
             Close?.Invoke();
         }
 

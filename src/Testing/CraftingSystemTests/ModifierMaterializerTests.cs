@@ -18,7 +18,7 @@ namespace LastBreathTest.CraftingSystemTests
         public void Materialize_RangedValue_RollsWithinBounds()
         {
             var range = new ValueRange(10f, 20f);
-            var descriptor = new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, range, ModifierScope.Global);
+            var descriptor = new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, range, ModifierScope.Global);
             var sink = new CollectingSink();
 
             new ModifierMaterializer(new DefaultRandomNumberGenerator(seed: 123)).Materialize(descriptor, sink, "test");
@@ -130,7 +130,7 @@ namespace LastBreathTest.CraftingSystemTests
         [TestMethod]
         public void Scale_Range_ScalesBothBounds()
         {
-            var descriptor = new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global);
+            var descriptor = new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global);
 
             var scaled = (ParameterDescriptor)DescriptorOperations.Scale(descriptor, 1.5f);
 

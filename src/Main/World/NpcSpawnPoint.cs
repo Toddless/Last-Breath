@@ -176,6 +176,7 @@ namespace LastBreath.World
 
             try
             {
+                ArgumentNullException.ThrowIfNull(_gameServiceProvider);
                 string npcId = _npcIds[_rnd.RandiRange(0, _npcIds.Length - 1)];
                 var definition = _provider!.CreateDefinition(npcId);
 

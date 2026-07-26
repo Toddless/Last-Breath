@@ -27,7 +27,7 @@ namespace Battle.Source
         private const string RageModifierSource = "BossRage";
 
         private static readonly EntityParameter[] s_rageParameters =
-            [EntityParameter.Damage, EntityParameter.CriticalChance, EntityParameter.AdditionalHitChance];
+            [EntityParameter.PhysicalDamage, EntityParameter.CriticalChance, EntityParameter.AdditionalHitChance];
 
         private readonly IRandomNumberGenerator _rnd;
         private readonly Func<bool> _isBattleActive;

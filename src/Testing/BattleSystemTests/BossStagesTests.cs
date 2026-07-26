@@ -224,7 +224,7 @@ namespace LastBreathTest.BattleSystemTests
             harness.TakeDamage();
             harness.TakeDamage();
 
-            Assert.AreEqual(1, harness.ParameterModifiers.GetModifiers(EntityParameter.Damage).Count);
+            Assert.AreEqual(1, harness.ParameterModifiers.GetModifiers(EntityParameter.PhysicalDamage).Count);
             Assert.AreEqual(1, harness.ParameterModifiers.GetModifiers(EntityParameter.CriticalChance).Count);
             Assert.AreEqual(1, harness.ParameterModifiers.GetModifiers(EntityParameter.AdditionalHitChance).Count);
         }
@@ -237,7 +237,7 @@ namespace LastBreathTest.BattleSystemTests
             harness.Health = 250f;
             harness.TakeDamage(); // arms the transition, but stage 1 has no rage
 
-            Assert.AreEqual(0, harness.ParameterModifiers.GetModifiers(EntityParameter.Damage).Count);
+            Assert.AreEqual(0, harness.ParameterModifiers.GetModifiers(EntityParameter.PhysicalDamage).Count);
         }
 
         [TestMethod]
@@ -250,7 +250,7 @@ namespace LastBreathTest.BattleSystemTests
 
             harness.Dispose();
 
-            Assert.AreEqual(0, harness.ParameterModifiers.GetModifiers(EntityParameter.Damage).Count);
+            Assert.AreEqual(0, harness.ParameterModifiers.GetModifiers(EntityParameter.PhysicalDamage).Count);
         }
 
         // ---------- the controller: stage attack effects ----------

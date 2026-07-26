@@ -16,7 +16,7 @@ namespace LastBreathTest.CraftingSystemTests
         {
             var pool = new List<IModifierDescriptor>
             {
-                Entry(EntityParameter.Damage, AffixKind.Prefix),
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix),
                 Entry(EntityParameter.Health, AffixKind.Prefix),
                 Entry(EntityParameter.Armor, AffixKind.Prefix),
                 Entry(EntityParameter.Strength, AffixKind.Suffix),
@@ -38,7 +38,7 @@ namespace LastBreathTest.CraftingSystemTests
         {
             var pool = new List<IModifierDescriptor>
             {
-                Entry(EntityParameter.Damage, AffixKind.Prefix, weight: 100f),
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix, weight: 100f),
                 Entry(EntityParameter.Health, AffixKind.Prefix, weight: 1f),
                 Entry(EntityParameter.Strength, AffixKind.Suffix, weight: 100f),
                 Entry(EntityParameter.Dexterity, AffixKind.Suffix, weight: 1f),
@@ -58,7 +58,7 @@ namespace LastBreathTest.CraftingSystemTests
         {
             var pool = new List<IModifierDescriptor>
             {
-                Entry(EntityParameter.Damage, AffixKind.Prefix),
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix),
                 Entry(EntityParameter.Health, AffixKind.Prefix),
             };
 
@@ -74,7 +74,7 @@ namespace LastBreathTest.CraftingSystemTests
         {
             var pool = new List<IModifierDescriptor>
             {
-                Entry(EntityParameter.Damage, AffixKind.Prefix),
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix),
                 Entry(EntityParameter.Strength, AffixKind.Suffix),
             };
 
@@ -88,7 +88,7 @@ namespace LastBreathTest.CraftingSystemTests
         [TestMethod]
         public void Roll_NoneEntry_IsSkippedAndNeverPicked()
         {
-            var stray = Entry(EntityParameter.Damage, AffixKind.None, weight: 100000f);
+            var stray = Entry(EntityParameter.PhysicalDamage, AffixKind.None, weight: 100000f);
             var pool = new List<IModifierDescriptor>
             {
                 stray,
@@ -110,8 +110,8 @@ namespace LastBreathTest.CraftingSystemTests
             // Damage with different bounds. They are one line for the player: only one may land.
             var pool = new List<IModifierDescriptor>
             {
-                Entry(EntityParameter.Damage, AffixKind.Prefix, weight: 100f),
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(50f, 90f), ModifierScope.Global)
+                Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix, weight: 100f),
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, new ValueRange(50f, 90f), ModifierScope.Global)
                     { Weight = 100f, Affix = AffixKind.Prefix },
                 Entry(EntityParameter.Health, AffixKind.Prefix, weight: 1f),
             };
@@ -121,7 +121,7 @@ namespace LastBreathTest.CraftingSystemTests
                 var picked = AffixRoller.Roll(pool, 2, 0, new DefaultRandomNumberGenerator(seed));
 
                 Assert.AreEqual(2, picked.Count, $"seed {seed}");
-                Assert.AreEqual(1, picked.Count(descriptor => descriptor is ParameterDescriptor { Parameter: EntityParameter.Damage }), $"seed {seed}: the same line landed twice.");
+                Assert.AreEqual(1, picked.Count(descriptor => descriptor is ParameterDescriptor { Parameter: EntityParameter.PhysicalDamage }), $"seed {seed}: the same line landed twice.");
             }
         }
 
@@ -131,9 +131,9 @@ namespace LastBreathTest.CraftingSystemTests
             // A composite renders as ONE line, so its Damage part neither blocks nor is blocked by the
             // standalone Damage entry — both may sit on the same item.
             var composite = new CompositeDescriptor(
-                [new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 10f, ModifierScope.Global)])
+                [new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 10f, ModifierScope.Global)])
                 { Weight = 100f, Affix = AffixKind.Prefix };
-            var pool = new List<IModifierDescriptor> { composite, Entry(EntityParameter.Damage, AffixKind.Prefix, weight: 100f) };
+            var pool = new List<IModifierDescriptor> { composite, Entry(EntityParameter.PhysicalDamage, AffixKind.Prefix, weight: 100f) };
 
             for (int seed = 0; seed < 50; seed++)
             {

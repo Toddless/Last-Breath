@@ -382,7 +382,7 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": {
                         "min": 0.35,
@@ -414,7 +414,7 @@
             "maxUpdateLevel": 12,
             "implicits": [
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": {
                         "min": 0.2,

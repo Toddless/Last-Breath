@@ -22,7 +22,7 @@
                 "CriticalChance": 0,
                 "AdditionalHitChance": 0,
                 "CriticalDamage": 0,
-                "Damage": 1,
+                "PhysicalDamage": 1,
                 "SpellDamage": 1,
                 "Accuracy": 0,
                 "Evade": 2000,
@@ -69,7 +69,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
-                "Damage": 120,
+                "PhysicalDamage": 120,
                 "SpellDamage": 40,
                 "Accuracy": 300,
                 "Evade": 250
@@ -126,7 +126,7 @@
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.2,
                 "CriticalDamage": 1.6,
-                "Damage": 220,
+                "PhysicalDamage": 220,
                 "SpellDamage": 60,
                 "Accuracy": 550,
                 "Evade": 450
@@ -167,7 +167,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
-                "Damage": 80,
+                "PhysicalDamage": 80,
                 "SpellDamage": 200,
                 "Accuracy": 350,
                 "Evade": 200
@@ -219,7 +219,7 @@
                 "CriticalChance": 0.3,
                 "AdditionalHitChance": 0.25,
                 "CriticalDamage": 1.8,
-                "Damage": 300,
+                "PhysicalDamage": 300,
                 "SpellDamage": 380,
                 "Accuracy": 800,
                 "Evade": 600
@@ -257,7 +257,7 @@
                 "CriticalChance": 0.6,
                 "AdditionalHitChance": 0.4,
                 "CriticalDamage": 2,
-                "Damage": 600,
+                "PhysicalDamage": 600,
                 "SpellDamage": 1200,
                 "Accuracy": 4300,
                 "Evade": 3300
@@ -294,7 +294,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.5,
-                "Damage": 110,
+                "PhysicalDamage": 110,
                 "SpellDamage": 0,
                 "Accuracy": 350,
                 "Evade": 350
@@ -332,7 +332,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.6,
-                "Damage": 130,
+                "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 250,
                 "Evade": 120
@@ -370,7 +370,7 @@
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.3,
-                "Damage": 40,
+                "PhysicalDamage": 40,
                 "SpellDamage": 0,
                 "Accuracy": 200,
                 "Evade": 450
@@ -408,7 +408,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.7,
-                "Damage": 260,
+                "PhysicalDamage": 260,
                 "SpellDamage": 0,
                 "Accuracy": 450,
                 "Evade": 150
@@ -446,7 +446,7 @@
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.2,
                 "CriticalDamage": 1.7,
-                "Damage": 180,
+                "PhysicalDamage": 180,
                 "SpellDamage": 0,
                 "Accuracy": 500,
                 "Evade": 500
@@ -496,7 +496,7 @@
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.3,
-                "Damage": 60,
+                "PhysicalDamage": 60,
                 "SpellDamage": 0,
                 "Accuracy": 200,
                 "Evade": 150
@@ -557,7 +557,7 @@
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
-                "Damage": 130,
+                "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 450,
                 "Evade": 300
@@ -608,7 +608,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
-                "Damage": 130,
+                "PhysicalDamage": 130,
                 "SpellDamage": 0,
                 "Accuracy": 300,
                 "Evade": 150
@@ -658,7 +658,7 @@
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.6,
-                "Damage": 150,
+                "PhysicalDamage": 150,
                 "SpellDamage": 0,
                 "Accuracy": 400,
                 "Evade": 400
@@ -706,7 +706,7 @@
                 "CriticalChance": 0.25,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.6,
-                "Damage": 160,
+                "PhysicalDamage": 160,
                 "SpellDamage": 60,
                 "Accuracy": 600,
                 "Evade": 450
@@ -745,7 +745,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
-                "Damage": 70,
+                "PhysicalDamage": 70,
                 "SpellDamage": 280,
                 "Accuracy": 450,
                 "Evade": 300
@@ -785,7 +785,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.6,
-                "Damage": 170,
+                "PhysicalDamage": 170,
                 "SpellDamage": 0,
                 "Accuracy": 400,
                 "Evade": 100
@@ -824,7 +824,7 @@
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.6,
-                "Damage": 190,
+                "PhysicalDamage": 190,
                 "SpellDamage": 0,
                 "Accuracy": 550,
                 "Evade": 250
@@ -864,7 +864,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
-                "Damage": 60,
+                "PhysicalDamage": 60,
                 "SpellDamage": 240,
                 "Accuracy": 400,
                 "Evade": 350
@@ -901,7 +901,7 @@
                 "CriticalChance": 0.2,
                 "AdditionalHitChance": 0.15,
                 "CriticalDamage": 1.8,
-                "Damage": 320,
+                "PhysicalDamage": 320,
                 "SpellDamage": 100,
                 "Accuracy": 650,
                 "Evade": 200
@@ -953,7 +953,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.35,
                 "CriticalDamage": 2,
-                "Damage": 500,
+                "PhysicalDamage": 500,
                 "SpellDamage": 300,
                 "Accuracy": 4200,
                 "Evade": 5600
@@ -1005,7 +1005,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 2.8,
-                "Damage": 500,
+                "PhysicalDamage": 500,
                 "SpellDamage": 300,
                 "Accuracy": 2300,
                 "Evade": 1600
@@ -1085,7 +1085,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.3,
                 "CriticalDamage": 1.9,
-                "Damage": 200,
+                "PhysicalDamage": 200,
                 "SpellDamage": 100,
                 "Accuracy": 700,
                 "Evade": 1600
@@ -1145,7 +1145,7 @@
                 "CriticalChance": 0.15,
                 "AdditionalHitChance": 0.35,
                 "CriticalDamage": 2,
-                "Damage": 200,
+                "PhysicalDamage": 200,
                 "SpellDamage": 50,
                 "Accuracy": 700,
                 "Evade": 1500
@@ -1183,7 +1183,7 @@
                 "CriticalChance": 0.1,
                 "AdditionalHitChance": 0.1,
                 "CriticalDamage": 1.5,
-                "Damage": 50,
+                "PhysicalDamage": 50,
                 "SpellDamage": 15,
                 "Accuracy": 175,
                 "Evade": 375
@@ -1212,7 +1212,7 @@
                 "CriticalChance": 0.05,
                 "AdditionalHitChance": 0.05,
                 "CriticalDamage": 1.5,
-                "Damage": 120,
+                "PhysicalDamage": 120,
                 "SpellDamage": 40,
                 "Accuracy": 350,
                 "Evade": 250

@@ -619,7 +619,7 @@ namespace Battle.Internal.Player
             EntityParameter.AdditionalHitChance => 0.05f,
             EntityParameter.CriticalDamage => 1.5f,
             EntityParameter.MulticastChance => 1f,
-            EntityParameter.Damage or EntityParameter.SpellDamage => 3000,
+            EntityParameter.PhysicalDamage or EntityParameter.SpellDamage => 3000,
             _ => 0f
         };
 
@@ -628,7 +628,7 @@ namespace Battle.Internal.Player
         {
             if (piece != EquipmentPiece.Weapon) return;
             var weapon = Equipment.Weapon;
-            Parameters.SetBaseValueForParameter(EntityParameter.Damage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.Damage));
+            Parameters.SetBaseValueForParameter(EntityParameter.PhysicalDamage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.PhysicalDamage));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
             Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));
         }

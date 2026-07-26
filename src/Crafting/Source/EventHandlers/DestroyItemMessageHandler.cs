@@ -23,10 +23,7 @@ namespace Crafting.Source.EventHandlers
         IGameMessageBus gameMessageBus)
         : IMessageHandler<DestroyItemMessage>
     {
-        // TODO:
-        // Пыль по категории + редкости (упущено в первой итерации)
-
-        // Category -> dust id: deliberately an explicit local mapping, NOT read from the UpgradeCosts
+        // Category -> dust id family: deliberately an explicit local mapping, NOT read from the UpgradeCosts
         // recraft section — a recraft price rebalance there must never silently change what shattering yields.
         private static readonly Dictionary<EquipmentCategory, string> s_dustByCategory = new()
         {
@@ -58,14 +55,24 @@ namespace Crafting.Source.EventHandlers
             return Task.CompletedTask;
         }
 
-        /// <summary>The dust of the item's category. Base amount is a FLAT 1 regardless of rarity
-        /// (owner's decision); mastery growth uses the raw resource-return channel bonus —
+        /// <summary>The dust of the item's category AND rarity tier. Base amount is a FLAT 1 regardless
+        /// of rarity (owner's decision); mastery growth uses the raw resource-return channel bonus —
         /// floor(1 × (1 + bonus)) — not the refund fraction, so zero mastery still yields exactly 1.</summary>
         private void AddDust(IEquipItem item)
         {
-            string dustId = s_dustByCategory[item.EquipmentPiece.ConvertEquipmentPartToCategory()];
+            string dustId = $"{s_dustByCategory[item.EquipmentPiece.ConvertEquipmentPartToCategory()]}_{DustTier(item.Rarity)}";
             AddToInventory(dustId, Mathf.FloorToInt(1f + craftingMastery.GetResourceReturnBonus()));
         }
+
+        /// <summary>Dust exists in four tiers only: Common shatters into Uncommon dust, everything above
+        /// Legendary (Unique; Mythic is sealed and never reaches here) collapses into Legendary dust.</summary>
+        private static string DustTier(Rarity rarity) => rarity switch
+        {
+            Rarity.Common or Rarity.Uncommon => nameof(Rarity.Uncommon),
+            Rarity.Rare => nameof(Rarity.Rare),
+            Rarity.Epic => nameof(Rarity.Epic),
+            _ => nameof(Rarity.Legendary),
+        };
 
         private void AddToInventory(string id, int amount)
         {

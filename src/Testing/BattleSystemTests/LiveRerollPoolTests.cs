@@ -73,7 +73,7 @@ namespace LastBreathTest.BattleSystemTests
             var provider = EmptyPoolProvider();
             provider.Setup(mock => mock.GetEquipItemModifierPool("Ring_Test")).Returns(
             [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
             ]);
             provider.Setup(mock => mock.GetResourceDescriptors(resourceId)).Returns(
             [
@@ -103,7 +103,7 @@ namespace LastBreathTest.BattleSystemTests
             var provider = EmptyPoolProvider();
             provider.Setup(mock => mock.GetEquipItemModifierPool("Ring_Test")).Returns(
             [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10000f, Affix = AffixKind.Prefix },
             ]);
             provider.Setup(mock => mock.GetResourceDescriptors(essenceId)).Returns(
             [
@@ -162,7 +162,7 @@ namespace LastBreathTest.BattleSystemTests
             var provider = EmptyPoolProvider();
             provider.Setup(mock => mock.GetResourceDescriptors("Ore")).Returns(
             [
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
                 new ParameterDescriptor(EntityParameter.Mana, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Prefix },
             ]);
 
@@ -181,7 +181,7 @@ namespace LastBreathTest.BattleSystemTests
             }
 
             Assert.IsTrue(seenParameters.Contains(EntityParameter.Mana), "the unrestricted entry of the used resource must stay reachable");
-            Assert.IsFalse(seenParameters.Contains(EntityParameter.Damage), "a Weapon-only entry must never land on a Jewellery item");
+            Assert.IsFalse(seenParameters.Contains(EntityParameter.PhysicalDamage), "a Weapon-only entry must never land on a Jewellery item");
         }
 
         [TestMethod]
@@ -194,7 +194,7 @@ namespace LastBreathTest.BattleSystemTests
             provider.Setup(mock => mock.GetResourceDescriptors("Essence")).Returns(
             [
                 new ParameterDescriptor(EntityParameter.Barrier, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Prefix },
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 1000f, Affix = AffixKind.Prefix, OnlyFor = EquipmentCategory.Weapon },
             ]);
 
             var seenParameters = new HashSet<EntityParameter>();
@@ -210,7 +210,7 @@ namespace LastBreathTest.BattleSystemTests
             }
 
             Assert.IsTrue(seenParameters.Contains(EntityParameter.Barrier), "the essence's entry must be rollable");
-            Assert.IsFalse(seenParameters.Contains(EntityParameter.Damage), "a Weapon-only essence entry must never land on a Jewellery item");
+            Assert.IsFalse(seenParameters.Contains(EntityParameter.PhysicalDamage), "a Weapon-only essence entry must never land on a Jewellery item");
         }
 
         private static ItemUpgrader CreateUpgrader(int seed, IItemDataProvider provider)

@@ -52,7 +52,7 @@ namespace Battle.Source.Effects
             if (evt.Context.Result != AttackResults.Succeed && !evt.Context.IsCritical) return;
 
             // Flat increase to crit damage on each successful critical attack
-            var modifier = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, critDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
+            var modifier = new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Flat, critDamagePerHit, $"CC_CritChance_OnHit_{InstanceId}");
             modifier.ApplyTo(Target);
         }
 

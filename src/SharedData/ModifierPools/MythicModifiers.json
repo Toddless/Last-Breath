@@ -4,7 +4,7 @@
             "id": "Mythic_Weapon",
             "modifiersPool": [
                 {
-                    "parameter": "Damage",
+                    "parameter": "PhysicalDamage",
                     "modifierType": "multi",
                     "value": {
                         "min": 0.69,

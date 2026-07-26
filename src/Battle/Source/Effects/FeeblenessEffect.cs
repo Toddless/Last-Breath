@@ -10,7 +10,7 @@ namespace Battle.Source.Effects
             duration,
             maxStacks,
             value: 1 - value,
-            parameter: EntityParameter.Damage,
+            parameter: EntityParameter.PhysicalDamage,
             type: OperationType.Multiply,
             priority: Priority.Weak,
             statusEffect: StatusEffects.None)

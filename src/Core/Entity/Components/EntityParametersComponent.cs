@@ -35,7 +35,7 @@
 
         public float MaxHealth => this[EntityParameter.Health];
         public float HealthRecovery => this[EntityParameter.HealthRecovery];
-        public float Damage => this[EntityParameter.Damage];
+        public float Damage => this[EntityParameter.PhysicalDamage];
         public float BlockChance => this[EntityParameter.BlockChance];
         public float CriticalDamage => this[EntityParameter.CriticalDamage];
         public float CriticalChance => this[EntityParameter.CriticalChance];

@@ -906,7 +906,7 @@ namespace Battle.Internal.Npc
         {
             if (bonus <= 0) return;
 
-            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.Damage, EntityParameter.SpellDamage, EntityParameter.Armor];
+            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.PhysicalDamage, EntityParameter.SpellDamage, EntityParameter.Armor];
             foreach (var parameter in boosted)
                 ParameterModifiers.AddModifier(ModifiersCreator.CreateModifierInstance(parameter, ModifierValueType.Increase, bonus, UndeadRisingModifierSource));
         }
@@ -978,7 +978,7 @@ namespace Battle.Internal.Npc
                     case EntityParameter.CriticalDamage:
                         value = 1.5f;
                         break;
-                    case EntityParameter.Damage:
+                    case EntityParameter.PhysicalDamage:
                     case EntityParameter.SpellDamage:
                     case EntityParameter.Accuracy:
                     case EntityParameter.Evade:

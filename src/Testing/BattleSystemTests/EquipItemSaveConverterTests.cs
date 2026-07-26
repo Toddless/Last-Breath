@@ -54,7 +54,7 @@ namespace LastBreathTest.BattleSystemTests
         public void WeaponRoundTripKeepsDamageMath()
         {
             var weapon = new WeaponItem(WeaponType.Sword, Handedness.OneHanded, 100f, 0.3f, 1.6f, "Iron_Sword", []);
-            var local = Modifier(EntityParameter.Damage, ModifierValueType.Increase, 0.2f);
+            var local = Modifier(EntityParameter.PhysicalDamage, ModifierValueType.Increase, 0.2f);
             local.Scope = ModifierScope.Local;
             weapon.SetModifiers([local]);
             weapon.Upgrade(2);

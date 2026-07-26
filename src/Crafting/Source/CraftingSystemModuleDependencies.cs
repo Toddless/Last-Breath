@@ -13,7 +13,9 @@
     using Core.Modifiers;
     using Core.Results;
     using Core.Views.UI;
+    using Core.Items.Use;
     using EventHandlers;
+    using ItemUse;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using RequestHandlers;
@@ -40,6 +42,10 @@
             services.AddSingleton<IItemUpgrader, ItemUpgrader>();
             services.AddSingleton<IItemAscender, ItemAscender>();
             services.AddSingleton<CraftingResources>();
+            // Recipe knowledge: mastery ladder ∪ scroll learns. The create handler is the gate.
+            services.AddSingleton<IRecipeKnowledge>(sp => new RecipeKnowledge(
+                sp.GetRequiredService<IItemDataProvider>(),
+                sp.GetRequiredService<ICraftingMastery>()));
             services.AddGameDataParticipant<ICraftingAdditiveProvider, CraftingAdditiveProvider>();
             // The "extra effect" pool crafted items roll from (mastery channel 4).
             services.AddGameDataParticipant<ICraftingEffectProvider, CraftingEffectProvider>();
@@ -52,6 +58,11 @@
             services.AddTransient<IRequestHandler<AscendEquipItemRequest, AscensionResult>, AscendEquipItemRequestHandler>();
 
             services.AddTransient<IMessageHandler<DestroyItemMessage>, DestroyItemMessageHandler>();
+            // The item-use seam: the shared channel + dispatch live here with the tooltip button;
+            // future consumable modules only register additional IItemUseBehavior implementations.
+            services.AddSingleton<IItemUseBehavior, LearnRecipeUseBehavior>();
+            services.AddSingleton<IItemUseService>(sp => new ItemUseService(sp.GetServices<IItemUseBehavior>()));
+            services.AddTransient<IMessageHandler<UseItemMessage>, UseItemMessageHandler>();
             services.AddTransient<IMessageHandler<GainCraftingExpirienceMessage>, GainCraftingExperienceMessageHandler>();
             services.AddTransient<IMessageHandler<OpenCraftingWindowMessage>, OpenCraftingWindowMessageHandler>();
             return services;

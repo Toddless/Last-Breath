@@ -2,7 +2,7 @@
 {
     public enum EntityParameter
     {
-        Damage = 1,
+        PhysicalDamage = 1,
         Intelligence,
         Dexterity,
         Strength,
@@ -28,6 +28,9 @@
         FireResistance,
         ColdResistance,
         LightningResistance,
+        FireDamage,
+        ColdDamage,
+        LightningDamage,
 
         // Aggregate ("all X") parameters: bucket-only members standing for a whole family. Never read as a
         // value — ParameterModifiersComponent folds their modifiers into each family member and fans change

@@ -8,6 +8,7 @@ namespace LastBreathTest.CraftingSystemTests
     using Core.MessageBus;
     using Core.Modifiers;
     using Core.Results;
+    using Core.Save.Participants;
     using Crafting.Source;
     using Moq;
 
@@ -179,6 +180,26 @@ namespace LastBreathTest.CraftingSystemTests
 
             Assert.AreEqual(ItemUpgradeResult.Success, result);
             Assert.AreEqual(1, item.UpdateLevel);
+        }
+
+        [TestMethod]
+        public void SaveRoundTrip_PersistsBaseLevelAndExperience_WithoutBonus()
+        {
+            var source = CreateMastery();
+            source.AddExperience(500); // a few levels on the default curve, with leftover experience
+            int earnedLevel = source.CurrentLevel;
+            int earnedExperience = source.CurrentExperience;
+            source.AddBonusLevel(); // simulates an equipment grant: must NOT be persisted
+
+            var captured = new CraftingMasterySaveParticipant(source).Capture();
+
+            var target = CreateMastery();
+            new CraftingMasterySaveParticipant(target).Restore(captured, savedVersion: 1);
+
+            Assert.IsTrue(earnedLevel > 0, "the curve numbers must actually level the source");
+            Assert.AreEqual(earnedLevel, target.CurrentLevel);
+            Assert.AreEqual(earnedExperience, target.CurrentExperience);
+            Assert.AreEqual(0, target.BonusLevel);
         }
 
         [TestMethod]

@@ -24,7 +24,7 @@ namespace LastBreath.UI
             ("UI_Char_Attributes", [EntityParameter.Strength, EntityParameter.Dexterity, EntityParameter.Intelligence]),
             ("UI_Char_Offense",
             [
-                EntityParameter.Damage, EntityParameter.SpellDamage, EntityParameter.Accuracy,
+                EntityParameter.PhysicalDamage, EntityParameter.SpellDamage, EntityParameter.Accuracy,
                 EntityParameter.CriticalChance, EntityParameter.CriticalDamage, EntityParameter.AdditionalHitChance,
                 EntityParameter.MulticastChance, EntityParameter.ArmorPenetration,
             ]),

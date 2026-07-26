@@ -909,7 +909,7 @@ namespace LastBreath.Npc
         {
             if (bonus <= 0) return;
 
-            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.Damage, EntityParameter.SpellDamage, EntityParameter.Armor];
+            EntityParameter[] boosted = [EntityParameter.Health, EntityParameter.PhysicalDamage, EntityParameter.SpellDamage, EntityParameter.Armor];
             foreach (var parameter in boosted)
                 ParameterModifiers.AddModifier(ModifiersCreator.CreateModifierInstance(parameter, ModifierValueType.Increase, bonus, UndeadRisingModifierSource));
         }
@@ -984,7 +984,7 @@ namespace LastBreath.Npc
                     case EntityParameter.MoveSpeed:
                         value = 500;
                         break;
-                    case EntityParameter.Damage:
+                    case EntityParameter.PhysicalDamage:
                     case EntityParameter.SpellDamage:
                     case EntityParameter.Accuracy:
                     case EntityParameter.Evade:

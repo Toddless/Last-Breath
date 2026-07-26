@@ -28,7 +28,8 @@ namespace Crafting.Source.RequestHandlers
         ICraftingMastery mastery,
         CraftingResources resources,
         ICraftingAdditiveProvider additives,
-        IInventory inventory)
+        IInventory inventory,
+        IRecipeKnowledge knowledge)
         : IRequestHandler<CreateEquipItemRequest, IEquipItem?>
     {
         public Task<IEquipItem?> HandleRequest(CreateEquipItemRequest request)
@@ -39,7 +40,7 @@ namespace Crafting.Source.RequestHandlers
                 // requirements (categories/specific ids/amounts). Safe while items are only created through the
                 // crafting UI; add domain-level recipe conformance if a non-UI creation path appears.
                 var allResources = MergeResources(request.RequiredResources, request.OptionalResources);
-                if (!MasteryAllows(request.RecipeId) || !resources.HasAll(allResources))
+                if (!knowledge.IsKnown(request.RecipeId) || !MasteryAllows(request.RecipeId) || !resources.HasAll(allResources))
                     return Task.FromResult<IEquipItem?>(null);
 
                 // Required and optional resources both feed the creation pool by design; entries from

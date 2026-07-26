@@ -209,15 +209,15 @@
                     "tier": 2,
                     "items": [
                         {
-                            "id": "Upgrade_Resource_Armor_Dust",
+                            "id": "Upgrade_Resource_Armor_Dust_Rare",
                             "price": 45
                         },
                         {
-                            "id": "Upgrade_Resource_Jewellery_Dust",
+                            "id": "Upgrade_Resource_Jewellery_Dust_Rare",
                             "price": 45
                         },
                         {
-                            "id": "Upgrade_Resource_Weapon_Dust",
+                            "id": "Upgrade_Resource_Weapon_Dust_Rare",
                             "price": 45
                         },
                         {
@@ -251,58 +251,6 @@
                         {
                             "id": "Upgrade_Resource_Journeyman_Rune",
                             "price": 105
-                        },
-                        {
-                            "id": "Recipe_Body_Steel_Bastion",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Body_Iron_Bastion",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Body_Hunter_Chestplate",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Body_Archmage_Mantle",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Helmet_Iron_Bastion",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Helmet_Hunter",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Helmet_Archmage_Cap",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Boots_Iron_Bastion",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Boots_Hunter",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Boots_Archmage_Sandals",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Gloves_Iron_Bastion",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Gloves_Hunter",
-                            "price": 130
-                        },
-                        {
-                            "id": "Recipe_Gloves_Archmage",
-                            "price": 130
                         }
                     ]
                 },
@@ -390,28 +338,16 @@
                             "price": 13
                         },
                         {
-                            "id": "Upgrade_Resource_Weapon_Dust",
+                            "id": "Upgrade_Resource_Weapon_Dust_Uncommon",
                             "price": 14
                         },
                         {
-                            "id": "Upgrade_Resource_Armor_Dust",
+                            "id": "Upgrade_Resource_Armor_Dust_Uncommon",
                             "price": 14
                         },
                         {
-                            "id": "Upgrade_Resource_Jewellery_Dust",
+                            "id": "Upgrade_Resource_Jewellery_Dust_Uncommon",
                             "price": 14
-                        },
-                        {
-                            "id": "Recipe_Weapon_Simple_Sword",
-                            "price": 15
-                        },
-                        {
-                            "id": "Recipe_Weapon_Simple_Axe",
-                            "price": 15
-                        },
-                        {
-                            "id": "Recipe_Weapon_Simple_Dagger",
-                            "price": 15
                         }
                     ]
                 }
@@ -548,7 +484,7 @@
                     "tier": 2,
                     "items": [
                         {
-                            "id": "Crafting_Resource_Amethyst_Gem",
+                            "id": "Crafting_Resource_Velvet_Fabric",
                             "price": 120
                         }
                     ]
@@ -600,7 +536,7 @@
                             "price": 133
                         },
                         {
-                            "id": "Crafting_Resource_Topaz_Gem",
+                            "id": "Crafting_Resource_Beryl_Gem",
                             "price": 280
                         }
                     ]

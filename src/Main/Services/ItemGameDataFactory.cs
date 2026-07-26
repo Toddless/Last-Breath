@@ -24,8 +24,8 @@ namespace LastBreath.Services
             new Requirement(type, id, amount);
 
         public ICraftingRecipe CreateRecipe(string id, string resultItemId, string[] tags, Rarity rarity,
-            List<IRequirement> requirements, ItemType itemType, bool isOpened, string[] optionalResourceCategories) =>
-            new CraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, isOpened);
+            List<IRequirement> requirements, ItemType itemType, int? unlockAtMastery, int basePrice, string[] optionalResourceCategories) =>
+            new CraftingRecipe(id, resultItemId, tags, rarity, requirements, itemType, optionalResourceCategories, unlockAtMastery, basePrice);
 
         public IMaterialCategory CreateMaterialCategory(List<IModifierDescriptor> modifiers, string id) =>
             new Core.Crafting.MaterialCategory(modifiers, id);

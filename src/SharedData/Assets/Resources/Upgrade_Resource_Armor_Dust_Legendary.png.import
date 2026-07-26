@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dk1mvnd514ii3"
-path="res://.godot/imported/Crafting_Resource_Topaz_Gem.png-e84928beaec21dd58e4d62d6bf3fcca8.ctex"
+uid="uid://bo4gwovoo773t"
+path="res://.godot/imported/Upgrade_Resource_Armor_Dust_Legendary.png-2b9234c7edf27e795ab23030e763e08c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Data/Shared/Assets/Resources/Crafting_Resource_Topaz_Gem.png"
-dest_files=["res://.godot/imported/Crafting_Resource_Topaz_Gem.png-e84928beaec21dd58e4d62d6bf3fcca8.ctex"]
+source_file="res://Data/Shared/Assets/Resources/Upgrade_Resource_Armor_Dust_Legendary.png"
+dest_files=["res://.godot/imported/Upgrade_Resource_Armor_Dust_Legendary.png-2b9234c7edf27e795ab23030e763e08c.ctex"]
 
 [params]
 

@@ -33,7 +33,7 @@ namespace Core.Items
         {
             get
             {
-                (float flat, float increase, float multiplier) = LocalBucket(EntityParameter.Damage);
+                (float flat, float increase, float multiplier) = LocalBucket(EntityParameter.PhysicalDamage);
                 return ((BaseDamage * UpdateMultiplier) + flat) * (1f + increase) * (1f + multiplier);
             }
         }
@@ -42,7 +42,7 @@ namespace Core.Items
         /// the crit pair receives exactly the resolved flat the owner would get from the item's lines.</summary>
         public (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter) => parameter switch
         {
-            EntityParameter.Damage => (BaseDamage * UpdateMultiplier, Damage - (BaseDamage * UpdateMultiplier)),
+            EntityParameter.PhysicalDamage => (BaseDamage * UpdateMultiplier, Damage - (BaseDamage * UpdateMultiplier)),
             EntityParameter.CriticalChance => (CriticalChance, ResolvedLocalFlat(parameter)),
             EntityParameter.CriticalDamage => (CriticalDamage, ResolvedLocalFlat(parameter)),
             _ => (0f, 0f),
@@ -50,6 +50,6 @@ namespace Core.Items
 
         protected override EquipItem CreateCopy() => new WeaponItem(this);
 
-        protected override bool IsLocalBucketExternal(EntityParameter parameter) => parameter == EntityParameter.Damage;
+        protected override bool IsLocalBucketExternal(EntityParameter parameter) => parameter == EntityParameter.PhysicalDamage;
     }
 }

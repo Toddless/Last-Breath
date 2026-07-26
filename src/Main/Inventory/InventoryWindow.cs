@@ -35,7 +35,7 @@ namespace LastBreath.Inventory
 
         private static readonly EntityParameter[] s_statParameters =
         [
-            EntityParameter.Damage,
+            EntityParameter.PhysicalDamage,
             EntityParameter.CriticalChance,
             EntityParameter.CriticalDamage,
             EntityParameter.Armor,

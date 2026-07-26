@@ -13,7 +13,9 @@
                 { "itemId": "Upgrade_Resource_Blacksmith_Rune", "count": 6, "chance": 0.8 },
                 { "itemId": "Upgrade_Resource_Jeweler_Rune", "count": 4, "chance": 0.6 },
                 { "itemId": "Weapon_Simple_Sword", "count": 1 },
-                { "itemId": "Weapon_Simple_Dagger", "count": 1 }
+                { "itemId": "Weapon_Simple_Dagger", "count": 1 },
+                { "itemId": "Recipe_Creators_Ring", "count": 1, "chance": 0.4 },
+                { "itemId": "Recipe_Body_Aegis", "count": 1, "chance": 0.25 }
             ],
             "randomEquip": {
                 "count": 3,

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wyw7tves500s"
-path="res://.godot/imported/Upgrade_Resource_Armor_Dust.png-b424ebf1e9fc07d02d3227e9ed330b56.ctex"
+uid="uid://4jtc47lfm088"
+path="res://.godot/imported/Crafting_Resource_Coarse_Wool_Fabric.png-335a497035e23e9855595bc47a58b289.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Data/Shared/Assets/Resources/Upgrade_Resource_Armor_Dust.png"
-dest_files=["res://.godot/imported/Upgrade_Resource_Armor_Dust.png-b424ebf1e9fc07d02d3227e9ed330b56.ctex"]
+source_file="res://Data/Shared/Assets/Resources/Crafting_Resource_Coarse_Wool_Fabric.png"
+dest_files=["res://.godot/imported/Crafting_Resource_Coarse_Wool_Fabric.png-335a497035e23e9855595bc47a58b289.ctex"]
 
 [params]
 

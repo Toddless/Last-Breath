@@ -164,7 +164,7 @@ namespace LastBreathTest.BattleSystemTests
             _provider.Strings["Modifier_Flat_Range"] = "{min}–{max} {parameter}";
             _provider.Strings["Modifier_Increase_Range"] = "{min}–{max} increased {parameter}";
             _provider.Strings["Modifier_Multiplicative_Range"] = "{min}–{max} more {parameter}";
-            _provider.Strings["Damage"] = "Damage";
+            _provider.Strings["PhysicalDamage"] = "Damage";
             _provider.Strings["CriticalChance"] = "Critical Chance";
 
             _formats = new ParameterFormatProvider();
@@ -175,7 +175,7 @@ namespace LastBreathTest.BattleSystemTests
 
         [TestMethod]
         public void FlatNumberParameterRendersPlainValue() =>
-            Assert.AreEqual("+50 Damage", _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 50f)));
+            Assert.AreEqual("+50 Damage", _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 50f)));
 
         [TestMethod]
         public void FlatPercentParameterScalesFractionTimesHundred() =>
@@ -184,34 +184,34 @@ namespace LastBreathTest.BattleSystemTests
 
         [TestMethod]
         public void IncreaseRendersPercentDelta() =>
-            Assert.AreEqual("+10% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, 0.1f)));
+            Assert.AreEqual("+10% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, 0.1f)));
 
         [TestMethod]
         public void MultiplicativeRendersDeltaAsPercent() =>
             // multiplicative values in data are DELTAS folded as (1 + Σ value): 0.2 = "+20% more"
-            Assert.AreEqual("+20% more Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.Damage, 0.2f)));
+            Assert.AreEqual("+20% more Damage", _formatter.Format(new Modifier(ModifierValueType.Multiplicative, EntityParameter.PhysicalDamage, 0.2f)));
 
         [TestMethod]
         public void NegativeValuesCarryMinusSign() =>
-            Assert.AreEqual("-15% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, -0.15f)));
+            Assert.AreEqual("-15% increased Damage", _formatter.Format(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, -0.15f)));
 
         [TestMethod]
         public void RangedFlatRendersThroughTheRangeTemplate() =>
-            Assert.AreEqual("+40–60 Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 50f), 0.8f, 1.2f));
+            Assert.AreEqual("+40–60 Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 50f), 0.8f, 1.2f));
 
         [TestMethod]
         public void RangedIncreaseCarriesUnitOnMaxOnly() =>
-            Assert.AreEqual("+10–20% increased Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Increase, EntityParameter.Damage, 0.2f), 0.5f, 1f));
+            Assert.AreEqual("+10–20% increased Damage", _formatter.FormatRanged(new Modifier(ModifierValueType.Increase, EntityParameter.PhysicalDamage, 0.2f), 0.5f, 1f));
 
         [TestMethod]
         public void DescriptorWithSpreadRendersRangeTemplate() =>
             Assert.AreEqual("+40–60 Damage", _formatter.FormatDescriptor(
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, new ValueRange(40f, 60f), ModifierScope.Global)));
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, new ValueRange(40f, 60f), ModifierScope.Global)));
 
         [TestMethod]
         public void DescriptorWithFixedValueRendersLikeALiveModifier() =>
             Assert.AreEqual("+50 Damage", _formatter.FormatDescriptor(
-                new ParameterDescriptor(EntityParameter.Damage, ModifierValueType.Flat, 50f, ModifierScope.Global)));
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 50f, ModifierScope.Global)));
 
         [TestMethod]
         public void DescriptorPercentParameterScalesBothBounds() =>
@@ -223,7 +223,7 @@ namespace LastBreathTest.BattleSystemTests
         {
             // BaseValue 50 rolled from [40..60]; the item then upgraded the line to 100 (×2) —
             // the interval follows the value channel so bounds stay comparable with the shown number.
-            var line = new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, 50f, "test")
+            var line = new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 50f, "test")
             {
                 RolledRange = new ValueRange(40f, 60f),
                 Value = 100f,
@@ -233,16 +233,16 @@ namespace LastBreathTest.BattleSystemTests
 
         [TestMethod]
         public void RolledRangeIsNullForFixedRolls() =>
-            Assert.IsNull(_formatter.FormatRolledRange(new SimpleModifier(EntityParameter.Damage, ModifierValueType.Flat, 50f, "test")));
+            Assert.IsNull(_formatter.FormatRolledRange(new SimpleModifier(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 50f, "test")));
 
         [TestMethod]
         public void DecimalsUseDotRegardlessOfSystemCulture() =>
-            Assert.AreEqual("+12.5 Damage", _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 12.5f)));
+            Assert.AreEqual("+12.5 Damage", _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 12.5f)));
 
         [TestMethod]
         public void RichFormatColorsTheValue() =>
             Assert.AreEqual($"[color={TextPalette.Number}]+50[/color] Damage",
-                _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.Damage, 50f), TextFormat.Rich));
+                _formatter.Format(new Modifier(ModifierValueType.Flat, EntityParameter.PhysicalDamage, 50f), TextFormat.Rich));
 
         [TestMethod]
         public void UnlistedParameterDefaultsToPlainNumber() =>
@@ -254,18 +254,18 @@ namespace LastBreathTest.BattleSystemTests
 
         [TestMethod]
         public void ParameterChangeSubtractCarriesMinusSign() =>
-            Assert.AreEqual("-50", _formatter.FormatParameterChange(EntityParameter.Damage, 50f, OperationType.Subtract));
+            Assert.AreEqual("-50", _formatter.FormatParameterChange(EntityParameter.PhysicalDamage, 50f, OperationType.Subtract));
 
         [TestMethod]
         public void ParameterChangeMultiplyShowsDeltaFromOne() =>
-            Assert.AreEqual("+20%", _formatter.FormatParameterChange(EntityParameter.Damage, 1.2f, OperationType.Multiply));
+            Assert.AreEqual("+20%", _formatter.FormatParameterChange(EntityParameter.PhysicalDamage, 1.2f, OperationType.Multiply));
 
         [TestMethod]
         public void ParameterChangeDivideShowsNegativeDelta() =>
-            Assert.AreEqual("-50%", _formatter.FormatParameterChange(EntityParameter.Damage, 2f, OperationType.Divide));
+            Assert.AreEqual("-50%", _formatter.FormatParameterChange(EntityParameter.PhysicalDamage, 2f, OperationType.Divide));
 
         [TestMethod]
         public void ParameterChangeOverrideShowsAbsoluteValueWithoutSign() =>
-            Assert.AreEqual("30", _formatter.FormatParameterChange(EntityParameter.Damage, 30f, OperationType.Override));
+            Assert.AreEqual("30", _formatter.FormatParameterChange(EntityParameter.PhysicalDamage, 30f, OperationType.Override));
     }
 }
