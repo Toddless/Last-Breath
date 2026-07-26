@@ -628,9 +628,18 @@ namespace Battle.Internal.Player
         {
             if (piece != EquipmentPiece.Weapon) return;
             var weapon = Equipment.Weapon;
+            // The FOLDED weapon stats (scaled base with the whole local bucket, like weapon.Damage):
+            // the weapon consumes its local lines itself, so none arrive as separate modifiers.
             Parameters.SetBaseValueForParameter(EntityParameter.PhysicalDamage, weapon?.Damage ?? GetUnarmedBaseValue(EntityParameter.PhysicalDamage));
-            Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, weapon?.CriticalChance ?? GetUnarmedBaseValue(EntityParameter.CriticalChance));
-            Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, weapon?.CriticalDamage ?? GetUnarmedBaseValue(EntityParameter.CriticalDamage));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalChance, FoldedWeaponStat(weapon, EntityParameter.CriticalChance));
+            Parameters.SetBaseValueForParameter(EntityParameter.CriticalDamage, FoldedWeaponStat(weapon, EntityParameter.CriticalDamage));
+        }
+
+        private float FoldedWeaponStat(IWeaponItem? weapon, EntityParameter parameter)
+        {
+            if (weapon == null) return GetUnarmedBaseValue(parameter);
+            (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
+            return baseValue + localBonus;
         }
 
         public Vector2 GetCameraPosition() => GlobalPosition;

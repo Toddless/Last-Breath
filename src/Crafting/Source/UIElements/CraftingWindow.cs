@@ -233,9 +233,17 @@ namespace Crafting.Source.UIElements
             _ => false,
         };
 
-        private static string EquipPickerTooltip(IEquipItem item)
+        private string EquipPickerTooltip(IEquipItem item)
         {
             var lines = new List<string> { $"{Localization.Localize(item.Rarity.ToString())} · {Localization.Localize(item.EquipmentPiece.ToString())}" };
+            foreach (var parameter in item.BaseStats.Keys)
+            {
+                (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
+                string value = _modifierFormatter?.FormatValue(ModifierValueType.Flat, parameter, baseValue + localBonus)
+                    ?? (baseValue + localBonus).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+                lines.Add($"{Localization.Localize(parameter.ToString())}: {value}");
+            }
+
             lines.AddRange(EquipItemLines.ComposeImplicits(item).Select(line => line.Text));
             lines.AddRange(EquipItemLines.ComposeRolled(item).Select(line => line.Text));
             lines.AddRange(item.Grants.Select(grant => Localization.Localize(grant.Id)));
@@ -435,7 +443,9 @@ namespace Crafting.Source.UIElements
         /// <summary>The "possible modifiers" column (Umbral mockup 2026-07-25): sections per slot
         /// family with entry counts. Create rows split into "kind + parameter" left and the roll
         /// interval right; the ascension gift pool keeps FULL sentence rows (owner: the split view
-        /// broke the mythic entries) with the Mythic tint. Upgrade/Reroll keep the column hidden.</summary>
+        /// broke the mythic entries) with the Mythic tint. Reroll shows the item's LIVE pool with
+        /// additives folded in; entries the dedup/slot rules would refuse right now render muted.
+        /// Upgrade keeps the column hidden.</summary>
         private void RenderPool()
         {
             if (_poolBox == null || _poolList == null) return;
@@ -445,6 +455,7 @@ namespace Crafting.Source.UIElements
             var rows = _mode switch
             {
                 CraftingMode.Create => DescriptorSections(CreationPoolDescriptors(), tint: null, splitRows: true, out entryCount),
+                CraftingMode.Recraft => DescriptorSections(RecraftPoolDescriptors(), tint: null, splitRows: true, out entryCount, RecraftIneligible()),
                 CraftingMode.Ascend => DescriptorSections(AscensionPoolDescriptors(),
                     Color.FromHtml(TextPalette.RarityColor(Rarity.Mythic)), splitRows: false, out entryCount),
                 _ => [],
@@ -478,11 +489,43 @@ namespace Crafting.Source.UIElements
                 ? _ascender.GetGiftPool(item.EquipmentPiece.ConvertEquipmentPartToCategory())
                 : [];
 
+        /// <summary>The item's live reroll pool with the chosen additives folded in — straight from
+        /// the upgrader, so the preview and the actual roll share one composition.</summary>
+        private IEnumerable<Core.Modifiers.IModifierDescriptor> RecraftPoolDescriptors() =>
+            _item is { IsSealed: false } item && _upgrader != null
+                ? _upgrader.GetRerollPreviewPool(item, ChosenAdditiveIds())
+                : [];
+
+        private List<string> ChosenAdditiveIds() => _additiveChoices.OfType<string>().ToList();
+
+        /// <summary>Mirror of TryRecraftModifier's refusal rules for the muted rendering: an entry
+        /// that is not a line at all (grant/operation/composite root — the latter's parts inherit
+        /// weight 0 and never win a roll), a stat already occupying a line (the picked line's own
+        /// stat stays legal), or — once a line is picked — the other slot family.</summary>
+        private Func<Core.Modifiers.IModifierDescriptor, bool>? RecraftIneligible()
+        {
+            if (_item == null) return null;
+
+            var occupied = _item.OccupiedLineKeys(_selectedModifierInstanceId == null ? [] : [_selectedModifierInstanceId]);
+            var targetAffix = SelectedLineAffix();
+            return descriptor =>
+                !Core.Modifiers.ModifierKey.TryFrom(descriptor, out var key)
+                || occupied.Contains(key)
+                || (targetAffix is { } affix && affix != AffixKind.None && descriptor.Affix != affix);
+        }
+
+        private AffixKind? SelectedLineAffix() =>
+            _item == null || _selectedModifierInstanceId == null
+                ? null
+                : EquipItemLines.ComposeRolled(_item)
+                    .FirstOrDefault(line => line.InstanceId == _selectedModifierInstanceId)?.Affix;
+
         /// <summary>Pool rows grouped by slot family (prefixes / suffixes / tail / mythic), each block
         /// opened by the shared affix caption with its entry count. A parameter descriptor splits into
         /// "kind + name" and the gold roll interval; sentence-shaped entries (context, composites) and
         /// grants keep their single-line form. Duplicates (same visible row) collapse.</summary>
-        private List<Control> DescriptorSections(IEnumerable<Core.Modifiers.IModifierDescriptor> descriptors, Color? tint, bool splitRows, out int entryCount)
+        private List<Control> DescriptorSections(IEnumerable<Core.Modifiers.IModifierDescriptor> descriptors, Color? tint, bool splitRows, out int entryCount,
+            Func<Core.Modifiers.IModifierDescriptor, bool>? ineligible = null)
         {
             var rows = new List<Control>();
             entryCount = 0;
@@ -494,7 +537,7 @@ namespace Crafting.Source.UIElements
                 var seen = new HashSet<string>();
                 foreach (var descriptor in OrderForDisplay(family))
                 {
-                    var row = DescriptorRow(descriptor, tint, splitRows, seen);
+                    var row = DescriptorRow(descriptor, tint, splitRows, seen, ineligible?.Invoke(descriptor) == true);
                     if (row != null) familyRows.Add(row);
                 }
 
@@ -546,13 +589,14 @@ namespace Crafting.Source.UIElements
             _ => 0,
         };
 
-        private Control? DescriptorRow(Core.Modifiers.IModifierDescriptor descriptor, Color? tint, bool splitRows, HashSet<string> seen)
+        private Control? DescriptorRow(Core.Modifiers.IModifierDescriptor descriptor, Color? tint, bool splitRows, HashSet<string> seen, bool muted = false)
         {
+            var mutedColor = Color.FromHtml(TextPalette.System);
             if (splitRows && descriptor is Core.Modifiers.ParameterDescriptor parameter && _modifierFormatter != null)
             {
                 string name = $"{Localization.Localize(KindKey(parameter.ValueType))} {Localization.Localize(parameter.Parameter.ToString())}";
                 string range = _modifierFormatter.FormatDescriptorRange(parameter);
-                return seen.Add($"{name}|{range}") ? SplitRow(name, range, tint) : null;
+                return seen.Add($"{name}|{range}") ? SplitRow(name, range, muted ? mutedColor : tint, muted) : null;
             }
 
             string text = descriptor switch
@@ -565,7 +609,8 @@ namespace Crafting.Source.UIElements
             if (string.IsNullOrEmpty(text) || !seen.Add(text)) return null;
 
             var label = new Label { Text = text, AutowrapMode = TextServer.AutowrapMode.WordSmart };
-            if (tint is { } color) label.AddThemeColorOverride("font_color", color);
+            if (muted) label.AddThemeColorOverride("font_color", mutedColor);
+            else if (tint is { } color) label.AddThemeColorOverride("font_color", color);
             return label;
         }
 
@@ -577,7 +622,7 @@ namespace Crafting.Source.UIElements
             _ => "UI_Mod_Kind_Flat",
         };
 
-        private static Control SplitRow(string name, string value, Color? tint)
+        private static Control SplitRow(string name, string value, Color? tint, bool muted = false)
         {
             var row = new HBoxContainer();
             row.AddThemeConstantOverride("separation", 8);
@@ -591,7 +636,7 @@ namespace Crafting.Source.UIElements
             row.AddChild(nameLabel);
 
             var valueLabel = new Label { Text = value, SizeFlagsVertical = SizeFlags.ShrinkCenter };
-            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.Number));
+            valueLabel.AddThemeColorOverride("font_color", muted ? Color.FromHtml(TextPalette.System) : Color.FromHtml(TextPalette.Number));
             row.AddChild(valueLabel);
             return row;
         }
@@ -762,6 +807,14 @@ namespace Crafting.Source.UIElements
                 AddWeaponStatRow(EntityParameter.CriticalDamage, weapon);
             }
 
+            // The typed base channel, folded with its locals — same convention as the item tooltip.
+            foreach (var parameter in item.BaseStats.Keys)
+            {
+                (float baseValue, float localBonus) = item.GetBaseStatBreakdown(parameter);
+                AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
+            }
+
+
             float? previewScale = _mode == CraftingMode.Upgrade && !item.IsSealed && item.UpdateLevel < item.MaxUpdateLevel
                 ? item.NextUpgradeValueScale
                 : null;
@@ -827,6 +880,10 @@ namespace Crafting.Source.UIElements
                 AddBaseStatRow(EntityParameter.CriticalDamage, weapon.CriticalDamage);
             }
 
+            // Unrolled base stats show their roll spread; a fixed base shows the single value.
+            foreach (var stat in blueprint.BaseStats)
+                AddBaseStatSpreadRow(stat);
+
             foreach (var descriptor in blueprint.Implicits)
                 _mods?.AddChild(new Label { Text = Localization.Format(descriptor), ThemeTypeVariation = "DimLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
@@ -845,7 +902,32 @@ namespace Crafting.Source.UIElements
             AddBaseStatRow(parameter, baseValue + localBonus, highlighted: Mathf.Abs(localBonus) > 0.0001f);
         }
 
-        /// <summary>One weapon base-stat row: dim parameter name, unit-aware value on the right.</summary>
+        /// <summary>Blueprint base-stat row: the roll spread ("500–900") instead of a value — the
+        /// bench previews what the mint can produce, not a concrete roll.</summary>
+        private void AddBaseStatSpreadRow(BaseStatBlueprint stat)
+        {
+            string Bound(float value) =>
+                _modifierFormatter?.FormatValue(ModifierValueType.Flat, stat.Parameter, value)
+                ?? value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+
+            var row = new HBoxContainer();
+            row.AddChild(new Label
+            {
+                Text = Localization.Localize(stat.Parameter.ToString()),
+                ThemeTypeVariation = "DimLabel",
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            });
+            var valueLabel = new Label
+            {
+                Text = stat.Value.IsFixed ? Bound(stat.Value.Min) : $"{Bound(stat.Value.Min)}–{Bound(stat.Value.Max)}",
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            valueLabel.AddThemeColorOverride("font_color", Color.FromHtml(TextPalette.BaseStat));
+            row.AddChild(valueLabel);
+            _mods?.AddChild(row);
+        }
+
+        /// <summary>One base-stat row: dim parameter name, unit-aware value on the right.</summary>
         private void AddBaseStatRow(EntityParameter parameter, float value, bool highlighted = false)
         {
             var row = new HBoxContainer();

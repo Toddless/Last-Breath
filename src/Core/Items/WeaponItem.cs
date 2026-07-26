@@ -29,27 +29,40 @@ namespace Core.Items
         public float CriticalChance { get; }
         public float CriticalDamage { get; }
 
-        public float Damage
+        public float Damage => FoldAroundBase(EntityParameter.PhysicalDamage, BaseDamage);
+
+        /// <summary>Every weapon base scales by the ONE multiplier (sharpening × ascension) — the
+        /// owner's rule: the scales raise every numeric value, bases included — and every base folds
+        /// its whole LOCAL bucket the same way: (base + flat) × (1 + inc) × (1 + multi). A local
+        /// "+X% increased crit" therefore amplifies the weapon's own crit base, exactly like local
+        /// damage lines always amplified the damage.</summary>
+        public (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter)
         {
-            get
+            float rawBase = parameter switch
             {
-                (float flat, float increase, float multiplier) = LocalBucket(EntityParameter.PhysicalDamage);
-                return ((BaseDamage * UpdateMultiplier) + flat) * (1f + increase) * (1f + multiplier);
-            }
+                EntityParameter.PhysicalDamage => BaseDamage,
+                EntityParameter.CriticalChance => CriticalChance,
+                EntityParameter.CriticalDamage => CriticalDamage,
+                _ => float.NaN,
+            };
+            if (float.IsNaN(rawBase)) return (0f, 0f);
+
+            float scaledBase = rawBase * LineMultiplier;
+            return (scaledBase, FoldAroundBase(parameter, rawBase) - scaledBase);
         }
 
-        /// <summary>Damage folds its whole local bucket around the sharpened base (see <see cref="Damage"/>);
-        /// the crit pair receives exactly the resolved flat the owner would get from the item's lines.</summary>
-        public (float Base, float LocalBonus) GetStatBreakdown(EntityParameter parameter) => parameter switch
+        private float FoldAroundBase(EntityParameter parameter, float baseValue)
         {
-            EntityParameter.PhysicalDamage => (BaseDamage * UpdateMultiplier, Damage - (BaseDamage * UpdateMultiplier)),
-            EntityParameter.CriticalChance => (CriticalChance, ResolvedLocalFlat(parameter)),
-            EntityParameter.CriticalDamage => (CriticalDamage, ResolvedLocalFlat(parameter)),
-            _ => (0f, 0f),
-        };
+            (float flat, float increase, float multiplier) = LocalBucket(parameter);
+            return ((baseValue * LineMultiplier) + flat) * (1f + increase) * (1f + multiplier);
+        }
 
         protected override EquipItem CreateCopy() => new WeaponItem(this);
 
-        protected override bool IsLocalBucketExternal(EntityParameter parameter) => parameter == EntityParameter.PhysicalDamage;
+        // The weapon triple consumes its own local buckets (the folds above) — none of the three
+        // may ALSO resolve into synthetic flats, or every local line would land twice.
+        protected override bool IsLocalBucketExternal(EntityParameter parameter) =>
+            parameter is EntityParameter.PhysicalDamage or EntityParameter.CriticalChance or EntityParameter.CriticalDamage
+            || base.IsLocalBucketExternal(parameter);
     }
 }

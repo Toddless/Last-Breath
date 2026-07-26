@@ -8,24 +8,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Intelligence",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 10,
-                        "max": 15
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Intelligence",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.05,
-                        "max": 0.1
-                    },
-                    "scope": "Local"
+                        "min": 11,
+                        "max": 17
+                    }
                 }
             ],
             "modifiers": [],
@@ -40,24 +29,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Strength",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 10,
-                        "max": 15
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Strength",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.05,
-                        "max": 0.1
-                    },
-                    "scope": "Local"
+                        "min": 11,
+                        "max": 17
+                    }
                 }
             ],
             "modifiers": [],
@@ -72,24 +50,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Dexterity",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 10,
-                        "max": 15
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Dexterity",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.05,
-                        "max": 0.1
-                    },
-                    "scope": "Local"
+                        "min": 11,
+                        "max": 17
+                    }
                 }
             ],
             "modifiers": [],
@@ -104,15 +71,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "AllAttribute",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -127,24 +92,20 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Dexterity",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Intelligence",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -159,24 +120,20 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Dexterity",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Strength",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -191,24 +148,20 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Intelligence",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Strength",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 10
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -223,24 +176,20 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "HealthRecovery",
-                    "modifierType": "flat",
                     "value": {
                         "min": 10,
                         "max": 25
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "ManaRecovery",
-                    "modifierType": "flat",
                     "value": {
                         "min": 5,
                         "max": 20
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -255,15 +204,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Mana",
-                    "modifierType": "flat",
                     "value": {
                         "min": 100,
                         "max": 250
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -278,15 +225,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
                         "min": 150,
                         "max": 300
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -301,24 +246,20 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
                         "min": 50,
                         "max": 150
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Mana",
-                    "modifierType": "flat",
                     "value": {
                         "min": 25,
                         "max": 125
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],

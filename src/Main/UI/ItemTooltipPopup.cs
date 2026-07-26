@@ -187,28 +187,39 @@ namespace LastBreath.UI
             ClearRows(_mods);
             ClearRows(_effects);
 
-            RenderWeaponStats(_item as IWeaponItem);
+            RenderItemStats(_item as IEquipItem);
             if (_item is IEquipItem equipItem) RenderEquipLines(equipItem);
             else HideEquipSections();
             RenderDescription(_item);
         }
 
-        /// <summary>The weapon's own base stats: effective values with the item's LOCAL lines folded
-        /// in. A locally modified stat glows brighter, and the Ctrl reveal splits it into
-        /// "base + local contribution" ("6% + 4%") instead of the folded total.</summary>
-        private void RenderWeaponStats(IWeaponItem? weapon)
+        /// <summary>The item's own base stats: effective values with the LOCAL lines folded in.
+        /// Weapons open with their combat triple; every equip then adds one row per typed base stat
+        /// (armor's evade, a ring's health). A locally modified stat glows brighter, and the Ctrl
+        /// reveal splits it into "base + local contribution" ("6% + 4%") instead of the folded
+        /// total. Implicits stay a separate section for the SPECIAL authored lines only.</summary>
+        private void RenderItemStats(IEquipItem? item)
         {
-            _baseStats?.Visible = weapon != null;
-            if (weapon == null) return;
+            _baseStats?.Visible = item is IWeaponItem || item?.BaseStats.Count > 0;
+            if (item == null) return;
 
-            AddBaseStatRow(EntityParameter.PhysicalDamage, weapon);
-            AddBaseStatRow(EntityParameter.CriticalChance, weapon);
-            AddBaseStatRow(EntityParameter.CriticalDamage, weapon);
+            if (item is IWeaponItem weapon)
+            {
+                AddBaseStatRow(EntityParameter.PhysicalDamage, weapon);
+                AddBaseStatRow(EntityParameter.CriticalChance, weapon);
+                AddBaseStatRow(EntityParameter.CriticalDamage, weapon);
+            }
+
+            foreach (var parameter in item.BaseStats.Keys)
+                AddBaseStatRow(parameter, item.GetBaseStatBreakdown(parameter));
         }
 
-        private void AddBaseStatRow(EntityParameter parameter, IWeaponItem weapon)
+        private void AddBaseStatRow(EntityParameter parameter, IWeaponItem weapon) =>
+            AddBaseStatRow(parameter, weapon.GetStatBreakdown(parameter));
+
+        private void AddBaseStatRow(EntityParameter parameter, (float Base, float LocalBonus) breakdown)
         {
-            (float baseValue, float localBonus) = weapon.GetStatBreakdown(parameter);
+            (float baseValue, float localBonus) = breakdown;
             bool locallyModified = System.MathF.Abs(localBonus) > 0.0001f;
 
             string text = locallyModified && _revealRanges

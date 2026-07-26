@@ -22,6 +22,12 @@ namespace Core.Crafting
         /// their recraft pools join the roll for this call only.</summary>
         string? TryRecraftModifier(IEquipItem item, string modifierInstanceId, IReadOnlyCollection<string>? additiveResourceIds = null);
 
+        /// <summary>The informational mirror of the reroll pool <see cref="TryRecraftModifier"/> draws
+        /// from — one composition serves both, so the preview can never drift from the actual roll:
+        /// family ∪ the base's own pool ∪ used-resource descriptors ∪ the operation's additives, the
+        /// whole union scaled by the item's PowerMultiplier.</summary>
+        IEnumerable<Modifiers.IModifierDescriptor> GetRerollPreviewPool(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null);
+
         /// <summary>Additives raise the success chance and may grant a second level on success.</summary>
         ItemUpgradeResult TryUpgradeItem(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null);
 

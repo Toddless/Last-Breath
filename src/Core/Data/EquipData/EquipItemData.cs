@@ -18,6 +18,7 @@ namespace Core.Data.EquipData
         [JsonProperty("tags")] public string[] Tags { get; init; } = [];
         [JsonProperty("updateLevel")] public LevelRangeData UpdateLevel { get; init; }
         [JsonProperty("maxUpdateLevel")] public int MaxUpdateLevel { get; init; }
+        [JsonProperty("baseStats")] public List<BaseStatData> BaseStats { get; init; } = [];
         [JsonProperty("implicits")] public List<ItemModifier> Implicits { get; init; } = [];
         [JsonProperty("modifiers")] public List<ItemModifier> Modifiers { get; init; } = [];
         [JsonProperty("grants")] public List<GrantData> Grants { get; init; } = [];

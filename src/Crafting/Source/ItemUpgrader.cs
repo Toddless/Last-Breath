@@ -54,18 +54,10 @@ namespace Crafting.Source
             var target = FindLine(item, modifierInstanceId);
             if (target == null) return null; // the line is not on the item
             (var targetAffix, string? targetGroupId) = target.Value;
-            // LIVE pool, computed at reroll time (never stored on the item, so a json edit is visible on
-            // existing items): family pool + the item's own pool + the used resources' descriptors, plus the
-            // operation's additive pools. The WHOLE union scales by the item's PowerMultiplier so a reroll
-            // matches the magnitude the item was born with (loot difficulty or crafting quality) — additives
-            // included, deliberately.
             // Composites flatten to atomic parts so a reroll is 1-for-1. A reroll preserves the slot family: candidates are
             // filtered to the target line's affix. A None line (legacy save / authored fodder predating the
             // affix markup) has no slot family to preserve, so it tolerantly rerolls from the FULL pool.
-            var livePool = itemDataProvider.GetLiveRerollPool(item)
-                .Concat(AdditivePools(additiveResourceIds))
-                .Concat(AdditiveResourceDescriptors(additiveResourceIds, item))
-                .Select(descriptor => DescriptorOperations.Scale(descriptor, item.PowerMultiplier));
+            var livePool = GetRerollPreviewPool(item, additiveResourceIds);
 
             // No duplicate lines: a candidate whose key (parameter + value type, NEVER the value) already
             // sits on the item is out — "+35% damage" next to "+33% damage" is the same line twice. The keys
@@ -113,6 +105,18 @@ namespace Crafting.Source
                 .Concat(sink.Contexts.Select(entry => entry.InstanceId))
                 .FirstOrDefault();
         }
+
+        /// <summary>LIVE pool, computed at call time (never stored on the item, so a json edit is visible
+        /// on existing items): family pool + the item's own pool + the used resources' descriptors, plus
+        /// the operation's additive pools. The WHOLE union scales by the item's PowerMultiplier so a
+        /// reroll matches the magnitude the item was born with (loot difficulty or crafting quality) —
+        /// additives included, deliberately. TryRecraftModifier rolls from EXACTLY this; the window's
+        /// pool column renders it (same one-source rule as the sharpening chance bar).</summary>
+        public IEnumerable<IModifierDescriptor> GetRerollPreviewPool(IEquipItem item, IReadOnlyCollection<string>? additiveResourceIds = null) =>
+            itemDataProvider.GetLiveRerollPool(item)
+                .Concat(AdditivePools(additiveResourceIds))
+                .Concat(AdditiveResourceDescriptors(additiveResourceIds, item))
+                .Select(descriptor => DescriptorOperations.Scale(descriptor, item.PowerMultiplier));
 
         // The informational mirror of the roll below: ONE formula in ComputeUpgradeChance serves both,
         // so the chance bar can never drift from what TryUpgradeItem actually rolls against.

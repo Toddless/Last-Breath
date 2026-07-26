@@ -16,6 +16,9 @@ namespace Core.Items
 
         private readonly List<IModifierInstance> _implicits = [];
         private readonly List<IModifierInstance> _modifiers = [];
+        // The piece's typed base channel (armor's evade, a ring's health), rolled once by the minter.
+        // Stored UNSCALED: sharpening/ascension apply on read, exactly like line values.
+        private readonly Dictionary<EntityParameter, float> _baseStats = [];
         private readonly List<ContextModifierEntry> _implicitsContextModifier = [];
         private readonly List<ContextModifierEntry> _contextModifiers = [];
         // Two carriers by design: the recipe's mandatory resources and the optional additives are
@@ -28,8 +31,9 @@ namespace Core.Items
         private IFightable? _owner;
 
         // THE line-value formula: every stored line (both channels, implicit or rolled) is worth
-        // Base × sharpening scale × ascension scale. All five write paths go through this.
-        private float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
+        // Base × sharpening scale × ascension scale. All five write paths go through this; the base
+        // stat channel and the weapon's BaseDamage read it too (ascension's "+15% to everything").
+        protected float LineMultiplier => UpdateMultiplier * AscensionMultiplier;
         protected float UpdateMultiplier { get; private set; } = 1f;
 
         public EquipmentPiece EquipmentPiece { get; }
@@ -83,7 +87,9 @@ namespace Core.Items
         public IReadOnlyList<ContextModifierEntry> ContextModifiers => _contextModifiers;
         public IReadOnlyList<IItemGrant> Grants => _grants;
         public IReadOnlyCollection<EntityParameter> AffectedParameters =>
-            _implicits.Concat(_modifiers).Select(modifier => modifier.EntityParameter).ToHashSet();
+            _implicits.Concat(_modifiers).Select(modifier => modifier.EntityParameter).Concat(_baseStats.Keys).ToHashSet();
+
+        public IReadOnlyDictionary<EntityParameter, float> BaseStats => _baseStats;
         public IReadOnlyDictionary<string, int> UsedRequiredResources => _usedRequiredResources;
         public IReadOnlyDictionary<string, int> UsedOptionalResources => _usedOptionalResources;
         public IReadOnlyDictionary<string, int> UsedResources
@@ -122,6 +128,7 @@ namespace Core.Items
             MaxUpdateLevel = source.MaxUpdateLevel;
             UpdateMultiplier = source.UpdateMultiplier;
             AscensionMultiplier = source.AscensionMultiplier; // before the lines: Set* below scale by it
+            foreach (var stat in source._baseStats) _baseStats[stat.Key] = stat.Value;
 
             SetImplicits(CopyModifiers(source._implicits));
             SetModifiers(CopyModifiers(source._modifiers));
@@ -147,6 +154,25 @@ namespace Core.Items
 
         public bool IsSame(string otherId) => InstanceId.Equals(otherId);
         public bool HasTag(string tag) => Tags.Contains(tag, StringComparer.OrdinalIgnoreCase);
+
+        public void SetBaseStats(IEnumerable<KeyValuePair<EntityParameter, float>> stats)
+        {
+            if (IsSealed) return;
+            _baseStats.Clear();
+            foreach ((var parameter, float value) in stats) _baseStats[parameter] = value;
+            _resolvedModifiers = null;
+        }
+
+        /// <summary>The weapon-damage convention generalized: base × sharpening/ascension scale,
+        /// then the whole local bucket folds around it — (scaledBase + flat) × (1 + increase) ×
+        /// (1 + multiplier). LocalBonus is everything on top of the scaled base.</summary>
+        public (float Base, float LocalBonus) GetBaseStatBreakdown(EntityParameter parameter)
+        {
+            float scaledBase = _baseStats.GetValueOrDefault(parameter) * LineMultiplier;
+            (float flat, float increase, float multiplier) = LocalBucket(parameter);
+            float effective = (scaledBase + flat) * (1f + increase) * (1f + multiplier);
+            return (scaledBase, effective - scaledBase);
+        }
 
         public void SetImplicits(IEnumerable<IModifier> modifiers)
         {
@@ -325,6 +351,7 @@ namespace Core.Items
         }
 
 
+
         /// <summary>The scaled value of one line. A flag line ("attacks ignore elemental resistances") is a
         /// switch, not a number: sharpening and ascension leave it exactly as data wrote it.</summary>
         private float Scaled(float baseValue, ModifierValueType type) =>
@@ -332,9 +359,10 @@ namespace Core.Items
 
         protected virtual EquipItem CreateCopy() => new(this);
 
-        // Parameters whose local bucket is consumed outside the generic resolution
-        // (weapon damage: locals fold into the base value channel instead of a synthetic flat modifier).
-        protected virtual bool IsLocalBucketExternal(EntityParameter parameter) => false;
+        // Parameters whose local bucket is consumed outside the generic per-line resolution: any
+        // parameter with a BASE STAT folds its locals around that base (see GetBaseStatBreakdown);
+        // weapon damage additionally folds into the weapon's own value channel (override below).
+        protected virtual bool IsLocalBucketExternal(EntityParameter parameter) => _baseStats.ContainsKey(parameter);
 
         private IEnumerable<IModifier> CopyModifiers(IEnumerable<IModifier> modifiers) =>
             modifiers.Select(IModifier (modifier) =>
@@ -419,6 +447,18 @@ namespace Core.Items
                 }
 
                 if (modifiers.Count > 0) resolved[group.Key] = modifiers;
+            }
+
+            // The base channel: every base stat hands the owner ONE flat — the scaled base with its
+            // whole local bucket folded around it. The group loop above deliberately skipped those
+            // locals (IsLocalBucketExternal), so nothing lands twice.
+            foreach (var parameter in _baseStats.Keys)
+            {
+                (float baseValue, float localBonus) = GetBaseStatBreakdown(parameter);
+                float effective = baseValue + localBonus;
+                if (effective == 0f) continue;
+                if (!resolved.TryGetValue(parameter, out var modifiers)) resolved[parameter] = modifiers = [];
+                modifiers.Add(ModifiersCreator.CreateModifierInstance(parameter, ModifierValueType.Flat, effective, InstanceId));
             }
 
             return resolved;

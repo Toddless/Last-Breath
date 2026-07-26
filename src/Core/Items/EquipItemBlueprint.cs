@@ -14,6 +14,11 @@ namespace Core.Items
         float CriticalChance,
         float CriticalDamage);
 
+    /// <summary>One base stat of a non-weapon equip (armor's evade, a ring's health): the piece's
+    /// reason to exist, typed — NOT an implicit line. The minter rolls the range once; local lines
+    /// then amplify the rolled base (the weapon-damage convention generalized).</summary>
+    public sealed record BaseStatBlueprint(EntityParameter Parameter, ValueRange Value);
+
     /// <summary>Parsed grant spec. Modifier lines are shared templates: the factory mints fresh
     /// instances per grant, so one blueprint safely feeds any number of items.</summary>
     public sealed record GrantBlueprint(
@@ -45,6 +50,11 @@ namespace Core.Items
         public LevelRangeData UpdateLevel { get; init; }
 
         public int MaxUpdateLevel { get; init; }
+
+        /// <summary>Base stat rolls; implicits below are reserved for the SPECIAL authored lines
+        /// (context knobs, unique flavor), never for the piece's plain defensive stats.</summary>
+        public IReadOnlyList<BaseStatBlueprint> BaseStats { get; init; } = [];
+
         public IReadOnlyList<IModifierDescriptor> Implicits { get; init; } = [];
         public IReadOnlyList<IModifierDescriptor> Modifiers { get; init; } = [];
         public IReadOnlyList<GrantBlueprint> Grants { get; init; } = [];

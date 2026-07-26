@@ -44,6 +44,11 @@ namespace Core.Data.SaveData
         // saves — including already-sealed mythics — restore with the neutral 1.
         [JsonProperty("ascensionMultiplier", NullValueHandling = NullValueHandling.Ignore)] public float? AscensionMultiplier { get; init; }
 
+        // The typed base channel (rolled UNSCALED values). Absent on legacy saves — their base stats
+        // still live as local implicit lines and restore through the modifier lists untouched.
+        [JsonProperty("baseStats", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<EntityParameter, float>? BaseStats { get; init; }
+
         [JsonProperty("implicits")] public List<ModifierSaveData> Implicits { get; init; } = [];
         [JsonProperty("modifiers")] public List<ModifierSaveData> Modifiers { get; init; } = [];
         [JsonProperty("contextImplicits")] public List<ContextModifierSaveData> ContextImplicits { get; init; } = [];

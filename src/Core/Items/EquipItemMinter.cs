@@ -2,6 +2,7 @@ namespace Core.Items
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Data;
     using Entity.Components;
     using Enums;
@@ -36,6 +37,7 @@ namespace Core.Items
             var item = CreateItem(blueprint);
             item.Rarity = blueprint.Rarity;
             ApplyUpdateLevel(blueprint, item);
+            RollBaseStats(blueprint, item);
 
             var implicits = Materialize(blueprint.Implicits, item.InstanceId);
             item.SetImplicits(implicits.Entities);
@@ -73,6 +75,16 @@ namespace Core.Items
             item.MaxUpdateLevel = blueprint.MaxUpdateLevel;
             int level = spec.IsFixed ? spec.Min : rnd.RandIntRange(spec.Min, spec.Max);
             if (level > 0) item.Upgrade(level);
+        }
+
+        /// <summary>Base stats roll right after the level and BEFORE any line — a fixed slot in the
+        /// seeded sequence, so adding a line to the data never shifts the base rolls.</summary>
+        private void RollBaseStats(EquipItemBlueprint blueprint, IEquipItem item)
+        {
+            if (blueprint.BaseStats.Count == 0) return;
+            item.SetBaseStats(blueprint.BaseStats.Select(stat => new KeyValuePair<EntityParameter, float>(
+                stat.Parameter,
+                stat.Value.IsFixed ? stat.Value.Min : rnd.RandFloatRange(stat.Value.Min, stat.Value.Max))));
         }
 
         private CollectingSink Materialize(IReadOnlyList<IModifierDescriptor> descriptors, string source)

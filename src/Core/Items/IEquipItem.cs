@@ -43,6 +43,19 @@
         /// crafting quality). Scales the LIVE reroll pool on every recraft; defaults to 1.</summary>
         float PowerMultiplier { get; set; }
 
+        /// <summary>The piece's typed base channel (armor's evade, a ring's health) — rolled once at
+        /// mint, stored UNSCALED; implicits are reserved for special authored lines. Local lines
+        /// amplify this base (the weapon-damage convention generalized).</summary>
+        IReadOnlyDictionary<EntityParameter, float> BaseStats { get; }
+
+        /// <summary>Scaled base (sharpening × ascension) and everything the LOCAL lines add on top:
+        /// effective = (Base + flat) × (1 + increase) × (1 + multiplier). The owner receives
+        /// Base + LocalBonus as one flat; the tooltip splits it on the Ctrl reveal.</summary>
+        (float Base, float LocalBonus) GetBaseStatBreakdown(EntityParameter parameter);
+
+        /// <summary>Minter/restore plumbing — replaces the whole base channel.</summary>
+        void SetBaseStats(IEnumerable<KeyValuePair<EntityParameter, float>> stats);
+
         /// <summary>How many modifier rerolls actually happened on this item — each one raises the next
         /// recraft's price. The setter exists for restore/copy plumbing; gameplay increments live in the
         /// upgrader and fire ONLY on a reroll that took place (a refusal is free and does not count).</summary>

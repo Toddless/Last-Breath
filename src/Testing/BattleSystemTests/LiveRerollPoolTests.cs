@@ -213,6 +213,36 @@ namespace LastBreathTest.BattleSystemTests
             Assert.IsFalse(seenParameters.Contains(EntityParameter.PhysicalDamage), "a Weapon-only essence entry must never land on a Jewellery item");
         }
 
+        [TestMethod]
+        public void PreviewPool_MatchesTheRollComposition_AdditivesAndScaleIncluded()
+        {
+            // The window renders GetRerollPreviewPool; TryRecraftModifier rolls from the same call.
+            // The preview must therefore carry the item's own pool, the additive's descriptors, and
+            // the PowerMultiplier scaling — here 2×: 100 → 200 and [10..20] → [20..40].
+            var provider = EmptyPoolProvider();
+            provider.Setup(mock => mock.GetEquipItemModifierPool("Ring_Test")).Returns(
+            [
+                new ParameterDescriptor(EntityParameter.PhysicalDamage, ModifierValueType.Flat, 100f, ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Prefix },
+            ]);
+            provider.Setup(mock => mock.GetResourceDescriptors("Essence")).Returns(
+            [
+                new ParameterDescriptor(EntityParameter.Barrier, ModifierValueType.Flat, new ValueRange(10f, 20f), ModifierScope.Global) { Weight = 10f, Affix = AffixKind.Suffix },
+            ]);
+            var item = new EquipItem(EquipmentPiece.Ring, "Ring_Test", []) { PowerMultiplier = 2f };
+
+            var preview = CreateUpgrader(seed: 1, provider.Object)
+                .GetRerollPreviewPool(item, ["Essence"])
+                .OfType<ParameterDescriptor>()
+                .ToList();
+
+            Assert.AreEqual(2, preview.Count);
+            var own = preview.Single(descriptor => descriptor.Parameter == EntityParameter.PhysicalDamage);
+            Assert.AreEqual(200f, own.Value.Min, 0.001f);
+            var additive = preview.Single(descriptor => descriptor.Parameter == EntityParameter.Barrier);
+            Assert.AreEqual(20f, additive.Value.Min, 0.001f);
+            Assert.AreEqual(40f, additive.Value.Max, 0.001f);
+        }
+
         private static ItemUpgrader CreateUpgrader(int seed, IItemDataProvider provider)
         {
             var rnd = new DefaultRandomNumberGenerator(seed);

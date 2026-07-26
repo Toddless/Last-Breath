@@ -138,6 +138,7 @@ namespace Core.Data
                     BasePrice = item.BasePrice,
                     UpdateLevel = item.UpdateLevel,
                     MaxUpdateLevel = item.MaxUpdateLevel,
+                    BaseStats = ParseBaseStats(item),
                     // Authored lines never carry an affix — they are implicit by definition, not rolled slots.
                     Implicits = LoadDescriptors(item.Implicits, item.Id, AffixPolicy.Forbidden),
                     Modifiers = LoadDescriptors(item.Modifiers, item.Id, AffixPolicy.Forbidden),
@@ -225,6 +226,31 @@ namespace Core.Data
 
             Tracker.TrackError($"Skipping item '{item.Id}': updateLevel [{level.Min}..{level.Max}] is invalid (bounds must be 0 <= min <= max <= maxUpdateLevel {item.MaxUpdateLevel})");
             return false;
+        }
+
+        /// <summary>Base stats parse per entry with the usual tolerance: a typo'd parameter or a
+        /// broken range drops that stat with a report, never the item.</summary>
+        private static List<BaseStatBlueprint> ParseBaseStats(EquipItemData item)
+        {
+            var stats = new List<BaseStatBlueprint>();
+            foreach (var stat in item.BaseStats)
+            {
+                if (!EnumParser.TryParseEnum<EntityParameter>(stat.Parameter, out var parameter))
+                {
+                    Tracker.TrackError($"Skipping base stat of '{item.Id}': '{stat.Parameter}' is not an EntityParameter");
+                    continue;
+                }
+
+                if (!stat.Value.IsValid)
+                {
+                    Tracker.TrackError($"Skipping base stat of '{item.Id}': value [{stat.Value.Min}..{stat.Value.Max}] is not a number or a valid min/max range");
+                    continue;
+                }
+
+                stats.Add(new BaseStatBlueprint(parameter, new ValueRange(stat.Value.Min, stat.Value.Max)));
+            }
+
+            return stats;
         }
 
         private static WeaponBlueprint ParseWeaponBlock(EquipItemData item) => new(

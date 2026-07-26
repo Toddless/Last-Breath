@@ -10,24 +10,20 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
                         "min": 180,
                         "max": 350
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Armor",
-                    "modifierType": "flat",
                     "value": {
                         "min": 300,
                         "max": 750
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -44,24 +40,13 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Armor",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 500,
-                        "max": 900
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Armor",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.25,
-                        "max": 0.6
-                    },
-                    "scope": "Local"
+                        "min": 625,
+                        "max": 1440
+                    }
                 }
             ],
             "modifiers": [],
@@ -78,24 +63,13 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 300,
-                        "max": 500
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Health",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.2,
-                        "max": 0.35
-                    },
-                    "scope": "Local"
+                        "min": 360,
+                        "max": 675
+                    }
                 }
             ],
             "modifiers": [],
@@ -112,24 +86,13 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Evade",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 500,
-                        "max": 900
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Evade",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.25,
-                        "max": 0.6
-                    },
-                    "scope": "Local"
+                        "min": 625,
+                        "max": 1440
+                    }
                 }
             ],
             "modifiers": [],
@@ -146,24 +109,20 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Evade",
-                    "modifierType": "flat",
                     "value": {
                         "min": 280,
                         "max": 420
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
                         "min": 200,
                         "max": 350
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -180,24 +139,20 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Barrier",
-                    "modifierType": "flat",
                     "value": {
                         "min": 220,
                         "max": 440
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Health",
-                    "modifierType": "flat",
                     "value": {
                         "min": 200,
                         "max": 400
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -214,24 +169,13 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Barrier",
-                    "modifierType": "flat",
                     "value": {
-                        "min": 400,
-                        "max": 900
-                    },
-                    "scope": "Local"
-                },
-                {
-                    "parameter": "Barrier",
-                    "modifierType": "inc",
-                    "value": {
-                        "min": 0.25,
-                        "max": 0.6
-                    },
-                    "scope": "Local"
+                        "min": 500,
+                        "max": 1440
+                    }
                 }
             ],
             "modifiers": [],
@@ -248,24 +192,20 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Barrier",
-                    "modifierType": "flat",
                     "value": {
                         "min": 180,
                         "max": 280
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Armor",
-                    "modifierType": "flat",
                     "value": {
                         "min": 300,
                         "max": 500
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -282,24 +222,20 @@
             ],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Barrier",
-                    "modifierType": "flat",
                     "value": {
                         "min": 180,
                         "max": 280
-                    },
-                    "scope": "Local"
+                    }
                 },
                 {
                     "parameter": "Evade",
-                    "modifierType": "flat",
                     "value": {
                         "min": 300,
                         "max": 500
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],

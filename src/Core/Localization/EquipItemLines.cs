@@ -19,6 +19,9 @@ namespace Core.Localization
     /// stamps directly and both panels show the same lines in the same order.</summary>
     public static class EquipItemLines
     {
+        /// <summary>Implicit rows are the SPECIAL authored lines only — the piece's plain base stats
+        /// live in the typed base channel (<see cref="IEquipItem.BaseStats"/>) and render as the item's
+        /// stat block, never here.</summary>
         public static List<EquipItemLine> ComposeImplicits(IEquipItem item, TextFormat format = TextFormat.Plain, float? previewValueScale = null) =>
             Compose(item.Implicits, item.ContextImplicits, format, previewValueScale);
 

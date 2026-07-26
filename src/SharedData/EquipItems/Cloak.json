@@ -7,15 +7,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Evade",
-                    "modifierType": "flat",
                     "value": {
                         "min": 220,
                         "max": 400
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],
@@ -29,15 +27,13 @@
             "tags": [],
             "updateLevel": 0,
             "maxUpdateLevel": 12,
-            "implicits": [
+            "baseStats": [
                 {
                     "parameter": "Evade",
-                    "modifierType": "flat",
                     "value": {
                         "min": 380,
                         "max": 700
-                    },
-                    "scope": "Local"
+                    }
                 }
             ],
             "modifiers": [],

@@ -29,6 +29,7 @@ namespace Core.Save
             PowerMultiplier = item.PowerMultiplier,
             RecraftCount = item.RecraftCount,
             AscensionMultiplier = item.AscensionMultiplier,
+            BaseStats = item.BaseStats.Count > 0 ? new Dictionary<EntityParameter, float>(item.BaseStats) : null,
             Implicits = ToModifierData(item.Implicits),
             Modifiers = ToModifierData(item.Modifiers),
             ContextImplicits = ToContextData(item.ContextImplicits),
@@ -65,6 +66,9 @@ namespace Core.Save
             // Assigned BEFORE the lines and the seal replay: the Set*/Upgrade calls below recompute
             // every value through it. Legacy saves (pre-rework mythics included) read as the neutral 1.
             item.AscensionMultiplier = data.AscensionMultiplier ?? 1f;
+            // Legacy saves carry no base channel: their base stats keep living as local implicit
+            // lines (restored below) and resolve through the old fold — no migration needed.
+            if (data.BaseStats is { Count: > 0 } baseStats) item.SetBaseStats(baseStats);
             item.SetImplicits(data.Implicits.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetModifiers(data.Modifiers.Select(modifier => ToModifier(modifier, item.InstanceId)));
             item.SetContextImplicits(data.ContextImplicits.Select(ToContextEntry));
