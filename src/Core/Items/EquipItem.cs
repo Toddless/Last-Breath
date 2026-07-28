@@ -352,10 +352,12 @@ namespace Core.Items
 
 
 
-        /// <summary>The scaled value of one line. A flag line ("attacks ignore elemental resistances") is a
-        /// switch, not a number: sharpening and ascension leave it exactly as data wrote it.</summary>
+        /// <summary>The scaled value of one line — FLAT lines ONLY. A percent line (increase/multiplicative)
+        /// already multiplies a value the scales have raised, so scaling it too would stack a multiplier on a
+        /// multiplier; a flag line ("attacks ignore elemental resistances") is a switch, not a number. Both
+        /// stay exactly as data wrote them.</summary>
         private float Scaled(float baseValue, ModifierValueType type) =>
-            type == ModifierValueType.Flag ? baseValue : baseValue * LineMultiplier;
+            type == ModifierValueType.Flat ? baseValue * LineMultiplier : baseValue;
 
         protected virtual EquipItem CreateCopy() => new(this);
 

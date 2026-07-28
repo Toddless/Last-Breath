@@ -46,7 +46,7 @@ namespace Battle.Source.Effects
 
             public void Apply(IAbilityActivationContext context)
             {
-                if (_spent) return;
+                if (_spent || context.IsPreview) return;
                 _spent = true;
                 context.Cooldown += amount;
             }

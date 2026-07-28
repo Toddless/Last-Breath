@@ -5,7 +5,5 @@
     {
         void RemoveUpgrade(T ability);
         void ApplyUpgrade(T ability);
-
-        IAbilityUpgrade Copy();
     }
 }

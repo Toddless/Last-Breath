@@ -311,6 +311,7 @@ namespace Battle.Internal.Npc
             NpcModifiers.AddModifiers(definition.Modifiers.ToList());
 
             GrantControlResistance();
+            Battle.Source.ExhaustionGrant.Attach(this);
             AttachAuthoredPassives(definition.Passives);
 
             CurrentHealth = Parameters.MaxHealth;

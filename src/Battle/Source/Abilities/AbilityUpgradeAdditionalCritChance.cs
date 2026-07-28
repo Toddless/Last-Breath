@@ -10,6 +10,6 @@ namespace Battle.Source.Abilities
             Priority.Weak,
             OperationType.Add,
             amount,
-            "Ability_Parameter_Decorator_Crit_Chance_Bonus",
+            $"Ability_Parameter_Decorator_{id}",
             id));
 }

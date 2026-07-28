@@ -1,0 +1,81 @@
+namespace PassiveTreeEditor.Source.Io
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Core.Data;
+    using Core.Enums;
+    using Newtonsoft.Json;
+    using Simulation;
+
+    /// <summary>
+    /// Tool-only preferences: which file was open and what character the totals are measured on.
+    /// Deliberately separate from the tree file — the tree is game data and must not carry editor
+    /// state into the repository.
+    /// </summary>
+    public static class EditorSettings
+    {
+        public static EditorSettingsState Load()
+        {
+            var state = new EditorSettingsState();
+
+            try
+            {
+                if (!File.Exists(ToolPaths.SettingsPath)) return state;
+
+                EditorSettingsDto? dto = JsonConvert.DeserializeObject<EditorSettingsDto>(File.ReadAllText(ToolPaths.SettingsPath));
+                if (dto is null) return state;
+
+                if (!string.IsNullOrWhiteSpace(dto.TreePath)) state.TreePath = dto.TreePath;
+
+                foreach (KeyValuePair<string, float> pair in dto.BaseStats ?? new Dictionary<string, float>())
+                    if (EnumParser.TryParseEnum(pair.Key, out EntityParameter parameter))
+                        state.BaseStats[parameter] = pair.Value;
+            }
+            catch (Exception)
+            {
+                // A damaged settings file must never stop the tool from opening: defaults win.
+                return new EditorSettingsState();
+            }
+
+            return state;
+        }
+
+        public static void Save(EditorSettingsState state)
+        {
+            var dto = new EditorSettingsDto
+            {
+                TreePath = state.TreePath,
+                BaseStats = new Dictionary<string, float>()
+            };
+
+            foreach (KeyValuePair<EntityParameter, float> pair in state.BaseStats.Values)
+                dto.BaseStats[pair.Key.ToString()] = pair.Value;
+
+            try
+            {
+                string json = JsonConvert.SerializeObject(dto, Formatting.Indented).Replace("\r\n", "\n");
+                File.WriteAllText(ToolPaths.SettingsPath, json + "\n", new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            }
+            catch (Exception)
+            {
+                // Preferences are a convenience; failing to persist them is not worth an error popup.
+            }
+        }
+    }
+
+    public sealed class EditorSettingsState
+    {
+        public string TreePath { get; set; } = string.Empty;
+
+        public BaseStatProfile BaseStats { get; set; } = BaseStatProfile.Unarmed();
+    }
+
+    public sealed class EditorSettingsDto
+    {
+        [JsonProperty("treePath")] public string? TreePath { get; set; }
+
+        [JsonProperty("baseStats")] public Dictionary<string, float>? BaseStats { get; set; }
+    }
+}

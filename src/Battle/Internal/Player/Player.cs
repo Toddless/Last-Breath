@@ -206,6 +206,7 @@ namespace Battle.Internal.Player
             Parameters.ParameterChanged += Strength.OnParameterChanges;
             Parameters.ParameterChanged += Intelligence.OnParameterChanges;
             CombatEvents = new CombatEventBus();
+            Battle.Source.ExhaustionGrant.Attach(this);
             SetBaseValuesForParameters();
             ConfigureStateMachine();
             CurrentHealth = Parameters.MaxHealth;

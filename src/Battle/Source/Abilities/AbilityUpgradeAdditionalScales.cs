@@ -9,8 +9,8 @@ namespace Battle.Source.Abilities
     public class AbilityUpgradeAdditionalScales(string id, string[] tags, int tier, float weaponScale, float spellScale)
         : AbilityUpgrade<Ability>(id, tags, tier)
     {
-        private const string WeaponDecoratorId = "Ability_Parameter_Decorator_Additional_Weapon_Scale";
-        private const string SpellDecoratorId = "Ability_Parameter_Decorator_Additional_Spell_Scale";
+        private string WeaponDecoratorId => $"Ability_Parameter_Decorator_{Id}_Weapon_Scale";
+        private string SpellDecoratorId => $"Ability_Parameter_Decorator_{Id}_Spell_Scale";
 
         public override void ApplyUpgrade(Ability ability)
         {

@@ -1,0 +1,3049 @@
+{
+    "version": 1,
+    "budget": 65,
+    "nodes": [
+        {
+            "id": "abilityunlock_1",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": -3.0,
+            "y": -50.0,
+            "title": "Double Strike",
+            "abilityId": "Ability_Double_Strike"
+        },
+        {
+            "id": "abilityunlock_10",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": 178.0,
+            "y": -378.0,
+            "title": "Head Butt",
+            "abilityId": "Ability_Head_Butt"
+        },
+        {
+            "id": "abilityunlock_11",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": 67.0,
+            "y": -165.0,
+            "title": "Ares` Blessing",
+            "abilityId": "Ability_Ares_Blessing"
+        },
+        {
+            "id": "abilityunlock_12",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": 71.0,
+            "y": -263.0,
+            "title": "Porcupine",
+            "abilityId": "Ability_Porcupine"
+        },
+        {
+            "id": "abilityunlock_13",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": -99.0,
+            "y": -342.0,
+            "title": "Berserk Fury",
+            "abilityId": "Ability_Berserk_Fury"
+        },
+        {
+            "id": "abilityunlock_14",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": -191.0,
+            "y": -438.0,
+            "title": "Armageddon",
+            "abilityId": "Ability_Armageddon"
+        },
+        {
+            "id": "abilityunlock_15",
+            "kind": "AbilityUnlock",
+            "stance": "Strength",
+            "x": 53.0,
+            "y": -500.0,
+            "title": "Sacrifice",
+            "abilityId": "Ability_Sacrifice"
+        },
+        {
+            "id": "abilityunlock_16",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 193.0,
+            "y": 38.0,
+            "title": "Ice Aegis",
+            "abilityId": "Ability_Ice_Aegis"
+        },
+        {
+            "id": "abilityunlock_17",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 274.0,
+            "y": 45.0,
+            "title": "Ice Blocks",
+            "abilityId": "Ability_Ice_Block"
+        },
+        {
+            "id": "abilityunlock_18",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 476.0,
+            "y": 36.0,
+            "title": "Discharge",
+            "abilityId": "Ability_Discharge"
+        },
+        {
+            "id": "abilityunlock_19",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 289.0,
+            "y": 367.0,
+            "title": "Overload",
+            "abilityId": "Ability_Overload"
+        },
+        {
+            "id": "abilityunlock_2",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -49.0,
+            "y": 23.0,
+            "title": "SoA",
+            "description": "Цель: враг.\nСтоимость: 100 маны.\nПерезарядка: 5.\nСерия из 2–5 атак, каждая наносит +30 + (50% + 25%). Прерывается уклонением.",
+            "abilityId": "Ability_Series_Of_Attacks"
+        },
+        {
+            "id": "abilityunlock_20",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 446.0,
+            "y": 128.0,
+            "title": "Static Armor",
+            "abilityId": "Ability_Static_Armor"
+        },
+        {
+            "id": "abilityunlock_21",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 164.0,
+            "y": 230.0,
+            "title": "Deep Freeze",
+            "abilityId": "Ability_Deep_Freeze"
+        },
+        {
+            "id": "abilityunlock_3",
+            "kind": "AbilityUnlock",
+            "stance": "Intelligence",
+            "x": 48.0,
+            "y": 26.0,
+            "title": "Ice Shards",
+            "abilityId": "Ability_Ice_Shards"
+        },
+        {
+            "id": "abilityunlock_4",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -138.0,
+            "y": 140.0,
+            "title": "Increasing Pressure",
+            "description": "Цель: враг. \nСтоимость: 100 маны. \nПерезарядка: 7.\nДо 5 усиливающихся атак, каждая +35 + (15% + 35%); каждый успешный удар усиливает следующий на 15%. При уклонении серия прерывается",
+            "abilityId": "Ability_Increasing_Pressure"
+        },
+        {
+            "id": "abilityunlock_5",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -267.0,
+            "y": 128.0,
+            "title": "Dark Shroud",
+            "description": "Цель: на себя. \nСтоимость: 100 маны. \nПерезарядка: 5.\nАктивация накладывает 5 стаков Лёгкого шага. В течении трех ходов восстанавливает 5% здоровья в начале хода.",
+            "abilityId": "Ability_Dark_Shroud"
+        },
+        {
+            "id": "abilityunlock_6",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -489.0,
+            "y": 160.0,
+            "title": "CC",
+            "abilityId": "Ability_Critical_Calculation"
+        },
+        {
+            "id": "abilityunlock_7",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -298.0,
+            "y": 378.0,
+            "title": "Poison Explosion",
+            "abilityId": "Ability_Poison_Explosion"
+        },
+        {
+            "id": "abilityunlock_8",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -430.0,
+            "y": 39.0,
+            "title": "Jar of Poison",
+            "abilityId": "Ability_Jar_Of_Poison"
+        },
+        {
+            "id": "abilityunlock_9",
+            "kind": "AbilityUnlock",
+            "stance": "Dexterity",
+            "x": -210.0,
+            "y": 191.0,
+            "title": "Posion Coating",
+            "abilityId": "Ability_Poison_Coating"
+        },
+        {
+            "id": "keystone_1",
+            "kind": "Keystone",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -494.0,
+            "y": -223.0
+        },
+        {
+            "id": "keystone_2",
+            "kind": "Keystone",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 72.0,
+            "y": 530.0,
+            "title": "Resonance",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.01
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": -0.25
+                }
+            ]
+        },
+        {
+            "id": "keystone_3",
+            "kind": "Keystone",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 449.0,
+            "y": -295.0,
+            "title": "Blood Seal"
+        },
+        {
+            "id": "keystone_4",
+            "kind": "Keystone",
+            "stance": "Intelligence",
+            "x": 511.0,
+            "y": 154.0,
+            "title": "Concentration",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.01
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": -0.25
+                }
+            ]
+        },
+        {
+            "id": "keystone_5",
+            "kind": "Keystone",
+            "stance": "Dexterity",
+            "x": -458.0,
+            "y": 276.0,
+            "title": "Precision",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.01
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": -0.25
+                }
+            ]
+        },
+        {
+            "id": "keystone_6",
+            "kind": "Keystone",
+            "stance": "Strength",
+            "x": -5.0,
+            "y": -546.0,
+            "title": "Unlimited Power",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.01
+                },
+                {
+                    "parameter": "HealthRecovery",
+                    "valueType": "Increase",
+                    "value": -0.25
+                }
+            ]
+        },
+        {
+            "id": "keystone_7",
+            "kind": "Keystone",
+            "stance": "Dexterity",
+            "x": -355.0,
+            "y": 63.0,
+            "title": "Poisonous Bite",
+            "description": "Each attack apply a Poison Stack (75% from total attack damage). Each stack lasts 3 turn`s. "
+        },
+        {
+            "id": "notable_1",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -278.0,
+            "y": -291.0,
+            "title": "Crit Damage Mitigation",
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "valueType": "Flat",
+                    "value": 0.15
+                }
+            ]
+        },
+        {
+            "id": "notable_10",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -223.0,
+            "y": 261.0,
+            "title": "Additional Attack Chance",
+            "modifiers": [
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Flat",
+                    "value": 0.05
+                },
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Increase",
+                    "value": 0.25
+                }
+            ]
+        },
+        {
+            "id": "notable_2",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -171.0,
+            "y": -123.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.15
+                }
+            ]
+        },
+        {
+            "id": "notable_3",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": 271.0,
+            "y": -250.0,
+            "title": "Elemental Damage",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.0
+                }
+            ]
+        },
+        {
+            "id": "notable_4",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": 246.0,
+            "y": -39.0,
+            "title": "All Ressistance",
+            "modifiers": [
+                {
+                    "parameter": "PhysicalDamage",
+                    "valueType": "Increase",
+                    "value": 0.0
+                }
+            ]
+        },
+        {
+            "id": "notable_5",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -122.0,
+            "y": 324.0,
+            "title": "Evasion",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Flat",
+                    "value": 300.0
+                },
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.25
+                }
+            ]
+        },
+        {
+            "id": "notable_6",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": 73.0,
+            "y": 156.0,
+            "title": "Barrier",
+            "modifiers": [
+                {
+                    "parameter": "Barrier",
+                    "valueType": "Flat",
+                    "value": 50.0
+                },
+                {
+                    "parameter": "Barrier",
+                    "valueType": "Increase",
+                    "value": 0.35
+                },
+                {
+                    "parameter": "Armor",
+                    "valueType": "Increase",
+                    "value": 0.15
+                }
+            ]
+        },
+        {
+            "id": "notable_7",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -144.0,
+            "y": 34.0,
+            "title": "Evasion",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Flat",
+                    "value": 500.0,
+                    "condition": "Until getting an attack"
+                },
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.15
+                },
+                {
+                    "parameter": "Evade",
+                    "valueType": "Multiplicative",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "notable_8",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -78.0,
+            "y": 86.0,
+            "title": "Suppression",
+            "modifiers": [
+                {
+                    "parameter": "SuppressChance",
+                    "valueType": "Flat",
+                    "value": 0.15
+                },
+                {
+                    "parameter": "Suppress",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "notable_9",
+            "kind": "Notable",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -289.0,
+            "y": 18.0,
+            "title": "Critical Chance",
+            "modifiers": [
+                {
+                    "parameter": "CriticalChance",
+                    "valueType": "Flat",
+                    "value": 0.05
+                },
+                {
+                    "parameter": "CriticalChance",
+                    "valueType": "Increase",
+                    "value": 0.25
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_1",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 1.0,
+            "y": 121.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_10",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -37.0,
+            "y": 268.0,
+            "title": "Evasion",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_11",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -86.0,
+            "y": 291.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_12",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -85.0,
+            "y": 330.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_13",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 27.0,
+            "y": 122.0,
+            "title": "Barrier",
+            "modifiers": [
+                {
+                    "parameter": "Barrier",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_14",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 35.0,
+            "y": 152.0,
+            "title": "Barrier",
+            "modifiers": [
+                {
+                    "parameter": "Barrier",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_2",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -27.0,
+            "y": 202.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_3",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 64.0,
+            "y": 227.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_4",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 5.0,
+            "y": 267.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_5",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -44.0,
+            "y": 343.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_6",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 104.0,
+            "y": 351.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_7",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -6.0,
+            "y": 465.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_8",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": -86.0,
+            "y": 239.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_int_9",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 160.0,
+            "y": 292.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -104.0,
+            "y": -49.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_10",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -222.0,
+            "y": -137.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_11",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -191.0,
+            "y": -157.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_12",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -316.0,
+            "y": -304.0,
+            "title": "Crit Damage Mitigation",
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_13",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -244.0,
+            "y": -8.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_14",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -213.0,
+            "y": -249.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -160.0,
+            "y": -78.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Increase",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -240.0,
+            "y": -53.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -260.0,
+            "y": -131.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_5",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -346.0,
+            "y": -120.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_6",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -350.0,
+            "y": -227.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_7",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -305.0,
+            "y": -248.0,
+            "title": "Crit Damage Mitigation",
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_8",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -333.0,
+            "y": -278.0,
+            "title": "Crit Damage Mitigation",
+            "modifiers": [
+                {
+                    "parameter": "CriticalDamageMitigation",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dex_strength_9",
+            "kind": "Small",
+            "stance": "Strength",
+            "hybridStance": "Dexterity",
+            "x": -207.0,
+            "y": -98.0,
+            "title": "Health",
+            "modifiers": [
+                {
+                    "parameter": "Health",
+                    "valueType": "Increase",
+                    "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_1",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -83.0,
+            "y": 15.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_10",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -391.0,
+            "y": 256.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_11",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -421.0,
+            "y": 158.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_12",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -436.0,
+            "y": 109.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_13",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -484.0,
+            "y": 78.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_14",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -232.0,
+            "y": 123.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_15",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -249.0,
+            "y": 82.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_16",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -290.0,
+            "y": 107.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_17",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -225.0,
+            "y": 226.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_18",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -118.0,
+            "y": 11.0,
+            "title": "Evasion",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_19",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -152.0,
+            "y": 7.0,
+            "title": "Evasion",
+            "modifiers": [
+                {
+                    "parameter": "Evade",
+                    "valueType": "Increase",
+                    "value": 0.03
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_2",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -100.0,
+            "y": 36.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_20",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -190.0,
+            "y": 241.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_21",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -357.0,
+            "y": 303.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_22",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -320.0,
+            "y": 333.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_23",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -106.0,
+            "y": 115.0,
+            "title": "Suppress",
+            "modifiers": [
+                {
+                    "parameter": "SuppressChance",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_24",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -70.0,
+            "y": 117.0,
+            "title": "Suppress",
+            "modifiers": [
+                {
+                    "parameter": "SuppressChance",
+                    "valueType": "Flat",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_25",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -162.0,
+            "y": 227.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_26",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -251.0,
+            "y": 36.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_27",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -273.0,
+            "y": -5.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_28",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -316.0,
+            "y": 3.0,
+            "title": "Critical Chance",
+            "modifiers": [
+                {
+                    "parameter": "CriticalChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_29",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -319.0,
+            "y": 30.0,
+            "title": "Critical Chance",
+            "modifiers": [
+                {
+                    "parameter": "CriticalChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_3",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -110.0,
+            "y": 62.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_30",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -289.0,
+            "y": 48.0,
+            "title": "Critical Chance",
+            "modifiers": [
+                {
+                    "parameter": "CriticalChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_31",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -192.0,
+            "y": 276.0,
+            "title": "Additional Attack Chance",
+            "modifiers": [
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_32",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -218.0,
+            "y": 293.0,
+            "title": "Additional Attack Chance",
+            "modifiers": [
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_33",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -253.0,
+            "y": 273.0,
+            "title": "Additional Attack Chance",
+            "modifiers": [
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_34",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -299.0,
+            "y": 81.0,
+            "title": "Additional Attack Chance",
+            "modifiers": [
+                {
+                    "parameter": "AdditionalHitChance",
+                    "valueType": "Increase",
+                    "value": 0.05
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_4",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -121.0,
+            "y": 91.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_5",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -175.0,
+            "y": 124.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_6",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -201.0,
+            "y": 168.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_7",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -254.0,
+            "y": 190.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_8",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -311.0,
+            "y": 207.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_dexterity_9",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "x": -337.0,
+            "y": 262.0,
+            "title": "Attribute",
+            "modifiers": [
+                {
+                    "parameter": "Dexterity",
+                    "valueType": "Flat",
+                    "value": 4.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_1",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 104.0,
+            "y": -54.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_10",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 314.0,
+            "y": -18.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_11",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 320.0,
+            "y": -286.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_12",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 279.0,
+            "y": -285.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_13",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 225.0,
+            "y": -102.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_14",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 228.0,
+            "y": -67.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_2",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 179.0,
+            "y": -88.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_3",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 191.0,
+            "y": -144.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_4",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 286.0,
+            "y": -117.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_5",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 277.0,
+            "y": -185.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_6",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 328.0,
+            "y": -246.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_7",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 443.0,
+            "y": -130.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_8",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 448.0,
+            "y": -236.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_int_str_9",
+            "kind": "Small",
+            "stance": "Dexterity",
+            "hybridStance": "Intelligence",
+            "x": 198.0,
+            "y": -261.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 2.0
+                },
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 2.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_1",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 78.0,
+            "y": 76.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_10",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 355.0,
+            "y": 259.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_11",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 436.0,
+            "y": 266.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_12",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 467.0,
+            "y": 216.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_13",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 388.0,
+            "y": 134.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_14",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 403.0,
+            "y": 81.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_15",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 312.0,
+            "y": 285.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_16",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 297.0,
+            "y": 314.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_17",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 278.0,
+            "y": 154.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_18",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 279.0,
+            "y": 90.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_19",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 188.0,
+            "y": 186.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_2",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 85.0,
+            "y": 116.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_3",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 133.0,
+            "y": 121.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_4",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 162.0,
+            "y": 86.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_5",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 224.0,
+            "y": 139.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_6",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 227.0,
+            "y": 262.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_7",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 313.0,
+            "y": 188.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_8",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 338.0,
+            "y": 96.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_intelligence_9",
+            "kind": "Small",
+            "stance": "Intelligence",
+            "x": 369.0,
+            "y": 196.0,
+            "title": "Intelligence",
+            "modifiers": [
+                {
+                    "parameter": "Intelligence",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_1",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -2.0,
+            "y": -105.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_10",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 1.0,
+            "y": -401.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_11",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -22.0,
+            "y": -473.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_12",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -172.0,
+            "y": -385.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_13",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -102.0,
+            "y": -477.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_14",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 108.0,
+            "y": -347.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_15",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 57.0,
+            "y": -431.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_2",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -65.0,
+            "y": -139.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_3",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 28.0,
+            "y": -149.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_4",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -2.0,
+            "y": -180.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_5",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 8.0,
+            "y": -249.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_6",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -113.0,
+            "y": -291.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_7",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 7.0,
+            "y": -303.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_8",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": 66.0,
+            "y": -322.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "small_strength_9",
+            "kind": "Small",
+            "stance": "Strength",
+            "x": -50.0,
+            "y": -374.0,
+            "title": "Strength",
+            "modifiers": [
+                {
+                    "parameter": "Strength",
+                    "valueType": "Flat",
+                    "value": 5.0
+                }
+            ]
+        },
+        {
+            "id": "sockettier2_1",
+            "kind": "SocketTier2",
+            "stance": "Dexterity",
+            "x": -155.0,
+            "y": 88.0,
+            "title": "Augmentation Slot (T2)",
+            "abilityId": "Ability_Series_Of_Attacks"
+        },
+        {
+            "id": "sockettier2_Ares_Blessing",
+            "kind": "SocketTier2",
+            "stance": "Strength",
+            "x": -77.0,
+            "y": -250.0,
+            "abilityId": "Ability_Ares_Blessing"
+        },
+        {
+            "id": "sockettier2_Armagedonn",
+            "kind": "SocketTier2",
+            "stance": "Strength",
+            "x": -156.0,
+            "y": -489.0,
+            "abilityId": "Ability_Armageddon"
+        },
+        {
+            "id": "sockettier2_Increasing_Pressure",
+            "kind": "SocketTier2",
+            "stance": "Dexterity",
+            "x": -203.0,
+            "y": 96.0,
+            "title": "Augmentation Slot (T2)",
+            "abilityId": "Ability_Increasing_Pressure"
+        },
+        {
+            "id": "sockettier2_Increasing_Pressure_2",
+            "kind": "SocketTier2",
+            "stance": "Dexterity",
+            "x": -289.0,
+            "y": 273.0,
+            "title": "Augmentation Slot (T2)",
+            "abilityId": "Ability_Dark_Shroud"
+        },
+        {
+            "id": "sockettier3_Series_Of_Attacks",
+            "kind": "SocketTier3",
+            "stance": "Dexterity",
+            "x": -272.0,
+            "y": 236.0,
+            "title": "Augmentation Slot (T3)",
+            "abilityId": "Ability_Series_Of_Attacks"
+        },
+        {
+            "id": "start",
+            "kind": "Start",
+            "x": 0.0,
+            "y": -0.0
+        }
+    ],
+    "edges": [
+        {
+            "from": "abilityunlock_1",
+            "to": "small_strength_1"
+        },
+        {
+            "from": "abilityunlock_1",
+            "to": "start"
+        },
+        {
+            "from": "abilityunlock_10",
+            "to": "small_strength_14"
+        },
+        {
+            "from": "abilityunlock_11",
+            "to": "small_strength_3"
+        },
+        {
+            "from": "abilityunlock_12",
+            "to": "small_strength_7"
+        },
+        {
+            "from": "abilityunlock_13",
+            "to": "small_strength_9"
+        },
+        {
+            "from": "abilityunlock_14",
+            "to": "small_strength_12"
+        },
+        {
+            "from": "abilityunlock_15",
+            "to": "small_strength_15"
+        },
+        {
+            "from": "abilityunlock_16",
+            "to": "small_intelligence_4"
+        },
+        {
+            "from": "abilityunlock_17",
+            "to": "small_intelligence_18"
+        },
+        {
+            "from": "abilityunlock_18",
+            "to": "small_intelligence_14"
+        },
+        {
+            "from": "abilityunlock_19",
+            "to": "small_intelligence_16"
+        },
+        {
+            "from": "abilityunlock_2",
+            "to": "small_dexterity_1"
+        },
+        {
+            "from": "abilityunlock_2",
+            "to": "start"
+        },
+        {
+            "from": "abilityunlock_20",
+            "to": "small_intelligence_11"
+        },
+        {
+            "from": "abilityunlock_21",
+            "to": "small_intelligence_19"
+        },
+        {
+            "from": "abilityunlock_3",
+            "to": "small_intelligence_1"
+        },
+        {
+            "from": "abilityunlock_3",
+            "to": "start"
+        },
+        {
+            "from": "abilityunlock_4",
+            "to": "small_dexterity_4"
+        },
+        {
+            "from": "abilityunlock_4",
+            "to": "small_dexterity_5"
+        },
+        {
+            "from": "abilityunlock_4",
+            "to": "small_dexterity_6"
+        },
+        {
+            "from": "abilityunlock_5",
+            "to": "small_dexterity_16"
+        },
+        {
+            "from": "abilityunlock_6",
+            "to": "small_dexterity_11"
+        },
+        {
+            "from": "abilityunlock_7",
+            "to": "small_dexterity_22"
+        },
+        {
+            "from": "abilityunlock_8",
+            "to": "small_dexterity_13"
+        },
+        {
+            "from": "abilityunlock_9",
+            "to": "small_dexterity_25"
+        },
+        {
+            "from": "keystone_1",
+            "to": "small_dex_strength_6"
+        },
+        {
+            "from": "keystone_2",
+            "to": "small_dex_int_7"
+        },
+        {
+            "from": "keystone_3",
+            "to": "small_int_str_8"
+        },
+        {
+            "from": "keystone_5",
+            "to": "small_dexterity_11"
+        },
+        {
+            "from": "keystone_6",
+            "to": "small_strength_11"
+        },
+        {
+            "from": "keystone_7",
+            "to": "small_dexterity_34"
+        },
+        {
+            "from": "notable_1",
+            "to": "small_dex_strength_12"
+        },
+        {
+            "from": "notable_10",
+            "to": "small_dexterity_33"
+        },
+        {
+            "from": "notable_2",
+            "to": "small_dex_strength_11"
+        },
+        {
+            "from": "notable_3",
+            "to": "small_int_str_12"
+        },
+        {
+            "from": "notable_4",
+            "to": "small_int_str_14"
+        },
+        {
+            "from": "notable_5",
+            "to": "small_dex_int_12"
+        },
+        {
+            "from": "notable_6",
+            "to": "small_dex_int_14"
+        },
+        {
+            "from": "notable_7",
+            "to": "small_dexterity_19"
+        },
+        {
+            "from": "notable_8",
+            "to": "small_dexterity_24"
+        },
+        {
+            "from": "notable_9",
+            "to": "small_dexterity_30"
+        },
+        {
+            "from": "small_dex_int_1",
+            "to": "small_dex_int_13"
+        },
+        {
+            "from": "small_dex_int_1",
+            "to": "small_dex_int_2"
+        },
+        {
+            "from": "small_dex_int_1",
+            "to": "start"
+        },
+        {
+            "from": "small_dex_int_10",
+            "to": "small_dex_int_11"
+        },
+        {
+            "from": "small_dex_int_10",
+            "to": "small_dex_int_4"
+        },
+        {
+            "from": "small_dex_int_11",
+            "to": "small_dex_int_12"
+        },
+        {
+            "from": "small_dex_int_13",
+            "to": "small_dex_int_14"
+        },
+        {
+            "from": "small_dex_int_2",
+            "to": "small_dex_int_3"
+        },
+        {
+            "from": "small_dex_int_2",
+            "to": "small_dex_int_8"
+        },
+        {
+            "from": "small_dex_int_3",
+            "to": "small_dex_int_4"
+        },
+        {
+            "from": "small_dex_int_4",
+            "to": "small_dex_int_5"
+        },
+        {
+            "from": "small_dex_int_5",
+            "to": "small_dex_int_6"
+        },
+        {
+            "from": "small_dex_int_6",
+            "to": "small_dex_int_7"
+        },
+        {
+            "from": "small_dex_int_6",
+            "to": "small_dex_int_9"
+        },
+        {
+            "from": "small_dex_int_8",
+            "to": "small_dexterity_6"
+        },
+        {
+            "from": "small_dex_int_9",
+            "to": "small_intelligence_6"
+        },
+        {
+            "from": "small_dex_strength_1",
+            "to": "small_dex_strength_2"
+        },
+        {
+            "from": "small_dex_strength_1",
+            "to": "start"
+        },
+        {
+            "from": "small_dex_strength_10",
+            "to": "small_dex_strength_11"
+        },
+        {
+            "from": "small_dex_strength_10",
+            "to": "small_dex_strength_9"
+        },
+        {
+            "from": "small_dex_strength_12",
+            "to": "small_dex_strength_8"
+        },
+        {
+            "from": "small_dex_strength_13",
+            "to": "small_dex_strength_5"
+        },
+        {
+            "from": "small_dex_strength_13",
+            "to": "small_dexterity_5"
+        },
+        {
+            "from": "small_dex_strength_14",
+            "to": "small_dex_strength_4"
+        },
+        {
+            "from": "small_dex_strength_14",
+            "to": "small_strength_6"
+        },
+        {
+            "from": "small_dex_strength_2",
+            "to": "small_dex_strength_3"
+        },
+        {
+            "from": "small_dex_strength_3",
+            "to": "small_dex_strength_4"
+        },
+        {
+            "from": "small_dex_strength_3",
+            "to": "small_dex_strength_9"
+        },
+        {
+            "from": "small_dex_strength_4",
+            "to": "small_dex_strength_5"
+        },
+        {
+            "from": "small_dex_strength_5",
+            "to": "small_dex_strength_6"
+        },
+        {
+            "from": "small_dex_strength_6",
+            "to": "small_dex_strength_7"
+        },
+        {
+            "from": "small_dex_strength_7",
+            "to": "small_dex_strength_8"
+        },
+        {
+            "from": "small_dexterity_1",
+            "to": "small_dexterity_2"
+        },
+        {
+            "from": "small_dexterity_10",
+            "to": "small_dexterity_11"
+        },
+        {
+            "from": "small_dexterity_10",
+            "to": "small_dexterity_21"
+        },
+        {
+            "from": "small_dexterity_10",
+            "to": "small_dexterity_9"
+        },
+        {
+            "from": "small_dexterity_11",
+            "to": "small_dexterity_12"
+        },
+        {
+            "from": "small_dexterity_12",
+            "to": "small_dexterity_13"
+        },
+        {
+            "from": "small_dexterity_14",
+            "to": "small_dexterity_15"
+        },
+        {
+            "from": "small_dexterity_14",
+            "to": "small_dexterity_7"
+        },
+        {
+            "from": "small_dexterity_14",
+            "to": "sockettier2_Increasing_Pressure"
+        },
+        {
+            "from": "small_dexterity_15",
+            "to": "small_dexterity_16"
+        },
+        {
+            "from": "small_dexterity_15",
+            "to": "small_dexterity_26"
+        },
+        {
+            "from": "small_dexterity_17",
+            "to": "small_dexterity_20"
+        },
+        {
+            "from": "small_dexterity_17",
+            "to": "small_dexterity_7"
+        },
+        {
+            "from": "small_dexterity_17",
+            "to": "sockettier3_Series_Of_Attacks"
+        },
+        {
+            "from": "small_dexterity_18",
+            "to": "small_dexterity_19"
+        },
+        {
+            "from": "small_dexterity_18",
+            "to": "small_dexterity_2"
+        },
+        {
+            "from": "small_dexterity_2",
+            "to": "small_dexterity_3"
+        },
+        {
+            "from": "small_dexterity_20",
+            "to": "small_dexterity_25"
+        },
+        {
+            "from": "small_dexterity_20",
+            "to": "small_dexterity_31"
+        },
+        {
+            "from": "small_dexterity_21",
+            "to": "small_dexterity_22"
+        },
+        {
+            "from": "small_dexterity_23",
+            "to": "small_dexterity_24"
+        },
+        {
+            "from": "small_dexterity_23",
+            "to": "small_dexterity_4"
+        },
+        {
+            "from": "small_dexterity_26",
+            "to": "small_dexterity_27"
+        },
+        {
+            "from": "small_dexterity_26",
+            "to": "small_dexterity_34"
+        },
+        {
+            "from": "small_dexterity_27",
+            "to": "small_dexterity_28"
+        },
+        {
+            "from": "small_dexterity_28",
+            "to": "small_dexterity_29"
+        },
+        {
+            "from": "small_dexterity_29",
+            "to": "small_dexterity_30"
+        },
+        {
+            "from": "small_dexterity_3",
+            "to": "small_dexterity_4"
+        },
+        {
+            "from": "small_dexterity_31",
+            "to": "small_dexterity_32"
+        },
+        {
+            "from": "small_dexterity_32",
+            "to": "small_dexterity_33"
+        },
+        {
+            "from": "small_dexterity_4",
+            "to": "sockettier2_1"
+        },
+        {
+            "from": "small_dexterity_5",
+            "to": "sockettier2_1"
+        },
+        {
+            "from": "small_dexterity_6",
+            "to": "small_dexterity_7"
+        },
+        {
+            "from": "small_dexterity_7",
+            "to": "small_dexterity_8"
+        },
+        {
+            "from": "small_dexterity_8",
+            "to": "small_dexterity_9"
+        },
+        {
+            "from": "small_int_str_1",
+            "to": "small_int_str_2"
+        },
+        {
+            "from": "small_int_str_1",
+            "to": "start"
+        },
+        {
+            "from": "small_int_str_10",
+            "to": "small_int_str_4"
+        },
+        {
+            "from": "small_int_str_10",
+            "to": "small_intelligence_8"
+        },
+        {
+            "from": "small_int_str_11",
+            "to": "small_int_str_12"
+        },
+        {
+            "from": "small_int_str_11",
+            "to": "small_int_str_6"
+        },
+        {
+            "from": "small_int_str_13",
+            "to": "small_int_str_14"
+        },
+        {
+            "from": "small_int_str_13",
+            "to": "small_int_str_3"
+        },
+        {
+            "from": "small_int_str_2",
+            "to": "small_int_str_3"
+        },
+        {
+            "from": "small_int_str_3",
+            "to": "small_int_str_4"
+        },
+        {
+            "from": "small_int_str_4",
+            "to": "small_int_str_5"
+        },
+        {
+            "from": "small_int_str_5",
+            "to": "small_int_str_6"
+        },
+        {
+            "from": "small_int_str_5",
+            "to": "small_int_str_9"
+        },
+        {
+            "from": "small_int_str_6",
+            "to": "small_int_str_7"
+        },
+        {
+            "from": "small_int_str_7",
+            "to": "small_int_str_8"
+        },
+        {
+            "from": "small_int_str_9",
+            "to": "small_strength_8"
+        },
+        {
+            "from": "small_intelligence_1",
+            "to": "small_intelligence_2"
+        },
+        {
+            "from": "small_intelligence_10",
+            "to": "small_intelligence_11"
+        },
+        {
+            "from": "small_intelligence_10",
+            "to": "small_intelligence_15"
+        },
+        {
+            "from": "small_intelligence_10",
+            "to": "small_intelligence_9"
+        },
+        {
+            "from": "small_intelligence_11",
+            "to": "small_intelligence_12"
+        },
+        {
+            "from": "small_intelligence_13",
+            "to": "small_intelligence_14"
+        },
+        {
+            "from": "small_intelligence_13",
+            "to": "small_intelligence_9"
+        },
+        {
+            "from": "small_intelligence_15",
+            "to": "small_intelligence_16"
+        },
+        {
+            "from": "small_intelligence_17",
+            "to": "small_intelligence_18"
+        },
+        {
+            "from": "small_intelligence_17",
+            "to": "small_intelligence_5"
+        },
+        {
+            "from": "small_intelligence_19",
+            "to": "small_intelligence_5"
+        },
+        {
+            "from": "small_intelligence_2",
+            "to": "small_intelligence_3"
+        },
+        {
+            "from": "small_intelligence_3",
+            "to": "small_intelligence_4"
+        },
+        {
+            "from": "small_intelligence_4",
+            "to": "small_intelligence_5"
+        },
+        {
+            "from": "small_intelligence_5",
+            "to": "small_intelligence_6"
+        },
+        {
+            "from": "small_intelligence_6",
+            "to": "small_intelligence_7"
+        },
+        {
+            "from": "small_intelligence_7",
+            "to": "small_intelligence_8"
+        },
+        {
+            "from": "small_intelligence_8",
+            "to": "small_intelligence_9"
+        },
+        {
+            "from": "small_strength_1",
+            "to": "small_strength_2"
+        },
+        {
+            "from": "small_strength_10",
+            "to": "small_strength_11"
+        },
+        {
+            "from": "small_strength_10",
+            "to": "small_strength_15"
+        },
+        {
+            "from": "small_strength_10",
+            "to": "small_strength_9"
+        },
+        {
+            "from": "small_strength_11",
+            "to": "small_strength_12"
+        },
+        {
+            "from": "small_strength_12",
+            "to": "small_strength_13"
+        },
+        {
+            "from": "small_strength_13",
+            "to": "sockettier2_Armagedonn"
+        },
+        {
+            "from": "small_strength_14",
+            "to": "small_strength_8"
+        },
+        {
+            "from": "small_strength_2",
+            "to": "small_strength_3"
+        },
+        {
+            "from": "small_strength_3",
+            "to": "small_strength_4"
+        },
+        {
+            "from": "small_strength_4",
+            "to": "small_strength_5"
+        },
+        {
+            "from": "small_strength_5",
+            "to": "small_strength_6"
+        },
+        {
+            "from": "small_strength_5",
+            "to": "sockettier2_Ares_Blessing"
+        },
+        {
+            "from": "small_strength_6",
+            "to": "small_strength_7"
+        },
+        {
+            "from": "small_strength_7",
+            "to": "small_strength_8"
+        },
+        {
+            "from": "small_strength_8",
+            "to": "small_strength_9"
+        }
+    ]
+}

@@ -91,6 +91,10 @@ msgstr ""
 msgid "Suppress"
 msgstr ""
 
+#. Suppression trigger chance
+msgid "SuppressChance"
+msgstr ""
+
 #. All attributes (universal modifier)
 msgid "AllAttribute"
 msgstr ""

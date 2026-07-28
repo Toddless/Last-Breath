@@ -56,7 +56,7 @@
                 "Strength"
             ],
             "levelMin": 1,
-            "levelScaling": 0.04,
+            "levelScaling": 0.03,
             "abilityCount": 2,
             "baseParameters": {
                 "Health": 900,
@@ -244,7 +244,7 @@
                 "Strength"
             ],
             "levelMin": 45,
-            "levelScaling": 0.06,
+            "levelScaling": 0.03,
             "abilityCount": 7,
             "baseParameters": {
                 "Health": 10000,
@@ -927,7 +927,7 @@
             ],
             "levelMin": 30,
             "levelMax": 30,
-            "levelScaling": 0,
+            "levelScaling": 0.06,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Dark_Shroud",
@@ -979,7 +979,7 @@
             ],
             "levelMin": 30,
             "levelMax": 30,
-            "levelScaling": 0,
+            "levelScaling": 0.06,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Ares_Blessing",
@@ -1031,7 +1031,7 @@
             ],
             "levelMin": 15,
             "levelMax": 15,
-            "levelScaling": 0,
+            "levelScaling": 0.06,
             "fleeHealthThreshold": 0,
             "stages": [
                 {
@@ -1111,7 +1111,7 @@
             ],
             "levelMin": 10,
             "levelMax": 10,
-            "levelScaling": 0,
+            "levelScaling": 0.06,
             "fleeHealthThreshold": 0,
             "abilities": [
                 "Ability_Critical_Calculation",

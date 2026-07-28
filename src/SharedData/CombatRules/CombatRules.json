@@ -7,5 +7,9 @@
     },
     "arena": {
         "maxBattleSlots": 10
+    },
+    "exhaustion": {
+        "costIncreasePerStack": 0.25,
+        "decayPerTurn": 3
     }
 }

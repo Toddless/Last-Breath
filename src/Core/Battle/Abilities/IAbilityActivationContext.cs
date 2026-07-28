@@ -22,6 +22,14 @@ namespace Core.Battle.Abilities
         /// context like <see cref="IAttackContext.Rnd"/> so a mutator never has to reach for a generator.</summary>
         RandomNumberGenerator Rnd { get; }
 
+        /// <summary>
+        /// True when the context estimates effective cost/cooldown for availability checks and UI —
+        /// nothing is paid and delivery never runs. Preview contexts carry no <see cref="Field"/>,
+        /// no <see cref="Targets"/> and no <see cref="Rnd"/>; chance-based mutators must stay inert
+        /// (no roll — availability is pessimistic) and self-consuming mutators must not spend themselves.
+        /// </summary>
+        bool IsPreview { get; }
+
         float Cost { get; set; }
         Costs CostType { get; set; }
         float Cooldown { get; set; }

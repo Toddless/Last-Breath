@@ -10,6 +10,6 @@
                 Priority.Weak,
                 OperationType.Subtract,
                 cooldown,
-                "",
+                $"Ability_Parameter_Decorator_{id}",
                 id));
 }

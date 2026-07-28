@@ -99,11 +99,14 @@ namespace LastBreathTest.CraftingSystemTests
             Assert.AreEqual(12, item.MaxUpdateLevel);
             Assert.AreEqual(item.MaxUpdateLevel, item.UpdateLevel, "An ascended item is fully sharpened by definition.");
 
-            // Every line of BOTH channels = Base × UpdateMultiplier × 1.15 (implicits included).
+            // Every FLAT line of BOTH channels = Base × UpdateMultiplier × 1.15 (implicits included).
             float updateMultiplier = 1f + (12 * 0.05f);
             Assert.AreEqual(100f * updateMultiplier * 1.15f, implicitLine.Value, 0.01f);
             Assert.AreEqual(10f * updateMultiplier * 1.15f, modifierLine.Value, 0.01f);
-            Assert.AreEqual(0.2f * updateMultiplier * 1.15f, contextLine.Value, 0.001f);
+
+            // A percent line already multiplies values the scales have raised: scaling it too would stack a
+            // multiplier on a multiplier, so sharpening and ascension leave it exactly as data wrote it.
+            Assert.AreEqual(0.2f, contextLine.Value, 0.001f);
             Assert.AreEqual(1.15f, item.AscensionMultiplier, 0.0001f);
 
             // Grant payloads scaled ONCE: the +15% becomes their new base.

@@ -11,7 +11,8 @@ namespace Core.Modifiers.Context
     {
         public void Apply(IAbilityActivationContext context)
         {
-            if (context.Rnd.Randf() > chance()) return;
+            // Preview never rolls: availability stays pessimistic and the RNG stream is untouched.
+            if (context.IsPreview || context.Rnd.Randf() > chance()) return;
             context.Cooldown = 0;
         }
     }

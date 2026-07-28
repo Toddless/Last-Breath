@@ -2,7 +2,7 @@
     "abilities": [
         {
             "id": "Ability_Series_Of_Attacks",
-            "tags": [],
+            "tags": [ "attack", "series" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 5,
@@ -98,7 +98,7 @@
         },
         {
             "id": "Ability_Increasing_Pressure",
-            "tags": [],
+            "tags": [ "attack", "series" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -183,7 +183,7 @@
         },
         {
             "id": "Ability_Jar_Of_Poison",
-            "tags": [],
+            "tags": [ "poison" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 3,
@@ -274,7 +274,7 @@
         },
         {
             "id": "Ability_Dark_Shroud",
-            "tags": [],
+            "tags": [ "buff", "evasion", "health" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -367,7 +367,7 @@
         },
         {
             "id": "Ability_Critical_Calculation",
-            "tags": [],
+            "tags": [ "buff", "crit" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 5,
@@ -458,7 +458,7 @@
         },
         {
             "id": "Ability_Poison_Explosion",
-            "tags": [],
+            "tags": [ "poison", "execute" ],
             "stance": 0,
             "targetType": 0,
             "cooldown": 7,
@@ -541,7 +541,7 @@
         },
         {
             "id": "Ability_Poison_Coating",
-            "tags": [],
+            "tags": [ "poison", "buff" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 7,
@@ -632,7 +632,7 @@
         },
         {
             "id": "Ability_Double_Strike",
-            "tags": [],
+            "tags": [ "attack" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -706,7 +706,7 @@
         },
         {
             "id": "Ability_Ares_Blessing",
-            "tags": [],
+            "tags": [ "buff", "health" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -796,7 +796,7 @@
         },
         {
             "id": "Ability_Porcupine",
-            "tags": [],
+            "tags": [ "buff", "retaliation" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -887,7 +887,7 @@
         },
         {
             "id": "Ability_Berserk_Fury",
-            "tags": [],
+            "tags": [ "attack", "series", "health" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 7,
@@ -978,7 +978,7 @@
         },
         {
             "id": "Ability_Head_Butt",
-            "tags": [],
+            "tags": [ "attack", "stun" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 4,
@@ -1049,7 +1049,7 @@
         },
         {
             "id": "Ability_Sacrifice",
-            "tags": [],
+            "tags": [ "health", "empower" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 5,
@@ -1135,7 +1135,7 @@
         },
         {
             "id": "Ability_Armageddon",
-            "tags": [],
+            "tags": [ "spell", "fire", "health" ],
             "stance": 1,
             "targetType": 0,
             "cooldown": 9,
@@ -1239,7 +1239,7 @@
         },
         {
             "id": "Ability_Ice_Block",
-            "tags": [],
+            "tags": [ "spell", "cold", "stun" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 5,
@@ -1332,7 +1332,7 @@
         },
         {
             "id": "Ability_Overload",
-            "tags": [],
+            "tags": [ "mana", "empower" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 5,
@@ -1424,7 +1424,7 @@
         },
         {
             "id": "Ability_Chain_Lightning",
-            "tags": [],
+            "tags": [ "spell", "lightning" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 9,
@@ -1494,7 +1494,7 @@
         },
         {
             "id": "Ability_Ice_Aegis",
-            "tags": [],
+            "tags": [ "buff", "cold", "barrier" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 9,
@@ -1588,7 +1588,7 @@
         },
         {
             "id": "Ability_Ice_Shards",
-            "tags": [],
+            "tags": [ "spell", "cold" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 4,
@@ -1686,7 +1686,7 @@
         },
         {
             "id": "Ability_Deep_Freeze",
-            "tags": [],
+            "tags": [ "spell", "cold", "freeze" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -1779,7 +1779,7 @@
         },
         {
             "id": "Ability_Discharge",
-            "tags": [],
+            "tags": [ "spell", "lightning", "barrier" ],
             "stance": 2,
             "targetType": 0,
             "cooldown": 6,
@@ -1865,7 +1865,7 @@
         },
         {
             "id": "Ability_Static_Armor",
-            "tags": [],
+            "tags": [ "buff", "lightning" ],
             "stance": 2,
             "targetType": 2,
             "cooldown": 6,
@@ -1954,7 +1954,7 @@
         },
         {
             "id": "Ability_Twin_Assist_Attack",
-            "tags": [],
+            "tags": [ "npc", "attack" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 0,
@@ -1971,7 +1971,7 @@
         },
         {
             "id": "Ability_Twin_Assist_Shield",
-            "tags": [],
+            "tags": [ "npc", "shield" ],
             "stance": 1,
             "targetType": 2,
             "cooldown": 0,
@@ -1986,7 +1986,7 @@
         },
         {
             "id": "Ability_Summon_Bone_Wolves",
-            "tags": [],
+            "tags": [ "npc", "summon" ],
             "stance": 0,
             "targetType": 2,
             "cooldown": 4,

@@ -1,0 +1,133 @@
+namespace PassiveTreeEditor.Source.View
+{
+    using Core.Localization;
+    using Core.Modifiers;
+    using Godot;
+    using Model;
+
+    /// <summary>
+    /// What a node gives, shown at the cursor. Modifier lines go through the game's own
+    /// <see cref="ModifierFormatter"/>, so a line reads here exactly as it will read in the item
+    /// tooltip — same .po templates, same percent-versus-number decision per parameter.
+    /// </summary>
+    public partial class NodeTooltip : PanelContainer
+    {
+        private const float CursorOffset = 18f;
+        private const float Width = 280f;
+
+        private VBoxContainer _content = null!;
+        private ModifierFormatter? _formatter;
+        private ILocalizationProvider? _localization;
+
+        public override void _Ready()
+        {
+            // Never a mouse target: the tooltip follows the cursor, and eating hover would make the
+            // node under it stop being hovered — the tooltip would flicker itself out of existence.
+            MouseFilter = MouseFilterEnum.Ignore;
+            Visible = false;
+            CustomMinimumSize = new Vector2(Width, 0);
+            ZIndex = 100;
+
+            AddThemeStyleboxOverride("panel", BuildStyle());
+
+            _content = new VBoxContainer { MouseFilter = MouseFilterEnum.Ignore };
+            _content.AddThemeConstantOverride("separation", 4);
+            AddChild(_content);
+        }
+
+        public void Initialize(ModifierFormatter formatter, ILocalizationProvider localization)
+        {
+            _formatter = formatter;
+            _localization = localization;
+        }
+
+        private static StyleBoxFlat BuildStyle()
+        {
+            var style = new StyleBoxFlat
+            {
+                BgColor = CanvasStyle.TooltipBackground,
+                BorderColor = CanvasStyle.GoldInk,
+                ContentMarginLeft = 12,
+                ContentMarginRight = 12,
+                ContentMarginTop = 10,
+                ContentMarginBottom = 10
+            };
+
+            style.SetBorderWidthAll(1);
+            return style;
+        }
+
+        public void HideTip() => Visible = false;
+
+        /// <summary>Fills in the node and places the card next to the cursor, kept inside
+        /// <paramref name="bounds"/> so it never hangs off the window edge.</summary>
+        public void ShowFor(PassiveNode node, Vector2 mouse, Vector2 bounds)
+        {
+            Build(node);
+
+            Visible = true;
+
+            // Minimum size rather than Size: the children were added this frame and layout has not
+            // run yet, so Size is still whatever the previous node needed.
+            Vector2 size = GetCombinedMinimumSize();
+            float x = Mathf.Clamp(mouse.X + CursorOffset, 0f, Mathf.Max(0f, bounds.X - size.X));
+            float y = Mathf.Clamp(mouse.Y + CursorOffset, 0f, Mathf.Max(0f, bounds.Y - size.Y));
+
+            Position = new Vector2(x, y);
+            Size = size;
+        }
+
+        private void Build(PassiveNode node)
+        {
+            foreach (Node child in _content.GetChildren())
+            {
+                _content.RemoveChild(child);
+                child.QueueFree();
+            }
+
+            _content.AddChild(Header(node));
+
+            if (!string.IsNullOrWhiteSpace(node.AbilityId))
+                _content.AddChild(Row(Translate(node.AbilityId), CanvasStyle.Ink1));
+
+            foreach (ModifierLine line in node.Modifiers) _content.AddChild(Row(Describe(line), CanvasStyle.Ink2));
+
+            if (!string.IsNullOrWhiteSpace(node.Description))
+                _content.AddChild(Row(node.Description, CanvasStyle.Ink3));
+        }
+
+        private Label Header(PassiveNode node)
+        {
+            var label = Row(CanvasStyle.ShortLabel(node), CanvasStyle.NodeColor(node));
+            label.AddThemeFontSizeOverride("font_size", 15);
+            return label;
+        }
+
+        private static Label Row(string text, Color color)
+        {
+            var label = new Label
+            {
+                Text = text,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                CustomMinimumSize = new Vector2(Width - 24f, 0),
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+
+            label.AddThemeColorOverride("font_color", color);
+            return label;
+        }
+
+        /// <summary>A conditional line is shown as written and marked: the tool has no battle state to
+        /// decide whether the condition holds, so it never hides the condition behind a number.</summary>
+        private string Describe(ModifierLine line)
+        {
+            string text = _formatter is null
+                ? $"{line.Parameter} {line.ValueType} {line.Value}"
+                : _formatter.Format(new SimpleModifier(line.Parameter, line.ValueType, line.Value, "tree"));
+
+            return line.IsConditional ? $"{text}  ({line.Condition})" : text;
+        }
+
+        private string Translate(string key) => _localization?.Translate(key) ?? key;
+    }
+}

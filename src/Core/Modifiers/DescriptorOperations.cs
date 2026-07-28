@@ -7,13 +7,14 @@ namespace Core.Modifiers
     /// <summary>Pure transforms over modifier descriptors used by the crafting roll.</summary>
     public static class DescriptorOperations
     {
-        /// <summary>Scales a descriptor's value bounds by a quality multiplier — LINEAR for every value type:
-        /// flat/increase/multiplicative all store the bonus delta (multi data is 0.15, never 1.15), so one
-        /// scale rule fits all. Returns a fresh descriptor; composites scale each part.</summary>
+        /// <summary>Scales a descriptor's value bounds by a quality multiplier — FLAT lines ONLY.
+        /// A percent line multiplies a value the scales have already raised, so scaling the percentage too
+        /// stacks a multiplier on a multiplier; a flag has no magnitude at all. Returns a fresh descriptor;
+        /// composites scale each part by that part's own value type.</summary>
         public static IModifierDescriptor Scale(IModifierDescriptor descriptor, float multiplier) => descriptor switch
         {
-            ParameterDescriptor parameter => parameter with { Value = parameter.Value.Scale(multiplier) },
-            ContextDescriptor context => context with { Value = context.Value.Scale(multiplier) },
+            ParameterDescriptor parameter when parameter.ValueType == ModifierValueType.Flat => parameter with { Value = parameter.Value.Scale(multiplier) },
+            ContextDescriptor context when context.ValueType == ModifierValueType.Flat => context with { Value = context.Value.Scale(multiplier) },
             CompositeDescriptor composite => composite with { Parts = composite.Parts.Select(part => Scale(part, multiplier)).ToList() },
             _ => descriptor,
         };

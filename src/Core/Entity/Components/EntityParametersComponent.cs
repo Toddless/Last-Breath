@@ -13,7 +13,10 @@
     {
         /// <summary>Effective-value bounds — the single owner of every parameter cap. Applied in the
         /// indexer, so ALL read channels (named properties, GetValueForParameter, ParameterChanged,
-        /// CalculateForBase previews) agree; decorators cannot push a value past its cap (tracker #42).</summary>
+        /// CalculateForBase previews) agree; decorators cannot push a value past its cap (tracker #42).
+        /// Parameters without an entry are floored at zero: every member of the enum is a magnitude
+        /// or a chance, and a negative value corrupts downstream formulas (negative armor amplifies
+        /// damage). The modifier-recalc path already clamped this way; the decorator path must agree.</summary>
         private static readonly Dictionary<EntityParameter, (float Min, float Max)> s_bounds = new()
         {
             [EntityParameter.BlockChance] = (0f, 0.9f),
@@ -109,6 +112,6 @@
             ParameterChanged?.Invoke(args, this[args]);
 
         private static float ApplyBounds(EntityParameter parameter, float value) =>
-            s_bounds.TryGetValue(parameter, out (float Min, float Max) bounds) ? Mathf.Clamp(value, bounds.Min, bounds.Max) : value;
+            s_bounds.TryGetValue(parameter, out (float Min, float Max) bounds) ? Mathf.Clamp(value, bounds.Min, bounds.Max) : Mathf.Max(0f, value);
     }
 }

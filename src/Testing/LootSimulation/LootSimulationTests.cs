@@ -90,14 +90,16 @@
                 var generated = (Core.Items.IEquipItem)creation.CreateItem(id, [], Rarity.Rare, 0f, multiplier);
                 // Rolled lines are stamped with an affix; authored blueprint lines (Affix == None) come
                 // from the item template, not the pool, and are out of this test's scope.
-                // Pool entries carry roll spreads, so linearity means BOTH bounds scale with the
-                // multiplier: the rolled value must land inside some entry's [Min, Max] × multiplier.
+                // Pool entries carry roll spreads. FLAT lines scale linearly — both bounds × multiplier;
+                // percent lines (increase/multi) stay exactly as authored: scaling a percentage would
+                // stack a multiplier on a multiplier (see DescriptorOperations.Scale).
                 foreach (var modifier in generated.Modifiers.OfType<SimpleModifier>().Where(line => line.Affix != AffixKind.None))
                 {
+                    float scale = modifier.ModifierValueType == ModifierValueType.Flat ? multiplier : 1f;
                     float epsilon = 0.001f * Math.Max(1f, Math.Abs(modifier.Value));
                     bool matchesPool = poolValues[(modifier.EntityParameter, modifier.ModifierValueType)]
-                        .Any(range => modifier.Value >= (range.Min * multiplier) - epsilon
-                                      && modifier.Value <= (range.Max * multiplier) + epsilon);
+                        .Any(range => modifier.Value >= (range.Min * scale) - epsilon
+                                      && modifier.Value <= (range.Max * scale) + epsilon);
                     Assert.IsTrue(matchesPool,
                         $"{id} x{multiplier}: {modifier.EntityParameter}/{modifier.ModifierValueType} = {modifier.Value} lands in no pool range.");
                 }

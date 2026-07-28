@@ -1,0 +1,21 @@
+{
+  "treePath": "D:/Programms/Godot_v4.7-stable_mono_win64/Projects/LastBreath/src/PassiveTreeEditor/Data/Shared/PassiveTree\\PassiveTree.json",
+  "baseStats": {
+    "Health": 1000.0,
+    "Barrier": 100.0,
+    "Mana": 500.0,
+    "Intelligence": 5.0,
+    "Strength": 5.0,
+    "Dexterity": 5.0,
+    "Evade": 300.0,
+    "Armor": 300.0,
+    "Accuracy": 300.0,
+    "CriticalChance": 0.05,
+    "AdditionalHitChance": 0.05,
+    "CriticalDamage": 1.5,
+    "MulticastChance": 0.0,
+    "PhysicalDamage": 100.0,
+    "SpellDamage": 50.0,
+    "MoveSpeed": 500.0
+  }
+}

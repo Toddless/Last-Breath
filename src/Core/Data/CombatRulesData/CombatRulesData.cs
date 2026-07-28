@@ -6,6 +6,18 @@ namespace Core.Data.CombatRulesData
     {
         [JsonProperty("controlResistance")] public ControlResistanceData ControlResistance { get; init; } = new();
         [JsonProperty("arena")] public ArenaData Arena { get; init; } = new();
+        [JsonProperty("exhaustion")] public ExhaustionData Exhaustion { get; init; } = new();
+    }
+
+    /// <summary>The "exhaustion" section: per-turn ability-spam limiter (see ExhaustionRules).</summary>
+    public record ExhaustionData
+    {
+        /// <summary>Cost surcharge per stack (0.25 = every stack makes abilities 25% pricier).</summary>
+        [JsonProperty("costIncreasePerStack")] public float CostIncreasePerStack { get; init; }
+
+        /// <summary>Stacks forgiven at the bearer's turn end. Generous by design: a typical turn
+        /// zeroes out, only a real burst carries over.</summary>
+        [JsonProperty("decayPerTurn")] public int DecayPerTurn { get; init; } = int.MaxValue;
     }
 
     /// <summary>The "arena" section: battle-slot budget of the battlefield.</summary>

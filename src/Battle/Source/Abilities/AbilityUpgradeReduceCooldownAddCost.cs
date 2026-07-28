@@ -7,8 +7,8 @@ namespace Battle.Source.Abilities
     public class AbilityUpgradeReduceCooldownAddCost(string id, string[] tags, int tier, float cooldown, float additionalCost)
         : AbilityUpgrade<Ability>(id, tags, tier)
     {
-        private const string CooldownDecoratorId = "Ability_Parameter_Decorator_Reduce_Cooldown";
-        private const string CostDecoratorId = "Ability_Parameter_Decorator_Additional_Cost";
+        private string CooldownDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cooldown";
+        private string CostDecoratorId => $"Ability_Parameter_Decorator_{Id}_Cost";
 
         public override void ApplyUpgrade(Ability ability)
         {

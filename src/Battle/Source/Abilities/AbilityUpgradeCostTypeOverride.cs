@@ -11,7 +11,7 @@ namespace Battle.Source.Abilities
     public class AbilityUpgradeCostTypeOverride(string id, string[] tags, int tier, Costs costType)
         : AbilityUpgrade<Ability>(id, tags, tier)
     {
-        private const string DecoratorId = "Ability_Parameter_Decorator_Cost_Type_Override";
+        private string DecoratorId => $"Ability_Parameter_Decorator_{Id}";
 
         public override void ApplyUpgrade(Ability ability) =>
             ability.AddParameterDecorator(new SimpleAbilityParameterDecorator(

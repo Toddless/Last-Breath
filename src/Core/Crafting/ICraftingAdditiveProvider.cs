@@ -1,5 +1,7 @@
 namespace Core.Crafting
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Crafting effects of an OPTIONAL resource (essences and the like), from the
     /// CraftingAdditives catalog. Upgrade: a flat success-chance bonus and a chance of a second
@@ -12,7 +14,7 @@ namespace Core.Crafting
     public interface ICraftingAdditiveProvider
     {
         /// <summary>Every resource id that has additive effects — the UI offers these in the optional slots.</summary>
-        System.Collections.Generic.IReadOnlyCollection<string> KnownAdditiveIds { get; }
+       IReadOnlyCollection<string> KnownAdditiveIds { get; }
 
         /// <summary>Null when the resource carries no crafting additive effects.</summary>
         CraftingAdditiveEffects? GetEffects(string resourceId);

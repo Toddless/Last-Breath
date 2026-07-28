@@ -26,5 +26,9 @@
         void Apply(IAbility ability);
 
         void Remove(IAbility ability);
+
+        /// <summary>Fresh unapplied instance with the same configuration — ability copies must not
+        /// share upgrade objects (applied state would leak between owners).</summary>
+        IAbilityUpgrade Copy();
     }
 }

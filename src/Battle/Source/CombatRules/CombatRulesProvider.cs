@@ -17,6 +17,8 @@ namespace Battle.Source.CombatRules
 
         public ArenaRules Arena { get; private set; } = ArenaRules.Default;
 
+        public ExhaustionRules Exhaustion { get; private set; } = ExhaustionRules.Disabled;
+
         public IReadOnlyList<string> Catalogs => [DataCatalog.CombatRules];
 
         public void Apply(string catalog, GameDataFile file)
@@ -33,6 +35,7 @@ namespace Battle.Source.CombatRules
             ControlResistance = new ControlResistanceRules(
                 mask, data.ControlResistance.DurationMultipliers, appliesTo, data.ControlResistance.ResistanceDecayTurns);
             Arena = new ArenaRules(data.Arena.MaxBattleSlots);
+            Exhaustion = new ExhaustionRules(data.Exhaustion.CostIncreasePerStack, data.Exhaustion.DecayPerTurn);
         }
     }
 }

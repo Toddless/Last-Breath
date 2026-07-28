@@ -5,5 +5,6 @@ namespace Core.Battle
     {
         ControlResistanceRules ControlResistance { get; }
         ArenaRules Arena { get; }
+        ExhaustionRules Exhaustion { get; }
     }
 }

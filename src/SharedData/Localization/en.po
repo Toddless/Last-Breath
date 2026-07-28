@@ -2228,6 +2228,9 @@ msgstr "Move Speed"
 msgid "Suppress"
 msgstr "Suppress"
 
+msgid "SuppressChance"
+msgstr "Suppress Chance"
+
 msgid "Health"
 msgstr "Health"
 

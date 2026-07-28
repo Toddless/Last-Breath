@@ -12,6 +12,7 @@ namespace Core.Battle.Abilities
         public required IBattleField Field { get; init; }
         public required RandomNumberGenerator Rnd { get; init; }
         public List<IFightable> Targets { get; init; } = [];
+        public bool IsPreview { get; init; }
 
         public float Cost { get; set; }
         public Costs CostType { get; set; }

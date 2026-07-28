@@ -18,8 +18,10 @@
     public abstract class Ability(AbilityBaseData data) : IAbility
     {
         // Rolls for cast mutators that fire by chance (item lines like "X% chance the cast is free").
-        // One shared, time-seeded generator instead of a fresh one per activation.
-        private static readonly RandomNumberGenerator s_castRnd = CreateCastRnd();
+        // One shared, time-seeded generator instead of a fresh one per activation. LAZY on the first
+        // real cast: the Godot RNG is a native object — sandboxes without the engine (tests) fatally
+        // crash on its construction (0xC0000005), and previews must never materialize it.
+        private static RandomNumberGenerator? s_castRnd;
 
         protected IFightable? Owner;
 
@@ -148,20 +150,8 @@
                 return;
             }
 
-            var context = new AbilityActivationContext
-            {
-                Ability = this,
-                Caster = Owner,
-                Field = field,
-                Rnd = s_castRnd,
-                Targets = targets,
-                Cost = CostValue,
-                CostType = CostType,
-                Cooldown = Cooldown
-            };
-            // Cast mutators run before anything is paid: ability-scoped first, then entity-scoped (items/effects)
-            ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
-            Owner.ModifierHandler.Apply(context);
+            var context = BuildActivationContext(targets, field);
+            ApplyActivationMutators(context);
 
             StartCooldown(context.Cooldown);
             ConsumeResource(context);
@@ -173,11 +163,15 @@
             Owner.CombatEvents.Publish<AbilityExecutedEvent>(new(this, Owner, CastId));
         }
 
-        private static RandomNumberGenerator CreateCastRnd()
+        private static RandomNumberGenerator CastRnd
         {
-            var rnd = new RandomNumberGenerator();
-            rnd.Randomize();
-            return rnd;
+            get
+            {
+                if (s_castRnd != null) return s_castRnd;
+                s_castRnd = new RandomNumberGenerator();
+                s_castRnd.Randomize();
+                return s_castRnd;
+            }
         }
 
         /// <summary>Delivery implementations (internal loops and execution strategies) call this on every
@@ -218,11 +212,12 @@
         public virtual bool IsEnoughResource()
         {
             if (Owner == null) return false;
-            return CostType switch
+            var context = PreviewActivation();
+            return context.CostType switch
             {
-                Costs.Mana => Owner.CurrentMana >= CostValue,
-                Costs.Health => Owner.CurrentHealth >= CostValue,
-                Costs.Barrier => Owner.CurrentBarrier >= CostValue,
+                Costs.Mana => Owner.CurrentMana >= context.Cost,
+                Costs.Health => Owner.CurrentHealth >= context.Cost,
+                Costs.Barrier => Owner.CurrentBarrier >= context.Cost,
                 _ => false
             };
         }
@@ -271,11 +266,49 @@
             parameters.Register(AbilityParameter.SpellDamageScale, Data.SpellDamageScale);
         }
 
-        /// <summary>Shared tail of every Copy(): fresh instance from the same data + the upgrade catalog.</summary>
+        /// <summary>Shared tail of every Copy(): fresh instance from the same data + the upgrade catalog.
+        /// Upgrades are copied element by element — a shared instance would leak applied state
+        /// (Learned, decorators) between the copy and the original.</summary>
         protected IAbility CopyUpgradesTo(Ability copy)
         {
-            copy.SetAbilityUpgrades(Upgrades.ToDictionary());
+            copy.SetAbilityUpgrades(Upgrades.ToDictionary(
+                tier => tier.Key,
+                tier => tier.Value.Select(upgrade => upgrade.Copy()).ToList()));
             return copy;
+        }
+
+        /// <summary>
+        /// Effective activation numbers for availability checks and UI: the real cast mutator
+        /// pipeline over a preview context (see <see cref="IAbilityActivationContext.IsPreview"/> —
+        /// chance-based and self-consuming mutators stay inert, nothing is paid).
+        /// </summary>
+        protected IAbilityActivationContext PreviewActivation()
+        {
+            // No battle field exists outside a cast; the IsPreview contract keeps mutators off it.
+            var context = BuildActivationContext([], field: null!, isPreview: true);
+            ApplyActivationMutators(context);
+            return context;
+        }
+
+        private AbilityActivationContext BuildActivationContext(List<IFightable> targets, IBattleField field, bool isPreview = false) => new()
+        {
+            Ability = this,
+            Caster = Owner!,
+            Field = field,
+            // Preview never rolls (IsPreview contract), so the native generator stays untouched.
+            Rnd = isPreview ? null! : CastRnd,
+            Targets = targets,
+            IsPreview = isPreview,
+            Cost = CostValue,
+            CostType = CostType,
+            Cooldown = Cooldown
+        };
+
+        // Cast mutators run before anything is paid: ability-scoped first, then entity-scoped (items/effects)
+        private void ApplyActivationMutators(AbilityActivationContext context)
+        {
+            ActivationEffect.Values.ToList().ForEach(mod => mod.Apply(context));
+            Owner?.ModifierHandler.Apply(context);
         }
 
         private static string ToParameterKey(string jsonKey) => char.ToUpperInvariant(jsonKey[0]) + jsonKey[1..];

@@ -102,7 +102,7 @@ namespace LastBreathTest.BattleSystemTests
         }
 
         [TestMethod]
-        public void ContextLinesRoundTripScaledByUpgrade()
+        public void ContextLinesRoundTrip_FlatScaledByUpgrade_PercentUntouched()
         {
             var item = new EquipItem(EquipmentPiece.Weapon, "Bloodthirsty", []);
             item.SetContextImplicits([new ContextModifierEntry(ContextParameter.BleedDuration, ModifierValueType.Flat, 1f)]);
@@ -117,7 +117,9 @@ namespace LastBreathTest.BattleSystemTests
             Assert.AreEqual(1f, duration.BaseValue, 0.001f);
             Assert.AreEqual(1, duration.WholeValue); // 1 * 1.6 floored
             Assert.AreEqual(1, restored.ContextModifiers.Count);
-            Assert.AreEqual(0.15f * 1.6f, restored.ContextModifiers[0].Value, 0.001f);
+            // Only FLAT rides the sharpening scale: a percent line would otherwise stack a multiplier on a
+            // multiplier, so it round-trips at exactly the value data wrote.
+            Assert.AreEqual(0.15f, restored.ContextModifiers[0].Value, 0.001f);
         }
 
         [TestMethod]

@@ -115,16 +115,38 @@ namespace LastBreathTest.CraftingSystemTests
         }
 
         [TestMethod]
-        public void Scale_MultiplicativeDelta_ScalesLinearly()
+        public void Scale_PercentDelta_IsNotScaled()
         {
-            // Multi data stores the bonus delta (0.15 = +15%), so quality x2 doubles the delta — the old
-            // factor-aware branch (1.15 -> 1.3) is gone together with factor-form data.
-            var descriptor = new ParameterDescriptor(EntityParameter.Health, ModifierValueType.Multiplicative, 0.15f, ModifierScope.Global);
+            // A percent line multiplies a value the quality/sharpening scales have ALREADY raised, so scaling
+            // the percentage too stacks a multiplier on a multiplier (+120% armor reading as +552% on a
+            // crafted ascended piece). Only flat magnitudes take the multiplier.
+            var multi = new ParameterDescriptor(EntityParameter.Health, ModifierValueType.Multiplicative, 0.15f, ModifierScope.Global);
+            var increase = new ParameterDescriptor(EntityParameter.Health, ModifierValueType.Increase, 0.1f, ModifierScope.Global);
 
-            var scaled = (ParameterDescriptor)DescriptorOperations.Scale(descriptor, 2f);
+            var scaledMulti = (ParameterDescriptor)DescriptorOperations.Scale(multi, 2f);
+            var scaledIncrease = (ParameterDescriptor)DescriptorOperations.Scale(increase, 2f);
 
-            Assert.AreEqual(0.3f, scaled.Value.Min, 0.0001f);
-            Assert.AreEqual(0.3f, scaled.Value.Max, 0.0001f);
+            Assert.AreEqual(0.15f, scaledMulti.Value.Min, 0.0001f);
+            Assert.AreEqual(0.15f, scaledMulti.Value.Max, 0.0001f);
+            Assert.AreEqual(0.1f, scaledIncrease.Value.Min, 0.0001f);
+            Assert.AreEqual(0.1f, scaledIncrease.Value.Max, 0.0001f);
+        }
+
+        [TestMethod]
+        public void Scale_Composite_ScalesEachPartByItsOwnValueType()
+        {
+            // The rule holds per PART, not per pool entry: a bundle of "+50 armor, +25% more armor" must
+            // double the flat half and leave the percent half exactly as data wrote it.
+            var composite = new CompositeDescriptor(
+            [
+                new ParameterDescriptor(EntityParameter.Armor, ModifierValueType.Flat, 50f, ModifierScope.Global),
+                new ParameterDescriptor(EntityParameter.Armor, ModifierValueType.Multiplicative, 0.25f, ModifierScope.Global),
+            ]);
+
+            var parts = ((CompositeDescriptor)DescriptorOperations.Scale(composite, 2f)).Parts;
+
+            Assert.AreEqual(100f, ((ParameterDescriptor)parts[0]).Value.Min, 0.0001f);
+            Assert.AreEqual(0.25f, ((ParameterDescriptor)parts[1]).Value.Min, 0.0001f);
         }
 
         [TestMethod]

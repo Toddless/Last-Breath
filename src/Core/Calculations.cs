@@ -44,10 +44,7 @@
         {
             var damageContext = new DamageContext
             {
-                Source = context.Attacker,
-                Cause = DamageCause.Attack,
-                IsCrit = context.ForceCriticalAttack || context.IsCritical,
-                SourceAbilityId = context.SourceAbilityId
+                Source = context.Attacker, Cause = DamageCause.Attack, IsCrit = context.ForceCriticalAttack || context.IsCritical, SourceAbilityId = context.SourceAbilityId
             };
             foreach ((DamageType type, float damage) in context.DamageComponents)
                 damageContext.Add(type, damage);
@@ -189,7 +186,10 @@
             float sumAdditions = 0 + value;
             float sumIncreases = 1;
             float sumMultiplicative = 1;
-            foreach (var group in modifiers.Where(IsModifierActive).GroupBy(m => m.ModifierValueType).OrderBy(g => g.Key))
+            foreach (var group in modifiers
+                         .Where(IsModifierActive)
+                         .GroupBy(m => m.ModifierValueType)
+                         .OrderBy(g => g.Key))
             {
                 switch (group.Key)
                 {
@@ -201,6 +201,9 @@
                         break;
                     case ModifierValueType.Multiplicative:
                         sumMultiplicative += group.Sum(x => x.Value);
+                        break;
+                    case ModifierValueType.Flag:
+                    default:
                         break;
                 }
             }
